@@ -1,0 +1,261 @@
+{
+  "parity_export_schema_version": "2",
+  "source_config": "configs/example_h2.yaml",
+  "experiment_id": "h2_sto3g_001",
+  "molecule": {
+    "symbols": [
+      "H",
+      "H"
+    ],
+    "coordinates_bohr": [
+      [
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        1.4
+      ]
+    ],
+    "charge": 0,
+    "multiplicity": 1,
+    "basis": "sto-3g"
+  },
+  "scf_method": "RHF",
+  "active_space": {
+    "n_active_orbitals": 2,
+    "n_active_electrons": 2
+  },
+  "fermion_to_qubit_map": "jordan_wigner",
+  "pauli_grouping": "tensor_product",
+  "quantum_algorithm": "vqe",
+  "pauli_support_max_terms": null,
+  "use_pauli_protocol": true,
+  "vqe_depth": 1,
+  "vqe_maxiter": 200,
+  "adapt_max_iter": 4,
+  "iqeb_max_rounds": 2,
+  "shots_per_circuit": 2048,
+  "backend_provider": "statevector",
+  "target_energy_stderr": null,
+  "run_sampled_pauli_protocol": false,
+  "run_qiskit_shots_pauli_protocol": false,
+  "pauli_protocol_expectation_path": "exact_executor",
+  "qpe_demo_track_after_variational": false,
+  "record_pauli_measurement_histograms": false,
+  "computable_abstract": {
+    "schema": "qchem_computable_abstract_v2",
+    "pauli_protocol_expectation_path": "exact_executor",
+    "evaluate_note": "Strict InQuanto-style evaluate reuse (conservative): each required Pauli label must appear in hamiltonian_pauli_strings from protocol_counts; see qchem_stack.protocols.pauli_support.assert_evaluate_compatible.",
+    "support_set_exported_from_protocol": false,
+    "items": [
+      {
+        "name": "ground_state_energy",
+        "kind": "energy",
+        "details": {
+          "algorithm": "vqe",
+          "vqe_depth": 1
+        }
+      },
+      {
+        "name": "hamiltonian_expectation_pauli_protocol",
+        "kind": "energy",
+        "details": {
+          "pauli_grouping": "tensor_product",
+          "pauli_protocol_expectation_path": "exact_executor"
+        }
+      }
+    ]
+  },
+  "excited_resource_from_config": null,
+  "inquanto_gap_categories": [
+    {
+      "id": "cloud_nexus",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71 \u2014 qnexus/HQC (non-cloud L1 parity: analog only)",
+      "inquanto_surface": "Nexus / qnexus / HQC (cloud + local ledger)",
+      "qchem_stack": "jobs/nexus_analog + jobs/nexus_cloud + integrations/nexus_optional (import probe)",
+      "status": "analog_v1_plus_adapter"
+    },
+    {
+      "id": "http_submit_poll_workspace",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71 \u2014 \u4f5c\u4e1a\u63d0\u4ea4/\u5217\u8868/\u8f6e\u8be2",
+      "inquanto_surface": "HTTPS job submit, list, poll status (Nexus-shaped product UX)",
+      "qchem_stack": "qchem_stack.api FastAPI: capability-surface, POST/GET /v1/runs (project_slug + workspace), GET /v1/runs/{id}/summary, GET /v1/runs/{id}/events (timeline_json), GET /v1/meta/product-analog, POST /v1/meta/workflow-preview, GET /v1/meta/parity-gaps, POST /v1/meta/computables-preview, GET /v1/meta/queue-stats, SQLite JobStore.list_jobs",
+      "status": "local_analog_v1"
+    },
+    {
+      "id": "qermit_graph",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71 \u2014 Qermit; see mitigation_execution_model",
+      "inquanto_surface": "Qermit MitRes / MitEx graphs and execution",
+      "qchem_stack": "qermit_analog + qermit_runtime + integrations/qermit_reference (capability matrix)",
+      "status": "analog_v2_runtime",
+      "mitigation_execution_model": {
+        "schema": "mitigation_execution_model_v1",
+        "sync_dag": {
+          "open_stack": "mitigation/qermit_analog.py JSON graph + optional mitigation_dag_execution trace on pipeline result",
+          "public_doc_anchor": "MitRes-style graphs (Quantinuum errmit manual \u2014 URL below)"
+        },
+        "async_batch_execution": {
+          "open_stack": "not_implemented_mitex_batch_scheduler",
+          "note": "Local SQLite jobs run whole experiments; not a Qermit MitEx multi-task batch runtime."
+        },
+        "public_doc_urls": [
+          "https://docs.quantinuum.com/inquanto/manual/errmit.html"
+        ],
+        "epistemic_bound": "Open analog only \u2014 not the closed Qermit wheel or vendor execution engine."
+      }
+    },
+    {
+      "id": "composable_computable",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71 \u2014 Computable / workflow-preview",
+      "inquanto_surface": "Computable graph",
+      "qchem_stack": "list_computables_for_config + computable_graph_v2 (semantic DAG + YAML computable_extra_edges/remove_edges) + POST /v1/meta/workflow-preview + optional computables_rich_v1 (include_computables_rich); PauliAveragingProtocol at run time",
+      "status": "analog_v2_semantic_graph_rich_optional"
+    },
+    {
+      "id": "evaluate_support_set",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71 \u2014 resource / Pauli support",
+      "inquanto_surface": "evaluate_expectation_value / measurement-plan support reuse (public docs)",
+      "qchem_stack": "protocol_counts hamiltonian_pauli_strings + protocols.pauli_support.assert_evaluate_compatible",
+      "status": "improved_v1"
+    },
+    {
+      "id": "compiler_pass_bundle",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a74 \u2014 TKET; gap id compiler_pass_bundle",
+      "inquanto_surface": "preoptimize_passes / compiler_passes / optimization_level (protocol compile stage)",
+      "qchem_stack": "CompilerSpec + compiler_bundle_signature_from_config + CircuitIR passes + integrations/tket_fullchain (pytket stats)",
+      "status": "improved_v1"
+    },
+    {
+      "id": "ucc_chem_ansatz",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a72 \u2014 ADAPT / IQEB / UCC",
+      "inquanto_surface": "UCC / chemically aware pools",
+      "qchem_stack": "HEA + ADAPT + IQEB (quantum.algorithm=iqeb; configs/example_h2_iqeb.yaml) + integrations/ucc_reference (fermion generators + ChemicallyAwareUCCPolicy hook)",
+      "status": "partial"
+    },
+    {
+      "id": "dmet_scf_loop",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a73 \u2014 DMET / Schmidt",
+      "inquanto_surface": "Full DMET self-consistency",
+      "qchem_stack": "schmidt_dmet_density_feedback_v1 + schmidt_dmet_multifragment_density_feedback_v1 + DMETSelfConsistencyLoop generic hooks",
+      "status": "schmidt_density_feedback_v1"
+    },
+    {
+      "id": "tensornet",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71 \u2014 CuTensorNet; parity_snapshot tensornet_engine_resolved",
+      "inquanto_surface": "CuTensorNetProtocol",
+      "qchem_stack": "cutensornet_protocol_stub + integrations/tensornet_closure (strategy map)",
+      "status": "stub_plus_vendor_hooks"
+    },
+    {
+      "id": "integrations_closure_layer",
+      "parity_matrix_anchor": "docs/\u67b6\u6784_InQuanto\u95ed\u6e90\u80fd\u529b\u95ed\u5408\u4e0e\u53ef\u590d\u73b0\u8fb9\u754c.md; open_gap_closure_reference",
+      "inquanto_surface": "Product defaults (TKET boxes, UCC regrouping, DMET, Nexus, Qermit, TN)",
+      "qchem_stack": "Package qchem_stack.integrations \u2014 see docs/\u67b6\u6784_InQuanto\u95ed\u6e90\u80fd\u529b\u95ed\u5408\u4e0e\u53ef\u590d\u73b0\u8fb9\u754c.md (L1 not L0)",
+      "status": "reference_v1"
+    },
+    {
+      "id": "drivers_cosmo_pbc",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a73 \u2014 chem/inquanto_driver_surface.py",
+      "inquanto_surface": "COSMO / PBC / full driver surface",
+      "qchem_stack": "ddCOSMO; pbc RHF/KRHF + k-mesh + optional PBC ddCOSMO",
+      "status": "partial_kmesh"
+    },
+    {
+      "id": "qpu_shot_histogram",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md \u00a71\u20132 \u2014 Qiskit shots / device counts",
+      "inquanto_surface": "Device counts \u2192 expectation",
+      "qchem_stack": "Qiskit get_counts path + statevector sim",
+      "status": "yes_qiskit"
+    }
+  ],
+  "vqd_after_variational": false,
+  "vqd_n_states": 2,
+  "vqd_penalty_weight": 5.0,
+  "vqd_shots_objective": 0,
+  "vqd_shots_overlap": 0,
+  "vqd_shots_weight": 0,
+  "qse_after_variational": false,
+  "qse_subspace_dim": 4,
+  "qse_max_basis": null,
+  "qse_shot_mode": "exact",
+  "qse_shots_per_matrix_element": 4096,
+  "qse_shots_per_ij_term": 512,
+  "sceom_after_variational": false,
+  "sceom_subspace_dim": 4,
+  "sceom_shots_per_matrix_element": 0,
+  "mitigation_execution_class": "unspecified",
+  "mitigation_pmsv_enabled": false,
+  "mitigation_pmsv_stabilizers": [],
+  "mitigation_pmsv_retention_rate": 1.0,
+  "mitigation_pmsv_report_extension": "default",
+  "mitigation_pmsv_extra": {},
+  "mitigation_zne_enabled": false,
+  "mitigation_zne_scales": [
+    1.0,
+    1.5,
+    2.0
+  ],
+  "embedding": {
+    "mode": "none",
+    "n_scf_cycles_embedding": null,
+    "classical_reference_method": null,
+    "projection_low_level": "HF",
+    "projection_high_level": "CAS",
+    "projection_threshold": 1e-08,
+    "projection_quantum_hamiltonian": "global_active_space",
+    "projection_fragment_atom_indices": [],
+    "fragment_labels": [],
+    "dmet_hamiltonian_source": "parity_stub",
+    "dmet_target_fragment_electrons": null,
+    "schmidt_fragment_atom_indices": [],
+    "schmidt_n_bath_spatial": 2,
+    "schmidt_max_impurity_spatial_orbitals": 14,
+    "schmidt_run_mu_bisection": false,
+    "schmidt_attach_fci_reference": true,
+    "schmidt_fci_reference_max_spatial_orbitals": 8,
+    "schmidt_dmet_max_cycles": 1,
+    "schmidt_dmet_mixing_alpha": 0.35,
+    "schmidt_dmet_convergence_tol": 0.001,
+    "schmidt_multi_fragment_atom_groups": [],
+    "schmidt_multi_primary_fragment_index": 0,
+    "schmidt_run_vqe_on_all_fragments": false,
+    "schmidt_per_fragment_vqe_maxiter": null,
+    "dmet_uniform_multifragment_toy": false
+  },
+  "chemistry_extended": {
+    "solvent_model": "none",
+    "ddcosmo_epsilon": 78.3553,
+    "pbc_cell_vectors_bohr": null,
+    "pbc_kpoint_mesh": [
+      1,
+      1,
+      1
+    ],
+    "pbc_active_space_kpoint_index": 0
+  },
+  "nexus_analog": {
+    "enabled": false,
+    "project_label": "default",
+    "unit_per_circuit": 1.0,
+    "unit_per_shot": 0.0001,
+    "unit_per_depth": 0.001
+  },
+  "nexus_cloud": {
+    "mode": "off",
+    "base_url": "",
+    "api_key_env": "NEXUS_API_KEY",
+    "project_slug": "",
+    "timeout_s": 30.0
+  },
+  "tensornet_expectation_stub": false,
+  "tensornet_contraction_engine": "stub",
+  "iqeb_implementation_path": "qchem_stack.quantum.algorithms.iqeb.IQEBVQE",
+  "compiler_native_twoq": "CX",
+  "compiler_optimization_level": 1,
+  "compiler_preoptimize_passes": [],
+  "compiler_passes_yaml": [],
+  "compiler_bundle_signature": "f11698e8ce7c38e0"
+}

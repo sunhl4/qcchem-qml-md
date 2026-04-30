@@ -1,0 +1,55 @@
+# Linear H4 (6-31g): projection + fragment Mulliken active Hamiltonian for variational stage.
+# Requires PySCF (``pip install qchem-stack[chem]``). See docs/inquanto_public_parity_matrix.md §3.
+schema_version: "1"
+experiment_id: "h4_projection_mulliken_smoke_001"
+random_seed: 0
+
+molecule:
+  symbols: ["H", "H", "H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+    - [0.0, 0.0, 2.8]
+    - [0.0, 0.0, 4.2]
+  charge: 0
+  multiplicity: 1
+  basis: "6-31g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "projection"
+  projection_low_level: "HF"
+  projection_high_level: "CAS"
+  projection_threshold: 1.0e-8
+  projection_quantum_hamiltonian: "fragment_mulliken_mo"
+  projection_fragment_atom_indices: [0, 1]
+  n_scf_cycles_embedding: 1
+  classical_reference_method: "MP2"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 60
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"

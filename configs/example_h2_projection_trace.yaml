@@ -1,0 +1,55 @@
+# Projection embedding L1 trace: records embedding_workflow + parity_snapshot block.
+# Default projection_quantum_hamiltonian: global_active_space → variational QubitHamiltonian
+# is the same global ActiveSpaceSpec JW as embedding.mode: none (metadata/trace only).
+# Set projection_quantum_hamiltonian: fragment_mulliken_mo + projection_fragment_atom_indices
+# for PySCF-driven fragment Mulliken active Hamiltonian (see projection_hamiltonian.py).
+# See docs/InQuanto_B_J_逐项闭合计划.md 序 D3.
+schema_version: "1"
+experiment_id: "h2_projection_trace_001"
+random_seed: 0
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "projection"
+  projection_low_level: "HF"
+  projection_high_level: "CAS"
+  projection_threshold: 1.0e-8
+  n_scf_cycles_embedding: 1
+  classical_reference_method: "MP2"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 80
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"

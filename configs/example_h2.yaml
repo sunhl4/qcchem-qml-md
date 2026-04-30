@@ -1,0 +1,65 @@
+schema_version: "1"
+experiment_id: "h2_sto3g_001"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  qiskit_mode: "statevector"
+  ionstack_endpoint: null
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 200
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"
+  # Optional: variational quantum deflation after VQE (three_protocol shot budgets)
+  # vqd_after_variational: false
+  # vqd_n_states: 2
+  # vqd_penalty_weight: 5.0
+  # vqd_shots_objective: 0
+  # vqd_shots_overlap: 0
+  # vqd_shots_weight: 0
+  # Packaged VQD-without-Pauli smoke: configs/example_h2_excited_smoke.yaml (see scripts/smoke_pipeline.py --excited-only).
+  # Optional: QSE / SCEOM on the same HEA state as VQE (after variational stage)
+  # qse_after_variational: false
+  # qse_subspace_dim: 4
+  # qse_max_basis: null
+  # qse_shot_mode: exact   # exact | gaussian_h | pauli_transitions
+  # qse_shots_per_matrix_element: 4096
+  # qse_shots_per_ij_term: 512
+  # sceom_after_variational: false
+  # sceom_subspace_dim: 4
+  # sceom_shots_per_matrix_element: 0

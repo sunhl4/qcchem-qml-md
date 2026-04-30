@@ -1,0 +1,2078 @@
+{
+  "zh": [
+    {
+      "text": "介绍",
+      "collapsed": false,
+      "items": [
+        {
+          "text": "介绍",
+          "link": "/mirror/introduction/"
+        },
+        {
+          "text": "什么是 InQuanto",
+          "link": "/mirror/introduction/overview/"
+        },
+        {
+          "text": "安装",
+          "link": "/mirror/introduction/installation/"
+        },
+        {
+          "text": "快速上手",
+          "link": "/mirror/introduction/quickstart/"
+        }
+      ]
+    },
+    {
+      "text": "用户手册",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "用户手册",
+          "link": "/mirror/manual/"
+        },
+        {
+          "text": "如何使用 InQuanto",
+          "link": "/mirror/manual/howto/"
+        },
+        {
+          "text": "几何",
+          "link": "/mirror/manual/geometry/"
+        },
+        {
+          "text": "Express 数据集",
+          "link": "/mirror/manual/express/"
+        },
+        {
+          "text": "对称性",
+          "link": "/mirror/manual/symmetry/"
+        },
+        {
+          "text": "空间 / 算符 / 状态 / 映射",
+          "link": "/mirror/manual/spaces_operators/"
+        },
+        {
+          "text": "Ansatze 概览",
+          "link": "/mirror/manual/ansatze/"
+        },
+        {
+          "text": "极小化器",
+          "link": "/mirror/manual/minimizers/"
+        },
+        {
+          "text": "Computables 概览",
+          "link": "/mirror/manual/computables/"
+        },
+        {
+          "text": "Protocols 概览（五阶段）",
+          "link": "/mirror/manual/protocols/"
+        },
+        {
+          "text": "Algorithms 概览",
+          "link": "/mirror/manual/algorithms/"
+        },
+        {
+          "text": "嵌入与 DMET",
+          "link": "/mirror/manual/embedding/"
+        },
+        {
+          "text": "噪声缓解",
+          "link": "/mirror/manual/noise_mitigation/"
+        }
+      ]
+    },
+    {
+      "text": "教程",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "教程",
+          "link": "/mirror/tutorials/"
+        },
+        {
+          "text": "核心教程",
+          "link": "/mirror/tutorials/core/"
+        },
+        {
+          "text": "后端教程",
+          "link": "/mirror/tutorials/backends/"
+        },
+        {
+          "text": "Fe4N2 案例研究",
+          "link": "/mirror/tutorials/case_study_fe4n2/"
+        },
+        {
+          "text": "碎片化教程",
+          "link": "/mirror/tutorials/fragmentation/"
+        }
+      ]
+    },
+    {
+      "text": "扩展",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "扩展",
+          "link": "/mirror/extensions/"
+        },
+        {
+          "text": "InQuanto-PySCF",
+          "link": "/mirror/extensions/inquanto_pyscf/"
+        },
+        {
+          "text": "InQuanto-Nexus",
+          "link": "/mirror/extensions/inquanto_nexus/"
+        },
+        {
+          "text": "InQuanto-NGLView",
+          "link": "/mirror/extensions/inquanto_nglview/"
+        },
+        {
+          "text": "InQuanto-Phayes",
+          "link": "/mirror/extensions/inquanto_phayes/"
+        },
+        {
+          "text": "InQuanto-cuTensorNet",
+          "link": "/mirror/extensions/inquanto_cutensornet/"
+        }
+      ]
+    },
+    {
+      "text": "API 参考",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "API 参考",
+          "link": "/mirror/api/"
+        },
+        {
+          "text": "InQuanto API 总览",
+          "link": "/mirror/api/api_intro_inquanto/"
+        },
+        {
+          "text": "InQuanto 扩展 API 总览",
+          "link": "/mirror/api/api_intro_extensions/"
+        },
+        {
+          "text": "inquanto.algorithms",
+          "link": "/mirror/api/algorithms/"
+        },
+        {
+          "text": "AlgorithmVQE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmVQE/"
+        },
+        {
+          "text": "AlgorithmAdaptVQE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmAdaptVQE/"
+        },
+        {
+          "text": "AlgorithmFermionicAdaptVQE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmFermionicAdaptVQE/"
+        },
+        {
+          "text": "AlgorithmIQEB",
+          "link": "/mirror/api/algorithms/classes/AlgorithmIQEB/"
+        },
+        {
+          "text": "AlgorithmVQD",
+          "link": "/mirror/api/algorithms/classes/AlgorithmVQD/"
+        },
+        {
+          "text": "AlgorithmQSE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmQSE/"
+        },
+        {
+          "text": "AlgorithmSCEOM",
+          "link": "/mirror/api/algorithms/classes/AlgorithmSCEOM/"
+        },
+        {
+          "text": "AlgorithmDeterministicQPE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmDeterministicQPE/"
+        },
+        {
+          "text": "AlgorithmInfoTheoryQPE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmInfoTheoryQPE/"
+        },
+        {
+          "text": "AlgorithmKitaevQPE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmKitaevQPE/"
+        },
+        {
+          "text": "AlgorithmVQS",
+          "link": "/mirror/api/algorithms/classes/AlgorithmVQS/"
+        },
+        {
+          "text": "AlgorithmMcLachlanRealTime",
+          "link": "/mirror/api/algorithms/classes/AlgorithmMcLachlanRealTime/"
+        },
+        {
+          "text": "AlgorithmMcLachlanImagTime",
+          "link": "/mirror/api/algorithms/classes/AlgorithmMcLachlanImagTime/"
+        },
+        {
+          "text": "inquanto.ansatzes",
+          "link": "/mirror/api/ansatz/"
+        },
+        {
+          "text": "GeneralAnsatz",
+          "link": "/mirror/api/ansatz/classes/GeneralAnsatz/"
+        },
+        {
+          "text": "CircuitAnsatz",
+          "link": "/mirror/api/ansatz/classes/CircuitAnsatz/"
+        },
+        {
+          "text": "ComposedAnsatz",
+          "link": "/mirror/api/ansatz/classes/ComposedAnsatz/"
+        },
+        {
+          "text": "TrotterAnsatz",
+          "link": "/mirror/api/ansatz/classes/TrotterAnsatz/"
+        },
+        {
+          "text": "FermionSpaceStateExp",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceStateExp/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCD/"
+        },
+        {
+          "text": "FermionSpaceStateExpChemicallyAware",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceStateExpChemicallyAware/"
+        },
+        {
+          "text": "FermionSpaceAnsatzChemicallyAwareUCCSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzChemicallyAwareUCCSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzkUpCCGD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzkUpCCGSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzkUpCCGSDSinglet",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGSDSinglet/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCGD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCGD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCGSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCGSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCSDSinglet",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCSDSinglet/"
+        },
+        {
+          "text": "FermionSpaceAnsatzsUPS",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzsUPS/"
+        },
+        {
+          "text": "FermionSpaceAnsatztUPS",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatztUPS/"
+        },
+        {
+          "text": "MultiConfigurationAnsatz",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationAnsatz/"
+        },
+        {
+          "text": "MultiConfigurationState",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationState/"
+        },
+        {
+          "text": "MultiConfigurationStateBox",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationStateBox/"
+        },
+        {
+          "text": "MultiConfigurationAnsatzSparse",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationAnsatzSparse/"
+        },
+        {
+          "text": "MultiConfigurationStateSparse",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationStateSparse/"
+        },
+        {
+          "text": "RealGeneralizedBasisRotationAnsatz",
+          "link": "/mirror/api/ansatz/classes/RealGeneralizedBasisRotationAnsatz/"
+        },
+        {
+          "text": "RealRestrictedBasisRotationAnsatz",
+          "link": "/mirror/api/ansatz/classes/RealRestrictedBasisRotationAnsatz/"
+        },
+        {
+          "text": "RealUnrestrictedBasisRotationAnsatz",
+          "link": "/mirror/api/ansatz/classes/RealUnrestrictedBasisRotationAnsatz/"
+        },
+        {
+          "text": "HamiltonianVariationalAnsatz",
+          "link": "/mirror/api/ansatz/classes/HamiltonianVariationalAnsatz/"
+        },
+        {
+          "text": "LayeredAnsatz",
+          "link": "/mirror/api/ansatz/classes/LayeredAnsatz/"
+        },
+        {
+          "text": "HardwareEfficientAnsatz",
+          "link": "/mirror/api/ansatz/classes/HardwareEfficientAnsatz/"
+        },
+        {
+          "text": "inquanto.computables",
+          "link": "/mirror/api/computables/"
+        },
+        {
+          "text": "ExpectationValue",
+          "link": "/mirror/api/computables/classes/ExpectationValue/"
+        },
+        {
+          "text": "ExpectationValueBraDerivative",
+          "link": "/mirror/api/computables/classes/ExpectationValueBraDerivative/"
+        },
+        {
+          "text": "ExpectationValueBraDerivativeImag",
+          "link": "/mirror/api/computables/classes/ExpectationValueBraDerivativeImag/"
+        },
+        {
+          "text": "ExpectationValueBraDerivativeReal",
+          "link": "/mirror/api/computables/classes/ExpectationValueBraDerivativeReal/"
+        },
+        {
+          "text": "ExpectationValueDerivative",
+          "link": "/mirror/api/computables/classes/ExpectationValueDerivative/"
+        },
+        {
+          "text": "ExpectationValueKetDerivative",
+          "link": "/mirror/api/computables/classes/ExpectationValueKetDerivative/"
+        },
+        {
+          "text": "ExpectationValueKetDerivativeImag",
+          "link": "/mirror/api/computables/classes/ExpectationValueKetDerivativeImag/"
+        },
+        {
+          "text": "ExpectationValueKetDerivativeReal",
+          "link": "/mirror/api/computables/classes/ExpectationValueKetDerivativeReal/"
+        },
+        {
+          "text": "ExpectationValueNonHermitian",
+          "link": "/mirror/api/computables/classes/ExpectationValueNonHermitian/"
+        },
+        {
+          "text": "MetricTensorImag",
+          "link": "/mirror/api/computables/classes/MetricTensorImag/"
+        },
+        {
+          "text": "MetricTensorReal",
+          "link": "/mirror/api/computables/classes/MetricTensorReal/"
+        },
+        {
+          "text": "Overlap",
+          "link": "/mirror/api/computables/classes/Overlap/"
+        },
+        {
+          "text": "OverlapImag",
+          "link": "/mirror/api/computables/classes/OverlapImag/"
+        },
+        {
+          "text": "OverlapReal",
+          "link": "/mirror/api/computables/classes/OverlapReal/"
+        },
+        {
+          "text": "OverlapSquared",
+          "link": "/mirror/api/computables/classes/OverlapSquared/"
+        },
+        {
+          "text": "ComputableFunction",
+          "link": "/mirror/api/computables/classes/ComputableFunction/"
+        },
+        {
+          "text": "ComputableInt",
+          "link": "/mirror/api/computables/classes/ComputableInt/"
+        },
+        {
+          "text": "ComputableList",
+          "link": "/mirror/api/computables/classes/ComputableList/"
+        },
+        {
+          "text": "ComputableTuple",
+          "link": "/mirror/api/computables/classes/ComputableTuple/"
+        },
+        {
+          "text": "ComputableNode",
+          "link": "/mirror/api/computables/classes/ComputableNode/"
+        },
+        {
+          "text": "ComputableSingleChild",
+          "link": "/mirror/api/computables/classes/ComputableSingleChild/"
+        },
+        {
+          "text": "Averageable",
+          "link": "/mirror/api/computables/classes/Averageable/"
+        },
+        {
+          "text": "Evaluatable",
+          "link": "/mirror/api/computables/classes/Evaluatable/"
+        },
+        {
+          "text": "CommutatorComputable",
+          "link": "/mirror/api/computables/classes/CommutatorComputable/"
+        },
+        {
+          "text": "ExpectationValueSumComputable",
+          "link": "/mirror/api/computables/classes/ExpectationValueSumComputable/"
+        },
+        {
+          "text": "HoleGFComputable",
+          "link": "/mirror/api/computables/classes/HoleGFComputable/"
+        },
+        {
+          "text": "KrylovSubspace",
+          "link": "/mirror/api/computables/classes/KrylovSubspace/"
+        },
+        {
+          "text": "KrylovSubspaceComputable",
+          "link": "/mirror/api/computables/classes/KrylovSubspaceComputable/"
+        },
+        {
+          "text": "LanczosCoefficientsComputable",
+          "link": "/mirror/api/computables/classes/LanczosCoefficientsComputable/"
+        },
+        {
+          "text": "LanczosMatrixComputable",
+          "link": "/mirror/api/computables/classes/LanczosMatrixComputable/"
+        },
+        {
+          "text": "ManyBodyGFComputable",
+          "link": "/mirror/api/computables/classes/ManyBodyGFComputable/"
+        },
+        {
+          "text": "NonOrthogonalMatricesComputable",
+          "link": "/mirror/api/computables/classes/NonOrthogonalMatricesComputable/"
+        },
+        {
+          "text": "OverlapMatrixComputable",
+          "link": "/mirror/api/computables/classes/OverlapMatrixComputable/"
+        },
+        {
+          "text": "PDM1234RealComputable",
+          "link": "/mirror/api/computables/classes/PDM1234RealComputable/"
+        },
+        {
+          "text": "ParticleGFComputable",
+          "link": "/mirror/api/computables/classes/ParticleGFComputable/"
+        },
+        {
+          "text": "QCM4Computable",
+          "link": "/mirror/api/computables/classes/QCM4Computable/"
+        },
+        {
+          "text": "QSEMatricesComputable",
+          "link": "/mirror/api/computables/classes/QSEMatricesComputable/"
+        },
+        {
+          "text": "RDM1234RealComputable",
+          "link": "/mirror/api/computables/classes/RDM1234RealComputable/"
+        },
+        {
+          "text": "RestrictedOneBodyRDMComputable",
+          "link": "/mirror/api/computables/classes/RestrictedOneBodyRDMComputable/"
+        },
+        {
+          "text": "RestrictedOneBodyRDMRealComputable",
+          "link": "/mirror/api/computables/classes/RestrictedOneBodyRDMRealComputable/"
+        },
+        {
+          "text": "SCEOMMatrixComputable",
+          "link": "/mirror/api/computables/classes/SCEOMMatrixComputable/"
+        },
+        {
+          "text": "SpinlessNBodyPDMArrayRealComputable",
+          "link": "/mirror/api/computables/classes/SpinlessNBodyPDMArrayRealComputable/"
+        },
+        {
+          "text": "SpinlessNBodyRDMArrayRealComputable",
+          "link": "/mirror/api/computables/classes/SpinlessNBodyRDMArrayRealComputable/"
+        },
+        {
+          "text": "UnrestrictedOneBodyRDMComputable",
+          "link": "/mirror/api/computables/classes/UnrestrictedOneBodyRDMComputable/"
+        },
+        {
+          "text": "UnrestrictedOneBodyRDMRealComputable",
+          "link": "/mirror/api/computables/classes/UnrestrictedOneBodyRDMRealComputable/"
+        },
+        {
+          "text": "inquanto.operators",
+          "link": "/mirror/api/operators/"
+        },
+        {
+          "text": "ChemistryRestrictedIntegralOperator",
+          "link": "/mirror/api/operators/classes/ChemistryRestrictedIntegralOperator/"
+        },
+        {
+          "text": "ChemistryRestrictedIntegralOperatorCompact",
+          "link": "/mirror/api/operators/classes/ChemistryRestrictedIntegralOperatorCompact/"
+        },
+        {
+          "text": "ChemistryUnrestrictedIntegralOperator",
+          "link": "/mirror/api/operators/classes/ChemistryUnrestrictedIntegralOperator/"
+        },
+        {
+          "text": "ChemistryUnrestrictedIntegralOperatorCompact",
+          "link": "/mirror/api/operators/classes/ChemistryUnrestrictedIntegralOperatorCompact/"
+        },
+        {
+          "text": "DoubleFactorizedTwoBodyIntegrals",
+          "link": "/mirror/api/operators/classes/DoubleFactorizedTwoBodyIntegrals/"
+        },
+        {
+          "text": "FCIDumpRestricted",
+          "link": "/mirror/api/operators/classes/FCIDumpRestricted/"
+        },
+        {
+          "text": "FCIDumpUnrestricted",
+          "link": "/mirror/api/operators/classes/FCIDumpUnrestricted/"
+        },
+        {
+          "text": "FermionOperator",
+          "link": "/mirror/api/operators/classes/FermionOperator/"
+        },
+        {
+          "text": "FermionOperatorList",
+          "link": "/mirror/api/operators/classes/FermionOperatorList/"
+        },
+        {
+          "text": "QubitOperator",
+          "link": "/mirror/api/operators/classes/QubitOperator/"
+        },
+        {
+          "text": "QubitOperatorList",
+          "link": "/mirror/api/operators/classes/QubitOperatorList/"
+        },
+        {
+          "text": "QubitOperatorString",
+          "link": "/mirror/api/operators/classes/QubitOperatorString/"
+        },
+        {
+          "text": "OrbitalTransformer",
+          "link": "/mirror/api/operators/classes/OrbitalTransformer/"
+        },
+        {
+          "text": "RestrictedDoubleFactorizedHamiltonian",
+          "link": "/mirror/api/operators/classes/RestrictedDoubleFactorizedHamiltonian/"
+        },
+        {
+          "text": "RestrictedOneBodyRDM",
+          "link": "/mirror/api/operators/classes/RestrictedOneBodyRDM/"
+        },
+        {
+          "text": "RestrictedTwoBodyRDM",
+          "link": "/mirror/api/operators/classes/RestrictedTwoBodyRDM/"
+        },
+        {
+          "text": "UnrestrictedDoubleFactorizedHamiltonian",
+          "link": "/mirror/api/operators/classes/UnrestrictedDoubleFactorizedHamiltonian/"
+        },
+        {
+          "text": "UnrestrictedOneBodyRDM",
+          "link": "/mirror/api/operators/classes/UnrestrictedOneBodyRDM/"
+        },
+        {
+          "text": "UnrestrictedTwoBodyRDM",
+          "link": "/mirror/api/operators/classes/UnrestrictedTwoBodyRDM/"
+        },
+        {
+          "text": "SymmetryOperatorFermionic",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorFermionic/"
+        },
+        {
+          "text": "SymmetryOperatorFermionicFactorized",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorFermionicFactorized/"
+        },
+        {
+          "text": "SymmetryOperatorPauli",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorPauli/"
+        },
+        {
+          "text": "SymmetryOperatorPauliFactorized",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorPauliFactorized/"
+        },
+        {
+          "text": "XDFCoreTensor",
+          "link": "/mirror/api/operators/classes/XDFCoreTensor/"
+        },
+        {
+          "text": "inquanto.spaces",
+          "link": "/mirror/api/spaces/"
+        },
+        {
+          "text": "FermionSpace",
+          "link": "/mirror/api/spaces/classes/FermionSpace/"
+        },
+        {
+          "text": "FermionSpaceBrillouin",
+          "link": "/mirror/api/spaces/classes/FermionSpaceBrillouin/"
+        },
+        {
+          "text": "FermionSpaceSupercell",
+          "link": "/mirror/api/spaces/classes/FermionSpaceSupercell/"
+        },
+        {
+          "text": "ParaFermionSpace",
+          "link": "/mirror/api/spaces/classes/ParaFermionSpace/"
+        },
+        {
+          "text": "QubitSpace",
+          "link": "/mirror/api/spaces/classes/QubitSpace/"
+        },
+        {
+          "text": "inquanto.states",
+          "link": "/mirror/api/states/"
+        },
+        {
+          "text": "FermionState",
+          "link": "/mirror/api/states/classes/FermionState/"
+        },
+        {
+          "text": "QubitState",
+          "link": "/mirror/api/states/classes/QubitState/"
+        },
+        {
+          "text": "inquanto.mappings",
+          "link": "/mirror/api/mappings/"
+        },
+        {
+          "text": "QubitMappingJordanWigner",
+          "link": "/mirror/api/mappings/classes/QubitMappingJordanWigner/"
+        },
+        {
+          "text": "QubitMappingBravyiKitaev",
+          "link": "/mirror/api/mappings/classes/QubitMappingBravyiKitaev/"
+        },
+        {
+          "text": "QubitMappingParity",
+          "link": "/mirror/api/mappings/classes/QubitMappingParity/"
+        },
+        {
+          "text": "inquanto.minimizers",
+          "link": "/mirror/api/minimizers/"
+        },
+        {
+          "text": "MinimizerScipy",
+          "link": "/mirror/api/minimizers/classes/MinimizerScipy/"
+        },
+        {
+          "text": "MinimizerNFT",
+          "link": "/mirror/api/minimizers/classes/MinimizerNFT/"
+        },
+        {
+          "text": "MinimizerRotosolve",
+          "link": "/mirror/api/minimizers/classes/MinimizerRotosolve/"
+        },
+        {
+          "text": "MinimizerSPSA",
+          "link": "/mirror/api/minimizers/classes/MinimizerSPSA/"
+        },
+        {
+          "text": "MinimizerSGD",
+          "link": "/mirror/api/minimizers/classes/MinimizerSGD/"
+        },
+        {
+          "text": "inquanto.symmetry",
+          "link": "/mirror/api/symmetry/"
+        },
+        {
+          "text": "inquanto.core",
+          "link": "/mirror/api/core/"
+        },
+        {
+          "text": "inquanto.embeddings",
+          "link": "/mirror/api/embeddings/"
+        },
+        {
+          "text": "inquanto.experiments",
+          "link": "/mirror/api/experiments/"
+        },
+        {
+          "text": "inquanto.express",
+          "link": "/mirror/api/express/"
+        },
+        {
+          "text": "inquanto.geometries",
+          "link": "/mirror/api/geometries/"
+        },
+        {
+          "text": "inquanto.protocols",
+          "link": "/mirror/api/protocols/"
+        },
+        {
+          "text": "PauliAveraging",
+          "link": "/mirror/api/protocols/classes/PauliAveraging/"
+        },
+        {
+          "text": "HadamardTest",
+          "link": "/mirror/api/protocols/classes/HadamardTest/"
+        },
+        {
+          "text": "ComputeUncompute",
+          "link": "/mirror/api/protocols/classes/ComputeUncompute/"
+        },
+        {
+          "text": "DestructiveSwapTest",
+          "link": "/mirror/api/protocols/classes/DestructiveSwapTest/"
+        },
+        {
+          "text": "SwapTest",
+          "link": "/mirror/api/protocols/classes/SwapTest/"
+        },
+        {
+          "text": "HadamardTestOverlap",
+          "link": "/mirror/api/protocols/classes/HadamardTestOverlap/"
+        },
+        {
+          "text": "FactorizedOverlap",
+          "link": "/mirror/api/protocols/classes/FactorizedOverlap/"
+        },
+        {
+          "text": "SwapFactorizedOverlap",
+          "link": "/mirror/api/protocols/classes/SwapFactorizedOverlap/"
+        },
+        {
+          "text": "ComputeUncomputeFactorizedOverlap",
+          "link": "/mirror/api/protocols/classes/ComputeUncomputeFactorizedOverlap/"
+        },
+        {
+          "text": "SparseStatevectorProtocol",
+          "link": "/mirror/api/protocols/classes/SparseStatevectorProtocol/"
+        },
+        {
+          "text": "BackendStatevectorProtocol",
+          "link": "/mirror/api/protocols/classes/BackendStatevectorProtocol/"
+        },
+        {
+          "text": "SymbolicProtocol",
+          "link": "/mirror/api/protocols/classes/SymbolicProtocol/"
+        },
+        {
+          "text": "HadamardTestDerivativeOverlap",
+          "link": "/mirror/api/protocols/classes/HadamardTestDerivativeOverlap/"
+        },
+        {
+          "text": "HadamardTestDerivative",
+          "link": "/mirror/api/protocols/classes/HadamardTestDerivative/"
+        },
+        {
+          "text": "CanonicalPhaseEstimation",
+          "link": "/mirror/api/protocols/classes/CanonicalPhaseEstimation/"
+        },
+        {
+          "text": "IterativePhaseEstimation",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimation/"
+        },
+        {
+          "text": "IterativePhaseEstimationSingleCircuit",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimationSingleCircuit/"
+        },
+        {
+          "text": "IterativePhaseEstimationQuantinuum",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimationQuantinuum/"
+        },
+        {
+          "text": "IterativePhaseEstimationStatevector",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimationStatevector/"
+        },
+        {
+          "text": "ProjectiveMeasurements",
+          "link": "/mirror/api/protocols/classes/ProjectiveMeasurements/"
+        },
+        {
+          "text": "ProtocolList",
+          "link": "/mirror/api/protocols/classes/ProtocolList/"
+        },
+        {
+          "text": "PMSV",
+          "link": "/mirror/api/protocols/classes/PMSV/"
+        },
+        {
+          "text": "SPAM",
+          "link": "/mirror/api/protocols/classes/SPAM/"
+        },
+        {
+          "text": "CombinedMitigation",
+          "link": "/mirror/api/protocols/classes/CombinedMitigation/"
+        },
+        {
+          "text": "BackendResultBootstrap",
+          "link": "/mirror/api/protocols/classes/BackendResultBootstrap/"
+        },
+        {
+          "text": "BackendResultSplit",
+          "link": "/mirror/api/protocols/classes/BackendResultSplit/"
+        },
+        {
+          "text": "inquanto.extensions.pyscf",
+          "link": "/mirror/api/extensions_pyscf/"
+        },
+        {
+          "text": "AVAS",
+          "link": "/mirror/api/extensions_pyscf/classes/AVAS/"
+        },
+        {
+          "text": "CASSCF",
+          "link": "/mirror/api/extensions_pyscf/classes/CASSCF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularUHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularUHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularRHFQMMMCOSMO",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularRHFQMMMCOSMO/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularROHFQMMMCOSMO",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularROHFQMMMCOSMO/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularUHFQMMMCOSMO",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularUHFQMMMCOSMO/"
+        },
+        {
+          "text": "ChemistryDriverPySCFGammaRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFGammaRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFGammaROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFGammaROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMomentumRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMomentumRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMomentumROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMomentumROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingROHF_UHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingROHF_UHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingGammaRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingGammaRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingGammaROHF_UHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingGammaROHF_UHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFIntegrals",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFIntegrals/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFActive",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFActive/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFCCSD",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFCCSD/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFFCI",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFFCI/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFMP2",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFMP2/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFRHF/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFActive",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFActive/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFCCSD",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFCCSD/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFFCI",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFFCI/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFMP2",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFMP2/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFROHF/"
+        },
+        {
+          "text": "FromActiveOrbitals",
+          "link": "/mirror/api/extensions_pyscf/classes/FromActiveOrbitals/"
+        },
+        {
+          "text": "FromActiveSpace",
+          "link": "/mirror/api/extensions_pyscf/classes/FromActiveSpace/"
+        },
+        {
+          "text": "FrozenCore",
+          "link": "/mirror/api/extensions_pyscf/classes/FrozenCore/"
+        },
+        {
+          "text": "FMO",
+          "link": "/mirror/api/extensions_pyscf/classes/FMO/"
+        },
+        {
+          "text": "FMOFragment",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragment/"
+        },
+        {
+          "text": "FMOFragmentPySCFActive",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFActive/"
+        },
+        {
+          "text": "FMOFragmentPySCFCCSD",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFCCSD/"
+        },
+        {
+          "text": "FMOFragmentPySCFMP2",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFMP2/"
+        },
+        {
+          "text": "FMOFragmentPySCFRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFRHF/"
+        },
+        {
+          "text": "PySCFChemistryRestrictedIntegralOperator",
+          "link": "/mirror/api/extensions_pyscf/classes/PySCFChemistryRestrictedIntegralOperator/"
+        },
+        {
+          "text": "PySCFChemistryUnrestrictedIntegralOperator",
+          "link": "/mirror/api/extensions_pyscf/classes/PySCFChemistryUnrestrictedIntegralOperator/"
+        },
+        {
+          "text": "inquanto.extensions.cutensornet",
+          "link": "/mirror/api/extensions_cutensornet/"
+        },
+        {
+          "text": "CuTensorNetProtocol",
+          "link": "/mirror/api/extensions_cutensornet/classes/CuTensorNetProtocol/"
+        },
+        {
+          "text": "inquanto.extensions.nexus",
+          "link": "/mirror/api/extensions_nexus/"
+        },
+        {
+          "text": "inquanto.extensions.phayes",
+          "link": "/mirror/api/extensions_phayes/"
+        },
+        {
+          "text": "inquanto.extensions.nglview",
+          "link": "/mirror/api/extensions_nglview/"
+        }
+      ]
+    },
+    {
+      "text": "杂项",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "杂项",
+          "link": "/mirror/misc/"
+        },
+        {
+          "text": "发行说明",
+          "link": "/mirror/misc/release_notes/"
+        },
+        {
+          "text": "参考文献",
+          "link": "/mirror/misc/bibliography/"
+        },
+        {
+          "text": "联系支持（文档内页）",
+          "link": "/mirror/misc/contact_docs/"
+        },
+        {
+          "text": "如何引用 InQuanto",
+          "link": "/mirror/misc/how_to_cite/"
+        },
+        {
+          "text": "许可与版本",
+          "link": "/mirror/misc/license/"
+        },
+        {
+          "text": "开源组件归属",
+          "link": "/mirror/misc/opensource_attribution/"
+        },
+        {
+          "text": "联系我们（官网门户）",
+          "link": "/mirror/misc/contact/"
+        }
+      ]
+    }
+  ],
+  "en": [
+    {
+      "text": "Introduction",
+      "collapsed": false,
+      "items": [
+        {
+          "text": "Introduction",
+          "link": "/mirror/introduction/"
+        },
+        {
+          "text": "What is InQuanto?",
+          "link": "/mirror/introduction/overview/"
+        },
+        {
+          "text": "Installation",
+          "link": "/mirror/introduction/installation/"
+        },
+        {
+          "text": "Quick-start guide",
+          "link": "/mirror/introduction/quickstart/"
+        }
+      ]
+    },
+    {
+      "text": "Manual",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Manual",
+          "link": "/mirror/manual/"
+        },
+        {
+          "text": "How to use InQuanto",
+          "link": "/mirror/manual/howto/"
+        },
+        {
+          "text": "Geometry",
+          "link": "/mirror/manual/geometry/"
+        },
+        {
+          "text": "Express data sets",
+          "link": "/mirror/manual/express/"
+        },
+        {
+          "text": "Symmetry",
+          "link": "/mirror/manual/symmetry/"
+        },
+        {
+          "text": "Spaces, operators, states and mappings",
+          "link": "/mirror/manual/spaces_operators/"
+        },
+        {
+          "text": "Ansatze overview",
+          "link": "/mirror/manual/ansatze/"
+        },
+        {
+          "text": "Minimizers",
+          "link": "/mirror/manual/minimizers/"
+        },
+        {
+          "text": "Computables overview",
+          "link": "/mirror/manual/computables/"
+        },
+        {
+          "text": "Protocols overview (five stages)",
+          "link": "/mirror/manual/protocols/"
+        },
+        {
+          "text": "Algorithms overview",
+          "link": "/mirror/manual/algorithms/"
+        },
+        {
+          "text": "Embeddings and DMET",
+          "link": "/mirror/manual/embedding/"
+        },
+        {
+          "text": "Noise mitigation",
+          "link": "/mirror/manual/noise_mitigation/"
+        }
+      ]
+    },
+    {
+      "text": "Tutorials",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Tutorials",
+          "link": "/mirror/tutorials/"
+        },
+        {
+          "text": "Core tutorials",
+          "link": "/mirror/tutorials/core/"
+        },
+        {
+          "text": "Backend tutorials",
+          "link": "/mirror/tutorials/backends/"
+        },
+        {
+          "text": "Fe4N2 case study",
+          "link": "/mirror/tutorials/case_study_fe4n2/"
+        },
+        {
+          "text": "Fragmentation tutorials",
+          "link": "/mirror/tutorials/fragmentation/"
+        }
+      ]
+    },
+    {
+      "text": "Extensions",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Extensions",
+          "link": "/mirror/extensions/"
+        },
+        {
+          "text": "InQuanto-PySCF",
+          "link": "/mirror/extensions/inquanto_pyscf/"
+        },
+        {
+          "text": "InQuanto-Nexus",
+          "link": "/mirror/extensions/inquanto_nexus/"
+        },
+        {
+          "text": "InQuanto-NGLView",
+          "link": "/mirror/extensions/inquanto_nglview/"
+        },
+        {
+          "text": "InQuanto-Phayes",
+          "link": "/mirror/extensions/inquanto_phayes/"
+        },
+        {
+          "text": "InQuanto-cuTensorNet",
+          "link": "/mirror/extensions/inquanto_cutensornet/"
+        }
+      ]
+    },
+    {
+      "text": "API reference",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "API reference",
+          "link": "/mirror/api/"
+        },
+        {
+          "text": "InQuanto API introduction",
+          "link": "/mirror/api/api_intro_inquanto/"
+        },
+        {
+          "text": "InQuanto Extensions API introduction",
+          "link": "/mirror/api/api_intro_extensions/"
+        },
+        {
+          "text": "inquanto.algorithms",
+          "link": "/mirror/api/algorithms/"
+        },
+        {
+          "text": "AlgorithmVQE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmVQE/"
+        },
+        {
+          "text": "AlgorithmAdaptVQE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmAdaptVQE/"
+        },
+        {
+          "text": "AlgorithmFermionicAdaptVQE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmFermionicAdaptVQE/"
+        },
+        {
+          "text": "AlgorithmIQEB",
+          "link": "/mirror/api/algorithms/classes/AlgorithmIQEB/"
+        },
+        {
+          "text": "AlgorithmVQD",
+          "link": "/mirror/api/algorithms/classes/AlgorithmVQD/"
+        },
+        {
+          "text": "AlgorithmQSE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmQSE/"
+        },
+        {
+          "text": "AlgorithmSCEOM",
+          "link": "/mirror/api/algorithms/classes/AlgorithmSCEOM/"
+        },
+        {
+          "text": "AlgorithmDeterministicQPE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmDeterministicQPE/"
+        },
+        {
+          "text": "AlgorithmInfoTheoryQPE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmInfoTheoryQPE/"
+        },
+        {
+          "text": "AlgorithmKitaevQPE",
+          "link": "/mirror/api/algorithms/classes/AlgorithmKitaevQPE/"
+        },
+        {
+          "text": "AlgorithmVQS",
+          "link": "/mirror/api/algorithms/classes/AlgorithmVQS/"
+        },
+        {
+          "text": "AlgorithmMcLachlanRealTime",
+          "link": "/mirror/api/algorithms/classes/AlgorithmMcLachlanRealTime/"
+        },
+        {
+          "text": "AlgorithmMcLachlanImagTime",
+          "link": "/mirror/api/algorithms/classes/AlgorithmMcLachlanImagTime/"
+        },
+        {
+          "text": "inquanto.ansatzes",
+          "link": "/mirror/api/ansatz/"
+        },
+        {
+          "text": "GeneralAnsatz",
+          "link": "/mirror/api/ansatz/classes/GeneralAnsatz/"
+        },
+        {
+          "text": "CircuitAnsatz",
+          "link": "/mirror/api/ansatz/classes/CircuitAnsatz/"
+        },
+        {
+          "text": "ComposedAnsatz",
+          "link": "/mirror/api/ansatz/classes/ComposedAnsatz/"
+        },
+        {
+          "text": "TrotterAnsatz",
+          "link": "/mirror/api/ansatz/classes/TrotterAnsatz/"
+        },
+        {
+          "text": "FermionSpaceStateExp",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceStateExp/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCD/"
+        },
+        {
+          "text": "FermionSpaceStateExpChemicallyAware",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceStateExpChemicallyAware/"
+        },
+        {
+          "text": "FermionSpaceAnsatzChemicallyAwareUCCSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzChemicallyAwareUCCSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzkUpCCGD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzkUpCCGSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzkUpCCGSDSinglet",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGSDSinglet/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCGD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCGD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCGSD",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCGSD/"
+        },
+        {
+          "text": "FermionSpaceAnsatzUCCSDSinglet",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCSDSinglet/"
+        },
+        {
+          "text": "FermionSpaceAnsatzsUPS",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatzsUPS/"
+        },
+        {
+          "text": "FermionSpaceAnsatztUPS",
+          "link": "/mirror/api/ansatz/classes/FermionSpaceAnsatztUPS/"
+        },
+        {
+          "text": "MultiConfigurationAnsatz",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationAnsatz/"
+        },
+        {
+          "text": "MultiConfigurationState",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationState/"
+        },
+        {
+          "text": "MultiConfigurationStateBox",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationStateBox/"
+        },
+        {
+          "text": "MultiConfigurationAnsatzSparse",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationAnsatzSparse/"
+        },
+        {
+          "text": "MultiConfigurationStateSparse",
+          "link": "/mirror/api/ansatz/classes/MultiConfigurationStateSparse/"
+        },
+        {
+          "text": "RealGeneralizedBasisRotationAnsatz",
+          "link": "/mirror/api/ansatz/classes/RealGeneralizedBasisRotationAnsatz/"
+        },
+        {
+          "text": "RealRestrictedBasisRotationAnsatz",
+          "link": "/mirror/api/ansatz/classes/RealRestrictedBasisRotationAnsatz/"
+        },
+        {
+          "text": "RealUnrestrictedBasisRotationAnsatz",
+          "link": "/mirror/api/ansatz/classes/RealUnrestrictedBasisRotationAnsatz/"
+        },
+        {
+          "text": "HamiltonianVariationalAnsatz",
+          "link": "/mirror/api/ansatz/classes/HamiltonianVariationalAnsatz/"
+        },
+        {
+          "text": "LayeredAnsatz",
+          "link": "/mirror/api/ansatz/classes/LayeredAnsatz/"
+        },
+        {
+          "text": "HardwareEfficientAnsatz",
+          "link": "/mirror/api/ansatz/classes/HardwareEfficientAnsatz/"
+        },
+        {
+          "text": "inquanto.computables",
+          "link": "/mirror/api/computables/"
+        },
+        {
+          "text": "ExpectationValue",
+          "link": "/mirror/api/computables/classes/ExpectationValue/"
+        },
+        {
+          "text": "ExpectationValueBraDerivative",
+          "link": "/mirror/api/computables/classes/ExpectationValueBraDerivative/"
+        },
+        {
+          "text": "ExpectationValueBraDerivativeImag",
+          "link": "/mirror/api/computables/classes/ExpectationValueBraDerivativeImag/"
+        },
+        {
+          "text": "ExpectationValueBraDerivativeReal",
+          "link": "/mirror/api/computables/classes/ExpectationValueBraDerivativeReal/"
+        },
+        {
+          "text": "ExpectationValueDerivative",
+          "link": "/mirror/api/computables/classes/ExpectationValueDerivative/"
+        },
+        {
+          "text": "ExpectationValueKetDerivative",
+          "link": "/mirror/api/computables/classes/ExpectationValueKetDerivative/"
+        },
+        {
+          "text": "ExpectationValueKetDerivativeImag",
+          "link": "/mirror/api/computables/classes/ExpectationValueKetDerivativeImag/"
+        },
+        {
+          "text": "ExpectationValueKetDerivativeReal",
+          "link": "/mirror/api/computables/classes/ExpectationValueKetDerivativeReal/"
+        },
+        {
+          "text": "ExpectationValueNonHermitian",
+          "link": "/mirror/api/computables/classes/ExpectationValueNonHermitian/"
+        },
+        {
+          "text": "MetricTensorImag",
+          "link": "/mirror/api/computables/classes/MetricTensorImag/"
+        },
+        {
+          "text": "MetricTensorReal",
+          "link": "/mirror/api/computables/classes/MetricTensorReal/"
+        },
+        {
+          "text": "Overlap",
+          "link": "/mirror/api/computables/classes/Overlap/"
+        },
+        {
+          "text": "OverlapImag",
+          "link": "/mirror/api/computables/classes/OverlapImag/"
+        },
+        {
+          "text": "OverlapReal",
+          "link": "/mirror/api/computables/classes/OverlapReal/"
+        },
+        {
+          "text": "OverlapSquared",
+          "link": "/mirror/api/computables/classes/OverlapSquared/"
+        },
+        {
+          "text": "ComputableFunction",
+          "link": "/mirror/api/computables/classes/ComputableFunction/"
+        },
+        {
+          "text": "ComputableInt",
+          "link": "/mirror/api/computables/classes/ComputableInt/"
+        },
+        {
+          "text": "ComputableList",
+          "link": "/mirror/api/computables/classes/ComputableList/"
+        },
+        {
+          "text": "ComputableTuple",
+          "link": "/mirror/api/computables/classes/ComputableTuple/"
+        },
+        {
+          "text": "ComputableNode",
+          "link": "/mirror/api/computables/classes/ComputableNode/"
+        },
+        {
+          "text": "ComputableSingleChild",
+          "link": "/mirror/api/computables/classes/ComputableSingleChild/"
+        },
+        {
+          "text": "Averageable",
+          "link": "/mirror/api/computables/classes/Averageable/"
+        },
+        {
+          "text": "Evaluatable",
+          "link": "/mirror/api/computables/classes/Evaluatable/"
+        },
+        {
+          "text": "CommutatorComputable",
+          "link": "/mirror/api/computables/classes/CommutatorComputable/"
+        },
+        {
+          "text": "ExpectationValueSumComputable",
+          "link": "/mirror/api/computables/classes/ExpectationValueSumComputable/"
+        },
+        {
+          "text": "HoleGFComputable",
+          "link": "/mirror/api/computables/classes/HoleGFComputable/"
+        },
+        {
+          "text": "KrylovSubspace",
+          "link": "/mirror/api/computables/classes/KrylovSubspace/"
+        },
+        {
+          "text": "KrylovSubspaceComputable",
+          "link": "/mirror/api/computables/classes/KrylovSubspaceComputable/"
+        },
+        {
+          "text": "LanczosCoefficientsComputable",
+          "link": "/mirror/api/computables/classes/LanczosCoefficientsComputable/"
+        },
+        {
+          "text": "LanczosMatrixComputable",
+          "link": "/mirror/api/computables/classes/LanczosMatrixComputable/"
+        },
+        {
+          "text": "ManyBodyGFComputable",
+          "link": "/mirror/api/computables/classes/ManyBodyGFComputable/"
+        },
+        {
+          "text": "NonOrthogonalMatricesComputable",
+          "link": "/mirror/api/computables/classes/NonOrthogonalMatricesComputable/"
+        },
+        {
+          "text": "OverlapMatrixComputable",
+          "link": "/mirror/api/computables/classes/OverlapMatrixComputable/"
+        },
+        {
+          "text": "PDM1234RealComputable",
+          "link": "/mirror/api/computables/classes/PDM1234RealComputable/"
+        },
+        {
+          "text": "ParticleGFComputable",
+          "link": "/mirror/api/computables/classes/ParticleGFComputable/"
+        },
+        {
+          "text": "QCM4Computable",
+          "link": "/mirror/api/computables/classes/QCM4Computable/"
+        },
+        {
+          "text": "QSEMatricesComputable",
+          "link": "/mirror/api/computables/classes/QSEMatricesComputable/"
+        },
+        {
+          "text": "RDM1234RealComputable",
+          "link": "/mirror/api/computables/classes/RDM1234RealComputable/"
+        },
+        {
+          "text": "RestrictedOneBodyRDMComputable",
+          "link": "/mirror/api/computables/classes/RestrictedOneBodyRDMComputable/"
+        },
+        {
+          "text": "RestrictedOneBodyRDMRealComputable",
+          "link": "/mirror/api/computables/classes/RestrictedOneBodyRDMRealComputable/"
+        },
+        {
+          "text": "SCEOMMatrixComputable",
+          "link": "/mirror/api/computables/classes/SCEOMMatrixComputable/"
+        },
+        {
+          "text": "SpinlessNBodyPDMArrayRealComputable",
+          "link": "/mirror/api/computables/classes/SpinlessNBodyPDMArrayRealComputable/"
+        },
+        {
+          "text": "SpinlessNBodyRDMArrayRealComputable",
+          "link": "/mirror/api/computables/classes/SpinlessNBodyRDMArrayRealComputable/"
+        },
+        {
+          "text": "UnrestrictedOneBodyRDMComputable",
+          "link": "/mirror/api/computables/classes/UnrestrictedOneBodyRDMComputable/"
+        },
+        {
+          "text": "UnrestrictedOneBodyRDMRealComputable",
+          "link": "/mirror/api/computables/classes/UnrestrictedOneBodyRDMRealComputable/"
+        },
+        {
+          "text": "inquanto.operators",
+          "link": "/mirror/api/operators/"
+        },
+        {
+          "text": "ChemistryRestrictedIntegralOperator",
+          "link": "/mirror/api/operators/classes/ChemistryRestrictedIntegralOperator/"
+        },
+        {
+          "text": "ChemistryRestrictedIntegralOperatorCompact",
+          "link": "/mirror/api/operators/classes/ChemistryRestrictedIntegralOperatorCompact/"
+        },
+        {
+          "text": "ChemistryUnrestrictedIntegralOperator",
+          "link": "/mirror/api/operators/classes/ChemistryUnrestrictedIntegralOperator/"
+        },
+        {
+          "text": "ChemistryUnrestrictedIntegralOperatorCompact",
+          "link": "/mirror/api/operators/classes/ChemistryUnrestrictedIntegralOperatorCompact/"
+        },
+        {
+          "text": "DoubleFactorizedTwoBodyIntegrals",
+          "link": "/mirror/api/operators/classes/DoubleFactorizedTwoBodyIntegrals/"
+        },
+        {
+          "text": "FCIDumpRestricted",
+          "link": "/mirror/api/operators/classes/FCIDumpRestricted/"
+        },
+        {
+          "text": "FCIDumpUnrestricted",
+          "link": "/mirror/api/operators/classes/FCIDumpUnrestricted/"
+        },
+        {
+          "text": "FermionOperator",
+          "link": "/mirror/api/operators/classes/FermionOperator/"
+        },
+        {
+          "text": "FermionOperatorList",
+          "link": "/mirror/api/operators/classes/FermionOperatorList/"
+        },
+        {
+          "text": "QubitOperator",
+          "link": "/mirror/api/operators/classes/QubitOperator/"
+        },
+        {
+          "text": "QubitOperatorList",
+          "link": "/mirror/api/operators/classes/QubitOperatorList/"
+        },
+        {
+          "text": "QubitOperatorString",
+          "link": "/mirror/api/operators/classes/QubitOperatorString/"
+        },
+        {
+          "text": "OrbitalTransformer",
+          "link": "/mirror/api/operators/classes/OrbitalTransformer/"
+        },
+        {
+          "text": "RestrictedDoubleFactorizedHamiltonian",
+          "link": "/mirror/api/operators/classes/RestrictedDoubleFactorizedHamiltonian/"
+        },
+        {
+          "text": "RestrictedOneBodyRDM",
+          "link": "/mirror/api/operators/classes/RestrictedOneBodyRDM/"
+        },
+        {
+          "text": "RestrictedTwoBodyRDM",
+          "link": "/mirror/api/operators/classes/RestrictedTwoBodyRDM/"
+        },
+        {
+          "text": "UnrestrictedDoubleFactorizedHamiltonian",
+          "link": "/mirror/api/operators/classes/UnrestrictedDoubleFactorizedHamiltonian/"
+        },
+        {
+          "text": "UnrestrictedOneBodyRDM",
+          "link": "/mirror/api/operators/classes/UnrestrictedOneBodyRDM/"
+        },
+        {
+          "text": "UnrestrictedTwoBodyRDM",
+          "link": "/mirror/api/operators/classes/UnrestrictedTwoBodyRDM/"
+        },
+        {
+          "text": "SymmetryOperatorFermionic",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorFermionic/"
+        },
+        {
+          "text": "SymmetryOperatorFermionicFactorized",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorFermionicFactorized/"
+        },
+        {
+          "text": "SymmetryOperatorPauli",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorPauli/"
+        },
+        {
+          "text": "SymmetryOperatorPauliFactorized",
+          "link": "/mirror/api/operators/classes/SymmetryOperatorPauliFactorized/"
+        },
+        {
+          "text": "XDFCoreTensor",
+          "link": "/mirror/api/operators/classes/XDFCoreTensor/"
+        },
+        {
+          "text": "inquanto.spaces",
+          "link": "/mirror/api/spaces/"
+        },
+        {
+          "text": "FermionSpace",
+          "link": "/mirror/api/spaces/classes/FermionSpace/"
+        },
+        {
+          "text": "FermionSpaceBrillouin",
+          "link": "/mirror/api/spaces/classes/FermionSpaceBrillouin/"
+        },
+        {
+          "text": "FermionSpaceSupercell",
+          "link": "/mirror/api/spaces/classes/FermionSpaceSupercell/"
+        },
+        {
+          "text": "ParaFermionSpace",
+          "link": "/mirror/api/spaces/classes/ParaFermionSpace/"
+        },
+        {
+          "text": "QubitSpace",
+          "link": "/mirror/api/spaces/classes/QubitSpace/"
+        },
+        {
+          "text": "inquanto.states",
+          "link": "/mirror/api/states/"
+        },
+        {
+          "text": "FermionState",
+          "link": "/mirror/api/states/classes/FermionState/"
+        },
+        {
+          "text": "QubitState",
+          "link": "/mirror/api/states/classes/QubitState/"
+        },
+        {
+          "text": "inquanto.mappings",
+          "link": "/mirror/api/mappings/"
+        },
+        {
+          "text": "QubitMappingJordanWigner",
+          "link": "/mirror/api/mappings/classes/QubitMappingJordanWigner/"
+        },
+        {
+          "text": "QubitMappingBravyiKitaev",
+          "link": "/mirror/api/mappings/classes/QubitMappingBravyiKitaev/"
+        },
+        {
+          "text": "QubitMappingParity",
+          "link": "/mirror/api/mappings/classes/QubitMappingParity/"
+        },
+        {
+          "text": "inquanto.minimizers",
+          "link": "/mirror/api/minimizers/"
+        },
+        {
+          "text": "MinimizerScipy",
+          "link": "/mirror/api/minimizers/classes/MinimizerScipy/"
+        },
+        {
+          "text": "MinimizerNFT",
+          "link": "/mirror/api/minimizers/classes/MinimizerNFT/"
+        },
+        {
+          "text": "MinimizerRotosolve",
+          "link": "/mirror/api/minimizers/classes/MinimizerRotosolve/"
+        },
+        {
+          "text": "MinimizerSPSA",
+          "link": "/mirror/api/minimizers/classes/MinimizerSPSA/"
+        },
+        {
+          "text": "MinimizerSGD",
+          "link": "/mirror/api/minimizers/classes/MinimizerSGD/"
+        },
+        {
+          "text": "inquanto.symmetry",
+          "link": "/mirror/api/symmetry/"
+        },
+        {
+          "text": "inquanto.core",
+          "link": "/mirror/api/core/"
+        },
+        {
+          "text": "inquanto.embeddings",
+          "link": "/mirror/api/embeddings/"
+        },
+        {
+          "text": "inquanto.experiments",
+          "link": "/mirror/api/experiments/"
+        },
+        {
+          "text": "inquanto.express",
+          "link": "/mirror/api/express/"
+        },
+        {
+          "text": "inquanto.geometries",
+          "link": "/mirror/api/geometries/"
+        },
+        {
+          "text": "inquanto.protocols",
+          "link": "/mirror/api/protocols/"
+        },
+        {
+          "text": "PauliAveraging",
+          "link": "/mirror/api/protocols/classes/PauliAveraging/"
+        },
+        {
+          "text": "HadamardTest",
+          "link": "/mirror/api/protocols/classes/HadamardTest/"
+        },
+        {
+          "text": "ComputeUncompute",
+          "link": "/mirror/api/protocols/classes/ComputeUncompute/"
+        },
+        {
+          "text": "DestructiveSwapTest",
+          "link": "/mirror/api/protocols/classes/DestructiveSwapTest/"
+        },
+        {
+          "text": "SwapTest",
+          "link": "/mirror/api/protocols/classes/SwapTest/"
+        },
+        {
+          "text": "HadamardTestOverlap",
+          "link": "/mirror/api/protocols/classes/HadamardTestOverlap/"
+        },
+        {
+          "text": "FactorizedOverlap",
+          "link": "/mirror/api/protocols/classes/FactorizedOverlap/"
+        },
+        {
+          "text": "SwapFactorizedOverlap",
+          "link": "/mirror/api/protocols/classes/SwapFactorizedOverlap/"
+        },
+        {
+          "text": "ComputeUncomputeFactorizedOverlap",
+          "link": "/mirror/api/protocols/classes/ComputeUncomputeFactorizedOverlap/"
+        },
+        {
+          "text": "SparseStatevectorProtocol",
+          "link": "/mirror/api/protocols/classes/SparseStatevectorProtocol/"
+        },
+        {
+          "text": "BackendStatevectorProtocol",
+          "link": "/mirror/api/protocols/classes/BackendStatevectorProtocol/"
+        },
+        {
+          "text": "SymbolicProtocol",
+          "link": "/mirror/api/protocols/classes/SymbolicProtocol/"
+        },
+        {
+          "text": "HadamardTestDerivativeOverlap",
+          "link": "/mirror/api/protocols/classes/HadamardTestDerivativeOverlap/"
+        },
+        {
+          "text": "HadamardTestDerivative",
+          "link": "/mirror/api/protocols/classes/HadamardTestDerivative/"
+        },
+        {
+          "text": "CanonicalPhaseEstimation",
+          "link": "/mirror/api/protocols/classes/CanonicalPhaseEstimation/"
+        },
+        {
+          "text": "IterativePhaseEstimation",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimation/"
+        },
+        {
+          "text": "IterativePhaseEstimationSingleCircuit",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimationSingleCircuit/"
+        },
+        {
+          "text": "IterativePhaseEstimationQuantinuum",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimationQuantinuum/"
+        },
+        {
+          "text": "IterativePhaseEstimationStatevector",
+          "link": "/mirror/api/protocols/classes/IterativePhaseEstimationStatevector/"
+        },
+        {
+          "text": "ProjectiveMeasurements",
+          "link": "/mirror/api/protocols/classes/ProjectiveMeasurements/"
+        },
+        {
+          "text": "ProtocolList",
+          "link": "/mirror/api/protocols/classes/ProtocolList/"
+        },
+        {
+          "text": "PMSV",
+          "link": "/mirror/api/protocols/classes/PMSV/"
+        },
+        {
+          "text": "SPAM",
+          "link": "/mirror/api/protocols/classes/SPAM/"
+        },
+        {
+          "text": "CombinedMitigation",
+          "link": "/mirror/api/protocols/classes/CombinedMitigation/"
+        },
+        {
+          "text": "BackendResultBootstrap",
+          "link": "/mirror/api/protocols/classes/BackendResultBootstrap/"
+        },
+        {
+          "text": "BackendResultSplit",
+          "link": "/mirror/api/protocols/classes/BackendResultSplit/"
+        },
+        {
+          "text": "inquanto.extensions.pyscf",
+          "link": "/mirror/api/extensions_pyscf/"
+        },
+        {
+          "text": "AVAS",
+          "link": "/mirror/api/extensions_pyscf/classes/AVAS/"
+        },
+        {
+          "text": "CASSCF",
+          "link": "/mirror/api/extensions_pyscf/classes/CASSCF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularUHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularUHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularRHFQMMMCOSMO",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularRHFQMMMCOSMO/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularROHFQMMMCOSMO",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularROHFQMMMCOSMO/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMolecularUHFQMMMCOSMO",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularUHFQMMMCOSMO/"
+        },
+        {
+          "text": "ChemistryDriverPySCFGammaRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFGammaRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFGammaROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFGammaROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMomentumRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMomentumRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFMomentumROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMomentumROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingROHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingROHF_UHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingROHF_UHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingGammaRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingGammaRHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFEmbeddingGammaROHF_UHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingGammaROHF_UHF/"
+        },
+        {
+          "text": "ChemistryDriverPySCFIntegrals",
+          "link": "/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFIntegrals/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFActive",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFActive/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFCCSD",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFCCSD/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFFCI",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFFCI/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFMP2",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFMP2/"
+        },
+        {
+          "text": "DMETRHFFragmentPySCFRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFRHF/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFActive",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFActive/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFCCSD",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFCCSD/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFFCI",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFFCI/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFMP2",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFMP2/"
+        },
+        {
+          "text": "ImpurityDMETROHFFragmentPySCFROHF",
+          "link": "/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFROHF/"
+        },
+        {
+          "text": "FromActiveOrbitals",
+          "link": "/mirror/api/extensions_pyscf/classes/FromActiveOrbitals/"
+        },
+        {
+          "text": "FromActiveSpace",
+          "link": "/mirror/api/extensions_pyscf/classes/FromActiveSpace/"
+        },
+        {
+          "text": "FrozenCore",
+          "link": "/mirror/api/extensions_pyscf/classes/FrozenCore/"
+        },
+        {
+          "text": "FMO",
+          "link": "/mirror/api/extensions_pyscf/classes/FMO/"
+        },
+        {
+          "text": "FMOFragment",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragment/"
+        },
+        {
+          "text": "FMOFragmentPySCFActive",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFActive/"
+        },
+        {
+          "text": "FMOFragmentPySCFCCSD",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFCCSD/"
+        },
+        {
+          "text": "FMOFragmentPySCFMP2",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFMP2/"
+        },
+        {
+          "text": "FMOFragmentPySCFRHF",
+          "link": "/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFRHF/"
+        },
+        {
+          "text": "PySCFChemistryRestrictedIntegralOperator",
+          "link": "/mirror/api/extensions_pyscf/classes/PySCFChemistryRestrictedIntegralOperator/"
+        },
+        {
+          "text": "PySCFChemistryUnrestrictedIntegralOperator",
+          "link": "/mirror/api/extensions_pyscf/classes/PySCFChemistryUnrestrictedIntegralOperator/"
+        },
+        {
+          "text": "inquanto.extensions.cutensornet",
+          "link": "/mirror/api/extensions_cutensornet/"
+        },
+        {
+          "text": "CuTensorNetProtocol",
+          "link": "/mirror/api/extensions_cutensornet/classes/CuTensorNetProtocol/"
+        },
+        {
+          "text": "inquanto.extensions.nexus",
+          "link": "/mirror/api/extensions_nexus/"
+        },
+        {
+          "text": "inquanto.extensions.phayes",
+          "link": "/mirror/api/extensions_phayes/"
+        },
+        {
+          "text": "inquanto.extensions.nglview",
+          "link": "/mirror/api/extensions_nglview/"
+        }
+      ]
+    },
+    {
+      "text": "Misc",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Misc",
+          "link": "/mirror/misc/"
+        },
+        {
+          "text": "Release notes",
+          "link": "/mirror/misc/release_notes/"
+        },
+        {
+          "text": "Bibliography",
+          "link": "/mirror/misc/bibliography/"
+        },
+        {
+          "text": "Contact support (in-docs)",
+          "link": "/mirror/misc/contact_docs/"
+        },
+        {
+          "text": "How to cite InQuanto",
+          "link": "/mirror/misc/how_to_cite/"
+        },
+        {
+          "text": "License / Changelog",
+          "link": "/mirror/misc/license/"
+        },
+        {
+          "text": "Open-source attribution",
+          "link": "/mirror/misc/opensource_attribution/"
+        },
+        {
+          "text": "Contact (corporate portal)",
+          "link": "/mirror/misc/contact/"
+        }
+      ]
+    }
+  ]
+}

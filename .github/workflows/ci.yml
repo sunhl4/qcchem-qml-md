@@ -1,0 +1,59 @@
+name: CI
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+      - name: Strict repro JSON API
+        run: python -c "from qchem_stack.repro.export import repro_json_dumps; repro_json_dumps({'ok': True})"
+      - name: Pytest
+        run: pytest tests -q --tb=short
+      - name: L1 excited regression (marker)
+        run: pytest -m l1_excited -q --tb=short
+      - name: L1 MD/ML bridge (marker)
+        run: pytest -m l1_md_ml -q --tb=short
+      - name: HTTP API optional extra (FastAPI)
+        run: |
+          pip install -e ".[api]"
+          pytest tests/test_api_runs.py -q --tb=short
+      - name: Smoke orchestration (PySCF)
+        run: python scripts/smoke_pipeline.py
+      - name: Smoke orchestration VQD path (PySCF)
+        run: python scripts/smoke_pipeline.py --excited-only
+      - name: Smoke orchestration IQEB (PySCF)
+        run: python scripts/smoke_pipeline.py --iqeb
+      - name: Smoke projection L1 trace (PySCF)
+        run: python scripts/smoke_pipeline.py --projection-trace
+      - name: Parity criteria export (no PySCF run)
+        run: python scripts/export_parity_criteria_table.py configs/example_h2.yaml | head -c 4000
+      - name: Parity export schema v2 keys
+        run: |
+          python scripts/export_parity_criteria_table.py configs/example_h2.yaml | python -c "import json,sys;d=json.load(sys.stdin);assert d.get('parity_export_schema_version')=='2';c=d['computable_abstract'];assert c.get('schema')=='qchem_computable_abstract_v2';assert isinstance(d.get('inquanto_gap_categories'),list);assert d.get('embedding',{}).get('mode')=='none'"
+      - name: Parity export multi-config L1 gate (check_parity_export_sample)
+        run: python scripts/check_parity_export_sample.py
+      - name: Pytket bridge (optional extra)
+        run: pytest tests/test_pytket_bridge.py -q --tb=short
+      - name: Smoke Qiskit Pauli shots (optional extra)
+        run: python scripts/smoke_pipeline.py --qiskit-shots
+      - name: Smoke sampled Pauli protocol (PySCF)
+        run: python scripts/smoke_pipeline.py --sampled
+      - name: QPE dual-track demo (no PySCF)
+        run: python scripts/run_qpe_track_demo.py

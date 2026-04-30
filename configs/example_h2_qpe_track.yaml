@@ -1,0 +1,49 @@
+# P2: same as example_h2.yaml plus QPE/容错 demo 轨道（稠密 Kitaev + Bayesian toy），无额外依赖。
+# `python scripts/smoke_pipeline.py` with this path, or `run_pipeline_from_config`.
+schema_version: "1"
+experiment_id: "h2_sto3g_qpe_track"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  qiskit_mode: "statevector"
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 200
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"
+  qpe_demo_track_after_variational: true

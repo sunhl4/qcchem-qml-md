@@ -1,0 +1,51 @@
+# P0: same as example_h2 but grouped Pauli **Monte Carlo** energy (statevector shot sim).
+# CI / local: `python scripts/smoke_pipeline.py --sampled`  (add to smoke) or
+# `run_pipeline_from_config` on this path.
+schema_version: "1"
+experiment_id: "h2_sto3g_sampled_pauli"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 1024
+  qiskit_mode: "statevector"
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 50
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"
+  run_sampled_pauli_protocol: true
+  record_pauli_measurement_histograms: false

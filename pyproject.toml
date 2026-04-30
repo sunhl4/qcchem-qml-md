@@ -1,0 +1,65 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qchem-stack"
+version = "0.1.0"
+description = "Quantum chemistry orchestration: classical downfolding, protocols, ML fusion, MD bridge"
+readme = "README.md"
+requires-python = ">=3.10"
+license = { text = "Apache-2.0" }
+authors = [{ name = "Yaozheng" }]
+dependencies = [
+    "numpy>=1.24",
+    "opt-einsum>=3.3",
+    "scipy>=1.11",
+    "pydantic>=2.5",
+    "PyYAML>=6.0",
+    "openfermion>=1.5",
+    "pandas>=2.0",
+]
+
+[project.optional-dependencies]
+chem = ["pyscf>=2.4"]
+quantum = ["qiskit>=1.0", "qiskit-aer>=0.13"]
+pytket = ["pytket>=1.25"]
+nexus = ["qnexus>=0.4"]
+api = ["fastapi>=0.100", "uvicorn[standard]>=0.23"]
+all = ["qchem-stack[chem,quantum,pytket,nexus]"]
+dev = ["qchem-stack[all,api]", "pytest>=7.4", "ruff>=0.3"]
+
+[project.scripts]
+qchem-jobs-worker = "qchem_stack.jobs.worker:main"
+qchem-pipeline-worker = "qchem_stack.jobs.worker:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
+markers = [
+    "l3: optional deep numerical benchmarks (QCHEM_RUN_L3=1)",
+    "l1_excited: VQD/QSE/SCEOM unit tests (selective CI: pytest -m l1_excited)",
+    "l1_md_ml: MD/ML bridge smoke (pytest -m l1_md_ml)",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = [
+  "E4",
+  "E7",
+  "E9",
+  "F",
+  "I",
+  "UP",
+]
+ignore = []
+
+[tool.ruff.lint.isort]
+known-first-party = ["qchem_stack"]
+

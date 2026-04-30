@@ -1,0 +1,53 @@
+# P2: Not executed by the main SCF pipeline. Documents **dual-track** (NISQ YAML vs QPE stack)
+# in the same repository. Run: `python scripts/run_qpe_track_demo.py` (no PySCF).
+#
+# NISQ chemistry runs: use `configs/example_h2.yaml` or `example_h2_sampled.yaml`.
+# Spectral / phase: `qchem_stack.qpe_qec_demo` (Kitaev classical emulation, Bayesian stub).
+schema_version: "1"
+experiment_id: "qpe_dual_track_marker"
+random_seed: 0
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 8
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 1
+  use_pauli_protocol: false
+
+extra:
+  qpe_reference:
+    script: "scripts/run_qpe_track_demo.py"
+    description: "Kitaev + BayesianQPE stub in qpe_qec_demo/"

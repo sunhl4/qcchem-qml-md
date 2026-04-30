@@ -1,0 +1,49 @@
+# virtualenv
+.venv/
+venv/
+.venv-wsl/
+env/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+*.egg-info/
+*.egg
+
+# test / lint / type
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+
+# IDE / OS
+.idea/
+.vscode/
+*.swp
+.DS_Store
+Thumbs.db
+
+# docs-site (VitePress)
+docs-site/node_modules/
+docs-site/.vitepress/dist/
+docs-site/docs/.vitepress/cache/
+
+# local / secrets
+.env
+.env.*
+!.env.example
+
+# SQLite / local jobs (if created at repo root)
+*.db
+
+# Jupyter
+.ipynb_checkpoints/

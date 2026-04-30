@@ -1,0 +1,53 @@
+{
+  "scf_energy": -1.0,
+  "energy_after_variational": -1.1,
+  "repro": {
+    "experiment_id": "minimal_fixture",
+    "run_summary": {
+      "stages_completed": ["scf", "variational"],
+      "qpe_demo_track_ran": true,
+      "quantum_algorithm": "vqe"
+    },
+    "parity_snapshot": {
+      "tensornet_engine_resolved": "stub",
+      "tensornet_fallback_reason": "stub_no_contraction",
+      "open_gap_closure_reference": {
+        "schema": "open_gap_closure_reference_v1"
+      }
+    }
+  },
+  "protocol_counts": {
+    "expectation_source": "exact",
+    "energy_stderr_model": "exact",
+    "pmsv_report": {"schema": "pmsv_fixture"}
+  },
+  "embedding_workflow": {
+    "mode": "none",
+    "schema": "embedding_workflow_fixture_v1"
+  },
+  "adapt_meta": {"total_gradient_evals": 3},
+  "adapt_pool": [0, 1],
+  "qpe_demo_track": {
+    "schema": "qpe_qec_demo_track_v1",
+    "kitaev_ground_energy_dense": -0.5,
+    "bayesian_phase_map_toy": {}
+  },
+  "vqd": {
+    "meta": {
+      "vqd_channels": [
+        {"three_protocol": {"objective": {}, "overlap": {}, "weight": {}}}
+      ]
+    }
+  },
+  "qse": {
+    "meta": {
+      "qse_shot_mode": "dense_reference_only"
+    }
+  },
+  "sceom": {
+    "meta": {
+      "shot_noise_model": "none",
+      "shots_per_matrix_element": 0
+    }
+  }
+}

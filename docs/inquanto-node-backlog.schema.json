@@ -1,0 +1,126 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qchem-stack.local/schemas/inquanto-node-backlog.schema.json",
+  "title": "InQuanto manifest node backlog",
+  "type": "object",
+  "required": ["meta", "nodes"],
+  "additionalProperties": false,
+  "properties": {
+    "meta": {
+      "type": "object",
+      "required": ["schema_version", "node_count", "manifest_path"],
+      "additionalProperties": true,
+      "properties": {
+        "schema_version": { "type": "integer", "minimum": 1 },
+        "source_pin_date": { "type": ["string", "null"] },
+        "inquanto_version_seen": { "type": ["string", "null"] },
+        "source_root": { "type": ["string", "null"] },
+        "node_count": { "type": "integer", "minimum": 1 },
+        "manifest_path": { "type": "string" },
+        "appendix_c_relative": { "type": "string" }
+      }
+    },
+    "nodes": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/node" }
+    }
+  },
+  "$defs": {
+    "node": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "appendix_c_node_index",
+        "breadcrumb",
+        "slug",
+        "title_zh",
+        "title_en",
+        "mirror_site_path",
+        "pillar",
+        "diataxis",
+        "status",
+        "is_class_leaf",
+        "acceptance_checklist",
+        "risks",
+        "platform_dimensions",
+        "open_questions",
+        "differentiator_focus",
+        "suggested_internal_routes",
+        "parity_doc_hint",
+        "source_pin_date",
+        "inquanto_version_seen"
+      ],
+      "properties": {
+        "appendix_c_node_index": { "type": "integer", "minimum": 1 },
+        "breadcrumb": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "slug": { "type": "string" },
+        "title_zh": { "type": "string" },
+        "title_en": { "type": "string" },
+        "inquanto_anchor": { "type": ["string", "null"] },
+        "mirror_site_path": { "type": "string", "pattern": "^/mirror/.+/$" },
+        "pillar": { "type": "string", "enum": ["P1", "P2", "P3", "P4", "meta"] },
+        "diataxis": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["shipped", "partial", "placeholder", "not-applicable"]
+        },
+        "is_class_leaf": { "type": "boolean" },
+        "milestone": { "type": ["string", "null"] },
+        "qchem_module": { "type": ["string", "null"] },
+        "reason_zh": { "type": ["string", "null"] },
+        "reason_en": { "type": ["string", "null"] },
+        "summary_zh": { "type": ["string", "null"] },
+        "summary_en": { "type": ["string", "null"] },
+        "acceptance_checklist": { "type": "array", "items": { "type": "string" } },
+        "risks": { "type": "array", "items": { "type": "string" } },
+        "platform_dimensions": {
+          "type": "object",
+          "required": [
+            "cloud_tenant",
+            "backend_observability",
+            "security_compliance",
+            "seo_url",
+            "i18n",
+            "ci"
+          ],
+          "additionalProperties": true,
+          "properties": {
+            "cloud_tenant": { "type": "string" },
+            "backend_observability": { "type": "string" },
+            "security_compliance": { "type": "string" },
+            "seo_url": { "type": "string" },
+            "i18n": { "type": "string" },
+            "ci": { "type": "string" },
+            "p4_jobs_api": { "type": "string" }
+          }
+        },
+        "open_questions": { "type": "array", "items": { "type": "string" } },
+        "differentiator_focus": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "mirror_audit",
+              "repro_contract",
+              "cloud_tenant",
+              "multi_backend",
+              "parity_evidence"
+            ]
+          },
+          "minItems": 1
+        },
+        "suggested_internal_routes": {
+          "type": "array",
+          "items": { "type": "string" },
+          "minItems": 1
+        },
+        "parity_doc_hint": { "type": "string" },
+        "source_pin_date": { "type": ["string", "null"] },
+        "inquanto_version_seen": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

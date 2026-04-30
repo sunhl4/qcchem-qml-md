@@ -1,0 +1,48 @@
+# IQEB outer loop + inner VQE on H2 active space (L1 parity; non-default algorithm).
+# See docs/InQuanto_B_J_逐项闭合计划.md 序 C3.
+schema_version: "1"
+experiment_id: "h2_iqeb_sto3g_001"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "iqeb"
+  iqeb_max_rounds: 2
+  vqe_depth: 1
+  vqe_maxiter: 200
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"

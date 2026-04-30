@@ -1,0 +1,57 @@
+# Grouped Pauli energy from **Qiskit Aer (or any Qiskit Backend) shot histograms** — true bitstring path.
+# Requires: pip install "qchem-stack[quantum,chem]"  (Qiskit + qiskit-aer + PySCF).
+# Run: `run_pipeline_from_config` on this file; see docs/技术文档_设备比特串与Qiskit采样路径.md
+schema_version: "1"
+experiment_id: "h2_sto3g_qiskit_pauli_shots"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "qiskit_aer_pauli"
+  provider: "qiskit"
+  qiskit_mode: "statevector"
+  # Per commuting-group / per-term circuit; used for stderr bookkeeping and Qiskit run(..., shots=...)
+  shots_per_circuit: 2048
+  # Optional Aer knobs (defaults to automatic method); optional: backend.meta["aer_method"]
+  # Optional: pass a pre-built `Backend` object in `qiskit_shots_backend` (see technical doc)
+  meta:
+    qiskit_shots_backend: "aer"
+    qiskit_transpile_optimization: 0
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 50
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"
+  # Mutually exclusive with run_sampled_pauli_protocol
+  run_qiskit_shots_pauli_protocol: true
+  record_pauli_measurement_histograms: true
