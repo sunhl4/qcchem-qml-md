@@ -6,7 +6,7 @@ import pickle
 import uuid
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -30,6 +30,10 @@ from qchem_stack.mitigation.zne import zne_scale_energy
 from qchem_stack.quantum.statevector import hea_state
 from qchem_stack.protocols.pauli_support import hamiltonian_pauli_term_records
 
+# Pauli ``run``/``evaluate`` expectation paths (P0): exact executor vs grouped statevector MC vs Qiskit
+# ``get_counts`` — see ``docs/技术文档_设备比特串与Qiskit采样路径.md`` §2 and
+# ``protocols.inquanto_contract.protocol_expectation_semantics_public``.
+
 
 class ProtocolPhase(str, Enum):
     INSTANTIATE = "instantiate"
@@ -41,7 +45,13 @@ class ProtocolPhase(str, Enum):
 
 @dataclass
 class PauliAveragingProtocol:
-    """Five-stage protocol with **commuting Pauli groups** (fewer measurement circuits) and shot stderr bounds."""
+    """Five-stage protocol with **commuting Pauli groups** (fewer measurement circuits) and shot stderr bounds.
+
+    **Evaluate / expectation (P0)**: when Pauli averaging runs, ``protocol_counts`` records
+    ``expectation_source`` and ``energy_stderr_model`` — either the default exact executor path,
+    ``run_sampled`` statevector grouped MC, or ``run_qiskit_shots`` device/Aer histograms
+    (mutually exclusive shot modes; see module comment above).
+    """
 
     hamiltonian: QubitOperator
     n_qubits: int
@@ -49,6 +59,7 @@ class PauliAveragingProtocol:
     pass_bundle: CompilerPassBundle = field(default_factory=CompilerPassBundle)
     pmsv: PMSVConfig | None = None
     zne_scales: list[float] | None = None
+    zne_mode: Literal["scalar_stub", "circuit_scale_fold"] = "scalar_stub"
     hea_depth: int = 1
     angles: np.ndarray = field(default_factory=lambda: np.zeros(1, dtype=float))
     measurement_grouping: Literal["tensor_product", "greedy_commuting"] = "tensor_product"
@@ -250,8 +261,45 @@ class PauliAveragingProtocol:
             kept = filter_shots_pmsv(raw_shots, self.pmsv.retention_rate, noise_rng)
             self._counts["kept_shots"] = kept
         if self.zne_scales:
-            scaled = [zne_scale_energy(e_val, s) for s in self.zne_scales]
-            self._counts["zne_energies"] = scaled
+            scales_f = [float(s) for s in self.zne_scales]
+            fold_requested = self.zne_mode == "circuit_scale_fold"
+            unsupported_fold = fold_requested and (self.run_sampled or self.run_qiskit_shots)
+            if fold_requested and not unsupported_fold:
+                base_depth = int(self.hea_depth)
+                curve: list[float] = []
+                for s in scales_f:
+                    eff_depth = max(1, base_depth + int(max(0.0, round(s - 1.0))))
+                    curve.append(
+                        float(
+                            exe.expectation_hea(
+                                self.hamiltonian,
+                                self.n_qubits,
+                                self.angles,
+                                eff_depth,
+                            )
+                        )
+                    )
+                self._counts["zne_curve"] = curve
+                self._counts["zne_energies"] = curve
+                self._counts["zne_mode"] = "circuit_scale_fold"
+                arr_s = np.asarray(scales_f, dtype=float)
+                arr_e = np.asarray(curve, dtype=float)
+                if arr_e.size >= 2:
+                    coef = np.polyfit(arr_s, arr_e, 1)
+                    self._counts["zne_extrapolated_energy"] = float(np.polyval(coef, 1.0))
+                else:
+                    self._counts["zne_extrapolated_energy"] = float(curve[0])
+                base_budget = int(self._counts.get("total_shots_budget", shots * max(1, n_groups)))
+                shot_mult = sum(max(1, int(round(s))) for s in scales_f)
+                self._counts["total_shots_budget"] = base_budget * shot_mult
+            else:
+                scaled = [zne_scale_energy(e_val, s) for s in scales_f]
+                self._counts["zne_energies"] = scaled
+                self._counts["zne_mode"] = "scalar_stub"
+                if unsupported_fold:
+                    self._counts["zne_circuit_fold_fallback_reason"] = (
+                        "circuit_scale_fold requires exact executor path (disable run_sampled / run_qiskit_shots)"
+                    )
         if self.pmsv is not None:
             rr = float(self.pmsv.retention_rate)
             discard = max(0.0, min(1.0, 1.0 - rr))
@@ -272,14 +320,34 @@ class PauliAveragingProtocol:
         return float(self._counts.get("expectation", 0.0))
 
     def dataframe_circuit_shot_rows(self) -> list[dict[str, Any]]:
-        rows = []
+        rows: list[dict[str, Any]] = []
         plan = self._measurement_plan or build_measurement_plan(
             self.hamiltonian, self.n_qubits, grouping=self.measurement_grouping
         )
         metas = plan.to_circuit_metas()
         eff = int(self._counts.get("shots_per_circuit_effective", self.backend.shots_per_circuit))
+        zne_scales = self.zne_scales or []
+        if self._counts.get("zne_mode") == "circuit_scale_fold" and zne_scales:
+            for si, sf in enumerate(float(s) for s in zne_scales):
+                shot_m = max(1, int(round(sf)))
+                for i, c in enumerate(self._compiled):
+                    extra: dict[str, Any] = {"zne_scale": sf, "zne_scale_index": si}
+                    if i < len(metas):
+                        extra["pauli_group_id"] = metas[i].get("group_id")
+                        extra["n_pauli_terms"] = metas[i].get("n_terms")
+                        extra["synthesized"] = metas[i].get("synthesized")
+                    rows.append(
+                        circuit_resource_row(
+                            f"zne{si}_circ_{i}",
+                            c,
+                            shots=eff * shot_m,
+                            backend=self.backend,
+                            extra=extra,
+                        )
+                    )
+            return rows
         for i, c in enumerate(self._compiled):
-            extra: dict[str, Any] = {}
+            extra = {}
             if i < len(metas):
                 extra["pauli_group_id"] = metas[i].get("group_id")
                 extra["n_pauli_terms"] = metas[i].get("n_terms")
@@ -290,7 +358,7 @@ class PauliAveragingProtocol:
                     c,
                     shots=eff,
                     backend=self.backend,
-                    extra=extra or None,
+                    extra=cast(dict[str, Any] | None, extra or None),
                 )
             )
         return rows

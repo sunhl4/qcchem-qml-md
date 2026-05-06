@@ -64,8 +64,13 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
         "configs/tutorial_inquanto_chain_h2.yaml",
         "configs/example_h2_excited_smoke.yaml",
         "configs/example_h2_iqeb.yaml",
+        "configs/example_h2_uccsd.yaml",
+        "configs/example_h2_uccsd_trotter.yaml",
+        "configs/example_h2_zne_circuit_fold.yaml",
+        "configs/example_decomposition_plugin_toy.yaml",
         "configs/example_h2_projection_trace.yaml",
         "configs/example_h4_projection_mulliken.yaml",
+        "configs/example_oniom_toy.yaml",
     ),
 )
 def test_m2_config_only_export_stable_keys(cfg_rel: str) -> None:

@@ -15,10 +15,10 @@ from qchem_stack.config import ExperimentConfig
 def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any] | None:
     """
     If any mitigation is enabled, return a JSON-serializable task graph
-    (input → … → output) for **sequential** PMSV / ZNE composition.
+    (input → … → output) for **sequential** SPAM (optional) / PMSV / ZNE composition.
     """
     m = cfg.mitigation
-    if not (m.pmsv_enabled or m.zne_enabled):
+    if not (m.pmsv_enabled or m.zne_enabled or m.spam_calibration_enabled):
         return None
 
     nodes: list[dict[str, Any]] = [
@@ -27,6 +27,19 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
     edges: list[dict[str, str]] = []
     order = 0
     prev = "in0"
+    if m.spam_calibration_enabled:
+        order += 1
+        nid = f"n{order}"
+        nodes.append(
+            {
+                "id": nid,
+                "kind": "SPAM_readout_calibration_stub",
+                "order": order,
+                "note": "Affine readout toy (see mitigation.spam); graph order matches runtime trace.",
+            }
+        )
+        edges.append({"source": prev, "target": nid, "dep": "sequential"})
+        prev = nid
     if m.pmsv_enabled:
         order += 1
         nid = f"n{order}"

@@ -1,0 +1,49 @@
+# DMET-shaped demo: two fragment labels share the global CAS Hamiltonian; dense ED impurity solve per fragment.
+schema_version: "1"
+experiment_id: "h4_dmet_exact_shared_demo"
+random_seed: 7
+
+molecule:
+  symbols: ["H", "H", "H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+    - [0.0, 0.0, 2.8]
+    - [0.0, 0.0, 4.2]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  provider: "statevector"
+  shots_per_circuit: 1024
+
+mitigation:
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "dmet"
+  fragment_labels: ["frag_a", "frag_b"]
+  dmet_hamiltonian_source: "whole_active_system"
+  dmet_multifragment_one_shot_shared_hamiltonian: true
+  dmet_fragment_use_exact_solver: true
+  dmet_fragment_exact_max_qubits: 14
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 80
+  use_pauli_protocol: false

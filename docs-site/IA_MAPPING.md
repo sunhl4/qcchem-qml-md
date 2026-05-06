@@ -50,8 +50,8 @@
 | `竞争定位与路线图_对标Quantinuum产品与技术路线.md` | `/concept/competitive-positioning` | 全文迁入 |
 | `工程记忆_Quantinuum对标与数据流技术文档.md` | `/concept/engineering-memory-quantinuum` | 全文迁入 |
 | `L3_benchmark_suite_roadmap.md` | `/parity/l3-benchmark-roadmap` | 全文迁入 |
-| `记忆_开放栈对标完成度与待闭合项.md` | `/parity/open-stack-memory` | 全文迁入 |
-| `记忆_HTTP_API与作业队列_工程记忆.md` | `/concept/http-api-worker-memory` | 全文迁入 |
+| `记忆_开放栈…`（已删） | `/concept/engineering-memory-quantinuum#13-…` | 合并入工程记忆 §13；`/parity/open-stack-memory` 别名 |
+| `记忆_HTTP…`（已删） | `/reference/http-api-sqlite-jobs#9-…` | 合并入 HTTP 契约 §9；`/concept/http-api-worker-memory` 别名 |
 | `不排期项_转排期与实现说明.md` | `/parity/backlog-to-schedule` | 全文迁入 |
 
 未列入的短文可归并到 Parity 或 Concept 子索引（后续迭代）。

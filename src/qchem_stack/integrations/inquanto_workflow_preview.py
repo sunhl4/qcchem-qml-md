@@ -35,6 +35,14 @@ def _hints_build(cfg: ExperimentConfig) -> list[str]:
     lines = [f"algorithm={q.algorithm}"]
     if q.algorithm == "vqe":
         lines.append(f"VQE depth={q.vqe_depth} maxiter={q.vqe_maxiter}")
+        if q.variational_ansatz == "uccsd":
+            if q.uccsd_trotter_steps is not None:
+                lines.append(
+                    f"variational_ansatz=uccsd Trotter layers={int(q.uccsd_trotter_steps)} "
+                    "(first-order product formula, JW)"
+                )
+            else:
+                lines.append("variational_ansatz=uccsd (closed-shell cluster exponentials, JW)")
     elif q.algorithm == "adapt":
         lines.append(f"ADAPT max_iter={q.adapt_max_iter}")
     else:
@@ -77,7 +85,7 @@ def _hints_run(cfg: ExperimentConfig) -> list[str]:
         lines.append(f"QSE dim={q.qse_subspace_dim}")
     if q.sceom_after_variational:
         lines.append("SCEOM after variational")
-    if q.qpe_demo_track_after_variational:
+    if q.qpe_demo_track_requested():
         lines.append("QPE demo track")
     return lines
 
@@ -139,6 +147,10 @@ def computable_graph_v2(
     (execution order is **not** changed — graph is for UX / Methods).
 
     This is an **open approximation** of vendor composable graphs (no fusion / conditional nodes).
+
+    To recover the underlying ref list from JSON, use
+    :func:`~qchem_stack.protocols.computable.refs_from_computable_graph_v2` (L1 round-trip with the
+    same ``cfg`` for edge overrides).
     """
     nodes: list[dict[str, Any]] = []
     for i, c in enumerate(refs):
@@ -313,5 +325,12 @@ def slim_product_summary_from_pipeline_result(row: dict[str, Any]) -> dict[str, 
     ps = repro.get("parity_snapshot")
     if isinstance(ps, dict):
         out["parity_snapshot_keys"] = sorted(ps.keys())
+
+    if isinstance(repro.get("workflow_preview_v1"), dict):
+        out["workflow_preview_in_repro"] = True
+
+    ew = repro.get("embedding_workflow")
+    if isinstance(ew, dict) and ew.get("epistemic_bound"):
+        out["embedding_epistemic_bound"] = str(ew["epistemic_bound"])[:400]
 
     return out

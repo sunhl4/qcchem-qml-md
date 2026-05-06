@@ -1,0 +1,57 @@
+# ONIOM-shaped toy: two fragment labels on a linear H4 chain share the global CAS Hamiltonian (DMET *shape*).
+# ``oniom_layers_v1`` is documentation-only metadata in ``embedding_workflow.oniom_toy_v1``.
+schema_version: "1"
+experiment_id: "h4_oniom_toy_layers_001"
+random_seed: 11
+
+molecule:
+  symbols: ["H", "H", "H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+    - [0.0, 0.0, 2.8]
+    - [0.0, 0.0, 4.2]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  provider: "statevector"
+  shots_per_circuit: 1024
+
+mitigation:
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "dmet"
+  fragment_labels: ["qm_core", "mm_shell"]
+  dmet_hamiltonian_source: "whole_active_system"
+  dmet_multifragment_one_shot_shared_hamiltonian: true
+  dmet_fragment_use_exact_solver: true
+  dmet_fragment_exact_max_qubits: 14
+  oniom_layers_v1:
+    - role: "QM"
+      fragment_ids: ["qm_core"]
+      note: "sto-3g toy high layer"
+    - role: "MM"
+      fragment_ids: ["mm_shell"]
+      note: "toy low layer — same shared Hamiltonian demo path"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 80
+  use_pauli_protocol: false

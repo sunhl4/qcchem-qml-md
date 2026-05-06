@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from qchem_stack.config import (
     ActiveSpaceSpec,
     ExperimentConfig,
@@ -13,6 +15,8 @@ from qchem_stack.protocols.computable import (
     ComputableSpec,
     list_computable_specs_for_config,
     list_computables_for_config,
+    refs_from_computable_graph_v2,
+    specs_from_computable_graph_v2,
 )
 
 
@@ -51,3 +55,23 @@ def test_list_specs_includes_iqeb_ground_energy_item() -> None:
     assert g.details["algorithm"] == "iqeb"
     assert g.details["iqeb_max_rounds"] == 4
     assert g.details["vqe_depth"] == 2
+
+
+def test_refs_from_computable_graph_v2_rejects_wrong_schema() -> None:
+    with pytest.raises(ValueError, match="computable_graph_v2"):
+        refs_from_computable_graph_v2({"schema": "computable_graph_v1", "nodes": []})
+
+
+def test_specs_from_graph_matches_refs_from_graph() -> None:
+    graph = {
+        "schema": "computable_graph_v2",
+        "nodes": [
+            {"id": "computable_0", "name": "ground_state_energy", "kind": "energy", "details": {"algorithm": "vqe"}},
+        ],
+        "edges": [],
+        "roots": ["computable_0"],
+    }
+    refs = refs_from_computable_graph_v2(graph)
+    specs = specs_from_computable_graph_v2(graph)
+    assert len(specs) == 1
+    assert specs[0].to_ref() == refs[0]

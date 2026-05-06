@@ -1,0 +1,361 @@
+/**
+ * CSS files with the .module.css suffix will be treated as CSS modules
+ * and scoped locally.
+ */
+
+.heroBanner {
+  padding: 5.6rem 0 5rem;
+  text-align: left;
+  position: relative;
+  overflow: hidden;
+  background:
+    radial-gradient(circle at 15% 18%, rgba(123, 209, 255, 0.18), transparent 28%),
+    radial-gradient(circle at 82% 26%, rgba(170, 145, 255, 0.22), transparent 32%),
+    linear-gradient(135deg, #071d2b 0%, #0f3159 45%, #251c58 100%);
+}
+
+.heroBanner::after {
+  content: '';
+  position: absolute;
+  inset: auto -5% -120px;
+  height: 220px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0), rgba(13, 75, 104, 0.22));
+  pointer-events: none;
+}
+
+.heroContent {
+  display: grid;
+  grid-template-columns: minmax(0, 1.08fr) minmax(320px, 0.82fr);
+  align-items: center;
+  gap: 3rem;
+  position: relative;
+  z-index: 1;
+}
+
+.heroCopy {
+  max-width: 720px;
+}
+
+.eyebrow {
+  margin: 0 0 0.55rem;
+  color: rgba(214, 232, 255, 0.9);
+  font-size: 0.9rem;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.heroTitle {
+  font-size: clamp(2.65rem, 6vw, 5.1rem);
+  letter-spacing: -0.055em;
+  line-height: 0.95;
+  margin-bottom: 1rem;
+  max-width: 780px;
+}
+
+.heroSubtitle {
+  color: rgba(236, 245, 255, 0.88);
+  max-width: 660px;
+  font-size: clamp(1.08rem, 2vw, 1.35rem);
+}
+
+.heroVisual {
+  min-height: 330px;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+
+.orbit {
+  width: min(390px, 78vw);
+  aspect-ratio: 1;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  position: relative;
+  box-shadow:
+    inset 0 0 50px rgba(123, 209, 255, 0.08),
+    0 0 80px rgba(123, 209, 255, 0.1);
+}
+
+.orbit::before,
+.orbit::after {
+  content: '';
+  position: absolute;
+  inset: 13%;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  transform: rotate(28deg) scaleX(1.24);
+}
+
+.orbit::after {
+  inset: 25%;
+  transform: rotate(-34deg) scaleX(1.38);
+  border-color: rgba(123, 209, 255, 0.18);
+}
+
+.orbitDotA,
+.orbitDotB,
+.orbitDotC {
+  position: absolute;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #7bd1ff;
+  box-shadow: 0 0 24px rgba(123, 209, 255, 0.9);
+}
+
+.orbitDotA {
+  top: 16%;
+  left: 64%;
+}
+
+.orbitDotB {
+  right: 18%;
+  bottom: 28%;
+  background: #c4b5fd;
+}
+
+.orbitDotC {
+  left: 19%;
+  bottom: 31%;
+  background: #d6f7ff;
+}
+
+.visualCard {
+  position: absolute;
+  width: min(300px, 78%);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 1.15rem;
+  background: rgba(8, 20, 34, 0.62);
+  box-shadow: 0 24px 80px rgba(0, 0, 0, 0.28);
+  backdrop-filter: blur(18px) saturate(135%);
+}
+
+.visualCard span,
+.visualCard small {
+  display: block;
+  color: rgba(226, 241, 255, 0.72);
+  font-family: var(--ifm-font-family-monospace);
+}
+
+.visualCard strong {
+  display: block;
+  color: #fff;
+  font-size: 1.08rem;
+  margin: 0.45rem 0;
+}
+
+@media screen and (max-width: 996px) {
+  .heroBanner {
+    padding: 3rem 1rem;
+    text-align: center;
+  }
+
+  .heroContent {
+    grid-template-columns: 1fr;
+    gap: 2rem;
+  }
+
+  .heroCopy {
+    margin: 0 auto;
+  }
+
+  .heroSubtitle {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+.buttons {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.8rem;
+  flex-wrap: wrap;
+}
+
+.badges {
+  display: flex;
+  justify-content: flex-start;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+  flex-wrap: wrap;
+}
+
+.badges span {
+  border: 1px solid rgba(255, 255, 255, 0.48);
+  color: #f5f9ff;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  padding: 0.28rem 0.72rem;
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(10px);
+}
+
+@media screen and (max-width: 996px) {
+  .badges {
+    justify-content: center;
+  }
+}
+
+.quickStartSection {
+  padding: 3.2rem 0 1.4rem;
+  background:
+    linear-gradient(180deg, rgba(248, 251, 255, 0.72), rgba(255, 255, 255, 0)),
+    radial-gradient(circle at 50% 0%, rgba(20, 99, 143, 0.08), transparent 36%);
+}
+
+.sectionHeader {
+  text-align: center;
+  margin-bottom: 1.6rem;
+}
+
+.sectionKicker {
+  color: var(--ifm-color-primary);
+  font-size: 0.78rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+.sectionTitle {
+  margin-bottom: 0.3rem;
+  font-size: clamp(1.85rem, 3vw, 2.45rem);
+  letter-spacing: -0.03em;
+}
+
+.sectionSubtitle {
+  text-align: center;
+  color: var(--ifm-color-emphasis-700);
+  max-width: 740px;
+  margin: 0 auto 1.5rem;
+}
+
+.quickGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+@media screen and (max-width: 996px) {
+  .quickGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .quickGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.quickCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(20, 99, 143, 0.12);
+  border-radius: 18px;
+  padding: 1.12rem 1.15rem;
+  background: rgba(255, 255, 255, 0.78);
+  box-shadow: 0 12px 38px rgba(9, 24, 44, 0.07);
+  backdrop-filter: blur(14px) saturate(130%);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.quickCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(9, 24, 44, 0.13);
+  border-color: var(--ifm-color-primary-light);
+}
+
+.quickCard h3 {
+  margin: 0 0 0.3rem;
+  font-size: 1.02rem;
+}
+
+.quickCard p {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+
+.metricsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.7rem;
+  margin: 0.7rem 0 1rem;
+}
+
+.metricCard {
+  border: 1px solid rgba(20, 99, 143, 0.1);
+  border-radius: 16px;
+  padding: 0.9rem 0.7rem;
+  text-align: center;
+  background: rgba(255, 255, 255, 0.62);
+  box-shadow: 0 8px 26px rgba(9, 24, 44, 0.05);
+}
+
+.metricValue {
+  margin: 0;
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--ifm-color-primary);
+}
+
+.metricLabel {
+  margin: 0.15rem 0 0;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.88rem;
+}
+
+.pathwayCard {
+  border: 1px solid rgba(20, 99, 143, 0.16);
+  border-radius: 18px;
+  padding: 1.1rem 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(20, 99, 143, 0.08), rgba(123, 209, 255, 0.05)),
+    rgba(255, 255, 255, 0.72);
+  box-shadow: 0 12px 36px rgba(9, 24, 44, 0.06);
+}
+
+.pathwayCard h3 {
+  margin: 0 0 0.3rem;
+}
+
+.pathwayCard p {
+  margin: 0;
+  color: var(--ifm-color-emphasis-700);
+}
+
+:global([data-theme='dark']) .quickCard,
+:global([data-theme='dark']) .metricCard {
+  background: linear-gradient(180deg, rgba(35, 45, 59, 0.72), rgba(28, 35, 46, 0.86));
+  border-color: rgba(135, 157, 184, 0.28);
+}
+
+:global([data-theme='dark']) .quickCard p,
+:global([data-theme='dark']) .metricLabel,
+:global([data-theme='dark']) .pathwayCard p,
+:global([data-theme='dark']) .sectionSubtitle {
+  color: rgba(232, 240, 252, 0.86);
+}
+
+:global([data-theme='dark']) .pathwayCard {
+  background: linear-gradient(135deg, rgba(62, 166, 222, 0.12), rgba(142, 119, 255, 0.08));
+  border-color: rgba(62, 166, 222, 0.45);
+}
+
+@media screen and (max-width: 996px) {
+  .metricsGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media screen and (max-width: 560px) {
+  .metricsGrid {
+    grid-template-columns: 1fr;
+  }
+}

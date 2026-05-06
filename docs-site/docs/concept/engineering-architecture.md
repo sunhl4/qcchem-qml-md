@@ -67,7 +67,7 @@ Gateway services should map these to HTTP/status codes and structured logs witho
 
 ## 9. HTTP API (optional extra)
 
-Chinese contract tables (endpoints, `schema`, `meta`, observability): [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](/reference/http-api-sqlite-jobs). Maintainer checklist: [记忆_HTTP_API与作业队列_工程记忆.md](/concept/http-api-worker-memory).
+Chinese contract tables (endpoints, `schema`, `meta`, observability): [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](/reference/http-api-sqlite-jobs). Maintainer decisions + checklist: **§9** in the same page (legacy HTTP memory doc merged).
 
 - Install: `pip install "qchem-stack[api]"`.
 - App: `qchem_stack.api.app:app` (FastAPI). Run: `uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000`.

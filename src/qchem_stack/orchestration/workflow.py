@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
+from qchem_stack.integrations.inquanto_workflow_preview import workflow_preview_payload
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config
 from qchem_stack.protocols.computable import computables_export_dict
 
@@ -32,6 +33,7 @@ class WorkflowCoordinator:
         pc = out.get("protocol_counts") if isinstance(out.get("protocol_counts"), dict) else None
         side: dict[str, Any] = {
             "computable_abstract": computables_export_dict(self._cfg, protocol_counts=pc),
+            "workflow_preview_v1": workflow_preview_payload(self._cfg),
             "hamiltonian_fingerprint": None,
         }
         hm = out.get("hamiltonian_meta")

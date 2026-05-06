@@ -2,10 +2,17 @@ from __future__ import annotations
 
 import hashlib
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from openfermion import InteractionOperator, jordan_wigner
+from openfermion import (
+    InteractionOperator,
+    bravyi_kitaev,
+    count_qubits,
+    get_fermion_operator,
+    jordan_wigner,
+    symmetry_conserving_bravyi_kitaev,
+)
 from openfermion.chem.molecular_data import spinorb_from_spatial
 from openfermion.linalg import get_sparse_operator
 from openfermion.ops import QubitOperator
@@ -15,6 +22,34 @@ from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
 
 if TYPE_CHECKING:
     from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+
+FermionQubitMappingName = Literal[
+    "jordan_wigner",
+    "bravyi_kitaev",
+    "symmetry_conserving_bravyi_kitaev",
+]
+
+
+def _interaction_operator_to_qubits(
+    mol_op: InteractionOperator,
+    mapping: FermionQubitMappingName,
+    *,
+    n_spin_orbitals: int | None = None,
+    n_active_fermions: int | None = None,
+) -> QubitOperator:
+    if mapping == "jordan_wigner":
+        return jordan_wigner(mol_op)
+    if mapping == "bravyi_kitaev":
+        return bravyi_kitaev(mol_op)
+    if mapping == "symmetry_conserving_bravyi_kitaev":
+        if n_spin_orbitals is None or n_active_fermions is None:
+            raise ValueError(
+                "symmetry_conserving_bravyi_kitaev requires n_spin_orbitals and n_active_fermions "
+                "(OpenFermion SCBK removes two qubits vs JW on the same active space)."
+            )
+        fo = get_fermion_operator(mol_op)
+        return symmetry_conserving_bravyi_kitaev(fo, int(n_spin_orbitals), int(n_active_fermions))
+    raise ValueError(f"Unknown fermion_qubit_mapping: {mapping!r}")
 
 
 def hamiltonian_fingerprint_from_qubit_operator(
@@ -47,7 +82,10 @@ def hamiltonian_fingerprint_from_qubit_operator(
 
 @dataclass
 class QubitHamiltonian:
-    """Jordan–Wigner (or mapped) qubit operator + sparse cache."""
+    """Qubit operator from a molecular :class:`InteractionOperator` + sparse cache.
+
+    ``meta['fermion_to_qubit_map']`` records the mapping used (e.g. Jordan–Wigner, Bravyi–Kitaev, or SCBK).
+    """
 
     operator: QubitOperator
     n_qubits: int
@@ -62,8 +100,10 @@ def molecular_hamiltonian_from_pyscf(
     rhf: PySCFRHFResult,
     n_active_orbitals: int,
     n_active_electrons: int,
+    *,
+    fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
 ) -> QubitHamiltonian:
-    """Build active-space molecular Hamiltonian (MO integrals) and JW-map."""
+    """Build active-space molecular Hamiltonian (MO integrals) and map to qubits."""
     from qchem_stack.chem.drivers.pyscf_driver import active_space_integrals
 
     constant, h1_sp, h2_sp = active_space_integrals(
@@ -72,22 +112,28 @@ def molecular_hamiltonian_from_pyscf(
     h1_so, h2_so = spinorb_from_spatial(h1_sp, h2_sp)
     n_spin = int(h1_so.shape[0])
     mol_op = InteractionOperator(float(constant), h1_so, h2_so)
-    qop = jordan_wigner(mol_op)
+    qop = _interaction_operator_to_qubits(
+        mol_op,
+        fermion_qubit_mapping,
+        n_spin_orbitals=n_spin,
+        n_active_fermions=n_active_electrons,
+    )
+    n_phys = int(count_qubits(qop))
     fs = FermionSpace(n_spin_orbitals=n_spin, n_electrons=n_active_electrons)
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
     meta = {
-        "fermion_to_qubit_map": "jordan_wigner",
+        "fermion_to_qubit_map": fermion_qubit_mapping,
         "integral_source": "pyscf_active_space",
         "n_active_orbitals": n_active_orbitals,
         "n_active_electrons": n_active_electrons,
-        "n_qubits": n_spin,
+        "n_qubits": n_phys,
         "hamiltonian_fingerprint": fp,
     }
     if fp_trunc:
         meta["hamiltonian_fingerprint_truncated"] = True
     if getattr(rhf, "driver_meta", None):
         meta["pyscf_driver"] = dict(rhf.driver_meta)
-    return QubitHamiltonian(operator=qop, n_qubits=n_spin, fermion_space=fs, meta=meta)
+    return QubitHamiltonian(operator=qop, n_qubits=n_phys, fermion_space=fs, meta=meta)
 
 
 def qubit_hamiltonian_from_spatial_chemist_integrals(
@@ -96,11 +142,12 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
     h2: np.ndarray,
     n_electrons: int,
     *,
+    fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
     integral_source: str = "spatial_chemist_integrals",
     meta_extra: dict[str, Any] | None = None,
     pyscf_driver_meta: dict[str, Any] | None = None,
 ) -> QubitHamiltonian:
-    """JW-map from spatial MO integrals with chemists' ``h2[p,q,r,s] = (pq|rs)`` (PySCF/OpenFermion layout)."""
+    """Map spatial MO integrals (chemists' ``h2[p,q,r,s] = (pq|rs)``) to qubits via OpenFermion."""
     h1a = np.asarray(h1, dtype=float)
     h2a = np.asarray(h2, dtype=float)
     norb = int(h1a.shape[0])
@@ -114,15 +161,21 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
     h1_so, h2_so = spinorb_from_spatial(h1a, h2a)
     n_spin = int(h1_so.shape[0])
     mol_op = InteractionOperator(float(constant), h1_so, h2_so)
-    qop = jordan_wigner(mol_op)
+    qop = _interaction_operator_to_qubits(
+        mol_op,
+        fermion_qubit_mapping,
+        n_spin_orbitals=n_spin,
+        n_active_fermions=n_electrons,
+    )
+    n_phys = int(count_qubits(qop))
     fs = FermionSpace(n_spin_orbitals=n_spin, n_electrons=n_electrons)
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
     meta: dict[str, Any] = {
-        "fermion_to_qubit_map": "jordan_wigner",
+        "fermion_to_qubit_map": fermion_qubit_mapping,
         "integral_source": integral_source,
         "n_active_orbitals": norb,
         "n_active_electrons": n_electrons,
-        "n_qubits": n_spin,
+        "n_qubits": n_phys,
         "hamiltonian_fingerprint": fp,
     }
     if fp_trunc:
@@ -131,4 +184,4 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
         meta["pyscf_driver"] = dict(pyscf_driver_meta)
     if meta_extra:
         meta.update(meta_extra)
-    return QubitHamiltonian(operator=qop, n_qubits=n_spin, fermion_space=fs, meta=meta)
+    return QubitHamiltonian(operator=qop, n_qubits=n_phys, fermion_space=fs, meta=meta)

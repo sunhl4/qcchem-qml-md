@@ -9,12 +9,12 @@
 - `PandM/materials/learning/quantum-chem/literature/Quantinuum_深度技术剖析_从积分到Shots的数据流与可证伪判据.md`
 - `PandM/materials/learning/quantum-chem/literature/Quantinuum_激发态深度剖析_VQD_QSE_SCEOM.md`
 - 能力矩阵：`docs/inquanto_public_parity_matrix.md`
-- **开放栈「记忆 + 缺口清单」**：[记忆_开放栈对标完成度与待闭合项.md](记忆_开放栈对标完成度与待闭合项.md)（闭源不可见部分的自研边界）
+- **开放栈「记忆 + 缺口清单」**：见本文 **[§13](#13-开放栈对标完成度与待闭合项原独立记忆合并)**（原 `记忆_开放栈对标完成度与待闭合项.md` 已合并）
 - **DMET / `parity_snapshot` 契约**：[技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)
 - **详细技术说明（本包）**：[技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md)（`CircuitIR`↔pytket、资源双轨、`JobHandle`/`protocol_hash`、与 Nexus **语义**类比）
 - 异步提交/拉结果短表：`docs/launch_retrieve_nexus_analog.md`
 - **HTTP + SQLite 队列 + 可观测性（契约）**：[技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)
-- **上述能力维护记忆**：[记忆_HTTP_API与作业队列_工程记忆.md](记忆_HTTP_API与作业队列_工程记忆.md)
+- **HTTP 维护决策与 Checklist**：[技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md) **§9**（原 `记忆_HTTP_API与作业队列_工程记忆.md` 已合并）
 
 ---
 
@@ -135,7 +135,7 @@
 **与 Nexus 的语义（已文档化，非 1:1 实现）**：
 
 - 短表：[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md)（`launch` / `retrieve` / worker 与 `JobHandle`）。
-- **本地 FastAPI 类比**（提交/列表/轮询、`parity-gaps`、`computables-preview`、`queue-stats`、`repro`-only）：[技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)；维护清单见 [记忆_HTTP_API与作业队列_工程记忆.md](记忆_HTTP_API与作业队列_工程记忆.md)。
+- **本地 FastAPI 类比**（提交/列表/轮询、`parity-gaps`、`computables-preview`、`queue-stats`、`repro`-only）：[技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)（契约 **§2–§7**；决策 **§9**）。
 - **`JobHandle.protocol_hash`**：与入队时 `SqliteJobStore` 中 `protocol_hash` 列一致，为 pickled 协议体的 SHA-256 前缀，便于和 `repro` 中作业指纹对账，**不** 等价于云侧项目 ID。
 - **`retrieve`**：语义同 `store.result(job_id)`；`status != DONE` 时**不**应假定存在 `expectation`（见 `PauliAveragingProtocol.retrieve` docstring）。
 
@@ -192,7 +192,7 @@
 | **可观测性** | `orchestration/run_context.py`（`RunContext`, `PipelineStageTimer`） |
 | 全管线异步入队 | `jobs/pipeline_jobs.py`, `jobs/pipeline_runner.py`, `jobs/worker_dispatch.py` |
 | 详细技术 | [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md) |
-| **HTTP / SQLite 队列 / 可观测性** | [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)；[记忆_HTTP_API与作业队列_工程记忆.md](记忆_HTTP_API与作业队列_工程记忆.md) |
+| **HTTP / SQLite 队列 / 可观测性** | [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)（含 §9 维护决策） |
 
 ---
 
@@ -216,4 +216,56 @@
 
 ---
 
-*文档版本：与仓库源码同步维护；重大行为变更时请更新 §1（缓解行）、§4、§7、§9、**§11** 及 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md)；必要时 bump 配置 `schema_version`（若引入破坏性 YAML 字段）。*
+## 13. 开放栈对标完成度与待闭合项（原独立记忆合并）
+
+**文档性质**：维护者决策记忆；口径与 [架构_InQuanto闭源能力闭合与可复现边界.md](架构_InQuanto闭源能力闭合与可复现边界.md) 一致：**L1 可审计**，非 **L0 闭源等价**。
+
+**关联技术说明**：
+
+- [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)
+- [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)
+- 机读差距：`qchem_stack.protocols.inquanto_contract.inquanto_gap_categories`
+- **聚合开放参考单包**：`parity_snapshot.open_gap_closure_reference`（`integrations/gap_closure_bundle.py`）
+
+### 13.1 我们「自己设计」的原则（闭源看不见时）
+
+| 原则 | 含义 |
+|------|------|
+| 阶段对齐 | SCF → 嵌入标签/意图 → 变分 → Pauli/编译/缓解 → 台账，与公开教程叙事同构 |
+| 合同优先 | 用 JSON schema 式字段（`parity_snapshot`、`embedding_workflow`）固定语义，便于审稿与 CI |
+| 参考实现可替换 | Protocol/钩子保留；stub 仅用于无 PySCF/无账户的 CI |
+| 诚实标注 | `epistemic_binding`、`caveat`、`dmet_solver_mode` 写明假设与不可冒充边界 |
+
+### 13.2 已在仓库落地的「开源侧」能力（≠ 对方闭源默认逐比特一致）
+
+| 原「缺口」叙事项 | 开源侧落地 | 说明 |
+|------------------|-----------|------|
+| Chemically aware UCC | `SinglesBeforeDoublesLexicographic`、`GreedyCommutingFermionicLayers`（OpenFermion commutator 分层）、`ChemicallyAwareUCCPolicy` 仍保留 | 文献可解释重组，**非** InQuanto 内部启发式 |
+| TKET 全链 / 编译 | `circuit_ir_tket_peephole_optimize_stats_or_none`（`FullPeepholeOptimise` before/after）、原 `circuit_ir_to_tket_stats_or_none` | **无** 商业离子阱私有 pass |
+| Nexus / HQC 工作流 | `nexus_public_workflow_blueprint`、既有 `nexus_cloud` / `nexus_analog` / `qnexus_probe`；**本地**可选 HTTP + `SqliteJobStore`（`api/app.py`） | **无** 真计费/队列二进制 |
+| Qermit | `qermit_mitigation_execution_overlays`、`mitigation_graph_report.execution_class_manifest` | **非** CQCL MitEx/MitRes |
+| cuTensorNet / TN 期望 | `tensornet.dense_expectation_reference`、stub + cuQuantum 探测保持 | **无** 大规模化学 TN 拓扑自动生成 |
+| 多片段 DMET | `DMETSelfConsistencyLoop` + **`run_uniform_hamiltonian_multifragment_toy`** | **非物理** bath：每片段同一全局 H，仅验证多片段循环 |
+| Schmidt 嵌入 + 外层 SCF | **`run_schmidt_density_feedback_cycles`**、**`run_schmidt_multifragment_density_cycles`** + 单片段 `schmidt_atomic_production` | **工程**对标 DMET *工作流形态*；**非**闭源 bath 拟合 |
+| L3 统计 | `l3_statistics_reference.energy_bootstrap_ci_stub` | bootstrap **示意** |
+| COSMO/PBC 驱动 | `open_driver_coverage_matrix` | **声明式**覆盖表 + PySCF 已实现路径 |
+
+**默认进快照的大包**：`ParityIntegrationsSpec.gap_closure_reference_bundle`（默认 `True`）→ `open_gap_closure_reference`（`open_gap_closure_reference_v1`）。
+
+### 13.3 原则上无法由本仓库「做完」的部分（L0 / 商业域）
+
+- 与 **闭源 wheel / 未公开 API** 的二进制或秘传超参一致（L0）。
+- **真实 HQC 账单、Nexus 生产 SLA、专用服务器侧 MitEx 调度延迟**。
+- **与某台 H 系列硬件** 在无人值班条件下的逐 shot 复现（L2/L3 需共同实验协议与原始数据）。
+
+若将来对方公开可检证接口，优先增厚 `integrations.*` 与 `parity_snapshot`，而非猜测闭包内行为。
+
+### 13.4 维护动作备忘
+
+- 能力变化时同步：`inquanto_gap_categories()`、[inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。
+- 新增 `parity_snapshot` 顶层键时：更新本节 §13.2、[技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)（若 DMET 相关）。
+- 变更 **HTTP 路由** / **作业表 `meta`** / **`run_context` 头** / **`pipeline_profile`** 时：同步 [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md) **§9**，并跑 `tests/test_api_runs.py`、`tests/test_job_store_list.py` 等。
+
+---
+
+*文档版本：与仓库源码同步维护；重大行为变更时请更新 §1（缓解行）、§4、§7、§9、**§11**、**§13** 及 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md)；必要时 bump 配置 `schema_version`（若引入破坏性 YAML 字段）。*

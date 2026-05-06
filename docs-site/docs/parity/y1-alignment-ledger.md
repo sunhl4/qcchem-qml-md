@@ -41,8 +41,8 @@
 
 ### Q3（月 7–9）：张量网 + 经典化学深度 + L3 套件
 
-- TN：小体系交叉检与 `parity_snapshot` 键；见 [L3_benchmark_suite_roadmap.md](/parity/l3-benchmark-roadmap)。
-- 经典化学：driver/AVAS/CASSCF **形状**（接口 + 文档）；诚实 PySCF 边界。
+- TN：矩阵与 gap **`tensornet`** 诚实 **`n/a`**（开放 stub）；可选 L3 路线图仍见 [L3_benchmark_suite_roadmap.md](/parity/l3-benchmark-roadmap)。
+- 经典化学：driver/PBC + **最小 CASSCF 审计**（`configs/example_h2_casscf_audit.yaml`）；AVAS/产品 CASSCF **仍为 partial**。
 
 ### Q4（月 10–12）：QPE/容错叙事 + 残余清零 + 年度签off
 
@@ -58,8 +58,9 @@
 | 月份 | yes 行数（估算） | partial | n/a | 无 gap 解释的 partial（目标 0） | 备注 |
 |------|------------------|---------|-----|----------------------------------|------|
 | Y1-M01 | | | | | |
+| Y1-M04 | **3** | **14** | **2** | 0 | 广义 P1 闭合；主表计数脚本：`qchem_qml_md/scripts/count_parity_matrix_main_tables.py`；**P2**：[P2 详细实施计划](/concept/p2-detailed-plan)（母稿：`docs/P2_详细实施计划.md`） |
 
-*说明：行数统计以 [inquanto_public_parity_matrix.md](/parity/public-matrix) 主表为准，主观分类需与 `inquanto_gap_categories` 一致。*
+*说明：行数统计以 [parity 矩阵](/parity/public-matrix) 主表 §1–§3 为准；脚本辅助计数，最终以 gap 语义为准。*
 
 ---
 
@@ -83,4 +84,6 @@
 - **295 节点机读 backlog**（仓库 `docs/inquanto-node-backlog.generated.json`；`npm run report:inquanto-backlog`）
 - 架构边界：[架构_InQuanto闭源能力闭合与可复现边界.md](/concept/architecture-boundaries)
 - 竞争策略：[竞争定位与路线图_对标Quantinuum产品与技术路线.md](/concept/competitive-positioning)
-- 签字清单：[L1_InQuanto_alignment_signoff.md](/parity/l1-signoff)
+- 路线图 P2：[P2 详细实施计划](/concept/p2-detailed-plan)
+- **P1 全量核对报告**（仓库）：`qchem_qml_md/docs/P1_completion_audit.md`
+- 签字清单：[L1_InQuanto_alignment_signoff.md](/parity/l1-signoff)；维护角色：仓库 `docs/MAINTAINERS.md`

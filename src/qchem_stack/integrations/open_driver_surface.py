@@ -28,12 +28,25 @@ def open_driver_coverage_matrix() -> dict[str, Any]:
             {
                 "inquanto_adjacent_name": "PBC / k-point mesh",
                 "status": "partial_kmesh",
-                "implementation": "chemistry_extended.pbc_cell_vectors_bohr + pbc_kpoint_mesh",
+                "implementation": (
+                    "chemistry_extended.pbc_cell_vectors_bohr + pbc_kpoint_mesh; "
+                    "Gamma demo YAML: configs/example_h2_pbc_gamma.yaml"
+                ),
             },
             {
                 "inquanto_adjacent_name": "Full COSMO/PBC feature parity with InQuanto drivers",
                 "status": "not_claimed",
                 "note": "Use PySCF ecosystem + explicit benchmarks; no vendor binary.",
+            },
+            {
+                "inquanto_adjacent_name": "AVAS / full CASSCF product workflows (Fe4N2-style tutorials)",
+                "status": "not_claimed",
+                "note": "No AVAS driver; CASCI-sized active integrals only where documented (projection path).",
+            },
+            {
+                "inquanto_adjacent_name": "CASSCF orbital optimization loop (InQuanto-pyscf class surface)",
+                "status": "not_claimed",
+                "note": "classical_reference_method and matrix rows are documentation hooks unless PySCF CASCI-only path applies.",
             },
         ],
     }

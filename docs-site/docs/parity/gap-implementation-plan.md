@@ -4,6 +4,8 @@
 
 **按序闭合（B→J，L1 对拍）**：维护稿 `qchem_qml_md/docs/InQuanto_B_J_逐项闭合计划.md`（不进 VitePress 树，与本文同源维护）
 
+**P2 双月排期（仓库母稿）**：`qchem_qml_md/docs/P2_详细实施计划.md` **§8**（8 周周历 + §6 执行序对照）。
+
 ---
 
 ## 1. 差距总表（相对 InQuanto 公开栈）
@@ -13,11 +15,11 @@
 | **云与计费** | Nexus、`qnexus`、HQC | 本地 SQLite + `jobs/cost` + YAML **`nexus_analog`** 单位账；可选 **`nexus_cloud`**（HTTP/ mock 侧车，无厂商 SDK） | **刻意不对齐**真云/真 HQC/合同与配额 |
 | **硬件** | H1/H2 等、校准与原生门集叙事 | `BackendSpec` + Qiskit / IonStack mock | 多后端**灵活**、非离子阱专优 |
 | **编译** | TKET 默认、chemistry-aware | 可选 [pytket 桥接](/reference/circuitir-tket-jobs) | **partial**：非默认全链 |
-| **对象模型** | `Computable`、丰富 `FermionSpace` 算子图 | `PauliAveragingProtocol` + 流水线函数 | **partial**：无独立 `Computable` 类 |
-| **经典化学** | 多 driver（COSMO、PBC、k 点、CASSCF/AVAS 等） | PySCF 主路径；**ddCOSMO**；**PBC**（RHF@Γ 或 **KRHF**+`pbc_kpoint_mesh`；CASCI 用 `pbc_active_space_kpoint_index`）；**嵌入**：单轮/多轮 **Schmidt 谱 bath + FCI 密度反馈**（`schmidt_dmet_max_cycles`）+ `whole_active_system` / DMET 钩子；**projection** 提供 **L1 轨迹**（`embedding_workflow` + `parity_snapshot.projection_embedding_open_trace`，样例 `configs/example_h2_projection_trace.yaml`，变分层仍为全局 JW） | **partial**：无 AVAS/全 CASSCF 产品深度；PBC+溶剂受 PySCF 能力限制；DMET 非闭源 bath 拟合 |
-| **Ansatz** | UCC/化学激发池、多化学 ansatz 名 | HEA、ADAPT、**IQEB（`quantum.algorithm=iqeb`，`configs/example_h2_iqeb.yaml`）** 等 | **partial**：UCC 非默认 |
-| **缓解** | Qermit `MitRes`/`MitEx` 图与产品运行时 | PMSV/ZNE/SPAM 存根 + **`qermit_analog` DAG 报告** + **`qermit_runtime` 线性执行迹**（`mitigation_dag_execution`）；`MitigationSpec.zne_scales` 与协议 ZNE 对齐 | **partial**：非 Qermit 商业二进制/调度 |
-| **张量网** | `CuTensorNetProtocol` / `inquanto-cutensornet` | **`cutensornet_protocol_stub`** + `opt_einsum` / **cupy** / **cuquantum** 检测等引擎位 | **partial**：有协议位与可复现行，**无** 闭源 cutensornet 化学收缩等价物 |
+| **对象模型** | `Computable`、丰富 `FermionSpace` 算子图 | `PauliAveragingProtocol` + 流水线函数；薄层 `protocols/computable.py` 与 workflow-preview / `repro` round-trip | **partial**：无闭源级独立 `Computable` **产品类** |
+| **经典化学** | 多 driver（COSMO、PBC、k 点、CASSCF/AVAS 等） | PySCF；**ddCOSMO**；**PBC**（样例 `configs/example_h2_pbc_gamma.yaml`）；Schmidt + **`schmidt_bath_sidecar_json_path`** + **`oniom_layers_v1`**（`configs/example_oniom_toy.yaml`）；projection；可选 **`casscf_orbital_optimization_audit`**（`configs/example_h2_casscf_audit.yaml`） | **partial**：无 AVAS/全 CASSCF **产品**深度；DMET 非闭源 bath **算法**拟合（有用户侧车） |
+| **Ansatz** | UCC/化学激发池、多化学 ansatz 名 | HEA、ADAPT、**IQEB**；**JW UCCSD**（`configs/example_h2_uccsd.yaml`）；**JW UCCSD Trotter**（`configs/example_h2_uccsd_trotter.yaml`） | **partial**：BK/SCBK 上 UCCSD Trotter **`n/a`**（矩阵 §2） |
+| **缓解** | Qermit `MitRes`/`MitEx` 图与产品运行时 | 同上 + **`parity_snapshot.zne_qiskit_unification_v1`**（见 [缓解映射](/concept/mitigation-mapping)） | **partial**：非 Qermit 商业二进制/调度 |
+| **张量网** | `CuTensorNetProtocol` / `inquanto-cutensornet` | stub + 引擎探测；矩阵 gap **`n/a`** | **`n/a`**：不宣称厂商化学尺度收缩 |
 | **协议 run** | 云侧 shot + DataFrame 一体 | 五阶段 + `protocol_counts` + 三能量路径 | **已较强**：现含 **精确 / statevector 采样 / Qiskit 比特串**（见 [技术说明](/reference/qiskit-shot-counts)） |
 | **激发态 / 谱** | 完整产品线叙事 | VQD/QSE/SCEOM/QPE 模块均为 **partial** | 算法深度与 InQuanto 闭源未逐条对齐 |
 | **MD/ML** | 非主宣传 | `md_bridge`、`QMEFDataset` | **本栈长板**（差异化） |
@@ -49,9 +51,11 @@
 2. **激发态报告**：`excited_resource_summary` / `resource_summary` 含 **`excited_methods_unified`**（schema v1）；export 含 **`excited_resource_from_config`**（仅 YAML，无跑库）。  
 3. **PMSV**：`MitigationSpec.pmsv_report_extension` / `pmsv_extra` + `mitigation.pmsv.finalize_pmsv_report` 合并进 `protocol_counts['pmsv_report']`。
 
-### P2 结构增强— **已落地（深化仍可比照 §1 表）**
+### 主线结构增强（差距文档 §3 批次，已交付）
 
-1. **QPE/容错 与 主 pipeline**：`quantum.qpe_demo_track_after_variational` → 输出 `qpe_demo_track`（Kitaev 稠密 + Bayesian toy）；样例 `configs/example_h2_qpe_track.yaml`；`repro.run_summary.qpe_demo_track_ran`。  
+> 注：此处 **不是** 竞品文档中的路线图 **P2（研究深度）**；路线图 P2 见 **[P2 详细实施计划](/concept/p2-detailed-plan)**（母稿：`qchem_qml_md/docs/P2_详细实施计划.md`）。
+
+1. **QPE/容错 与 主 pipeline**：`quantum.qpe_demo_track_after_variational` **或** `quantum.qpe_pipeline_integration` → 输出 `qpe_demo_track`（`qpe_qec_demo.pipeline_track`）；双轨 runnable：`configs/qpe_dual_track_demo.yaml`；传统 Pauli 链上样例仍用 `configs/example_h2_qpe_track.yaml`；`repro.run_summary.qpe_demo_track_ran`。  
 2. **Computable 薄层**：`qchem_stack.protocols.computable`（`ComputableRef`、`list_computables_for_config`、`computables_export_dict`），与 `inquanto_contract` 映射联动。  
 3. **TKET**：CI 单跑 `tests/test_pytket_bridge.py`（`[dev]` 含 `pytket`）。
 
@@ -119,9 +123,16 @@
 - 新增长板或关闭差距时：更新 [parity 矩阵](/parity/public-matrix) 相应行、本文 §1、以及 `inquanto_contract.inquanto_gap_categories()`。  
 - 论文 Methods：优先引用 `repro.run_summary`、`pauli_protocol_expectation_path`、`protocol_expectation_source`。
 - **公开 InQuanto 手册锚定**：维护时记录对照 `https://docs.quantinuum.com/inquanto/` 的日期（与 [L1_InQuanto_alignment_signoff.md](/parity/l1-signoff) 钉扎字段一致）；改版后做一次矩阵/机读表 diff 登记。
-- **Y1 「非云非硬件」公开面对标执行台账**（季度 OKR、月度度量、文档索引）：[台账](/parity/y1-alignment-ledger)；L3 数值套件路线：[L3](/parity/l3-benchmark-roadmap)；年度残余 `partial` SLA：[Y1 SLA](/parity/y1-residual-sla-template)。
+- **Y1 「非云非硬件」公开面对标执行台账**（季度 OKR、月度度量、文档索引）：[台账](/parity/y1-alignment-ledger)；L3 数值套件路线：[L3](/parity/l3-benchmark-roadmap)；年度残余 `partial` SLA：[Y1 SLA](/parity/y1-residual-sla-template)；**路线图 P2**：[P2 详细实施计划](/concept/p2-detailed-plan)（母稿：`qchem_qml_md/docs/P2_详细实施计划.md`）。
+- **P1 全量核对报告**（仓库）：`qchem_qml_md/docs/P1_completion_audit.md`
 - **InQuanto 手册 How-to**：与公开 [How to use](https://docs.quantinuum.com/inquanto/manual/howto.html) 的模块级对齐见 `qchem_qml_md/docs/InQuanto_manual_howto_与_qchem_stack_映射.md`（不进 VitePress 树）。
 
 ---
 
-*版本：含 parity export v2、Qiskit shots、原不排期项迭代（Nexus 类比、Qermit 图+运行时、张量网 stub+引擎、PBC/k 点侧）、**§4 三周日历（非云非硬件 L1 严格对齐）**、与 [parity 矩阵](/parity/public-matrix) 表同步。*
+## 6. 路线图 §141 残余（P2）
+
+与 [竞争定位](/concept/competitive-positioning) §141「仍需推进」一致；**WBS / 闸门 / 非目标** 全文：[P2 详细实施计划](/concept/p2-detailed-plan)（母稿：`qchem_qml_md/docs/P2_详细实施计划.md`）。矩阵未升格前不将残余项冒充 P1 `yes`。
+
+---
+
+*版本：含 parity export v2、Qiskit shots、原不排期项迭代（Nexus 类比、Qermit 图+运行时、张量网 stub+引擎、PBC/k 点侧）、**§4 三周日历（非云非硬件 L1 严格对齐）**、**§5 P1 全量核对报告链接**、**§6 P2 索引**、与 [parity 矩阵](/parity/public-matrix) 表同步。*

@@ -1,6 +1,7 @@
 from qchem_stack.chem.embedding.dmet import (
     DMETContext,
     FragmentSolverProtocol,
+    QubitHamiltonianFragmentSolverExact,
     QubitHamiltonianFragmentSolverVQE,
     VQEFragmentSolverStub,
 )
@@ -18,6 +19,7 @@ __all__ = [
     "molecular_hamiltonian_fragment_mulliken_projection",
     "mulliken_mo_populations_on_atoms",
     "select_active_mo_indices",
+    "QubitHamiltonianFragmentSolverExact",
     "QubitHamiltonianFragmentSolverVQE",
     "VQEFragmentSolverStub",
 ]

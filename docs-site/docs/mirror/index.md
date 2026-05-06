@@ -4,9 +4,13 @@ title: 公开文档对照（审计视图）
 
 # 公开文档对照（审计视图）
 
+<div class="qcs-mirror-audit-banner">
+
 本区与 [Quantinuum 公开 InQuanto 文档树](https://docs.quantinuum.com/inquanto/) **结构对齐**，用于盘点「公开文档里有什么 ↔ 我们有什么」。它是 **透明对标附件**，**不是** qchem-stack 的产品说明书——产品介绍与任务路径请以 [四柱指南](/guide/) 为准。
 
 每个节点在站内都有一页（未实现的节点保留**占位**），并标注 `shipped` / `partial` / `placeholder` / `not-applicable`。目标是让读者与合作方**独立审计**能力边界，而非复述官方文案。
+
+</div>
 
 ## 状态图例
 

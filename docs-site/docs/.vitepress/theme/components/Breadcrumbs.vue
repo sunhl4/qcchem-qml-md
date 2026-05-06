@@ -2,6 +2,31 @@
 import { useRoute } from "vitepress";
 import { computed } from "vue";
 
+/** Last path segment → short display label (breadcrumbs). */
+const slugLabels: Record<string, string> = {
+  en: "EN",
+  mirror: "Mirror",
+  parity: "Parity",
+  product: "Product",
+  tutorial: "Tutorial",
+  guide: "Guide",
+  reference: "Reference",
+  concept: "Concept",
+  cloud: "Cloud",
+  meta: "Meta",
+  design: "Design",
+  api: "API",
+  protocols: "Protocols",
+  extensions: "Extensions",
+  misc: "Misc",
+};
+
+function labelForSlug(seg: string): string {
+  const raw = decodeURIComponent(seg);
+  const key = raw.toLowerCase();
+  return slugLabels[key] ?? raw;
+}
+
 const route = useRoute();
 const segments = computed(() => {
   const parts = route.path.replace(/\/+$/, "").split("/").filter(Boolean);
@@ -9,7 +34,7 @@ const segments = computed(() => {
   let cursor = "";
   for (const seg of parts) {
     cursor += "/" + seg;
-    acc.push({ text: decodeURIComponent(seg), href: cursor + "/" });
+    acc.push({ text: labelForSlug(seg), href: cursor + "/" });
   }
   return acc;
 });

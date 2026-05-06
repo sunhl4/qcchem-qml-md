@@ -2,6 +2,10 @@
 
 Open orchestration layer aligned with an InQuanto-style pipeline: **chemistry input → downfolding → quantum core → protocol state machine → jobs → ML fusion → MD force-field dataset**.
 
+## Documentation map (all engineering docs)
+
+**Single index** (Chinese canonical, paths, merge log, reading order): [docs/技术文档_软件工程文档总索引.md](docs/技术文档_软件工程文档总索引.md).
+
 ## Boundaries and public parity
 
 This project is an **independent open-source** stack: it does **not** copy Quantinuum closed-source products. Capabilities are traced to **public** InQuanto / TKET / Nexus **documentation and papers** only.
@@ -10,7 +14,7 @@ This project is an **independent open-source** stack: it does **not** copy Quant
 
 - **InQuanto public docs site — multi-volume report + appendices A/B/C + 295-node JSON backlog** (IA / Diátaxis / Nexus boundary analysis; **appendix-C ~21.7k lines**; machine backlog [`docs/inquanto-node-backlog.generated.json`](docs/inquanto-node-backlog.generated.json)): [`docs/architecture-report-quantinuum-inquanto-web/INDEX.md`](docs/architecture-report-quantinuum-inquanto-web/INDEX.md) — **stays in repo** to inform `docs-site` UX; not copied into the VitePress tree. Regenerate: `cd docs-site && npm run report:inquanto-appendix && npm run report:inquanto-backlog`; gate: `npm run check:mirror && npm run check:node-backlog`.
 
-- **Competitive positioning vs Quantinuum (product + technical routes, P0–P2 roadmap)**: [docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) — what we **do** compete on (open orchestration, reproducibility, multi-backend, MD/ML) and what we **do not** (Nexus, H-series lock-in, InQuanto binary parity).
+- **Competitive positioning vs InQuanto and Tangelo (product + technical routes, P0–P3 roadmap)**: [docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) — what we **do** compete on (open orchestration, reproducibility, multi-backend, MD/ML, workflow discipline) and what we **do not** (Nexus, H-series lock-in, InQuanto binary parity).
 - **InQuanto public “How to use” → this repo (topic map)**：[docs/InQuanto_manual_howto_与_qchem_stack_映射.md](docs/InQuanto_manual_howto_与_qchem_stack_映射.md) — aligns [Quantinuum howto](https://docs.quantinuum.com/inquanto/manual/howto.html) sections (workflows, chemistry prep, computables/protocols, expert use) to **open, auditable** paths (`pipeline`, `protocols`, `chem`, optional TKET bridge); **not** closed-wheel parity.
 - **Parity matrix (public API vs `qchem_stack`)**: [docs/inquanto_public_parity_matrix.md](docs/inquanto_public_parity_matrix.md).
 - **Software architecture (layering, typed errors, strict `repro` JSON export)**: [docs/ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md).
@@ -18,6 +22,7 @@ This project is an **independent open-source** stack: it does **not** copy Quant
 - **Detailed technical doc (`CircuitIR`, TKET bridge, job contract)**: [docs/技术文档_CircuitIR与TKET桥接及作业契约.md](docs/技术文档_CircuitIR与TKET桥接及作业契约.md).
 - **Qiskit 设备 / Aer 比特串直方图 → Pauli 协议能量**（`get_counts` 路径，与 InQuanto 公开故事对齐的 shot 真链）: [docs/技术文档_设备比特串与Qiskit采样路径.md](docs/技术文档_设备比特串与Qiskit采样路径.md)。
 - **与 InQuanto 能力差距 + 分阶段计划**（差什么、不做什么、P0–P2）：[docs/与InQuanto能力差距与实施计划.md](docs/与InQuanto能力差距与实施计划.md)（`repro`、export **v2**、**§1 总表**与 [parity 矩阵](docs/inquanto_public_parity_matrix.md) 随代码维护同步）。  
+- **路线图 P2（研究深度 · WBS · 闸门）**：[docs/P2_详细实施计划.md](docs/P2_详细实施计划.md)；文档站可读镜像：`docs-site` 路由 **`/concept/p2-detailed-plan`**（英文摘要 **`/en/concept/p2-detailed-plan`**）。维护角色占位：[docs/MAINTAINERS.md](docs/MAINTAINERS.md)。  
 - **原「不排期」项落代码说明**（Nexus 类比、Qermit 图+运行时、张量网 stub+引擎、PBC/k 点/ddCOSMO 等，**非** 商业云/闭源同构）：[docs/不排期项_转排期与实现说明.md](docs/不排期项_转排期与实现说明.md)。
 - **Competitor research notes** (same workspace root): `../PandM/materials/learning/quantum-chem/literature/Quantinuum_量子计算化学竞品研究总索引.md`.
 - **Launch/retrieve (Nexus 类比，本地 SQLite)**: [docs/launch_retrieve_nexus_analog.md](docs/launch_retrieve_nexus_analog.md)（`JobHandle.protocol_hash` 与 `PauliAveragingProtocol.launch` / `retrieve`）。
@@ -28,7 +33,7 @@ Public Quantinuum docs describe a chemistry orchestration **layer** (PySCF, algo
 
 | InQuanto (public) | `qchem_stack` |
 |-------------------|---------------|
-| PySCF / drivers / active space | `qchem_stack/chem/` (e.g. `chem/drivers/`, `chem/hamiltonian.py`)；扩展：`chemistry_extended` 上 **ddCOSMO**、**PBC**（`pbc_kpoint_mesh` → RHF@Γ 或 **KRHF** + 选 k 的 CASCI）、名称映射 `chem/inquanto_driver_surface.py` |
+| PySCF / drivers / active space | `qchem_stack/chem/` (e.g. `chem/drivers/`, `chem/hamiltonian.py`)；**fermion→qubit**：`active_space.fermion_qubit_mapping`（`jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`）；扩展：`chemistry_extended` 上 **ddCOSMO**、**PBC**（`pbc_kpoint_mesh` → RHF@Γ 或 **KRHF** + 选 k 的 CASCI）、名称映射 `chem/inquanto_driver_surface.py` |
 | `Algorithm*`, VQE / ADAPT / **IQEB** / VQD / QSE / SCEOM | `qchem_stack/quantum/`, `quantum/qse_transition.py`；**IQEB**：`quantum.algorithm=iqeb`，`configs/example_h2_iqeb.yaml` |
 | `Protocol` 五阶段、资源表 `dataframe_circuit_shot` | `qchem_stack/protocols/`, `backends/spec.py`；`protocols/computable.py` 薄层（非一等 `Computable` 图） |
 | Passes / TKET-style metrics (optional) | `backends/compile_passes.py`; optional `pip install qchem-stack[pytket]` then `backends/pytket_bridge.py` |
@@ -36,7 +41,7 @@ Public Quantinuum docs describe a chemistry orchestration **layer** (PySCF, algo
 | `CuTensorNetProtocol` **类比** | `qchem_stack/tensornet/`（`cutensornet_protocol_stub` + `opt_einsum` / cupy / **cuquantum 检测** 等；**非** `inquanto-cutensornet`） |
 | 计价 (HQC **类比**) + 作业 + 可选云侧车 | `jobs/cost`, `jobs/nexus_analog`, **可选** `jobs/nexus_cloud`（`http`/`mock`）；异步仍见 [launch/retrieve](docs/launch_retrieve_nexus_analog.md)（SQLite + `NexusAnalogSpec` 与同步计价一致） |
 | Parity 表、判据与资源双轨说明 | [docs/inquanto_public_parity_matrix.md](docs/inquanto_public_parity_matrix.md), [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md), [技术文档](docs/技术文档_CircuitIR与TKET桥接及作业契约.md) |
-| 对 Quantinuum 的**竞争定位与 P0–P2 路线** | [docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) |
+| 对 InQuanto / Tangelo 的**竞争定位与 P0–P3 路线** | [docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) |
 
 ## End-to-end orchestration (YAML)
 
@@ -53,6 +58,8 @@ out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqli
 For an InQuanto-style **Methods sidecar** (computable abstract v2 + `hamiltonian_meta` fingerprint), use `WorkflowCoordinator` (`qchem_stack.orchestration.WorkflowCoordinator`): it wraps `run_pipeline_from_config` and sets `out["methods_sidecar"]`. A packaged **tutorial-shaped** chain (ROHF, DMET labels, ADAPT, PMSV, compiler pass lists) lives at `configs/tutorial_inquanto_chain_h2.yaml`.
 
 CI runs `python scripts/smoke_pipeline.py` then `python scripts/smoke_pipeline.py --excited-only` (`configs/example_h2_excited_smoke.yaml`, VQD without Pauli protocol), **`--iqeb`** (H2 IQEB), **`--projection-trace`** (projection L1 YAML), and marker subsets **`pytest -m l1_excited`** / **`pytest -m l1_md_ml`**. Locally, `python scripts/smoke_pipeline.py --excited` runs both packaged YAMLs in one go.
+
+P1 **backend / mapping conformance** (needs PySCF; Qiskit optional): `pytest tests/test_backend_conformance.py`.
 
 ### Optional HTTP API (`fastapi`)
 
@@ -100,7 +107,7 @@ h = molecular_hamiltonian_from_pyscf(result, n_active_orbitals=2, n_active_elect
 - **Pipeline VQD** reuses the variational ground state (`ground_angles` / `ground_energy`); `out["excited_resource_summary"]` aggregates YAML shot hints and QSE schedule meta for export scripts.
 - **`resource_summary`**: always includes `pauli_averaging_protocol_ran` when the Pauli stage runs; if any excited stage ran, adds `excited_stages`, `excited_shots_upper_bound`, and `sum_shots_total_with_excited_upper_bound` (protocol `sum_shots` plus excited bound). If `use_pauli_protocol: false` but QSE/SCEOM/VQD ran, a minimal `resource_summary` is still emitted for the excited block.
 - **`repro.run_summary`**: after every sync run, stage list (`stages_completed`), `scf_energy`, `energy_pauli_protocol` (if Pauli stage ran), VQE (`vqe_maxiter_yaml`, `vqe_nfev`) or ADAPT (`adapt_max_iter_yaml`, `adapt_total_gradient_evals`, `adapt_steps_recorded`, `adapt_excitation_layers`), plus `n_pauli_terms` / `n_pauli_groups` / `n_circuits` / `n_qubits`, **`protocol_total_shots_budget` / `protocol_n_measurement_circuits` / `protocol_shots_per_circuit_effective` / `protocol_energy_stderr`** from `protocol_counts`, and after `run_pipeline_from_config(..., job_db=...)`, **`async_job_id`**, **`protocol_hash_prefix`**, and **`job_async_*`** from the SQLite worker result. May also surface **`nexus_analog_hqc_units`**, **`mitigation_graph_report_present`**, **`mitigation_dag_execution_present`**, **`nexus_cloud_repro`**. **`repro.parity_snapshot`** (config-only, at run start) also records `use_pauli_protocol`, `vqe_depth` / `vqe_maxiter` / `adapt_max_iter`, sampled/histogram YAML flags, `backend_provider`, `zne_enabled`, **`mitigation_zne_scales`**, `chemistry_extended`（含 PBC/k 网字段）, `nexus_analog` / **`nexus_cloud`**, `tensornet_*` 开关, and excited-state YAML plus `vqd_penalty_weight`.
-- **`run_pipeline_from_config`** reuses the `QubitHamiltonian` from the in-process sync pass (no second PySCF → JW build for the SQLite job lane).
+- **`run_pipeline_from_config`** reuses the `QubitHamiltonian` from the in-process sync pass (no second PySCF → qubit-operator build for the SQLite job lane).
 - **Jobs**: `JobStatus`, `process_job_with_retry`, SQLite columns `retry_count` / `error_message` / `protocol_hash` (migration on open).
 
 ### `PauliAveragingProtocol` / `protocol_counts` semantics (vs InQuanto `run` → `evaluate`)
@@ -117,7 +124,7 @@ h = molecular_hamiltonian_from_pyscf(result, n_active_orbitals=2, n_active_elect
 
 ## Layout
 
-- `qchem_stack/chem` — molecular spec, PySCF driver (incl. optional PBC + k-mesh, ddCOSMO), embedding hooks, JW Hamiltonian, InQuanto-name alias table
+- `qchem_stack/chem` — molecular spec, PySCF driver (incl. optional PBC + k-mesh, ddCOSMO), embedding hooks, qubit Hamiltonian (`active_space.fermion_qubit_mapping`: JW or BK), InQuanto-name alias table
 - `qchem_stack/quantum` — ansätze, VQE / ADAPT / IQEB / VQD / QSE
 - `qchem_stack/protocols` — five-stage protocol, shot dataframe, `computable` helpers, job pickle surface
 - `qchem_stack/mitigation` — PMSV, SPAM, ZNE, `qermit_analog` (DAG report), `qermit_runtime` (linear trace)

@@ -15,6 +15,7 @@ from qchem_stack.protocols.inquanto_contract import (
     inquanto_gap_categories,
     inquanto_object_map_for_docs,
     pauli_protocol_expectation_path_for_config,
+    protocol_expectation_semantics_public,
 )
 
 
@@ -89,6 +90,7 @@ def test_parity_export_stable_keys_present() -> None:
         "inquanto_gap_categories": inquanto_gap_categories(),
         "iqeb_implementation_path": "qchem_stack.quantum.algorithms.iqeb.IQEBVQE",
         "pauli_protocol_expectation_path": pauli_protocol_expectation_path_for_config(cfg),
+        "protocol_expectation_semantics_v1": protocol_expectation_semantics_public(),
         "embedding": cfg.embedding.model_dump(),
     }
     assert PARITY_EXPORT_V2_STABLE_KEYS <= set(blob.keys())

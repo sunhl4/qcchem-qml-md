@@ -17,7 +17,7 @@
 
 ## 2. Pipeline 行为
 
-1. SCF + 构造 **`qh`**：`schmidt_atomic_production` 时先按 `schmidt_dmet_max_cycles` 做（可选多轮）密度反馈，再得到 **杂质 JW** `qh`；否则为全局活性空间 `molecular_hamiltonian_from_pyscf`。
+1. SCF + 构造 **`qh`**：`schmidt_atomic_production` 时先按 `schmidt_dmet_max_cycles` 做（可选多轮）密度反馈，再得到 **杂质 qubit Hamiltonian**（`active_space.fermion_qubit_mapping`，默认 Jordan–Wigner）`qh`；否则为全局活性空间 `molecular_hamiltonian_from_pyscf`。
 2. 若 `embedding.mode == "dmet"`，写入 `out["embedding_workflow"]`（含 `dmet_hamiltonian_source`、所用求解器类名字符串）。
 3. 若 `dmet_hamiltonian_source == "whole_active_system"`，调用 `_run_dmet_fragment_solve_if_requested`：  
    `QubitHamiltonianFragmentSolverVQE` + `OneShotEmbeddingDriver.run(ctx, {label: qh})` → `out["dmet_fragment_solve"]`（并带 `hamiltonian_source` 字段）。

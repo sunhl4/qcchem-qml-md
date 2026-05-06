@@ -30,8 +30,20 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 Contract and endpoints: see [HTTP API · SQLite jobs](/en/reference/http-api-sqlite-jobs).
 
+## 4. Common commands (cheat sheet)
+
+| Task | Command |
+|------|---------|
+| Drain queued jobs from SQLite | `qchem-jobs-worker --db ./jobs.sqlite` (same as `qchem-pipeline-worker`) |
+| Run the local API | `uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000` |
+| Repo smoke test | `python scripts/smoke_pipeline.py` (flags like `--sampled`, `--qiskit-shots`, …) |
+
+Full list: **[CLI & scripts](/en/reference/cli-and-scripts)**.
+
 ## Next
 
-- [Guides overview](/en/guide/)
-- [Public parity matrix](/en/parity/public-matrix)
-- [Engineering architecture](/en/concept/engineering-architecture)
+- [Product features](/en/product/features)  
+- [Workflow & YAML](/en/tutorial/workflow-overview)  
+- [Guides overview](/en/guide/)  
+- [CLI & scripts](/en/reference/cli-and-scripts) · [HTTP API](/en/reference/http-api-sqlite-jobs)  
+- Deeper: [Principles & reading](/en/guide/principles-and-reading); internal benchmark: [Positioning & roadmap](/en/product/)  

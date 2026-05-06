@@ -37,3 +37,6 @@ def test_qermit_gap_has_execution_model_nested() -> None:
     mm = qg.get("mitigation_execution_model")
     assert isinstance(mm, dict)
     assert mm.get("schema") == "mitigation_execution_model_v1"
+    assert "dag_trace_order_invariant" in qg and "test_mitigation_dag_trace_homology" in str(
+        qg["dag_trace_order_invariant"]
+    )

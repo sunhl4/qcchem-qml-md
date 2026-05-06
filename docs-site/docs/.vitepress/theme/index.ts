@@ -7,12 +7,15 @@ import MirrorBranch from "./components/MirrorBranch.vue";
 import PillarMirror from "./components/PillarMirror.vue";
 import Breadcrumbs from "./components/Breadcrumbs.vue";
 import LangSwitch from "./components/LangSwitch.vue";
+import SiteMegaFooter from "./components/SiteMegaFooter.vue";
 import "./custom.css";
+import "./inquanto-home.css";
 
 /** Stable slot fns + options object so Layout patches don't remount slots every parent render (avoids nav/doc flicker). */
 const layoutSlots = {
   "nav-bar-content-after": () => h(LangSwitch),
   "doc-before": () => h(Breadcrumbs),
+  "layout-bottom": () => h(SiteMegaFooter),
 };
 
 export default {

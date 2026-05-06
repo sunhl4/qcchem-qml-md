@@ -7,6 +7,7 @@ from qchem_stack.chem.inquanto_driver_surface import (
     PYSCF_MIN_VERSION_RECOMMENDED,
     SUPPORTED_SOLVENT_MODELS,
 )
+from qchem_stack.integrations.open_driver_surface import open_driver_coverage_matrix
 
 
 def test_inquanto_alias_map_covers_documented_rows() -> None:
@@ -25,3 +26,11 @@ def test_pyscf_min_version_recommended_documented() -> None:
     assert PYSCF_MIN_VERSION_RECOMMENDED
     parts = PYSCF_MIN_VERSION_RECOMMENDED.split(".")
     assert len(parts) >= 1 and parts[0].isdigit()
+
+
+def test_open_driver_coverage_matrix_documents_avoided_chemistry_rows() -> None:
+    m = open_driver_coverage_matrix()
+    rows = m.get("rows") or []
+    names = {r.get("inquanto_adjacent_name", "") for r in rows if isinstance(r, dict)}
+    assert "AVAS / full CASSCF product workflows (Fe4N2-style tutorials)" in names
+    assert "CASSCF orbital optimization loop (InQuanto-pyscf class surface)" in names

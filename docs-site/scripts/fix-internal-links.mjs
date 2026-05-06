@@ -24,8 +24,8 @@ const MAP = [
   ["竞争定位与路线图_对标Quantinuum产品与技术路线.md", "/concept/competitive-positioning"],
   ["工程记忆_Quantinuum对标与数据流技术文档.md", "/concept/engineering-memory-quantinuum"],
   ["L3_benchmark_suite_roadmap.md", "/parity/l3-benchmark-roadmap"],
-  ["记忆_开放栈对标完成度与待闭合项.md", "/parity/open-stack-memory"],
-  ["记忆_HTTP_API与作业队列_工程记忆.md", "/concept/http-api-worker-memory"],
+  ["记忆_开放栈对标完成度与待闭合项.md", "/concept/engineering-memory-quantinuum#13-开放栈对标完成度与待闭合项原独立记忆合并"],
+  ["记忆_HTTP_API与作业队列_工程记忆.md", "/reference/http-api-sqlite-jobs#9-工程决策与范围原独立http-工程记忆合并"],
   ["不排期项_转排期与实现说明.md", "/parity/backlog-to-schedule"],
   ["架构_InQuanto闭源能力闭合与可复现边界.md", "/concept/architecture-boundaries"],
 ];

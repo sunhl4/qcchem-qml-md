@@ -5,8 +5,32 @@ import pytest
 pytestmark = pytest.mark.l1_md_ml
 
 from qchem_stack.md_bridge import QMEFDataset, QMFrame, StubTorchMLIPTrainer
+
+_FREEZE_QMFRAME_FIELDS = frozenset(
+    {
+        "atomic_numbers",
+        "positions_bohr",
+        "energy_hartree",
+        "forces_hartree_bohr",
+        "charge",
+        "multiplicity",
+        "box",
+        "method_tag",
+        "active_space_hash",
+        "protocol_hash",
+        "repro_config_sha256_prefix",
+        "backend_noise_tag",
+    }
+)
 from qchem_stack.md_bridge.exporter import export_extended_xyz, write_hdf5_stub
 from qchem_stack.md_bridge.hooks import write_mace_yaml_stub, write_nequip_yaml_stub
+
+
+def test_qmframe_fields_cover_p2_repro_freeze_doc() -> None:
+    """P2-W6: ``docs/md_bridge_repro_freeze_list.md`` must stay aligned with ``QMFrame``."""
+    names = frozenset(QMFrame.model_fields)
+    missing = sorted(_FREEZE_QMFRAME_FIELDS - names)
+    assert not missing, f"QMFrame missing documented fields: {missing}"
 
 
 def test_md_export_roundtrip(tmp_path) -> None:

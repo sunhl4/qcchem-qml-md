@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
 from qchem_stack.config import (
@@ -91,6 +93,38 @@ def test_build_schmidt_h2_single_atom_fragment() -> None:
     assert model.n_fragment_spatial_orbitals == 1
     assert model.n_bath_spatial_orbitals == 1
     assert model.meta.get("schema") == "schmidt_impurity_integrals_v1"
+
+
+@pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
+def test_pipeline_schmidt_production_with_bath_sidecar_json() -> None:
+    root = Path(__file__).resolve().parents[1]
+    sidecar = root / "configs" / "schmidt_bath_sidecar_toy.json"
+    cfg = ExperimentConfig(
+        experiment_id="schmidt_sidecar",
+        random_seed=2,
+        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        scf=SCFSpec(method="RHF"),
+        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        backend=BackendSpecConfig(provider="statevector"),
+        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=40, use_pauli_protocol=False),
+        embedding=EmbeddingSpec(
+            mode="dmet",
+            fragment_labels=["frag0"],
+            dmet_hamiltonian_source="schmidt_atomic_production",
+            schmidt_fragment_atom_indices=[0],
+            schmidt_n_bath_spatial=1,
+            schmidt_max_impurity_spatial_orbitals=8,
+            schmidt_attach_fci_reference=False,
+            schmidt_bath_sidecar_json_path=str(sidecar),
+        ),
+    )
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
+    out = run_pipeline_sync(cfg, cfg_path=root / "configs" / "example_h2.yaml")
+    wf = out.get("embedding_workflow") or {}
+    sc = wf.get("schmidt_bath_sidecar_v1")
+    assert isinstance(sc, dict)
+    assert sc.get("schema") == "schmidt_bath_sidecar_v1"
 
 
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")

@@ -12,6 +12,8 @@ for parity tables and future PySCF hooks.
 | GeometryPeriodic / PBC | `chemistry_extended.pbc_cell_vectors_bohr` + `pbc_kpoint_mesh`（PySCF pbc RHF 或 KRHF） | `partial`（Γ→RHF，非 Γ→KRHF；k 网与 InQuanto 闭源 driver 非行级等价） |
 
 PySCF **最低建议版本**见本模块 `PYSCF_MIN_VERSION_RECOMMENDED`（与 ``pyproject.toml`` optional `chem` extra 一致）；PBC+溶剂组合见矩阵「partial」列；本表**不**声称与闭源 `inquanto-pyscf` 行级一致。
+
+**维护**：若上调 ``PYSCF_MIN_VERSION_RECOMMENDED``，请同步更新 [inquanto_public_parity_matrix.md](../../docs/inquanto_public_parity_matrix.md) §3 driver 备注、[Y1_residual_partial_SLA_template.md](../../docs/Y1_residual_partial_SLA_template.md) 中 ``drivers_cosmo_pbc`` 行与 ``tests/test_inquanto_driver_surface_l1.py``。
 """
 
 from __future__ import annotations

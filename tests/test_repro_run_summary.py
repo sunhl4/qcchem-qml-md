@@ -2,7 +2,13 @@
 
 from __future__ import annotations
 
-from qchem_stack.config import ExperimentConfig, MoleculeSpec, ActiveSpaceSpec, QuantumSpec
+from qchem_stack.config import (
+    ActiveSpaceSpec,
+    EmbeddingSpec,
+    ExperimentConfig,
+    MoleculeSpec,
+    QuantumSpec,
+)
 from qchem_stack.orchestration.pipeline import _attach_run_summary, collect_repro_metadata
 
 
@@ -80,6 +86,10 @@ def test_attach_run_summary_stages_and_protocol_semantics() -> None:
     assert sm["pauli_protocol_expectation_path"] == "exact_executor"
     assert sm["vqe_maxiter_yaml"] == 200
     assert "vqe_nfev" not in sm
+    assert sm.get("vqd_n_states_yaml") == 2
+    assert "vqd_n_energies_recorded" not in sm
+    assert sm.get("qse_subspace_dim_yaml") == 4
+    assert sm.get("qse_n_excitation_energies") == 1
 
 
 def test_attach_run_summary_includes_scf_and_vqe_counters() -> None:
@@ -171,3 +181,137 @@ def test_parity_snapshot_includes_vqd_penalty_weight() -> None:
     cfg = _base_cfg(QuantumSpec(vqd_penalty_weight=2.5, vqd_after_variational=True))
     r = collect_repro_metadata(cfg)
     assert r["parity_snapshot"]["vqd_penalty_weight"] == 2.5
+
+
+def test_attach_run_summary_vqd_energy_and_shot_yaml() -> None:
+    cfg = _base_cfg(
+        QuantumSpec(
+            vqd_after_variational=True,
+            vqd_n_states=2,
+            vqd_shots_objective=10,
+            vqd_shots_overlap=20,
+            vqd_shots_weight=30,
+            use_pauli_protocol=False,
+        )
+    )
+    out: dict = {
+        "repro": collect_repro_metadata(cfg),
+        "scf_energy": -1.0,
+        "energy_after_variational": -1.2,
+        "vqd": {
+            "energies": [-1.2, -0.5],
+            "meta": {
+                "reused_pipeline_ground": True,
+                "vqd_channels": [
+                    {"level": 0, "three_protocol": {"a": 1}},
+                    {"level": 1, "three_protocol": {"b": 2}},
+                ],
+                "shots_objective": 10,
+                "shots_overlap": 20,
+                "shots_weight": 30,
+            },
+        },
+    }
+    _attach_run_summary(out, cfg)
+    sm = out["repro"]["run_summary"]
+    assert sm["vqd_n_energies_recorded"] == 2
+    assert sm["vqd_deflation_levels_completed"] == 1
+    assert sm["vqd_channels_count"] == 2
+    assert sm["vqd_three_protocol_present"] is True
+    assert sm["vqd_shots_objective_yaml"] == 10
+    assert sm["vqd_shots_overlap_yaml"] == 20
+    assert sm["vqd_shots_weight_yaml"] == 30
+
+
+def test_attach_run_summary_qse_schedule_fields() -> None:
+    cfg = _base_cfg(
+        QuantumSpec(
+            qse_after_variational=True,
+            qse_subspace_dim=4,
+            qse_max_basis=5,
+            qse_shot_mode="pauli_transitions",
+            use_pauli_protocol=False,
+        )
+    )
+    out: dict = {
+        "repro": collect_repro_metadata(cfg),
+        "scf_energy": -1.0,
+        "energy_after_variational": -1.2,
+        "qse": {
+            "excitation_energies": [0.1, 0.2],
+            "meta": {
+                "K": 3,
+                "shot_noise_model": "independent_complex_gaussian_per_ij_term",
+                "qse_pauli_transition_schedule": {
+                    "n_transition_tasks": 9,
+                    "total_shots_upper_bound": 900,
+                },
+            },
+        },
+    }
+    _attach_run_summary(out, cfg)
+    sm = out["repro"]["run_summary"]
+    assert sm["qse_basis_dimension_K"] == 3
+    assert sm["qse_n_excitation_energies"] == 2
+    assert sm["qse_n_transition_tasks"] == 9
+    assert sm["qse_total_shots_upper_bound"] == 900
+    assert sm["qse_max_basis_yaml"] == 5
+
+
+def test_attach_run_summary_sceom_nested_meta() -> None:
+    cfg = _base_cfg(
+        QuantumSpec(
+            sceom_after_variational=True,
+            sceom_subspace_dim=2,
+            sceom_shots_per_matrix_element=128,
+            use_pauli_protocol=False,
+        )
+    )
+    out: dict = {
+        "repro": collect_repro_metadata(cfg),
+        "scf_energy": -1.0,
+        "energy_after_variational": -1.2,
+        "sceom": {
+            "energies": [-1.0, -0.9],
+            "meta": {
+                "subspace_dim": 2,
+                "construction": "M_ij=<psi|[Si,[H,Sj]]|psi> with Pauli toy generators",
+                "shot_noise_model": "symmetric_gaussian_on_real_M",
+            },
+        },
+    }
+    _attach_run_summary(out, cfg)
+    sm = out["repro"]["run_summary"]
+    assert sm["sceom_n_energies_recorded"] == 2
+    assert sm["sceom_active_generator_count"] == 2
+    assert "Pauli toy" in sm["sceom_matrix_construction"]
+
+
+def test_attach_run_summary_dmet_embedding_flags() -> None:
+    cfg = ExperimentConfig(
+        experiment_id="dmet_rsum",
+        random_seed=0,
+        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]),
+        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        quantum=QuantumSpec(use_pauli_protocol=False),
+        embedding=EmbeddingSpec(
+            mode="dmet",
+            fragment_labels=["A", "B"],
+            dmet_hamiltonian_source="parity_stub",
+            dmet_uniform_multifragment_toy=True,
+        ),
+    )
+    out: dict = {
+        "repro": collect_repro_metadata(cfg),
+        "scf_energy": -1.0,
+        "energy_after_variational": -1.2,
+        "dmet_fragment_solve": {"schema": "dmet_one_shot_v1", "fragments": []},
+    }
+    _attach_run_summary(out, cfg)
+    sm = out["repro"]["run_summary"]
+    assert sm["dmet_embedding_active"] is True
+    assert sm["dmet_hamiltonian_source_yaml"] == "parity_stub"
+    assert sm["dmet_fragment_count"] == 2
+    assert sm["dmet_uniform_multifragment_toy_yaml"] is True
+    assert sm["dmet_fragment_solve_present"] is True
+    assert sm["dmet_fragment_solve_schema"] == "dmet_one_shot_v1"

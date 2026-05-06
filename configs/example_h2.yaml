@@ -18,6 +18,8 @@ scf:
 active_space:
   n_active_orbitals: 2
   n_active_electrons: 2
+  # Optional: jordan_wigner | bravyi_kitaev | symmetry_conserving_bravyi_kitaev (OpenFermion SCBK)
+  fermion_qubit_mapping: jordan_wigner
 
 backend:
   name: "statevector_sim"

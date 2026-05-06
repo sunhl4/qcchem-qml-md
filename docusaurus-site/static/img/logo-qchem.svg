@@ -1,0 +1,7 @@
+<svg width="140" height="36" viewBox="0 0 140 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect x="1" y="1" width="34" height="34" rx="8" fill="#14638F"/>
+  <path d="M10 24V12H17.5C20.6 12 23 14.2 23 17.1C23 20.1 20.6 22.3 17.5 22.3H13V24H10ZM13 19.7H17.2C18.6 19.7 19.7 18.7 19.7 17.1C19.7 15.6 18.6 14.6 17.2 14.6H13V19.7Z" fill="white"/>
+  <circle cx="27.5" cy="9.5" r="2.5" fill="#7BD1FF"/>
+  <text x="44" y="15" fill="#14638F" font-family="Arial, Helvetica, sans-serif" font-size="11" font-weight="700">qchem-stack</text>
+  <text x="44" y="28" fill="#5A6B7A" font-family="Arial, Helvetica, sans-serif" font-size="10">documentation</text>
+</svg>

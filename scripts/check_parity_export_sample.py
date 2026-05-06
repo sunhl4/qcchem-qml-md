@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 """Smoke-check parity export JSON (config-only) for L1 regression.
 
-Runs ``export_parity_criteria_table`` on three bundled YAMLs (VQE, ADAPT, excited smoke)
-and asserts stable keys + ``parity_matrix_anchor`` on every gap row.
+Runs ``export_parity_criteria_table`` (config-only) on ``SAMPLE_CONFIGS_REL`` and asserts
+stable keys + ``parity_matrix_anchor`` on every gap row.
 
 Does not require PySCF or a pipeline results file.
+
+When adding parity-driven ``configs/*.yaml``, extend ``SAMPLE_CONFIGS_REL`` so CI keeps
+schema coverage (see ``docs/P1_completion_audit.md`` §5 item 12).
 """
 
 from __future__ import annotations
@@ -22,7 +25,7 @@ if str(_SRC) not in sys.path:
 
 from qchem_stack.protocols.inquanto_contract import PARITY_EXPORT_V2_STABLE_KEYS
 
-# M2-style sampling: VQE + ADAPT + excited + IQEB + projection trace + projection Mulliken (config-only export).
+# M2-style sampling: VQE + ADAPT + excited + IQEB + projection + Pauli shot-path YAMLs (config-only export).
 SAMPLE_CONFIGS_REL = (
     "configs/example_h2.yaml",
     "configs/tutorial_inquanto_chain_h2.yaml",
@@ -30,6 +33,20 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_h2_iqeb.yaml",
     "configs/example_h2_projection_trace.yaml",
     "configs/example_h4_projection_mulliken.yaml",
+    "configs/example_h2_sampled.yaml",
+    "configs/example_h2_qiskit_shots.yaml",
+    "configs/example_h2_uccsd.yaml",
+    "configs/example_h2_uccsd_trotter.yaml",
+    "configs/example_h2_zne_circuit_fold.yaml",
+    "configs/qpe_dual_track_demo.yaml",
+    "configs/example_decomposition_plugin_toy.yaml",
+    "configs/example_h2_pbc_gamma.yaml",
+    "configs/example_oniom_toy.yaml",
+    "configs/example_h4_dmet_fragment_exact_small.yaml",
+    "configs/example_h2_qpe_track.yaml",
+    "configs/example_h2_qpe_track_parity_integrations.yaml",
+    "configs/example_h2_casscf_audit.yaml",
+    "configs/example_h2_embedding_parity.yaml",
 )
 
 

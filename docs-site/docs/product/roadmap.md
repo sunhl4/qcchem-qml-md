@@ -5,7 +5,7 @@ description: P0–P2 工程节拍、Y1 Q3 L3 基准与 Parity 文档索引
 
 # 路线图
 
-本页把工程叙事 **压缩成一页目录**；细则仍以仓库正文 [竞争定位与路线图](/concept/competitive-positioning)（第五节）为准，契约与签 off 仍以 Parity 区为准。
+本页把工程叙事 **压缩成一页目录**；细则仍以仓库正文 [竞争定位与路线图](/concept/competitive-positioning)（第五节）为准，契约与签 off 仍以 Parity 区为准。**P2 执行分解（WBS）** 见 **[P2 详细实施计划](/concept/p2-detailed-plan)**（母稿：`qchem_qml_md/docs/P2_详细实施计划.md`；与 gap 文档 §3「已交付批次」区分）。
 
 ## 节拍总览（概念）
 
@@ -45,6 +45,7 @@ flowchart TB
 | 主题 | 页面 |
 |------|------|
 | 差距与实施顺序 | [能力差距与实施计划](/parity/gap-implementation-plan) |
+| 路线图 P2（全文） | [P2 详细实施计划](/concept/p2-detailed-plan)（母稿：`qchem_qml_md/docs/P2_详细实施计划.md`） |
 | 契约矩阵 | [公开契约矩阵](/parity/public-matrix) |
 | L1 / Y1 钉扎 | [L1 签 off](/parity/l1-signoff)、[Y1 对标台账](/parity/y1-alignment-ledger) |
 | 开放栈记忆 | [开放栈记忆](/parity/open-stack-memory) |
@@ -52,4 +53,4 @@ flowchart TB
 
 ## 返回产品与上手
 
-- [产品与方案](/product/) · [15 分钟上手](/tutorial/quickstart) · [指南总览](/guide/)
+- [产品功能](/product/features) · [定位与路线](/product/) · [15 分钟上手](/tutorial/quickstart) · [指南总览](/guide/)

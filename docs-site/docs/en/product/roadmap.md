@@ -5,7 +5,7 @@ description: P0–P2 engineering beats, Y1 Q3 L3 benchmarks, and parity doc inde
 
 # Roadmap
 
-This page compresses the engineering narrative into **one navigable hub**. Authoritative detail stays in [Competitive positioning](/concept/competitive-positioning) (§5 — Chinese-primary); contract matrices and sign-offs live under Parity.
+This page compresses the engineering narrative into **one navigable hub**. Authoritative detail stays in [Competitive positioning](/concept/competitive-positioning) (§5 — Chinese-primary); contract matrices and sign-offs live under Parity. **Roadmap P2 WBS**: **[full plan (Chinese)](/concept/p2-detailed-plan)** · [English summary](/en/concept/p2-detailed-plan) · canonical repo file `qchem_qml_md/docs/P2_详细实施计划.md`.
 
 ## Beat overview (conceptual)
 
@@ -45,6 +45,7 @@ See **[L3 benchmark roadmap](/parity/l3-benchmark-roadmap)** (Chinese-primary).
 | Topic | Page |
 |------|------|
 | Gap list & implementation order | [Gap implementation plan](/parity/gap-implementation-plan) (Chinese-primary) |
+| Roadmap P2 | [Full plan (ZH)](/concept/p2-detailed-plan) · [Summary (EN)](/en/concept/p2-detailed-plan); canonical `qchem_qml_md/docs/P2_详细实施计划.md` |
 | Contract matrix | [Public parity matrix](/en/parity/public-matrix) · [full matrix (ZH)](/parity/public-matrix) |
 | L1 / Y1 pinning | [L1 sign-off](/en/parity/l1-signoff) · [Y1 alignment ledger](/parity/y1-alignment-ledger) |
 | Open-stack memory | [Open-stack memory](/parity/open-stack-memory) |
@@ -52,4 +53,4 @@ See **[L3 benchmark roadmap](/parity/l3-benchmark-roadmap)** (Chinese-primary).
 
 ## Back to product & quickstart
 
-- [Product & positioning](/en/product/) · [15-minute quickstart](/en/tutorial/quickstart) · [Guides overview](/en/guide/)
+- [Product features](/en/product/features) · [Positioning & roadmap](/en/product/) · [15-minute quickstart](/en/tutorial/quickstart) · [Guides overview](/en/guide/)

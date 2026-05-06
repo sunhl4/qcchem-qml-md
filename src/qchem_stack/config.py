@@ -25,6 +25,12 @@ class SCFSpec(BaseModel):
 class ActiveSpaceSpec(BaseModel):
     n_active_orbitals: int
     n_active_electrons: int
+    fermion_qubit_mapping: Literal[
+        "jordan_wigner",
+        "bravyi_kitaev",
+        "symmetry_conserving_bravyi_kitaev",
+    ] = "jordan_wigner"
+    """OpenFermion transform from :class:`openfermion.InteractionOperator` to :class:`openfermion.QubitOperator`."""
 
 
 class BackendSpecConfig(BaseModel):
@@ -44,6 +50,8 @@ class MitigationSpec(BaseModel):
     """``sync_graph``: Qermit-style DAG; ``async_batch``: launch/retrieve-friendly; ``shot_postselect``: PMSV-style."""
     pmsv_enabled: bool = False
     zne_enabled: bool = False
+    zne_mode: Literal["scalar_stub", "circuit_scale_fold"] = "scalar_stub"
+    """``scalar_stub``: scale energies via :func:`~qchem_stack.mitigation.zne.zne_scale_energy`; ``circuit_scale_fold``: exact HEA-depth amplification per scale (statevector path only; sampled/Qiskit shots fall back to stub)."""
     zne_scales: list[float] = Field(
         default_factory=lambda: [1.0, 1.5, 2.0],
     )
@@ -56,6 +64,8 @@ class MitigationSpec(BaseModel):
     """Hook name for :func:`qchem_stack.mitigation.pmsv.finalize_pmsv_report` (extensible PMSV metadata)."""
     pmsv_extra: dict[str, Any] = Field(default_factory=dict)
     """Opaque key-value pass-through into ``protocol_counts['pmsv_report']`` (plugin / lab metadata)."""
+    spam_calibration_enabled: bool = False
+    """When true, include a readout-correction stub node in ``mitigation_graph_report`` (before PMSV/ZNE)."""
 
 
 class CompilerSpec(BaseModel):
@@ -82,6 +92,13 @@ class ChemistryExtendedSpec(BaseModel):
     """Monkhorst–Pack mesh ``[nx,ny,nz]``; all ``1`` → Γ-only :class:`pyscf.pbc.scf.hf.RHF`, else :class:`pyscf.pbc.scf.khf.KRHF` with that mesh."""
     pbc_active_space_kpoint_index: int = 0
     """Which k-point in ``KRHF`` MO list to use for CASCI / active-space integrals (Γ is usually index ``0`` in PySCF ordering)."""
+    casscf_orbital_optimization_audit: bool = False
+    """
+    Molecular RHF branch only: run PySCF :class:`pyscf.mcscf.CASSCF` for the configured active-space
+    electron/orbital counts and record ``casscf_orbital_audit_v1`` in ``rhf.driver_meta`` (surfaced in
+    ``hamiltonian_meta.pyscf_driver``). The variational Hamiltonian still uses the existing CASCI integral
+    path unless a future change feeds CASSCF-optimized orbitals into ``active_space_integrals``.
+    """
 
     @model_validator(mode="after")
     def _validate_pbc_cell_matrix(self) -> ChemistryExtendedSpec:
@@ -159,12 +176,24 @@ class ParityIntegrationsSpec(BaseModel):
     Attach ``open_gap_closure_reference`` (UCC/TKET/Nexus/Qermit/TN/L3/driver matrix) to
     ``parity_snapshot`` — **open engineered references**, not vendor L0 parity.
     """
+    include_computables_rich_in_repro: bool = False
+    """
+    When ``True``, ``repro.workflow_preview_v1`` matches ``POST /v1/meta/workflow-preview`` with
+    ``include_computables_rich=True`` (adds ``computables_rich`` / ``computables_rich_v1``).
+    Default ``False`` keeps slimmer ``repro``; enable for strict L1 preview↔repro parity tests.
+    """
+
+    resource_estimation_preview: bool = False
+    """
+    When ``True``, ``export_parity_criteria_table`` may emit ``resource_estimation_preview_v1``
+    (P2-W1 shallow Methods/resource narrative; no cloud pricing).
+    """
 
 
 class EmbeddingSpec(BaseModel):
     """Falsifiability fields for DMET / projection workflows (chemistry pre-stage)."""
 
-    mode: Literal["none", "dmet", "projection"] = "none"
+    mode: Literal["none", "dmet", "projection", "plugin"] = "none"
     n_scf_cycles_embedding: int | None = None
     """How many self-consistent embedding sweeps; ``None`` if not used."""
     classical_reference_method: str | None = None
@@ -196,8 +225,9 @@ class EmbeddingSpec(BaseModel):
     """
     Impurity operator source for DMET-shaped runs (open stack).
 
-    ``parity_stub``: parity ledger uses placeholder dicts. ``whole_active_system``: **single-fragment
-    demo** — exactly one ``fragment_labels`` entry; reuse the global active-space ``QubitHamiltonian``.
+    ``parity_stub``: parity ledger uses placeholder dicts. ``whole_active_system``: reuse the global
+    active-space ``QubitHamiltonian`` as the impurity (default: exactly one ``fragment_labels`` entry;
+    optionally multiple labels when ``dmet_multifragment_one_shot_shared_hamiltonian`` is ``True``).
     ``schmidt_atomic_production``: **Schmidt + spectral bath** impurity Hamiltonian from SCF density
     (see ``schmidt_*`` fields); main-pipeline VQE runs on this impurity ``QubitHamiltonian``, not CASCI active space.
     """
@@ -246,6 +276,36 @@ class EmbeddingSpec(BaseModel):
     (each fragment sees full ``QubitHamiltonian`` — **non-physical**, wiring test only). Off by default.
     Incompatible with ``schmidt_atomic_production``.
     """
+    dmet_multifragment_one_shot_shared_hamiltonian: bool = False
+    """
+    When ``dmet_hamiltonian_source=='whole_active_system'``, allow **multiple** ``fragment_labels`` and run
+    :class:`~qchem_stack.integrations.dmet_self_consistent.OneShotEmbeddingDriver` with the **same**
+    global ``QubitHamiltonian`` per fragment (demo / reproducibility only).
+    """
+    dmet_fragment_use_exact_solver: bool = False
+    """Dense diagonalization impurity solve for small ``n_qubits`` (see ``dmet_fragment_exact_max_qubits``)."""
+    dmet_fragment_exact_max_qubits: int = Field(default=14, ge=1, le=64)
+    """Skip dense ED above this qubit count (fragment ledger records ``skipped``)."""
+    decomposition_plugin: str = ""
+    """Registered toy/plugin name when ``mode=='plugin'`` (e.g. ``uniform_fragment_guess``)."""
+    decomposition_plugin_json_path: str | None = None
+    """Path to fragment integral JSON (resolved relative to experiment YAML when needed)."""
+    schmidt_bath_sidecar_json_path: str | None = None
+    """
+    Optional JSON merged into ``embedding_workflow.schmidt_bath_sidecar_v1`` when
+    ``dmet_hamiltonian_source == 'schmidt_atomic_production'`` (user / Methods audit hook).
+    Relative paths resolve against the directory of the experiment YAML when ``cfg_path`` is known.
+    """
+    oniom_layers_v1: list[dict[str, Any]] = Field(default_factory=list)
+    """Toy QM/MM layer hints → ``embedding_workflow.oniom_toy_v1`` (documentation-only)."""
+
+    @field_validator("schmidt_bath_sidecar_json_path")
+    @classmethod
+    def _strip_bath_sidecar(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip()
+        return s or None
 
     @field_validator("schmidt_per_fragment_vqe_maxiter")
     @classmethod
@@ -264,10 +324,17 @@ class EmbeddingSpec(BaseModel):
                     "embedding.dmet_hamiltonian_source='whole_active_system' requires embedding.mode='dmet'."
                 )
             labs = [x for x in self.fragment_labels if str(x).strip()]
-            if len(labs) != 1:
+            if self.dmet_multifragment_one_shot_shared_hamiltonian:
+                if len(labs) < 2:
+                    raise ValueError(
+                        "embedding.dmet_multifragment_one_shot_shared_hamiltonian requires at least two "
+                        "non-empty embedding.fragment_labels entries."
+                    )
+            elif len(labs) != 1:
                 raise ValueError(
                     "embedding.dmet_hamiltonian_source='whole_active_system' requires exactly one "
-                    "non-empty embedding.fragment_labels entry."
+                    "non-empty embedding.fragment_labels entry (unless "
+                    "dmet_multifragment_one_shot_shared_hamiltonian is True)."
                 )
         if self.dmet_hamiltonian_source == "schmidt_atomic_production":
             if self.mode != "dmet":
@@ -310,6 +377,15 @@ class EmbeddingSpec(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def _plugin_embedding_requires_fields(self) -> EmbeddingSpec:
+        if self.mode == "plugin":
+            if not (self.decomposition_plugin or "").strip():
+                raise ValueError("embedding.mode='plugin' requires embedding.decomposition_plugin")
+            if not (self.decomposition_plugin_json_path or "").strip():
+                raise ValueError("embedding.mode='plugin' requires embedding.decomposition_plugin_json_path")
+        return self
+
+    @model_validator(mode="after")
     def _projection_mulliken_requires_mode_and_indices(self) -> EmbeddingSpec:
         if self.projection_quantum_hamiltonian == "fragment_mulliken_mo":
             if self.mode != "projection":
@@ -340,9 +416,16 @@ class ComputableGraphEdgeRemove(BaseModel):
 
 
 class QuantumSpec(BaseModel):
-    """Quantum stage after PySCF + JW Hamiltonian (InQuanto-style chain)."""
+    """Quantum stage after PySCF + qubit Hamiltonian (InQuanto-style chain).
+
+    Fermion→qubit mapping is selected on :class:`ActiveSpaceSpec` as ``fermion_qubit_mapping``.
+    """
 
     algorithm: Literal["vqe", "adapt", "iqeb"] = "vqe"
+    variational_ansatz: Literal["hea", "uccsd"] = "hea"
+    """``hea``: hardware-efficient layers; ``uccsd``: JW-only cluster expansion (see ``quantum/algorithms/uccsd_vqe.py``)."""
+    uccsd_trotter_steps: int | None = None
+    """If set (>=1) with ``variational_ansatz='uccsd'``, use first-order product-formula layers (see :class:`~qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDTrotterVQE`). ``None`` keeps exact sequential ``expm`` factors per cluster generator."""
     vqe_depth: int = 1
     vqe_maxiter: int = 200
     adapt_max_iter: int = 5
@@ -384,6 +467,11 @@ class QuantumSpec(BaseModel):
     """If > 0, symmetric Gaussian noise on real :math:`M` (placeholder shot model)."""
     qpe_demo_track_after_variational: bool = False
     """If True, attach :mod:`qpe_qec_demo` dense Kitaev + Bayesian toy block to pipeline output (no extra deps)."""
+    qpe_pipeline_integration: bool = False
+    """If True, same as enabling the QPE demo track (alias for dual-track YAML that avoids the longer flag name)."""
+
+    def qpe_demo_track_requested(self) -> bool:
+        return bool(self.qpe_demo_track_after_variational or self.qpe_pipeline_integration)
     pauli_support_max_terms: int | None = None
     """If set, cap ``protocol_counts['hamiltonian_pauli_strings']`` length; full count in ``n_hamiltonian_pauli_terms_full``."""
     tensornet_expectation_stub: bool = False
@@ -404,6 +492,17 @@ class QuantumSpec(BaseModel):
                 "Set only one of run_sampled_pauli_protocol (statevector MC) and "
                 "run_qiskit_shots_pauli_protocol (Qiskit device/Aer bitstrings), not both."
             )
+        return self
+
+    @model_validator(mode="after")
+    def _uccsd_trotter_steps_valid(self) -> QuantumSpec:
+        t = self.uccsd_trotter_steps
+        if t is None:
+            return self
+        if self.variational_ansatz != "uccsd":
+            raise ValueError("quantum.uccsd_trotter_steps is only valid when variational_ansatz='uccsd'.")
+        if int(t) < 1:
+            raise ValueError("quantum.uccsd_trotter_steps must be >= 1 when set.")
         return self
 
 
@@ -443,6 +542,29 @@ class ExperimentConfig(BaseModel):
                     f"embedding.projection_fragment_atom_indices: atom index {i} out of range "
                     f"(n_atom={n_atom})."
                 )
+        return self
+
+    @model_validator(mode="after")
+    def _uccsd_variational_constraints(self) -> ExperimentConfig:
+        q = self.quantum
+        if q.variational_ansatz != "uccsd":
+            return self
+        if q.algorithm != "vqe":
+            raise ValueError("quantum.variational_ansatz='uccsd' requires quantum.algorithm='vqe'.")
+        if self.active_space.fermion_qubit_mapping != "jordan_wigner":
+            raise ValueError(
+                "quantum.variational_ansatz='uccsd' requires active_space.fermion_qubit_mapping='jordan_wigner'."
+            )
+        if q.use_pauli_protocol:
+            raise ValueError(
+                "quantum.variational_ansatz='uccsd' is incompatible with use_pauli_protocol=True "
+                "(Pauli measurement circuits use HEA). Set use_pauli_protocol: false."
+            )
+        if q.vqd_after_variational or q.qse_after_variational or q.sceom_after_variational:
+            raise ValueError(
+                "quantum.variational_ansatz='uccsd' cannot combine with VQD/QSE/SCEOM "
+                "(those stages expect HEA angle packing)."
+            )
         return self
 
 

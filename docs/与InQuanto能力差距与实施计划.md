@@ -4,6 +4,8 @@
 
 **按序闭合（B→J，L1 对拍）**：[InQuanto_B_J_逐项闭合计划.md](InQuanto_B_J_逐项闭合计划.md)
 
+**P2 双月周历（8 周排期）**：[P2_详细实施计划.md](P2_详细实施计划.md) **§8**（与 §6 执行序、§5 闸门配套）。
+
 ---
 
 ## 1. 差距总表（相对 InQuanto 公开栈）
@@ -13,11 +15,11 @@
 | **云与计费** | Nexus、`qnexus`、HQC | 本地 SQLite + `jobs/cost` + YAML **`nexus_analog`** 单位账；可选 **`nexus_cloud`**（HTTP/ mock 侧车，无厂商 SDK） | **刻意不对齐**真云/真 HQC/合同与配额 |
 | **硬件** | H1/H2 等、校准与原生门集叙事 | `BackendSpec` + Qiskit / IonStack mock | 多后端**灵活**、非离子阱专优 |
 | **编译** | TKET 默认、chemistry-aware | 可选 [pytket 桥接](技术文档_CircuitIR与TKET桥接及作业契约.md) | **partial**：非默认全链 |
-| **对象模型** | `Computable`、丰富 `FermionSpace` 算子图 | `PauliAveragingProtocol` + 流水线函数 | **partial**：无独立 `Computable` 类 |
-| **经典化学** | 多 driver（COSMO、PBC、k 点、CASSCF/AVAS 等） | PySCF 主路径；**ddCOSMO**；**PBC**（RHF@Γ 或 **KRHF**+`pbc_kpoint_mesh`；CASCI 用 `pbc_active_space_kpoint_index`）；**嵌入**：单轮/多轮 **Schmidt 谱 bath + FCI 密度反馈**（`schmidt_dmet_max_cycles`）+ `whole_active_system` / DMET 钩子；**projection** 提供 **L1 轨迹**（`embedding_workflow` + `parity_snapshot.projection_embedding_open_trace`，样例 `configs/example_h2_projection_trace.yaml`，变分层仍为全局 JW） | **partial**：无 AVAS/全 CASSCF 产品深度；PBC+溶剂受 PySCF 能力限制；DMET 非闭源 bath 拟合 |
-| **Ansatz** | UCC/化学激发池、多化学 ansatz 名 | HEA、ADAPT、**IQEB（`quantum.algorithm=iqeb`，`configs/example_h2_iqeb.yaml`）** 等 | **partial**：UCC 非默认 |
-| **缓解** | Qermit `MitRes`/`MitEx` 图与产品运行时 | PMSV/ZNE/SPAM 存根 + **`qermit_analog` DAG 报告** + **`qermit_runtime` 线性执行迹**（`mitigation_dag_execution`）；`MitigationSpec.zne_scales` 与协议 ZNE 对齐 | **partial**：非 Qermit 商业二进制/调度 |
-| **张量网** | `CuTensorNetProtocol` / `inquanto-cutensornet` | **`cutensornet_protocol_stub`** + `opt_einsum` / **cupy** / **cuquantum** 检测等引擎位 | **partial**：有协议位与可复现行，**无** 闭源 cutensornet 化学收缩等价物 |
+| **对象模型** | `Computable`、丰富 `FermionSpace` 算子图 | `PauliAveragingProtocol` + 流水线函数；**薄层** `protocols/computable.py`（`ComputableRef`、`list_computables_for_config`）与 `workflow-preview` / `repro` round-trip | **partial**：无闭源级独立 `Computable` **产品类**；开放栈以 DAG 预览 + 机读 dict 闭合 L1 |
+| **经典化学** | 多 driver（COSMO、PBC、k 点、CASSCF/AVAS 等） | PySCF 主路径；**ddCOSMO**；**PBC**（RHF@Γ 或 **KRHF**+`pbc_kpoint_mesh`；CASCI 用 `pbc_active_space_kpoint_index`；样例 `configs/example_h2_pbc_gamma.yaml`）；**嵌入**：Schmidt 生产 + **`schmidt_bath_sidecar_json_path`**（用户 JSON→`embedding_workflow`）+ **`oniom_layers_v1`** 玩具层（`configs/example_oniom_toy.yaml`）+ `whole_active_system` / DMET / plugin；**projection** L1 轨迹（`configs/example_h2_projection_trace.yaml` 等）；可选 **`chemistry_extended.casscf_orbital_optimization_audit`**（`configs/example_h2_casscf_audit.yaml`，审计能量入 `hamiltonian_meta.pyscf_driver`） | **partial**：无 AVAS/全 CASSCF **产品**深度；PBC+溶剂受 PySCF 版本约束；DMET 非闭源 bath **算法**拟合（已有用户侧车钩子） |
+| **Ansatz** | UCC/化学激发池、多化学 ansatz 名 | HEA、ADAPT、**IQEB**（`configs/example_h2_iqeb.yaml`）；**JW UCCSD**（`configs/example_h2_uccsd.yaml`）；**JW UCCSD 一阶 Trotter 层**（`quantum.uccsd_trotter_steps`，`configs/example_h2_uccsd_trotter.yaml`） | **partial**：BK/SCBK 上映射的 UCCSD（含 Trotter）为 **`n/a`**（矩阵 §2）；化学池广度仍不及闭源默认 |
+| **缓解** | Qermit `MitRes`/`MitEx` 图与产品运行时 | PMSV/ZNE/SPAM 存根 + **`qermit_analog` DAG 报告** + **`qermit_runtime` 线性执行迹**（`mitigation_dag_execution`）；`MitigationSpec.zne_scales` 与协议 ZNE 对齐；启用 ZNE+Qiskit Pauli 时 **`parity_snapshot.zne_qiskit_unification_v1`**（见 `mitigation_PMSV_ZNE_Qermit_mapping.md`） | **partial**：非 Qermit 商业二进制/调度 |
+| **张量网** | `CuTensorNetProtocol` / `inquanto-cutensornet` | **`cutensornet_protocol_stub`** + 引擎探测键（`opt_einsum` / cupy / cuquantum 等）；矩阵与 gap **`tensornet`** 标明 **`n/a`**：不宣称厂商化学尺度收缩 | **`n/a`（开放栈诚实降级）**：保留 stub/钩子供 Methods 对读，**不**验收与 `inquanto-cutensornet` 产品二分等价 |
 | **协议 run** | 云侧 shot + DataFrame 一体 | 五阶段 + `protocol_counts` + 三能量路径 | **已较强**：现含 **精确 / statevector 采样 / Qiskit 比特串**（见 [技术文档_设备比特串与Qiskit采样路径.md](技术文档_设备比特串与Qiskit采样路径.md)） |
 | **激发态 / 谱** | 完整产品线叙事 | VQD/QSE/SCEOM/QPE 模块均为 **partial** | 算法深度与 InQuanto 闭源未逐条对齐 |
 | **MD/ML** | 非主宣传 | `md_bridge`、`QMEFDataset` | **本栈长板**（差异化） |
@@ -49,9 +51,13 @@
 2. **激发态报告**：`excited_resource_summary` / `resource_summary` 含 **`excited_methods_unified`**（schema v1）；export 含 **`excited_resource_from_config`**（仅 YAML，无跑库）。  
 3. **PMSV**：`MitigationSpec.pmsv_report_extension` / `pmsv_extra` + `mitigation.pmsv.finalize_pmsv_report` 合并进 `protocol_counts['pmsv_report']`。
 
-### P2 结构增强— **已落地（深化仍可比照 §1 表）**
+**P1 全量核对报告**（竞争定位 P1 行 × L1 × 差距 P1 × parity 摘要 × 建议队列）：[P1_completion_audit.md](P1_completion_audit.md)。
 
-1. **QPE/容错 与 主 pipeline**：`quantum.qpe_demo_track_after_variational` → 输出 `qpe_demo_track`（Kitaev 稠密 + Bayesian toy）；样例 `configs/example_h2_qpe_track.yaml`；`repro.run_summary.qpe_demo_track_ran`。  
+### 主线结构增强（差距文档 §3 批次，已交付）
+
+> 注：此处 **不是** 竞品文档中的路线图 **P2（研究深度）**；路线图 P2 的 WBS 与里程碑见 [P2_详细实施计划.md](P2_详细实施计划.md)。
+
+1. **QPE/容错 与 主 pipeline**：`quantum.qpe_demo_track_after_variational` **或** `quantum.qpe_pipeline_integration` → 输出 `qpe_demo_track`（`qpe_qec_demo.pipeline_track`）；双轨 runnable：`configs/qpe_dual_track_demo.yaml`；传统 Pauli 链上样例仍用 `configs/example_h2_qpe_track.yaml`；`repro.run_summary.qpe_demo_track_ran`。  
 2. **Computable 薄层**：`qchem_stack.protocols.computable`（`ComputableRef`、`list_computables_for_config`、`computables_export_dict`），与 `inquanto_contract` 映射联动。  
 3. **TKET**：CI 单跑 `tests/test_pytket_bridge.py`（`[dev]` 含 `pytket`）。
 
@@ -119,9 +125,28 @@
 - 新增长板或关闭差距时：更新 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) 相应行、本文 §1、以及 `inquanto_contract.inquanto_gap_categories()`。  
 - 论文 Methods：优先引用 `repro.run_summary`、`pauli_protocol_expectation_path`、`protocol_expectation_source`。
 - **公开 InQuanto 手册锚定**：维护时记录对照 `https://docs.quantinuum.com/inquanto/` 的日期（与 [L1_InQuanto_alignment_signoff.md](L1_InQuanto_alignment_signoff.md) 钉扎字段一致）；改版后做一次矩阵/机读表 diff 登记。
-- **Y1 「非云非硬件」公开面对标执行台账**（季度 OKR、月度度量、文档索引）：[InQuanto_Y1_public_alignment_ledger.md](InQuanto_Y1_public_alignment_ledger.md)；L3 数值套件路线：[L3_benchmark_suite_roadmap.md](L3_benchmark_suite_roadmap.md)；年度残余 `partial` SLA：[Y1_residual_partial_SLA_template.md](Y1_residual_partial_SLA_template.md)。
+- **Y1 「非云非硬件」公开面对标执行台账**（季度 OKR、月度度量、文档索引）：[InQuanto_Y1_public_alignment_ledger.md](InQuanto_Y1_public_alignment_ledger.md)；L3 数值套件路线：[L3_benchmark_suite_roadmap.md](L3_benchmark_suite_roadmap.md)；年度残余 `partial` SLA：[Y1_residual_partial_SLA_template.md](Y1_residual_partial_SLA_template.md)；**路线图 P2**：[P2_详细实施计划.md](P2_详细实施计划.md)。
 - **InQuanto 手册 How-to**：与公开 [How to use](https://docs.quantinuum.com/inquanto/manual/howto.html) 的模块级对齐见 [InQuanto_manual_howto_与_qchem_stack_映射.md](InQuanto_manual_howto_与_qchem_stack_映射.md)。
 
 ---
 
-*版本：含 parity export v2、Qiskit shots、原不排期项迭代（Nexus 类比、Qermit 图+运行时、张量网 stub+引擎、PBC/k 点侧）、**§4 三周日历（非云非硬件 L1 严格对齐）**、与 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) 表同步。*
+## 6. 路线图 §141 残余项（P2，禁止冒充 P1 `yes`）
+
+与 [竞争定位与路线图_对标Quantinuum产品与技术路线.md](竞争定位与路线图_对标Quantinuum产品与技术路线.md) §141「仍需推进」一致；矩阵未升格前不关闭为 `yes`。**执行细化（WBS、闸门、非目标）** 以 [P2_详细实施计划.md](P2_详细实施计划.md) 为准。
+
+### P2-W3：AVAS / 产品 CASSCF 与「最小审计」分界
+
+- **差距表 §1「经典化学」行**仍标 **`partial`**：无 AVAS；无 InQuanto 级全 CASSCF **产品**深度。  
+- **已有机读**：`casscf_orbital_optimization_audit` 仅审计轨道一步（见 `configs/example_h2_casscf_audit.yaml`）。  
+- **设计母页**：[P2_W3_classical_avas_casscf_boundary.md](P2_W3_classical_avas_casscf_boundary.md)（与矩阵 §3 同步维护）。
+
+| 阶段（示意） | 主题 | 交付物方向 |
+|--------------|------|------------|
+| P2 初波 | QPE/FT × 资源 × 编译 | `run_summary` / `protocol_counts` 与 TKET 探针联合叙事；超越 demo 的资源估计可选 |
+| P2 初波 | 分解与大体系 | DMET bath 自洽深化；ONIOM/QM-MM **最小可跑** demo（较 §3 已交付玩具层字段更进一步） |
+| P2 持续 | 经典深度 / 缓解 / MDML | AVAS/CASSCF 文档化 partial；进阶 mitigation block；`QMEFDataset` 与 trainer smoke |
+| 并行 | 教程与 examples | `docs-site`、`examples/`、CI 钩子 |
+
+---
+
+*版本：含 parity export v2、Qiskit shots、原不排期项迭代（Nexus 类比、Qermit 图+运行时、张量网 stub+引擎、PBC/k 点侧）、**§4 三周日历（非云非硬件 L1 严格对齐）**、**§6 P2 backlog（索引至 P2 详细计划）**、与 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) 表同步。*

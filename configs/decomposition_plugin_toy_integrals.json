@@ -1,0 +1,17 @@
+{
+  "schema": "decomposition_plugin_toy_v1",
+  "primary_fragment_id": "f0",
+  "fragments": {
+    "f0": {
+      "n_qubits": 2,
+      "fermion_qubit_mapping": "jordan_wigner",
+      "pauli_coefficients": [
+        { "label": "II", "coeff": -0.55 },
+        { "label": "ZI", "coeff": -0.2 },
+        { "label": "IZ", "coeff": -0.2 },
+        { "label": "ZZ", "coeff": 0.08 },
+        { "label": "XX", "coeff": 0.03 }
+      ]
+    }
+  }
+}

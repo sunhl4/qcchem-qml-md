@@ -20,6 +20,7 @@
 | **W2 进度（激发态 `run_summary`）** | 已完成：`vqd_three_protocol_present`、`qse_shot_mode`、`qse_shot_noise_model`（条件）、`sceom_*` 写入 `repro.run_summary`；`out["qse"].meta` 含 `qse_shot_mode`；验收见 [工程记忆 §3.1](工程记忆_Quantinuum对标与数据流技术文档.md) 与 `tests/test_orchestration_pipeline.py` |
 | **IQEB / projection L1** | `quantum.algorithm=iqeb` + `configs/example_h2_iqeb.yaml`；`embedding.mode=projection` + `configs/example_h2_projection_trace.yaml`；CI：`smoke_pipeline.py --iqeb` / `--projection-trace`；`PARITY_SNAPSHOT_DOCUMENTED_KEYS` 含 `iqeb_max_rounds`、`projection_embedding_open_trace` |
 | **非云「超越」机读钉扎** | `GET /v1/meta/capability-surface` → **`open_stack_differentiators`**（`open_stack_differentiators_v1`）；矩阵 [§0](inquanto_public_parity_matrix.md) 与 [竞争定位 §3 卖点 6](竞争定位与路线图_对标Quantinuum产品与技术路线.md) |
+| **P2 双月周历（8 周）** | 排期与周交付物见 [P2_详细实施计划.md](P2_详细实施计划.md) **§8**；与 §6 执行序同源，季度 OKR 可引用 §8 行作为子任务 |
 
 ---
 
@@ -41,8 +42,8 @@
 
 ### Q3（月 7–9）：张量网 + 经典化学深度 + L3 套件
 
-- TN：小体系交叉检与 `parity_snapshot` 键；见 [L3_benchmark_suite_roadmap.md](L3_benchmark_suite_roadmap.md)。
-- 经典化学：driver/AVAS/CASSCF **形状**（接口 + 文档）；诚实 PySCF 边界。
+- TN：矩阵与 gap **`tensornet`** 诚实 **`n/a`**（开放 stub，不宣称 `inquanto-cutensornet`）；可选环境里 L3 交叉检仍见 [L3_benchmark_suite_roadmap.md](L3_benchmark_suite_roadmap.md)。
+- 经典化学：driver/PBC + **最小 CASSCF 审计**（`configs/example_h2_casscf_audit.yaml`）；AVAS/产品 CASSCF **仍为 partial**。
 
 ### Q4（月 10–12）：QPE/容错叙事 + 残余清零 + 年度签off
 
@@ -58,8 +59,9 @@
 | 月份 | yes 行数（估算） | partial | n/a | 无 gap 解释的 partial（目标 0） | 备注 |
 |------|------------------|---------|-----|----------------------------------|------|
 | Y1-M01 | | | | | |
+| Y1-M04 | **3** | **14** | **2**（含 `tensornet`→矩阵/`gap` **n/a**） | 0 | **广义 P1 排期闭合**；主表 §1–§3 行计数见 `python scripts/count_parity_matrix_main_tables.py`（示例输出：`yes=3 partial=14 n/a=2`，与手填冲突时以 gap 语义为准）；后续路线图见 [P2_详细实施计划.md](P2_详细实施计划.md) |
 
-*说明：行数统计以 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) 主表为准，主观分类需与 `inquanto_gap_categories` 一致。*
+*说明：行数统计以 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) 主表 §1–§3 为准；脚本辅助计数，主观分类仍以 `inquanto_gap_categories` 与矩阵备注为准。*
 
 ---
 
@@ -103,4 +105,5 @@ jq '.nodes[] | select(.pillar=="P2" and .status=="shipped" and .is_class_leaf==f
 - **公开手册 How-to（功能参考）**：[InQuanto_manual_howto_与_qchem_stack_映射.md](InQuanto_manual_howto_与_qchem_stack_映射.md)（锚 [How to use InQuanto](https://docs.quantinuum.com/inquanto/manual/howto.html)）
 - 架构边界：[架构_InQuanto闭源能力闭合与可复现边界.md](架构_InQuanto闭源能力闭合与可复现边界.md)
 - 竞争策略：[竞争定位与路线图_对标Quantinuum产品与技术路线.md](竞争定位与路线图_对标Quantinuum产品与技术路线.md)
-- 签字清单：[L1_InQuanto_alignment_signoff.md](L1_InQuanto_alignment_signoff.md)
+- 签字清单：[L1_InQuanto_alignment_signoff.md](L1_InQuanto_alignment_signoff.md)；维护角色：[MAINTAINERS.md](MAINTAINERS.md)
+- **P1 全量核对报告**：[P1_completion_audit.md](P1_completion_audit.md)

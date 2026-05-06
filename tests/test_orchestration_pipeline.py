@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import math
 
 import pytest
 
@@ -49,6 +50,10 @@ quantum:
     assert "scf_energy" in out
     assert "energy_pauli_protocol" in out
     assert out["repro"]["config_sha256_prefix"]
+    assert out["embedding_workflow"]["mode"] == "none"
+    assert out["repro"]["embedding_workflow"]["mode"] == "none"
+    wp = out["repro"].get("workflow_preview_v1")
+    assert isinstance(wp, dict) and wp.get("schema") == "workflow_preview_v1"
     snap = out["repro"]["parity_snapshot"]
     assert snap["pauli_grouping"] == "tensor_product"
     assert snap["hamiltonian_meta"]["fermion_to_qubit_map"] == "jordan_wigner"
@@ -59,6 +64,20 @@ quantum:
     assert rs["n_pauli_groups"] is not None and rs["n_pauli_groups"] >= 0
     assert rs.get("pauli_averaging_protocol_ran") is True
     assert "excited_stages" not in rs
+
+
+def test_qpe_dual_track_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "qpe_dual_track_demo.yaml"
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.qpe_pipeline_integration is True
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    qdt = out["qpe_demo_track"]
+    assert qdt["schema"] == "qpe_qec_demo_track_v1"
+    assert "kitaev_ground_energy_dense" in qdt
+    assert isinstance(qdt.get("bayesian_phase_map_toy"), dict)
+    assert math.isfinite(float(out["energy_after_variational"]))
+    assert out["repro"]["run_summary"].get("qpe_demo_track_ran") is True
 
 
 def test_run_pipeline_sync_h2_qpe_demo_track(tmp_path) -> None:
@@ -158,6 +177,10 @@ quantum:
     assert rs["sum_shots_total_with_excited_upper_bound"] == rs["excited_shots_upper_bound"]
     rsum = out["repro"]["run_summary"]
     assert rsum.get("vqd_three_protocol_present") is True
+    assert rsum.get("vqd_n_energies_recorded") == 2
+    assert rsum.get("vqd_deflation_levels_completed") == 1
+    assert rsum.get("vqd_channels_count") == 2
+    assert rsum.get("vqd_shots_objective_yaml") == 100
 
 
 def test_run_pipeline_sync_h2_qse_sceom_yaml(tmp_path) -> None:
@@ -219,6 +242,11 @@ quantum:
     assert rsum.get("sceom_shot_noise_model") == "none"
     assert rsum.get("sceom_shots_per_matrix_element") == 0
     assert out["qse"]["meta"].get("qse_shot_mode") == "exact"
+    assert rsum.get("qse_n_excitation_energies") == len(out["qse"]["excitation_energies"])
+    assert rsum.get("qse_basis_dimension_K") == out["qse"]["meta"].get("K")
+    assert rsum.get("sceom_n_energies_recorded") == len(out["sceom"]["energies"])
+    assert rsum.get("sceom_active_generator_count") == 2
+    assert rsum.get("sceom_matrix_construction") is not None
 
 
 def test_run_pipeline_sync_h2_qse_pauli_transitions_run_summary(tmp_path) -> None:
@@ -409,7 +437,10 @@ def test_tutorial_inquanto_chain_yaml_runs() -> None:
     assert snap.get("dmet_open_loop_architecture", {}).get("schema") == "dmet_open_architecture_v1"
     assert snap.get("dmet_one_shot_open_ledger", {}).get("schema") == "dmet_one_shot_v1"
     assert snap.get("dmet_solver_mode") == "parity_stub"
-    assert out["repro"]["run_summary"].get("dmet_one_shot_open_ledger_present") is True
+    rsum = out["repro"]["run_summary"]
+    assert rsum.get("dmet_one_shot_open_ledger_present") is True
+    assert rsum.get("dmet_embedding_active") is True
+    assert rsum.get("dmet_hamiltonian_source_yaml") == "parity_stub"
     assert "energy_pauli_protocol" in out
     pc = out["protocol_counts"]
     assert pc.get("hamiltonian_pauli_term_records")
@@ -448,6 +479,73 @@ def test_dmet_whole_active_system_impurity_vqe_matches_global_vqe() -> None:
     assert float(row["energy"]) == pytest.approx(e0, rel=1e-10, abs=1e-10)
     assert out["embedding_workflow"]["dmet_hamiltonian_source"] == "whole_active_system"
     assert out["repro"]["parity_snapshot"]["dmet_solver_mode"] == "whole_active_system"
+    rsum = out["repro"]["run_summary"]
+    assert rsum.get("dmet_embedding_active") is True
+    assert rsum.get("dmet_fragment_solve_present") is True
+    assert rsum.get("dmet_fragment_solve_schema") == "dmet_one_shot_v1"
+    assert rsum.get("dmet_hamiltonian_source_yaml") == "whole_active_system"
+
+
+def test_run_pipeline_sync_packaged_h2_uccsd_yaml() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_uccsd.yaml"
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["algorithm"] == "vqe"
+    vm = out.get("vqe_meta")
+    assert isinstance(vm, dict)
+    assert vm.get("variational_ansatz") == "uccsd"
+    assert int(vm["uccsd_n_parameters"]) >= 1
+    ev = float(out["energy_after_variational"])
+    assert math.isfinite(ev)
+    assert ev < float(out["scf_energy"]) + 1e-6
+    assert ev > -2.0
+    snap = out["repro"]["parity_snapshot"]
+    assert snap["variational_ansatz"] == "uccsd"
+    assert snap["uccsd_n_parameters"] == int(vm["uccsd_n_parameters"])
+    rsum = out["repro"]["run_summary"]
+    assert rsum["variational_ansatz_yaml"] == "uccsd"
+    assert rsum["uccsd_n_parameters"] == int(vm["uccsd_n_parameters"])
+    rs = out["resource_summary"]
+    assert rs["pauli_averaging_protocol_ran"] is False
+    assert "energy_pauli_protocol" not in out
+
+
+def test_run_pipeline_sync_packaged_h2_uccsd_trotter_yaml() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_uccsd_trotter.yaml"
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    vm = out["vqe_meta"]
+    assert vm.get("uccsd_trotter_steps") == 2
+    assert vm.get("uccsd_product_formula") == "first_order_layer_repeat"
+    snap = out["repro"]["parity_snapshot"]
+    assert snap["uccsd_trotter_steps"] == 2
+
+
+def test_run_pipeline_sync_oniom_toy_yaml_sets_embedding_layers() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_oniom_toy.yaml"
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    wf = out.get("embedding_workflow") or {}
+    ot = wf.get("oniom_toy_v1")
+    assert isinstance(ot, dict)
+    assert ot.get("schema") == "oniom_toy_v1"
+    assert len(ot.get("layers") or []) == 2
+
+
+def test_run_pipeline_sync_h2_casscf_audit_yaml() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_casscf_audit.yaml"
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    hm = out.get("hamiltonian_meta") or {}
+    pd = hm.get("pyscf_driver") or {}
+    audit = pd.get("casscf_orbital_audit_v1")
+    assert isinstance(audit, dict)
+    assert audit.get("schema") == "casscf_orbital_audit_v1"
+    assert "casscf_energy_au" in audit
 
 
 def test_run_pipeline_sync_packaged_h2_iqeb_yaml() -> None:

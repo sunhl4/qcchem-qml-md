@@ -33,6 +33,8 @@ def test_open_gap_closure_reference_has_schemas() -> None:
     )
     g = build_open_gap_closure_reference(cfg)
     assert g["schema"] == "open_gap_closure_reference_v1"
+    assert g["ucc"]["chemically_aware_ucc_policy_protocol"].endswith("ChemicallyAwareUCCPolicy")
+    assert "build_spin_uccsd_fermion_generators_policy_param" in g["ucc"]
     assert g["ucc"]["n_greedy_commuting_trotter_layers"] >= 1
     assert g["nexus"]["schema"] == "nexus_public_workflow_blueprint_v1"
     assert g["l3_statistics"]["schema"] == "l3_energy_bootstrap_stub_v1"

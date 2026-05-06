@@ -30,8 +30,20 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 契约与端点表见 [HTTP API · SQLite 作业](/reference/http-api-sqlite-jobs)。
 
+## 4. 常用命令（摘要）
+
+| 场景 | 命令 |
+|------|------|
+| 消费 SQLite 队列里的作业 | `qchem-jobs-worker --db ./jobs.sqlite`（或 `qchem-pipeline-worker`，等价） |
+| 起本地 API | `uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000` |
+| 仓库内烟测 | `python scripts/smoke_pipeline.py`（可加 `--sampled`、`--qiskit-shots` 等） |
+
+完整说明与更多脚本见 **[命令行与脚本](/reference/cli-and-scripts)**。
+
 ## 下一步
 
-- [指南总览](/guide/) — 四柱索引  
-- [公开 parity 矩阵](/parity/public-matrix) — 与 InQuanto 公开能力的对照  
-- [工程架构](/concept/engineering-architecture) — 分层与稳定 JSON 导出  
+- [产品功能](/product/features) — 能力分层与用户接口一览  
+- [工作流与 YAML 概览](/tutorial/workflow-overview) — 配置与四柱对应  
+- [指南总览](/guide/) — 按柱阅读功能与用法  
+- [命令行与脚本](/reference/cli-and-scripts) · [HTTP API](/reference/http-api-sqlite-jobs)  
+- 深入：[原理与阅读建议](/guide/principles-and-reading)；内部对标见 [定位与路线](/product/)  

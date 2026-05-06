@@ -26,9 +26,13 @@ INQUANTO_TO_QCHEM_OBJECT_MAP: dict[str, str] = {
     "AlgorithmVQD": "qchem_stack.quantum.algorithms.excited.VQD",
     "AlgorithmQSE": "qchem_stack.quantum.algorithms.excited.QSE + quantum.qse_transition (Pauli transition shot modes)",
     "AlgorithmSCEOM": "qchem_stack.quantum.algorithms.sceom.run_sceom_nested_commutator_from_hea",
-    "Algorithm*QPE (track)": "qchem_stack.qpe_qec_demo + pipeline._attach_qpe_demo_track_if_requested (qpe_demo_track_after_variational)",
+    "Algorithm*QPE (track)": "qchem_stack.qpe_qec_demo.pipeline_track + pipeline._attach_qpe_demo_track_if_requested (qpe_demo_track_after_variational | qpe_pipeline_integration)",
     "AlgorithmBayesianQPE + Phayes": "qchem_stack.qpe_qec_demo.BayesianQPEStub",
-    "Qubit Hamiltonian (JW)": "qchem_stack.chem.hamiltonian.QubitHamiltonian / molecular_hamiltonian_from_pyscf",
+    "Qubit Hamiltonian (JW)": (
+        "qchem_stack.chem.hamiltonian.QubitHamiltonian + molecular_hamiltonian_from_pyscf / "
+        "qubit_hamiltonian_from_spatial_chemist_integrals (JW or Bravyi–Kitaev via "
+        "active_space.fermion_qubit_mapping)"
+    ),
     "dataframe_circuit / shot rows": "qchem_stack.backends.spec.circuit_resource_row, dataframe_circuit_shot_rows",
     "Computable (expectation from circuits)": "qchem_stack.protocols.computable + integrations.inquanto_workflow_preview.computable_graph_v2 + POST /v1/meta/workflow-preview",
     "TKET / pytket pass metrics": "optional: qchem_stack.integrations.tket_fullchain + backends.pytket_bridge (parity_integrations.tket_first_circuit_stats)",
@@ -90,6 +94,7 @@ def open_stack_differentiators_public() -> dict[str, Any]:
                     "scripts/export_parity_criteria_table.py",
                     "scripts/check_parity_export_sample.py",
                     "protocols/inquanto_contract.py",
+                    "tests/test_repro_top_level_key_registry.py",
                 ],
             },
             {
@@ -117,6 +122,15 @@ def open_stack_differentiators_public() -> dict[str, Any]:
                     "configs/example_h2_projection_trace.yaml",
                 ],
             },
+            {
+                "id": "mitigation_dag_trace_l1",
+                "summary": "Qermit-analog DAG node kinds match linear mitigation execution trace order (audit invariant).",
+                "evidence_modules": [
+                    "mitigation/qermit_analog.py",
+                    "mitigation/qermit_runtime.py",
+                    "tests/test_mitigation_dag_trace_homology.py",
+                ],
+            },
         ],
         "epistemic_bound": (
             "Beyond means transparency and optional open extras — not numerical equivalence to closed "
@@ -135,6 +149,11 @@ PARITY_SNAPSHOT_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "vqe_maxiter",
         "adapt_max_iter",
         "iqeb_max_rounds",
+        "fermion_qubit_mapping",
+        "variational_ansatz",
+        "uccsd_n_parameters",
+        "uccsd_trotter_steps",
+        "zne_qiskit_unification_v1",
         "projection_embedding_open_trace",
         "run_sampled_pauli_protocol",
         "run_qiskit_shots_pauli_protocol",
@@ -148,6 +167,7 @@ PARITY_SNAPSHOT_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "zne_enabled",
         "mitigation_execution_class",
         "mitigation_zne_scales",
+        "mitigation_zne_mode",
         "compiler_native_twoq",
         "compiler_optimization_level",
         "compiler_preoptimize_passes",
@@ -216,7 +236,133 @@ PARITY_EXPORT_V2_STABLE_KEYS: frozenset[str] = frozenset(
         "inquanto_gap_categories",
         "iqeb_implementation_path",
         "pauli_protocol_expectation_path",
+        "protocol_expectation_semantics_v1",
         "embedding",
+    }
+)
+
+
+# Registry for CI: every key written by ``orchestration.pipeline._attach_run_summary`` must appear here
+# (update when adding run_summary fields).
+RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
+    {
+        "stages_completed",
+        "quantum_algorithm",
+        "variational_ansatz_yaml",
+        "uccsd_n_parameters",
+        "pauli_protocol_expectation_path",
+        "energy_after_variational",
+        "dmet_embedding_active",
+        "dmet_hamiltonian_source_yaml",
+        "dmet_fragment_count",
+        "dmet_uniform_multifragment_toy_yaml",
+        "dmet_stub_one_shot_ledger_yaml",
+        "dmet_fragment_solve_present",
+        "dmet_fragment_solve_schema",
+        "schmidt_dmet_max_cycles_yaml",
+        "schmidt_dmet_cycles_executed",
+        "schmidt_dmet_converged_early",
+        "schmidt_per_fragment_vqe_n_fragments",
+        "schmidt_per_fragment_vqe_total_nfev",
+        "schmidt_per_fragment_vqe_min_energy_au",
+        "schmidt_per_fragment_vqe_max_energy_au",
+        "scf_energy",
+        "vqe_maxiter_yaml",
+        "vqe_nfev",
+        "adapt_max_iter_yaml",
+        "adapt_total_gradient_evals",
+        "adapt_steps_recorded",
+        "adapt_excitation_layers",
+        "iqeb_max_rounds_yaml",
+        "iqeb_outer_rounds_recorded",
+        "iqeb_selected_pauli_count",
+        "iqeb_final_inner_vqe_nfev",
+        "iqeb_implementation_path",
+        "sum_shots_total_with_excited_upper_bound",
+        "excited_shots_upper_bound",
+        "pauli_averaging_protocol_ran",
+        "sum_shots_backend_protocol",
+        "n_pauli_terms",
+        "n_pauli_groups",
+        "n_circuits",
+        "n_qubits",
+        "energy_pauli_protocol",
+        "protocol_expectation_source",
+        "protocol_energy_stderr_model",
+        "protocol_total_shots_budget",
+        "protocol_n_measurement_circuits",
+        "protocol_shots_per_circuit_effective",
+        "protocol_energy_stderr",
+        "protocol_pmsv_report",
+        "vqd_n_states_yaml",
+        "vqd_n_energies_recorded",
+        "vqd_deflation_levels_completed",
+        "vqd_reused_pipeline_ground",
+        "vqd_three_protocol_present",
+        "vqd_channels_count",
+        "vqd_shots_objective_yaml",
+        "vqd_shots_overlap_yaml",
+        "vqd_shots_weight_yaml",
+        "qse_shot_mode",
+        "qse_subspace_dim_yaml",
+        "qse_max_basis_yaml",
+        "qse_n_excitation_energies",
+        "qse_shot_noise_model",
+        "qse_basis_dimension_K",
+        "qse_n_transition_tasks",
+        "qse_total_shots_upper_bound",
+        "sceom_shots_per_matrix_element",
+        "sceom_subspace_dim_yaml",
+        "sceom_n_energies_recorded",
+        "sceom_shot_noise_model",
+        "sceom_active_generator_count",
+        "sceom_matrix_construction",
+        "async_job_id",
+        "protocol_hash_prefix",
+        "job_async_expectation",
+        "job_async_energy_stderr",
+        "job_async_total_shots_budget",
+        "qpe_demo_track_ran",
+        "nexus_analog_hqc_units",
+        "mitigation_graph_report_present",
+        "mitigation_dag_execution_present",
+        "nexus_cloud_repro",
+        "qnexus_client_probe_available",
+        "tket_first_circuit_stats_ok",
+        "dmet_one_shot_open_ledger_present",
+        "dmet_fragment_solve_energy",
+        "dmet_solver_mode",
+        "open_gap_closure_reference_present",
+        "dmet_uniform_multifragment_toy_present",
+        "schmidt_per_fragment_vqe_in_parity_snapshot",
+        "pipeline_total_wall_ms",
+        "pipeline_slowest_stage",
+        "pipeline_slowest_stage_ms",
+        "trace_id",
+        "client_request_id",
+    }
+)
+
+
+# Keys allowed on ``repro`` root after ``collect_repro_metadata`` + pipeline finalization (P1 audit).
+REPRO_DOCUMENTED_KEYS: frozenset[str] = frozenset(
+    {
+        "experiment_id",
+        "random_seed",
+        "config_sha256_prefix",
+        "config_path",
+        "python",
+        "packages",
+        "embedding_config",
+        "chemistry_extended_config",
+        "nexus_analog_config",
+        "nexus_cloud_config",
+        "parity_snapshot",
+        "workflow_preview_v1",
+        "run_context",
+        "run_summary",
+        "pipeline_profile",
+        "embedding_workflow",
     }
 )
 
@@ -242,6 +388,53 @@ def classify_pauli_expectation_path(q: QuantumSpec) -> str:
 def pauli_protocol_expectation_path_for_config(cfg: ExperimentConfig) -> str:
     """Convenience: classify from a full :class:`ExperimentConfig`."""
     return classify_pauli_expectation_path(cfg.quantum)
+
+
+def protocol_expectation_semantics_public() -> dict[str, Any]:
+    """
+    P0 / Methods: stable mapping from YAML intent to ``pauli_protocol_expectation_path`` tokens and
+    typical ``protocol_counts`` keys (see ``PauliAveragingProtocol`` run/evaluate branches).
+
+    Narrative doc: ``docs/技术文档_设备比特串与Qiskit采样路径.md`` §2.
+    """
+    return {
+        "schema": "protocol_expectation_semantics_v1",
+        "doc_anchor": "docs/技术文档_设备比特串与Qiskit采样路径.md (section 2)",
+        "yaml_mutual_exclusion": (
+            "QuantumSpec.run_sampled_pauli_protocol XOR run_qiskit_shots_pauli_protocol "
+            "(validated in QuantumSpec model_validator)"
+        ),
+        "paths": [
+            {
+                "order": 1,
+                "label": "default_exact_executor",
+                "when": {
+                    "use_pauli_protocol": True,
+                    "run_sampled_pauli_protocol": False,
+                    "run_qiskit_shots_pauli_protocol": False,
+                },
+                "pauli_protocol_expectation_path": PAULI_PATH_EXACT,
+                "protocol_counts_expectation_source": "executor_exact_or_device_mean",
+                "protocol_counts_energy_stderr_model": "conservative_sum_bound_equal_shots",
+            },
+            {
+                "order": 2,
+                "label": "statevector_grouped_shot_simulation",
+                "when": {"use_pauli_protocol": True, "run_sampled_pauli_protocol": True},
+                "pauli_protocol_expectation_path": PAULI_PATH_STATEVECTOR_SHOT_SIM,
+                "protocol_counts_expectation_source": "grouped_shot_simulation_statevector",
+                "protocol_counts_energy_stderr_model": "sample_stderr_independent_groups_approx",
+            },
+            {
+                "order": 3,
+                "label": "qiskit_get_counts_histogram",
+                "when": {"use_pauli_protocol": True, "run_qiskit_shots_pauli_protocol": True},
+                "pauli_protocol_expectation_path": PAULI_PATH_QISKIT_COUNTS,
+                "protocol_counts_expectation_source": "qiskit_shot_counts_get_counts",
+                "protocol_counts_energy_stderr_model": "empirical_shot_variance_independent_groups_approx",
+            },
+        ],
+    }
 
 
 def inquanto_object_map_for_docs() -> dict[str, str]:
@@ -274,8 +467,15 @@ def inquanto_gap_categories() -> list[dict[str, Any]]:
             "id": "qermit_graph",
             "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — Qermit; see mitigation_execution_model",
             "inquanto_surface": "Qermit MitRes / MitEx graphs and execution",
-            "qchem_stack": "qermit_analog + qermit_runtime + integrations/qermit_reference (capability matrix)",
+            "qchem_stack": (
+                "qermit_analog + qermit_runtime + integrations/qermit_reference (capability matrix); "
+                "MitigationSpec.zne_mode=circuit_scale_fold wires Pauli protocol zne_curve into mitigation_dag_execution"
+            ),
             "status": "analog_v2_runtime",
+            "dag_trace_order_invariant": (
+                "L1: ``mitigation_graph_report.nodes`` (excluding in/out shells) kinds sequence equals "
+                "``mitigation_dag_execution.trace[].node`` order — ``tests/test_mitigation_dag_trace_homology.py``"
+            ),
             "mitigation_execution_model": mitigation_execution_model_public(),
         },
         {
@@ -303,22 +503,37 @@ def inquanto_gap_categories() -> list[dict[str, Any]]:
             "id": "ucc_chem_ansatz",
             "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — ADAPT / IQEB / UCC",
             "inquanto_surface": "UCC / chemically aware pools",
-            "qchem_stack": "HEA + ADAPT + IQEB (quantum.algorithm=iqeb; configs/example_h2_iqeb.yaml) + integrations/ucc_reference (fermion generators + ChemicallyAwareUCCPolicy hook)",
-            "status": "partial",
+            "qchem_stack": (
+                "HEA + ADAPT + IQEB + optional JW-only UCCSD variational (quantum.variational_ansatz=uccsd; "
+                "UCCSDVQE / UCCSDTrotterVQE reject BK/SCBK — use JW for UCCSD circuit; "
+                "dense cluster exponentials: configs/example_h2_uccsd.yaml; "
+                "first-order Trotter layers: quantum.uccsd_trotter_steps + "
+                "configs/example_h2_uccsd_trotter.yaml) + integrations/ucc_reference + "
+                "quantum/ansatz_registry.py; VQE+HEA on BK/SCBK Hamiltonians remains supported"
+            ),
+            "status": "partial_jw_uccsd_and_trotter_packaged_bk_scbk_uccsd_na",
         },
         {
             "id": "dmet_scf_loop",
             "parity_matrix_anchor": "inquanto_public_parity_matrix.md §3 — DMET / Schmidt",
             "inquanto_surface": "Full DMET self-consistency",
-            "qchem_stack": "schmidt_dmet_density_feedback_v1 + schmidt_dmet_multifragment_density_feedback_v1 + DMETSelfConsistencyLoop generic hooks",
-            "status": "schmidt_density_feedback_v1",
+            "qchem_stack": (
+                "schmidt_dmet_density_feedback_v1 + schmidt_dmet_multifragment_density_feedback_v1 + "
+                "DMETSelfConsistencyLoop generic hooks + optional dense fragment ED "
+                "(QubitHamiltonianFragmentSolverExact; configs/example_h4_dmet_fragment_exact_small.yaml); "
+                "optional schmidt_bath_sidecar_json_path → embedding_workflow.schmidt_bath_sidecar_v1; "
+                "ONIOM toy layers → embedding_workflow.oniom_toy_v1 (configs/example_oniom_toy.yaml)"
+            ),
+            "status": "schmidt_density_feedback_v1_plus_hooks_oniom_toy_yaml",
         },
         {
             "id": "tensornet",
             "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — CuTensorNet; parity_snapshot tensornet_engine_resolved",
             "inquanto_surface": "CuTensorNetProtocol",
             "qchem_stack": "cutensornet_protocol_stub + integrations/tensornet_closure (strategy map)",
-            "status": "stub_plus_vendor_hooks",
+            "status": (
+                "n_a_no_shipped_l3_chemistry_contraction_reason_open_stack_stub_only_not_inquanto_cutensornet"
+            ),
         },
         {
             "id": "integrations_closure_layer",

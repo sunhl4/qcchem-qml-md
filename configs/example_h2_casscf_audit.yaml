@@ -1,0 +1,45 @@
+# Minimal PySCF CASSCF orbital optimization audit on H2 (sto-3g); energies land in hamiltonian_meta.pyscf_driver.
+schema_version: "1"
+experiment_id: "h2_casscf_orbital_audit_001"
+random_seed: 3
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+chemistry_extended:
+  casscf_orbital_optimization_audit: true
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  provider: "statevector"
+  shots_per_circuit: 2048
+
+mitigation:
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 120
+  use_pauli_protocol: false

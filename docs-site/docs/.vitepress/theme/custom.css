@@ -1,36 +1,435 @@
+/**
+ * qchem-stack docs — light chrome aligned with public InQuanto documentation rhythm
+ * (purple accent, neutral surfaces). Not a copy of vendor CSS.
+ */
+
 :root {
-  --vp-c-brand-1: #2563eb;
-  --vp-c-brand-2: #3b82f6;
-  --vp-c-brand-3: #60a5fa;
-  --vp-c-brand-soft: rgba(37, 99, 235, 0.16);
-  --vp-home-hero-name-color: transparent;
-  --vp-home-hero-name-background: linear-gradient(120deg, #2563eb 0%, #14b8a6 60%, #f59e0b 100%);
-  --vp-home-hero-image-background-image: linear-gradient(120deg, #60a5fa50 0%, #34d39950 100%);
-  --vp-home-hero-image-filter: blur(56px);
+  --qcs-font: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial,
+    "Noto Sans SC", "PingFang SC", "Microsoft YaHei", sans-serif;
+  --qcs-radius-lg: 10px;
+  --qcs-radius-xl: 14px;
+  --qcs-shadow-card: 0 1px 3px rgba(15, 23, 42, 0.06);
+
+  --inq-link: #5b21b6;
+
+  --vp-c-brand-1: #5b21b6;
+  --vp-c-brand-2: #6d28d9;
+  --vp-c-brand-3: #7c3aed;
+  --vp-c-brand-soft: rgba(91, 33, 182, 0.08);
+
+  --vp-c-bg: #ffffff;
+  --vp-c-bg-alt: #f9fafb;
+  --vp-c-bg-soft: #f3f4f6;
+  --vp-c-bg-elv: #ffffff;
+  --vp-c-divider: #e8eaef;
+  --vp-c-text-1: #0f172a;
+  --vp-c-text-2: #475569;
+  --vp-c-text-3: #64748b;
+  /* Home / cards: calmer neutrals */
+  --qcs-surface-elevated: #fafbfc;
+  --qcs-surface-muted: #f4f5f7;
+
+  --vp-home-hero-name-color: inherit;
+  --vp-home-hero-name-background: none;
+  --vp-nav-bg-color: #ffffff;
 }
 
-html.dark {
-  --vp-c-brand-1: #60a5fa;
-  --vp-c-brand-2: #38bdf8;
-  --vp-c-brand-3: #93c5fd;
-  --vp-c-bg: #0b0f14;
-  --vp-c-bg-alt: #0f141b;
-  --vp-c-bg-soft: #141b24;
+html {
+  font-family: var(--qcs-font);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Top nav */
+.VPNav {
+  border-bottom: 1px solid var(--vp-c-divider);
+  background: var(--vp-nav-bg-color);
+}
+
+.VPNavBar .title {
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+/* Doc pages: comfortable measure */
+.VPContent .content-container,
+.VPContent.is-home .VPHome .container {
+  max-width: 72rem;
+}
+
+.vp-doc p,
+.vp-doc li {
+  line-height: 1.65;
+}
+
+.VPHero {
+  padding: clamp(1.75rem, 4vw, 2.75rem) 1.5rem 1.25rem;
+  position: relative;
+}
+
+.VPHero::before {
+  display: none;
+}
+
+.VPHero .container {
+  position: relative;
+  z-index: 1;
 }
 
 .VPHero .heading .name {
   letter-spacing: -0.02em;
+  font-weight: 700;
+  font-size: clamp(1.75rem, 3vw, 2.25rem);
+  color: var(--vp-c-text-1);
 }
 
 .VPHero .tagline {
-  max-width: 46rem;
+  max-width: 40rem;
+  font-size: clamp(0.95rem, 1.35vw, 1.05rem);
+  line-height: 1.55;
+  color: var(--vp-c-text-2);
 }
 
+.VPHero .text {
+  font-size: clamp(1.25rem, 2.2vw, 1.65rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  color: var(--vp-c-text-1);
+}
+
+/* Home hub: slightly smaller hero caps so pillars stay the focal band */
+.VPHome .VPHero .heading .name {
+  font-size: clamp(2rem, 3.4vw, 2.35rem);
+  font-weight: 700;
+  letter-spacing: -0.035em;
+}
+
+.VPHome .VPHero .text {
+  font-size: clamp(0.7rem, 1.15vw, 0.8125rem);
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-3);
+}
+
+/* Home: minimal top veil — generous, editorial */
+.VPContent.is-home {
+  background: linear-gradient(
+    180deg,
+    var(--qcs-surface-elevated) 0%,
+    var(--vp-c-bg) min(32vh, 420px),
+    var(--vp-c-bg) 100%
+  );
+}
+
+.VPHero .actions {
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  margin-top: 0.25rem;
+}
+
+.VPHero .action.medium {
+  border-radius: 10px;
+  font-weight: 600;
+}
+
+.VPHero .action.medium.brand {
+  box-shadow: none;
+  border: 1px solid transparent;
+}
+
+.VPHome .VPHero .action.medium.alt {
+  border: 1px solid var(--vp-c-divider);
+  background: transparent;
+  color: var(--vp-c-text-2);
+  font-weight: 600;
+}
+
+.VPHome .VPHero .action.medium.alt:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 22%, var(--vp-c-divider));
+  color: var(--vp-c-text-1);
+}
+
+/* Home feature row (VitePress default blocks) */
+.VPHomeFeatures .item {
+  border-radius: var(--qcs-radius-lg);
+  border: 1px solid var(--vp-c-divider);
+  background: var(--vp-c-bg-soft);
+  padding: 1.15rem 1.25rem;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.VPHomeFeatures .item:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 35%, var(--vp-c-divider));
+  background: var(--vp-c-bg-alt);
+}
+
+.VPHomeFeatures .title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.VPHomeFeatures .details {
+  font-size: 0.92rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-2);
+}
+
+/* Pillar grid on home */
 .qcs-hero-pillars {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 0.9rem;
-  margin: 1rem 0 2rem;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 1rem;
+  margin: 1.25rem 0 2.25rem;
+}
+
+.qcs-hero-pillars--compact {
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.85rem;
+  margin: 0.75rem 0 1.75rem;
+}
+
+.qcs-hero-pillars--compact .qcs-pillar {
+  min-height: 138px;
+  padding: 1rem 1.15rem 0.95rem;
+}
+
+/* —— Three-pillar hub block (structure vs public InQuanto hub; qchem-stack content) —— */
+.vp-doc .qcs-hub-wrap {
+  margin: 0 0 2.5rem;
+  scroll-margin-top: 4.5rem;
+}
+
+.vp-doc .qcs-hub-kicker {
+  margin: 0 0 1.25rem;
+  font-size: 0.82rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-3);
+  max-width: 52rem;
+}
+
+.vp-doc .qcs-hub-kicker a {
+  color: var(--vp-c-brand-2);
+  font-weight: 600;
+  text-decoration: none;
+}
+
+.vp-doc .qcs-hub-kicker a:hover {
+  text-decoration: underline;
+}
+
+.vp-doc .qcs-hub-triad {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1rem;
+  margin: 0 0 1rem;
+}
+
+@media (max-width: 960px) {
+  .vp-doc .qcs-hub-triad {
+    grid-template-columns: 1fr;
+  }
+}
+
+.vp-doc a.qcs-hub-card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  min-height: 280px;
+  padding: 1.5rem 1.6rem 1.45rem;
+  border-radius: 14px;
+  border: 1px solid var(--vp-c-divider);
+  background: linear-gradient(165deg, var(--vp-c-bg-soft) 0%, var(--vp-c-bg-alt) 55%);
+  text-decoration: none;
+  color: inherit;
+  box-shadow: var(--qcs-shadow-card);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.vp-doc a.qcs-hub-card:hover {
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 45%, var(--vp-c-divider));
+  transform: translateY(-2px);
+  background: var(--vp-c-bg-elv);
+  box-shadow: 0 24px 48px -28px rgba(0, 0, 0, 0.65);
+}
+
+.vp-doc .qcs-hub-card__eyebrow {
+  display: block;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--vp-c-brand-1);
+  margin-bottom: 0.5rem;
+}
+
+.vp-doc .qcs-hub-card__title {
+  display: block;
+  font-size: clamp(1.15rem, 2vw, 1.35rem);
+  font-weight: 750;
+  letter-spacing: -0.03em;
+  line-height: 1.25;
+  color: var(--vp-c-text-1);
+  margin-bottom: 0.65rem;
+}
+
+.vp-doc .qcs-hub-card__lede {
+  display: block;
+  flex: 1;
+  font-size: 0.92rem;
+  line-height: 1.58;
+  color: var(--vp-c-text-2);
+  margin-bottom: 0.75rem;
+}
+
+.vp-doc .qcs-hub-card__kw {
+  display: block;
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.72rem;
+  letter-spacing: 0.02em;
+  color: var(--vp-c-text-3);
+  margin-bottom: 1rem;
+}
+
+.vp-doc .qcs-hub-card__cta {
+  display: inline-block;
+  margin-top: auto;
+  font-size: 0.88rem;
+  font-weight: 700;
+  color: var(--vp-c-brand-1);
+}
+
+.vp-doc a.qcs-hub-card:hover .qcs-hub-card__cta {
+  color: var(--vp-c-brand-2);
+}
+
+.vp-doc a.qcs-hub-band {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.5rem 1.25rem;
+  margin: 0;
+  padding: 1rem 1.35rem;
+  border-radius: 12px;
+  border: 1px solid color-mix(in srgb, var(--vp-c-brand-1) 22%, var(--vp-c-divider));
+  background: color-mix(in srgb, var(--vp-c-brand-1) 6%, var(--vp-c-bg-soft));
+  text-decoration: none;
+  color: inherit;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.vp-doc a.qcs-hub-band:hover {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 10%, var(--vp-c-bg-alt));
+  border-color: color-mix(in srgb, var(--vp-c-brand-1) 35%, var(--vp-c-divider));
+}
+
+.vp-doc .qcs-hub-band__label {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--vp-c-brand-1);
+  flex: 0 0 auto;
+}
+
+.vp-doc .qcs-hub-band__text {
+  flex: 1 1 12rem;
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: var(--vp-c-text-2);
+}
+
+.vp-doc .qcs-hub-band__text code {
+  font-size: 0.84em;
+}
+
+.vp-doc .qcs-hub-band__cta {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--vp-c-brand-1);
+  white-space: nowrap;
+}
+
+/* Home “常用入口” section */
+.qcs-home-section {
+  margin: 2rem 0 1.5rem;
+  padding: 1.35rem 1.5rem 1.5rem;
+  border-radius: var(--qcs-radius-xl);
+  border: 1px solid var(--vp-c-divider);
+  background: linear-gradient(165deg, var(--vp-c-bg-soft) 0%, var(--vp-c-bg-alt) 100%);
+  box-shadow: var(--qcs-shadow-card);
+}
+
+.qcs-home-section h2 {
+  margin: 0 0 1rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--vp-c-text-1);
+}
+
+.qcs-home-section .vp-doc > h2:first-child,
+.qcs-home-section > h2 {
+  border: none;
+  padding-top: 0;
+}
+
+.qcs-home-section table {
+  display: table;
+  width: 100%;
+  margin: 0;
+  font-size: 0.92rem;
+  border-collapse: collapse;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.qcs-home-section th,
+.qcs-home-section td {
+  padding: 0.65rem 0.85rem;
+  text-align: left;
+  vertical-align: top;
+  border-bottom: 1px solid var(--vp-c-divider);
+}
+
+.qcs-home-section tr:last-child td {
+  border-bottom: none;
+}
+
+.qcs-home-section th {
+  font-weight: 600;
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--vp-c-text-3);
+  background: rgba(15, 23, 42, 0.04);
+}
+
+.qcs-home-section td:first-child {
+  font-weight: 600;
+  color: var(--vp-c-text-1);
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .qcs-home-section td:first-child {
+    white-space: normal;
+  }
+}
+
+.qcs-home-footnote {
+  margin: 1.5rem 0 0;
+  font-size: 0.88rem;
+  line-height: 1.55;
+  color: var(--vp-c-text-3);
+}
+
+.qcs-home-footnote code {
+  font-size: 0.84em;
+  padding: 0.12em 0.35em;
+  border-radius: 6px;
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
 }
 
 .mirror-breadcrumb {
@@ -60,16 +459,158 @@ html.dark {
   flex-wrap: wrap;
   align-items: center;
   gap: 0.4em;
-  letter-spacing: -0.015em;
+  letter-spacing: -0.02em;
 }
 
-.VPHero .heading .text {
-  font-size: clamp(1.35rem, 2.6vw, 2rem);
+/* Mermaid on dark pages */
+.vp-doc .mermaid {
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-divider);
+  border-radius: 10px;
+  padding: 1rem 1.1rem;
+  margin: 1rem 0;
+}
+
+/* Mirror audit roots */
+.vp-doc .qcs-mirror-audit-banner {
+  border: 1px solid var(--vp-c-divider);
+  border-left: 4px solid var(--vp-c-brand-1);
+  border-radius: 10px;
+  background: var(--vp-c-bg-soft);
+  padding: 1rem 1.15rem 1.1rem;
+  margin: 0 0 1.25rem;
+}
+
+.vp-doc .qcs-mirror-audit-banner p:last-child {
+  margin-bottom: 0;
+}
+
+/* Sidebar: slightly clearer group separation */
+.VPSidebarItem.level-0 > .item > .text {
   font-weight: 700;
-  letter-spacing: -0.03em;
+  font-size: 0.72rem;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-3);
 }
 
-.VPHero .actions {
-  flex-wrap: wrap;
-  gap: 0.5rem;
+/* Site-wide mega footer (`SiteMegaFooter.vue` → `layout-bottom`) */
+.qcs-site-mega-footer {
+  margin-top: auto;
+  border-top: 1px solid var(--vp-c-divider);
+  background: var(--qcs-surface-elevated);
+  color: var(--vp-c-text-2);
+  font-size: 0.875rem;
 }
+
+.qcs-site-mega-footer__inner {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 3.25rem 1.5rem 2.5rem;
+}
+
+.qcs-site-mega-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 2rem 2.25rem;
+}
+
+@media (max-width: 1100px) {
+  .qcs-site-mega-footer__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .qcs-site-mega-footer__grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.qcs-site-mega-footer__heading {
+  margin: 0 0 0.85rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--vp-c-text-3);
+}
+
+.qcs-site-mega-footer__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45rem;
+}
+
+.qcs-site-mega-footer__list a {
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.15s ease;
+}
+
+.qcs-site-mega-footer__list a:hover {
+  color: var(--vp-c-text-1);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.qcs-site-mega-footer__list--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+}
+
+@media (max-width: 1100px) {
+  .qcs-site-mega-footer__col--opensource {
+    grid-column: 1 / -1;
+  }
+}
+
+.qcs-site-mega-footer__note {
+  margin: 0.75rem 0 0;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  color: var(--vp-c-text-3);
+}
+
+.qcs-site-mega-footer__slash-row {
+  margin-top: 2.5rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid var(--vp-c-divider);
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem 0.5rem;
+  font-size: 0.8125rem;
+}
+
+.qcs-site-mega-footer__slash-row a {
+  color: var(--vp-c-text-2);
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.qcs-site-mega-footer__slash-row a:hover {
+  color: var(--vp-c-text-1);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.qcs-site-mega-footer__sep {
+  color: var(--vp-c-text-3);
+  opacity: 0.65;
+  user-select: none;
+}
+
+.qcs-site-mega-footer__copyright {
+  margin: 1.5rem 0 0;
+  font-size: 0.6875rem;
+  line-height: 1.6;
+  letter-spacing: 0.02em;
+  color: var(--vp-c-text-3);
+}
+

@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1200" y2="630" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0D4B68"/>
+      <stop offset="0.55" stop-color="#1F3975"/>
+      <stop offset="1" stop-color="#422D86"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <circle cx="1050" cy="120" r="180" fill="#7BD1FF" fill-opacity="0.12"/>
+  <circle cx="180" cy="560" r="220" fill="#8CB8FF" fill-opacity="0.1"/>
+
+  <rect x="86" y="120" width="122" height="122" rx="24" fill="#14638F"/>
+  <path d="M120 208V154H154C162.8 154 169.5 160.2 169.5 168.7C169.5 177.3 162.8 183.5 154 183.5H133.5V208H120ZM133.5 176H152.7C156.7 176 159.6 173.2 159.6 168.7C159.6 164.3 156.7 161.5 152.7 161.5H133.5V176Z" fill="white"/>
+  <circle cx="182" cy="146" r="10" fill="#7BD1FF"/>
+
+  <text x="250" y="178" fill="white" font-family="Arial, Helvetica, sans-serif" font-size="68" font-weight="700">qchem-stack Docs</text>
+  <text x="250" y="240" fill="#D6E8FF" font-family="Arial, Helvetica, sans-serif" font-size="32">
+    Quantum chemistry workflows for open and reproducible execution
+  </text>
+
+  <g transform="translate(250 308)">
+    <rect width="250" height="58" rx="12" fill="rgba(255,255,255,0.13)"/>
+    <text x="20" y="38" fill="#F5FAFF" font-family="Arial, Helvetica, sans-serif" font-size="28">Chemical Specification</text>
+  </g>
+  <g transform="translate(520 308)">
+    <rect width="250" height="58" rx="12" fill="rgba(255,255,255,0.13)"/>
+    <text x="22" y="38" fill="#F5FAFF" font-family="Arial, Helvetica, sans-serif" font-size="28">Program Construction</text>
+  </g>
+  <g transform="translate(790 308)">
+    <rect width="250" height="58" rx="12" fill="rgba(255,255,255,0.13)"/>
+    <text x="18" y="38" fill="#F5FAFF" font-family="Arial, Helvetica, sans-serif" font-size="28">Execution &amp; Analysis</text>
+  </g>
+
+  <text x="250" y="455" fill="#C8DBFF" font-family="Arial, Helvetica, sans-serif" font-size="30">
+    Guides � Tutorials � API � Cloud � Parity
+  </text>
+  <text x="86" y="580" fill="#9FC3EF" font-family="Arial, Helvetica, sans-serif" font-size="24">
+    qchem_qml_md / Docusaurus
+  </text>
+</svg>

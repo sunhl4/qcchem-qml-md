@@ -137,8 +137,9 @@ def molecular_hamiltonian_fragment_mulliken_projection(
         "reference_energy_rhf_au": float(rhf.e_tot),
         "module": "qchem_stack.chem.embedding.projection_hamiltonian",
         "epistemic_bound": (
-            "Fragment Mulliken MO screening + CASCI active integrals + JW — not full projection embedding "
-            "nor vendor-closed driver parity."
+            "Fragment Mulliken MO screening + CASCI active integrals + user-selected fermion→qubit mapping "
+            "(Jordan–Wigner or Bravyi–Kitaev via ``active_space.fermion_qubit_mapping``) — not full projection "
+            "embedding nor vendor-closed driver parity."
         ),
     }
 
@@ -148,6 +149,7 @@ def molecular_hamiltonian_fragment_mulliken_projection(
         h1a,
         h2a,
         ne,
+        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
         integral_source="pyscf_projection_fragment_mulliken_v1",
         meta_extra={"projection_mulliken_mo_audit_v1": audit},
         pyscf_driver_meta=dict(dm) if dm else None,

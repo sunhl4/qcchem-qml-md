@@ -18,12 +18,15 @@ import sys
 from pathlib import Path
 
 from qchem_stack.config import compiler_bundle_signature_from_config, load_experiment_config
+from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
+from qchem_stack.integrations.resource_estimation_preview import build_resource_estimation_preview_v1
 from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
 from qchem_stack.protocols.computable import computables_export_dict
 from qchem_stack.protocols.inquanto_contract import (
     PARITY_EXPORT_V2_STABLE_KEYS,
     classify_pauli_expectation_path,
     inquanto_gap_categories,
+    protocol_expectation_semantics_public,
 )
 
 
@@ -33,16 +36,18 @@ def _table_from_config(
     protocol_counts: dict | None = None,
 ) -> dict:
     cfg = load_experiment_config(cfg_path)
-    return {
+    out = {
         "parity_export_schema_version": "2",
         "source_config": str(cfg_path),
         "experiment_id": cfg.experiment_id,
         "molecule": cfg.molecule.model_dump(),
         "scf_method": cfg.scf.method,
         "active_space": cfg.active_space.model_dump(),
-        "fermion_to_qubit_map": "jordan_wigner",
+        "fermion_to_qubit_map": cfg.active_space.fermion_qubit_mapping,
         "pauli_grouping": cfg.quantum.pauli_grouping,
         "quantum_algorithm": cfg.quantum.algorithm,
+        "variational_ansatz": cfg.quantum.variational_ansatz,
+        "uccsd_trotter_steps": cfg.quantum.uccsd_trotter_steps,
         "pauli_support_max_terms": cfg.quantum.pauli_support_max_terms,
         "use_pauli_protocol": cfg.quantum.use_pauli_protocol,
         "vqe_depth": cfg.quantum.vqe_depth,
@@ -55,7 +60,9 @@ def _table_from_config(
         "run_sampled_pauli_protocol": cfg.quantum.run_sampled_pauli_protocol,
         "run_qiskit_shots_pauli_protocol": cfg.quantum.run_qiskit_shots_pauli_protocol,
         "pauli_protocol_expectation_path": classify_pauli_expectation_path(cfg.quantum),
+        "protocol_expectation_semantics_v1": protocol_expectation_semantics_public(),
         "qpe_demo_track_after_variational": cfg.quantum.qpe_demo_track_after_variational,
+        "qpe_pipeline_integration": cfg.quantum.qpe_pipeline_integration,
         "record_pauli_measurement_histograms": cfg.quantum.record_pauli_measurement_histograms,
         "computable_abstract": computables_export_dict(cfg, protocol_counts=protocol_counts),
         "excited_resource_from_config": build_excited_resource_summary_for_export(cfg),
@@ -82,8 +89,11 @@ def _table_from_config(
         "mitigation_pmsv_report_extension": cfg.mitigation.pmsv_report_extension,
         "mitigation_pmsv_extra": cfg.mitigation.pmsv_extra,
         "mitigation_zne_enabled": cfg.mitigation.zne_enabled,
+        "mitigation_zne_mode": cfg.mitigation.zne_mode,
         "mitigation_zne_scales": list(cfg.mitigation.zne_scales),
         "embedding": cfg.embedding.model_dump(),
+        "embedding_mode": cfg.embedding.mode,
+        "parity_integrations_dmet_stub_one_shot_ledger": cfg.parity_integrations.dmet_stub_one_shot_ledger,
         "chemistry_extended": cfg.chemistry_extended.model_dump(),
         "nexus_analog": cfg.nexus_analog.model_dump(),
         "nexus_cloud": cfg.nexus_cloud.model_dump(),
@@ -95,7 +105,17 @@ def _table_from_config(
         "compiler_preoptimize_passes": list(cfg.compiler.preoptimize_passes),
         "compiler_passes_yaml": list(cfg.compiler.compiler_passes),
         "compiler_bundle_signature": compiler_bundle_signature_from_config(cfg),
+        "methods_resource_preview_v1": {
+            "schema": "methods_resource_preview_v1",
+            "qpe_pipeline_integration": cfg.quantum.qpe_pipeline_integration,
+            "qpe_demo_track_after_variational": cfg.quantum.qpe_demo_track_after_variational,
+            "use_pauli_protocol": cfg.quantum.use_pauli_protocol,
+            "parity_integrations_tket_first_circuit_stats": cfg.parity_integrations.tket_first_circuit_stats,
+        },
     }
+    if cfg.parity_integrations.resource_estimation_preview:
+        out["resource_estimation_preview_v1"] = build_resource_estimation_preview_v1(cfg=cfg)
+    return out
 
 
 def _truncate_pauli_support_for_export(out: dict, *, max_pauli: int | None) -> None:
@@ -185,6 +205,32 @@ def main() -> None:
                     "job_async_expectation",
                     "job_async_energy_stderr",
                     "job_async_total_shots_budget",
+                    "vqd_n_states_yaml",
+                    "vqd_n_energies_recorded",
+                    "vqd_deflation_levels_completed",
+                    "vqd_channels_count",
+                    "vqd_shots_objective_yaml",
+                    "vqd_shots_overlap_yaml",
+                    "vqd_shots_weight_yaml",
+                    "qse_subspace_dim_yaml",
+                    "qse_max_basis_yaml",
+                    "qse_basis_dimension_K",
+                    "qse_n_excitation_energies",
+                    "qse_n_transition_tasks",
+                    "qse_total_shots_upper_bound",
+                    "sceom_subspace_dim_yaml",
+                    "sceom_n_energies_recorded",
+                    "sceom_active_generator_count",
+                    "sceom_matrix_construction",
+                    "dmet_embedding_active",
+                    "dmet_hamiltonian_source_yaml",
+                    "dmet_fragment_count",
+                    "dmet_uniform_multifragment_toy_yaml",
+                    "dmet_stub_one_shot_ledger_yaml",
+                    "dmet_fragment_solve_present",
+                    "dmet_fragment_solve_schema",
+                    "variational_ansatz_yaml",
+                    "uccsd_n_parameters",
                 ):
                     if key in rsum and rsum[key] is not None:
                         out[f"{key}_mirror_run_summary"] = rsum[key]
@@ -212,6 +258,7 @@ def main() -> None:
                     "has_kitaev": qdt.get("kitaev_ground_energy_dense") is not None,
                     "has_bayesian_stub": qdt.get("bayesian_phase_map_toy") is not None,
                 }
+            out["methods_resource_unified_v1"] = build_methods_resource_unified_v1(data)
             if isinstance(rsum, dict) and rsum.get("qpe_demo_track_ran"):
                 out["qpe_demo_track_ran_from_run_summary"] = True
             if isinstance(rsum, dict):
@@ -223,7 +270,12 @@ def main() -> None:
                     out["sceom_shot_noise_model_from_run_summary"] = rsum["sceom_shot_noise_model"]
             psnap = repro.get("parity_snapshot")
             if isinstance(psnap, dict):
-                for k in ("tensornet_engine_resolved", "tensornet_fallback_reason"):
+                for k in (
+                    "tensornet_engine_resolved",
+                    "tensornet_fallback_reason",
+                    "variational_ansatz",
+                    "uccsd_n_parameters",
+                ):
                     if psnap.get(k) is not None:
                         out[f"{k}_from_parity_snapshot"] = psnap[k]
                 ogr = psnap.get("open_gap_closure_reference")
@@ -250,6 +302,15 @@ def main() -> None:
                     out["sceom_shot_noise_model_from_run"] = sm.get("shot_noise_model")
                     if sm.get("shots_per_matrix_element") is not None:
                         out["sceom_shots_per_matrix_element_from_run"] = sm["shots_per_matrix_element"]
+    cfg_final = load_experiment_config(args.config)
+    if cfg_final.parity_integrations.resource_estimation_preview:
+        pdata: dict | None = None
+        if args.results and args.results.is_file():
+            raw = json.loads(args.results.read_text(encoding="utf-8"))
+            pdata = raw if isinstance(raw, dict) else None
+        out["resource_estimation_preview_v1"] = build_resource_estimation_preview_v1(
+            cfg=cfg_final, pipeline_row=pdata
+        )
     _truncate_pauli_support_for_export(out, max_pauli=args.max_pauli_export)
     json.dump(out, sys.stdout, indent=2, sort_keys=False)
     sys.stdout.write("\n")

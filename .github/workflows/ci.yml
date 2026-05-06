@@ -26,6 +26,8 @@ jobs:
         run: python -c "from qchem_stack.repro.export import repro_json_dumps; repro_json_dumps({'ok': True})"
       - name: Pytest
         run: pytest tests -q --tb=short
+      - name: Examples tutorials smoke
+        run: python examples/run_all_smoke.py
       - name: L1 excited regression (marker)
         run: pytest -m l1_excited -q --tb=short
       - name: L1 MD/ML bridge (marker)
@@ -57,3 +59,22 @@ jobs:
         run: python scripts/smoke_pipeline.py --sampled
       - name: QPE dual-track demo (no PySCF)
         run: python scripts/run_qpe_track_demo.py
+
+  docs-site:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: docs-site/package-lock.json
+      - name: Install docs-site
+        working-directory: docs-site
+        run: npm ci
+      - name: Configs index matches repo YAML
+        working-directory: docs-site
+        run: npm run check:configs-table
+      - name: VitePress production build
+        working-directory: docs-site
+        run: npm run docs:build

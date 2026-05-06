@@ -1,0 +1,5 @@
+{
+  "schema": "schmidt_bath_sidecar_v1",
+  "open_stack_note": "Toy JSON hook merged into embedding_workflow for L1 bath metadata audits.",
+  "example_scalar": 0.0
+}

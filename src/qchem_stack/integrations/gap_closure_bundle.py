@@ -55,6 +55,10 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
         ),
         "ucc": {
             "module": "qchem_stack.integrations.ucc_reference",
+            "chemically_aware_ucc_policy_protocol": "qchem_stack.integrations.ucc_reference.ChemicallyAwareUCCPolicy",
+            "build_spin_uccsd_fermion_generators_policy_param": (
+                "Optional ``policy: ChemicallyAwareUCCPolicy``; default ``IdentityRegrouping`` when omitted."
+            ),
             "active_space_generators_count": len(base_gens),
             "n_greedy_commuting_trotter_layers": len(layers_greedy),
             "singles_before_doubles_reorders": gens_sbd != base_gens,

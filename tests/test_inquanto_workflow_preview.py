@@ -17,7 +17,14 @@ from qchem_stack.integrations.inquanto_workflow_preview import (
     slim_product_summary_from_pipeline_result,
     workflow_preview_payload,
 )
-from qchem_stack.protocols.computable import ComputableRef, ComputableSpec, list_computable_specs_for_config, list_computables_for_config
+from qchem_stack.protocols.computable import (
+    ComputableRef,
+    ComputableSpec,
+    list_computable_specs_for_config,
+    list_computables_for_config,
+    refs_from_computable_graph_v2,
+    specs_from_computable_graph_v2,
+)
 
 
 def _cfg() -> ExperimentConfig:
@@ -119,6 +126,34 @@ def test_computable_graph_v2_vqd_without_pauli() -> None:
     )
 
 
+def _semantic_graph_fingerprint(g: dict) -> dict:
+    nodes = [{"name": n["name"], "kind": n["kind"], "details": dict(n.get("details") or {})} for n in g["nodes"]]
+    edges = sorted((e["from"], e["to"], e["kind"]) for e in g["edges"])
+    roots = sorted(g.get("roots") or [])
+    out: dict = {
+        "schema": g.get("schema"),
+        "edge_model": g.get("edge_model"),
+        "nodes": nodes,
+        "edges": edges,
+        "roots": roots,
+    }
+    if g.get("declarative_edge_overrides"):
+        out["declarative_edge_overrides"] = True
+    return out
+
+
+def test_computable_graph_v2_roundtrip_refs_re_emit_identical() -> None:
+    cfg = _cfg()
+    refs = list_computables_for_config(cfg)
+    g = computable_graph_v2(refs, cfg)
+    refs2 = refs_from_computable_graph_v2(g)
+    assert refs2 == refs
+    specs2 = specs_from_computable_graph_v2(g)
+    assert [s.to_ref() for s in specs2] == refs
+    g2 = computable_graph_v2(refs2, cfg)
+    assert _semantic_graph_fingerprint(g) == _semantic_graph_fingerprint(g2)
+
+
 def test_computable_declarative_extra_and_remove() -> None:
     q = QuantumSpec(
         algorithm="vqe",
@@ -156,6 +191,9 @@ def test_computable_declarative_extra_and_remove() -> None:
     assert any(
         e["from"] == "computable_0" and e["to"] == "computable_2" and e["kind"] == "custom_fork" for e in edges
     )
+    refs2 = refs_from_computable_graph_v2(g)
+    g2 = computable_graph_v2(refs2, cfg)
+    assert _semantic_graph_fingerprint(g) == _semantic_graph_fingerprint(g2)
 
 
 def test_slim_summary_api_labels() -> None:

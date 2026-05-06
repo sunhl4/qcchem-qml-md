@@ -13,17 +13,15 @@ from __future__ import annotations
 from openfermion.ops import QubitOperator
 
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
-from qchem_stack.qpe_qec_demo import BayesianQPEStub, kitaev_qpe_energy_estimate
+from qchem_stack.qpe_qec_demo.pipeline_track import qpe_demo_track_payload
 
 
 def main() -> None:
     h = QubitOperator(((0, "Z"),), 0.5) + QubitOperator((), 0.1)
     qh = QubitHamiltonian(operator=h, n_qubits=1, meta={"demo": "qpe_track"})
-    e0 = kitaev_qpe_energy_estimate(qh, bits=4)
-    print("kitaev_qpe_energy_estimate(ground, dense emul)", e0)
-    stub = BayesianQPEStub()
-    phase_map = stub.estimate([(0.0, 0.5), (1.0, 1.0)])
-    print("BayesianQPEStub MAP phase (toy)", phase_map)
+    blob = qpe_demo_track_payload(qh, bits=4)
+    print("kitaev_qpe_energy_estimate(ground, dense emul)", blob["kitaev_ground_energy_dense"])
+    print("BayesianQPEStub MAP phase (toy)", blob["bayesian_phase_map_toy"])
 
 
 if __name__ == "__main__":

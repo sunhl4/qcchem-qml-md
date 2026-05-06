@@ -28,6 +28,7 @@ from qchem_stack.protocols.inquanto_contract import (
 )
 from qchem_stack.protocols.protocol import PauliAveragingProtocol, ProtocolPhase
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
+from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
 from qchem_stack.tensornet import run_cutensornet_expectation_stub
 
 
@@ -92,11 +93,42 @@ def test_qermit_analog_report_with_zne_only_has_schema() -> None:
     assert "nodes" in r and "edges" in r and "topological_order" in r
 
 
+def test_qermit_analog_spam_only_includes_spam_node() -> None:
+    cfg = ExperimentConfig(
+        experiment_id="l1_spam",
+        random_seed=0,
+        molecule=MoleculeSpec(symbols=["H"], coordinates_bohr=[[0.0, 0.0, 0.0]]),
+        active_space=ActiveSpaceSpec(n_active_orbitals=1, n_active_electrons=1),
+        mitigation=MitigationSpec(spam_calibration_enabled=True),
+    )
+    r = build_qermit_style_mitigation_report(cfg)
+    assert r is not None
+    kinds = [n.get("kind") for n in r["nodes"]]
+    assert "SPAM_readout_calibration_stub" in kinds
+
+
+def test_mitigation_runtime_spam_trace_matches_graph_order() -> None:
+    cfg = ExperimentConfig(
+        experiment_id="l1_spam_rt",
+        random_seed=0,
+        molecule=MoleculeSpec(symbols=["H"], coordinates_bohr=[[0.0, 0.0, 0.0]]),
+        active_space=ActiveSpaceSpec(n_active_orbitals=1, n_active_electrons=1),
+        mitigation=MitigationSpec(spam_calibration_enabled=True),
+    )
+    graph = build_qermit_style_mitigation_report(cfg)
+    assert graph is not None
+    out = {"energy_after_variational": -0.5, "mitigation_graph_report": graph}
+    rt = execute_mitigation_dag_runtime(cfg, out)
+    assert rt is not None
+    assert rt["trace"][0]["node"] == "SPAM_readout_calibration_stub"
+
+
 def test_tensornet_stubs_whitelisted() -> None:
     assert "tensornet_engine_resolved" in PARITY_SNAPSHOT_DOCUMENTED_KEYS
     assert "tensornet_fallback_reason" in PARITY_SNAPSHOT_DOCUMENTED_KEYS
     assert "iqeb_max_rounds" in PARITY_SNAPSHOT_DOCUMENTED_KEYS
     assert "projection_embedding_open_trace" in PARITY_SNAPSHOT_DOCUMENTED_KEYS
+    assert "fermion_qubit_mapping" in PARITY_SNAPSHOT_DOCUMENTED_KEYS
 
 
 def test_tensornet_stub_status_matches_engine_documentation() -> None:

@@ -41,6 +41,36 @@ class ComputableSpec:
         return ComputableRef(name=self.name, kind=self.kind, details=dict(self.details))
 
 
+def refs_from_computable_graph_v2(graph: dict[str, Any]) -> list[ComputableRef]:
+    """Inverse of :func:`~qchem_stack.integrations.inquanto_workflow_preview.computable_graph_v2` on the ``nodes`` slice.
+
+    Reconstructs refs in **node list order** (same convention as the forward builder). YAML edge
+    overrides in the graph are not represented here — re-emit with the same
+    :class:`~qchem_stack.config.ExperimentConfig` to restore them.
+    """
+    sch = graph.get("schema")
+    if sch != "computable_graph_v2":
+        raise ValueError(f"expected schema computable_graph_v2, got {sch!r}")
+    nodes = graph.get("nodes")
+    if not isinstance(nodes, list):
+        raise ValueError("computable_graph_v2.nodes must be a list")
+    out: list[ComputableRef] = []
+    for n in nodes:
+        if not isinstance(n, dict):
+            raise ValueError("each computable_graph_v2 node must be a dict")
+        name, kind = n.get("name"), n.get("kind")
+        if name is None or kind is None:
+            raise ValueError("each node must have name and kind")
+        raw = n.get("details")
+        details = dict(raw) if isinstance(raw, dict) else {}
+        out.append(ComputableRef(str(name), str(kind), details))
+    return out
+
+
+def specs_from_computable_graph_v2(graph: dict[str, Any]) -> list[ComputableSpec]:
+    return [ComputableSpec.from_ref(r) for r in refs_from_computable_graph_v2(graph)]
+
+
 def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
     """List what the current YAML is configured to *evaluate* (best-effort, documentation-first)."""
     out: list[ComputableRef] = []
@@ -80,13 +110,28 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
         out.append(ComputableRef("excitation_energies_qse", "spectrum", {"subspace_dim": q.qse_subspace_dim}))
     if q.sceom_after_variational:
         out.append(ComputableRef("sceom_energies", "spectrum", {"subspace_dim": q.sceom_subspace_dim}))
-    if q.qpe_demo_track_after_variational:
+    if q.qpe_demo_track_requested():
         out.append(ComputableRef("qpe_demo_track", "phase", {"hook": "qpe_qec_demo.kitaev + bayesian_stub"}))
     return out
 
 
 def list_computable_specs_for_config(cfg: ExperimentConfig) -> list[ComputableSpec]:
     return [ComputableSpec.from_ref(r) for r in list_computables_for_config(cfg)]
+
+
+def assert_computable_workflow_graph_roundtrip(cfg: ExperimentConfig) -> None:
+    """``computable_graph_v2`` ↔ :func:`refs_from_computable_graph_v2` matches :func:`list_computables_for_config`.
+
+    L1 / wave-F: guarantees workflow-preview DAG nodes round-trip to the same ref list (order + payloads).
+    """
+    from qchem_stack.integrations.inquanto_workflow_preview import computable_graph_v2
+
+    refs = list_computables_for_config(cfg)
+    graph = computable_graph_v2(refs, cfg)
+    back = refs_from_computable_graph_v2(graph)
+    assert len(back) == len(refs), (refs, back)
+    for a, b in zip(refs, back, strict=True):
+        assert a.name == b.name and a.kind == b.kind and a.details == b.details, (a, b)
 
 
 def computables_export_dict(

@@ -28,7 +28,7 @@ i18n_key: tutorials.case_study_fe4n2.fe4n2_avas_casscf
 
 ## 我们的实现
 
-**占位** — 尚未实现，预计在 下个里程碑 落地。在站点保留位置以便未来直接填充内容。
+**占位（Fe4N2 全教程链仍为占位）**。开放栈可提供 **最小 CASSCF 轨道优化审计**（PySCF `mcscf.CASSCF` 能量写入 `hamiltonian_meta.pyscf_driver.casscf_orbital_audit_v1`，与差距表「无 AVAS / 全 CASSCF 产品深度」叙述一致）：见仓库 `configs/example_h2_casscf_audit.yaml` 与 [差距总表 § 经典化学](/parity/gap-implementation-plan)。
 
 ## 相关
 

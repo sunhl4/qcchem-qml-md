@@ -111,6 +111,31 @@
 
 ---
 
+## 附录 A — P1 maximal 机读对账（`gap.id` ↔ 矩阵锚点 ↔ 测试 / YAML / CI）
+
+**用途**：Phase0 基线；合并 PR 时按本表检查「改代码 → 改矩阵 / gap / 测试」是否闭环。`inquanto_gap_categories()` 为机读权威列表。
+
+| gap.id | parity_matrix_anchor（摘要） | 主要 pytest / 脚本 | 代表 YAML（节选） |
+|--------|------------------------------|---------------------|-------------------|
+| `cloud_nexus` | §1 qnexus/HQC | `tests/test_api_runs.py`（侧车元数据） | Nexus 类比 YAML（见 ENGINEERING） |
+| `http_submit_poll_workspace` | §1 作业网关 | `tests/test_api_runs.py` | `_minimal_experiment_yaml` |
+| `qermit_graph` | §1 Qermit | `tests/test_mitigation_dag_trace_homology.py` | `example_h2_zne_circuit_fold.yaml`（ZNE） |
+| `composable_computable` | §1 Computable | `tests/test_computable.py`、`tests/test_workflow_preview_repro_alignment.py`、`tests/test_inquanto_workflow_preview.py` | `example_h2.yaml`；rich：`parity_integrations.include_computables_rich_in_repro` |
+| （导出）`methods_resource_preview_v1` / `methods_resource_unified_v1` | §1 Methods / QPE 资源合一 | `tests/test_methods_resource_unified_export.py`、`scripts/export_parity_criteria_table.py` | `qpe_dual_track_demo.yaml`、`configs/example_h2.yaml`（`--results` 路径） |
+| `evaluate_support_set` | §1 resource | `tests/test_pauli_support*`（若存在）/ protocol 单测 | `example_h2.yaml` |
+| `compiler_pass_bundle` | §4 TKET | `tests/test_backend_conformance.py::test_example_h2_tket_probe_dict_when_pauli_protocol_runs` | `example_h2.yaml` |
+| `ucc_chem_ansatz` | §2 UCC/ADAPT | `tests/test_backend_conformance.py::test_example_h2_uccsd_packaged_yaml_repro_schema`、`tests/test_orchestration_pipeline.py`（Trotter） | `example_h2_uccsd.yaml`、`example_h2_uccsd_trotter.yaml` |
+| `dmet_scf_loop` | §3 DMET | Schmidt / fragment 相关 `tests/test_*schmidt*`、`test_export_parity_golden` | `example_h4_dmet_fragment_exact_small.yaml` 等 |
+| `tensornet` | §1 CuTensorNet（矩阵 **`n/a`**） | tensornet stub 单测 + `parity_snapshot.tensornet_*`；gap status 闭合为 vendor-free **`n/a`** | `quantum.tensornet_expectation_stub` 配置；见矩阵 §1 |
+| `integrations_closure_layer` | 架构闭合 | `integrations/gap_closure_bundle` 导出链 | parity export |
+| `drivers_cosmo_pbc` | §3 driver | `tests/test_inquanto_driver_surface_l1.py` | `example_h2_pbc_gamma.yaml`、`chemistry_extended` PBC/ddCOSMO |
+| （教程）projection 深入 | §3 Projection | — | `docs-site/docs/tutorial/projection-embedding-deep-dive.md`；`example_h2_projection_trace.yaml`、`example_h4_projection_mulliken.yaml` |
+| `qpu_shot_histogram` | Qiskit shots | `tests/test_*qiskit*` / export 抽样 | `example_h2_qiskit_shots.yaml` |
+
+**CI 挂钩**：[`../.github/workflows/ci.yml`](../.github/workflows/ci.yml) — `check_parity_export_sample`、`l1_excited`、`l1_md_ml`、projection smoke；脚本内 `SAMPLE_CONFIGS_REL` 与上表 YAML 应对齐。
+
+---
+
 ## 依赖解除声明
 
 若业务方坚持的「完美对拍」= **L0 与 InQuanto 闭包数值/对象同构**，则 **超出本开源仓范围**，须单列商务与法务项；本计划 **不作此类验收**。

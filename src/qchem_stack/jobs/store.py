@@ -378,7 +378,7 @@ class SqliteJobStore:
             if not meta_eq:
                 sql = (
                     f"SELECT job_id, status, job_kind, created, updated, protocol_hash, meta "
-                    f"FROM jobs {where_base} ORDER BY created DESC LIMIT ? OFFSET ?"
+                    f"FROM jobs {where_base} ORDER BY created DESC, rowid DESC LIMIT ? OFFSET ?"
                 )
                 rows = con.execute(sql, [*params, lim, off]).fetchall()
                 return _rows_to_items(rows)
@@ -389,7 +389,7 @@ class SqliteJobStore:
             where_exp = f"WHERE {' AND '.join(exp_clauses)}"
             sql_json = (
                 f"SELECT job_id, status, job_kind, created, updated, protocol_hash, meta "
-                f"FROM jobs {where_exp} ORDER BY created DESC LIMIT ? OFFSET ?"
+                f"FROM jobs {where_exp} ORDER BY created DESC, rowid DESC LIMIT ? OFFSET ?"
             )
             try:
                 rows = con.execute(sql_json, [*exp_params, lim, off]).fetchall()
@@ -398,7 +398,7 @@ class SqliteJobStore:
                 scan_n = min(lim + off + 500, _JSON_SCAN_CAP)
                 scan_sql = (
                     f"SELECT job_id, status, job_kind, created, updated, protocol_hash, meta "
-                    f"FROM jobs {where_base} ORDER BY created DESC LIMIT ?"
+                    f"FROM jobs {where_base} ORDER BY created DESC, rowid DESC LIMIT ?"
                 )
                 scanned = con.execute(scan_sql, [*params, scan_n]).fetchall()
 
