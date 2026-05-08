@@ -22,14 +22,32 @@ INQUANTO_TO_QCHEM_OBJECT_MAP: dict[str, str] = {
     "Protocol (five stages)": "qchem_stack.protocols.protocol.PauliAveragingProtocol + ProtocolPhase",
     "AlgorithmVQE": "qchem_stack.quantum.algorithms.vqe.VQE",
     "AlgorithmAdaptVQE": "qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
+    "Operator pool registry (ADAPT/IQEB)": (
+        "qchem_stack.quantum.operator_pool_registry (quantum.adapt_pool_id / quantum.iqeb_pool_id; "
+        "pool_id_aliases; operator_pool_registry_export_v1 under algorithm_registry_alignment_v1 when "
+        "resource_estimation_preview; same schema on GET /v1/meta/capability-surface)"
+    ),
+    "YAML quantum.algorithm_factory (variational plugins)": (
+        "qchem_stack.quantum.variational_plugins (spec, loader, registry); "
+        "examples/echo_runner.py; configs/example_h2_echo_variational_plugin.yaml"
+    ),
     "AlgorithmIQEB": "qchem_stack.quantum.algorithms.iqeb.IQEBVQE (outer-loop Pauli correction + VQE; set quantum.algorithm=iqeb; configs/example_h2_iqeb.yaml)",
     "AlgorithmVQD": "qchem_stack.quantum.algorithms.excited.VQD",
     "AlgorithmQSE": "qchem_stack.quantum.algorithms.excited.QSE + quantum.qse_transition (Pauli transition shot modes)",
     "AlgorithmSCEOM": "qchem_stack.quantum.algorithms.sceom.run_sceom_nested_commutator_from_hea",
-    "Algorithm*QPE (track)": "qchem_stack.qpe_qec_demo.pipeline_track + pipeline._attach_qpe_demo_track_if_requested (qpe_demo_track_after_variational | qpe_pipeline_integration)",
+    "Algorithm*QPE (track)": (
+        "qchem_stack.qpe_qec_demo.pipeline_track + pipeline._attach_qpe_demo_track_if_requested "
+        "(qpe_demo_track_after_variational | qpe_pipeline_integration); "
+        "run_summary.qpe_open_stack_contract_v1 points at quantum/algorithms/qpe.AlgorithmKitaevQPE / Deterministic / InfoTheory"
+    ),
+    "AlgorithmVQS / AlgorithmMcLachlan*": (
+        "qchem_stack.quantum.algorithms.vqs (AlgorithmVQS, AlgorithmMcLachlanRealTime, AlgorithmMcLachlanImagTime) + "
+        "vqs_pipeline_track.vqs_track_payload; optional main-line YAML quantum.vqs_track_after_variational | "
+        "vqs_pipeline_integration → pipeline attaches vqs_track + run_summary.vqs_open_stack_contract_v1"
+    ),
     "AlgorithmBayesianQPE + Phayes": "qchem_stack.qpe_qec_demo.BayesianQPEStub",
     "Qubit Hamiltonian (JW)": (
-        "qchem_stack.chem.hamiltonian.QubitHamiltonian + molecular_hamiltonian_from_pyscf / "
+        "qchem_stack.chem.hamiltonian.QubitHamiltonian + molecular_hamiltonian_from_classical_reference / "
         "qubit_hamiltonian_from_spatial_chemist_integrals (JW or Bravyi–Kitaev via "
         "active_space.fermion_qubit_mapping)"
     ),
@@ -104,7 +122,7 @@ def open_stack_differentiators_public() -> dict[str, Any]:
             },
             {
                 "id": "multi_backend_no_single_vendor_gate",
-                "summary": "statevector / qiskit / ionstack mock executors under one YAML.",
+                "summary": "adapter-first chemistry plus statevector / qiskit / ionstack mock executors under one YAML.",
                 "evidence_modules": ["backends/"],
             },
             {
@@ -120,6 +138,21 @@ def open_stack_differentiators_public() -> dict[str, Any]:
                     "orchestration/pipeline.py",
                     "configs/example_h2_iqeb.yaml",
                     "configs/example_h2_projection_trace.yaml",
+                ],
+            },
+            {
+                "id": "operator_pool_and_variational_plugin_registry_exports",
+                "summary": (
+                    "ADAPT/IQEB operator pools (+ YAML aliases) on GET /v1/meta/capability-surface "
+                    "(operator_pool_registry_export_v1) and under algorithm_registry_alignment_v1 when "
+                    "parity_integrations.resource_estimation_preview is on variational/registry exports."
+                ),
+                "evidence_modules": [
+                    "quantum/operator_pool_registry.py",
+                    "api/app.py",
+                    "quantum/variational_plugins/registry.py",
+                    "scripts/export_parity_criteria_table.py",
+                    "integrations/l3_algorithm_benchmark.py",
                 ],
             },
             {
@@ -165,6 +198,9 @@ PARITY_SNAPSHOT_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "backend_provider",
         "pmsv_enabled",
         "zne_enabled",
+        "spam_calibration_enabled",
+        "classical_shadows_stub_enabled",
+        "classical_shadows_budget_pairs",
         "mitigation_execution_class",
         "mitigation_zne_scales",
         "mitigation_zne_mode",
@@ -180,6 +216,8 @@ PARITY_SNAPSHOT_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "vqd_shots_objective",
         "vqd_shots_overlap",
         "vqd_shots_weight",
+        "vqd_overlap_exponent_yaml",
+        "vqd_cobyla_maxiter_yaml",
         "qse_after_variational",
         "qse_subspace_dim",
         "qse_max_basis",
@@ -189,6 +227,19 @@ PARITY_SNAPSHOT_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "sceom_after_variational",
         "sceom_subspace_dim",
         "sceom_shots_per_matrix_element",
+        "sceom_generator_strategy_yaml",
+        "vqs_track_after_variational",
+        "vqs_pipeline_integration",
+        "vqs_mode",
+        "vqs_n_times",
+        "vqs_dt",
+        "vqs_rhs_mode_yaml",
+        "vqs_tangent_fd_epsilon_yaml",
+        "qpe_demo_track_after_variational_yaml",
+        "qpe_demo_track_n_bits_yaml",
+        "qpe_pipeline_integration_yaml",
+        "qpe_three_pack_after_variational_yaml",
+        "qpe_three_pack_time_yaml",
         "hamiltonian_meta",
         "embedding_mode",
         "n_scf_cycles_embedding",
@@ -248,15 +299,34 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
     {
         "stages_completed",
         "quantum_algorithm",
+        "quantum_algorithm_yaml",
+        "quantum_algorithm_factory_yaml",
+        "classical_backend_id",
+        "classical_benchmark_backend_yaml",
         "variational_ansatz_yaml",
         "uccsd_n_parameters",
         "pauli_protocol_expectation_path",
         "energy_after_variational",
+        "mitigation_zne_mode_yaml",
+        "mitigation_zne_scales_yaml",
+        "spam_calibration_enabled_yaml",
+        "classical_shadows_stub_enabled_yaml",
+        "classical_shadows_budget_pairs_yaml",
+        "embedding_input_representation_yaml",
+        "embedding_input_system_schema",
+        "energy_components_present",
+        "energy_components_schema",
+        "energy_components_mean_field_total_au",
+        "energy_components_nuclear_repulsion_au",
         "dmet_embedding_active",
         "dmet_hamiltonian_source_yaml",
         "dmet_fragment_count",
         "dmet_uniform_multifragment_toy_yaml",
         "dmet_stub_one_shot_ledger_yaml",
+        "decomposition_plugin_yaml",
+        "decomposition_primary_fragment_id",
+        "decomposition_fragment_count",
+        "decomposition_total_pauli_terms",
         "dmet_fragment_solve_present",
         "dmet_fragment_solve_schema",
         "schmidt_dmet_max_cycles_yaml",
@@ -267,17 +337,50 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "schmidt_per_fragment_vqe_min_energy_au",
         "schmidt_per_fragment_vqe_max_energy_au",
         "scf_energy",
+        "classical_benchmarks_present",
+        "classical_benchmarks_schema",
+        "classical_bench_hf_status",
+        "classical_bench_hf_energy_au",
+        "classical_bench_mp2_status",
+        "classical_bench_mp2_energy_au",
+        "classical_bench_ccsd_status",
+        "classical_bench_ccsd_energy_au",
+        "classical_bench_casci_status",
+        "classical_bench_casci_energy_au",
+        "classical_benchmark_summary_present",
+        "classical_benchmark_summary_schema",
+        "classical_benchmark_recommended_baseline_method",
+        "classical_benchmark_recommended_baseline_energy_au",
+        "classical_benchmark_best_method",
+        "classical_benchmark_best_energy_au",
+        "classical_benchmark_delta_best_vs_hf_au",
+        "rdm_correction_present",
+        "rdm_correction_schema",
+        "rdm_correction_method",
+        "rdm_correction_status",
+        "rdm_correction_energy_au",
+        "rdm_correction_readiness_present",
+        "rdm_correction_readiness_schema",
+        "rdm_correction_readiness_requested_method",
+        "rdm_correction_readiness_rdm1_source",
+        "rdm_correction_readiness_rdm_basis",
+        "rdm_correction_readiness_spin_model",
+        "rdm_correction_readiness_reference_wavefunction",
+        "rdm_correction_readiness_kernel_class",
+        "rdm_correction_readiness_nevpt2_pyscf_status",
         "vqe_maxiter_yaml",
         "vqe_nfev",
         "adapt_max_iter_yaml",
         "adapt_total_gradient_evals",
         "adapt_steps_recorded",
         "adapt_excitation_layers",
+        "adapt_pool_id_yaml",
         "iqeb_max_rounds_yaml",
         "iqeb_outer_rounds_recorded",
         "iqeb_selected_pauli_count",
         "iqeb_final_inner_vqe_nfev",
         "iqeb_implementation_path",
+        "iqeb_pool_id_yaml",
         "sum_shots_total_with_excited_upper_bound",
         "excited_shots_upper_bound",
         "pauli_averaging_protocol_ran",
@@ -288,6 +391,7 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "n_qubits",
         "energy_pauli_protocol",
         "protocol_expectation_source",
+        "protocol_zne_mode",
         "protocol_energy_stderr_model",
         "protocol_total_shots_budget",
         "protocol_n_measurement_circuits",
@@ -295,6 +399,8 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "protocol_energy_stderr",
         "protocol_pmsv_report",
         "vqd_n_states_yaml",
+        "vqd_overlap_exponent_yaml",
+        "vqd_cobyla_maxiter_yaml",
         "vqd_n_energies_recorded",
         "vqd_deflation_levels_completed",
         "vqd_reused_pipeline_ground",
@@ -313,6 +419,7 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "qse_total_shots_upper_bound",
         "sceom_shots_per_matrix_element",
         "sceom_subspace_dim_yaml",
+        "sceom_generator_strategy_yaml",
         "sceom_n_energies_recorded",
         "sceom_shot_noise_model",
         "sceom_active_generator_count",
@@ -323,6 +430,13 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "job_async_energy_stderr",
         "job_async_total_shots_budget",
         "qpe_demo_track_ran",
+        "qpe_open_stack_contract_v1",
+        "qpe_three_pack_ran",
+        "qpe_three_pack_deterministic_energy_est",
+        "qpe_three_pack_kitaev_energy_est",
+        "qpe_three_pack_info_theory_energy_est",
+        "vqs_track_ran",
+        "vqs_open_stack_contract_v1",
         "nexus_analog_hqc_units",
         "mitigation_graph_report_present",
         "mitigation_dag_execution_present",
@@ -353,12 +467,17 @@ REPRO_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "config_path",
         "python",
         "packages",
+        "classical_software_versions",
+        "pyscf_version",
         "embedding_config",
         "chemistry_extended_config",
         "nexus_analog_config",
         "nexus_cloud_config",
         "parity_snapshot",
         "workflow_preview_v1",
+        "workflow_preview_variational_execution_v1",
+        "workflow_preview_qpe_track_v1",
+        "workflow_preview_vqs_track_v1",
         "run_context",
         "run_summary",
         "pipeline_profile",
@@ -505,14 +624,31 @@ def inquanto_gap_categories() -> list[dict[str, Any]]:
             "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — ADAPT / IQEB / UCC",
             "inquanto_surface": "UCC / chemically aware pools",
             "qchem_stack": (
-                "HEA + ADAPT + IQEB + optional JW-only UCCSD variational (quantum.variational_ansatz=uccsd; "
-                "UCCSDVQE / UCCSDTrotterVQE reject BK/SCBK — use JW for UCCSD circuit; "
-                "dense cluster exponentials: configs/example_h2_uccsd.yaml; "
-                "first-order Trotter layers: quantum.uccsd_trotter_steps + "
-                "configs/example_h2_uccsd_trotter.yaml) + integrations/ucc_reference + "
-                "quantum/ansatz_registry.py; VQE+HEA on BK/SCBK Hamiltonians remains supported"
+                "HEA + ADAPT + IQEB + ``quantum.variational_ansatz=uccsd`` dense cluster ansatz "
+                "(UCCSDVQE / UCCSDTrotterVQE — **Jordan–Wigner** with JW particle-sector projector, "
+                "or **Bravyi–Kitaev** BK-matched exponentials without JW projector; rejects "
+                "**symmetry_conserving_bravyi_kitaev** qubit truncation); JW & BK operator pools "
+                "``fermionic_uccsd*`` slices in ``operator_pool_registry_export_v1``; "
+                "`configs/example_h2_uccsd.yaml`, `configs/example_h2_uccsd_trotter.yaml`, BK example "
+                "`configs/example_h2_uccsd_bk.yaml` + integrations/ucc_reference; HEA+VQE stays valid on BK/SCBK Hamiltonians alone"
             ),
-            "status": "partial_jw_uccsd_and_trotter_packaged_bk_scbk_uccsd_na",
+            "status": "partial_jw_sector_projector_bk_dense_packaged_scbk_truncation_na",
+        },
+        {
+            "id": "adapt_iqeb_operator_pool_surface",
+            "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — quantum.adapt_pool_id / iqeb_pool_id export",
+            "inquanto_surface": "Chemically motivated excitation / pool selection (vendor documentation narrative)",
+            "qchem_stack": (
+                "quantum.operator_pool_registry (JW spin-UCCSD + singles/doubles slices; "
+                "BK-mapped pools ``fermionic_uccsd_bravyi_kitaev`` + BK singles/doubles/concat; "
+                "iqeb qubit-excitation pool; toy_pair_xx; aliases "
+                "`qubit_excitation`→`iqeb_qubit_excitation`, `uccsd_jw`→`fermionic_uccsd`, "
+                "`uccsd_bravyi_kitaev`/`uccsd_bk`→`fermionic_uccsd_bravyi_kitaev` via "
+                "`operator_pool_registry_export_v1.pool_id_aliases`); YAML quantum.adapt_pool_id / quantum.iqeb_pool_id; "
+                "run_summary echoes pool ids when adapt/iqeb runs; operator_pool_registry_export_v1 "
+                "in algorithm_registry_alignment_v1 parity export block"
+            ),
+            "status": "executable_pools_partial_vs_vendor_full_excitation_taxonomy",
         },
         {
             "id": "dmet_scf_loop",
@@ -538,9 +674,9 @@ def inquanto_gap_categories() -> list[dict[str, Any]]:
         },
         {
             "id": "integrations_closure_layer",
-            "parity_matrix_anchor": "docs/架构_InQuanto闭源能力闭合与可复现边界.md; open_gap_closure_reference",
+            "parity_matrix_anchor": "docs/工程记忆_Quantinuum对标与数据流技术文档.md §0; open_gap_closure_reference",
             "inquanto_surface": "Product defaults (TKET boxes, UCC regrouping, DMET, Nexus, Qermit, TN)",
-            "qchem_stack": "Package qchem_stack.integrations — see docs/架构_InQuanto闭源能力闭合与可复现边界.md (L1 not L0)",
+            "qchem_stack": "Package qchem_stack.integrations — see docs/工程记忆_Quantinuum对标与数据流技术文档.md §0 (L1 not L0)",
             "status": "reference_v1",
         },
         {

@@ -19,4 +19,4 @@
 
 权威 JSON：`inquanto_gap_categories` 中 `id=qermit_graph` 嵌套 `mitigation_execution_model`（`schema: mitigation_execution_model_v1`）。
 
-**公开 errmit 手册钉扎（维护）**：本文档编写时对照 [Quantinuum errmit 手册](https://docs.quantinuum.com/inquanto/manual/errmit.html)，锚定日期见 [L1_InQuanto_alignment_signoff.md](/parity/l1-signoff)「公开文档钉扎」。
+**公开 errmit 手册钉扎（维护）**：本文档编写时对照 [Quantinuum errmit 手册](https://docs.quantinuum.com/inquanto/manual/errmit.html)，锚定日期见 [差距计划 — 附录 C](/parity/gap-implementation-plan#appendix-c)「公开文档钉扎」。

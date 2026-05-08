@@ -29,6 +29,7 @@ nexus = ["qnexus>=0.4"]
 api = ["fastapi>=0.100", "uvicorn[standard]>=0.23"]
 all = ["qchem-stack[chem,quantum,pytket,nexus]"]
 dev = ["qchem-stack[all,api]", "pytest>=7.4", "ruff>=0.3"]
+examples_viz = ["matplotlib>=3.7"]
 
 [project.scripts]
 qchem-jobs-worker = "qchem_stack.jobs.worker:main"
@@ -64,4 +65,8 @@ ignore = []
 
 [tool.ruff.lint.isort]
 known-first-party = ["qchem_stack"]
+
+# Tests use ``pytest.importorskip`` before importing qchem_stack / PySCF — imports are intentionally not at file top.
+[tool.ruff.lint.per-file-ignores]
+"tests/**" = ["E402"]
 

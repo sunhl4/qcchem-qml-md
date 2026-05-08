@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 
-from importlib.metadata import PackageNotFoundError, version as _package_version
+from importlib.metadata import PackageNotFoundError
+from importlib.metadata import version as _package_version
 
 from qchem_stack.exceptions import (
     ConfigurationError,

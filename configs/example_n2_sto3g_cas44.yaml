@@ -1,0 +1,47 @@
+# N₂（sto-3g，14 e / 10 空间轨道）：CAS(4,4) 冻结内层 10 e、在 4 条活性轨道上相关 4 e。
+# 比 H₂ 明显「大」，且不做活性截断时全空间量子模拟成本更高；本配置用于演示活性空间必要性。
+schema_version: "1"
+experiment_id: "n2_sto3g_cas44_001"
+random_seed: 13
+
+molecule:
+  symbols: ["N", "N"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 2.074]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 4
+  n_active_electrons: 4
+  fermion_qubit_mapping: "jordan_wigner"
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 1024
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 80
+  use_pauli_protocol: false
+  pauli_grouping: "tensor_product"

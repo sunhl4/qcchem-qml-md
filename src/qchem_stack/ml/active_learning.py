@@ -1,7 +1,8 @@
 from __future__ import annotations
 
+from collections.abc import Callable
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -14,7 +15,7 @@ class ActiveLearningLoop:
     """Pick next geometry index by max predicted uncertainty (toy on discrete pool)."""
 
     pool_features: np.ndarray
-    acquisition: Callable[[np.ndarray, "SurrogateEnergyModel"], int]
+    acquisition: Callable[[np.ndarray, SurrogateEnergyModel], int]
 
     def next_index(self, model: SurrogateEnergyModel) -> int:
         return int(self.acquisition(self.pool_features, model))

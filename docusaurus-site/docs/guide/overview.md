@@ -11,7 +11,7 @@ keywords:
 
 # 指南总览
 
-按 P1 -> P4 阅读功能与用法。快速上手看 [教程](../tutorial/quickstart)，接口与命令看 [参考](../reference/cli-http)。
+按 P1 -> P4 阅读功能与用法。快速上手看 [教程](../tutorial/quickstart)，接口与命令看 [参考](../reference/cli-and-scripts)。
 
 | 柱 | 入口 |
 |----|------|
@@ -20,4 +20,4 @@ keywords:
 | P3 执行与分析 | [执行与分析](./execution-and-analysis) |
 | P4 作业与可复现 | [作业与可复现](./jobs-and-reproducibility) |
 
-与 InQuanto 的对照参考使用 [对标页](../parity/competitor-benchmark)。
+如果你是新同学，先看 [新用户三条路径](./onboarding-three-paths)。

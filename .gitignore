@@ -47,3 +47,8 @@ docs-site/docs/.vitepress/cache/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# Example runs (keep .gitkeep + README)
+examples/artifacts/**
+!examples/artifacts/.gitkeep
+!examples/artifacts/README.md

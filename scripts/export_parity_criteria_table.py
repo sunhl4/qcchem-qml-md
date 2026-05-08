@@ -13,21 +13,35 @@ Usage::
 from __future__ import annotations
 
 import argparse
+import dataclasses
 import json
 import sys
 from pathlib import Path
 
+from qchem_stack.chem.fermion_mapping_registry import DOCUMENTED_FERMION_QUBIT_MAPPINGS
+from qchem_stack.chem.solvers.registry import create_solver, registered_solver_ids
 from qchem_stack.config import compiler_bundle_signature_from_config, load_experiment_config
+from qchem_stack.integrations.inquanto_workflow_preview import (
+    workflow_preview_qpe_track_slice_v1,
+    workflow_preview_variational_execution_slice_v1,
+    workflow_preview_vqs_track_slice_v1,
+)
 from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
-from qchem_stack.integrations.resource_estimation_preview import build_resource_estimation_preview_v1
+from qchem_stack.integrations.resource_estimation_preview import (
+    build_resource_estimation_preview_v1,
+)
+from qchem_stack.md_bridge import QMFrame
 from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
 from qchem_stack.protocols.computable import computables_export_dict
 from qchem_stack.protocols.inquanto_contract import (
-    PARITY_EXPORT_V2_STABLE_KEYS,
     classify_pauli_expectation_path,
     inquanto_gap_categories,
     protocol_expectation_semantics_public,
 )
+from qchem_stack.quantum.algorithm_registry import ALGORITHM_REGISTRY
+from qchem_stack.quantum.ansatz_registry import ANSATZ_REGISTRY
+from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
+from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
 
 def _table_from_config(
@@ -36,16 +50,21 @@ def _table_from_config(
     protocol_counts: dict | None = None,
 ) -> dict:
     cfg = load_experiment_config(cfg_path)
+    solver = create_solver(cfg)
     out = {
         "parity_export_schema_version": "2",
         "source_config": str(cfg_path),
         "experiment_id": cfg.experiment_id,
         "molecule": cfg.molecule.model_dump(),
         "scf_method": cfg.scf.method,
+        "scf_driver": cfg.scf.driver,
+        "registered_solvers": sorted(registered_solver_ids()),
+        "solver_capabilities_snapshot": dataclasses.asdict(solver.capabilities),
         "active_space": cfg.active_space.model_dump(),
         "fermion_to_qubit_map": cfg.active_space.fermion_qubit_mapping,
         "pauli_grouping": cfg.quantum.pauli_grouping,
         "quantum_algorithm": cfg.quantum.algorithm,
+        "quantum_algorithm_factory": cfg.quantum.algorithm_factory,
         "variational_ansatz": cfg.quantum.variational_ansatz,
         "uccsd_trotter_steps": cfg.quantum.uccsd_trotter_steps,
         "pauli_support_max_terms": cfg.quantum.pauli_support_max_terms,
@@ -63,6 +82,12 @@ def _table_from_config(
         "protocol_expectation_semantics_v1": protocol_expectation_semantics_public(),
         "qpe_demo_track_after_variational": cfg.quantum.qpe_demo_track_after_variational,
         "qpe_pipeline_integration": cfg.quantum.qpe_pipeline_integration,
+        "qpe_demo_track_n_bits": cfg.quantum.qpe_demo_track_n_bits,
+        "vqs_track_after_variational": cfg.quantum.vqs_track_after_variational,
+        "vqs_pipeline_integration": cfg.quantum.vqs_pipeline_integration,
+        "vqs_mode": cfg.quantum.vqs_mode,
+        "vqs_n_times": cfg.quantum.vqs_n_times,
+        "vqs_dt": cfg.quantum.vqs_dt,
         "record_pauli_measurement_histograms": cfg.quantum.record_pauli_measurement_histograms,
         "computable_abstract": computables_export_dict(cfg, protocol_counts=protocol_counts),
         "excited_resource_from_config": build_excited_resource_summary_for_export(cfg),
@@ -93,8 +118,11 @@ def _table_from_config(
         "mitigation_zne_scales": list(cfg.mitigation.zne_scales),
         "embedding": cfg.embedding.model_dump(),
         "embedding_mode": cfg.embedding.mode,
+        "embedding_input_representation": cfg.embedding.embedding_input_representation,
         "parity_integrations_dmet_stub_one_shot_ledger": cfg.parity_integrations.dmet_stub_one_shot_ledger,
         "chemistry_extended": cfg.chemistry_extended.model_dump(),
+        "classical_benchmark_enabled": cfg.chemistry_extended.classical_benchmark_enabled,
+        "rdm_correction_method": cfg.chemistry_extended.rdm_correction_method,
         "nexus_analog": cfg.nexus_analog.model_dump(),
         "nexus_cloud": cfg.nexus_cloud.model_dump(),
         "tensornet_expectation_stub": cfg.quantum.tensornet_expectation_stub,
@@ -109,12 +137,36 @@ def _table_from_config(
             "schema": "methods_resource_preview_v1",
             "qpe_pipeline_integration": cfg.quantum.qpe_pipeline_integration,
             "qpe_demo_track_after_variational": cfg.quantum.qpe_demo_track_after_variational,
+            "qpe_demo_track_n_bits": cfg.quantum.qpe_demo_track_n_bits,
             "use_pauli_protocol": cfg.quantum.use_pauli_protocol,
             "parity_integrations_tket_first_circuit_stats": cfg.parity_integrations.tket_first_circuit_stats,
+            "vqs_track_after_variational": cfg.quantum.vqs_track_after_variational,
+            "vqs_pipeline_integration": cfg.quantum.vqs_pipeline_integration,
         },
     }
+    ve = workflow_preview_variational_execution_slice_v1(cfg)
+    if ve is not None:
+        out["workflow_preview_variational_execution_v1"] = ve
+    vqx = workflow_preview_vqs_track_slice_v1(cfg)
+    if vqx is not None:
+        out["workflow_preview_vqs_track_v1"] = vqx
+    qpex = workflow_preview_qpe_track_slice_v1(cfg)
+    if qpex is not None:
+        out["workflow_preview_qpe_track_v1"] = qpex
     if cfg.parity_integrations.resource_estimation_preview:
         out["resource_estimation_preview_v1"] = build_resource_estimation_preview_v1(cfg=cfg)
+        out["algorithm_registry_alignment_v1"] = {
+            "schema": "algorithm_registry_alignment_v1",
+            "algorithm_registry_ids": sorted(ALGORITHM_REGISTRY.keys()),
+            "variational_registry_export_v1": variational_registry_export(),
+            "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
+            "ansatz_registry_ids": sorted(ANSATZ_REGISTRY.keys()),
+            "documented_fermion_qubit_mappings": list(DOCUMENTED_FERMION_QUBIT_MAPPINGS),
+        }
+        out["md_ml_repro_freeze_fields_v1"] = {
+            "schema": "md_ml_repro_freeze_fields_v1",
+            "qmframe_fields": sorted(QMFrame.model_fields.keys()),
+        }
     return out
 
 
@@ -188,6 +240,21 @@ def main() -> None:
             hm = data.get("hamiltonian_meta")
             if isinstance(hm, dict) and hm.get("hamiltonian_fingerprint") is not None:
                 out["hamiltonian_fingerprint_from_run"] = hm.get("hamiltonian_fingerprint")
+            cb = data.get("classical_benchmarks")
+            if isinstance(cb, dict):
+                out["classical_benchmarks_from_run"] = cb
+            cbs = data.get("classical_benchmark_summary")
+            if isinstance(cbs, dict):
+                out["classical_benchmark_summary_from_run"] = cbs
+            rcorr = data.get("rdm_correction")
+            if isinstance(rcorr, dict):
+                out["rdm_correction_from_run"] = rcorr
+            rr_read = data.get("rdm_correction_readiness")
+            if isinstance(rr_read, dict):
+                out["rdm_correction_readiness_from_run"] = rr_read
+            ecmp = data.get("energy_components")
+            if isinstance(ecmp, dict):
+                out["energy_components_from_run"] = ecmp
             out["excited_resource_summary_from_run"] = data.get("excited_resource_summary")
             if isinstance(rsum, dict):
                 for key in (
@@ -225,12 +292,53 @@ def main() -> None:
                     "dmet_embedding_active",
                     "dmet_hamiltonian_source_yaml",
                     "dmet_fragment_count",
+                    "decomposition_primary_fragment_id",
+                    "decomposition_fragment_count",
+                    "decomposition_total_pauli_terms",
+                    "mitigation_zne_mode_yaml",
+                    "mitigation_zne_scales_yaml",
                     "dmet_uniform_multifragment_toy_yaml",
                     "dmet_stub_one_shot_ledger_yaml",
                     "dmet_fragment_solve_present",
                     "dmet_fragment_solve_schema",
+                    "protocol_zne_mode",
                     "variational_ansatz_yaml",
                     "uccsd_n_parameters",
+                    "classical_benchmarks_present",
+                    "classical_benchmarks_schema",
+                    "classical_bench_hf_status",
+                    "classical_bench_hf_energy_au",
+                    "classical_bench_mp2_status",
+                    "classical_bench_mp2_energy_au",
+                    "classical_bench_ccsd_status",
+                    "classical_bench_ccsd_energy_au",
+                    "classical_bench_casci_status",
+                    "classical_bench_casci_energy_au",
+                    "classical_benchmark_summary_present",
+                    "classical_benchmark_summary_schema",
+                    "classical_benchmark_recommended_baseline_method",
+                    "classical_benchmark_recommended_baseline_energy_au",
+                    "classical_benchmark_best_method",
+                    "classical_benchmark_best_energy_au",
+                    "classical_benchmark_delta_best_vs_hf_au",
+                    "embedding_input_representation_yaml",
+                    "embedding_input_system_schema",
+                    "energy_components_present",
+                    "energy_components_schema",
+                    "energy_components_mean_field_total_au",
+                    "energy_components_nuclear_repulsion_au",
+                    "rdm_correction_present",
+                    "rdm_correction_schema",
+                    "rdm_correction_method",
+                    "rdm_correction_status",
+                    "rdm_correction_energy_au",
+                    "rdm_correction_readiness_present",
+                    "rdm_correction_readiness_schema",
+                    "rdm_correction_readiness_requested_method",
+                    "rdm_correction_readiness_rdm1_source",
+                    "rdm_correction_readiness_reference_wavefunction",
+                    "rdm_correction_readiness_kernel_class",
+                    "rdm_correction_readiness_nevpt2_pyscf_status",
                 ):
                     if key in rsum and rsum[key] is not None:
                         out[f"{key}_mirror_run_summary"] = rsum[key]
@@ -258,9 +366,18 @@ def main() -> None:
                     "has_kitaev": qdt.get("kitaev_ground_energy_dense") is not None,
                     "has_bayesian_stub": qdt.get("bayesian_phase_map_toy") is not None,
                 }
+            vtr = data.get("vqs_track")
+            if isinstance(vtr, dict):
+                out["vqs_track_from_run"] = {
+                    "schema": vtr.get("schema"),
+                    "has_energy_observable": bool(vtr.get("energy_observable")),
+                    "vqs_mode_from_run": vtr.get("vqs_mode"),
+                }
             out["methods_resource_unified_v1"] = build_methods_resource_unified_v1(data)
             if isinstance(rsum, dict) and rsum.get("qpe_demo_track_ran"):
                 out["qpe_demo_track_ran_from_run_summary"] = True
+            if isinstance(rsum, dict) and rsum.get("vqs_track_ran"):
+                out["vqs_track_ran_from_run_summary"] = True
             if isinstance(rsum, dict):
                 if rsum.get("vqd_three_protocol_present") is not None:
                     out["vqd_three_protocol_present_from_run_summary"] = rsum["vqd_three_protocol_present"]

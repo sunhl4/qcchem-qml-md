@@ -7,10 +7,10 @@ pytestmark = pytest.mark.l1_excited
 import numpy as np
 from openfermion.ops import QubitOperator
 
+from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
 from qchem_stack.chem.fermion import FermionSpace
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
-from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
 from qchem_stack.quantum.algorithms.excited import QSE, VQD
 from qchem_stack.quantum.algorithms.sceom import (
     default_sceom_pauli_generators,

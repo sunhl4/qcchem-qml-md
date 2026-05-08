@@ -1,0 +1,100 @@
+"""Representative pipeline metrics for publication-style tables (optional L3 / CI gate).
+
+``L3_PYTEST_YAMLS`` is the slim set for ``pytest -m l3`` (`QCHEM_RUN_L3=1`); ``DEFAULT_BENCHMARK_YAMLS`` adds
+baseline H2 VQE, default IQEB, and QPE dual-track for paper-style ``l3_algorithm_benchmark_report.py`` defaults.
+"""
+
+from __future__ import annotations
+
+import time
+from pathlib import Path
+from typing import Any
+
+from qchem_stack.config import load_experiment_config
+from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
+DEFAULT_BENCHMARK_YAMLS: tuple[str, ...] = (
+    "configs/example_h2.yaml",
+    "configs/example_h2_adapt_singles_pool.yaml",
+    "configs/example_h2_adapt_doubles_pool.yaml",
+    "configs/example_h2_adapt_uccsd_jw_alias.yaml",
+    "configs/example_h2_iqeb.yaml",
+    "configs/example_h2_iqeb_fermionic_doubles_pool.yaml",
+    "configs/example_h2_iqeb_qubit_excitation_alias.yaml",
+    "configs/example_h2_excited_smoke.yaml",
+    "configs/qpe_dual_track_demo.yaml",
+)
+
+L3_PYTEST_YAMLS: tuple[str, ...] = (
+    "configs/example_h2_adapt_singles_pool.yaml",
+    "configs/example_h2_adapt_doubles_pool.yaml",
+    "configs/example_h2_adapt_uccsd_jw_alias.yaml",
+    "configs/example_h2_iqeb_fermionic_doubles_pool.yaml",
+    "configs/example_h2_iqeb_qubit_excitation_alias.yaml",
+    "configs/example_h2_excited_smoke.yaml",
+)
+
+
+def algorithm_benchmark_bundle_v1(*, repo_root: Path, config_rels: list[str]) -> dict[str, Any]:
+    rows: list[dict[str, Any]] = []
+    for rel in config_rels:
+        p = repo_root / rel
+        if not p.is_file():
+            continue
+        t0 = time.perf_counter()
+        cfg = load_experiment_config(p)
+        exp_id = cfg.experiment_id
+        out = run_pipeline_sync(cfg, cfg_path=p)
+        wall_ms = (time.perf_counter() - t0) * 1000.0
+        rs = out.get("repro", {}).get("run_summary") or {}
+        nfev_val = out.get("nfev")
+        nfev = int(nfev_val) if isinstance(nfev_val, int) else None
+        row: dict[str, Any] = {
+            "experiment_id": exp_id,
+            "config_rel": rel,
+            "quantum_algorithm_yaml": cfg.quantum.algorithm,
+            "adapt_pool_id_yaml": cfg.quantum.adapt_pool_id,
+            "iqeb_pool_id_yaml": cfg.quantum.iqeb_pool_id,
+            "scf_energy_au": out.get("scf_energy"),
+            "energy_after_variational_au": out.get("energy_after_variational"),
+            "nfev": nfev,
+            "adapt_total_gradient_evals": rs.get("adapt_total_gradient_evals"),
+            "wall_time_ms": float(wall_ms),
+            "stages_completed_tail": list((rs.get("stages_completed") or [])[-5:]),
+        }
+        rows.append(row)
+    return {"schema": "algorithm_benchmark_bundle_v1", "rows": rows}
+
+
+def merged_experiment_benchmark_v1(bundle: dict[str, Any]) -> dict[str, Any]:
+    rows = bundle.get("rows") if isinstance(bundle.get("rows"), list) else []
+    walls = [float(r["wall_time_ms"]) for r in rows if r.get("wall_time_ms") is not None]
+
+    algo_walls: dict[str, list[float]] = {}
+    for r in rows:
+        algo = r.get("quantum_algorithm_yaml")
+        key = algo if isinstance(algo, str) else ""
+        wm = r.get("wall_time_ms")
+        if wm is None:
+            continue
+        algo_walls.setdefault(key, []).append(float(wm))
+
+    by_algo: list[dict[str, Any]] = []
+    for key in sorted(algo_walls.keys()):
+        gw = algo_walls[key]
+        by_algo.append(
+            {
+                "quantum_algorithm_yaml": key or None,
+                "n_configs": len(gw),
+                "total_wall_time_ms": float(sum(gw)),
+                "mean_wall_time_ms": float(sum(gw) / len(gw)) if gw else None,
+            }
+        )
+
+    return {
+        "schema": "merged_experiment_benchmark_v1",
+        "n_configs": len(rows),
+        "total_wall_time_ms": float(sum(walls)) if walls else None,
+        "mean_wall_time_ms": float(sum(walls) / len(walls)) if walls else None,
+        "by_quantum_algorithm_yaml": by_algo,
+    }

@@ -42,7 +42,75 @@ def test_export_example_h2_matches_golden_fixture() -> None:
     assert _FIXTURE.is_file()
     golden = json.loads(_FIXTURE.read_text(encoding="utf-8"))
     fresh = _normalize_export(_export_json("configs/example_h2.yaml"))
-    assert fresh == golden
+    # Keep the historical fixture as a backwards-compatible baseline while allowing additive export keys.
+    for key, value in golden.items():
+        assert fresh.get(key) == value
+    assert fresh.get("scf_driver") == "pyscf"
+    assert isinstance(fresh.get("registered_solvers"), list)
+    assert "pyscf" in fresh["registered_solvers"]
+    assert isinstance(fresh.get("solver_capabilities_snapshot"), dict)
+    assert fresh["solver_capabilities_snapshot"].get("backend_id") == "pyscf"
+
+
+@pytest.mark.skipif(
+    not (_ROOT / "configs" / "example_h2_echo_variational_plugin.yaml").is_file(),
+    reason="echo plugin example config missing",
+)
+def test_export_echo_variational_plugin_config_only_yaml_factory_dispatch() -> None:
+    fresh = _normalize_export(_export_json("configs/example_h2_echo_variational_plugin.yaml"))
+    fac = "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
+    assert fresh.get("quantum_algorithm") == "echo_reference_plugin"
+    assert fresh.get("quantum_algorithm_factory") == fac
+    abstract = fresh.get("computable_abstract")
+    assert isinstance(abstract, dict)
+    items = abstract.get("items") or []
+    assert items and items[0].get("details", {}).get("variational_dispatch") == "yaml_algorithm_factory_v1"
+    wpex = fresh.get("workflow_preview_variational_execution_v1")
+    assert isinstance(wpex, dict) and wpex.get("algorithm_factory") == fac
+
+
+@pytest.mark.skipif(
+    not (_ROOT / "configs" / "example_h2_micro_vqe_plugin.yaml").is_file(),
+    reason="micro vqe plugin example config missing",
+)
+def test_export_micro_vqe_variational_plugin_config_only() -> None:
+    fresh = _normalize_export(_export_json("configs/example_h2_micro_vqe_plugin.yaml"))
+    fac = "qchem_stack.quantum.variational_plugins.examples.vqe_micro_plugin:micro_vqe_runner_factory"
+    assert fresh.get("quantum_algorithm_factory") == fac
+    assert fresh.get("quantum_algorithm") == "micro_vqe_yaml_plugin_demo"
+
+
+def test_export_parity_psi4_config_only_row_present() -> None:
+    cfg = _ROOT / "tests" / "fixtures" / "_tmp_psi4_export.yaml"
+    cfg.write_text(
+        """
+schema_version: "1"
+experiment_id: psi4_export
+random_seed: 0
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  basis: sto-3g
+scf:
+  driver: psi4
+  method: RHF
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+""",
+        encoding="utf-8",
+    )
+    try:
+        data = _export_json("tests/fixtures/_tmp_psi4_export.yaml")
+        assert data.get("scf_driver") == "psi4"
+        caps = data.get("solver_capabilities_snapshot")
+        assert isinstance(caps, dict)
+        assert caps.get("backend_id") == "psi4"
+        assert caps.get("supports_restricted_active_space_qubit_hamiltonian") is False
+    finally:
+        cfg.unlink(missing_ok=True)
 
 
 def test_export_results_merge_includes_algorithm_sidecars() -> None:
@@ -64,13 +132,24 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
         "configs/tutorial_inquanto_chain_h2.yaml",
         "configs/example_h2_excited_smoke.yaml",
         "configs/example_h2_iqeb.yaml",
+        "configs/example_h2_adapt_singles_pool.yaml",
+        "configs/example_h2_adapt_doubles_pool.yaml",
+        "configs/example_h2_iqeb_fermionic_doubles_pool.yaml",
+        "configs/example_h2_iqeb_qubit_excitation_alias.yaml",
+        "configs/example_h2_adapt_uccsd_jw_alias.yaml",
         "configs/example_h2_uccsd.yaml",
         "configs/example_h2_uccsd_trotter.yaml",
+        "configs/example_h2_uccsd_bk.yaml",
         "configs/example_h2_zne_circuit_fold.yaml",
         "configs/example_decomposition_plugin_toy.yaml",
+        "configs/example_decomposition_plugin_two_fragment.yaml",
         "configs/example_h2_projection_trace.yaml",
         "configs/example_h4_projection_mulliken.yaml",
         "configs/example_oniom_toy.yaml",
+        "configs/example_h2_avas_stub.yaml",
+        "configs/example_h2_avas.yaml",
+        "configs/example_h2_classical_shadows_stub.yaml",
+        "configs/example_decomposition_plugin_contract.yaml",
     ),
 )
 def test_m2_config_only_export_stable_keys(cfg_rel: str) -> None:
@@ -99,6 +178,8 @@ def test_m2_pipeline_then_export_documented_keys() -> None:
     cfg_path = _ROOT / "configs" / "example_h2.yaml"
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
+    ec = out.get("energy_components")
+    assert isinstance(ec, dict) and ec.get("schema") == "energy_components_v1"
     tmp = _ROOT / "tests" / "fixtures" / "_m2_tmp_pipeline_out.json"
     try:
         tmp.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
@@ -107,3 +188,39 @@ def test_m2_pipeline_then_export_documented_keys() -> None:
         assert isinstance(exp.get("run_summary_from_repro"), dict)
     finally:
         tmp.unlink(missing_ok=True)
+
+
+def test_export_results_merge_includes_plugin_and_zne_run_summary_mirrors() -> None:
+    try:
+        import pyscf  # noqa: F401
+    except ImportError:
+        pytest.skip("PySCF not installed")
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
+    # Plugin path: decomposition summary mirrors.
+    cfg_plugin_rel = "configs/example_decomposition_plugin_two_fragment.yaml"
+    cfg_plugin_path = _ROOT / cfg_plugin_rel
+    out_plugin = run_pipeline_sync(load_experiment_config(cfg_plugin_path), cfg_path=cfg_plugin_path)
+    tmp_plugin = _ROOT / "tests" / "fixtures" / "_tmp_plugin_export_merge.json"
+    try:
+        tmp_plugin.write_text(json.dumps(out_plugin, indent=2) + "\n", encoding="utf-8")
+        exp_plugin = _export_json(cfg_plugin_rel, results=tmp_plugin)
+    finally:
+        tmp_plugin.unlink(missing_ok=True)
+    assert exp_plugin.get("decomposition_fragment_count_mirror_run_summary") == 2
+    assert exp_plugin.get("decomposition_total_pauli_terms_mirror_run_summary") == 9
+
+    # ZNE path: mitigation mirrors include yaml and protocol zne_mode.
+    cfg_zne_rel = "configs/example_h2_zne_circuit_fold.yaml"
+    cfg_zne_path = _ROOT / cfg_zne_rel
+    out_zne = run_pipeline_sync(load_experiment_config(cfg_zne_path), cfg_path=cfg_zne_path)
+    tmp_zne = _ROOT / "tests" / "fixtures" / "_tmp_zne_export_merge.json"
+    try:
+        tmp_zne.write_text(json.dumps(out_zne, indent=2) + "\n", encoding="utf-8")
+        exp_zne = _export_json(cfg_zne_rel, results=tmp_zne)
+    finally:
+        tmp_zne.unlink(missing_ok=True)
+    assert exp_zne.get("mitigation_zne_mode_yaml_mirror_run_summary") == "circuit_scale_fold"
+    assert isinstance(exp_zne.get("mitigation_zne_scales_yaml_mirror_run_summary"), list)
+    assert exp_zne.get("protocol_zne_mode_mirror_run_summary") in ("circuit_scale_fold", "scalar_stub")

@@ -3,11 +3,12 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-pyscf = pytest.importorskip("pyscf")
-
-from qchem_stack.config import load_experiment_config
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
+from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+from qchem_stack.config import load_experiment_config
+
+pyscf = pytest.importorskip("pyscf")
 
 
 def test_pbc_h2_cell_rhf_to_qubit_h(tmp_path) -> None:
@@ -44,9 +45,14 @@ chemistry_extended:
     r = drv.run_pbc_rhf()
     assert r.driver_meta.get("pbc") is True
     assert r.e_tot < 0.0
-    qh = molecular_hamiltonian_from_pyscf(
-        r, n_active_orbitals=2, n_active_electrons=2
+    ref = ClassicalMeanFieldReference(
+        mf=r.mf,
+        e_tot=float(r.e_tot),
+        mo_energy=r.mo_energy,
+        molecular_system=r.molecular_system,
+        driver_meta=dict(r.driver_meta),
     )
+    qh = molecular_hamiltonian_from_classical_reference(ref, n_active_orbitals=2, n_active_electrons=2)
     assert qh.n_qubits == 4
     assert "pyscf_driver" in qh.meta
     mol = r.mf.mol

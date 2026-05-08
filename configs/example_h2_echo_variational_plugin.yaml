@@ -1,0 +1,34 @@
+schema_version: "1"
+experiment_id: "h2_echo_variational_plugin_001"
+random_seed: 0
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  basis: sto-3g
+
+scf:
+  driver: pyscf
+  method: RHF
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: statevector_sim
+  provider: statevector
+
+embedding:
+  mode: none
+
+quantum:
+  # Label for repro / parity (runner comes from algorithm_factory).
+  algorithm: echo_reference_plugin
+  algorithm_factory: qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory
+  vqe_depth: 1
+  vqe_maxiter: 10
+  use_pauli_protocol: false

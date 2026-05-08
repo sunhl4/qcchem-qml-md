@@ -16,8 +16,8 @@ from qchem_stack.config import (
 from qchem_stack.jobs.nexus_analog import (
     default_nexus_analog_for_job_result,
     nexus_analog_billing_for_job_result,
-    nexus_analog_ledger_from_spec,
     nexus_analog_ledger_from_rows,
+    nexus_analog_ledger_from_spec,
 )
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.tensornet import run_cutensornet_expectation_stub
@@ -135,8 +135,8 @@ def test_qermit_runtime_trace() -> None:
 
 
 def test_nexus_cloud_mock_sidecar() -> None:
-    from qchem_stack.jobs.nexus_cloud import nexus_cloud_repro_sidecar
     from qchem_stack.config import NexusCloudSpec
+    from qchem_stack.jobs.nexus_cloud import nexus_cloud_repro_sidecar
 
     c = _cfg()
     c = c.model_copy(update={"nexus_cloud": NexusCloudSpec(mode="mock")})

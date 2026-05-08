@@ -61,7 +61,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -126,7 +126,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -191,7 +191,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -256,7 +256,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -320,7 +320,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -388,7 +388,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -452,7 +452,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -527,7 +527,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -602,7 +602,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -677,7 +677,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -750,7 +750,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -824,7 +824,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -887,7 +887,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -936,7 +936,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
 - **已绑定模块（manifest `qchem`）**:
-  - `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf`
+  - `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`
 - **工程动作**: 在 Python 包内定位该符号；更新 parity 矩阵行；为 `/reference/` 或 `/guide/` 写 Methods 段落时引用此路径。
 
 - **status（manifest）**: `shipped`
@@ -951,7 +951,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1026,7 +1026,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1089,7 +1089,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1153,7 +1153,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1229,7 +1229,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1303,7 +1303,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1368,7 +1368,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1433,7 +1433,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1498,7 +1498,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1564,7 +1564,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1642,7 +1642,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1711,7 +1711,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1780,7 +1780,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1849,7 +1849,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1917,7 +1917,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -1986,7 +1986,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2055,7 +2055,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2131,7 +2131,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2199,7 +2199,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2268,7 +2268,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2336,7 +2336,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2404,7 +2404,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2471,7 +2471,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2545,7 +2545,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2610,7 +2610,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2675,7 +2675,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2739,7 +2739,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2813,7 +2813,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2877,7 +2877,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -2941,7 +2941,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3005,7 +3005,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3070,7 +3070,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3136,7 +3136,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3202,7 +3202,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3268,7 +3268,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3336,7 +3336,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3401,7 +3401,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3470,7 +3470,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3543,7 +3543,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3614,7 +3614,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3683,7 +3683,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3753,7 +3753,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3822,7 +3822,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3890,7 +3890,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -3955,7 +3955,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4019,7 +4019,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4083,7 +4083,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4148,7 +4148,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4213,7 +4213,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4279,7 +4279,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4345,7 +4345,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4410,7 +4410,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4475,7 +4475,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4539,7 +4539,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4608,7 +4608,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4680,7 +4680,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 - **P4**: `GET/POST /v1/runs`、`repro` 须有 **API 表或控制台等价说明**。
@@ -4751,7 +4751,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4819,7 +4819,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4888,7 +4888,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -4954,7 +4954,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5029,7 +5029,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5105,7 +5105,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5182,7 +5182,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5258,7 +5258,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5335,7 +5335,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5412,7 +5412,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5489,7 +5489,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5566,7 +5566,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5643,7 +5643,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5720,7 +5720,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5796,7 +5796,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5872,7 +5872,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -5948,7 +5948,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6024,7 +6024,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6100,7 +6100,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6176,7 +6176,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6253,7 +6253,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6328,7 +6328,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6404,7 +6404,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6480,7 +6480,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6556,7 +6556,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6632,7 +6632,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6708,7 +6708,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6784,7 +6784,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6860,7 +6860,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -6936,7 +6936,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7012,7 +7012,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7088,7 +7088,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7164,7 +7164,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7240,7 +7240,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7316,7 +7316,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7392,7 +7392,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7468,7 +7468,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7544,7 +7544,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7620,7 +7620,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7696,7 +7696,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7772,7 +7772,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7848,7 +7848,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -7924,7 +7924,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8000,7 +8000,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8076,7 +8076,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8152,7 +8152,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8228,7 +8228,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8304,7 +8304,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8381,7 +8381,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8458,7 +8458,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8533,7 +8533,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8609,7 +8609,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8685,7 +8685,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8761,7 +8761,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8837,7 +8837,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8913,7 +8913,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -8989,7 +8989,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9065,7 +9065,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9141,7 +9141,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9217,7 +9217,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9293,7 +9293,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9369,7 +9369,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9445,7 +9445,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9521,7 +9521,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9597,7 +9597,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9673,7 +9673,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9749,7 +9749,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9825,7 +9825,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9901,7 +9901,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -9977,7 +9977,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10053,7 +10053,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10129,7 +10129,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10205,7 +10205,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10281,7 +10281,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10357,7 +10357,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10433,7 +10433,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10509,7 +10509,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10585,7 +10585,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10661,7 +10661,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10737,7 +10737,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10813,7 +10813,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10889,7 +10889,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -10965,7 +10965,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11041,7 +11041,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11117,7 +11117,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11193,7 +11193,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11269,7 +11269,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11345,7 +11345,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11421,7 +11421,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11497,7 +11497,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11573,7 +11573,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11649,7 +11649,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11725,7 +11725,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11801,7 +11801,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11877,7 +11877,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -11954,7 +11954,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12029,7 +12029,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12105,7 +12105,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12181,7 +12181,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12257,7 +12257,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12333,7 +12333,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12409,7 +12409,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12485,7 +12485,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12561,7 +12561,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12637,7 +12637,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12713,7 +12713,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12789,7 +12789,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12865,7 +12865,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -12941,7 +12941,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13017,7 +13017,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13093,7 +13093,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13169,7 +13169,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13245,7 +13245,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13321,7 +13321,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13397,7 +13397,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13473,7 +13473,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13549,7 +13549,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13625,7 +13625,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13701,7 +13701,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13777,7 +13777,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13853,7 +13853,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13921,7 +13921,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -13990,7 +13990,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14059,7 +14059,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14128,7 +14128,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14197,7 +14197,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14273,7 +14273,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14338,7 +14338,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14404,7 +14404,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14480,7 +14480,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14546,7 +14546,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14613,7 +14613,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14680,7 +14680,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14756,7 +14756,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14824,7 +14824,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14893,7 +14893,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -14962,7 +14962,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15031,7 +15031,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15100,7 +15100,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15176,7 +15176,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15251,7 +15251,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15327,7 +15327,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15404,7 +15404,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15468,7 +15468,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15544,7 +15544,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15620,7 +15620,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15696,7 +15696,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15772,7 +15772,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15848,7 +15848,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -15924,7 +15924,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16000,7 +16000,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16076,7 +16076,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16152,7 +16152,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16228,7 +16228,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16304,7 +16304,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16380,7 +16380,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16456,7 +16456,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16532,7 +16532,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16608,7 +16608,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16684,7 +16684,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16760,7 +16760,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16836,7 +16836,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16912,7 +16912,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -16988,7 +16988,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17065,7 +17065,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17140,7 +17140,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17216,7 +17216,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17292,7 +17292,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17369,7 +17369,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17446,7 +17446,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17522,7 +17522,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17598,7 +17598,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17674,7 +17674,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17751,7 +17751,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17826,7 +17826,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17902,7 +17902,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -17978,7 +17978,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18054,7 +18054,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18130,7 +18130,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18206,7 +18206,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18282,7 +18282,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18358,7 +18358,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18434,7 +18434,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18510,7 +18510,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18586,7 +18586,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18662,7 +18662,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18738,7 +18738,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18814,7 +18814,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18890,7 +18890,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -18966,7 +18966,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19042,7 +19042,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19118,7 +19118,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19194,7 +19194,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19270,7 +19270,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19346,7 +19346,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19422,7 +19422,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19498,7 +19498,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19574,7 +19574,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19650,7 +19650,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19726,7 +19726,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19802,7 +19802,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19878,7 +19878,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -19954,7 +19954,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20030,7 +20030,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20106,7 +20106,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20182,7 +20182,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20258,7 +20258,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20334,7 +20334,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20410,7 +20410,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20486,7 +20486,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20562,7 +20562,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20638,7 +20638,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20714,7 +20714,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20791,7 +20791,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20857,7 +20857,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -20936,7 +20936,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 - **P4**: `GET/POST /v1/runs`、`repro` 须有 **API 表或控制台等价说明**。
@@ -21012,7 +21012,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21088,7 +21088,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21152,7 +21152,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21222,7 +21222,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21292,7 +21292,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21365,7 +21365,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21434,7 +21434,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21504,7 +21504,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21574,7 +21574,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 
@@ -21644,7 +21644,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。
 - **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。
 - **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。
-- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。
+- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。
 - **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。
 - **CI**: 外链存活巡检；教程命令可选 smoke。
 

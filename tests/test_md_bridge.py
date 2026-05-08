@@ -27,7 +27,7 @@ from qchem_stack.md_bridge.hooks import write_mace_yaml_stub, write_nequip_yaml_
 
 
 def test_qmframe_fields_cover_p2_repro_freeze_doc() -> None:
-    """P2-W6: ``docs/md_bridge_repro_freeze_list.md`` must stay aligned with ``QMFrame``."""
+    """P2-W6: ``docs/工程记忆_Quantinuum对标与数据流技术文档.md`` §16 must stay aligned with ``QMFrame``."""
     names = frozenset(QMFrame.model_fields)
     missing = sorted(_FREEZE_QMFRAME_FIELDS - names)
     assert not missing, f"QMFrame missing documented fields: {missing}"
@@ -55,3 +55,28 @@ def test_md_export_roundtrip(tmp_path) -> None:
     assert art.metrics["rmse_energy_mHa"] == 0.0
     tr.export_openmm(tmp_path / "omm.txt")
     tr.export_lammps(tmp_path / "lmp.txt")
+
+
+def test_qmef_frame_can_carry_pipeline_repro_config_sha256_prefix() -> None:
+    """P2-W6: ``QMFrame.repro_config_sha256_prefix`` aligns with ``repro.config_sha256_prefix`` policy."""
+    from pathlib import Path
+
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.orchestration.pipeline import collect_repro_metadata
+
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2.yaml"
+    if not p.is_file():
+        pytest.skip("example_h2.yaml missing")
+    cfg = load_experiment_config(p)
+    repro = collect_repro_metadata(cfg, cfg_path=p)
+    prefix = repro.get("config_sha256_prefix")
+    assert isinstance(prefix, str) and len(prefix) == 16
+    fr = QMFrame(
+        atomic_numbers=[1, 1],
+        positions_bohr=[[0, 0, 0], [0, 0, 1.4]],
+        energy_hartree=-1.0,
+        forces_hartree_bohr=[],
+        repro_config_sha256_prefix=prefix,
+    )
+    assert fr.repro_config_sha256_prefix == prefix

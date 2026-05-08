@@ -1,7 +1,7 @@
 """L1 phase B (序 1–6): Protocols, resource semantics, Qermit analog, tensornet stub.
 
 Complements ``test_protocols_jobs.py`` and ``test_tier2_inquanto_frontier.py`` with
-contract-level checks tied to ``docs/InQuanto_B_J_逐项闭合计划.md``.
+contract-level checks tied to ``docs/与InQuanto能力差距与实施计划.md`` appendix D.
 """
 
 from __future__ import annotations
@@ -17,18 +17,18 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
+from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
+from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
 from qchem_stack.protocols.inquanto_contract import (
+    PARITY_SNAPSHOT_DOCUMENTED_KEYS,
     PAULI_PATH_DISABLED,
     PAULI_PATH_EXACT,
     PAULI_PATH_QISKIT_COUNTS,
     PAULI_PATH_STATEVECTOR_SHOT_SIM,
-    PARITY_SNAPSHOT_DOCUMENTED_KEYS,
     classify_pauli_expectation_path,
     mitigation_execution_model_public,
 )
 from qchem_stack.protocols.protocol import PauliAveragingProtocol, ProtocolPhase
-from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
-from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
 from qchem_stack.tensornet import run_cutensornet_expectation_stub
 
 

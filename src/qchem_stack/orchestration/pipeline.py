@@ -4,15 +4,19 @@ import hashlib
 import json
 import logging
 import sys
+from collections.abc import Callable
 from pathlib import Path
-from typing import Any, Callable
-
-_pipeline_log = logging.getLogger(__name__)
+from typing import Any
 
 import numpy as np
 
 from qchem_stack.backends.factory import executor_from_spec
 from qchem_stack.backends.spec import summarize_circuit_shot_rows
+from qchem_stack.chem.active_space.mean_field_meta import (
+    apply_active_space_strategy_to_mean_field_meta,
+)
+from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver, PySCFRHFResult
 from qchem_stack.chem.embedding.dmet import (
     DMETContext,
@@ -20,12 +24,13 @@ from qchem_stack.chem.embedding.dmet import (
     QubitHamiltonianFragmentSolverVQE,
     VQEFragmentSolverStub,
 )
+from qchem_stack.chem.energy_components import build_energy_components_v1
 from qchem_stack.chem.hamiltonian import (
     QubitHamiltonian,
-    molecular_hamiltonian_from_pyscf,
+    molecular_hamiltonian_from_canonical_active_space_pack,
     qubit_hamiltonian_from_spatial_chemist_integrals,
 )
-from qchem_stack.integrations.dmet_self_consistent import OneShotEmbeddingDriver
+from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.config import (
     ExperimentConfig,
     backend_spec_from_config,
@@ -35,21 +40,22 @@ from qchem_stack.config import (
     load_experiment_config,
 )
 from qchem_stack.exceptions import PipelineError
-from qchem_stack.jobs.store import SqliteJobStore
-from qchem_stack.orchestration.run_context import PipelineStageTimer, RunContext
-from qchem_stack.mitigation.pmsv import PMSVConfig
+from qchem_stack.integrations.dmet_self_consistent import OneShotEmbeddingDriver
+from qchem_stack.jobs.nexus_analog import nexus_analog_ledger_from_rows
 from qchem_stack.jobs.nexus_cloud import nexus_cloud_repro_sidecar
+from qchem_stack.jobs.store import SqliteJobStore
+from qchem_stack.mitigation.pmsv import PMSVConfig
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
-from qchem_stack.jobs.nexus_analog import nexus_analog_ledger_from_rows
+from qchem_stack.orchestration.run_context import PipelineStageTimer, RunContext
 from qchem_stack.protocols.inquanto_contract import classify_pauli_expectation_path
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
-from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
 from qchem_stack.quantum.algorithms.excited import QSE, VQD
-from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
-from qchem_stack.quantum.algorithms.sceom import run_sceom_nested_commutator_from_hea
-from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDTrotterVQE, UCCSDVQE
 from qchem_stack.quantum.algorithms.vqe import VQE
+from qchem_stack.quantum.variational_plugins.registry import run_variational_stage
+from qchem_stack.quantum.variational_plugins.spec import VariationalRunContext
+
+_pipeline_log = logging.getLogger(__name__)
 
 
 def _package_versions() -> dict[str, str]:
@@ -75,10 +81,26 @@ def _package_versions() -> dict[str, str]:
     return out
 
 
+def _classical_software_versions() -> dict[str, str]:
+    out: dict[str, str] = {}
+    for name in ("pyscf", "psi4"):
+        try:
+            mod = __import__(name)
+            out[name] = str(getattr(mod, "__version__", "?"))
+        except Exception:  # noqa: BLE001
+            out[name] = "not_imported"
+    return out
+
+
 def _repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -> dict[str, Any]:
     """Falsifiability / parity fields aligned with competitor Methods tables (public docs only)."""
     snap: dict[str, Any] = {
         "quantum_algorithm": cfg.quantum.algorithm,
+        **(
+            {"quantum_algorithm_factory": cfg.quantum.algorithm_factory}
+            if cfg.quantum.algorithm_factory
+            else {}
+        ),
         "use_pauli_protocol": cfg.quantum.use_pauli_protocol,
         "vqe_depth": cfg.quantum.vqe_depth,
         "vqe_maxiter": cfg.quantum.vqe_maxiter,
@@ -101,6 +123,9 @@ def _repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) 
         "backend_provider": cfg.backend.provider,
         "pmsv_enabled": cfg.mitigation.pmsv_enabled,
         "zne_enabled": cfg.mitigation.zne_enabled,
+        "spam_calibration_enabled": cfg.mitigation.spam_calibration_enabled,
+        "classical_shadows_stub_enabled": cfg.mitigation.classical_shadows_stub_enabled,
+        "classical_shadows_budget_pairs": int(cfg.mitigation.classical_shadows_budget_pairs),
         "mitigation_execution_class": cfg.mitigation.execution_class,
         "mitigation_zne_scales": [float(x) for x in cfg.mitigation.zne_scales],
         **({"mitigation_zne_mode": cfg.mitigation.zne_mode} if cfg.mitigation.zne_enabled else {}),
@@ -110,6 +135,8 @@ def _repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) 
         "compiler_passes_yaml": list(cfg.compiler.compiler_passes),
         "compiler_bundle_signature": compiler_bundle_signature_from_config(cfg),
         "pauli_support_max_terms": cfg.quantum.pauli_support_max_terms,
+        "vqd_overlap_exponent_yaml": float(cfg.quantum.vqd_overlap_exponent),
+        "vqd_cobyla_maxiter_yaml": int(cfg.quantum.vqd_cobyla_maxiter),
         "vqd_after_variational": cfg.quantum.vqd_after_variational,
         "vqd_n_states": cfg.quantum.vqd_n_states,
         "vqd_penalty_weight": cfg.quantum.vqd_penalty_weight,
@@ -125,6 +152,19 @@ def _repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) 
         "sceom_after_variational": cfg.quantum.sceom_after_variational,
         "sceom_subspace_dim": cfg.quantum.sceom_subspace_dim,
         "sceom_shots_per_matrix_element": cfg.quantum.sceom_shots_per_matrix_element,
+        "sceom_generator_strategy_yaml": cfg.quantum.sceom_generator_strategy,
+        "vqs_track_after_variational": cfg.quantum.vqs_track_after_variational,
+        "vqs_pipeline_integration": cfg.quantum.vqs_pipeline_integration,
+        "vqs_mode": cfg.quantum.vqs_mode,
+        "vqs_n_times": cfg.quantum.vqs_n_times,
+        "vqs_dt": float(cfg.quantum.vqs_dt),
+        "vqs_rhs_mode_yaml": cfg.quantum.vqs_rhs_mode,
+        "vqs_tangent_fd_epsilon_yaml": float(cfg.quantum.vqs_tangent_fd_epsilon),
+        "qpe_demo_track_after_variational_yaml": cfg.quantum.qpe_demo_track_after_variational,
+        "qpe_pipeline_integration_yaml": cfg.quantum.qpe_pipeline_integration,
+        "qpe_demo_track_n_bits_yaml": int(cfg.quantum.qpe_demo_track_n_bits),
+        "qpe_three_pack_after_variational_yaml": cfg.quantum.qpe_three_pack_after_variational,
+        "qpe_three_pack_time_yaml": float(cfg.quantum.qpe_three_pack_time),
     }
     if qh is not None and qh.meta:
         snap["hamiltonian_meta"] = dict(qh.meta)
@@ -441,17 +481,26 @@ def collect_repro_metadata(
     qh: QubitHamiltonian | None = None,
 ) -> dict[str, Any]:
     """Hashes and versions for job / publication reproducibility."""
-    from qchem_stack.integrations.inquanto_workflow_preview import workflow_preview_payload
+    from qchem_stack.integrations.inquanto_workflow_preview import (
+        workflow_preview_payload,
+        workflow_preview_qpe_track_slice_v1,
+        workflow_preview_variational_execution_slice_v1,
+        workflow_preview_vqs_track_slice_v1,
+    )
 
     raw_yaml = dump_experiment_config(cfg)
     h = hashlib.sha256(raw_yaml.encode("utf-8")).hexdigest()[:16]
-    return {
+    classical_versions = _classical_software_versions()
+    repro: dict[str, Any] = {
         "experiment_id": cfg.experiment_id,
         "random_seed": cfg.random_seed,
         "config_sha256_prefix": h,
         "config_path": str(cfg_path) if cfg_path else None,
         "python": sys.version.split()[0],
         "packages": _package_versions(),
+        "classical_software_versions": classical_versions,
+        # Backward-compatibility alias; kept while downstream tables migrate.
+        "pyscf_version": classical_versions.get("pyscf", "not_imported"),
         "embedding_config": cfg.embedding.model_dump(mode="json"),
         "chemistry_extended_config": cfg.chemistry_extended.model_dump(mode="json"),
         "nexus_analog_config": cfg.nexus_analog.model_dump(mode="json"),
@@ -463,52 +512,182 @@ def collect_repro_metadata(
             include_computables_rich=cfg.parity_integrations.include_computables_rich_in_repro,
         ),
     }
+    ve_slice = workflow_preview_variational_execution_slice_v1(cfg)
+    if ve_slice is not None:
+        repro["workflow_preview_variational_execution_v1"] = ve_slice
+    vqs_slice = workflow_preview_vqs_track_slice_v1(cfg)
+    if vqs_slice is not None:
+        repro["workflow_preview_vqs_track_v1"] = vqs_slice
+    qpe_slice = workflow_preview_qpe_track_slice_v1(cfg)
+    if qpe_slice is not None:
+        repro["workflow_preview_qpe_track_v1"] = qpe_slice
+    return repro
 
 
-def _run_scf(cfg: ExperimentConfig) -> PySCFRHFResult:
+def _run_scf(cfg: ExperimentConfig) -> ClassicalMeanFieldReference:
+    from qchem_stack.chem.bridges import (
+        classical_mean_field_via_solver_bridge,
+        molecular_system_from_experiment,
+    )
+
+    if cfg.active_space.strategy == "manual":
+        frz = list(cfg.active_space.frozen_orbitals)
+        recipe = (
+            "manual:"
+            f"n_active_orbitals={cfg.active_space.n_active_orbitals},"
+            f"n_active_electrons={cfg.active_space.n_active_electrons},"
+            f"frozen_orbitals={frz}"
+        )
+    elif cfg.active_space.strategy == "avas_stub":
+        recipe = (
+            "avas_stub:"
+            f"ncas={cfg.active_space.ncas},nelecas={cfg.active_space.nelecas}:partial_open_stack_no_avas_projection"
+        )
+    elif cfg.active_space.strategy == "avas":
+        recipe = (
+            "avas:"
+            f"ao_labels={cfg.chemistry_extended.avas_ao_labels}:"
+            f"threshold={cfg.chemistry_extended.avas_threshold}:pyscf_mcscf_avas"
+        )
+    else:
+        recipe = f"cas:ncas={cfg.active_space.ncas},nelecas={cfg.active_space.nelecas}"
+    mf_pack = classical_mean_field_via_solver_bridge(cfg)
+    rhf = ClassicalMeanFieldReference.from_mean_field_pack(
+        mf_pack,
+        molecular_system=molecular_system_from_experiment(cfg),
+    )
+    apply_active_space_strategy_to_mean_field_meta(
+        rhf.driver_meta,
+        strategy=cfg.active_space.strategy,
+        recipe=recipe,
+        avas_ao_labels=cfg.chemistry_extended.avas_ao_labels,
+    )
+    if cfg.active_space.frozen_orbitals:
+        rhf.driver_meta["active_space_frozen_orbitals"] = list(cfg.active_space.frozen_orbitals)
+    return rhf
+
+
+def _require_pyscf_reference(
+    rhf: ClassicalMeanFieldReference,
+    *,
+    context: str,
+) -> Any:
+    """Return a PySCF mean-field object **only** for stages that are still PySCF-plugin-specific.
+
+    Orchestration is **backend-agnostic** once data live in :class:`ClassicalMeanFieldReference`;
+    this helper marks the narrow band where we still need raw PySCF ``mf`` (AO export, Schmidt
+    production, some embedding bridges). Prefer :func:`_solver_capabilities` + capability gates
+    for anything that another ``ChemIntegralSolver`` could plausibly implement.
+    """
+    tag = rhf.backend_tag()
+    if tag != "pyscf":
+        raise PipelineError(
+            f"{context} currently requires PySCF-style mean-field handle (got backend={tag!r}). "
+            "Use embedding.mode=plugin for backend-agnostic Hamiltonian ingestion, "
+            "or implement the corresponding backend-specific bridge."
+        )
+    return rhf.as_pyscf_rhf_result()
+
+
+def _solver_capabilities(cfg: ExperimentConfig) -> Any:
+    return create_solver(cfg).capabilities
+
+
+def _refine_mean_field_for_active_space(
+    cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference
+) -> ExperimentConfig:
+    """AVAS projection (optional) + shared CASSCF kernel (audit/orbital feed)."""
+    from qchem_stack.chem.active_space.mo_coeff_transform_hooks import apply_mo_coeff_transform_hook
+    from qchem_stack.chem.active_space.pyscf_active_space_hooks import (
+        apply_pyscf_avas_to_reference,
+        casscf_energy_and_maybe_orbitals,
+        patch_experiment_active_space_resolution,
+    )
+
+    caps = _solver_capabilities(cfg)
+    if cfg.active_space.strategy == "avas":
+        if not caps.supports_avas_active_space_projection:
+            raise PipelineError(
+                "active_space.strategy='avas' requires AVAS capability on the selected backend "
+                f"(backend={caps.backend_id!r})."
+            )
+        # PySCF plugin boundary: AVAS projection requires backend-native orbital projection hooks.
+        apply_pyscf_avas_to_reference(cfg, rhf)
+        cfg = patch_experiment_active_space_resolution(cfg, rhf)
+
+    audit = bool(cfg.chemistry_extended.casscf_orbital_optimization_audit)
+    feed = bool(cfg.chemistry_extended.casscf_orbital_optimization_for_integrals)
+    if audit or feed:
+        if not caps.supports_casscf_orbital_audit:
+            raise PipelineError(
+                "casscf_orbital_* flags require PySCF-style CASSCF support on the selected backend "
+                f"(backend={caps.backend_id!r})."
+            )
+        if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
+            raise PipelineError("CASSCF orbital hooks are unsupported on the PBC branch.")
+        if cfg.scf.method != "RHF":
+            raise PipelineError("casscf_orbital_* hooks require scf.method=RHF.")
+        casscf_energy_and_maybe_orbitals(
+            cfg,
+            rhf,
+            update_integrals_orbitals=feed,
+            record_audit=audit,
+        )
+
+    apply_mo_coeff_transform_hook(cfg, rhf)
+
+    return cfg
+
+
+def _embedding_input_system_payload(cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference) -> dict[str, Any] | None:
+    rep = cfg.embedding.embedding_input_representation
+    if rep == "mo":
+        return None
+    caps = _solver_capabilities(cfg)
+    if not caps.supports_embedding_input_ao_lowdin:
+        raise PipelineError(
+            "embedding_input_representation=ao/lowdin_orth_ao requires backend capability "
+            f"'supports_embedding_input_ao_lowdin'; backend {caps.backend_id!r} lacks this capability."
+        )
+    if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
+        raise PipelineError("embedding_input_representation=ao/lowdin_orth_ao is currently molecular-only (non-PBC).")
     drv = PySCFDriver.from_config(cfg)
-    if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
-        return drv.run_pbc_rhf()
-    if cfg.scf.method == "RHF":
-        return drv.run_rhf()
-    if cfg.scf.method == "ROHF":
-        return drv.run_rohf()
-    return drv.run_uhf()
-
-
-def _maybe_attach_casscf_orbital_audit(cfg: ExperimentConfig, rhf: PySCFRHFResult) -> None:
-    if not cfg.chemistry_extended.casscf_orbital_optimization_audit:
-        return
-    if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
-        raise PipelineError("chemistry_extended.casscf_orbital_optimization_audit is not supported on the PBC branch.")
-    if cfg.scf.method != "RHF":
-        raise PipelineError("casscf_orbital_optimization_audit requires scf.method=RHF.")
-    try:
-        from pyscf import mcscf
-    except ImportError as e:  # pragma: no cover
-        raise PipelineError("casscf_orbital_optimization_audit requires PySCF with mcscf.") from e
-    mf = rhf.mf
-    ncas = int(cfg.active_space.n_active_orbitals)
-    nelec = int(cfg.active_space.n_active_electrons)
-    mc = mcscf.CASSCF(mf, ncas, nelec)
-    ret = mc.kernel()
-    e_casscf = float(ret[0] if isinstance(ret, tuple) else ret)
-    rhf.driver_meta["casscf_orbital_audit_v1"] = {
-        "schema": "casscf_orbital_audit_v1",
-        "active_spatial_orbitals": ncas,
-        "active_electrons": nelec,
-        "casscf_energy_au": e_casscf,
-        "note": (
-            "Minimal CASSCF orbital optimization on the RHF reference; quantum layer still uses "
-            "the standard CASCI-type active-space integral build unless wired to these orbitals."
-        ),
+    # TODO(capability): remove raw PySCF handle dependency once AO/Lowdin payload adapter is backend-neutral.
+    rhf_pyscf = _require_pyscf_reference(rhf, context="embedding_input_representation=ao/lowdin_orth_ao")
+    if rep == "ao":
+        ao_sys = drv.get_system_ao(rhf_pyscf, run_hf=True)
+        return {
+            "schema": "embedding_input_system_v1",
+            "representation": "ao",
+            "has_run_hf": bool(ao_sys.has_run_hf),
+            "e_tot": ao_sys.e_tot,
+            "driver_meta": dict(ao_sys.driver_meta),
+            "epistemic_bound": "AO wrapper keeps SCF object for fragment builders; no full InQuanto AO driver parity claim.",
+        }
+    low = drv.get_lowdin_system(rhf_pyscf)
+    return {
+        "schema": "embedding_input_system_v1",
+        "representation": "lowdin_orth_ao",
+        "n_spatial_orbitals": int(low.h1_spatial.shape[0]),
+        "rdm1_trace": float(np.trace(low.rdm1_spatial)),
+        "constant": float(low.constant),
+        "driver_meta": dict(low.driver_meta),
+        "epistemic_bound": "Löwdin AO tensors are provided for open embedding workflows (not a closed-source embedding product clone).",
     }
 
 
 def _schmidt_hamiltonian_and_context(
-    cfg: ExperimentConfig, rhf: PySCFRHFResult
+    cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference
 ) -> tuple[QubitHamiltonian, dict[str, Any]]:
     """Build primary Schmidt impurity ``QubitHamiltonian`` and a small context for per-fragment VQE."""
+    caps = _solver_capabilities(cfg)
+    if not caps.supports_schmidt_atomic_hamiltonian:
+        raise PipelineError(
+            "embedding.dmet_hamiltonian_source='schmidt_atomic_production' requires backend support "
+            f"(backend={caps.backend_id!r})."
+        )
+    # TODO(capability): replace this PySCF-handle assertion with backend-neutral Schmidt adapter contracts.
+    _require_pyscf_reference(rhf, context="schmidt_atomic_production")
     if cfg.scf.method != "RHF":
         raise PipelineError(
             "embedding.dmet_hamiltonian_source='schmidt_atomic_production' requires scf.method='RHF' "
@@ -631,7 +810,7 @@ def _schmidt_hamiltonian_and_context(
 
 def _run_schmidt_per_fragment_vqe(
     cfg: ExperimentConfig,
-    rhf: PySCFRHFResult,
+    rhf: ClassicalMeanFieldReference,
     schmidt_ctx: dict[str, Any],
     exe: Any,
 ) -> dict[str, Any] | None:
@@ -652,6 +831,8 @@ def _run_schmidt_per_fragment_vqe(
     if mx is None:
         mx = cfg.quantum.vqe_maxiter
     rows: list[dict[str, Any]] = []
+    # TODO(capability): support non-PySCF mean-field handles for per-fragment Schmidt VQE.
+    _require_pyscf_reference(rhf, context="schmidt_run_vqe_on_all_fragments")
     for i, atoms in enumerate(groups):
         model = build_schmidt_impurity_integrals(
             rhf,
@@ -693,14 +874,17 @@ def _run_schmidt_per_fragment_vqe(
 
 def _hamiltonian_with_schmidt_context(
     cfg: ExperimentConfig,
-    rhf: PySCFRHFResult,
+    rhf: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
 ) -> tuple[QubitHamiltonian, dict[str, Any] | None]:
     if cfg.embedding.mode == "plugin":
-        from qchem_stack.chem.embedding.decomposition_plugin import qubit_hamiltonian_from_decomposition_plugin
+        from qchem_stack.chem.embedding.decomposition_plugin import (
+            qubit_hamiltonian_from_decomposition_plugin,
+        )
 
         return qubit_hamiltonian_from_decomposition_plugin(cfg, cfg_path=cfg_path), None
+    sol = create_solver(cfg)
     if cfg.embedding.dmet_hamiltonian_source == "schmidt_atomic_production":
         qh, ctx = _schmidt_hamiltonian_and_context(cfg, rhf)
         return qh, ctx
@@ -708,23 +892,73 @@ def _hamiltonian_with_schmidt_context(
         cfg.embedding.mode == "projection"
         and cfg.embedding.projection_quantum_hamiltonian == "fragment_mulliken_mo"
     ):
+        if not sol.capabilities.supports_projection_fragment_mulliken_hamiltonian:
+            raise PipelineError(
+                "projection.fragment_mulliken_mo requires backend support "
+                f"(backend={sol.capabilities.backend_id!r})."
+            )
         from qchem_stack.chem.embedding.projection_hamiltonian import (
             molecular_hamiltonian_fragment_mulliken_projection,
         )
 
         qh, _audit = molecular_hamiltonian_fragment_mulliken_projection(rhf, cfg)
         return qh, None
-    return molecular_hamiltonian_from_pyscf(
+    if not sol.capabilities.supports_restricted_active_space_qubit_hamiltonian:
+        raise PipelineError(
+            "This pipeline stage builds a qubit Hamiltonian from restricted active-space MO integrals; "
+            f"the selected backend {sol.capabilities.backend_id!r} does not provide "
+            "a canonical active-space integral pack yet."
+        )
+    pack = CanonicalActiveSpaceIntegralPack.from_classical_reference(
         rhf,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
+    )
+    return molecular_hamiltonian_from_canonical_active_space_pack(
+        pack,
+        n_active_orbitals=cfg.active_space.n_active_orbitals,
+        n_active_electrons=cfg.active_space.n_active_electrons,
         fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+        prefer_restricted_spatial_fermion_for_jordan_wigner=cfg.active_space.prefer_restricted_spatial_fermion_for_jordan_wigner,
+        jordan_wigner_coeff_atol=cfg.active_space.jordan_wigner_coeff_atol,
+        classical_reference_for_meta=rhf,
     ), None
 
 
-def _hamiltonian(cfg: ExperimentConfig, rhf: PySCFRHFResult) -> QubitHamiltonian:
+def _hamiltonian(cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference) -> QubitHamiltonian:
     qh, _ = _hamiltonian_with_schmidt_context(cfg, rhf)
     return qh
+
+
+def _excited_protocol_contract_v1_block() -> dict[str, Any]:
+    """Stable documentation slice for parity / Methods (shot semantics mirror YAML + implementation)."""
+
+    return {
+        "schema": "excited_protocol_contract_v1",
+        "vqd_three_protocol": (
+            "`objective`: deflation energy channel (exact statevector expectation or grouped Pauli when "
+            "`vqd_shots_objective`>0). `overlap`: swap-test overlaps between solved levels when "
+            "`vqd_shots_overlap`>0. `weight`: reserved coupling to overlap shot budget."
+        ),
+        "qse_shot_modes": {
+            "exact": (
+                "Dense Hamiltonian projected into QSE basis built from HEA single-reference determinants/"
+                "excitations."
+            ),
+            "gaussian_h": (
+                "`qse_shots_per_matrix_element` injects symmetric Gaussian noise on real parts of dense "
+                "matrix elements — placeholder shot model vs device POVM."
+            ),
+            "pauli_transitions": (
+                "Per-(i,j) transition channel built from Pauli transition strings; budgets via "
+                "`qse_shots_per_ij_term` × schedule task count (`qse_total_shots_upper_bound`)."
+            ),
+        },
+        "sceom_shot_semantics": (
+            "When `sceom_shots_per_matrix_element`>0, apply symmetric Gaussian noise to real diagonal/"
+            "off-diagonal entries of the nested-commutator matrix before GHEP (open-stack SCEOM prototype)."
+        ),
+    }
 
 
 def build_excited_resource_summary_for_export(cfg: ExperimentConfig) -> dict[str, Any] | None:
@@ -761,6 +995,7 @@ def build_excited_resource_summary_for_export(cfg: ExperimentConfig) -> dict[str
     ch = _excited_shot_channel_upper_bounds(er)
     er["shot_channel_upper_bounds"] = ch
     er["excited_methods_unified"] = _excited_methods_unified(er)
+    er["excited_protocol_contract_v1"] = _excited_protocol_contract_v1_block()
     return er
 
 
@@ -811,6 +1046,7 @@ def _build_excited_resource_summary(
     ch = _excited_shot_channel_upper_bounds(er)
     er["shot_channel_upper_bounds"] = ch
     er["excited_methods_unified"] = _excited_methods_unified(er)
+    er["excited_protocol_contract_v1"] = _excited_protocol_contract_v1_block()
     return er
 
 
@@ -924,7 +1160,82 @@ def _attach_qpe_demo_track_if_requested(
         return
     from qchem_stack.qpe_qec_demo.pipeline_track import qpe_demo_track_payload
 
-    out["qpe_demo_track"] = qpe_demo_track_payload(qh, bits=4)
+    out["qpe_demo_track"] = qpe_demo_track_payload(qh, bits=int(cfg.quantum.qpe_demo_track_n_bits))
+
+
+def _attach_vqs_track_if_requested(
+    out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
+) -> None:
+    """Optional VQS / McLachlan dynamics on variational parameters (YAML ``vqs_rhs_mode`` for McLachlan modes)."""
+    if not cfg.quantum.vqs_track_requested():
+        return
+    ang = out.get("angles")
+    if ang is None:
+        return
+    from qchem_stack.quantum.algorithms.vqs_pipeline_track import vqs_track_payload
+
+    q = cfg.quantum
+    out["vqs_track"] = vqs_track_payload(
+        qh,
+        ang,
+        mode=q.vqs_mode,
+        n_times=q.vqs_n_times,
+        dt=float(q.vqs_dt),
+        rhs_mode_yaml=q.vqs_rhs_mode,
+        tangent_fd_epsilon_yaml=float(q.vqs_tangent_fd_epsilon),
+    )
+
+
+def _attach_qpe_three_algorithm_pack_if_requested(
+    out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
+) -> None:
+    """Dense QPE trio from :mod:`~qchem_stack.quantum.algorithms.qpe` (config ``qpe_three_pack_*``)."""
+    if not cfg.quantum.qpe_three_pack_requested():
+        return
+    from qchem_stack.quantum.algorithms.qpe import (
+        AlgorithmDeterministicQPE,
+        AlgorithmInfoTheoryQPE,
+        AlgorithmKitaevQPE,
+    )
+
+    qt = cfg.quantum
+    t_ev = float(qt.qpe_three_pack_time)
+
+    def _row(public: str, res: Any) -> dict[str, Any]:
+        meta = getattr(res, "meta", None)
+        md = dict(meta) if isinstance(meta, dict) else {}
+        return {
+            "algorithm": public,
+            "phase_mu": float(getattr(res, "phase_mu", 0.0)),
+            "phase_sigma": float(getattr(res, "phase_sigma", 0.0)),
+            "energy_estimate": float(getattr(res, "energy_estimate", float("nan"))),
+            "meta": md,
+        }
+
+    det = AlgorithmDeterministicQPE(qh, time=t_ev, n_rounds=int(qt.qpe_three_pack_deterministic_rounds))
+    kit = AlgorithmKitaevQPE(qh, time=t_ev, n_bits=int(qt.qpe_three_pack_kitaev_bits))
+    inf = AlgorithmInfoTheoryQPE(qh, time=t_ev, n_samples=int(qt.qpe_three_pack_info_samples))
+
+    rd = det.build().run()
+    rk = kit.build().run()
+    ri = inf.build().run(seed=int(cfg.random_seed))
+
+    out["qpe_algorithm_three_pack"] = {
+        "schema": "qpe_algorithm_three_pack_v1",
+        "time": float(t_ev),
+        "yaml_note": (
+            "Dense-spectrum emulation on the Hamiltonian Hilbert space; phase summaries are illustrative."
+        ),
+        "deterministic_qpe_report_v1": _row("deterministic_qpe", rd),
+        "kitaev_qpe_report_v1": _row("kitaev_qpe", rk),
+        "info_theory_qpe_report_v1": _row("info_theory_qpe", ri),
+        "yaml_flags": {"qpe_three_pack_after_variational": bool(qt.qpe_three_pack_after_variational)},
+        "implementations": {
+            "deterministic": "qchem_stack.quantum.algorithms.qpe.AlgorithmDeterministicQPE",
+            "kitaev": "qchem_stack.quantum.algorithms.qpe.AlgorithmKitaevQPE",
+            "info_theory": "qchem_stack.quantum.algorithms.qpe.AlgorithmInfoTheoryQPE",
+        },
+    }
 
 
 def _resource_summary_excited_only(n_qubits: int, excited_rs: dict[str, Any]) -> dict[str, Any]:
@@ -966,6 +1277,53 @@ def _maybe_attach_md_ml_qmef_dataset(
     repro["qmef_ml_attachment_v1"] = build_qmef_ml_attachment_repro_block(cfg, out, rhf, cfg_path=cfg_path)
 
 
+def _classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:
+    """Compact Methods-friendly digest for ``classical_benchmarks``."""
+    rows: dict[str, dict[str, Any]] = {}
+    for method_key in ("hf", "mp2", "ccsd", "casci"):
+        v = cb.get(method_key)
+        if isinstance(v, dict):
+            rows[method_key] = v
+    ok_vals: dict[str, float] = {}
+    for k, row in rows.items():
+        if row.get("status") == "ok" and row.get("value") is not None:
+            ok_vals[k] = float(row["value"])
+    hf = ok_vals.get("hf")
+    best_method: str | None = None
+    best_energy: float | None = None
+    if ok_vals:
+        best_method = min(ok_vals, key=ok_vals.get)
+        best_energy = float(ok_vals[best_method])
+    deltas_vs_hf: dict[str, float] = {}
+    if hf is not None:
+        for k, v in ok_vals.items():
+            if k == "hf":
+                continue
+            deltas_vs_hf[k] = float(v - hf)
+    recommended_baseline_method: str | None = None
+    for preferred in ("ccsd", "mp2", "hf"):
+        if preferred in ok_vals:
+            recommended_baseline_method = preferred
+            break
+    recommended_baseline_energy: float | None = (
+        float(ok_vals[recommended_baseline_method]) if recommended_baseline_method is not None else None
+    )
+    return {
+        "schema": "classical_benchmark_summary_v1",
+        "recommended_baseline_policy": "prefer_ccsd_else_mp2_else_hf",
+        "recommended_baseline_method": recommended_baseline_method,
+        "recommended_baseline_energy_au": recommended_baseline_energy,
+        "methods_reported": sorted(rows.keys()),
+        "methods_ok": sorted(ok_vals.keys()),
+        "methods_non_ok": sorted(k for k in rows if k not in ok_vals),
+        "reference_hf_energy_au": hf,
+        "best_method": best_method,
+        "best_energy_au": best_energy,
+        "delta_best_vs_hf_au": (float(best_energy - hf) if (best_energy is not None and hf is not None) else None),
+        "method_deltas_vs_hf_au": deltas_vs_hf,
+    }
+
+
 def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     """Merge machine-readable stage list and resource hints into ``out['repro']`` (single JSON blob for Methods)."""
     repro = out.get("repro")
@@ -999,10 +1357,33 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     sm: dict[str, Any] = {
         "stages_completed": stages,
         "quantum_algorithm": q.algorithm,
+        "quantum_algorithm_yaml": q.algorithm,
+        "classical_backend_id": str(cfg.scf.driver),
         "variational_ansatz_yaml": q.variational_ansatz,
         "pauli_protocol_expectation_path": classify_pauli_expectation_path(q),
         "energy_after_variational": out.get("energy_after_variational"),
+        "mitigation_zne_mode_yaml": cfg.mitigation.zne_mode,
+        "mitigation_zne_scales_yaml": [float(x) for x in cfg.mitigation.zne_scales],
+        "spam_calibration_enabled_yaml": cfg.mitigation.spam_calibration_enabled,
+        "classical_shadows_stub_enabled_yaml": cfg.mitigation.classical_shadows_stub_enabled,
+        "classical_shadows_budget_pairs_yaml": int(cfg.mitigation.classical_shadows_budget_pairs),
+        "embedding_input_representation_yaml": cfg.embedding.embedding_input_representation,
+        "classical_benchmark_backend_yaml": cfg.chemistry_extended.classical_benchmark_backend,
     }
+    if q.algorithm_factory:
+        sm["quantum_algorithm_factory_yaml"] = q.algorithm_factory
+    eis = out.get("embedding_input_system")
+    if isinstance(eis, dict) and eis.get("schema") is not None:
+        sm["embedding_input_system_schema"] = eis["schema"]
+    ec = out.get("energy_components")
+    if isinstance(ec, dict):
+        sm["energy_components_present"] = True
+        if ec.get("schema") is not None:
+            sm["energy_components_schema"] = ec["schema"]
+        if ec.get("mean_field_total_au") is not None:
+            sm["energy_components_mean_field_total_au"] = float(ec["mean_field_total_au"])
+        if ec.get("nuclear_repulsion_au") is not None:
+            sm["energy_components_nuclear_repulsion_au"] = float(ec["nuclear_repulsion_au"])
     vm_rs = out.get("vqe_meta")
     if isinstance(vm_rs, dict) and vm_rs.get("uccsd_n_parameters") is not None:
         sm["uccsd_n_parameters"] = int(vm_rs["uccsd_n_parameters"])
@@ -1014,6 +1395,16 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         sm["dmet_fragment_count"] = len(frag_labels)
         sm["dmet_uniform_multifragment_toy_yaml"] = bool(emb.dmet_uniform_multifragment_toy)
         sm["dmet_stub_one_shot_ledger_yaml"] = bool(cfg.parity_integrations.dmet_stub_one_shot_ledger)
+    elif emb.mode == "plugin":
+        sm["decomposition_plugin_yaml"] = emb.decomposition_plugin
+        wf = out.get("embedding_workflow")
+        if isinstance(wf, dict):
+            if wf.get("decomposition_primary_fragment_id") is not None:
+                sm["decomposition_primary_fragment_id"] = wf["decomposition_primary_fragment_id"]
+            if wf.get("decomposition_fragment_count") is not None:
+                sm["decomposition_fragment_count"] = int(wf["decomposition_fragment_count"])
+            if wf.get("decomposition_total_pauli_terms") is not None:
+                sm["decomposition_total_pauli_terms"] = int(wf["decomposition_total_pauli_terms"])
     dfs_ledger = out.get("dmet_fragment_solve")
     if isinstance(dfs_ledger, dict):
         sm["dmet_fragment_solve_present"] = True
@@ -1047,11 +1438,71 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
             sm["schmidt_per_fragment_vqe_max_energy_au"] = max(energies)
     if out.get("scf_energy") is not None:
         sm["scf_energy"] = out["scf_energy"]
+    cb = out.get("classical_benchmarks")
+    if isinstance(cb, dict):
+        sm["classical_benchmarks_present"] = True
+        if cb.get("schema") is not None:
+            sm["classical_benchmarks_schema"] = cb["schema"]
+        for method_key in ("hf", "mp2", "ccsd", "casci"):
+            blk = cb.get(method_key)
+            if isinstance(blk, dict):
+                if blk.get("status") is not None:
+                    sm[f"classical_bench_{method_key}_status"] = str(blk["status"])
+                if blk.get("value") is not None:
+                    sm[f"classical_bench_{method_key}_energy_au"] = float(blk["value"])
+    cbs = out.get("classical_benchmark_summary")
+    if isinstance(cbs, dict):
+        sm["classical_benchmark_summary_present"] = True
+        if cbs.get("schema") is not None:
+            sm["classical_benchmark_summary_schema"] = cbs["schema"]
+        if cbs.get("recommended_baseline_method") is not None:
+            sm["classical_benchmark_recommended_baseline_method"] = cbs["recommended_baseline_method"]
+        if cbs.get("recommended_baseline_energy_au") is not None:
+            sm["classical_benchmark_recommended_baseline_energy_au"] = float(
+                cbs["recommended_baseline_energy_au"]
+            )
+        if cbs.get("best_method") is not None:
+            sm["classical_benchmark_best_method"] = cbs["best_method"]
+        if cbs.get("best_energy_au") is not None:
+            sm["classical_benchmark_best_energy_au"] = float(cbs["best_energy_au"])
+        if cbs.get("delta_best_vs_hf_au") is not None:
+            sm["classical_benchmark_delta_best_vs_hf_au"] = float(cbs["delta_best_vs_hf_au"])
+    rcorr = out.get("rdm_correction")
+    if isinstance(rcorr, dict):
+        sm["rdm_correction_present"] = True
+        if rcorr.get("schema") is not None:
+            sm["rdm_correction_schema"] = rcorr["schema"]
+        if rcorr.get("method") is not None:
+            sm["rdm_correction_method"] = rcorr["method"]
+        if rcorr.get("status") is not None:
+            sm["rdm_correction_status"] = rcorr["status"]
+        if rcorr.get("energy_correction_au") is not None:
+            sm["rdm_correction_energy_au"] = float(rcorr["energy_correction_au"])
+    rr_ready = out.get("rdm_correction_readiness")
+    if isinstance(rr_ready, dict):
+        sm["rdm_correction_readiness_present"] = True
+        if rr_ready.get("schema") is not None:
+            sm["rdm_correction_readiness_schema"] = rr_ready["schema"]
+        if rr_ready.get("requested_method") is not None:
+            sm["rdm_correction_readiness_requested_method"] = rr_ready["requested_method"]
+        if rr_ready.get("rdm1_source") is not None:
+            sm["rdm_correction_readiness_rdm1_source"] = rr_ready["rdm1_source"]
+        if rr_ready.get("rdm_basis") is not None:
+            sm["rdm_correction_readiness_rdm_basis"] = rr_ready["rdm_basis"]
+        if rr_ready.get("spin_model") is not None:
+            sm["rdm_correction_readiness_spin_model"] = rr_ready["spin_model"]
+        if rr_ready.get("reference_wavefunction") is not None:
+            sm["rdm_correction_readiness_reference_wavefunction"] = rr_ready["reference_wavefunction"]
+        if rr_ready.get("kernel_class") is not None:
+            sm["rdm_correction_readiness_kernel_class"] = rr_ready["kernel_class"]
+        if rr_ready.get("nevpt2_pyscf_status") is not None:
+            sm["rdm_correction_readiness_nevpt2_pyscf_status"] = rr_ready["nevpt2_pyscf_status"]
     if q.algorithm == "vqe":
         sm["vqe_maxiter_yaml"] = q.vqe_maxiter
         if "nfev" in out:
             sm["vqe_nfev"] = out["nfev"]
-    elif q.algorithm == "adapt":
+    elif q.algorithm in ("adapt", "tetris_adapt"):
+        sm["adapt_pool_id_yaml"] = q.adapt_pool_id
         sm["adapt_max_iter_yaml"] = q.adapt_max_iter
         am = out.get("adapt_meta")
         if isinstance(am, dict) and "total_gradient_evals" in am:
@@ -1064,6 +1515,7 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         if isinstance(pool, list):
             sm["adapt_excitation_layers"] = len(pool)
     elif q.algorithm == "iqeb":
+        sm["iqeb_pool_id_yaml"] = q.iqeb_pool_id
         sm["iqeb_max_rounds_yaml"] = q.iqeb_max_rounds
         im = out.get("iqeb_meta")
         if isinstance(im, dict) and im.get("rounds") is not None:
@@ -1097,6 +1549,8 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     if isinstance(pc, dict):
         if pc.get("expectation_source"):
             sm["protocol_expectation_source"] = pc["expectation_source"]
+        if pc.get("zne_mode") is not None:
+            sm["protocol_zne_mode"] = pc["zne_mode"]
         if pc.get("energy_stderr_model"):
             sm["protocol_energy_stderr_model"] = pc["energy_stderr_model"]
         if pc.get("total_shots_budget") is not None:
@@ -1112,6 +1566,8 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     vqd = out.get("vqd")
     if isinstance(vqd, dict):
         sm["vqd_n_states_yaml"] = q.vqd_n_states
+        sm["vqd_overlap_exponent_yaml"] = float(q.vqd_overlap_exponent)
+        sm["vqd_cobyla_maxiter_yaml"] = int(q.vqd_cobyla_maxiter)
         en = vqd.get("energies")
         if isinstance(en, list):
             sm["vqd_n_energies_recorded"] = len(en)
@@ -1156,6 +1612,7 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     if isinstance(sceom_out, dict):
         sm["sceom_shots_per_matrix_element"] = q.sceom_shots_per_matrix_element
         sm["sceom_subspace_dim_yaml"] = q.sceom_subspace_dim
+        sm["sceom_generator_strategy_yaml"] = q.sceom_generator_strategy
         sce = sceom_out.get("energies")
         if isinstance(sce, list):
             sm["sceom_n_energies_recorded"] = len(sce)
@@ -1181,8 +1638,56 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
             sm["job_async_energy_stderr"] = jr["energy_stderr"]
         if jr.get("total_shots_budget") is not None:
             sm["job_async_total_shots_budget"] = jr["total_shots_budget"]
-    if out.get("qpe_demo_track"):
+    if isinstance(out.get("qpe_demo_track"), dict):
         sm["qpe_demo_track_ran"] = True
+        sm["qpe_open_stack_contract_v1"] = {
+            "schema": "qpe_open_stack_contract_v1",
+            "demo_track_payload_schema": out["qpe_demo_track"].get("schema"),
+            "kitaev_dense_energy_fn": (
+                "qchem_stack.qpe_qec_demo.pipeline_track.kitaev_qpe_energy_estimate — dense phase readout shortcut"
+            ),
+            "algorithm_classes": {
+                "kitaev": "qchem_stack.quantum.algorithms.qpe.AlgorithmKitaevQPE",
+                "info_theory": "qchem_stack.quantum.algorithms.qpe.AlgorithmInfoTheoryQPE",
+                "deterministic": "qchem_stack.quantum.algorithms.qpe.AlgorithmDeterministicQPE",
+            },
+            "bayesian_stub": "qchem_stack.qpe_qec_demo.BayesianQPEStub",
+            "yaml_flags": {
+                "qpe_demo_track_after_variational": q.qpe_demo_track_after_variational,
+                "qpe_pipeline_integration": q.qpe_pipeline_integration,
+            },
+            "pipeline_attach": "_attach_qpe_demo_track_if_requested (orchestration/pipeline.py)",
+        }
+    if isinstance(out.get("qpe_algorithm_three_pack"), dict):
+        qp3 = out["qpe_algorithm_three_pack"]
+        sm["qpe_three_pack_ran"] = True
+        sm["qpe_three_pack_deterministic_energy_est"] = (qp3.get("deterministic_qpe_report_v1") or {}).get(
+            "energy_estimate"
+        )
+        sm["qpe_three_pack_kitaev_energy_est"] = (qp3.get("kitaev_qpe_report_v1") or {}).get("energy_estimate")
+        sm["qpe_three_pack_info_theory_energy_est"] = (qp3.get("info_theory_qpe_report_v1") or {}).get(
+            "energy_estimate"
+        )
+    if isinstance(out.get("vqs_track"), dict):
+        sm["vqs_track_ran"] = True
+        sm["vqs_open_stack_contract_v1"] = {
+            "schema": "vqs_open_stack_contract_v1",
+            "track_payload_schema": out["vqs_track"].get("schema"),
+            "implementations": {
+                "vqs": "qchem_stack.quantum.algorithms.vqs.AlgorithmVQS",
+                "mclachlan_real_time": "qchem_stack.quantum.algorithms.vqs.AlgorithmMcLachlanRealTime",
+                "mclachlan_imag_time": "qchem_stack.quantum.algorithms.vqs.AlgorithmMcLachlanImagTime",
+            },
+            "pipeline_track_module": "qchem_stack.quantum.algorithms.vqs_pipeline_track",
+            "yaml_flags": {
+                "vqs_track_after_variational": q.vqs_track_after_variational,
+                "vqs_pipeline_integration": q.vqs_pipeline_integration,
+                "vqs_rhs_mode_yaml": q.vqs_rhs_mode,
+                "vqs_tangent_fd_epsilon_yaml": float(q.vqs_tangent_fd_epsilon),
+            },
+            "vqs_mode_yaml": q.vqs_mode,
+            "pipeline_attach": "_attach_vqs_track_if_requested (orchestration/pipeline.py)",
+        }
     if isinstance(out.get("nexus_analog_ledger"), dict):
         sm["nexus_analog_hqc_units"] = out["nexus_analog_ledger"].get("hqc_units")
     if out.get("mitigation_graph_report"):
@@ -1259,6 +1764,7 @@ def run_pipeline_sync(
     production job tracing.
     """
     q = cfg.quantum
+    solver_caps = _solver_capabilities(cfg)
     profile = PipelineStageTimer()
 
     def _emit(stage: str) -> None:
@@ -1268,7 +1774,79 @@ def run_pipeline_sync(
             )
 
     rhf = _run_scf(cfg)
-    _maybe_attach_casscf_orbital_audit(cfg, rhf)
+    cfg = _refine_mean_field_for_active_space(cfg, rhf)
+    nuclear_au: float | None
+    try:
+        nuclear_au = float(rhf.mf.mol.energy_nuc())
+    except Exception:
+        nuclear_au = None
+    solvent_eps = (
+        float(cfg.chemistry_extended.ddcosmo_epsilon)
+        if cfg.chemistry_extended.solvent_model == "ddcosmo"
+        else None
+    )
+    energy_components = build_energy_components_v1(
+        nuclear_repulsion_au=nuclear_au,
+        mean_field_total_au=float(rhf.e_tot),
+        solvent_model=str(cfg.chemistry_extended.solvent_model),
+        solvent_dielectric=solvent_eps,
+        energy_accounting_model=str(rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")),
+    )
+    classical_benchmarks: dict[str, Any] | None = None
+    rdm_bundle_meta: dict[str, Any] | None = None
+    rdm_correction_report: dict[str, Any] | None = None
+    rdm_correction_readiness: dict[str, Any] | None = None
+    embedding_input_payload = _embedding_input_system_payload(cfg, rhf)
+    if cfg.chemistry_extended.classical_benchmark_enabled:
+        from qchem_stack.chem.classical_benchmarks import (
+            ClassicalBenchmarkContext,
+            run_classical_post_hf_benchmarks,
+        )
+
+        classical_benchmarks = run_classical_post_hf_benchmarks(
+            cfg,
+            ClassicalBenchmarkContext(
+                mean_field_reference=rhf,
+                reference_scf_method=str(cfg.scf.method),
+                n_active_orbitals=int(cfg.active_space.n_active_orbitals),
+                n_active_electrons=int(cfg.active_space.n_active_electrons),
+            ),
+        )
+    if cfg.chemistry_extended.rdm_correction_method != "none":
+        from qchem_stack.integrations.rdm_corrections import (
+            build_rdm_correction_readiness,
+            rdm_bundle_from_mean_field,
+            run_pyscf_nevpt2_casci_correction,
+            run_rdm_correction,
+        )
+        if not solver_caps.supports_rdm_correction_hooks:
+            raise PipelineError(
+                "rdm_correction_method requires backend RDM extraction support "
+                f"(backend={solver_caps.backend_id!r})."
+            )
+        rdmb = rdm_bundle_from_mean_field(rhf)
+        rdm_bundle_meta = dict(rdmb.metadata)
+        rdm_m = cfg.chemistry_extended.rdm_correction_method
+        if rdm_m in ("stub_nevpt2", "stub_ac0"):
+            rdm_correction_report = run_rdm_correction(rdm_m, rdmb)
+        elif rdm_m == "pyscf_nevpt2_casci":
+            if not solver_caps.supports_rdm_nevpt2_casci:
+                raise PipelineError(
+                    "rdm_correction_method='pyscf_nevpt2_casci' requires backend support "
+                    f"(backend={solver_caps.backend_id!r})."
+                )
+            rdm_correction_report = run_pyscf_nevpt2_casci_correction(
+                rhf,
+                int(cfg.active_space.n_active_orbitals),
+                int(cfg.active_space.n_active_electrons),
+            )
+        else:
+            raise ValueError(f"Unsupported rdm_correction_method: {rdm_m!r}")
+        rdm_correction_readiness = build_rdm_correction_readiness(
+            requested_method=rdm_m,
+            correction_report=rdm_correction_report,
+            bundle_meta=rdm_bundle_meta,
+        )
     profile.mark("scf_done")
     _emit("scf_done")
     _pipeline_log.info(
@@ -1295,51 +1873,11 @@ def run_pipeline_sync(
     exe = executor_from_spec(bspec)
     bundle = compiler_pass_bundle_from_config(cfg)
 
-    if q.algorithm == "adapt":
-        av = FermionicAdaptVQE(
-            qh,
-            max_ops=q.adapt_max_iter,
-            hea_depth=q.vqe_depth,
-            executor=exe,
-        )
-        ar = av.run(seed=cfg.random_seed)
-        hea_angles = np.asarray(ar.meta["hea_angles"], dtype=float)
-        angles = hea_angles
-        energy_pre = ar.energy
-        algo_meta = {"algorithm": "adapt", "adapt_meta": ar.meta, "adapt_pool": ar.pool_indices}
-    elif q.algorithm == "iqeb":
-        iq = IQEBVQE(qh, max_rounds=q.iqeb_max_rounds, executor=exe)
-        ir = iq.run(depth=q.vqe_depth, seed=cfg.random_seed)
-        angles = ir.vqe.angles
-        energy_pre = ir.energy
-        algo_meta = {
-            "algorithm": "iqeb",
-            "iqeb_meta": ir.meta,
-            "iqeb_selected_pauli_strings": ir.selected_pauli_strings,
-            "nfev": ir.vqe.nfev,
-            "vqe_meta": ir.vqe.meta,
-        }
-    else:
-        if q.variational_ansatz == "uccsd":
-            if q.uccsd_trotter_steps is not None:
-                ur = UCCSDTrotterVQE(
-                    qh,
-                    executor=exe,
-                    n_trotter_steps=int(q.uccsd_trotter_steps),
-                ).run(maxiter=q.vqe_maxiter, seed=cfg.random_seed)
-            else:
-                ur = UCCSDVQE(qh, executor=exe).run(maxiter=q.vqe_maxiter, seed=cfg.random_seed)
-            angles = ur.angles
-            energy_pre = ur.energy
-            algo_meta = {"algorithm": "vqe", "nfev": ur.nfev, "vqe_meta": ur.meta}
-        else:
-            vr = VQE(qh, depth=q.vqe_depth, executor=exe).run(
-                maxiter=q.vqe_maxiter,
-                seed=cfg.random_seed,
-            )
-            angles = vr.angles
-            energy_pre = vr.energy
-            algo_meta = {"algorithm": "vqe", "nfev": vr.nfev, "vqe_meta": vr.meta}
+    vctx = VariationalRunContext(cfg=cfg, hamiltonian=qh, executor=exe, seed=cfg.random_seed)
+    stage = run_variational_stage(vctx)
+    algo_meta = stage.algo_meta_must_include_algorithm(cfg.quantum.algorithm)
+    angles = stage.angles
+    energy_pre = float(stage.energy)
 
     profile.mark("variational_done")
     _emit("variational_done")
@@ -1358,6 +1896,18 @@ def run_pipeline_sync(
         "angles": angles.tolist() if isinstance(angles, np.ndarray) else list(angles),
         **algo_meta,
     }
+    if classical_benchmarks is not None:
+        out["classical_benchmarks"] = classical_benchmarks
+        out["classical_benchmark_summary"] = _classical_benchmark_summary(classical_benchmarks)
+    if embedding_input_payload is not None:
+        out["embedding_input_system"] = embedding_input_payload
+    out["energy_components"] = energy_components
+    if rdm_bundle_meta is not None:
+        out["rdm_bundle_meta"] = rdm_bundle_meta
+    if rdm_correction_report is not None:
+        out["rdm_correction"] = rdm_correction_report
+    if rdm_correction_readiness is not None:
+        out["rdm_correction_readiness"] = rdm_correction_readiness
     out["hamiltonian_meta"] = dict(qh.meta)
     if cfg.embedding.mode == "dmet":
         wf: dict[str, Any] = {
@@ -1417,6 +1967,8 @@ def run_pipeline_sync(
                 "schema": "oniom_toy_v1",
                 "layers": [dict(x) for x in cfg.embedding.oniom_layers_v1],
             }
+        if embedding_input_payload is not None:
+            wf["embedding_input_system"] = embedding_input_payload
         out["embedding_workflow"] = wf
         _run_dmet_fragment_solve_if_requested(cfg, qh, exe, out)
         if schmidt_ctx is not None:
@@ -1478,18 +2030,45 @@ def run_pipeline_sync(
             wf["epistemic_bound"] = (
                 "Open reproducibility — not closed-source projection driver parity."
             )
+        if embedding_input_payload is not None:
+            wf["embedding_input_system"] = embedding_input_payload
         out["embedding_workflow"] = wf
         profile.mark("embedding_projection")
         _emit("embedding_projection")
     elif cfg.embedding.mode == "plugin":
         emb = cfg.embedding
+        hm = out.get("hamiltonian_meta") or {}
+        resolved_json = hm.get("decomposition_plugin_json")
+        term_counts = hm.get("decomposition_fragment_pauli_term_counts")
+        term_total = 0
+        if isinstance(term_counts, dict):
+            term_total = sum(int(v) for v in term_counts.values())
         out["embedding_workflow"] = {
             "schema": "embedding_workflow_v1",
             "mode": "plugin",
             "decomposition_plugin": emb.decomposition_plugin,
             "decomposition_plugin_json_path": emb.decomposition_plugin_json_path,
+            "decomposition_plugin_json_resolved_path": resolved_json,
+            "decomposition_primary_fragment_id": hm.get("decomposition_primary_fragment_id"),
+            "decomposition_fragment_count": hm.get("decomposition_fragment_count"),
+            "decomposition_fragment_ids": hm.get("decomposition_fragment_ids"),
+            "decomposition_fragment_pauli_term_counts": term_counts,
+            "decomposition_total_pauli_terms": term_total,
+            "decomposition_plugin_schema": hm.get("decomposition_plugin_schema"),
+            "decomposition_fragment_energy_terms_v1": hm.get("decomposition_fragment_energy_terms_v1"),
+            "integral_source": hm.get("integral_source"),
+            "epistemic_bound": (
+                "Open decomposition-plugin contract v1 (optional per-fragment energy-term stubs) "
+                "— not closed-source embedding/decomposition product parity."
+                if hm.get("decomposition_plugin_schema") == "decomposition_plugin_contract_v1"
+                else (
+                    "Open plugin boundary (toy v1 JSON) — not closed decomposition product parity."
+                )
+            ),
             "note": "Toy decomposition-plugin Hamiltonian replaces molecular active-space build.",
         }
+        if embedding_input_payload is not None:
+            out["embedding_workflow"]["embedding_input_system"] = embedding_input_payload
         profile.mark("embedding_plugin")
         _emit("embedding_plugin")
     else:
@@ -1498,6 +2077,8 @@ def run_pipeline_sync(
             "mode": "none",
             "note": "No DMET/projection embedding stage; variational Hamiltonian uses global active space.",
         }
+        if embedding_input_payload is not None:
+            out["embedding_workflow"]["embedding_input_system"] = embedding_input_payload
         profile.mark("embedding_none")
         _emit("embedding_none")
 
@@ -1509,6 +2090,8 @@ def run_pipeline_sync(
             n_states=q.vqd_n_states,
             depth=q.vqe_depth,
             penalty_weight=q.vqd_penalty_weight,
+            overlap_exponent=q.vqd_overlap_exponent,
+            cobyla_maxiter=q.vqd_cobyla_maxiter,
             executor=exe,
         )
         vqd_res = vqd.run(
@@ -1521,6 +2104,7 @@ def run_pipeline_sync(
             ground_energy=float(energy_pre),
         )
         out["vqd"] = {
+            "schema": "excited_vqd_bundle_v1",
             "energies": vqd_res.energies,
             "meta": vqd_res.meta,
         }
@@ -1548,11 +2132,26 @@ def run_pipeline_sync(
         qse_meta = dict(qse_res.meta)
         qse_meta["qse_shot_mode"] = q.qse_shot_mode
         out["qse"] = {
+            "schema": "excited_qse_bundle_v1",
             "excitation_energies": qse_res.excitation_energies,
             "meta": qse_meta,
         }
 
     if q.sceom_after_variational:
+        from qchem_stack.quantum.algorithms.sceom import (
+            resolve_sceom_s_generators,
+            run_sceom_nested_commutator_from_hea,
+        )
+
+        sceom_kw: dict[str, Any] = {}
+        gens, _ = resolve_sceom_s_generators(
+            strategy=q.sceom_generator_strategy,
+            hamiltonian=qh,
+            subspace_dim=q.sceom_subspace_dim,
+        )
+        if gens is not None:
+            sceom_kw["s_generators"] = gens
+        sceom_kw["generator_strategy_yaml"] = q.sceom_generator_strategy
         sceom_res = run_sceom_nested_commutator_from_hea(
             qh,
             ang,
@@ -1560,8 +2159,10 @@ def run_pipeline_sync(
             subspace_dim=q.sceom_subspace_dim,
             shots_per_matrix_element=q.sceom_shots_per_matrix_element,
             seed=cfg.random_seed,
+            **sceom_kw,
         )
         out["sceom"] = {
+            "schema": "excited_sceom_bundle_v1",
             "energies": sceom_res.energies,
             "meta": sceom_res.meta,
         }
@@ -1592,6 +2193,8 @@ def run_pipeline_sync(
             }
         _attach_nexus_mitigation_tn(out, cfg, qh)
         _attach_qpe_demo_track_if_requested(out, cfg, qh)
+        _attach_qpe_three_algorithm_pack_if_requested(out, cfg, qh)
+        _attach_vqs_track_if_requested(out, cfg, qh)
         _finalize_open_stack_parity_snapshot(out, cfg, None)
         _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
         profile.mark("pauli_protocol_skipped")
@@ -1635,6 +2238,8 @@ def run_pipeline_sync(
     )
     _attach_nexus_mitigation_tn(out, cfg, qh)
     _attach_qpe_demo_track_if_requested(out, cfg, qh)
+    _attach_qpe_three_algorithm_pack_if_requested(out, cfg, qh)
+    _attach_vqs_track_if_requested(out, cfg, qh)
     _finalize_open_stack_parity_snapshot(out, cfg, proto)
     _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
     profile.mark("pauli_protocol_done")

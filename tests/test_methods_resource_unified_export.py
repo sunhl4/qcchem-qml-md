@@ -13,6 +13,20 @@ import pytest
 _ROOT = Path(__file__).resolve().parents[1]
 
 
+def _export_with_results(cfg_rel: str, results_path: Path) -> dict:
+    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    cmd = [
+        sys.executable,
+        str(_ROOT / "scripts" / "export_parity_criteria_table.py"),
+        str(_ROOT / cfg_rel),
+        "--results",
+        str(results_path),
+    ]
+    proc = subprocess.run(cmd, cwd=str(_ROOT), capture_output=True, text=True, env=env, check=False)
+    assert proc.returncode == 0, proc.stderr or proc.stdout
+    return json.loads(proc.stdout)
+
+
 def test_methods_resource_preview_in_config_only_export() -> None:
     import importlib.util
 
@@ -26,20 +40,30 @@ def test_methods_resource_preview_in_config_only_export() -> None:
     assert isinstance(prev, dict)
     assert prev.get("schema") == "methods_resource_preview_v1"
     assert prev.get("qpe_pipeline_integration") is True
+    assert prev.get("qpe_demo_track_n_bits") == 4
+    wq = d.get("workflow_preview_qpe_track_v1")
+    assert isinstance(wq, dict) and wq.get("schema") == "workflow_preview_qpe_track_v1"
+    assert wq.get("qpe_demo_track_n_bits") == 4
 
 
-def _export_with_results(cfg_rel: str, results: Path) -> dict:
-    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
-    cmd = [
-        sys.executable,
-        str(_ROOT / "scripts" / "export_parity_criteria_table.py"),
-        str(_ROOT / cfg_rel),
-        "--results",
-        str(results),
-    ]
-    proc = subprocess.run(cmd, cwd=str(_ROOT), capture_output=True, text=True, env=env, check=False)
-    assert proc.returncode == 0, proc.stderr or proc.stdout
-    return json.loads(proc.stdout)
+def test_methods_resource_preview_includes_vqs_flags() -> None:
+    import importlib.util
+
+    p_yaml = _ROOT / "configs" / "example_h2_vqs_track.yaml"
+    if not p_yaml.is_file():
+        pytest.skip("example_h2_vqs_track.yaml missing")
+    ep_path = _ROOT / "scripts" / "export_parity_criteria_table.py"
+    spec = importlib.util.spec_from_file_location("export_parity_criteria_table", ep_path)
+    mod = importlib.util.module_from_spec(spec)
+    assert spec.loader is not None
+    spec.loader.exec_module(mod)
+    d = mod._table_from_config(p_yaml)
+    prev = d.get("methods_resource_preview_v1")
+    assert isinstance(prev, dict)
+    assert prev.get("vqs_pipeline_integration") is True
+    assert prev.get("vqs_track_after_variational") is False
+    wvq = d.get("workflow_preview_vqs_track_v1")
+    assert isinstance(wvq, dict) and wvq.get("schema") == "workflow_preview_vqs_track_v1"
 
 
 @pytest.mark.skipif(
@@ -55,21 +79,27 @@ def test_methods_resource_unified_from_qpe_dual_track_pipeline() -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    cfg_path = _ROOT / "configs" / "qpe_dual_track_demo.yaml"
+    cfg_rel = "configs/qpe_dual_track_demo.yaml"
+    cfg_path = _ROOT / cfg_rel
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     tmp = _ROOT / "tests" / "fixtures" / "_tmp_qpe_dual_methods_resource.json"
     try:
         tmp.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
-        exp = _export_with_results("configs/qpe_dual_track_demo.yaml", tmp)
+        exp = _export_with_results(cfg_rel, tmp)
     finally:
         tmp.unlink(missing_ok=True)
 
     uni = exp.get("methods_resource_unified_v1")
     assert isinstance(uni, dict)
     assert uni.get("schema") == "methods_resource_unified_v1"
+    assert uni.get("classical_backend_id") == "pyscf"
     assert isinstance(uni.get("resource_summary"), dict)
     assert uni.get("run_summary_qpe_demo_track_ran") is True
+    qp_wf = exp.get("workflow_preview_qpe_track_v1")
+    assert isinstance(qp_wf, dict) and qp_wf.get("schema") == "workflow_preview_qpe_track_v1"
+    qcontr = uni.get("qpe_open_stack_contract_v1")
+    assert isinstance(qcontr, dict) and qcontr.get("schema") == "qpe_open_stack_contract_v1"
     qpeb = uni.get("qpe_demo_track")
     assert isinstance(qpeb, dict)
     assert qpeb.get("schema")
@@ -100,7 +130,10 @@ def test_methods_resource_unified_qpe_plus_tket_probe_schema() -> None:
     uni = exp.get("methods_resource_unified_v1")
     assert isinstance(uni, dict)
     assert uni.get("schema") == "methods_resource_unified_v1"
+    assert uni.get("classical_backend_id") == "pyscf"
     assert uni.get("run_summary_qpe_demo_track_ran") is True
+    qcontr = uni.get("qpe_open_stack_contract_v1")
+    assert isinstance(qcontr, dict) and qcontr.get("schema") == "qpe_open_stack_contract_v1"
     rs = uni.get("resource_summary")
     assert isinstance(rs, dict)
     assert rs.get("pauli_averaging_protocol_ran") is True
@@ -112,7 +145,20 @@ def test_methods_resource_unified_qpe_plus_tket_probe_schema() -> None:
     assert isinstance(rev, dict)
     assert rev.get("schema") == "resource_estimation_preview_v1"
     assert rev.get("mode") == "pipeline"
-    assert rev.get("resource_summary_n_circuits") is not None
+    assert rev.get("qpe_demo_track_n_bits") == 4
+    rs_run = out.get("resource_summary")
+    assert isinstance(rs_run, dict)
+    for k in (
+        "n_circuits",
+        "n_qubits",
+        "sum_shots",
+        "max_depth",
+        "sum_twoq",
+        "n_pauli_terms",
+        "n_pauli_groups",
+    ):
+        if rs_run.get(k) is not None:
+            assert rev.get(f"resource_summary_{k}") == rs_run.get(k)
 
 
 def test_resource_estimation_preview_v1_config_only_export() -> None:
@@ -133,3 +179,145 @@ def test_resource_estimation_preview_v1_config_only_export() -> None:
     assert rev.get("schema") == "resource_estimation_preview_v1"
     assert rev.get("mode") == "config_only"
     assert rev.get("parity_integrations_tket_first_circuit_stats") is True
+    assert rev.get("qpe_demo_track_n_bits") == 4
+    assert rev.get("qpe_three_pack_time_yaml") == 1.0
+    assert rev.get("vqs_rhs_mode_yaml") == "linear_damping"
+    assert rev.get("classical_shadows_stub_enabled_yaml") is False
+
+
+def test_registry_and_mdml_blocks_in_config_only_export() -> None:
+    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    cfg = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
+    proc = subprocess.run(
+        [sys.executable, str(_ROOT / "scripts" / "export_parity_criteria_table.py"), str(cfg)],
+        cwd=str(_ROOT),
+        capture_output=True,
+        text=True,
+        env=env,
+        check=False,
+    )
+    assert proc.returncode == 0, proc.stderr or proc.stdout
+    exp = json.loads(proc.stdout)
+    reg = exp.get("algorithm_registry_alignment_v1")
+    assert isinstance(reg, dict)
+    assert reg.get("schema") == "algorithm_registry_alignment_v1"
+    assert "vqe" in (reg.get("algorithm_registry_ids") or [])
+    vre = reg.get("variational_registry_export_v1")
+    assert isinstance(vre, dict) and "vqe" in vre
+    assert isinstance(vre["vqe"], dict) and vre["vqe"].get("has_materialization") is True
+    pre = reg.get("operator_pool_registry_export_v1")
+    assert isinstance(pre, dict)
+    assert pre.get("schema") == "operator_pool_registry_export_v1"
+    assert "fermionic_uccsd" in (pre.get("registered_ids") or [])
+    assert "fermionic_uccsd_doubles_only" in (pre.get("registered_ids") or [])
+    assert "qubit_excitation" in (pre.get("registered_ids") or [])
+    assert "uccsd_jw" in (pre.get("registered_ids") or [])
+    assert "hea" in (reg.get("ansatz_registry_ids") or [])
+    mdml = exp.get("md_ml_repro_freeze_fields_v1")
+    assert isinstance(mdml, dict)
+    assert mdml.get("schema") == "md_ml_repro_freeze_fields_v1"
+    assert "protocol_hash" in (mdml.get("qmframe_fields") or [])
+
+
+def test_methods_resource_unified_v1_includes_classical_benchmark_fields_when_enabled(tmp_path) -> None:
+    pytest.importorskip("pyscf")
+
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
+    cfg_path = tmp_path / "h2_methods_uni_bench.yaml"
+    cfg_path.write_text(
+        """
+schema_version: "1"
+experiment_id: methods_uni_bench
+random_seed: 1
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf:
+  driver: pyscf
+  method: RHF
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+backend:
+  provider: statevector
+  shots_per_circuit: 256
+quantum:
+  algorithm: vqe
+  vqe_depth: 1
+  vqe_maxiter: 10
+  use_pauli_protocol: false
+chemistry_extended:
+  classical_benchmark_enabled: true
+""",
+        encoding="utf-8",
+    )
+    cfg = load_experiment_config(cfg_path)
+    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
+    uni = build_methods_resource_unified_v1(out)
+    assert uni.get("schema") == "methods_resource_unified_v1"
+    assert uni.get("classical_benchmark_active") is True
+    assert uni.get("classical_benchmark_summary_schema") == "classical_benchmark_summary_v1"
+    assert uni.get("classical_benchmark_recommended_baseline_policy") == "prefer_ccsd_else_mp2_else_hf"
+    assert uni.get("classical_benchmark_recommended_baseline_method") in ("ccsd", "mp2", "hf")
+    assert uni.get("classical_benchmark_recommended_baseline_energy_au") is not None
+
+
+def test_resource_estimation_preview_pipeline_merges_qpe_three_from_run_summary() -> None:
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.integrations.resource_estimation_preview import (
+        build_resource_estimation_preview_v1,
+    )
+
+    cfg_path = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
+    if not cfg_path.is_file():
+        pytest.skip("configs/example_h2_qpe_track_parity_integrations.yaml missing")
+    cfg = load_experiment_config(cfg_path)
+    row = {
+        "resource_summary": {"n_circuits": 42},
+        "repro": {
+            "run_summary": {
+                "qpe_three_pack_ran": True,
+                "qpe_three_pack_deterministic_energy_est": -1.23,
+                "qpe_three_pack_kitaev_energy_est": -1.22,
+                "qpe_three_pack_info_theory_energy_est": -1.21,
+            }
+        },
+    }
+    p = build_resource_estimation_preview_v1(cfg=cfg, pipeline_row=row)
+    assert p["mode"] == "pipeline"
+    assert p["resource_summary_n_circuits"] == 42
+    assert p["run_summary_qpe_three_pack_ran"] is True
+    assert p["qpe_three_pack_deterministic_energy_est_from_run"] == -1.23
+    assert p["qpe_three_pack_kitaev_energy_est_from_run"] == -1.22
+    assert p["qpe_three_pack_info_theory_energy_est_from_run"] == -1.21
+
+
+def test_methods_resource_unified_includes_qpe_three_pack_energy_fields() -> None:
+    from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
+
+    uni = build_methods_resource_unified_v1(
+        {
+            "resource_summary": {},
+            "repro": {
+                "run_summary": {
+                    "classical_backend_id": "pyscf",
+                    "qpe_three_pack_ran": True,
+                    "qpe_three_pack_deterministic_energy_est": -2.5,
+                    "qpe_three_pack_kitaev_energy_est": -2.4,
+                    "qpe_three_pack_info_theory_energy_est": -2.3,
+                }
+            },
+        }
+    )
+    assert uni["run_summary_qpe_three_pack_ran"] is True
+    assert uni["qpe_three_pack_deterministic_energy_est"] == -2.5
+    assert uni["qpe_three_pack_kitaev_energy_est"] == -2.4
+    assert uni["qpe_three_pack_info_theory_energy_est"] == -2.3

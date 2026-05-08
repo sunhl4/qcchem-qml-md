@@ -9,7 +9,6 @@ def test_xy_anticommute_zi_commute() -> None:
     n = 2
     x0 = ((0, "X"),)
     y0 = ((0, "Y"),)
-    z0 = ((0, "Z"),)
     assert not pauli_terms_commute(x0, y0, n)
     assert pauli_terms_commute(x0, ((1, "X"),), n)
 

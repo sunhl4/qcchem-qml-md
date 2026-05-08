@@ -17,7 +17,7 @@ i18n_key: api.extensions_pyscf.classes.CASSCF
 - **状态**: 部分对齐
 - **四柱归属**: P1 化学与嵌入
 - **Diátaxis**: Reference
-- **对应模块**: `chemistry_extended.casscf_orbital_optimization_audit`（最小审计 YAML：`configs/example_h2_casscf_audit.yaml`）
+- **对应模块**: *（占位，未实现 — 见里程碑）*
 - **里程碑**: —
 - **InQuanto 锚点**: [https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.CASSCF](https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.CASSCF)
 :::
@@ -28,7 +28,9 @@ i18n_key: api.extensions_pyscf.classes.CASSCF
 
 ## 我们的实现
 
-**部分对齐** — 主线路仍用 **CASCI 型活性空间积分** 变到 qubit；与 InQuanto **CASSCF 产品类** 非 L0 等价。开放栈提供可选 **CASSCF 轨道优化一步审计**（见 frontmatter「对应模块」与 [公开 parity 矩阵](/parity/public-matrix) §3）。
+**部分对齐** — 对应模块: *（占位，未实现 — 见里程碑）*
+
+字段或行为已落地但与 InQuanto 公开语义不完全等价；详细 caveat 见 [公开 parity 矩阵](/parity/public-matrix)。
 
 ## 相关
 

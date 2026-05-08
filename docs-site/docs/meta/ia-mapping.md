@@ -42,11 +42,12 @@ description: 四柱命名、URL 与仓库 docs/*.md 的 canonical 对照
 
 | 仓库相对路径 `qchem_qml_md/docs/` | 站内路径 | 备注 |
 |-----------------------------------|----------|------|
+| `README.md` | — | **仅仓库内**：入口与三母稿索引；不镜像到 VitePress |
 | （新建） | `/tutorial/quickstart` | 摘自 README 编排与 YAML 示例 |
 | （新建） | `/tutorial/workflow-overview` | 工作流与 YAML 与四柱对应（教程） |
 | （新建） | `/guide/principles-and-reading` | 原理与阅读建议（指南） |
 | `ENGINEERING_ARCHITECTURE.md` | `/concept/engineering-architecture` | 全文迁入 |
-| `架构_InQuanto闭源能力闭合与可复现边界.md` | `/concept/architecture-boundaries` | 全文迁入 |
+| `架构_InQuanto闭源能力闭合与可复现边界.md`（已删） | `/concept/engineering-memory-quantinuum` §0；`/concept/architecture-boundaries` | 正文并入 `工程记忆…` §0；旧路由页可保留为快照 |
 | `技术文档_HTTP_API与SQLite作业队列及可观测性契约.md` | `/reference/http-api-sqlite-jobs` | 全文迁入 |
 | `技术文档_CircuitIR与TKET桥接及作业契约.md` | `/reference/circuitir-tket-jobs` | 全文迁入 |
 | `技术文档_设备比特串与Qiskit采样路径.md` | `/reference/qiskit-shot-counts` | 全文迁入 |
@@ -54,16 +55,16 @@ description: 四柱命名、URL 与仓库 docs/*.md 的 canonical 对照
 | `launch_retrieve_nexus_analog.md` | `/concept/launch-retrieve-nexus-analog` | 全文迁入 |
 | `mitigation_PMSV_ZNE_Qermit_mapping.md` | `/concept/mitigation-mapping` | 全文迁入 |
 | `inquanto_public_parity_matrix.md` | `/parity/public-matrix` | 全文迁入 |
-| `L1_InQuanto_alignment_signoff.md` | `/parity/l1-signoff` | 全文迁入 |
-| `InQuanto_Y1_public_alignment_ledger.md` | `/parity/y1-alignment-ledger` | 全文迁入 |
-| `Y1_residual_partial_SLA_template.md` | `/parity/y1-residual-sla-template` | 全文迁入 |
+| `L1_InQuanto_alignment_signoff.md`（已删） | `/parity/gap-implementation-plan#appendix-c`；`/parity/l1-signoff` | 正文并入 `与InQuanto…` 附录 C；本站 L1 页为摘要/镜像 |
+| `InQuanto_Y1_public_alignment_ledger.md`（已删） | `/parity/gap-implementation-plan#appendix-b`；`/parity/y1-alignment-ledger` | 正文并入 `与InQuanto…` 附录 B；本站 Y1 页为摘要/镜像 |
+| `Y1_residual_partial_SLA_template.md`（已删） | `/parity/y1-alignment-ledger#y1-residual-partial-sla-template` | 全文并入台账 **§6**；`/parity/y1-residual-sla-template` 为跳转 stub |
 | `与InQuanto能力差距与实施计划.md` | `/parity/gap-implementation-plan` | 全文迁入 |
 | `竞争定位与路线图_对标Quantinuum产品与技术路线.md` | `/concept/competitive-positioning` | 全文迁入 |
 | `工程记忆_Quantinuum对标与数据流技术文档.md` | `/concept/engineering-memory-quantinuum` | 全文迁入 |
-| `L3_benchmark_suite_roadmap.md` | `/parity/l3-benchmark-roadmap` | 全文迁入 |
+| `L3_benchmark_suite_roadmap.md`（已删） | `/parity/y1-alignment-ledger#l3-benchmark-suite-roadmap` | 全文并入台账 **§7**；`/parity/l3-benchmark-roadmap` 为跳转 stub |
 | `记忆_开放栈对标完成度与待闭合项.md`（已删） | `/concept/engineering-memory-quantinuum#13-…` | 合并入仓库 `工程记忆…` §13；`/parity/open-stack-memory` 为别名页 |
 | `记忆_HTTP_API与作业队列_工程记忆.md`（已删） | `/reference/http-api-sqlite-jobs#9-…` | 合并入仓库 HTTP 技术文档 §9；`/concept/http-api-worker-memory` 为别名页 |
-| `不排期项_转排期与实现说明.md` | `/parity/backlog-to-schedule` | 全文迁入 |
+| `不排期项_转排期与实现说明.md`（已删） | `/parity/gap-implementation-plan#appendix-f`；`/parity/backlog-to-schedule` | 正文并入 `与InQuanto…` 附录 F；本站 backlog 页为摘要/镜像 |
 PandM 文献索引等仍位于仓库 `Yaozheng/PandM/`；静态部署时相对链接可能不可用，请在检出完整 monorepo 时使用。
 
 **与 InQuanto 公开站模块一一对照、便于以后逐项改写的母版**：[InQuanto 模块复现骨架](/meta/inquanto-module-scaffold)。

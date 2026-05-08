@@ -4,24 +4,28 @@
 
 | 字段 | 说明 |
 |------|------|
-| `mode` | `none` / `dmet` / `projection` |
+| `mode` | `none` / `dmet` / `projection` / **`plugin`**（分解插件玩具层；需 `decomposition_plugin` + `decomposition_plugin_json_path`） |
 | `fragment_labels` | DMET 模式下片段 id 列表 |
 | `n_scf_cycles_embedding` | 设计意图上的自洽轮数（台账；完整数值循环需用户钩子） |
 | `classical_reference_method` | 文档/parity 用经典基线标签 |
-| **`dmet_hamiltonian_source`** | **`parity_stub`**：占位 dict，不求解。**`whole_active_system`**：恰好 **一个** 非空 `fragment_labels`；杂质哈密顿量 = **全局活性空间** `QubitHamiltonian`。**`schmidt_atomic_production`**：Schmidt + 谱 bath 杂质 `qh`；`schmidt_dmet_max_cycles>1` 时先跑 `integrations/schmidt_dmet_self_consistent` 密度反馈（`repro` / `schmidt_dmet_self_consistency`），再可选 μ 与主 VQE。 |
+| **`dmet_hamiltonian_source`** | **`parity_stub`**：占位 dict，不求解。**`whole_active_system`**：杂质哈密顿量 = **全局活性空间** `QubitHamiltonian`；默认要求 **恰好一个** 非空 `fragment_labels`。若 `dmet_multifragment_one_shot_shared_hamiltonian: true`，允许 **≥2** 个标签：各片段杂质求解仍使用 **同一** 全局 `qh`（演示/可复现用，非物理多片段 DMET）。**`schmidt_atomic_production`**：Schmidt + 谱 bath 杂质 `qh`；`schmidt_dmet_max_cycles>1` 时先跑 `integrations/schmidt_dmet_self_consistent` 密度反馈（`repro` / `schmidt_dmet_self_consistency`），再可选 μ 与主 VQE。 |
+| **`schmidt_bath_sidecar_json_path`** | 可选：相对实验 YAML 解析的 JSON，合并入 `embedding_workflow.schmidt_bath_sidecar_v1`（用户/Methods 审计钩子）。 |
+| **`oniom_layers_v1`** | 玩具 QM/MM 层提示 → `embedding_workflow.oniom_toy_v1`（文档向元数据）。 |
+| **`decomposition_plugin` / `decomposition_plugin_json_path`** | `mode=='plugin'` 时必填：注册玩具插件名 + 片段积分 JSON 路径。`decomposition_plugin_toy_v1` 载荷会校验 **`primary_fragment_id`**、每个 fragment 的 **`n_qubits`** 与 `pauli_coefficients[*].{label,coeff}`，并在 `embedding_workflow` 暴露 `decomposition_fragment_count` / `decomposition_fragment_ids` 摘要。 |
 
-校验（`model_validator`）：
+校验（`model_validator`，见 `config.py`）：
 
-- `whole_active_system` 要求 `mode == "dmet"` 且 `len(fragment_labels) == 1`（非空字符串）。
-- `schmidt_atomic_production` 要求 `mode == "dmet"`，且不得与 `dmet_uniform_multifragment_toy` 同时开启。**单片段**：`schmidt_fragment_atom_indices` 非空（且 `schmidt_multi_fragment_atom_groups` 为空）。**多片段**：`schmidt_multi_fragment_atom_groups` 非空、与 `schmidt_fragment_atom_indices` 互斥；可选 `fragment_labels` 与组数一致；`schmidt_multi_primary_fragment_index` 指定主线路 `qh` 对应的组。可选 `dmet_target_fragment_electrons` + `schmidt_run_mu_bisection`；**多轮密度反馈**：`schmidt_dmet_max_cycles`（>1）、`schmidt_dmet_mixing_alpha`、`schmidt_dmet_convergence_tol`。
+- `whole_active_system`：`mode == "dmet"`；默认 `len(fragment_labels)==1`；若 `dmet_multifragment_one_shot_shared_hamiltonian` 则 `len(fragment_labels)>=2`。
+- `schmidt_atomic_production`：`mode == "dmet"`，且不得与 `dmet_uniform_multifragment_toy` 同时开启。**单片段**：`schmidt_fragment_atom_indices` 非空（且 `schmidt_multi_fragment_atom_groups` 为空）。**多片段**：`schmidt_multi_fragment_atom_groups` 非空、与 `schmidt_fragment_atom_indices` 互斥；可选 `fragment_labels` 与组数一致；`schmidt_multi_primary_fragment_index` 指定主线路 `qh` 对应的组。可选 `dmet_target_fragment_electrons` + `schmidt_run_mu_bisection`；**多轮密度反馈**：`schmidt_dmet_max_cycles`（>1）、`schmidt_dmet_mixing_alpha`、`schmidt_dmet_convergence_tol`。
+- **`projection_quantum_hamiltonian == 'fragment_mulliken_mo'`**：要求 `mode=='projection'` 且 `projection_fragment_atom_indices` 非空。
 
 ## 2. Pipeline 行为
 
-1. SCF + 构造 **`qh`**：`schmidt_atomic_production` 时先按 `schmidt_dmet_max_cycles` 做（可选多轮）密度反馈，再得到 **杂质 qubit Hamiltonian**（`active_space.fermion_qubit_mapping`，默认 Jordan–Wigner）`qh`；否则为全局活性空间 `molecular_hamiltonian_from_pyscf`。
-2. 若 `embedding.mode == "dmet"`，写入 `out["embedding_workflow"]`（含 `dmet_hamiltonian_source`、所用求解器类名字符串）。
+1. SCF + 构造 **`qh`**：`schmidt_atomic_production` 时先按 `schmidt_dmet_max_cycles` 做（可选多轮）密度反馈，再得到 **杂质 qubit Hamiltonian**（`active_space.fermion_qubit_mapping`，默认 Jordan–Wigner）`qh`；否则为全局活性空间 `molecular_hamiltonian_from_classical_reference`。
+2. 若 `embedding.mode == "dmet"`，写入 `out["embedding_workflow"]`（含 `dmet_hamiltonian_source`、所用求解器类名字符串）；可选并入 **`schmidt_bath_sidecar_v1`**、**`oniom_toy_v1`**。若 `mode == "projection"`，写入 `out["embedding_workflow"]`（`schema: projection_embedding_workflow_v1`）记录投影工作流元数据。若 **`parity_integrations.enabled`** 且 `mode == "projection"`，另在开放栈快照中写入 **`parity_snapshot.projection_embedding_open_trace`**（`schema: projection_embedding_open_trace_v1`，见 `pipeline._append_open_stack_parity_fields`）。
 3. 若 `dmet_hamiltonian_source == "whole_active_system"`，调用 `_run_dmet_fragment_solve_if_requested`：  
    `QubitHamiltonianFragmentSolverVQE` + `OneShotEmbeddingDriver.run(ctx, {label: qh})` → `out["dmet_fragment_solve"]`（并带 `hamiltonian_source` 字段）。
-4. 主变分（VQE/ADAPT）仍在 **`qh`** 上运行，与杂质 VQE **独立** 两次优化；在相同 `random_seed`、`vqe_depth`、`vqe_maxiter`、同一 `executor` 下，单片段全空间时杂质基态能量应与 `energy_after_variational` **数值一致**（见 `tests/test_orchestration_pipeline.py::test_dmet_whole_active_system_impurity_vqe_matches_global_vqe`）。
+4. 主变分（VQE/ADAPT/IQEB）仍在 **`qh`** 上运行，与杂质 VQE **独立** 两次优化；在相同 `random_seed`、`vqe_depth`、`vqe_maxiter`、同一 `executor` 下，**单片段** `whole_active_system` 时杂质基态能量应与 `energy_after_variational` **数值一致**（见 `tests/test_orchestration_pipeline.py::test_dmet_whole_active_system_impurity_vqe_matches_global_vqe`）。**`dmet_multifragment_one_shot_shared_hamiltonian`** 路径不声称多片段物理自洽，仅验证驱动与杂质接口。
 
 ## 3. `parity_snapshot` 中与 DMET/开放栈相关的键
 
@@ -35,6 +39,7 @@
 | `dmet_solver_mode` | 运行后 | `parity_stub` / `whole_active_system` / `schmidt_atomic_production` |
 | `schmidt_embedding_production` | 运行后（Schmidt 路径） | `schmidt_production_audit`：单轮或多轮 `schmidt_dmet_self_consistency`（`schema: schmidt_dmet_density_feedback_v1`） |
 | `dmet_fragment_solve_error` | 异常路径 | 预留（当前校验主要在 Pydantic） |
+| `projection_embedding_open_trace` | `parity_integrations.enabled` 且 `mode==projection` | `schema: projection_embedding_open_trace_v1`；与矩阵 §3 Projection 行同源（`embedding_workflow` 另有 `projection_embedding_workflow_v1`） |
 | `tket_closure_layer_descriptor` | `parity_integrations` 开启 | TKET 开放层描述（编译阶段叙事） |
 | `tket_first_compiled_circuit_probe` / `qnexus_probe` / … | 运行后 / 条件 | 见 ``pipeline._finalize_open_stack_parity_snapshot`` / ``_append_open_stack_parity_fields`` |
 | `tensornet_engine_resolved` | 运行后 | TN stub 的 `engine_resolved` 或 YAML `tensornet_contraction_engine` |
@@ -44,9 +49,20 @@
 
 ## 3b. `parity_snapshot` 顶层键注册（维护 CI）
 
-权威集合：`qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS`（新增快照字段时必须同步更新）。单测 `tests/test_parity_snapshot_key_registry.py` 校验 `collect_repro_metadata(..., qh=None)` 产出的快照键为该集合子集。
+权威集合：`qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS`（新增快照字段时必须同步更新）。单测 `tests/test_parity_snapshot_key_registry.py`：`test_collect_repro_metadata_parity_keys_whitelisted`、`test_repro_quantum_snapshot_minimal_config_whitelisted`（配置期）；`test_finalize_adds_tensornet_parity_keys_when_stub_runs`（finalize 追加键）。两阶段写入与完整维护说明见 **§3c**。
 
 条件键（ParityIntegrations / DMET / Schmidt / TN stub）的实现溯源：`orchestration/pipeline._repro_quantum_snapshot`、`_append_open_stack_parity_fields`、`_finalize_open_stack_parity_snapshot`。
+
+### 3c. `PARITY_SNAPSHOT_DOCUMENTED_KEYS` 与 CI（权威键集合）
+
+**源码**：`qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS`（`frozenset`）。**任何**写入 `repro["parity_snapshot"]` 的新顶层键必须先加入该集合，否则 `tests/test_parity_snapshot_key_registry.py` 中 `test_collect_repro_metadata_parity_keys_whitelisted`、`test_repro_quantum_snapshot_minimal_config_whitelisted` 等会失败。
+
+**键从哪来（两阶段）**：
+
+1. **配置 / 量子契约基线**：`_repro_quantum_snapshot` 合并 `QuantumSpec` / `BackendSpec` / `MitigationSpec` / `CompilerSpec`、激发态开关、`embedding` 摘要、`chemistry_extended`、`nexus_*`、`tensornet_*` 等；随后在 **`parity_integrations.enabled`** 时由 `_append_open_stack_parity_fields` 追加开放栈叙事块（`open_stack_*`、`dmet_open_loop_architecture`、`projection_embedding_open_trace` 等，依 `EmbeddingSpec.mode` 与 flags）。
+2. **运行结束后验字段**：`_finalize_open_stack_parity_snapshot` 在管线尾部按实际输出写入或覆盖 **`tket_first_compiled_circuit_probe`**、**`dmet_one_shot_open_ledger`** / **`dmet_solver_mode`**、**`schmidt_embedding_production`**、**`schmidt_per_fragment_vqe_summary`**、**`dmet_uniform_multifragment_toy`**、**`tensornet_engine_resolved`** / **`tensornet_fallback_reason`**、**`uccsd_n_parameters`**（若变分元数据统计）、**`zne_qiskit_unification_v1`** 等。
+
+**文档维护**：§3 表为 **DMET/嵌入/投影** 视角的摘要；**完整键名列表** 以 `inquanto_contract.py` 中 `frozenset` 字面量为准（可用 `python -c "from qchem_stack.protocols.inquanto_contract import PARITY_SNAPSHOT_DOCUMENTED_KEYS; print('\\n'.join(sorted(PARITY_SNAPSHOT_DOCUMENTED_KEYS)))"` 打印对照）。
 
 ## 4. 求解器类
 

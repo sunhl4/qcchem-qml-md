@@ -7,8 +7,8 @@ from openfermion.ops import QubitOperator
 
 from qchem_stack.chem.fermion import FermionSpace
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
-from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
 from qchem_stack.qpe_qec_demo import BayesianQPEStub
+from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
 
 
 def test_iqeb_outer_loop_meta_and_selected_strings() -> None:
@@ -25,8 +25,10 @@ def test_iqeb_outer_loop_meta_and_selected_strings() -> None:
     assert len(res.selected_pauli_strings) == 1
 
 
-def test_bayesian_qpe_stub_estimate_returns_float() -> None:
+def test_bayesian_qpe_stub_estimate_returns_map_dict() -> None:
     stub = BayesianQPEStub(grid_points=64)
-    phase = stub.estimate([(0.0, 0.5), (1.0, 1.0)])
-    assert isinstance(phase, float)
+    out = stub.estimate([(0.0, 0.5), (1.0, 1.0)])
+    assert isinstance(out, dict)
+    assert out.get("schema") == "bayesian_qpe_stub_map_v1"
+    phase = float(out["map_phase"])
     assert -3.15 <= phase <= 3.15

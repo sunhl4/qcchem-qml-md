@@ -121,6 +121,8 @@ def test_capability_surface_v1() -> None:
     assert isinstance(diff, dict)
     assert diff.get("schema") == "open_stack_differentiators_v1"
     assert isinstance(diff.get("beyond_public_doc_bundle"), list) and diff["beyond_public_doc_bundle"]
+    pools = d.get("operator_pool_registry_export_v1")
+    assert isinstance(pools, dict) and pools.get("schema") == "operator_pool_registry_export_v1"
 
 
 def test_capability_surface_matches_inquanto_contract() -> None:
@@ -132,6 +134,9 @@ def test_capability_surface_matches_inquanto_contract() -> None:
         mitigation_execution_model_public,
         open_stack_differentiators_public,
     )
+    from qchem_stack.quantum.algorithm_registry import algorithm_registry_export
+    from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
+    from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
     client = TestClient(app)
     r = client.get("/v1/meta/capability-surface")
@@ -144,6 +149,9 @@ def test_capability_surface_matches_inquanto_contract() -> None:
         "gaps": inquanto_gap_categories(),
         "mitigation_execution_model": mitigation_execution_model_public(),
         "open_stack_differentiators": open_stack_differentiators_public(),
+        "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
+        "algorithm_registry_export_v1": algorithm_registry_export(),
+        "variational_registry_export_v1": variational_registry_export(),
     }
     assert body == expected
 

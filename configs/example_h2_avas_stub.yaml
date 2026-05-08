@@ -1,0 +1,39 @@
+# Minimal H2 — AVAS **stub** strategy (same ncas/nelecas semantics as `strategy=cas`; no AO threshold projection).
+#
+# Recorded in hamiltonian_meta.pyscf_driver via chem.active_space.mean_field_meta:
+#   avas_partial_stub, avas_atomic_projection_executed=false, avas_stub_semantics,
+#   avas_ao_labels_requested + avas_ao_labels_logging_only (from chemistry_extended.avas_ao_labels).
+schema_version: "1"
+experiment_id: "h2_avas_stub_smoke"
+random_seed: 1
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+
+scf:
+  driver: pyscf
+  method: RHF
+
+active_space:
+  strategy: avas_stub
+  ncas: 2
+  nelecas: 2
+
+backend:
+  provider: statevector
+  shots_per_circuit: 256
+
+quantum:
+  algorithm: vqe
+  vqe_depth: 1
+  vqe_maxiter: 20
+  use_pauli_protocol: false
+
+chemistry_extended:
+  avas_ao_labels: ["H 1s"]

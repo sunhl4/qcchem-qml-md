@@ -60,6 +60,80 @@ def test_greedy_commuting_layers_partition_uccsd() -> None:
     assert len(layers) >= 1
 
 
+def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
+    """Dense UCCSD matches PySCF FCI window on Tangelo-aligned JW Hamiltonian."""
+    pytest.importorskip("pyscf")
+    from pathlib import Path
+
+    from qchem_stack.backends.executor_base import StatevectorHeaExecutor
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
+
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    drv = PySCFDriver.from_config(cfg)
+    rhf = drv.run_rhf()
+    ref = ClassicalMeanFieldReference(
+        mf=rhf.mf,
+        e_tot=float(rhf.e_tot),
+        mo_energy=rhf.mo_energy,
+        molecular_system=rhf.molecular_system,
+        driver_meta=dict(rhf.driver_meta),
+    )
+    qh = molecular_hamiltonian_from_classical_reference(
+        ref,
+        n_active_orbitals=cfg.active_space.n_active_orbitals,
+        n_active_electrons=cfg.active_space.n_active_electrons,
+    )
+    ur = UCCSDVQE(qh, executor=StatevectorHeaExecutor()).run(maxiter=400, seed=42)
+    assert ur.meta.get("jw_fixed_electron_sector_projection") is True
+    e = float(ur.energy)
+    assert e <= float(rhf.e_tot) + 1e-3
+    e_fci = -1.1372759436170443
+    assert e >= e_fci - 5e-3
+
+
+def test_uccsd_vqe_h2_bravyi_kitaev_energy_window() -> None:
+    """Dense BK UCCSD reaches the same physical window as JW (ground state is encoding-invariant)."""
+    pytest.importorskip("pyscf")
+    from pathlib import Path
+
+    from qchem_stack.backends.executor_base import StatevectorHeaExecutor
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
+
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    drv = PySCFDriver.from_config(cfg)
+    rhf = drv.run_rhf()
+    ref = ClassicalMeanFieldReference(
+        mf=rhf.mf,
+        e_tot=float(rhf.e_tot),
+        mo_energy=rhf.mo_energy,
+        molecular_system=rhf.molecular_system,
+        driver_meta=dict(rhf.driver_meta),
+    )
+    qh = molecular_hamiltonian_from_classical_reference(
+        ref,
+        n_active_orbitals=cfg.active_space.n_active_orbitals,
+        n_active_electrons=cfg.active_space.n_active_electrons,
+        fermion_qubit_mapping="bravyi_kitaev",
+    )
+    ur = UCCSDVQE(qh, executor=StatevectorHeaExecutor()).run(maxiter=400, seed=7)
+    assert ur.meta.get("fermion_to_qubit_map") == "bravyi_kitaev"
+    assert ur.meta.get("jw_fixed_electron_sector_projection") is False
+    e = float(ur.energy)
+    assert e <= float(rhf.e_tot) + 1e-3
+    e_fci = -1.1372759436170443
+    assert e >= e_fci - 6e-3
+
+
 def test_expectation_qubit_operator_dense_Z0() -> None:
     op = QubitOperator("Z0", 1.0)
     psi = np.array([1.0, 0.0], dtype=np.complex128)

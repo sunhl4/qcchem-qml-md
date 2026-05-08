@@ -5,7 +5,7 @@ Install: ``pip install qchem-stack[pytket]`` (or ``pip install pytket``).
 
 from __future__ import annotations
 
-from typing import Any, Tuple, cast
+from typing import Any, cast
 
 from qchem_stack.backends.spec import CircuitIR
 
@@ -22,7 +22,7 @@ def _require_pytket() -> type:
     return cast(type, Circuit)
 
 
-def circuit_ir_to_pytket(ir: CircuitIR) -> Tuple[Any, list[str]]:
+def circuit_ir_to_pytket(ir: CircuitIR) -> tuple[Any, list[str]]:
     """Build a pytket :class:`~pytket.circuit.Circuit` from supported :class:`CircuitIR` ops.
 
     Supported names: ``RY``, ``RX``, ``CX``, ``CNOT``, ``H``, ``SDG``, ``MEASURE``.

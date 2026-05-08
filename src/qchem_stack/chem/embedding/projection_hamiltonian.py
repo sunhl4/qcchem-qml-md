@@ -19,9 +19,12 @@ from typing import Any
 
 import numpy as np
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.embedding.schmidt_production import _atom_ao_ranges
-from qchem_stack.chem.hamiltonian import QubitHamiltonian, qubit_hamiltonian_from_spatial_chemist_integrals
+from qchem_stack.chem.hamiltonian import (
+    QubitHamiltonian,
+    qubit_hamiltonian_from_spatial_chemist_integrals,
+)
 from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import EmbeddingError
 
@@ -77,7 +80,7 @@ def select_active_mo_indices(
 
 
 def molecular_hamiltonian_fragment_mulliken_projection(
-    rhf: PySCFRHFResult,
+    rhf: ClassicalMeanFieldReference,
     cfg: ExperimentConfig,
 ) -> tuple[QubitHamiltonian, dict[str, Any]]:
     """
@@ -85,12 +88,18 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     ``cfg.embedding.projection_fragment_atom_indices``, with (``ncore``, ``ncas``, ``nelecas``)
     matching :class:`ActiveSpaceSpec`.
     """
+    tag = rhf.backend_tag()
+    if tag != "pyscf":
+        raise EmbeddingError(
+            "projection.fragment_mulliken_mo is currently implemented on the PySCF backend "
+            f"(got backend={tag!r})."
+        )
+    rhf_pyscf = rhf.as_pyscf_rhf_result()
     if cfg.scf.method != "RHF":
         raise EmbeddingError(
             "projection_quantum_hamiltonian='fragment_mulliken_mo' requires scf.method='RHF' in this stack."
         )
-    mf = rhf.mf
-    mol = mf.mol
+    mf = rhf_pyscf.mf
     mo_coeff = mf.mo_coeff
     if not isinstance(mo_coeff, np.ndarray):
         raise EmbeddingError("fragment_mulliken_mo requires a molecular (non-k-point) real MO coefficient matrix.")
@@ -100,7 +109,7 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     ncas = int(cfg.active_space.n_active_orbitals)
     if ncas > n_mo or ne > 2 * ncas or ne < 0 or ne % 2 != 0:
         raise EmbeddingError("Invalid active_space electron/orbital count for MO dimensions.")
-    from pyscf import mcscf
+    from pyscf import ao2mo, mcscf
 
     cas = mcscf.CASCI(mf, ncas, ne)
     ncore = int(cas.ncore)
@@ -122,7 +131,9 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     h1a = np.asarray(h1, dtype=float)
     h2a = np.asarray(h2, dtype=float)
     # Match :func:`active_space_integrals`: ``e_core`` from ``get_h1eff`` already includes
-    # ``energy_nuc()`` and inactive-core contributions; do not add ``mol.energy_nuc()`` again.
+    # nuclear repulsion (and frozen-core energy when applicable).
+    if h2a.ndim != 4:
+        h2a = np.asarray(ao2mo.restore(1, h2a, ncas), dtype=float)
     constant = float(e_core)
 
     audit: dict[str, Any] = {
@@ -135,7 +146,7 @@ def molecular_hamiltonian_fragment_mulliken_projection(
         "n_active_orbitals": ncas,
         "n_active_electrons": ne,
         "mo_coeff_permutation": [int(p) for p in perm],
-        "reference_energy_rhf_au": float(rhf.e_tot),
+        "reference_energy_rhf_au": float(rhf_pyscf.e_tot),
         "module": "qchem_stack.chem.embedding.projection_hamiltonian",
         "epistemic_bound": (
             "Fragment Mulliken MO screening + CASCI active integrals + user-selected fermion→qubit mapping "
@@ -144,7 +155,7 @@ def molecular_hamiltonian_fragment_mulliken_projection(
         ),
     }
 
-    dm = getattr(rhf, "driver_meta", None) or {}
+    dm = getattr(rhf_pyscf, "driver_meta", None) or {}
     qh = qubit_hamiltonian_from_spatial_chemist_integrals(
         constant,
         h1a,

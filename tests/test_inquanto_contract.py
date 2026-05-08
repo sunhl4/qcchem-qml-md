@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 from pydantic import ValidationError
 
-from qchem_stack.config import MoleculeSpec, ActiveSpaceSpec, ExperimentConfig, QuantumSpec
+from qchem_stack.config import ActiveSpaceSpec, ExperimentConfig, MoleculeSpec, QuantumSpec
 from qchem_stack.protocols.inquanto_contract import (
     PAULI_PATH_DISABLED,
     PAULI_PATH_EXACT,
@@ -52,12 +52,15 @@ def test_inquanto_map_and_gaps_non_empty() -> None:
     m = inquanto_object_map_for_docs()
     assert "Protocol (five stages)" in m
     assert "Noise mitigation (Qermit-style)" in m
-    assert "AlgorithmIQEB" in m
+    assert "YAML quantum.algorithm_factory (variational plugins)" in m
+    assert "Operator pool registry (ADAPT/IQEB)" in m
     assert "Algorithm*QPE (track)" in m
+    assert "AlgorithmVQS / AlgorithmMcLachlan*" in m
     g = inquanto_gap_categories()
     assert any(x.get("id") == "cloud_nexus" for x in g)
     assert any(x.get("id") == "http_submit_poll_workspace" for x in g)
     assert any(x.get("id") == "evaluate_support_set" for x in g)
+    assert any(x.get("id") == "adapt_iqeb_operator_pool_surface" for x in g)
     assert any(x.get("id") == "compiler_pass_bundle" for x in g)
     assert any(x.get("id") == "integrations_closure_layer" for x in g)
     comp = next(x for x in g if x.get("id") == "composable_computable")
@@ -79,8 +82,8 @@ def test_parity_export_stable_keys_present() -> None:
     from qchem_stack.protocols.inquanto_contract import PARITY_EXPORT_V2_STABLE_KEYS
 
     cfg = _exp_cfg()
-    from qchem_stack.protocols.computable import computables_export_dict
     from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
+    from qchem_stack.protocols.computable import computables_export_dict
 
     blob = {
         "parity_export_schema_version": "2",

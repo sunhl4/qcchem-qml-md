@@ -5,9 +5,9 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from openfermion.ops import QubitOperator
 from scipy.linalg import eigh
 from scipy.optimize import minimize
-from openfermion.ops import QubitOperator
 
 from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.pauli_shot_sim import energy_estimate_grouped_shot_simulation
@@ -166,9 +166,9 @@ class VQDResult:
 class VQD:
     """Sequential deflation (Higgott et al., `Quantum 3, 156 (2019)`) with optional three-channel reporting.
 
-    Optimization still uses a **single** classical objective (energy + overlap penalty). After each
-    level, :func:`_vqd_three_protocol_channels` reports objective / overlap / weight statistics
-    analogous to InQuanto's three ``Protocol`` slots (shot budgets optional).
+    Optimization uses a single classical scalar objective (regularized overlap penalty configurable via
+    ``overlap_exponent``). After each level, :func:`_vqd_three_protocol_channels` reports objective /
+    overlap / weight statistics analogous to three ``Protocol`` slots (optional shot budgets).
     """
 
     def __init__(
@@ -177,12 +177,17 @@ class VQD:
         n_states: int = 2,
         depth: int = 1,
         penalty_weight: float = 5.0,
+        *,
+        overlap_exponent: float = 1.0,
+        cobyla_maxiter: int = 150,
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> None:
         self.hamiltonian = hamiltonian
         self.n_states = n_states
         self.depth = depth
         self.penalty_weight = penalty_weight
+        self.overlap_exponent = float(max(overlap_exponent, 0.05))
+        self.cobyla_maxiter = int(max(1, cobyla_maxiter))
         self._executor = executor
 
     def run(
@@ -265,11 +270,12 @@ class VQD:
             def objective(x: np.ndarray, states: list[np.ndarray] = prev_states) -> float:
                 g = hea_state(x, self.hamiltonian.n_qubits, self.depth)
                 g = g / (np.linalg.norm(g) + 1e-15)
-                ov_sum = sum(abs(np.vdot(s, g)) ** 2 for s in states)
+                p = float(self.overlap_exponent)
+                ov_sum = sum(abs(np.vdot(s, g)) ** (2.0 * p) for s in states)
                 e = exe.expectation_state(g, self.hamiltonian.operator, self.hamiltonian.n_qubits)
                 return e + self.penalty_weight * ov_sum
 
-            r = minimize(objective, x0, method="COBYLA", options={"maxiter": 150})
+            r = minimize(objective, x0, method="COBYLA", options={"maxiter": self.cobyla_maxiter})
             g_new = hea_state(np.asarray(r.x), self.hamiltonian.n_qubits, self.depth)
             g_new = g_new / (np.linalg.norm(g_new) + 1e-15)
             e_new = exe.expectation_state(g_new, self.hamiltonian.operator, self.hamiltonian.n_qubits)
@@ -310,6 +316,8 @@ class VQD:
                 "shots_overlap": shots_overlap,
                 "shots_weight": shots_weight,
                 "reused_pipeline_ground": reused_ground,
+                "overlap_exponent_yaml": float(self.overlap_exponent),
+                "cobyla_maxiter_yaml": int(self.cobyla_maxiter),
             },
         )
 
@@ -354,12 +362,17 @@ class QSE:
         evals = np.sort(np.real(evals))
         e0 = float(evals[0])
         exc = [float(evals[i] - e0) for i in range(1, len(evals))]
+        svals = np.linalg.svd(np.real(s_sub), compute_uv=False)
+        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
         return QSEResult(
             excitation_energies=exc,
             meta={
                 "reference": "arXiv:1603.05681",
                 "K": len(basis),
+                "K_raw": int(self.hamiltonian.n_qubits + 1),
+                "linear_dependencies_removed": int(max(0, self.hamiltonian.n_qubits + 1 - len(basis))),
                 "H_sub_shape": list(h_sub.shape),
+                "S_condition_number": cond_s,
             },
         )
 
@@ -387,6 +400,8 @@ class QSE:
         evals = np.sort(np.real(evals))
         e0 = float(evals[0])
         exc = [float(evals[i] - e0) for i in range(1, len(evals))]
+        svals = np.linalg.svd(s_real, compute_uv=False)
+        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
         return QSEResult(
             excitation_energies=exc,
             meta={
@@ -394,6 +409,7 @@ class QSE:
                 "K": len(basis),
                 "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
                 "shots_per_matrix_element": shots_per_matrix_element,
+                "S_condition_number": cond_s,
             },
         )
 
@@ -425,6 +441,8 @@ class QSE:
             records=records,
         )
         _, exc = solve_qse_ghep(h_sym, s_mat)
+        svals = np.linalg.svd(np.real(s_mat), compute_uv=False)
+        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
         return QSEResult(
             excitation_energies=exc,
             meta={
@@ -432,6 +450,7 @@ class QSE:
                 "K": len(basis),
                 "shot_noise_model": "independent_complex_gaussian_per_ij_term",
                 "shots_per_ij_term": shots_per_ij_term,
+                "S_condition_number": cond_s,
                 "qse_pauli_transition_schedule": {
                     "n_qubits": sched.n_qubits,
                     "subspace_dim": sched.subspace_dim,

@@ -154,7 +154,7 @@ def product_analog() -> dict[str, object]:
         "emulation_notes": [
             "Five-stage protocol preview: POST /v1/meta/workflow-preview (YAML-only, no chemistry).",
             "Computable DAG (semantic v2): POST /v1/meta/workflow-preview.",
-            "Capability one-shot: GET /v1/meta/capability-surface (gaps + public object map).",
+            "Capability one-shot: GET /v1/meta/capability-surface (gaps + public object map + operator_pool_registry_export_v1).",
             "Job lifecycle: POST/GET /v1/runs (optional project_slug), GET /v1/runs/{id}/summary, repro GET /v1/runs/{id}/repro (DONE only); events use persisted timeline when available.",
             "ML / MD bridge surface: GET /v1/meta/ml-md-bridge; validate QMEFDataset JSON: POST /v1/meta/qmef-validate; in-memory MLIP stub fit: POST /v1/meta/ml-md-trainer-stub-fit.",
         ],
@@ -167,7 +167,8 @@ def product_analog() -> dict[str, object]:
 @app.get("/v1/meta/capability-surface", tags=["meta"])
 def capability_surface() -> dict[str, object]:
     """
-    Single fetch for landing / admin consoles: version, full gap rows, InQuanto-public name → implementation map.
+    Single fetch for landing / admin consoles: version, full gap rows, InQuanto-public name → implementation map,
+    plus **operator_pool_registry_export_v1** (ADAPT/IQEB pool ids and aliases).
 
     **Not** a substitute for narrative docs — aggregates machine-readable parity artifacts.
     """
@@ -178,6 +179,9 @@ def capability_surface() -> dict[str, object]:
         mitigation_execution_model_public,
         open_stack_differentiators_public,
     )
+    from qchem_stack.quantum.algorithm_registry import algorithm_registry_export
+    from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
+    from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
     return {
         "schema": "capability_surface_v1",
@@ -186,6 +190,9 @@ def capability_surface() -> dict[str, object]:
         "gaps": inquanto_gap_categories(),
         "mitigation_execution_model": mitigation_execution_model_public(),
         "open_stack_differentiators": open_stack_differentiators_public(),
+        "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
+        "algorithm_registry_export_v1": algorithm_registry_export(),
+        "variational_registry_export_v1": variational_registry_export(),
     }
 
 

@@ -1,0 +1,51 @@
+# Parity/export sample: Z-matrix + density fitting (combined MO-input path).
+schema_version: "1"
+experiment_id: "h2_zmatrix_sto3g_df_parity_sample"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  zmatrix: |
+    H
+    H 1 0.74
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+  density_fit: true
+  density_fit_auxbasis: "weigend"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  qiskit_mode: "statevector"
+  ionstack_endpoint: null
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 200
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"

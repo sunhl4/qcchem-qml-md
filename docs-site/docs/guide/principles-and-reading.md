@@ -42,6 +42,7 @@ description: "底层机制与算法 — 建议的站内阅读顺序与深度材�
 
 下列路径相对于 **`qchem_qml_md` 仓库根**，为站内 Concept / Parity / Reference 的**中文或中英母稿**；在本地 IDE 打开即可（本站不链到 VitePress 树外文件，以免死链）。
 
+- `docs/README.md`（**按主题导览**；与 `README.md` / `CONTRIBUTING.md` 与 `docs/技术文档_*.md` §2 分组一致）
 - `docs/ENGINEERING_ARCHITECTURE.md`
 - `docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md`
 - `docs/技术文档_CircuitIR与TKET桥接及作业契约.md`
@@ -50,10 +51,9 @@ description: "底层机制与算法 — 建议的站内阅读顺序与深度材�
 - `docs/P1_化学与嵌入_InQuanto镜像与qchem_stack复现程度对照.md`
 - `docs/inquanto_public_parity_matrix.md`
 - `docs/与InQuanto能力差距与实施计划.md`
-- `docs/L1_InQuanto_alignment_signoff.md`
-- `docs/InQuanto_Y1_public_alignment_ledger.md`
-- `docs/Y1_residual_partial_SLA_template.md`
-- `docs/L3_benchmark_suite_roadmap.md`
+- `docs/与InQuanto能力差距与实施计划.md`（附录 C）
+- `docs/与InQuanto能力差距与实施计划.md`（附录 B）
+- `docs/与InQuanto能力差距与实施计划.md`（附录 B）（**§6** SLA、**§7** L3；原独立模板已并入）
 - `docs/工程记忆_Quantinuum对标与数据流技术文档.md` §13（原 `记忆_开放栈…` 已合并）
 - `docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md`
 - `docs/architecture-report-quantinuum-inquanto-web/INDEX.md`（多卷报告入口；含 vol-03 教程思路等）

@@ -56,12 +56,18 @@
 ## 4. 我们**不**应作为对标的方面（避免目标错位）
 
 - 与 **Quantinuum 商业云 + H 系列** 的 **1:1 产品替代**（无 Nexus、无 HQC、无真机 SLA）。  
-- 追求与 **Qermit 商业运行时、inquanto-cutensornet、InQuanto 闭源 driver 目录** 的 **1:1** 替代（本仓库已提供 **开放栈可对表类比**：`qermit_analog`+`qermit_runtime`、`tensornet` stub+引擎钩子、PySCF 上 **ddCOSMO/PBC（含 k 网）** 等，见 [不排期项_转排期与实现说明.md](/parity/backlog-to-schedule) / [parity 矩阵](/parity/public-matrix)——**仍非** 产品与闭源等价）。  
+- 追求与 **Qermit 商业运行时、inquanto-cutensornet、InQuanto 闭源 driver 目录** 的 **1:1** 替代（本仓库已提供 **开放栈可对表类比**：`qermit_analog`+`qermit_runtime`、`tensornet` stub+引擎钩子、PySCF 上 **ddCOSMO/PBC（含 k 网）** 等，见 [差距计划 — 附录 F](/parity/gap-implementation-plan#appendix-f) / [parity 矩阵](/parity/public-matrix)——**仍非** 产品与闭源等价）。  
 - 以「**又做一套 InQuanto**」为 KPI——会陷入闭源与硬件护城河；应把 KPI 放在**开放可审计 + 领域扩展（MD/ML）+ 方法论文级**。
 
 ---
 
 ## 5. 分阶段工程优化目标（直接指导 `qchem_qml_md` 迭代）
+
+### 5.1 经典化学驱动（现阶段 PySCF，契约可多后端）
+
+- **现状**：端到端数值与 CI 示例默认 **`scf.driver=pyscf`**（受限活性空间 → qubit 哈密顿量、CASCI 主路径、多数嵌入分支）。  
+- **契约**：`ChemIntegralSolver` / `create_solver` → `ClassicalMeanFieldReference`（`upstream_classical_software_tag`）；活性空间元数据 **`chem.active_space.mean_field_meta`**；经典后 HF 基准 **`chem.classical_benchmarks`** —— 与具体量子化学程序类名解耦，便于扩展。  
+- **扩展**：在 **`chem/solvers/registry.py`** 注册适配器，按需点亮 **`SolverCapabilities`**（尤其是 **`supports_restricted_active_space_qubit_hamiltonian`**）；Psi4 可走 **RHF 总能量** `compute_mean_field`，仍 **不提供**默认活性空间哈密顿量通道（与 PySCF 数值主线不等价）。权威条文见仓库 **`docs/`** 母稿 [竞争定位与路线图 §5.1](../../../docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) 及 [ENGINEERING_ARCHITECTURE §1.1](../../../docs/ENGINEERING_ARCHITECTURE.md#11-architecture-invariant-pinned)。
 
 下表将「竞争焦点」落为**仓库内**可执行项，并与现有 **partial** 行对齐。优先级 **P0** 短期可交卷，**P1** 中程，**P2** 结构增强。
 
@@ -76,18 +82,17 @@
 | **P2** | 多后端**设备真 shot**（可选） | `PauliAveragingProtocol` 的 `run_qiskit_shots_pauli_protocol` + `backends/qiskit_pauli_shots.py`：Aer/IBM 等经 Qiskit `Backend.run` 的 `get_counts` 与 `resource_rows` 对齐；`HamiltonianExpectationExecutor` 仍用于非 shot 路径的精确期望 | [技术文档_设备比特串与Qiskit采样路径.md](/reference/qiskit-shot-counts) |
 | **持续** | **MD/ML** 与化学核**契约稳定** | `md_bridge` schema、QMEF 与上游 `repro` 字段一致 | `md_bridge/` |
 
-**已落地（工程执行）**：P0 已加 `export_parity_criteria_table` 扩展字段、CI 中 **parity 导出 + `--sampled` + `run_qpe_track_demo`**；P0 `run_sampled` 见 `configs/example_h2_sampled.yaml`；P1 已加 **`EmbeddingSpec` + `repro`、PMSV YAML + `pmsv_report`、`excited_shot_accounting`**；P2 已加 **`scripts/run_qpe_track_demo.py` + `configs/qpe_dual_track_demo.yaml`**、`pauli_measurement_ledger`；P2 已加 **Qiskit 比特串 Pauli 路径**（`run_qiskit_shots_pauli_protocol`、`configs/example_h2_qiskit_shots.yaml`、见 [技术文档_设备比特串与Qiskit采样路径.md](/reference/qiskit-shot-counts)）；持续项已加 **`QMFrame.repro_config_sha256_prefix`**。**另（开放栈可对表）**：`nexus_analog`/`nexus_cloud` 侧车、`qermit_*`、`tensornet` stub（矩阵 **`n/a`**）、PBC+k 点/ddCOSMO、JW **UCCSD Trotter**、Schmidt **bath 侧车**与 ONIOM **玩具层**、最小 **CASSCF 审计** 等已进主包与矩阵，见 [README](/tutorial/quickstart)、[工程记忆](/concept/engineering-memory-quantinuum) 与仓库 `docs/竞争定位…` §6「仍需推进」。**仍为后续**：Quantinuum 专有云真机一键编排、主 pipeline 内 QPE 与 FT **资源级**深度合流、产品级 ONIOM/QM-MM。
+**已闭合批次（不在本站铺陈证据链）**：P0/P1、主线结构增强与不排期四项 **v1** 类比均已收口。权威清单见仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 E、附录 F）；机读键与矩阵见 [parity 矩阵](/parity/public-matrix)、[差距与实施计划](/parity/gap-implementation-plan) **§3**；物化链见 [工程记忆](/concept/engineering-memory-quantinuum)。**仍为后续（多为路线图 P2）**：QPE/FT 资源级深度、产品级 ONIOM/QM-MM、AVAS/全 CASSCF 深度、BK/SCBK 上 UCCSD Trotter（矩阵 **`n/a`**）、教程资产扩张——见母稿 `docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md` §6「仍需推进」与 [P2 详细实施计划](/concept/p2-detailed-plan)。
 
 ---
 
 ## 6. 与现有「工程记忆 / parity」的衔接
 
-- 详细差距与实现顺序见 [工程记忆_Quantinuum对标与数据流技术文档.md](/concept/engineering-memory-quantinuum)（激发态、Protocol `run`、shots、ADAPT 元数据等）。  
-- 公开能力覆盖见 [inquanto_public_parity_matrix.md](/parity/public-matrix)。  
-- **能力差距 + 排期**（与 InQuanto 公开栈逐项对照、含 `pauli_protocol_expectation_path`）：[与InQuanto能力差距与实施计划.md](/parity/gap-implementation-plan)。  
-- **本文**负责：**战略一句话 + P0–P2 表**；**工程记忆**负责：**模块级**细节与机读字段。
+- **三块母稿分工**：战略与三方对比（**本文**）；物化链 / 判据 / 模块索引（[工程记忆](/concept/engineering-memory-quantinuum)）；差距表 + 维护约定 + P2 索引（[差距与实施计划](/parity/gap-implementation-plan)）。路线图 **P2** 分解见 [P2 详细实施计划](/concept/p2-detailed-plan)。  
+- 公开能力覆盖见 [parity 矩阵](/parity/public-matrix)。  
+- InQuanto B→J 与 L1 哲学见仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 D、附录 C）（本站 [L1 签字](/parity/l1-signoff) 为摘要/镜像）。
 
-**维护约定**：当 parity 中某行从 `partial` 收束为更「可发表」时，**同时**更新本文 §5 对应行与工程记忆 §9 路线图，避免三份文档分歧。
+**维护约定**：当 parity 中某行从 `partial` 收束为更「可发表」时，**同时**更新本文 §5、[差距计划 §1/§3](/parity/gap-implementation-plan) 与工程记忆相关节，避免三份母稿分歧。
 
 ---
 

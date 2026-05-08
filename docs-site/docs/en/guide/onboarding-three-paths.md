@@ -15,13 +15,13 @@ Hub for **P2-W7** (two-month plan). Details live in each linked tutorial and in 
 
 1. [Public parity matrix](/en/parity/public-matrix)  
 2. [L1 signoff](/en/parity/l1-signoff)  
-3. [Gap plan](/parity/gap-implementation-plan) (ZH) and [P2 plan](/en/concept/p2-detailed-plan) (EN summary; full §6–§8 in repo `docs/P2_详细实施计划.md`)  
+3. [Gap plan](/parity/gap-implementation-plan) (ZH) and [P2 plan](/en/concept/p2-detailed-plan) (EN summary; full §6–§8 in repo `docs/与InQuanto能力差距与实施计划.md`（附录 A）)  
 4. Repo root **`CONTRIBUTING.md`** (CI markers, parity export)
 
 ## Path C — MD/ML and `QMEFDataset`
 
 1. [Principles & reading](/en/guide/principles-and-reading) (execution/mitigation sections as needed)  
-2. `src/qchem_stack/md_bridge/` and **`docs/md_bridge_repro_freeze_list.md`**  
+2. `src/qchem_stack/md_bridge/` and **`docs/工程记忆_Quantinuum对标与数据流技术文档.md` §16**  
 3. `pytest -m l1_md_ml`
 
-**Maintenance**: Two-month calendar in repo `docs/P2_详细实施计划.md` §8.
+**Maintenance**: Two-month calendar in repo `docs/与InQuanto能力差距与实施计划.md`（附录 A） §8.

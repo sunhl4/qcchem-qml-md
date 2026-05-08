@@ -44,6 +44,7 @@ _RESULT_KEYS = (
     "nexus_cloud_repro",
     "tensornet_protocol_stub",
     "qpe_demo_track",
+    "vqs_track",
 )
 
 

@@ -49,5 +49,5 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 - [工作流与 YAML 概览](./workflow)
 - [产品功能](../product/features)
-- [指南总览](../guide/overview)
-- [命令与脚本](../reference/cli-http)
+- [指南总览](../guide/)
+- [命令与脚本](../reference/cli-and-scripts)

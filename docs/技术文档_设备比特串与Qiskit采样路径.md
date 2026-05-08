@@ -9,20 +9,28 @@
 | **有** | 对每组对易 Pauli，构造 **HEA + 单比特基变更 + 全比特测量** 的 Qiskit 线路；`Aer` 或真实 `Backend.run(..., shots=...)`；`get_counts`；按与 `pauli_shot_sim` **同一套** 张量/计算基索引，把 `histogram` 重组成 \(\langle H\rangle\) 的估计及分组方差近似。 |
 | **无** | 不绑定 IBM Quantum 账号、Nexus 作业队列、InQuanto 内部对象名或未公开 API；不保证与闭源 InQuanto 的数值逐比特一致。 |
 
+**前置条件**：下列三条路径均在 **`quantum.use_pauli_protocol: true`** 且管线实际构造 `PauliAveragingProtocol` 时生效。若 `use_pauli_protocol: false`，管线在 `pre_pauli_protocol` 之后直接跳过 Pauli 阶段（无 `protocol_counts` 中的本节字段）；见 `orchestration/pipeline.py` 中 `pauli_protocol_skipped` 分支。
+
+**机读分类（CI / gap）**：`qchem_stack.protocols.inquanto_contract.protocol_expectation_semantics_public()` 将上述开关组合映射到 `protocol_counts_expectation_source` / `protocol_counts_energy_stderr_model`，与 parity 导出同源维护。
+
 **对标叙事**：在「公开的产品故事」上，本路径与 InQuanto 文档中常见的 **Computable → Protocol / shot schedule → counts → expectation** 一致；实现落点在 `qchem_stack.backends.qiskit_pauli_shots` 与 `PauliAveragingProtocol.run` 的 `run_qiskit_shots` 分支。
 
 ## 2. 三条 Pauli 协议能量路径对比
 
+记 Hamiltonian 的 Pauli 分解为 \(H=\sum_P c_P P\)。分组测量计划将 \(\{P\}\) 划分为对易组 \(G_k\)；每组一次（或若干次子 shots）线路读出计算基计数，再把各 Pauli 本征值在采样基上累加得到 \(\hat E\)。能量不确定度 `energy_stderr` 在各路径下采用不同模型（见各路径的 `energy_stderr_model`）。
+
 1. **默认**（`run_sampled_pauli_protocol: false` 且 `run_qiskit_shots_pauli_protocol: false`）  
-   由 `HamiltonianExpectationExecutor` 提供 \(\langle H\rangle\)（`statevector` 或 `QiskitStatevector` 等 **精确/解析** 期望）。`protocol_counts.energy_stderr` 使用**保守的**、与分组预算相关的上界类模型（见 `backends/shot_budget.py`）。
+   由 `HamiltonianExpectationExecutor.expectation_hea` 提供 \(\langle H\rangle\)（`statevector` / `QiskitStatevector` 等 **精确或设备解析期望**，取决于 `BackendSpec`）。`protocol_counts` 写入：`expectation_source: executor_exact_or_device_mean`，`energy_stderr_model: conservative_sum_bound_equal_shots`（`backends/shot_budget.energy_estimate_with_uncertainty` 的保守上界，可按 `target_energy_stderr` 反推有效 `shots_per_circuit`）。
 
 2. **状态向量分组蒙特卡洛**（`run_sampled_pauli_protocol: true`）  
-   在 `hea_state` 上按组从计算基分布 **采样**，与 InQuanto 式「模拟 shot」一致。直方图来自**模拟**计数。实现：`backends/pauli_shot_sim.py`。
+   在 `hea_state` 上按组从计算基分布 **采样**，与 InQuanto 式「模拟 shot」一致。直方图来自**模拟**计数。实现：`backends/pauli_shot_sim.py`。`protocol_counts`：`expectation_source: grouped_shot_simulation_statevector`，`energy_stderr_model: sample_stderr_independent_groups_approx`。
 
 3. **Qiskit 比特串路径**（`run_qiskit_shots_pauli_protocol: true`）  
-   每条（子）线路在 Qiskit 上 `run` 指定 `shots`，直方图来自 `result().get_counts()`。实现：`backends/qiskit_pauli_shots.py`。
+   每条（子）线路在 Qiskit 上 `run` 指定 `shots`，直方图来自 `result().get_counts()`。实现：`backends/qiskit_pauli_shots.py`。`protocol_counts`：`expectation_source: qiskit_shot_counts_get_counts`，`energy_stderr_model: empirical_shot_variance_independent_groups_approx`。
 
-配置约束（`QuantumSpec`）：`run_sampled_pauli_protocol` 与 `run_qiskit_shots_pauli_protocol` **不能同时为 true**。
+**PMSV**：若启用 PMSV 且 `retention_rate<1`，协议层对 `energy_stderr` 额外乘 `1/sqrt(retention_rate)` 记入 `pmsv_stderr_scale`（与 ZNE 电路放大不同：仍为协议层 stderr 缩放）。
+
+配置约束（`QuantumSpec`）：`run_sampled_pauli_protocol` 与 `run_qiskit_shots_pauli_protocol` **不能同时为 true**（`PauliAveragingProtocol.run` 与 `QuantumSpec` 模型校验一致）。
 
 ## 3. 线路与线序约定
 
@@ -117,4 +125,4 @@ quantum:
 
 ---
 
-*文档版本与代码：`expectation_source = qiskit_shot_counts_get_counts`；直方图 schema 与 `pauli_shot_sim` 的 `measurement_histogram_rows` 一致（并增加 `source` 字段）。*
+*文档版本与代码：`expectation_source` / `energy_stderr_model` 以 `protocols/protocol.py` 中 `PauliAveragingProtocol.run` 写入 `proto._counts` 的字符串为准；Qiskit 路径下 `expectation_source = qiskit_shot_counts_get_counts`。直方图 schema 与 `pauli_shot_sim` 的 `measurement_histogram_rows` 一致（并增加 `source: "qiskit_shot_counts"` 便于筛选）。*

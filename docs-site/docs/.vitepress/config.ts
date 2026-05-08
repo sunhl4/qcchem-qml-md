@@ -5,12 +5,11 @@ import mirrorSidebar from "./sidebar-mirror.json" with { type: "json" };
 const conceptItemsZh = [
   { text: "工程分层架构", link: "/concept/engineering-architecture" },
   { text: "竞争定位与路线图", link: "/concept/competitive-positioning" },
+  { text: "工程记忆（Quantinuum · 物化链）", link: "/concept/engineering-memory-quantinuum" },
   { text: "P2 详细实施计划", link: "/concept/p2-detailed-plan" },
   { text: "架构边界（闭源对照）", link: "/concept/architecture-boundaries" },
-  { text: "工程记忆（Quantinuum 对标）", link: "/concept/engineering-memory-quantinuum" },
   { text: "Launch / Retrieve（Nexus 类比）", link: "/concept/launch-retrieve-nexus-analog" },
   { text: "缓解映射（PMSV / ZNE / Qermit）", link: "/concept/mitigation-mapping" },
-  { text: "HTTP API 维护记忆", link: "/concept/http-api-worker-memory" },
 ];
 
 const referenceItemsZh = [
@@ -45,20 +44,19 @@ const parityItemsZh = [
   { text: "差距与实施计划", link: "/parity/gap-implementation-plan" },
   { text: "L1 签 off", link: "/parity/l1-signoff" },
   { text: "Y1 对标台账", link: "/parity/y1-alignment-ledger" },
-  { text: "Y1 残余 SLA 模板", link: "/parity/y1-residual-sla-template" },
-  { text: "L3 基准路线图", link: "/parity/l3-benchmark-roadmap" },
+  { text: "Y1 残余 SLA 模板", link: "/parity/y1-alignment-ledger#y1-residual-partial-sla-template" },
+  { text: "L3 基准路线图", link: "/parity/y1-alignment-ledger#l3-benchmark-suite-roadmap" },
   { text: "开放栈记忆", link: "/parity/open-stack-memory" },
   { text: "迭代说明", link: "/parity/backlog-to-schedule" },
 ];
 
-/** EN pages are partial; remaining entries point to authoritative ZH parity docs. */
 const parityItemsEn = [
   { text: "Parity matrix", link: "/en/parity/public-matrix" },
   { text: "L1 sign-off", link: "/en/parity/l1-signoff" },
   { text: "Gap plan (ZH)", link: "/parity/gap-implementation-plan" },
   { text: "Y1 ledger (ZH)", link: "/parity/y1-alignment-ledger" },
-  { text: "Y1 SLA template (ZH)", link: "/parity/y1-residual-sla-template" },
-  { text: "L3 benchmark (ZH)", link: "/parity/l3-benchmark-roadmap" },
+  { text: "Y1 SLA template (ZH)", link: "/parity/y1-alignment-ledger#y1-residual-partial-sla-template" },
+  { text: "L3 benchmark (ZH)", link: "/parity/y1-alignment-ledger#l3-benchmark-suite-roadmap" },
   { text: "Open-stack memory (ZH)", link: "/parity/open-stack-memory" },
   { text: "Backlog to schedule (ZH)", link: "/parity/backlog-to-schedule" },
 ];
@@ -68,6 +66,10 @@ const guideItemsZh = [
   { text: "新用户三条路径", link: "/guide/onboarding-three-paths" },
   { text: "原理与阅读建议", link: "/guide/principles-and-reading" },
   { text: "P1 化学与嵌入", link: "/guide/chemistry-and-embedding/" },
+  { text: "多后端统一适配合同", link: "/guide/chemistry-and-embedding/backend-adapter-unified-io" },
+  { text: "后端适配快速接入", link: "/guide/chemistry-and-embedding/backend-adapter-quickstart" },
+  { text: "InQuanto-PySCF 量子问题对照", link: "/guide/chemistry-and-embedding/inquanto-pyscf-problem-analog" },
+  { text: "二次量子化读表（Fock / Hamiltonian）", link: "/guide/chemistry-and-embedding/second-quantization-fock-hamiltonian-readout" },
   { text: "P2 算法与协议", link: "/guide/algorithms-and-protocols/" },
   { text: "P3 执行与分析", link: "/guide/execution-and-analysis/" },
   { text: "P4 作业与可复现", link: "/guide/jobs-and-reproducibility/" },
@@ -78,6 +80,10 @@ const guideItemsEn = [
   { text: "Three onboarding paths", link: "/en/guide/onboarding-three-paths" },
   { text: "Principles & reading", link: "/en/guide/principles-and-reading" },
   { text: "P1 Chemistry & embedding", link: "/en/guide/chemistry-and-embedding/" },
+  { text: "Unified backend adapter I/O contract", link: "/en/guide/chemistry-and-embedding/backend-adapter-unified-io" },
+  { text: "Backend adapter quickstart", link: "/en/guide/chemistry-and-embedding/backend-adapter-quickstart" },
+  { text: "InQuanto-PySCF analog (quantum problem)", link: "/en/guide/chemistry-and-embedding/inquanto-pyscf-problem-analog" },
+  { text: "Second quantization (Fock & Hamiltonian)", link: "/en/guide/chemistry-and-embedding/second-quantization-fock-hamiltonian-readout" },
   { text: "P2 Algorithms & protocols", link: "/en/guide/algorithms-and-protocols/" },
   { text: "P3 Execution & analysis", link: "/en/guide/execution-and-analysis/" },
   { text: "P4 Jobs & reproducibility", link: "/en/guide/jobs-and-reproducibility/" },
@@ -246,6 +252,19 @@ export default withMermaid(defineConfig({
     "qchem-stack documentation: product features, user interfaces, tutorials, guides, CLI and HTTP API; InQuanto benchmark under positioning (internal).",
   cleanUrls: true,
   srcDir: ".",
+  /**
+   * This package’s VitePress root is `docs-site/docs/`. Many pages intentionally
+   * link to repo root (`docs/`, `src/`, `CONTRIBUTING.md`, …) which is outside
+   * `srcDir`. Keep those hrefs correct for clones; exempt them from the checker.
+   */
+  ignoreDeadLinks: [
+    /^https?:\/\//,
+    // Three hops `../../../` or `./../../../` → repo root from `docs/parity`, `docs/concept`, …
+    /^(?:\.\/)?(?:\.\.\/){3}(?:docs\/|src\/|tests\/|configs\/|\.github\/)/,
+    /^(?:\.\/)?(?:\.\.\/){3}CONTRIBUTING(?:\.md)?$/,
+    // Four hops from `docs/en/concept`, `docs/guide/**/`, … → `docs/`
+    /^(?:\.\/)?(?:\.\.\/){4}docs\//,
+  ],
 
   vite: {
     server: {

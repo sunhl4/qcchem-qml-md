@@ -6,7 +6,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 
 const config: Config = {
   title: 'qchem-stack Docs',
-  tagline: 'Quantum chemistry workflows for open and reproducible execution',
+  tagline: 'Open quantum chemistry workflows with reproducible engineering outputs',
   favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -45,7 +45,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           routeBasePath: '/',
           editUrl:
-            'https://github.com/your-org/qchem_qml_md/tree/main/docusaurus-site/',
+            'https://github.com/sunhl4/qcchem-qml-md/tree/main/docusaurus-site/',
         },
         blog: false,
         theme: {
@@ -69,10 +69,10 @@ const config: Config = {
       items: [
         {to: '/getting-started', label: '快速开始', position: 'left'},
         {to: '/product/features', label: '产品能力', position: 'left'},
-        {to: '/product/positioning', label: '定位路线', position: 'left'},
-        {to: '/guide/overview', label: '指南', position: 'left'},
+        {to: '/guide/', label: '指南', position: 'left'},
         {to: '/tutorial/quickstart', label: '教程', position: 'left'},
-        {to: '/reference/http-api-sqlite-jobs', label: '参考', position: 'left'},
+        {to: '/reference/cli-and-scripts', label: '参考', position: 'left'},
+        {to: '/parity/public-matrix', label: '对标', position: 'left'},
         {to: '/changelog/', label: '更新日志', position: 'left'},
         {
           type: 'docSidebar',
@@ -86,7 +86,7 @@ const config: Config = {
           position: 'right',
         },
         {
-          href: 'https://github.com/facebook/docusaurus',
+          href: 'https://github.com/sunhl4/qcchem-qml-md',
           label: 'GitHub',
           position: 'right',
         },
@@ -103,7 +103,7 @@ const config: Config = {
               to: '/getting-started',
             },
             {label: '产品能力', to: '/product/features'},
-            {label: '定位路线', to: '/product/positioning'},
+            {label: '指南总览', to: '/guide/'},
             {label: '教程', to: '/tutorial/quickstart'},
             {label: '更新日志', to: '/changelog/'},
           ],
@@ -112,8 +112,8 @@ const config: Config = {
           title: '产品与架构',
           items: [
             {
-              label: '三层架构指南',
-              to: '/guide/overview',
+              label: '四柱指南',
+              to: '/guide/',
             },
             {
               label: '云端与作业',
@@ -133,8 +133,8 @@ const config: Config = {
               href: 'https://docs.quantinuum.com/inquanto/',
             },
             {
-              label: 'Docusaurus',
-              href: 'https://github.com/facebook/docusaurus',
+              label: '项目 GitHub',
+              href: 'https://github.com/sunhl4/qcchem-qml-md',
             },
           ],
         },

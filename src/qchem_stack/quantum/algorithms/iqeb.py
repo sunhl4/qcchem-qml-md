@@ -4,10 +4,13 @@ from copy import deepcopy
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-from openfermion.ops import QubitOperator
+import numpy as np
 
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.quantum.algorithms.base import AlgorithmBase
 from qchem_stack.quantum.algorithms.vqe import VQE, VQEResult
+from qchem_stack.quantum.operator_pool_registry import build_registered_operator_pool
+from qchem_stack.quantum.statevector import expectation_qubit_operator, hea_state
 
 if TYPE_CHECKING:
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
@@ -21,23 +24,36 @@ class IQEBResult:
     meta: dict[str, Any] = field(default_factory=dict)
 
 
-class IQEBVQE:
-    """IQEB-style outer loop: augment Hamiltonian with small Pauli corrections then re-VQE."""
+class IQEBVQE(AlgorithmBase):
+    """IQEB-style outer loop with gradient-ranked candidate screening."""
 
     def __init__(
         self,
         hamiltonian: QubitHamiltonian,
         max_rounds: int = 2,
+        n_grads: int = 3,
+        energy_tolerance: float = 1e-8,
+        pool_id: str = "iqeb_qubit_excitation",
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> None:
+        super().__init__()
+        self._algorithm_name = "iqeb"
+        self._report_schema = "algorithm_iqeb_report_v1"
         self.base = hamiltonian
         self.max_rounds = max(1, max_rounds)
+        self.n_grads = max(1, int(n_grads))
+        self.energy_tolerance = float(energy_tolerance)
+        self.pool_id = pool_id
+        self.pool = build_registered_operator_pool(pool_id, hamiltonian)
         self._executor = executor
 
     def run(self, depth: int = 1, seed: int = 0) -> IQEBResult:
         h = deepcopy(self.base.operator)
         selected: list[str] = []
+        selected_indices: list[int] = []
         last: VQEResult | None = None
+        rounds_meta: list[dict[str, Any]] = []
+        prev_energy: float | None = None
         for r in range(self.max_rounds):
             qh = QubitHamiltonian(
                 operator=h,
@@ -46,14 +62,54 @@ class IQEBVQE:
             )
             vqe = VQE(qh, depth=depth, executor=self._executor)
             last = vqe.run(maxiter=120, seed=seed + r)
-            if r < self.max_rounds - 1:
-                tag = f"ZZ_round{r}"
-                selected.append(tag)
-                h += QubitOperator(((0, "Z"), (1, "Z")), 1e-4 * (-1) ** r)
+            state = hea_state(last.angles, self.base.n_qubits, depth)
+            grad_map: list[tuple[int, float]] = []
+            for idx, op in enumerate(self.pool):
+                if idx in selected_indices:
+                    continue
+                comm = h * op - op * h
+                g = float(abs(np.real(expectation_qubit_operator(state, comm, self.base.n_qubits))))
+                grad_map.append((idx, g))
+            grad_map.sort(key=lambda x: x[1], reverse=True)
+            top = grad_map[: self.n_grads]
+            rounds_meta.append(
+                {
+                    "round": r,
+                    "energy": float(last.energy),
+                    "top_gradients": [{"pool_index": int(i), "gradient": float(g)} for i, g in top],
+                }
+            )
+            if prev_energy is not None and abs(float(prev_energy) - float(last.energy)) < self.energy_tolerance:
+                break
+            if r >= self.max_rounds - 1 or not top:
+                break
+            best_idx, _ = top[0]
+            selected_indices.append(int(best_idx))
+            tag = f"pool_{best_idx}_round{r}"
+            selected.append(tag)
+            h += 1e-4 * self.pool[best_idx]
+            prev_energy = float(last.energy)
         assert last is not None
-        return IQEBResult(
+        out = IQEBResult(
             energy=last.energy,
             selected_pauli_strings=selected,
             vqe=last,
-            meta={"rounds": self.max_rounds},
+            meta={
+                "rounds": self.max_rounds,
+                "n_grads": self.n_grads,
+                "energy_tolerance": self.energy_tolerance,
+                "selected_pool_indices": selected_indices,
+                "pool_id": self.pool_id,
+                "iqeb_rounds": rounds_meta,
+            },
         )
+        self._set_report(
+            metrics={
+                "energy": out.energy,
+                "rounds": len(rounds_meta),
+                "selected_terms": len(selected_indices),
+            },
+            artifacts={"selected_pool_indices": selected_indices},
+            diagnostics={"meta": dict(out.meta)},
+        )
+        return out

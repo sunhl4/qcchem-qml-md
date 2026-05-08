@@ -13,7 +13,7 @@ description: Concept / Tutorial / Reference / Parity 四类与站内路径及母
 |------|----------|---------------------------|
 | 工程分层架构 | [/concept/engineering-architecture](/concept/engineering-architecture) | `ENGINEERING_ARCHITECTURE.md` |
 | 竞争定位与路线图 | [/concept/competitive-positioning](/concept/competitive-positioning) | `竞争定位与路线图_对标Quantinuum产品与技术路线.md` |
-| 架构边界 | [/concept/architecture-boundaries](/concept/architecture-boundaries) | `架构_InQuanto闭源能力闭合与可复现边界.md` |
+| 架构边界 | [/concept/engineering-memory-quantinuum](/concept/engineering-memory-quantinuum) §0；[/concept/architecture-boundaries](/concept/architecture-boundaries) | 真源：`工程记忆…` §0；旧页可选 |
 | Launch / Retrieve（Nexus 类比） | [/concept/launch-retrieve-nexus-analog](/concept/launch-retrieve-nexus-analog) | `launch_retrieve_nexus_analog.md` |
 | 缓解映射 | [/concept/mitigation-mapping](/concept/mitigation-mapping) | `mitigation_PMSV_ZNE_Qermit_mapping.md` |
 | HTTP API 维护决策 | [/reference/http-api-sqlite-jobs](/reference/http-api-sqlite-jobs) **§9** | 原 `记忆_HTTP…` 已合并 |
@@ -42,8 +42,8 @@ description: Concept / Tutorial / Reference / Parity 四类与站内路径及母
 | 主题 | 站内路径 | 母稿 |
 |------|----------|------|
 | 公开契约矩阵 | [/parity/public-matrix](/parity/public-matrix) | `inquanto_public_parity_matrix.md` |
-| L1 签 off | [/parity/l1-signoff](/parity/l1-signoff) | `L1_InQuanto_alignment_signoff.md` |
-| Y1 台账 | [/parity/y1-alignment-ledger](/parity/y1-alignment-ledger) | `InQuanto_Y1_public_alignment_ledger.md` |
+| L1 签 off | [/parity/gap-implementation-plan#appendix-c](/parity/gap-implementation-plan#appendix-c)；[/parity/l1-signoff](/parity/l1-signoff) | 真源：`与InQuanto…` 附录 C |
+| Y1 台账 | [/parity/gap-implementation-plan#appendix-b](/parity/gap-implementation-plan#appendix-b)；[/parity/y1-alignment-ledger](/parity/y1-alignment-ledger) | 真源：`与InQuanto…` 附录 B |
 | 差距与实施计划 | [/parity/gap-implementation-plan](/parity/gap-implementation-plan) | `与InQuanto能力差距与实施计划.md` |
 | 其余 | 见侧栏 **Parity** | 见 [IA slug 映射](/meta/ia-mapping) 表 |
 

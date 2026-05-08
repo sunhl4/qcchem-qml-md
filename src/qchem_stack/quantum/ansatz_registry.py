@@ -9,49 +9,107 @@ Fermion→qubit mapping names live in ``chem.fermion_mapping_registry``.
 
 from __future__ import annotations
 
-from typing import Final
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any, Final
 
-ANSATZ_REGISTRY: Final[dict[str, dict[str, str]]] = {
-    "hea": {
-        "summary": "Hardware-efficient layered rotations; depth from ``quantum.vqe_depth``.",
-        "implementation": "qchem_stack.quantum.algorithms.vqe.VQE",
-    },
-    "uccsd": {
-        "summary": (
+from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
+from qchem_stack.quantum.algorithms.vqe import VQE
+
+AnsatzFactory = Callable[..., Any]
+
+
+@dataclass(frozen=True)
+class AnsatzRegistryEntry:
+    summary: str
+    implementation: str
+    factory: AnsatzFactory
+    capabilities: dict[str, bool] = field(default_factory=dict)
+
+def _hea_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> VQE:
+    return VQE(hamiltonian, **kwargs)
+
+
+def _uccsd_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> UCCSDVQE:
+    return UCCSDVQE(hamiltonian, **kwargs)
+
+
+def _uccsd_trotter_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> UCCSDTrotterVQE:
+    return UCCSDTrotterVQE(hamiltonian, **kwargs)
+
+
+ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
+    "hea": AnsatzRegistryEntry(
+        summary="Hardware-efficient layered rotations; depth from ``quantum.vqe_depth``.",
+        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
+        factory=_hea_factory,
+        capabilities={"supports_gradient": True, "supports_auxiliary": True},
+    ),
+    "uccsd": AnsatzRegistryEntry(
+        summary=(
             "Closed-shell spin-orbital UCCSD as sequential matrix exponentials on the JW Hartree–Fock "
             "reference (``quantum.variational_ansatz: uccsd`` with ``algorithm: vqe``; JW-only)."
         ),
-        "implementation": "qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDVQE",
-    },
-    "fermionic_adapt": {
-        "summary": "Fermionic-pool ADAPT-VQE.",
-        "implementation": "qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
-    },
-    "iqeb": {
-        "summary": "IQEB outer loop with inner VQE.",
-        "implementation": "qchem_stack.quantum.algorithms.iqeb.IQEBVQE",
-    },
-    "uccsd_closed_shell_reference": {
-        "summary": (
+        implementation="qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDVQE",
+        factory=_uccsd_factory,
+        capabilities={"jordan_wigner_only": True},
+    ),
+    "fermionic_adapt": AnsatzRegistryEntry(
+        summary="Fermionic-pool ADAPT-VQE.",
+        implementation="qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
+        factory=_hea_factory,
+        capabilities={"supports_pool_growth": True},
+    ),
+    "iqeb": AnsatzRegistryEntry(
+        summary="IQEB outer loop with inner VQE.",
+        implementation="qchem_stack.quantum.algorithms.iqeb.IQEBVQE",
+        factory=_hea_factory,
+        capabilities={"supports_outer_rounds": True},
+    ),
+    "uccsd_closed_shell_reference": AnsatzRegistryEntry(
+        summary=(
             "Closed-shell spin-orbital UCCSD **excitation-count / bookkeeping** surface "
             "(``parity_integrations.uccsd_excitation_reference`` in ``parity_snapshot``); "
             "main-line variational ansatz remains HEA unless you swap algorithms."
         ),
-        "implementation": (
+        implementation=(
             "integrations/gap_closure_bundle + parity_snapshot ucc rows; "
             "qchem_stack.quantum.algorithms.vqe.VQE for demo energies"
         ),
-    },
-    "trotter_ucc_placeholder": {
-        "summary": (
+        factory=_hea_factory,
+    ),
+    "trotter_ucc_placeholder": AnsatzRegistryEntry(
+        summary=(
             "Alias for **first-order Trotter-layer UCCSD** wiring: set ``quantum.variational_ansatz: uccsd`` "
             "and ``quantum.uccsd_trotter_steps`` (JW-only). Example: ``configs/example_h2_uccsd_trotter.yaml``."
         ),
-        "implementation": "qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDTrotterVQE",
-    },
+        implementation="qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDTrotterVQE",
+        factory=_uccsd_trotter_factory,
+        capabilities={"jordan_wigner_only": True},
+    ),
+    "adapt_solver_tangelo_alias": AnsatzRegistryEntry(
+        summary=(
+            "Naming parity anchor vs broad solver menus (e.g. Tangelo ``ADAPTSolver`` tutorials): "
+            "still resolves to fermionic-pool ADAPT-VQE in this stack."
+        ),
+        implementation="qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
+        factory=_hea_factory,
+    ),
 }
 
 
 def list_registered_ansatz_ids() -> tuple[str, ...]:
     """Sorted tuple of registry keys (deterministic for export / tests)."""
     return tuple(sorted(ANSATZ_REGISTRY.keys()))
+
+
+def ansatz_registry_export() -> dict[str, dict[str, Any]]:
+    out: dict[str, dict[str, Any]] = {}
+    for key, entry in ANSATZ_REGISTRY.items():
+        out[key] = {
+            "summary": entry.summary,
+            "implementation": entry.implementation,
+            "capabilities": dict(entry.capabilities),
+        }
+    return out

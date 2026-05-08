@@ -140,7 +140,7 @@ def test_example_h2_uccsd_trotter_packaged_yaml_repro_schema() -> None:
     assert snap["uccsd_trotter_steps"] == 2
 
 
-def test_uccsd_trotter_rejects_non_jw_mapping() -> None:
+def test_uccsd_trotter_bravyi_kitaev_smoke_pipeline() -> None:
     _require_pyscf()
     cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2_uccsd_trotter.yaml"
     cfg = load_experiment_config(cfg_path)
@@ -151,7 +151,26 @@ def test_uccsd_trotter_rejects_non_jw_mapping() -> None:
             )
         }
     )
-    with pytest.raises(ValueError, match="jordan_wigner"):
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
+    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
+    snap = out["repro"]["parity_snapshot"]
+    assert snap["fermion_qubit_mapping"] == "bravyi_kitaev"
+    assert snap["variational_ansatz"] == "uccsd"
+
+
+def test_uccsd_trotter_rejects_symmetry_conserving_bk() -> None:
+    _require_pyscf()
+    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2_uccsd_trotter.yaml"
+    cfg = load_experiment_config(cfg_path)
+    cfg = cfg.model_copy(
+        update={
+            "active_space": cfg.active_space.model_copy(
+                update={"fermion_qubit_mapping": "symmetry_conserving_bravyi_kitaev"}  # type: ignore[arg-type]
+            )
+        }
+    )
+    with pytest.raises(ValueError, match="square fermion encoding"):
         from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
         run_pipeline_sync(cfg, cfg_path=cfg_path)
@@ -165,3 +184,12 @@ def test_example_h2_tket_probe_dict_when_pauli_protocol_runs() -> None:
     tp = out["repro"]["parity_snapshot"].get("tket_first_compiled_circuit_probe")
     assert isinstance(tp, dict)
     assert tp.get("schema") in ("tket_stats_attempt_v1", "tket_stats_skipped_v1")
+
+
+def test_cross_solver_parity_pyscf_baseline_smoke() -> None:
+    """W10: JSON report always exposes finite PySCF HF totals (Psi4 optional)."""
+    _require_pyscf()
+    from qchem_stack.integrations.cross_solver_parity import build_cross_solver_parity_report
+
+    report = build_cross_solver_parity_report(atol=5e-4)
+    assert report["summary"]["n_cases"] >= 1

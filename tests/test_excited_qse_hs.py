@@ -11,11 +11,23 @@ from qchem_stack.quantum.algorithms.sceom import run_sceom_reference_subspace
 from qchem_stack.quantum.algorithms.vqe import VQE
 
 
+def test_qse_dense_first_excitation_gap_matches_two_level_z_model() -> None:
+    """Dense QSE spectrum: Δ = E₁−E₀ = 2|a| for H = a·Z + c·I on one qubit."""
+    a_m, c_m = 0.35, 0.05
+    op = QubitOperator(((0, "Z"),), a_m) + QubitOperator((), c_m)
+    qh = QubitHamiltonian(operator=op, n_qubits=1, fermion_space=FermionSpace(1, 1))
+    qse = QSE(qh, subspace_dim=2)
+    r = qse.run_dense_reference()
+    assert len(r.excitation_energies) >= 1
+    assert r.excitation_energies[0] == pytest.approx(2.0 * abs(a_m), rel=1e-8, abs=1e-8)
+
+
 def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
     pytest.importorskip("pyscf")
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
-    from qchem_stack.config import ExperimentConfig, MoleculeSpec, ActiveSpaceSpec, SCFSpec
+    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.config import ActiveSpaceSpec, ExperimentConfig, MoleculeSpec, SCFSpec
 
     cfg = ExperimentConfig(
         experiment_id="t",
@@ -29,7 +41,14 @@ def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
     )
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_pyscf(r, n_active_orbitals=2, n_active_electrons=2)
+    ref = ClassicalMeanFieldReference(
+        mf=r.mf,
+        e_tot=float(r.e_tot),
+        mo_energy=r.mo_energy,
+        molecular_system=r.molecular_system,
+        driver_meta=dict(r.driver_meta),
+    )
+    qh = molecular_hamiltonian_from_classical_reference(ref, n_active_orbitals=2, n_active_electrons=2)
     v = VQE(qh, depth=1).run(maxiter=100, seed=0)
     qse = QSE(qh, subspace_dim=8)
     sub = qse.run_from_vqe_hea_basis(v.angles, depth=1, max_basis=min(6, 2**qh.n_qubits))

@@ -51,8 +51,17 @@ Use an environment where `qchem_stack` is importable.
 | `python scripts/smoke_pipeline.py` | Smoke run (default `configs/example_h2.yaml`); flags such as `--excited`, `--sampled`, `--qiskit-shots`, `--iqeb`, `--projection-trace` (see file docstring) |
 | `python scripts/export_parity_criteria_table.py <config.yaml>` | Export parity / Methods-oriented field table; optional `--results out.json` |
 | `python scripts/check_parity_export_sample.py` | Validate export samples (CI helper) |
+| `python scripts/check_solver_adapter_contract.py [config.yaml]` | Validate backend adapter contract for current `scf.driver`; supports `--driver`, `--run-mean-field`, `--require-mean-field-success` |
+| `python scripts/create_solver_adapter_scaffold.py <backend_id>` | Generate a solver scaffold (TODO[1/2/3]) and print register/check commands; add `--with-demo-register` to emit `scripts/register_<backend>_demo.py` (in-process contract checks) |
+| `python scripts/demo_mock_external_backend.py` | Run a copyable custom-backend example: register `mock_external` and execute one plugin-path pipeline run |
 | `python scripts/run_qpe_track_demo.py` | QPE track demo (optional) |
 | `python scripts/resource_estimation_demo.py` | Resource demo (optional) |
+
+One-line adapter debug helper:
+
+```bash
+python -c "from qchem_stack.chem.solvers import create_solver; from qchem_stack.config import load_experiment_config; c=load_experiment_config('configs/example_h2.yaml'); print(create_solver(c).capabilities)"
+```
 
 ## Python API (not a shell CLI)
 

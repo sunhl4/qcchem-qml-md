@@ -24,7 +24,7 @@ from typing import Any
 
 import numpy as np
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.embedding.schmidt_production import (
     SchmidtImpurityModel,
     SchmidtProductionError,
@@ -37,6 +37,19 @@ from qchem_stack.integrations.dmet_self_consistent import (
     DMETFragmentResult,
     DMETSelfConsistencyLoop,
 )
+
+
+def _as_pyscf_mean_field_reference(
+    rhf: ClassicalMeanFieldReference,
+    *,
+    context: str,
+) -> ClassicalMeanFieldReference:
+    tag = rhf.backend_tag()
+    if tag != "pyscf":
+        raise SchmidtProductionError(
+            f"{context} currently requires backend='pyscf' (got backend={tag!r})."
+        )
+    return rhf
 
 
 @dataclass
@@ -93,7 +106,7 @@ def _sequential_schmidt_density_mix(
 
 
 def run_schmidt_density_feedback_cycles(
-    rhf: PySCFRHFResult,
+    rhf: ClassicalMeanFieldReference,
     *,
     fragment_atom_indices: list[int],
     n_bath_orbitals: int,
@@ -110,9 +123,11 @@ def run_schmidt_density_feedback_cycles(
     SchmidtProductionError
         Invalid dimensions or caps.
     """
+    rhf_ref = _as_pyscf_mean_field_reference(rhf, context="schmidt density feedback cycles")
+    rhf_pyscf = rhf_ref.as_pyscf_rhf_result()
     if max_cycles < 1:
         raise SchmidtProductionError("max_cycles must be >= 1")
-    mf = rhf.mf
+    mf = rhf_pyscf.mf
     mol = mf.mol
     nel = int(mol.nelectron)
     S = np.asarray(mf.get_ovlp(), dtype=float)
@@ -124,7 +139,7 @@ def run_schmidt_density_feedback_cycles(
 
     for k in range(max_cycles):
         model = build_schmidt_impurity_integrals(
-            rhf,
+            rhf_ref,
             fragment_atom_indices=list(fragment_atom_indices),
             n_bath_orbitals=int(n_bath_orbitals),
             max_impurity_spatial_orbitals=int(max_impurity_spatial_orbitals),
@@ -179,7 +194,7 @@ def run_schmidt_density_feedback_cycles(
 
 
 def run_schmidt_multifragment_density_cycles(
-    rhf: PySCFRHFResult,
+    rhf: ClassicalMeanFieldReference,
     *,
     fragment_atom_groups: list[list[int]],
     fragment_labels: list[str] | None,
@@ -196,6 +211,7 @@ def run_schmidt_multifragment_density_cycles(
 
     After outer cycles, rebuild the **primary** impurity model from final ``D``.
     """
+    rhf_ref = _as_pyscf_mean_field_reference(rhf, context="schmidt multifragment density cycles")
     if not fragment_atom_groups:
         raise SchmidtProductionError("fragment_atom_groups must be non-empty")
     if any(not g for g in fragment_atom_groups):
@@ -212,7 +228,7 @@ def run_schmidt_multifragment_density_cycles(
         labs = [f"fragment_{i}" for i in range(len(fragment_atom_groups))]
     fid_atoms = {labs[i]: list(fragment_atom_groups[i]) for i in range(len(labs))}
 
-    mf = rhf.mf
+    mf = rhf_ref.mf
     mol = mf.mol
     nel = int(mol.nelectron)
     S = np.asarray(mf.get_ovlp(), dtype=float)
@@ -238,7 +254,7 @@ def run_schmidt_multifragment_density_cycles(
         atoms = bath.meta["fragment_atoms"][fid]
         dloc = np.asarray(bath.meta["D_ao"], dtype=float)
         return build_schmidt_impurity_integrals(
-            rhf,
+            rhf_ref,
             fragment_atom_indices=list(atoms),
             n_bath_orbitals=int(n_bath_orbitals),
             max_impurity_spatial_orbitals=int(max_impurity_spatial_orbitals),
@@ -263,7 +279,7 @@ def run_schmidt_multifragment_density_cycles(
     dmet_public = {k: v for k, v in dmet_rep.items() if not str(k).startswith("_")}
     primary_atoms = list(fragment_atom_groups[int(primary_fragment_index)])
     final_model = build_schmidt_impurity_integrals(
-        rhf,
+        rhf_ref,
         fragment_atom_indices=primary_atoms,
         n_bath_orbitals=int(n_bath_orbitals),
         max_impurity_spatial_orbitals=int(max_impurity_spatial_orbitals),

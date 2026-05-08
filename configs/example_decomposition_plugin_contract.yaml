@@ -1,0 +1,43 @@
+# Decomposition plugin JSON using ``decomposition_plugin_contract_v1`` (optional fragment energy-term stubs).
+schema_version: "1"
+experiment_id: "decomp_plugin_contract_001"
+random_seed: 3
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  provider: "statevector"
+  shots_per_circuit: 512
+
+mitigation:
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "plugin"
+  decomposition_plugin: "uniform_fragment_guess"
+  decomposition_plugin_json_path: "configs/decomposition_plugin_contract_integrals.json"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 40
+  use_pauli_protocol: false

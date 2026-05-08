@@ -451,7 +451,7 @@ edit: false
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
-| **qchem_module** | qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf |
+| **qchem_module** | qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference |
 | **milestone** | — |
 | **summary_zh** | — |
 | **summary_en** | — |

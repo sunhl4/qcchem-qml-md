@@ -2,13 +2,29 @@ from __future__ import annotations
 
 import pytest
 
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+from qchem_stack.config import (
+    ActiveSpaceSpec,
+    ExperimentConfig,
+    MoleculeSpec,
+    load_experiment_config,
+)
+from qchem_stack.qpe_qec_demo import FaultTolerantDemoAdapter
+from qchem_stack.quantum.algorithms.vqe import VQE
+
 pyscf = pytest.importorskip("pyscf")
 
-from qchem_stack.config import ActiveSpaceSpec, ExperimentConfig, MoleculeSpec, load_experiment_config
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
-from qchem_stack.quantum.algorithms.vqe import VQE
-from qchem_stack.qpe_qec_demo import FaultTolerantDemoAdapter
+
+def _as_reference(rhf) -> ClassicalMeanFieldReference:
+    return ClassicalMeanFieldReference(
+        mf=rhf.mf,
+        e_tot=float(rhf.e_tot),
+        mo_energy=rhf.mo_energy,
+        molecular_system=rhf.molecular_system,
+        driver_meta=dict(rhf.driver_meta),
+    )
 
 
 def test_h2_active_space_vqe(tmp_path_factory) -> None:
@@ -39,9 +55,10 @@ active_space:
     cfg = load_experiment_config(cfg_path)
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_pyscf(r, n_active_orbitals=2, n_active_electrons=2)
+    qh = molecular_hamiltonian_from_classical_reference(_as_reference(r), n_active_orbitals=2, n_active_electrons=2)
     assert qh.meta.get("fermion_to_qubit_map") == "jordan_wigner"
     assert qh.meta.get("integral_source") == "pyscf_active_space"
+    assert qh.meta.get("integral_openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
     assert qh.meta.get("n_active_electrons") == 2
     v = VQE(qh, depth=1).run(maxiter=200, seed=0)
     ad = FaultTolerantDemoAdapter()
@@ -62,8 +79,8 @@ def test_h2_active_space_bravyi_kitaev_meta() -> None:
     )
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_pyscf(
-        r,
+    qh = molecular_hamiltonian_from_classical_reference(
+        _as_reference(r),
         n_active_orbitals=2,
         n_active_electrons=2,
         fermion_qubit_mapping="bravyi_kitaev",
@@ -84,8 +101,8 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
     )
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_pyscf(
-        r,
+    qh = molecular_hamiltonian_from_classical_reference(
+        _as_reference(r),
         n_active_orbitals=2,
         n_active_electrons=2,
         fermion_qubit_mapping="symmetry_conserving_bravyi_kitaev",
@@ -97,9 +114,9 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
 
 def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
     """Figure-asset strategy: bounded UCCSD amplitudes + L-BFGS-B stays variational vs CASCI."""
-    import numpy as np
     from pathlib import Path
 
+    import numpy as np
     from pyscf import mcscf
 
     from qchem_stack.backends.factory import executor_from_spec
@@ -110,8 +127,8 @@ def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
     cfg = load_experiment_config(root / "configs" / "example_h2_vqe_figure_near_casci.yaml")
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_pyscf(
-        r,
+    qh = molecular_hamiltonian_from_classical_reference(
+        _as_reference(r),
         n_active_orbitals=int(cfg.active_space.n_active_orbitals),
         n_active_electrons=int(cfg.active_space.n_active_electrons),
         fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,

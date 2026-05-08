@@ -1,4 +1,7 @@
-from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor, StatevectorHeaExecutor
+from qchem_stack.backends.executor_base import (
+    HamiltonianExpectationExecutor,
+    StatevectorHeaExecutor,
+)
 from qchem_stack.backends.factory import executor_from_spec
 from qchem_stack.backends.ionstack_executor import IonStackHeaExecutor
 from qchem_stack.backends.pauli_grouping import (
@@ -24,7 +27,12 @@ from qchem_stack.backends.shot_budget import (
     energy_estimate_with_uncertainty,
     recommended_shots_per_circuit,
 )
-from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle, circuit_resource_row, dataframe_circuit_shot
+from qchem_stack.backends.spec import (
+    BackendSpec,
+    CompilerPassBundle,
+    circuit_resource_row,
+    dataframe_circuit_shot,
+)
 
 __all__ = [
     "BackendSpec",

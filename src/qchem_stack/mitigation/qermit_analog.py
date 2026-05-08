@@ -15,10 +15,16 @@ from qchem_stack.config import ExperimentConfig
 def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any] | None:
     """
     If any mitigation is enabled, return a JSON-serializable task graph
-    (input → … → output) for **sequential** SPAM (optional) / PMSV / ZNE composition.
+    (input → … → output) for **sequential** SPAM (optional) / classical shadows (optional)
+    / PMSV / ZNE composition.
     """
     m = cfg.mitigation
-    if not (m.pmsv_enabled or m.zne_enabled or m.spam_calibration_enabled):
+    if not (
+        m.pmsv_enabled
+        or m.zne_enabled
+        or m.spam_calibration_enabled
+        or m.classical_shadows_stub_enabled
+    ):
         return None
 
     nodes: list[dict[str, Any]] = [
@@ -36,6 +42,20 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
                 "kind": "SPAM_readout_calibration_stub",
                 "order": order,
                 "note": "Affine readout toy (see mitigation.spam); graph order matches runtime trace.",
+            }
+        )
+        edges.append({"source": prev, "target": nid, "dep": "sequential"})
+        prev = nid
+    if m.classical_shadows_stub_enabled:
+        order += 1
+        nid = f"n{order}"
+        nodes.append(
+            {
+                "id": nid,
+                "kind": "classical_shadows_expectation_stub",
+                "order": order,
+                "budget_pairs_hint": int(m.classical_shadows_budget_pairs),
+                "note": "Scalar-energy identity stub (no randomized measurement sampling).",
             }
         )
         edges.append({"source": prev, "target": nid, "dep": "sequential"})

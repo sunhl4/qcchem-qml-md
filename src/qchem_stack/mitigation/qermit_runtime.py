@@ -20,7 +20,12 @@ def execute_mitigation_dag_runtime(
 ) -> dict[str, Any] | None:
     """If mitigation is on and an energy is present in ``out``, return an execution trace."""
     m = cfg.mitigation
-    if not (m.pmsv_enabled or m.zne_enabled or m.spam_calibration_enabled):
+    if not (
+        m.pmsv_enabled
+        or m.zne_enabled
+        or m.spam_calibration_enabled
+        or m.classical_shadows_stub_enabled
+    ):
         return None
     e_raw = out.get("energy_pauli_protocol")
     if e_raw is None:
@@ -42,7 +47,7 @@ def execute_mitigation_dag(
     *,
     protocol_counts: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
-    """Run PMSV then ZNE stubs in graph order; attach report id for audit."""
+    """Run optional SPAM, classical-shadows stub, PMSV, then ZNE stubs in graph order."""
     m = cfg.mitigation
     trace: list[dict[str, Any]] = []
     e = float(energy)
@@ -57,6 +62,19 @@ def execute_mitigation_dag(
                 "energy_stderr_in": se,
                 "energy_stderr_out": se,
                 "note": "Scalar-energy identity stub; bitstring-level readout correction is not applied here.",
+            }
+        )
+
+    if m.classical_shadows_stub_enabled:
+        trace.append(
+            {
+                "node": "classical_shadows_expectation_stub",
+                "energy_in": e,
+                "energy_out": e,
+                "energy_stderr_in": se,
+                "energy_stderr_out": se,
+                "budget_pairs_hint": int(m.classical_shadows_budget_pairs),
+                "note": "Identity stub — open-stack analog to shadows narratives without sampling.",
             }
         )
 

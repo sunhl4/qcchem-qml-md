@@ -133,7 +133,7 @@ manual:
           title_en: Qubit mapping
           inquanto: manual/spaces.html#qubit-mapping
           status: shipped
-          qchem: qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf
+          qchem: qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference
     ansatze:
       title_zh: Ansatze 概览
       title_en: Ansatze overview

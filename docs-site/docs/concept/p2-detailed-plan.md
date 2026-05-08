@@ -6,17 +6,36 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 # P2 详细实施计划（研究深度 · 大体系 · 产品化前置）
 
 ::: tip 母稿与镜像
-**正文修订以仓库母稿为准**：`qchem_qml_md/docs/P2_详细实施计划.md`。合并 PR 时请先改母稿再同步本页，或同一 PR 内双改保持一致。
+**正文修订以仓库母稿为准**：`qchem_qml_md/docs/与InQuanto能力差距与实施计划.md`（**附录 A**）。合并 PR 时请先改母稿再同步本页，或同一 PR 内双改保持一致。
+:::
+
+## InQuanto-PySCF × Tangelo 总计划（新增实施入口）
+
+已新增仓库主文档：`docs/实施总计划_InQuanto_PySCF_Tangelo.md`，作为本主题的单一实施入口，统一沉淀：
+
+- InQuanto `inquanto-pyscf` API 能力拆解（公开可核验范围）
+- Tangelo 源码借鉴点（`IntegralSolver` 抽象、solver 选择、`SecondQuantizedMolecule` 数据模型）
+- `qchem_stack` 当前实现差距矩阵（逐项状态、风险、借鉴动作）
+- 双轨实施计划（12 周周历 + 任务级清单，含 DoD、回滚与风险控制）
+
+建议阅读顺序：
+
+1. 本页（P2 路线与边界）
+2. `docs/实施总计划_InQuanto_PySCF_Tangelo.md`（详细实施）
+3. [差距与实施计划](/parity/gap-implementation-plan)（年度台账与附录锚点）
+
+::: info
+本页继续承载路线图语义与里程碑框架；模块级动作与任务分解统一维护在总计划文档，避免双写漂移。
 :::
 
 **文档角色**：在 [竞争定位与路线图](/concept/competitive-positioning) §6、§141 残余与 [差距与实施计划](/parity/gap-implementation-plan) 之上，给出 **P2 阶段** 的可执行分解（WBS、里程碑、闸门、非目标）。  
-**术语**：本文 **路线图 P2** = 竞品文档中的「研究深度与大体系」阶段；**不等于** [差距与实施计划](/parity/gap-implementation-plan) §3 里历史批次标题「P2 结构增强」（该批次描述的是已交付的 QPE 轨接入、Computable 薄层等，为避免混淆已在差距文档中改称「主线结构增强（已交付）」）。
+**术语**：本文 **路线图 P2** = 竞品文档中的「研究深度与大体系」阶段；**不等于**「主线结构增强」历史批次（QPE 演示轨接入、Computable 薄层、TKET CI 等——已交付并收进 [差距与实施计划](/parity/gap-implementation-plan) **§3 摘要表**）。
 
 ---
 
 ## 1. 与 P1 的边界
 
-**P1（广义已闭合）**：L1 公开契约下，`repro` / `parity_snapshot` / export / CI 与矩阵 **`n/a` 诚实降级**（含 TN、BK/SCBK UCCSD Trotter）对齐；UCCSD Trotter（JW）、ZNE 机读合一、Schmidt bath 侧车、ONIOM 玩具层、CASSCF 审计轨道一步、教程与双 parity 等已落地（见 [竞争定位与路线图](/concept/competitive-positioning) §6「已落地」段）。
+**P1（广义已闭合）**：L1 公开契约下，`repro` / `parity_snapshot` / export / CI 与矩阵 **`n/a` 诚实降级**（含 TN、BK/SCBK UCCSD Trotter）对齐；UCCSD Trotter（JW）、ZNE 机读合一、Schmidt bath 侧车、ONIOM 玩具层、CASSCF 审计轨道一步、教程与双 parity 等已落地（见 [竞争定位](/concept/competitive-positioning) §6「已闭合批次」与仓库 `docs/与InQuanto能力差距与实施计划.md`（**附录 E**））。
 
 **P2 增量**：在 **不冒充闭源 L0**、**不伪造 Nexus/H 系** 前提下，把仍为 **`partial`** 或 **研究级** 的能力推进到「可写 Methods + 可回归 YAML + 文档叙事闭合」，优先：
 
@@ -56,7 +75,7 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 | **P2-W6** | MD/ML | 数据集 YAML + trainer smoke；`repro` 字段冻结 | `pytest -m l1_md_ml` 扩展 |
 | **P2-W7** | 教程与 examples | `docs-site` + `examples/` 对齐 CI 钩子 | 贡献指南中列出新入门路径 |
 
-**P2-W1 最小闭环（已钉）**：代表 YAML `configs/example_h2_qpe_track_parity_integrations.yaml`；`export_parity_criteria_table.py --results` → `methods_resource_unified_v1`；回归 `tests/test_methods_resource_unified_export.py::test_methods_resource_unified_qpe_plus_tket_probe_schema`（需 PySCF + pytket）。母稿说明见仓库 `docs/P2_详细实施计划.md` 同段。
+**P2-W1 最小闭环（已钉）**：代表 YAML `configs/example_h2_qpe_track_parity_integrations.yaml`；`export_parity_criteria_table.py --results` → `methods_resource_unified_v1`；回归 `tests/test_methods_resource_unified_export.py::test_methods_resource_unified_qpe_plus_tket_probe_schema`（需 PySCF + pytket）。母稿说明见仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 A） 同段。
 
 依赖：**W1** 可并行 **W5**；**W2** 依赖 P1 嵌入基底；**W3** 依赖 PySCF 可选链；**W6** 可与 **W2** 并行；**W7** 贯穿各波次文档交付。
 
@@ -69,7 +88,7 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 | **M-P2-a** | Q1 | W1 闭合 + W5 文档/registry；月度台账刷新 |
 | **M-P2-b** | Q2 | W2 最小 demo + W4 选一.depth |
 | **M-P2-c** | Q3 | W3 路径 + W6 smoke |
-| **M-P2-d** | Q4 | W7 打包；残余 `partial` 填入 [Y1 残余 SLA 模板](/parity/y1-residual-sla-template) 或升级 Y3 项 |
+| **M-P2-d** | Q4 | W7 打包；残余 `partial` 填入 [Y1 对标台账 §6](/parity/y1-alignment-ledger#y1-residual-partial-sla-template) 或升级 Y3 项 |
 
 （若与 **Y1 台账** Q3/Q4 重叠，以台账 [Y1 对标台账](/parity/y1-alignment-ledger) 季度 OKR 为准，本文 WBS 作二级拆分。）
 
@@ -87,7 +106,7 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 
 ## 6. 建议执行顺序（P1 签字后）
 
-与仓库母稿 **`docs/P2_详细实施计划.md` §6** 同表（W1→W7 与 B→J 序 21）；本站不双写，避免漂移。
+与仓库母稿 **`docs/与InQuanto能力差距与实施计划.md`（附录 A） §6** 同表（W1→W7 与 B→J 序 21）；本站不双写，避免漂移。
 
 ---
 
@@ -95,6 +114,19 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 
 - 战略总表：[竞争定位与路线图](/concept/competitive-positioning) §5–§6。  
 - 差距总表与维护约定：[差距与实施计划](/parity/gap-implementation-plan)。  
-- **本站路由**：`/concept/p2-detailed-plan`（VitePress）；修订请以仓库 `docs/P2_详细实施计划.md` 为母稿同步。  
-- 维护角色占位：仓库 `docs/MAINTAINERS.md`。  
+- **本站路由**：`/concept/p2-detailed-plan`（VitePress）；修订请以仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 A） 为母稿同步。  
+- 维护角色占位：仓库 `CONTRIBUTING.md`（维护角色）。  
 - 295 节点 backlog：仓库 `docs/inquanto-node-backlog.generated.json`（波次筛选见 [Y1 对标台账](/parity/y1-alignment-ledger) §3.5）。
+- 执行归档：仓库 `docs/execution/`（含 Day12/W2、Day25/45/65/80/90 阶段收口页）。
+
+---
+
+<a id="adr-p2-w2-decomposition-scope"></a>
+<a id="p2-w3-avas-casscf-boundary"></a>
+<a id="p2-w5-algorithm-registry-alignment"></a>
+
+## 8. 附录 §9–§11（ADR · W3 · W5；正文以仓库母稿为准）
+
+**ADR（P2-W2 分解范围钉扎）、P2-W3（AVAS / CASSCF `partial` 边界）、P2-W5（算法 / ansatz / fermion 映射 registry 三表）** 的**完整技术正文**已并入仓库母稿 **`docs/与InQuanto能力差距与实施计划.md`（附录 A）** 的 **§9、§10、§11**（与 [公开矩阵](/parity/public-matrix) §2–§3 强交叉维护）。本站为防双写漂移**不重复粘贴**长表；请在本地打开该 Markdown 阅读或 PR 修改。
+
+本页保留上述 **三个锚点 id**，供 `fix-internal-links` 与历史链接跳转到「附录入口」；与母稿锚点同名，便于全仓 `grep`。

@@ -10,6 +10,7 @@ Mirrors **Program Construction** in the InQuanto hub.
 
 ## Related pages
 
+- UCC singles / Brillouin / HF reference gradients — **Chinese long-form** [`docs/UCC_hf参考下单激发梯度_Brillouin与优化实践.md`](../../../../docs/UCC_hf参考下单激发梯度_Brillouin与优化实践.md)
 - [Engineering architecture §9](/en/concept/engineering-architecture)
 - [Public matrix §1–2](/en/parity/public-matrix)
 

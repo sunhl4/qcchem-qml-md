@@ -2,14 +2,14 @@ from __future__ import annotations
 
 import json
 import math
+from pathlib import Path
 
 import pytest
 
 pyscf = pytest.importorskip("pyscf")
 
-from pathlib import Path
-
 from qchem_stack.config import load_experiment_config
+from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config, run_pipeline_sync
 
 
@@ -58,12 +58,73 @@ quantum:
     assert snap["pauli_grouping"] == "tensor_product"
     assert snap["hamiltonian_meta"]["fermion_to_qubit_map"] == "jordan_wigner"
     assert snap["hamiltonian_meta"]["n_active_orbitals"] == 2
+    pd = snap["hamiltonian_meta"].get("pyscf_driver") or {}
+    assert pd.get("active_space_strategy") == "cas"
+    assert str(pd.get("active_space_recipe", "")).startswith("cas:")
     rs = out["resource_summary"]
     assert rs["n_circuits"] >= 1
     assert rs["n_pauli_terms"] is not None and rs["n_pauli_terms"] >= 1
     assert rs["n_pauli_groups"] is not None and rs["n_pauli_groups"] >= 0
     assert rs.get("pauli_averaging_protocol_ran") is True
     assert "excited_stages" not in rs
+
+
+def test_run_pipeline_sync_h2_with_classical_benchmarks(tmp_path) -> None:
+    cfg_path = tmp_path / "h2_bench.yaml"
+    cfg_path.write_text(
+        """
+schema_version: "1"
+experiment_id: orch_test_bench
+random_seed: 1
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf:
+  driver: pyscf
+  method: RHF
+active_space:
+  strategy: cas
+  ncas: 2
+  nelecas: 2
+backend:
+  provider: statevector
+  shots_per_circuit: 256
+quantum:
+  algorithm: vqe
+  vqe_depth: 1
+  vqe_maxiter: 20
+  use_pauli_protocol: false
+chemistry_extended:
+  classical_benchmark_enabled: true
+""",
+        encoding="utf-8",
+    )
+    cfg = load_experiment_config(cfg_path)
+    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
+    cb = out.get("classical_benchmarks")
+    assert isinstance(cb, dict)
+    assert cb.get("schema") == "qchem_classical_post_hf_benchmarks_v1"
+    assert isinstance(cb.get("hf"), dict)
+    assert cb["hf"].get("status") == "ok"
+    cbs = out.get("classical_benchmark_summary")
+    assert isinstance(cbs, dict)
+    assert cbs.get("schema") == "classical_benchmark_summary_v1"
+    assert cbs.get("recommended_baseline_policy") == "prefer_ccsd_else_mp2_else_hf"
+    assert cbs.get("recommended_baseline_method") in ("ccsd", "mp2", "hf", None)
+    assert cbs.get("reference_hf_energy_au") is not None
+    assert isinstance(cbs.get("method_deltas_vs_hf_au"), dict)
+    rsum = out["repro"]["run_summary"]
+    assert rsum.get("classical_benchmarks_present") is True
+    assert rsum.get("classical_benchmarks_schema") == "qchem_classical_post_hf_benchmarks_v1"
+    assert rsum.get("classical_benchmark_summary_present") is True
+    assert rsum.get("classical_benchmark_summary_schema") == "classical_benchmark_summary_v1"
+    if cbs.get("recommended_baseline_method") is not None:
+        assert rsum.get("classical_benchmark_recommended_baseline_method") == cbs["recommended_baseline_method"]
 
 
 def test_qpe_dual_track_yaml_runs_via_pipeline() -> None:
@@ -74,10 +135,100 @@ def test_qpe_dual_track_yaml_runs_via_pipeline() -> None:
     out = run_pipeline_sync(cfg, cfg_path=p)
     qdt = out["qpe_demo_track"]
     assert qdt["schema"] == "qpe_qec_demo_track_v1"
+    pec = qdt.get("phase_estimation_contract_v1") or {}
+    assert pec.get("schema") == "phase_estimation_contract_v1"
     assert "kitaev_ground_energy_dense" in qdt
     assert isinstance(qdt.get("bayesian_phase_map_toy"), dict)
     assert math.isfinite(float(out["energy_after_variational"]))
     assert out["repro"]["run_summary"].get("qpe_demo_track_ran") is True
+    qp = out["repro"].get("workflow_preview_qpe_track_v1")
+    assert isinstance(qp, dict) and qp.get("schema") == "workflow_preview_qpe_track_v1"
+    assert qp.get("qpe_pipeline_integration") is True
+    wp = out["repro"].get("workflow_preview_v1") or {}
+    assert wp.get("qpe_track_execution") == qp
+
+
+def test_adapt_singles_pool_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_adapt_singles_pool.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_adapt_singles_pool.yaml missing")
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.adapt_pool_id == "fermionic_uccsd_singles"
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert isinstance(out["repro"]["run_summary"].get("adapt_pool_id_yaml"), str)
+    assert math.isfinite(float(out["energy_after_variational"]))
+
+
+def test_adapt_doubles_pool_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_adapt_doubles_pool.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_adapt_doubles_pool.yaml missing")
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.adapt_pool_id == "fermionic_uccsd_doubles_only"
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert math.isfinite(float(out["energy_after_variational"]))
+
+
+def test_adapt_uccsd_jw_alias_pool_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_adapt_uccsd_jw_alias.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_adapt_uccsd_jw_alias.yaml missing")
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.adapt_pool_id == "uccsd_jw"
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["repro"]["run_summary"].get("adapt_pool_id_yaml") == "uccsd_jw"
+    assert math.isfinite(float(out["energy_after_variational"]))
+
+
+def test_iqeb_fermionic_doubles_pool_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_iqeb_fermionic_doubles_pool.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_iqeb_fermionic_doubles_pool.yaml missing")
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.iqeb_pool_id == "fermionic_uccsd_doubles_only"
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert math.isfinite(float(out["energy_after_variational"]))
+
+
+def test_iqeb_qubit_excitation_alias_pool_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_iqeb_qubit_excitation_alias.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_iqeb_qubit_excitation_alias.yaml missing")
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.iqeb_pool_id == "qubit_excitation"
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["repro"]["run_summary"].get("iqeb_pool_id_yaml") == "qubit_excitation"
+    assert math.isfinite(float(out["energy_after_variational"]))
+
+
+def test_vqs_track_yaml_runs_via_pipeline() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_vqs_track.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_vqs_track.yaml missing")
+    cfg = load_experiment_config(p)
+    assert cfg.quantum.vqs_pipeline_integration is True
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    vt = out["vqs_track"]
+    assert vt["schema"] == "vqs_track_v1"
+    vic = vt.get("vqs_integration_contract_v1") or {}
+    assert vic.get("schema") == "vqs_integration_contract_v1"
+    assert vt["times"]
+    assert len(vt["final_parameters"]) == len(vt["initial_parameters"])
+    assert int(vt.get("n_steps", 0)) >= 1
+    rsum = out["repro"]["run_summary"]
+    assert rsum.get("vqs_track_ran") is True
+    vcon = rsum.get("vqs_open_stack_contract_v1")
+    assert isinstance(vcon, dict) and vcon.get("schema") == "vqs_open_stack_contract_v1"
+    uni = build_methods_resource_unified_v1(out)
+    assert uni.get("schema") == "methods_resource_unified_v1"
+    assert uni.get("run_summary_vqs_track_ran") is True
+    assert isinstance(uni.get("vqs_open_stack_contract_v1"), dict)
 
 
 def test_run_pipeline_sync_h2_qpe_demo_track(tmp_path) -> None:
@@ -161,10 +312,13 @@ quantum:
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     assert "vqd" in out
+    assert out["vqd"].get("schema") == "excited_vqd_bundle_v1"
     assert len(out["vqd"]["energies"]) == 2
     assert out["vqd"]["meta"].get("reused_pipeline_ground") is True
     assert out["vqd"]["energies"][0] == pytest.approx(out["energy_after_variational"])
     assert out["excited_resource_summary"]["vqd"]["n_states"] == 2
+    epc = out["excited_resource_summary"].get("excited_protocol_contract_v1") or {}
+    assert epc.get("schema") == "excited_protocol_contract_v1"
     snap = out["repro"]["parity_snapshot"]
     assert snap["vqd_shots_objective"] == 100
     assert snap["vqd_shots_overlap"] == 80
@@ -224,10 +378,12 @@ quantum:
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     assert "qse" in out
+    assert out["qse"]["schema"] == "excited_qse_bundle_v1"
     assert out["qse"]["excitation_energies"]
     assert out["qse"]["meta"].get("K", 0) >= 1
     assert "sceom" in out
     assert len(out["sceom"]["energies"]) >= 1
+    assert out["sceom"]["schema"] == "excited_sceom_bundle_v1"
     snap = out["repro"]["parity_snapshot"]
     assert snap["qse_after_variational"] is True
     assert snap["qse_shot_mode"] == "exact"
@@ -495,11 +651,16 @@ def test_run_pipeline_sync_packaged_h2_uccsd_yaml() -> None:
     vm = out.get("vqe_meta")
     assert isinstance(vm, dict)
     assert vm.get("variational_ansatz") == "uccsd"
+    assert vm.get("jw_fixed_electron_sector_projection") is True
     assert int(vm["uccsd_n_parameters"]) >= 1
     ev = float(out["energy_after_variational"])
     assert math.isfinite(ev)
-    assert ev < float(out["scf_energy"]) + 1e-6
-    assert ev > -2.0
+    scf_e = float(out["scf_energy"])
+    assert scf_e < -1.0
+    # UCCSD on Tangelo-aligned Hamiltonian: between sto-3g FCI and RHF for H₂(2e, CAS(2,2)).
+    assert ev <= scf_e + 1e-3
+    e_fci_sto3g_h2 = -1.1372759436170443
+    assert ev >= e_fci_sto3g_h2 - 5e-3
     snap = out["repro"]["parity_snapshot"]
     assert snap["variational_ansatz"] == "uccsd"
     assert snap["uccsd_n_parameters"] == int(vm["uccsd_n_parameters"])
@@ -519,8 +680,19 @@ def test_run_pipeline_sync_packaged_h2_uccsd_trotter_yaml() -> None:
     vm = out["vqe_meta"]
     assert vm.get("uccsd_trotter_steps") == 2
     assert vm.get("uccsd_product_formula") == "first_order_layer_repeat"
+    assert vm.get("jw_fixed_electron_sector_projection") is True
     snap = out["repro"]["parity_snapshot"]
     assert snap["uccsd_trotter_steps"] == 2
+
+
+def test_run_pipeline_sync_fe_helike_sto3g_cas22_smoke_yaml() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_fe_sto3g_helike_rhf_cas22.yaml"
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["hamiltonian_meta"]["n_qubits"] == 4
+    assert math.isfinite(float(out["scf_energy"]))
+    assert math.isfinite(float(out["energy_after_variational"]))
 
 
 def test_run_pipeline_sync_oniom_toy_yaml_sets_embedding_layers() -> None:
@@ -546,6 +718,7 @@ def test_run_pipeline_sync_h2_casscf_audit_yaml() -> None:
     assert isinstance(audit, dict)
     assert audit.get("schema") == "casscf_orbital_audit_v1"
     assert "casscf_energy_au" in audit
+    assert audit.get("mo_coeff_rotated_into_casscf") is False
 
 
 def test_run_pipeline_sync_packaged_h2_iqeb_yaml() -> None:

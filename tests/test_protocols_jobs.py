@@ -1,16 +1,16 @@
 from __future__ import annotations
 
-import tempfile
-from pathlib import Path
-
 import numpy as np
 from openfermion.ops import QubitOperator
 
-from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
+from qchem_stack.backends.spec import (
+    BackendSpec,
+    CompilerPassBundle,
+    dataframe_circuit_shot,
+    summarize_circuit_shot_rows,
+)
 from qchem_stack.jobs.cost import CostEstimate
-from qchem_stack.jobs.store import SqliteJobStore
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
-from qchem_stack.backends.spec import dataframe_circuit_shot, summarize_circuit_shot_rows
 
 
 def test_protocol_five_stage_and_cost() -> None:

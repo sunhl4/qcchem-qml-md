@@ -17,7 +17,7 @@ keywords:
 | 层次 | 你关心什么 | 建议从哪里读 |
 |------|------------|----------------|
 | 1. 主要功能 | 软件解决什么问题、一条任务如何走完 | [15 分钟上手](../tutorial/quickstart) + [工作流与 YAML](../tutorial/workflow) |
-| 2. 用法与接口 | 怎么配 YAML、怎么调 Python/HTTP/命令行 | [指南总览](../guide/overview) + [命令行与脚本](../reference/cli-http) |
+| 2. 用法与接口 | 怎么配 YAML、怎么调 Python/HTTP/命令行 | [指南总览](../guide/) + [命令行与脚本](../reference/cli-and-scripts) |
 | 3. 实现细节 | 字段契约、编译与采样路径、作业与复现语义 | [HTTP API](../reference/http-api-sqlite-jobs) + [云与作业](../cloud/overview) |
 
 ## 主要功能（用户视角）
@@ -39,5 +39,5 @@ keywords:
 
 1. [快速上手](../tutorial/quickstart)
 2. [工作流与 YAML](../tutorial/workflow)
-3. [指南总览](../guide/overview)
-4. [命令与 HTTP 接口](../reference/cli-http)
+3. [指南总览](../guide/)
+4. [命令与 HTTP 接口](../reference/cli-and-scripts)

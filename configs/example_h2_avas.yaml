@@ -1,0 +1,27 @@
+# Minimal H2 run with **real** PySCF AVAS projection (``active_space.strategy=avas``).
+#
+# AVAS picks ``(ncas, nelecas)``; the pipeline maps them into ``ExperimentConfig.active_space`` via
+# ``driver_meta.qchem_active_space_resolution_v1`` so parity / workflow preview stay coherent.
+schema_version: "1"
+experiment_id: "h2_avas_smoke"
+random_seed: 0
+molecule:
+  symbols: ["H", "H"]
+  coordinates:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 0.74]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf:
+  driver: pyscf
+  method: RHF
+active_space:
+  strategy: avas
+  ncas: 2
+  nelecas: 2
+quantum:
+  use_pauli_protocol: false
+chemistry_extended:
+  avas_ao_labels: ["H 1s"]
+  avas_threshold: 0.2

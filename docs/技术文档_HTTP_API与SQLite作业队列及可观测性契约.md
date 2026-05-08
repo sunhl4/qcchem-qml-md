@@ -66,12 +66,13 @@ HTTP 异步入队常见键：
 | `trace_id` | `RunContext` |
 | `experiment_id` | 校验后的 `ExperimentConfig.experiment_id` |
 | `nexus_analog_project_label` | YAML `nexus_analog.project_label`（若启用） |
-| `api_workspace_label` | POST body `workspace_label`（竞品「项目」类比，trim，≤400 字符） |
+| `api_workspace_label` | POST body `workspace_label`（竞品「工作区」类比，trim，≤400 字符） |
+| `api_project_slug` | POST body `project_slug`（竞品「项目 slug」类比，trim，**≤200** 字符；与 `workspace_label` 一并用于 `GET /v1/runs` 过滤；真源 `app.py` `post_run`） |
 
 ### 3.3 列表与过滤
 
 - `list_jobs(status=?, job_kind=?, experiment_id=?, api_workspace_label=?, api_project_slug=?, limit=, offset=)`：按 **`created DESC, rowid DESC`**（`created` 相同时保证**后入队**优先，避免同秒双作业顺序抖动）。
-- `experiment_id` / `api_workspace_label`：优先 `json_extract(meta, '$.<key>')`；失败时回退扫描（上限见 `jobs/store.py` 中 `_JSON_SCAN_CAP`）。
+- `experiment_id` / `api_workspace_label` / `api_project_slug`：优先 `json_extract(meta, '$.<key>')`；失败时回退扫描（上限见 `jobs/store.py` 中 `_JSON_SCAN_CAP`）。
 
 ### 3.4 运维 API
 
@@ -90,26 +91,51 @@ HTTP 异步入队常见键：
 
 ## 5. HTTP API 一览（`schema` 契约）
 
+**真源**：`src/qchem_stack/api/app.py`（FastAPI）。下表为 **响应体顶层 `schema` 字段** 与主要负载；与 OpenAPI 不一致时以代码为准。
+
 | 方法 | 路径 | `schema`（响应体内或约定） |
 |------|------|----------------------------|
-| GET | `/health` | JSON：`{"status":"ok"}` |
-| GET | `/health/ready` | JSON：`{"status":"ready","job_db_default":"<resolved_path>"}`（SQLite ping 失败 → **503**） |
-| GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`object_map` + `gaps`） |
-| GET | `/v1/meta/parity-gaps` | `inquanto_gap_export_v1` |
-| GET | `/v1/meta/product-analog` | `product_analog_v1` |
-| POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`） |
-| POST | `/v1/meta/computables-preview` | `computables_preview_v1`（内嵌 `computable_abstract` v2） |
+| GET | `/health` | 无 `schema`；体为 `{"status":"ok"}` |
+| GET | `/health/ready` | 无 `schema`；体为 `{"status":"ready","job_db_default":...}`；SQLite ping 失败 → **503** |
+| GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`qchem_stack_version`、`object_map`、`gaps`、`mitigation_execution_model`、`open_stack_differentiators`、`operator_pool_registry_export_v1`） |
+| GET | `/v1/meta/parity-gaps` | `inquanto_gap_export_v1`：`qchem_stack_version`、`gaps` |
+| GET | `/v1/meta/product-analog` | `product_analog_v1`（控制台用路由指针 + `emulation_notes`） |
+| POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`；可选 `computables_rich`） |
+| POST | `/v1/meta/computables-preview` | `computables_preview_v1`（`experiment_id`、`computables[]`、`computable_abstract` v2） |
 | GET | `/v1/meta/ml-md-bridge` | `ml_md_bridge_surface_v1`（QMEF / 导出器 / stub trainer 指针） |
 | POST | `/v1/meta/qmef-validate` | `qmef_validate_v1`（请求体 `{ "qmef": { … } }`） |
 | POST | `/v1/meta/ml-md-trainer-stub-fit` | `ml_md_trainer_stub_fit_v1`（内存 stub ``fit``；**不落盘** checkpoint） |
-| GET | `/v1/meta/queue-stats` | `queue_stats_v1` |
-| GET | `/v1/runs` | `job_list_v1`（含 `limit`/`offset` 回显） |
-| POST | `/v1/runs` | 同步：`full_pipeline_job_result_v1`；异步 **202**：`run_enqueue_response_v1` |
-| GET | `/v1/runs/{id}/status` | `job_status_v1` |
-| GET | `/v1/runs/{id}/summary` | `run_product_summary_v1`（`DONE` 为完整 slim；排队中为 `partial`；可含 `api_labels`） |
+| GET | `/v1/meta/queue-stats` | `queue_stats_v1`：`job_db`、`counts` |
+| GET | `/v1/runs` | `job_list_v1`（`job_db`、`limit`、`offset`、`jobs`） |
+| POST | `/v1/runs` | 同步 **200**：`full_pipeline_job_result_v1`；异步 **202**：`run_enqueue_response_v1` |
+| GET | `/v1/runs/{id}/status` | `job_status_v1`（`get_job_public_summary` 展开字段） |
+| GET | `/v1/runs/{id}/summary` | `run_product_summary_v1`（非 `DONE` 时 `partial`；`DONE` 为完整 slim；可含 `api_labels`） |
 | GET | `/v1/runs/{id}/events` | `job_events_v1`（`note`=`sqlite_timeline_json_v1` 或 `sqlite_coarse_timeline_v1`） |
 | GET | `/v1/runs/{id}/repro` | `run_repro_only_v1`（仅 `DONE`；否则 **409**） |
-| GET | `/v1/runs/{id}` | `SqliteJobStore.result` 合并形（`DONE` 时混用结果 JSON） |
+| GET | `/v1/runs/{id}` | 无统一 `schema`；为 `SqliteJobStore.result(job_id)` 原始合并字典 |
+
+### 5.1 路由 ↔ 实现函数（维护用）
+
+| 路径 | `app.py` 中处理函数 |
+|------|---------------------|
+| `GET /health` | `health` |
+| `GET /health/ready` | `ready` |
+| `GET /v1/meta/product-analog` | `product_analog` |
+| `GET /v1/meta/capability-surface` | `capability_surface` |
+| `GET /v1/meta/parity-gaps` | `parity_gaps` |
+| `POST /v1/meta/workflow-preview` | `workflow_preview` |
+| `POST /v1/meta/computables-preview` | `computables_preview` |
+| `GET /v1/meta/ml-md-bridge` | `ml_md_bridge_meta` |
+| `POST /v1/meta/qmef-validate` | `qmef_validate` |
+| `POST /v1/meta/ml-md-trainer-stub-fit` | `ml_md_trainer_stub_fit` |
+| `GET /v1/meta/queue-stats` | `queue_stats` |
+| `GET /v1/runs` | `list_runs` |
+| `POST /v1/runs` | `post_run` |
+| `GET /v1/runs/{job_id}/status` | `get_run_status` |
+| `GET /v1/runs/{job_id}/events` | `get_run_events` |
+| `GET /v1/runs/{job_id}/summary` | `get_run_summary_ux` |
+| `GET /v1/runs/{job_id}/repro` | `get_run_repro` |
+| `GET /v1/runs/{job_id}` | `get_run` |
 
 **响应头（成功 POST `/v1/runs`）**：`X-Trace-ID`；若请求带 client id 则 `X-Request-ID`。
 
@@ -143,7 +169,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 ## 8. 维护清单（变更时同步）
 
-1. 增删 HTTP 路由或响应 `schema`：更新本文 **§5**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §9、[README.md](../README.md) HTTP 段、[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) 表格（若行为类比变）。
+1. 增删 HTTP 路由或响应 `schema`：更新本文 **§5**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §9、[README.md](../../README.md) HTTP 段、[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) 表格（若行为类比变）。
 2. 增减 `meta` 键或 `full_pipeline_job_result_v1` 白名单：更新 **`pipeline_runner.py`**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §10。
 3. 观测字段变更：更新 **§2**、`tests/test_observability_pipeline.py`（PySCF）、`tests/test_api_runs.py`（FastAPI）。
 4. 机读差距分类：视需要更新 `inquanto_contract.inquanto_gap_categories()` 与 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。

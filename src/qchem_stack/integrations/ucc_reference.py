@@ -94,6 +94,48 @@ def count_uccsd_excitations(n_spin_orbitals: int, n_electrons: int) -> dict[str,
     return {"n_single_excitations": n_singles, "n_double_excitations": n_doubles}
 
 
+def build_spin_ucc_doubles_only_fermion_generators(
+    n_spin_orbitals: int,
+    n_electrons: int,
+    *,
+    policy: ChemicallyAwareUCCPolicy | None = None,
+) -> list[FermionOperator]:
+    """Doubles-only fermionic raising operators — spin-orbital paired excitations ``ij→ab``.
+
+    Complements **singles-only** pools for ADAPT/IQEB-style staged pools; JW-mapped downstream.
+    May be empty if there are fewer than two virtuals or occupied pairs (graceful degeneration).
+    """
+    occ = list(range(n_electrons))
+    virt = list(range(n_electrons, n_spin_orbitals))
+    ops: list[FermionOperator] = []
+    for i, j in itertools.combinations(occ, 2):
+        for a, b in itertools.combinations(virt, 2):
+            ops.append(FermionOperator(((b, 1), (a, 1), (j, 0), (i, 0)), 1.0))
+    pol = policy or IdentityRegrouping()
+    return pol.regroup_generators(ops)
+
+
+def build_spin_ucc_singles_only_fermion_generators(
+    n_spin_orbitals: int,
+    n_electrons: int,
+    *,
+    policy: ChemicallyAwareUCCPolicy | None = None,
+) -> list[FermionOperator]:
+    """Singles-only (UCCS-style) fermionic raising operators — doubles omitted.
+
+    Useful as a **smaller chemistry-aware ADAPT/IQEB pool** (still JW-mapped downstream).
+    Not equivalent to a vendor full excitation taxonomy.
+    """
+    occ = list(range(n_electrons))
+    virt = list(range(n_electrons, n_spin_orbitals))
+    ops: list[FermionOperator] = []
+    for i in occ:
+        for a in virt:
+            ops.append(FermionOperator(((a, 1), (i, 0)), 1.0))
+    pol = policy or IdentityRegrouping()
+    return pol.regroup_generators(ops)
+
+
 def build_spin_uccsd_fermion_generators(
     n_spin_orbitals: int,
     n_electrons: int,

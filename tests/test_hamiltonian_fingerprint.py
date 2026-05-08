@@ -4,10 +4,15 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import numpy as np
 import pytest
+from openfermion import InteractionOperator
 from openfermion.ops import QubitOperator
 
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+from qchem_stack.chem.fermion import FermionSpace
 from qchem_stack.chem.hamiltonian import hamiltonian_fingerprint_from_qubit_operator
+from qchem_stack.chem.system import MolecularSystem
 
 
 def test_fingerprint_stable_for_same_operator() -> None:
@@ -36,22 +41,36 @@ def test_fingerprint_truncation_flag() -> None:
 
 def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
     pytest.importorskip("pyscf")
-    from qchem_stack.config import load_experiment_config
     from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
+    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.config import load_experiment_config
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    h1 = molecular_hamiltonian_from_pyscf(
-        r,
+    ref1 = ClassicalMeanFieldReference(
+        mf=r.mf,
+        e_tot=float(r.e_tot),
+        mo_energy=r.mo_energy,
+        molecular_system=r.molecular_system,
+        driver_meta=dict(r.driver_meta),
+    )
+    h1 = molecular_hamiltonian_from_classical_reference(
+        ref1,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
     )
     r2 = drv.run_rhf()
-    h2 = molecular_hamiltonian_from_pyscf(
-        r2,
+    ref2 = ClassicalMeanFieldReference(
+        mf=r2.mf,
+        e_tot=float(r2.e_tot),
+        mo_energy=r2.mo_energy,
+        molecular_system=r2.molecular_system,
+        driver_meta=dict(r2.driver_meta),
+    )
+    h2 = molecular_hamiltonian_from_classical_reference(
+        ref2,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
     )
@@ -64,25 +83,59 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
 
 def test_h2_fingerprint_sensitive_to_fermion_mapping() -> None:
     pytest.importorskip("pyscf")
-    from qchem_stack.config import load_experiment_config
     from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
+    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.config import load_experiment_config
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    h_jw = molecular_hamiltonian_from_pyscf(
-        r,
+    ref = ClassicalMeanFieldReference(
+        mf=r.mf,
+        e_tot=float(r.e_tot),
+        mo_energy=r.mo_energy,
+        molecular_system=r.molecular_system,
+        driver_meta=dict(r.driver_meta),
+    )
+    h_jw = molecular_hamiltonian_from_classical_reference(
+        ref,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
         fermion_qubit_mapping="jordan_wigner",
     )
-    h_bk = molecular_hamiltonian_from_pyscf(
-        r,
+    h_bk = molecular_hamiltonian_from_classical_reference(
+        ref,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
         fermion_qubit_mapping="bravyi_kitaev",
     )
     assert h_jw.meta["hamiltonian_fingerprint"] != h_bk.meta["hamiltonian_fingerprint"]
+
+
+def test_non_pyscf_reference_meta_stored_as_classical_driver() -> None:
+    from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_active_space_fermionic_operator
+
+    mol_op = InteractionOperator(
+        0.0,
+        np.zeros((2, 2), dtype=float),
+        np.zeros((2, 2, 2, 2), dtype=float),
+    )
+    fs = FermionSpace(n_spin_orbitals=2, n_electrons=2)
+    ref = ClassicalMeanFieldReference(
+        mf=None,
+        e_tot=0.0,
+        mo_energy=np.zeros(1, dtype=float),
+        molecular_system=MolecularSystem(symbols=["H"], coordinates_bohr=np.zeros((1, 3), dtype=float)),
+        driver_meta={"upstream_classical_software_tag": "mock_solver", "note": "contract-test"},
+    )
+    qh = qubit_hamiltonian_from_active_space_fermionic_operator(
+        mol_op,
+        fs,
+        n_active_orbitals=1,
+        n_active_electrons=2,
+        rhf=ref,
+    )
+    assert "classical_driver" in qh.meta
+    assert qh.meta.get("classical_driver", {}).get("upstream_classical_software_tag") == "mock_solver"
 

@@ -1,0 +1,47 @@
+# ADAPT-VQE with JW-mapped **singles-only** fermionic pool (`fermionic_uccsd_singles`).
+# Smaller chemistry-aware operator set than full UCCSD doubles; parity / registry.demo.
+schema_version: "1"
+experiment_id: "h2_adapt_singles_pool_sto3g"
+random_seed: 0
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 256
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "adapt"
+  adapt_pool_id: "fermionic_uccsd_singles"
+  adapt_max_iter: 3
+  vqe_depth: 1
+  vqe_maxiter: 80
+  use_pauli_protocol: false

@@ -97,7 +97,7 @@ Copyright · [parity](/parity/public-matrix) · [Architecture](/concept/engineer
 
 统一模板：
 
-1. **一句话定义**（与 IA_MAPPING 英文 label 一致）。
+1. **一句话定义**（与 [`meta/ia-mapping`](../meta/ia-mapping.md) 英文 label 一致）。
 2. **你将学到**（3 条 bullet）。
 3. **相关文档**（手列链接到 `/concept|`/tutorial|`/reference`）。
 4. **下一步**（相邻柱或 Quickstart）。

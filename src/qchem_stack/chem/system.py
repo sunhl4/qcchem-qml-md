@@ -15,6 +15,7 @@ class MolecularSystem:
     charge: int = 0
     multiplicity: int = 1
     basis: str = "sto-3g"
+    ecp: str | dict[str, str] | None = None
     meta: dict[str, Any] = field(default_factory=dict)
 
     def __post_init__(self) -> None:

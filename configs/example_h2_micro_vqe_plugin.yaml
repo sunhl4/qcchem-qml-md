@@ -1,0 +1,33 @@
+schema_version: "1"
+experiment_id: "h2_micro_vqe_plugin_demo"
+random_seed: 7
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  basis: sto-3g
+
+scf:
+  driver: pyscf
+  method: RHF
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: statevector_sim
+  provider: statevector
+
+embedding:
+  mode: none
+
+quantum:
+  algorithm: micro_vqe_yaml_plugin_demo
+  algorithm_factory: qchem_stack.quantum.variational_plugins.examples.vqe_micro_plugin:micro_vqe_runner_factory
+  vqe_depth: 1
+  vqe_maxiter: 120
+  use_pauli_protocol: false

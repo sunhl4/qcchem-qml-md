@@ -4,10 +4,18 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+from openfermion.ops import QubitOperator
+from scipy.linalg import expm
 from scipy.optimize import minimize
 
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
-from qchem_stack.quantum.statevector import apply_excitation_simple, hea_state
+from qchem_stack.quantum.algorithms.base import AlgorithmBase
+from qchem_stack.quantum.operator_pool_registry import build_registered_operator_pool
+from qchem_stack.quantum.statevector import (
+    expectation_qubit_operator,
+    hea_state,
+    qubit_operator_to_sparse,
+)
 
 if TYPE_CHECKING:
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
@@ -16,34 +24,41 @@ if TYPE_CHECKING:
 @dataclass
 class AdaptResult:
     energy: float
-    pool_indices: list[tuple[int, int]]
+    pool_indices: list[int]
     angles_per_layer: list[float]
     meta: dict[str, Any] = field(default_factory=dict)
 
 
-class FermionicAdaptVQE:
-    """Greedy ADAPT-like loop using a toy qubit pool ``(i,j) -> exp(i*theta X_i X_j)``."""
+class FermionicAdaptVQE(AlgorithmBase):
+    """ADAPT-VQE loop with commutator gradients and executable operator pools."""
 
     def __init__(
         self,
         hamiltonian: QubitHamiltonian,
-        pool: list[tuple[int, int]] | None = None,
+        pool: list[QubitOperator] | None = None,
+        pool_id: str = "fermionic_uccsd",
         max_ops: int = 4,
         hea_depth: int = 1,
+        tetris_style: bool = False,
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> None:
         from qchem_stack.backends.executor_base import StatevectorHeaExecutor
 
+        super().__init__()
+        self._algorithm_name = "adapt"
+        self._report_schema = "algorithm_adapt_report_v1"
         self.hamiltonian = hamiltonian
         self.h_op = hamiltonian.operator
         self.n_qubits = hamiltonian.n_qubits
         self.max_ops = max_ops
         self.hea_depth = hea_depth
+        self.pool_id = pool_id
+        self.tetris_style = bool(tetris_style)
         self._executor = executor or StatevectorHeaExecutor()
-        if pool is None:
-            self.pool = [(i, j) for i in range(self.n_qubits) for j in range(i + 1, self.n_qubits)]
-        else:
-            self.pool = pool
+        self.pool = pool or build_registered_operator_pool(pool_id, hamiltonian)
+
+    def build(self, **kwargs: Any) -> FermionicAdaptVQE:
+        return super().build(pool_id=self.pool_id, tetris_style=self.tetris_style, **kwargs)
 
     def run(
         self,
@@ -51,80 +66,113 @@ class FermionicAdaptVQE:
         seed: int = 0,
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> AdaptResult:
+        self._ensure_built()
         exe = executor or self._executor
         rng = np.random.default_rng(seed)
         n_hea = 2 * self.n_qubits * self.hea_depth
         hea_angles = rng.uniform(-np.pi, np.pi, size=n_hea)
-        layers: list[tuple[tuple[int, int], float]] = []
+        layers: list[tuple[int, float]] = []
+        pool_mats = [qubit_operator_to_sparse(op, self.n_qubits) for op in self.pool]
 
-        def build_state(hea_x: np.ndarray, exc: list[tuple[tuple[int, int], float]]) -> np.ndarray:
+        def build_state(hea_x: np.ndarray, exc: list[tuple[int, float]]) -> np.ndarray:
             st = hea_state(hea_x, self.n_qubits, self.hea_depth)
-            for (i, j), th in exc:
-                st = apply_excitation_simple(st, i, j, self.n_qubits, th)
+            for pool_idx, th in exc:
+                st = expm(-1j * float(th) * pool_mats[pool_idx]) @ st
             return st / np.linalg.norm(st)
 
-        def energy_fn(hea_x: np.ndarray, exc: list[tuple[tuple[int, int], float]]) -> float:
+        def energy_fn(hea_x: np.ndarray, exc: list[tuple[int, float]]) -> float:
             st = build_state(hea_x, exc)
             return exe.expectation_state(st, self.h_op, self.n_qubits)
+
+        def gradient_commutator(state: np.ndarray, pool_idx: int) -> float:
+            op = self.pool[pool_idx]
+            comm = self.h_op * op - op * self.h_op
+            val = expectation_qubit_operator(state, comm, self.n_qubits)
+            return float(abs(np.real(val)))
 
         adapt_steps: list[dict[str, Any]] = []
         total_gradient_evals = 0
         for iter_k in range(self.max_ops):
-            best_idx = -1
-            best_grad_mag = 0.0
+            active_state = build_state(hea_angles, layers)
             n_candidates = 0
-            grad_evals_this_round = 0
-
-            for idx, (i, j) in enumerate(self.pool):
-                if any((pair == (i, j)) for pair, _ in layers):
+            grad_map: list[tuple[int, float]] = []
+            for idx in range(len(self.pool)):
+                if any((pool_idx == idx) for pool_idx, _ in layers):
                     continue
                 n_candidates += 1
-
-                def obj(delta: float, ij: tuple[int, int] = (i, j)) -> float:
-                    trial = layers + [(ij, float(delta))]
-                    return energy_fn(hea_angles, trial)
-
-                g = (obj(1e-3) - obj(-1e-3)) / 2e-3
-                grad_evals_this_round += 2
-                if abs(g) > best_grad_mag:
-                    best_grad_mag = abs(g)
-                    best_idx = idx
+                grad_map.append((idx, gradient_commutator(active_state, idx)))
+            grad_evals_this_round = n_candidates
+            grad_map.sort(key=lambda x: x[1], reverse=True)
+            best_grad_mag = float(grad_map[0][1]) if grad_map else 0.0
 
             step: dict[str, Any] = {
                 "iteration": iter_k,
                 "n_pool_candidates_scanned": n_candidates,
                 "n_gradient_evals": grad_evals_this_round,
                 "best_grad_mag": float(best_grad_mag),
-                "selected_pair": None,
+                "selected_indices": [],
             }
             adapt_steps.append(step)
             total_gradient_evals += grad_evals_this_round
 
-            if best_idx < 0 or best_grad_mag < grad_tol:
+            if not grad_map or best_grad_mag < grad_tol:
                 break
-            pair = self.pool[best_idx]
+            selected_this_round = [grad_map[0][0]]
+            if self.tetris_style:
+                used_qubits: set[int] = set()
+                for idx, g in grad_map:
+                    if g < grad_tol:
+                        continue
+                    term_qubits = {
+                        q
+                        for term in self.pool[idx].terms
+                        for (q, _p) in term
+                    }
+                    if used_qubits & term_qubits:
+                        continue
+                    selected_this_round.append(idx)
+                    used_qubits |= term_qubits
+                    if len(selected_this_round) >= 4:
+                        break
 
             def full_obj(x: np.ndarray) -> float:
                 hea_x = x[:n_hea]
-                th = float(x[n_hea])
-                trial = layers + [(pair, th)]
+                tail = x[n_hea:]
+                trial = list(layers)
+                for k, idx in enumerate(selected_this_round):
+                    trial.append((idx, float(tail[k])))
                 return energy_fn(hea_x, trial)
 
-            x0 = np.concatenate([hea_angles, [0.0]])
+            x0 = np.concatenate([hea_angles, np.zeros(len(selected_this_round), dtype=float)])
             res = minimize(full_obj, x0, method="COBYLA", options={"maxiter": 80})
             hea_angles = np.asarray(res.x[:n_hea], dtype=float)
-            layers.append((pair, float(res.x[n_hea])))
-            step["selected_pair"] = [int(pair[0]), int(pair[1])]
+            for k, idx in enumerate(selected_this_round):
+                layers.append((idx, float(res.x[n_hea + k])))
+            step["selected_indices"] = [int(x) for x in selected_this_round]
 
         e = energy_fn(hea_angles, layers)
-        return AdaptResult(
+        out = AdaptResult(
             energy=e,
-            pool_indices=[p for p, _ in layers],
+            pool_indices=[pool_idx for pool_idx, _ in layers],
             angles_per_layer=[a for _, a in layers],
             meta={
                 "hea_angles": hea_angles.tolist(),
-                "layers": [(list(p), a) for p, a in layers],
+                "layers": [{"pool_index": int(p), "angle": float(a)} for p, a in layers],
                 "adapt_steps": adapt_steps,
                 "total_gradient_evals": total_gradient_evals,
+                "pool_id": self.pool_id,
+                "pool_size": len(self.pool),
+                "gradient_mode": "commutator",
+                "tetris_style": self.tetris_style,
             },
         )
+        self._set_report(
+            metrics={
+                "energy": out.energy,
+                "n_selected_ops": len(out.pool_indices),
+                "total_gradient_evals": total_gradient_evals,
+            },
+            artifacts={"selected_pool_indices": list(out.pool_indices)},
+            diagnostics={"meta": dict(out.meta)},
+        )
+        return out

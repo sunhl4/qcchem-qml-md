@@ -7,10 +7,10 @@ from pathlib import Path
 import pytest
 
 from qchem_stack.config import (
+    ActiveSpaceSpec,
     EmbeddingSpec,
     ExperimentConfig,
     MoleculeSpec,
-    ActiveSpaceSpec,
     QuantumSpec,
 )
 from qchem_stack.orchestration.pipeline import collect_repro_metadata

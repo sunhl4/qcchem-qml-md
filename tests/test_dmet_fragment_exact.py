@@ -23,7 +23,10 @@ def test_h4_dmet_multifragment_exact_shared_yaml() -> None:
     assert led.get("multifragment_shared_global_hamiltonian") is True
     frags = led.get("fragments") or []
     assert len(frags) == 2
-    assert all((f.get("meta") or {}).get("solver") == "QubitHamiltonianFragmentSolverExact" for f in frags)
+    def _frag_solver(f: dict) -> str | None:
+        return f.get("solver") or (f.get("meta") or {}).get("solver")
+
+    assert all(_frag_solver(f) == "QubitHamiltonianFragmentSolverExact" for f in frags)
     e0 = frags[0].get("energy")
     e1 = frags[1].get("energy")
     assert e0 is not None and e1 is not None

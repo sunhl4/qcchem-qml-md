@@ -73,3 +73,34 @@ def test_mitigation_graph_schema_propagates_to_runtime_trace() -> None:
     assert graph is not None
     dex = execute_mitigation_dag(-0.5, None, graph, cfg, protocol_counts={})
     assert dex.get("graph_schema") == graph.get("schema")
+
+
+def test_classical_shadows_stub_trace_matches_graph_standalone() -> None:
+    cfg = _minimal_cfg(classical_shadows_stub_enabled=True, classical_shadows_budget_pairs=64)
+    graph = build_qermit_style_mitigation_report(cfg)
+    assert graph is not None
+    dag_kinds = _dag_mitigation_kinds(graph)
+    dex = execute_mitigation_dag(0.12, None, graph, cfg, protocol_counts={})
+    trace_kinds = _trace_node_kinds(dex)
+    assert dag_kinds == trace_kinds == ["classical_shadows_expectation_stub"]
+
+
+def test_classical_shadows_stub_between_spam_and_pmsv_matches_trace() -> None:
+    cfg = _minimal_cfg(
+        spam_calibration_enabled=True,
+        classical_shadows_stub_enabled=True,
+        pmsv_enabled=True,
+        pmsv_stabilizers=["Z0"],
+        pmsv_retention_rate=0.85,
+    )
+    graph = build_qermit_style_mitigation_report(cfg)
+    assert graph is not None
+    dag_kinds = _dag_mitigation_kinds(graph)
+    dex = execute_mitigation_dag(-1.1, 0.05, graph, cfg, protocol_counts={})
+    trace_kinds = _trace_node_kinds(dex)
+    assert dag_kinds == trace_kinds
+    assert dag_kinds == [
+        "SPAM_readout_calibration_stub",
+        "classical_shadows_expectation_stub",
+        "PMSV_symmetry_filter",
+    ]

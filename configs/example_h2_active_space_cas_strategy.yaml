@@ -1,0 +1,31 @@
+schema_version: "1"
+experiment_id: h2_active_space_cas_strategy
+random_seed: 7
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+
+scf:
+  driver: pyscf
+  method: RHF
+
+active_space:
+  strategy: cas
+  ncas: 2
+  nelecas: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: statevector_sim
+  provider: statevector
+  shots_per_circuit: 1024
+
+quantum:
+  use_pauli_protocol: false
+  vqe_maxiter: 20

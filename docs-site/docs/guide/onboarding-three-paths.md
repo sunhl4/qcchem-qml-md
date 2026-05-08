@@ -27,9 +27,9 @@ description: 从「能跑起来」「能对齐 InQuanto 公开契约」「MD/ML 
 适合：势函数 / 数据集 / 与 `repro` 弱耦合的长板。
 
 1. [原理与阅读建议](/guide/principles-and-reading) 中与执行、缓解相关的节（按需）  
-2. 源码 `src/qchem_stack/md_bridge/` 与母稿 **`docs/md_bridge_repro_freeze_list.md`**（`QMEFDataset` / `repro` 冻结字段）  
+2. 源码 `src/qchem_stack/md_bridge/` 与母稿 **`docs/工程记忆_Quantinuum对标与数据流技术文档.md` §16**（`QMEFDataset` / `repro` 冻结字段）  
 3. 运行 `pytest -m l1_md_ml`（见根目录 `CONTRIBUTING.md`）
 
 ---
 
-**维护**：双月周历见仓库 `docs/P2_详细实施计划.md` §8；更新本页时同步根目录 `CONTRIBUTING.md` 中的「新用户三条路径」链接。
+**维护**：双月周历见仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 A） §8；更新本页时同步根目录 `CONTRIBUTING.md` 中的「新用户三条路径」链接。

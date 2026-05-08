@@ -39,3 +39,5 @@ def test_excited_export_config_only_for_vqd_yaml() -> None:
     assert block is not None
     assert "excited_methods_unified" in block
     assert block.get("vqd") is not None or block.get("qse") is not None
+    c = block.get("excited_protocol_contract_v1")
+    assert isinstance(c, dict) and c.get("schema") == "excited_protocol_contract_v1"

@@ -1,13 +1,13 @@
 # qchem-stack — software engineering architecture
 
-This document complements the InQuanto **parity** and chemistry narrative docs. It fixes the **internal layering** and **integration contracts** you need for a maintainable product (not a one-off benchmark script). For Quantinuum’s public “How to use InQuanto” topic map vs this repo, see [InQuanto_manual_howto_与_qchem_stack_映射.md](InQuanto_manual_howto_与_qchem_stack_映射.md) ([official howto](https://docs.quantinuum.com/inquanto/manual/howto.html)).
+This document complements the InQuanto **parity** and chemistry narrative docs. It fixes the **internal layering** and **integration contracts** you need for a maintainable product (not a one-off benchmark script). **Chinese mother-doc taxonomy** (strategy, contracts, sign-off): [竞争定位与路线图_对标Quantinuum产品与技术路线.md](竞争定位与路线图_对标Quantinuum产品与技术路线.md)、[工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md)、[与InQuanto能力差距与实施计划.md](与InQuanto能力差距与实施计划.md). For Quantinuum’s public “How to use InQuanto” topic map vs this repo, see **§14** in [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md) ([official howto](https://docs.quantinuum.com/inquanto/manual/howto.html)).
 
 ## 1. Layer model
 
 | Layer | Packages / modules | Responsibility |
 |--------|-------------------|----------------|
 | **Domain config** | `qchem_stack.config` | Pydantic `ExperimentConfig` — single source of truth for YAML, validation, cost guards. |
-| **Chemistry drivers** | `qchem_stack.chem.*` | PySCF (optional extra), Hamiltonian builders, Schmidt / DMET *shapes*. |
+| **Chemistry drivers / adapters** | `qchem_stack.chem.*` (`chem.solvers`, **`chem.bridges`**) | `ChemIntegralSolver` registry + **interchange façade** (`classical_mean_field_via_solver_bridge` → `MolecularMeanFieldResult`); Hamiltonian builders, Schmidt / DMET *shapes*. |
 | **Quantum algorithms** | `qchem_stack.quantum.*` | VQE, ADAPT, excited-state drivers — no YAML parsing. |
 | **Backends & protocol** | `qchem_stack.backends.*`, `qchem_stack.protocols.*` | Executor abstraction, Pauli averaging, resource rows. |
 | **Orchestration** | `qchem_stack.orchestration` | `run_pipeline_sync` / `run_pipeline_from_config` — **wires** layers; logging at INFO. |
@@ -17,6 +17,18 @@ This document complements the InQuanto **parity** and chemistry narrative docs. 
 | **Errors** | `qchem_stack.exceptions` | Typed base errors for ops and API gateways. |
 
 **Rule of thumb:** algorithms and drivers never import orchestration. Orchestration imports everything below.
+
+## 1.1 Architecture invariant (pinned)
+
+The project is pinned to this invariant:
+
+- **Unified classical interface first**: all classical chemistry software enters through `ChemIntegralSolver` + bridge interchange.
+- **Backend-agnostic downstream**: after bridge/interchange objects are formed (`MolecularMeanFieldResult`, `ClassicalMeanFieldReference`, `CanonicalActiveSpaceIntegralPack`), orchestration/quantum/reporting logic must not depend on vendor-native class names.
+- **PySCF is an example backend, not a privileged architecture dependency**.
+- **Any backend-specific branch must be isolated at adapter/interchange boundaries with explicit capability gates** (`SolverCapabilities`), never by hidden assumptions in algorithm code.
+- **Compatibility fields are transitional only**: legacy PySCF-typed convenience slots may remain temporarily for migration, but all new public APIs must use backend-agnostic interchange types first and document deprecation windows.
+
+**Production milestone (pinned):** end-to-end **numerical** classical chemistry in CI and representative YAMLs targets **`scf.driver=pyscf`** until another backend implements `compute_mean_field` and (when building restricted active-space qubit Hamiltonians) satisfies `SolverCapabilities.supports_restricted_active_space_qubit_hamiltonian` plus interchange tests for `CanonicalActiveSpaceIntegralPack.from_classical_reference`. Additional codes register via `qchem_stack.chem.solvers.registry`. Product narrative and extension checklist (Chinese): [竞争定位与路线图 — §5.1](竞争定位与路线图_对标Quantinuum产品与技术路线.md).
 
 ## 2. Public surfaces (stability intent)
 
@@ -75,8 +87,8 @@ Chinese contract tables (endpoints, `schema`, `meta`, observability): [技术文
 - **`GET /health/ready`** — tries default job DB parent mkdir + `SELECT 1` on SQLite; **503** if path unusable.
 - **`GET /v1/meta/parity-gaps`** — `schema: inquanto_gap_export_v1`: package version + `gaps` from `inquanto_gap_categories()` (dashboard / CI against [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)).
 - **`GET /v1/meta/product-analog`** — `schema: product_analog_v1`: one-shot “what we emulate” vs InQuanto/Nexus *public* narratives (routes pointer list; no closed-source claims).
-- **`POST /v1/meta/workflow-preview`** — `schema: workflow_preview_v1`: five **protocol stages** (`instantiate`→`evaluate`) with config hints + **`computable_graph_v2`** (`semantic_dataflow_v1`; optional YAML **`quantum.computable_extra_edges`** / **`quantum.computable_remove_edges`**) + `roots` + `computable_abstract` — YAML only; core logic in `integrations/inquanto_workflow_preview.py`. On completed runs, the same blob is copied to **`repro.workflow_preview_v1`** (P1 alignment with the HTTP preview; regression `tests/test_workflow_preview_repro_alignment.py`). **`REPRO_DOCUMENTED_KEYS`** in `protocols/inquanto_contract.py` whitelists `repro` root keys; **`embedding_workflow`** is mirrored under `repro` after the pipeline builds it (including `mode: none` when embedding is off).
-- **`GET /v1/meta/capability-surface`** — `schema: capability_surface_v1`: version + full **`inquanto_object_map`** + **`inquanto_gap_categories`** + **`mitigation_execution_model`** + **`open_stack_differentiators`** (`open_stack_differentiators_v1`: non-cloud / non-vendor-HW auditability extras; single console bootstrap fetch; regression: `tests/test_api_runs.py::test_capability_surface_matches_inquanto_contract`).
+- **`POST /v1/meta/workflow-preview`** — `schema: workflow_preview_v1`: five **protocol stages** (`instantiate`→`evaluate`) with config hints + **`computable_graph_v2`** (`semantic_dataflow_v1`; optional YAML **`quantum.computable_extra_edges`** / **`quantum.computable_remove_edges`**) + `roots` + `computable_abstract` — YAML only; core logic in `integrations/inquanto_workflow_preview.py`. On completed runs, the same blob is copied to **`repro.workflow_preview_v1`** (P1 alignment with the HTTP preview; regression `tests/test_workflow_preview_repro_alignment.py`). When enabled in YAML, the payload may also include nested **`variational_execution`**, **`qpe_track_execution`**, and **`vqs_track_execution`**; the latter two are duplicated at **`repro`** root as **`workflow_preview_qpe_track_v1`** and **`workflow_preview_vqs_track_v1`** for export / Methods parity. **`REPRO_DOCUMENTED_KEYS`** in `protocols/inquanto_contract.py` whitelists `repro` root keys; **`embedding_workflow`** is mirrored under `repro` after the pipeline builds it (including `mode: none` when embedding is off).
+- **`GET /v1/meta/capability-surface`** — `schema: capability_surface_v1`: `qchem_stack_version` + **`object_map`**（`inquanto_object_map_for_docs()`）+ **`gaps`**（`inquanto_gap_categories()`）+ **`mitigation_execution_model`**（`mitigation_execution_model_public()`）+ **`open_stack_differentiators`**（`open_stack_differentiators_public()`）+ **`operator_pool_registry_export_v1`**（`operator_pool_registry.operator_pool_registry_export_v1`，与 parity export 同 schema）；回归：`tests/test_api_runs.py::test_capability_surface_matches_inquanto_contract`。
 - **`POST /v1/meta/computables-preview`** — `schema: computables_preview_v1`: InQuanto-**Computable**-style list + **`computable_abstract` v2** from YAML only (no chemistry run); mirrors `scripts/export_parity_criteria_table` abstract block.
 - **`GET /v1/meta/ml-md-bridge`** — `schema: ml_md_bridge_surface_v1`: `QMFrame` field hints, exporter / NequIP·MACE stub hook import paths, `StubTorchMLIPTrainer` summary, lightweight ridge surrogate pointers (`tests/test_api_ml_md_bridge.py`).
 - **`POST /v1/meta/qmef-validate`** — `schema: qmef_validate_v1`: body `{ "qmef": { … } }` validated as **`QMEFDataset`** JSON (no QC run).

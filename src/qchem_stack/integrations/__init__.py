@@ -1,7 +1,7 @@
 """
 Closed-gap **extension layer** toward InQuanto *public-contract* parity (not binary parity).
 
-See ``docs/架构_InQuanto闭源能力闭合与可复现边界.md`` for epistemic bounds (L0–L3).
+See ``docs/工程记忆_Quantinuum对标与数据流技术文档.md`` §0 for epistemic bounds (L0–L3).
 """
 
 from __future__ import annotations

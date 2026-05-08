@@ -33,8 +33,8 @@ npm start
 
 1. 先看 [产品能力](./product/features)
 2. 再看 [教程快速上手](./tutorial/quickstart)
-3. 然后进入 [三层架构指南](./guide/overview)
-4. 最后补齐 [P4 作业与可复现](./guide/jobs-and-reproducibility) 与 [HTTP API](./reference/http-api-sqlite-jobs)
+3. 然后进入 [指南总览（P1-P4）](./guide/)
+4. 最后补齐 [P4 作业与可复现](./guide/jobs-and-reproducibility) 与 [命令行/HTTP 参考](./reference/cli-and-scripts)
 
 ## 外部参考
 

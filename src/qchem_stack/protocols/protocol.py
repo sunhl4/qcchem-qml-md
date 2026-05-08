@@ -20,15 +20,43 @@ from qchem_stack.backends.pauli_measure_expand import (
     deserialize_basis_key,
     hea_operations,
 )
-from qchem_stack.backends.shot_budget import energy_estimate_with_uncertainty, recommended_shots_per_circuit
-from qchem_stack.backends.spec import BackendSpec, CircuitIR, CompilerPassBundle, circuit_resource_row
-from qchem_stack.jobs.store import JobHandle, SqliteJobStore
-from qchem_stack.mitigation.pmsv import PMSVConfig, filter_shots_pmsv, finalize_pmsv_report
+from qchem_stack.backends.shot_budget import (
+    energy_estimate_with_uncertainty,
+    recommended_shots_per_circuit,
+)
+from qchem_stack.backends.spec import (
+    BackendSpec,
+    CircuitIR,
+    CompilerPassBundle,
+    circuit_resource_row,
+)
 from qchem_stack.config import NexusAnalogSpec
 from qchem_stack.jobs.nexus_analog import nexus_analog_billing_for_job_result
+from qchem_stack.jobs.store import JobHandle, SqliteJobStore
+from qchem_stack.mitigation.pmsv import PMSVConfig, filter_shots_pmsv, finalize_pmsv_report
 from qchem_stack.mitigation.zne import zne_scale_energy
-from qchem_stack.quantum.statevector import hea_state
 from qchem_stack.protocols.pauli_support import hamiltonian_pauli_term_records
+from qchem_stack.quantum.statevector import hea_state
+
+
+def _hea_angles_for_depth(
+    angles: np.ndarray, *, n_qubits: int, base_depth: int, eff_depth: int
+) -> np.ndarray:
+    """Pad or truncate variational angles for ``hea_state`` when ZNE uses a larger effective HEA depth."""
+    n_base = int(2 * n_qubits * base_depth)
+    n_eff = int(2 * n_qubits * eff_depth)
+    a = np.asarray(angles, dtype=float).reshape(-1)
+    if a.size == n_eff:
+        return a
+    if a.size != n_base:
+        raise ValueError(
+            f"HEA angles length mismatch: got {a.size}, expected {n_base} for depth={base_depth} "
+            f"or {n_eff} for effective depth={eff_depth}"
+        )
+    if eff_depth <= base_depth:
+        return a[:n_eff]
+    return np.concatenate([a, np.zeros(n_eff - n_base, dtype=float)])
+
 
 # Pauli ``run``/``evaluate`` expectation paths (P0): exact executor vs grouped statevector MC vs Qiskit
 # ``get_counts`` — see ``docs/技术文档_设备比特串与Qiskit采样路径.md`` §2 and
@@ -221,7 +249,17 @@ class PauliAveragingProtocol:
             if self.record_histograms and "measurement_histogram_rows" in q_meta:
                 self._counts["measurement_histogram_rows"] = q_meta["measurement_histogram_rows"]
         else:
-            e = exe.expectation_hea(self.hamiltonian, self.n_qubits, self.angles, self.hea_depth)
+            e = exe.expectation_hea(
+                self.hamiltonian,
+                self.n_qubits,
+                _hea_angles_for_depth(
+                    self.angles,
+                    n_qubits=self.n_qubits,
+                    base_depth=int(self.hea_depth),
+                    eff_depth=int(self.hea_depth),
+                ),
+                self.hea_depth,
+            )
             est = energy_estimate_with_uncertainty(e, plan, terms_dict, shots)
             stderr = float(est.stderr) * pmsv_stderr_scale
             self._counts = {
@@ -270,12 +308,18 @@ class PauliAveragingProtocol:
                 curve: list[float] = []
                 for s in scales_f:
                     eff_depth = max(1, base_depth + int(max(0.0, round(s - 1.0))))
+                    ang = _hea_angles_for_depth(
+                        self.angles,
+                        n_qubits=self.n_qubits,
+                        base_depth=base_depth,
+                        eff_depth=eff_depth,
+                    )
                     curve.append(
                         float(
                             exe.expectation_hea(
                                 self.hamiltonian,
                                 self.n_qubits,
-                                self.angles,
+                                ang,
                                 eff_depth,
                             )
                         )

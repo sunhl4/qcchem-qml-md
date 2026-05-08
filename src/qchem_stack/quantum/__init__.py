@@ -1,17 +1,8 @@
-from qchem_stack.quantum.statevector import expectation_qubit_operator
-from qchem_stack.quantum.algorithms.vqe import VQE
-from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
-from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
-from qchem_stack.quantum.algorithms.excited import VQD, QSE
+"""Quantum algorithms and utilities.
 
-# ``vqe_from_experiment_config`` lives in ``quantum.runtime`` to avoid import cycles
-# (runtime → backends → executor_base → quantum.statevector).
+Public re-exports were removed from this ``__init__`` to prevent import cycles
+(``chem`` ↔ ``config`` ↔ ``quantum``). Import concrete modules explicitly, e.g.
+``from qchem_stack.quantum.algorithms.vqe import VQE``.
+"""
 
-__all__ = [
-    "expectation_qubit_operator",
-    "VQE",
-    "FermionicAdaptVQE",
-    "IQEBVQE",
-    "VQD",
-    "QSE",
-]
+__all__: list[str] = []

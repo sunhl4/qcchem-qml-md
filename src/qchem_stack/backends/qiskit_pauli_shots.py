@@ -9,7 +9,6 @@ probabilities come from empirical frequencies instead of a statevector.
 from __future__ import annotations
 
 import math
-from collections import Counter
 from typing import Any
 
 import numpy as np

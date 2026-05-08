@@ -1,0 +1,48 @@
+# H₂O（sto-3g）：10 电子 / 7 条空间轨道；CAS(4,4) 即冻结 6 e（3 条核轨道）、在 4 条活性轨道上相关 4 e。
+# 典型「大一点的分子 + 必须截活性空间」的教科书例子（几何为近似 Bohr 内坐标，仅作算例）。
+schema_version: "1"
+experiment_id: "h2o_sto3g_cas44_001"
+random_seed: 21
+
+molecule:
+  symbols: ["O", "H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.809]
+    - [0.0, 1.515, -0.599]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 4
+  n_active_electrons: 4
+  fermion_qubit_mapping: "jordan_wigner"
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 1024
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 100
+  use_pauli_protocol: false
+  pauli_grouping: "tensor_product"

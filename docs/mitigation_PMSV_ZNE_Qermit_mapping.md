@@ -31,6 +31,6 @@
 
 ### MitigationSpec YAML 键（机读审计）
 
-与 `qchem_stack.config.MitigationSpec` 字段一一对应（YAML `mitigation.*`）：`execution_class`、`pmsv_enabled`、`zne_enabled`、`zne_mode`、`zne_scales`、`pmsv_stabilizers`、`pmsv_retention_rate`、`pmsv_report_extension`、`pmsv_extra`、`spam_calibration_enabled`、`pec_literature_stub_enabled`。回归：`tests/test_mitigation_spec_doc_audit.py`。
+与 `qchem_stack.config.MitigationSpec` 字段一一对应（YAML `mitigation.*`）：`execution_class`、`pmsv_enabled`、`zne_enabled`、`zne_mode`、`zne_scales`、`pmsv_stabilizers`、`pmsv_retention_rate`、`pmsv_report_extension`、`pmsv_extra`、`spam_calibration_enabled`、`pec_literature_stub_enabled`、`classical_shadows_stub_enabled`、`classical_shadows_budget_pairs`。回归：`tests/test_mitigation_spec_doc_audit.py`。
 
-**公开 errmit 手册钉扎（维护）**：本文档编写时对照 [Quantinuum errmit 手册](https://docs.quantinuum.com/inquanto/manual/errmit.html)，锚定日期见 [L1_InQuanto_alignment_signoff.md](L1_InQuanto_alignment_signoff.md)「公开文档钉扎」。
+**公开 errmit 手册钉扎（维护）**：本文档编写时对照 [Quantinuum errmit 手册](https://docs.quantinuum.com/inquanto/manual/errmit.html)，锚定日期见 [与InQuanto能力差距与实施计划 — 附录 C](与InQuanto能力差距与实施计划.md#appendix-c)「公开文档钉扎」。

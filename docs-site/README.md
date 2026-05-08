@@ -4,7 +4,7 @@
 
 **设计与对标关系（模板语义）**：本站与 InQuanto **公开文档站**可视为沿用**同一类文档产品模板**——顶栏模块（Introduction / Manual / Tutorials / API / Extensions / Misc）、首页三柱叙事、浅色文档阅读节奏等与公开站**对齐**；**差异**在于正文与功能边界（qchem-stack 自管栈、`repro`/SQLite、无 Nexus 绑定等）以及**实现载体**（本站为 VitePress + 自有主题/CSS，非对方源码或设计资产）。便于你对照改文案、删减模块而不改整体层级。
 
-**软件工程母稿总索引**（`docs/` 全表、合并/弃用记录、推荐阅读顺序）：[`../docs/技术文档_软件工程文档总索引.md`](../docs/技术文档_软件工程文档总索引.md)。
+**仓库文档入口**：根目录 [`README.md`](../README.md)、[`CONTRIBUTING.md`](../CONTRIBUTING.md)；对标三母稿与附录在 [`../docs/`](../docs/)（与 [`与InQuanto能力差距与实施计划.md`](../docs/与InQuanto能力差距与实施计划.md) 等）。
 
 **InQuanto 文档站架构报告（多卷 + 附录 A/B/C + 295 节点机读 backlog）**：母稿在仓库 [`../docs/architecture-report-quantinuum-inquanto-web/`](../docs/architecture-report-quantinuum-inquanto-web/INDEX.md)，用于指导本站信息架构与门禁，**不**作为 VitePress 内嵌长文。机读 backlog：**`../docs/inquanto-node-backlog.generated.json`**。再生：`npm run report:inquanto-appendix`；`npm run report:inquanto-backlog`；门禁：`npm run verify:inquanto`。
 
@@ -81,8 +81,7 @@ To register a newly-discovered InQuanto leaf or change its status, **edit `scrip
 
 ## IA reference
 
-- [`docs/meta/ia-mapping.md`](docs/meta/ia-mapping.md) — pillar slugs and source-file map.
-- [`../IA_MAPPING.md`](../IA_MAPPING.md) — same content at the package root.
+- [`docs/meta/ia-mapping.md`](docs/meta/ia-mapping.md) — pillar slugs and source-file map (single canonical copy).
 - [`docs/design/wireframe-home-guides.md`](docs/design/wireframe-home-guides.md) — block-level wireframe of the home and guides hubs.
 
 ## Syncing from repo `docs/`

@@ -8,10 +8,18 @@ InQuanto exposes ``Computable`` objects that bind observables to execution; here
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import Any, Protocol
 
+import numpy as np
+from openfermion.ops import QubitOperator
+
+from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
 from qchem_stack.config import ExperimentConfig
-from qchem_stack.protocols.inquanto_contract import classify_pauli_expectation_path, pauli_protocol_expectation_path_for_config
+from qchem_stack.protocols.inquanto_contract import (
+    classify_pauli_expectation_path,
+    pauli_protocol_expectation_path_for_config,
+)
+from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 
 @dataclass(frozen=True)
@@ -39,6 +47,104 @@ class ComputableSpec:
 
     def to_ref(self) -> ComputableRef:
         return ComputableRef(name=self.name, kind=self.kind, details=dict(self.details))
+
+
+class Computable(Protocol):
+    """Runtime computable primitive consumed by algorithm build/run flows."""
+
+    def evaluate(self, parameters: np.ndarray) -> float | complex: ...
+
+
+@dataclass
+class ExpectationValue:
+    """Expectation ``<psi(theta)|H|psi(theta)>`` over an HEA state."""
+
+    hamiltonian: QubitOperator
+    n_qubits: int
+    hea_depth: int
+    executor: HamiltonianExpectationExecutor
+
+    def evaluate(self, parameters: np.ndarray) -> float:
+        return float(
+            self.executor.expectation_hea(
+                self.hamiltonian,
+                self.n_qubits,
+                np.asarray(parameters, dtype=float),
+                self.hea_depth,
+            )
+        )
+
+
+@dataclass
+class OverlapSquared:
+    """Overlap squared between two HEA parameter sets."""
+
+    n_qubits: int
+    hea_depth: int
+    reference_parameters: np.ndarray
+
+    def evaluate(self, parameters: np.ndarray) -> float:
+        psi_ref = hea_state(np.asarray(self.reference_parameters, dtype=float), self.n_qubits, self.hea_depth)
+        psi = hea_state(np.asarray(parameters, dtype=float), self.n_qubits, self.hea_depth)
+        return float(abs(np.vdot(psi_ref, psi)) ** 2)
+
+
+@dataclass
+class ExpectationValueDerivative:
+    """Finite-difference derivative for an expectation expression."""
+
+    expression: ExpectationValue
+    parameter_index: int
+    step: float = 1e-4
+
+    def evaluate(self, parameters: np.ndarray) -> float:
+        p = np.asarray(parameters, dtype=float).copy()
+        i = int(self.parameter_index)
+        dp = float(self.step)
+        p[i] += dp
+        fp = self.expression.evaluate(p)
+        p[i] -= 2.0 * dp
+        fm = self.expression.evaluate(p)
+        return float((fp - fm) / (2.0 * dp))
+
+
+@dataclass
+class MatrixElement:
+    """Matrix element ``<left(theta_l)|O|right(theta_r)>`` for HEA states."""
+
+    operator: QubitOperator
+    n_qubits: int
+    hea_depth: int
+    right_parameters: np.ndarray
+
+    def evaluate(self, left_parameters: np.ndarray) -> complex:
+        psi_l = hea_state(np.asarray(left_parameters, dtype=float), self.n_qubits, self.hea_depth)
+        psi_r = hea_state(np.asarray(self.right_parameters, dtype=float), self.n_qubits, self.hea_depth)
+        op = qubit_operator_to_sparse(self.operator, self.n_qubits)
+        return complex(np.vdot(psi_l, op @ psi_r))
+
+
+@dataclass
+class ProtocolRunner:
+    """Thin protocol adapter mirroring InQuanto build(protocol=...) usage."""
+
+    objective: Computable
+    auxiliary: dict[str, Computable] = field(default_factory=dict)
+    gradient: Computable | None = None
+
+    def evaluate_objective(self, parameters: np.ndarray) -> float:
+        return float(self.objective.evaluate(parameters))
+
+    def evaluate_auxiliary(self, parameters: np.ndarray) -> dict[str, float]:
+        out: dict[str, float] = {}
+        for k, expr in self.auxiliary.items():
+            out[k] = float(np.real(expr.evaluate(parameters)))
+        return out
+
+    def evaluate_gradient(self, parameters: np.ndarray) -> float | None:
+        if self.gradient is None:
+            return None
+        return float(np.real(self.gradient.evaluate(parameters)))
 
 
 def refs_from_computable_graph_v2(graph: dict[str, Any]) -> list[ComputableRef]:
@@ -75,13 +181,30 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
     """List what the current YAML is configured to *evaluate* (best-effort, documentation-first)."""
     out: list[ComputableRef] = []
     q = cfg.quantum
-    if q.algorithm == "vqe":
-        out.append(ComputableRef("ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe_depth}))
-    elif q.algorithm == "adapt":
+    if q.algorithm_factory:
         out.append(
-            ComputableRef("ground_state_energy", "energy", {"algorithm": "adapt", "adapt_max_iter": q.adapt_max_iter})
+            ComputableRef(
+                "ground_state_energy",
+                "energy",
+                {
+                    "algorithm_label": q.algorithm,
+                    "variational_dispatch": "yaml_algorithm_factory_v1",
+                    "algorithm_factory": q.algorithm_factory,
+                    "vqe_depth": q.vqe_depth,
+                },
+            )
         )
-    else:
+    elif q.algorithm == "vqe":
+        out.append(ComputableRef("ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe_depth}))
+    elif q.algorithm in ("adapt", "tetris_adapt"):
+        out.append(
+            ComputableRef(
+                "ground_state_energy",
+                "energy",
+                {"algorithm": q.algorithm, "adapt_max_iter": q.adapt_max_iter},
+            )
+        )
+    elif q.algorithm == "iqeb":
         out.append(
             ComputableRef(
                 "ground_state_energy",
@@ -89,6 +212,18 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
                 {
                     "algorithm": "iqeb",
                     "iqeb_max_rounds": q.iqeb_max_rounds,
+                    "vqe_depth": q.vqe_depth,
+                },
+            )
+        )
+    else:
+        out.append(
+            ComputableRef(
+                "ground_state_energy",
+                "energy",
+                {
+                    "algorithm": q.algorithm,
+                    "variational_plugin_registry_id": q.algorithm,
                     "vqe_depth": q.vqe_depth,
                 },
             )
@@ -112,6 +247,18 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
         out.append(ComputableRef("sceom_energies", "spectrum", {"subspace_dim": q.sceom_subspace_dim}))
     if q.qpe_demo_track_requested():
         out.append(ComputableRef("qpe_demo_track", "phase", {"hook": "qpe_qec_demo.kitaev + bayesian_stub"}))
+    if q.vqs_track_requested():
+        out.append(
+            ComputableRef(
+                "vqs_track",
+                "dynamics",
+                {
+                    "hook": "quantum.algorithms.vqs + vqs_pipeline_track",
+                    "vqs_mode": q.vqs_mode,
+                    "vqs_n_times": q.vqs_n_times,
+                },
+            )
+        )
     return out
 
 

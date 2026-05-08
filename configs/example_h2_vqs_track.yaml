@@ -1,0 +1,53 @@
+# Optional VQS / McLachlan toy dynamics sidecar after variational (open-stack interface alignment).
+# Run:
+# ``python -c "from pathlib import Path; from qchem_stack.config import load_experiment_config; from qchem_stack.orchestration.pipeline import run_pipeline_sync; p=Path('configs/example_h2_vqs_track.yaml'); print(run_pipeline_sync(load_experiment_config(p), cfg_path=p).get('vqs_track', {}).get('schema'))"``
+schema_version: "1"
+experiment_id: "h2_vqs_track_marker"
+random_seed: 0
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 8
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 120
+  use_pauli_protocol: false
+  vqs_pipeline_integration: true
+  # McLachlan TDVP finite-difference RHS can be stiff on small toy circuits; prefer damping for CI stability.
+  vqs_rhs_mode: "linear_damping"
+  vqs_mode: "mclachlan_real_time"
+  vqs_n_times: 6
+  vqs_dt: 0.05

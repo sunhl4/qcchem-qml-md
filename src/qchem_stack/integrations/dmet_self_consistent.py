@@ -8,7 +8,7 @@ so the same orchestration matches `EmbeddingSpec` / `repro` contracts without Py
 from __future__ import annotations
 
 from collections.abc import Callable
-from dataclasses import asdict, dataclass, field, replace
+from dataclasses import dataclass, field, replace
 from typing import Any
 
 from qchem_stack.chem.embedding.dmet import DMETContext
@@ -192,10 +192,12 @@ class OneShotEmbeddingDriver:
                     meta={key: val for key, val in sol.items() if key != "energy"},
                 )
             )
-        return {
-            "schema": "dmet_one_shot_v1",
-            "fragments": [asdict(r) for r in results],
-        }
+        rows: list[dict[str, Any]] = []
+        for r in results:
+            row: dict[str, Any] = {"fragment_id": r.fragment_id, "energy": r.energy}
+            row.update(r.meta)
+            rows.append(row)
+        return {"schema": "dmet_one_shot_v1", "fragments": rows}
 
 
 def _coerce_float(x: Any) -> float | None:

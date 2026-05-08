@@ -16,4 +16,4 @@ def test_adapt_records_steps_and_gradient_evals() -> None:
     assert len(r.meta["adapt_steps"]) >= 1
     assert r.meta["total_gradient_evals"] == sum(s["n_gradient_evals"] for s in r.meta["adapt_steps"])
     for s in r.meta["adapt_steps"]:
-        assert s["n_gradient_evals"] == 2 * s["n_pool_candidates_scanned"]
+        assert s["n_gradient_evals"] == s["n_pool_candidates_scanned"]

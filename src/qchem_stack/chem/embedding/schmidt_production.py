@@ -20,7 +20,7 @@ from typing import Any
 import numpy as np
 from scipy.linalg import eigh
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.exceptions import EmbeddingError
 
 
@@ -83,7 +83,7 @@ class SchmidtImpurityModel:
 
 
 def build_schmidt_impurity_integrals(
-    rhf: PySCFRHFResult,
+    rhf: ClassicalMeanFieldReference,
     *,
     fragment_atom_indices: list[int],
     n_bath_orbitals: int,
@@ -102,7 +102,16 @@ def build_schmidt_impurity_integrals(
         Optional AO density for bath env (D,S) and for :math:`\\gamma` embedding in MF;
         default is converged SCF ``mf.make_rdm1()``.
     """
-    mf = rhf.mf
+    tag = rhf.backend_tag()
+    if tag != "pyscf":
+        raise SchmidtProductionError(
+            "Schmidt impurity integral builder is currently implemented for backend='pyscf' "
+            f"(got backend={tag!r})."
+        )
+    rhf_pyscf = rhf.as_pyscf_rhf_result()
+    mf = rhf_pyscf.mf
+    if hasattr(mf, "raw_handle") and callable(getattr(mf, "raw_handle")):
+        mf = mf.raw_handle()
     mol = mf.mol
     ref_name = mf.__class__.__name__
     if ref_name not in ("RHF", "RKS"):
@@ -242,8 +251,6 @@ def fci_impurity_spatial_ground(
     mu: float = 0.0,
 ) -> tuple[float, np.ndarray, dict[str, Any]]:
     """FCI electronic energy (no constant) + spatial 1-RDM + compact meta."""
-    from pyscf import fci
-
     norb = model.n_spatial_orbitals
     ne = model.n_alpha_electrons + model.n_beta_electrons
     if ne % 2 != 0:
@@ -252,10 +259,12 @@ def fci_impurity_spatial_ground(
     h1 = apply_chemical_potential_fragment_block(
         model.h1, mu=mu, n_fragment_spatial_orbitals=model.n_fragment_spatial_orbitals
     )
-    cisolver = fci.direct_nosym.FCI()
+    from pyscf.fci import direct_spin0
+
+    cisolver = direct_spin0.FCI()
     cisolver.max_cycle = 500
     e0, civec = cisolver.kernel(h1, model.h2, norb, (nocc_a, nocc_a))
-    dm1 = np.asarray(fci.direct_nosym.make_rdm1(civec, norb, (nocc_a, nocc_a)), dtype=float)
+    dm1 = np.asarray(direct_spin0.make_rdm1(civec, norb, (nocc_a, nocc_a)), dtype=float)
     n_frag_sp = model.n_fragment_spatial_orbitals
     n_frag_trace = float(np.trace(dm1[:n_frag_sp, :n_frag_sp])) if n_frag_sp > 0 else 0.0
     meta = {
@@ -303,14 +312,14 @@ def bisection_mu_for_fragment_electron_count(
         h1 = apply_chemical_potential_fragment_block(
             model.h1, mu=mu, n_fragment_spatial_orbitals=model.n_fragment_spatial_orbitals
         )
-        from pyscf import fci
+        from pyscf.fci import direct_spin0
 
         norb = model.n_spatial_orbitals
         ne = model.n_alpha_electrons + model.n_beta_electrons
         na = ne // 2
-        cisolver = fci.direct_nosym.FCI()
+        cisolver = direct_spin0.FCI()
         _, civec = cisolver.kernel(h1, model.h2, norb, (na, na))
-        dm1 = fci.direct_nosym.make_rdm1(civec, norb, (na, na))
+        dm1 = direct_spin0.make_rdm1(civec, norb, (na, na))
         nfs = model.n_fragment_spatial_orbitals
         return float(np.trace(dm1[:nfs, :nfs])) if nfs > 0 else 0.0
 

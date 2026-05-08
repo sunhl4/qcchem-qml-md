@@ -10,6 +10,7 @@
 
 ## 相关文档
 
+- [母仓库 `docs/` · UCC/HF 下单激发梯度与 Brillouin（长文）](../../../../docs/UCC_hf参考下单激发梯度_Brillouin与优化实践.md)（相对本站根；亦可直接打开仓库同名文件）
 - [工程架构 §9](/concept/engineering-architecture) — API 摘要  
 - [公开矩阵 §1–2](/parity/public-matrix) — Protocols 与 Algorithms  
 - [竞争定位](/concept/competitive-positioning) — P0–P2 路线  

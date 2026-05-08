@@ -18,10 +18,18 @@ from openfermion.linalg import get_sparse_operator
 from openfermion.ops import QubitOperator
 
 from qchem_stack.chem.fermion import FermionSpace
+from qchem_stack.chem.jordan_wigner_sparse import jordan_wigner_interaction_operator_sparse
 from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
+from qchem_stack.chem.spatial_restricted_fermion import (
+    restricted_spatial_integrals_to_fermion_operator,
+)
 
 if TYPE_CHECKING:
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.restricted_integral_operator import (
+        RestrictedActiveSpaceIntegralOperatorCompact,
+    )
 
 FermionQubitMappingName = Literal[
     "jordan_wigner",
@@ -30,15 +38,28 @@ FermionQubitMappingName = Literal[
 ]
 
 
+def _classical_driver_meta_payload(reference: Any) -> tuple[dict[str, Any], str]:
+    if reference is None or not getattr(reference, "driver_meta", None):
+        return {}, ""
+    driver_meta = dict(reference.driver_meta)
+    backend_tag = str(
+        driver_meta.get("upstream_classical_software_tag")
+        or driver_meta.get("driver_family")
+        or ""
+    ).strip().lower()
+    return driver_meta, backend_tag
+
+
 def _interaction_operator_to_qubits(
     mol_op: InteractionOperator,
     mapping: FermionQubitMappingName,
     *,
     n_spin_orbitals: int | None = None,
     n_active_fermions: int | None = None,
+    jordan_wigner_coeff_atol: float | None = None,
 ) -> QubitOperator:
     if mapping == "jordan_wigner":
-        return jordan_wigner(mol_op)
+        return jordan_wigner_interaction_operator_sparse(mol_op, atol=jordan_wigner_coeff_atol)
     if mapping == "bravyi_kitaev":
         return bravyi_kitaev(mol_op)
     if mapping == "symmetry_conserving_bravyi_kitaev":
@@ -67,10 +88,18 @@ def hamiltonian_fingerprint_from_qubit_operator(
     rows: list[tuple[str, str]] = []
     for term, coeff in sorted(
         qop.terms.items(),
-        key=lambda tv: (canonical_pauli_string_from_term(tv[0]), float(tv[1])),
+        key=lambda tv: (
+            canonical_pauli_string_from_term(tv[0]),
+            complex(tv[1]).real,
+            complex(tv[1]).imag,
+        ),
     ):
         label = canonical_pauli_string_from_term(term) if term else "I"
-        rows.append((label, f"{float(coeff):.16g}"))
+        z = complex(coeff)
+        if abs(z.imag) <= 1e-14:
+            rows.append((label, f"{z.real:.16g}"))
+        else:
+            rows.append((label, f"{z.real:.16g}{z.imag:+.16g}j"))
     truncated = False
     if max_terms is not None and len(rows) > max_terms:
         rows = rows[:max_terms]
@@ -96,39 +125,155 @@ class QubitHamiltonian:
         return get_sparse_operator(self.operator, n_qubits=self.n_qubits)
 
 
-def molecular_hamiltonian_from_pyscf(
-    rhf: PySCFRHFResult,
+def molecular_hamiltonian_from_canonical_active_space_pack(
+    pack: CanonicalActiveSpaceIntegralPack,
+    *,
+    n_active_orbitals: int,
+    n_active_electrons: int,
+    fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
+    prefer_restricted_spatial_fermion_for_jordan_wigner: bool = False,
+    jordan_wigner_coeff_atol: float | None = None,
+    classical_reference_for_meta: ClassicalMeanFieldReference | None = None,
+) -> QubitHamiltonian:
+    """Build qubit Hamiltonian from :class:`~qchem_stack.chem.bridges.canonical_integral_pack.CanonicalActiveSpaceIntegralPack`."""
+    from qchem_stack.chem.bridges.canonical_integral_pack import (
+        CanonicalActiveSpaceIntegralPack as CanonicalPack,
+    )
+
+    if not isinstance(pack, CanonicalPack):
+        raise TypeError(f"expected CanonicalActiveSpaceIntegralPack, got {type(pack)!r}")
+    compact = pack.compact
+    if int(compact.n_active_orbitals) != int(n_active_orbitals) or int(compact.n_active_electrons) != int(
+        n_active_electrons
+    ):
+        raise ValueError(
+            f"active-space mismatch: pack compact has n_act={compact.n_active_orbitals}, "
+            f"ne={compact.n_active_electrons}; got n_active_orbitals={n_active_orbitals}, "
+            f"n_active_electrons={n_active_electrons}."
+        )
+    mol_op = compact.to_interaction_operator()
+    n_so = int(mol_op.one_body_tensor.shape[0])
+    fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=n_active_electrons)
+
+    if prefer_restricted_spatial_fermion_for_jordan_wigner:
+        if fermion_qubit_mapping != "jordan_wigner":
+            raise ValueError(
+                "prefer_restricted_spatial_fermion_for_jordan_wigner requires fermion_qubit_mapping='jordan_wigner'."
+            )
+        if jordan_wigner_coeff_atol is not None:
+            raise ValueError(
+                "jordan_wigner_coeff_atol applies only to the InteractionOperator JW path; "
+                "set prefer_restricted_spatial_fermion_for_jordan_wigner=False or atol=None."
+            )
+        return qubit_hamiltonian_from_compact_restricted_active_space(
+            compact,
+            fs,
+            n_active_orbitals=n_active_orbitals,
+            n_active_electrons=n_active_electrons,
+            fermion_qubit_mapping=fermion_qubit_mapping,
+            rhf=classical_reference_for_meta,
+            canonical_pack=pack,
+        )
+
+    return qubit_hamiltonian_from_active_space_fermionic_operator(
+        mol_op,
+        fs,
+        n_active_orbitals=n_active_orbitals,
+        n_active_electrons=n_active_electrons,
+        fermion_qubit_mapping=fermion_qubit_mapping,
+        rhf=classical_reference_for_meta,
+        jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
+        canonical_pack=pack,
+    )
+
+
+def molecular_hamiltonian_from_classical_reference(
+    reference: ClassicalMeanFieldReference,
     n_active_orbitals: int,
     n_active_electrons: int,
     *,
     fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
+    prefer_restricted_spatial_fermion_for_jordan_wigner: bool = False,
+    jordan_wigner_coeff_atol: float | None = None,
 ) -> QubitHamiltonian:
-    """Build active-space molecular Hamiltonian (MO integrals) and map to qubits."""
-    from qchem_stack.chem.drivers.pyscf_driver import active_space_integrals
+    """Build active-space molecular Hamiltonian from backend-agnostic mean-field reference."""
+    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
 
-    constant, h1_sp, h2_sp = active_space_integrals(
-        rhf, n_active_orbitals=n_active_orbitals, n_active_electrons=n_active_electrons
+    pack = CanonicalActiveSpaceIntegralPack.from_classical_reference(
+        reference,
+        n_active_orbitals=n_active_orbitals,
+        n_active_electrons=n_active_electrons,
     )
-    # PySCF returns spatial ERIs in chemists' notation (pq|rs). OpenFermion's
-    # InteractionOperator two-body tensor uses a physicist-style slot ordering.
-    # For consistency with PySCF CASCI energies, map (pq|rs) -> (p r s q) and
-    # include the 1/2 prefactor before constructing the InteractionOperator.
-    h2_of = 0.5 * np.transpose(np.asarray(h2_sp, dtype=float), (0, 2, 3, 1))
-    h1_so, h2_so = spinorb_from_spatial(h1_sp, h2_of)
-    n_spin = int(h1_so.shape[0])
-    mol_op = InteractionOperator(float(constant), h1_so, h2_so)
+    return molecular_hamiltonian_from_canonical_active_space_pack(
+        pack,
+        n_active_orbitals=n_active_orbitals,
+        n_active_electrons=n_active_electrons,
+        fermion_qubit_mapping=fermion_qubit_mapping,
+        prefer_restricted_spatial_fermion_for_jordan_wigner=prefer_restricted_spatial_fermion_for_jordan_wigner,
+        jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
+        classical_reference_for_meta=reference,
+    )
+
+
+def fermionic_active_space_interaction_operator_from_classical_reference(
+    reference: ClassicalMeanFieldReference,
+    *,
+    n_active_orbitals: int,
+    n_active_electrons: int,
+) -> tuple[InteractionOperator, FermionSpace]:
+    """MO active-space :class:`InteractionOperator` + :class:`FermionSpace` from unified reference."""
+    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
+
+    pack = CanonicalActiveSpaceIntegralPack.from_classical_reference(
+        reference,
+        n_active_orbitals=n_active_orbitals,
+        n_active_electrons=n_active_electrons,
+    )
+    return fermionic_active_space_interaction_operator_from_canonical_pack(pack)
+
+
+def fermionic_active_space_interaction_operator_from_canonical_pack(
+    pack: CanonicalActiveSpaceIntegralPack,
+) -> tuple[InteractionOperator, FermionSpace]:
+    from qchem_stack.chem.bridges.canonical_integral_pack import (
+        CanonicalActiveSpaceIntegralPack as CanonicalPack,
+    )
+
+    if not isinstance(pack, CanonicalPack):
+        raise TypeError(f"expected CanonicalActiveSpaceIntegralPack, got {type(pack)!r}")
+    mol_op = pack.compact.to_interaction_operator()
+    n_so = int(mol_op.one_body_tensor.shape[0])
+    fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=pack.compact.n_active_electrons)
+    return mol_op, fs
+
+
+def qubit_hamiltonian_from_active_space_fermionic_operator(
+    mol_op: InteractionOperator,
+    fermion_space: FermionSpace,
+    *,
+    n_active_orbitals: int,
+    n_active_electrons: int,
+    fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
+    rhf: ClassicalMeanFieldReference | None = None,
+    jordan_wigner_coeff_atol: float | None = None,
+    canonical_pack: CanonicalActiveSpaceIntegralPack | None = None,
+) -> QubitHamiltonian:
+    """Map a pre-built fermionic active-space operator to qubits (shared by pipeline helpers)."""
+    n_spin = int(fermion_space.n_spin_orbitals)
     qop = _interaction_operator_to_qubits(
         mol_op,
         fermion_qubit_mapping,
         n_spin_orbitals=n_spin,
         n_active_fermions=n_active_electrons,
+        jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
     )
     n_phys = int(count_qubits(qop))
-    fs = FermionSpace(n_spin_orbitals=n_spin, n_electrons=n_active_electrons)
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
-    meta = {
+    meta: dict[str, Any] = {
         "fermion_to_qubit_map": fermion_qubit_mapping,
         "integral_source": "pyscf_active_space",
+        "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+        "jw_build": "interaction_operator",
         "n_active_orbitals": n_active_orbitals,
         "n_active_electrons": n_active_electrons,
         "n_qubits": n_phys,
@@ -136,9 +281,94 @@ def molecular_hamiltonian_from_pyscf(
     }
     if fp_trunc:
         meta["hamiltonian_fingerprint_truncated"] = True
-    if getattr(rhf, "driver_meta", None):
-        meta["pyscf_driver"] = dict(rhf.driver_meta)
-    return QubitHamiltonian(operator=qop, n_qubits=n_phys, fermion_space=fs, meta=meta)
+    if jordan_wigner_coeff_atol is not None:
+        meta["jordan_wigner_coeff_atol"] = float(jordan_wigner_coeff_atol)
+    driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
+    if driver_meta:
+        if backend_tag == "pyscf":
+            meta["pyscf_driver"] = driver_meta
+        else:
+            meta["classical_driver"] = driver_meta
+    if canonical_pack is not None:
+        meta["canonical_integral_pack"] = {
+            "schema": canonical_pack.schema,
+            "provenance": dict(canonical_pack.provenance),
+        }
+    return QubitHamiltonian(
+        operator=qop,
+        n_qubits=n_phys,
+        fermion_space=fermion_space,
+        meta=meta,
+    )
+
+
+def qubit_hamiltonian_from_compact_restricted_active_space(
+    compact: RestrictedActiveSpaceIntegralOperatorCompact,
+    fermion_space: FermionSpace,
+    *,
+    n_active_orbitals: int,
+    n_active_electrons: int,
+    fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
+    rhf: ClassicalMeanFieldReference | None = None,
+    jordan_wigner_coeff_atol: float | None = None,
+    canonical_pack: CanonicalActiveSpaceIntegralPack | None = None,
+) -> QubitHamiltonian:
+    """Map compact MO integrals to qubits without instantiating a dense spin-orbital ERI tensor.
+
+    Uses :func:`~qchem_stack.chem.spatial_restricted_fermion.restricted_spatial_integrals_to_fermion_operator`
+    + OpenFermion JW **only** when ``fermion_qubit_mapping == \"jordan_wigner\"``. Other mappings fall back to
+    :meth:`~qchem_stack.chem.restricted_integral_operator.RestrictedActiveSpaceIntegralOperatorCompact.to_interaction_operator`.
+    """
+    from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
+
+    if fermion_qubit_mapping != "jordan_wigner":
+        mol_op = compact.to_interaction_operator()
+        return qubit_hamiltonian_from_active_space_fermionic_operator(
+            mol_op,
+            fermion_space,
+            n_active_orbitals=n_active_orbitals,
+            n_active_electrons=n_active_electrons,
+            fermion_qubit_mapping=fermion_qubit_mapping,
+            rhf=rhf,
+            jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
+            canonical_pack=canonical_pack,
+        )
+
+    h2_of = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(compact.dense_h2_chemist_spatial())
+    h1 = np.asarray(compact.h1_active_mo, dtype=float)
+    fo = restricted_spatial_integrals_to_fermion_operator(float(compact.constant), h1, h2_of)
+    qop = jordan_wigner(fo)
+    n_phys = int(count_qubits(qop))
+    fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
+    meta: dict[str, Any] = {
+        "fermion_to_qubit_map": fermion_qubit_mapping,
+        "integral_source": "pyscf_active_space",
+        "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+        "jw_build": "restricted_spatial_fermion_operator",
+        "n_active_orbitals": n_active_orbitals,
+        "n_active_electrons": n_active_electrons,
+        "n_qubits": n_phys,
+        "hamiltonian_fingerprint": fp,
+    }
+    if fp_trunc:
+        meta["hamiltonian_fingerprint_truncated"] = True
+    driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
+    if driver_meta:
+        if backend_tag == "pyscf":
+            meta["pyscf_driver"] = driver_meta
+        else:
+            meta["classical_driver"] = driver_meta
+    if canonical_pack is not None:
+        meta["canonical_integral_pack"] = {
+            "schema": canonical_pack.schema,
+            "provenance": dict(canonical_pack.provenance),
+        }
+    return QubitHamiltonian(
+        operator=qop,
+        n_qubits=n_phys,
+        fermion_space=fermion_space,
+        meta=meta,
+    )
 
 
 def qubit_hamiltonian_from_spatial_chemist_integrals(
@@ -151,10 +381,32 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
     integral_source: str = "spatial_chemist_integrals",
     meta_extra: dict[str, Any] | None = None,
     pyscf_driver_meta: dict[str, Any] | None = None,
+    prefer_restricted_spatial_fermion_for_jordan_wigner: bool = False,
+    jordan_wigner_coeff_atol: float | None = None,
 ) -> QubitHamiltonian:
-    """Map spatial MO integrals (chemists' ``h2[p,q,r,s] = (pq|rs)``) to qubits via OpenFermion."""
+    """Map spatial MO integrals to qubits via OpenFermion (Tangelo-style convention).
+
+    ``h2`` must be **raw** PySCF MO chemist ERIs (same layout as ``ao2mo.restore(1, ...)`` /
+    CASCI ``get_h2eff``). They are reordered with
+    :func:`~qchem_stack.chem.integral_convention.spatial_mo_eri_pyscf_to_openfermion_mo_ordering`.
+    By default, integrals are promoted with :func:`openfermion.chem.molecular_data.spinorb_from_spatial`,
+    then passed to :class:`openfermion.InteractionOperator` with a **0.5** factor on the spin-orbital two-body
+    block (see SandboxAQ Tangelo ``SecondQuantizedMolecule._get_fermionic_hamiltonian``).
+
+    Set ``prefer_restricted_spatial_fermion_for_jordan_wigner=True`` with ``fermion_qubit_mapping='jordan_wigner'``
+    to build a :class:`openfermion.FermionOperator` directly from spatial MO blocks (no dense ``(2*norb)^4``
+    spin-orbital ERI array). ``jordan_wigner_coeff_atol`` applies only to the InteractionOperator JW path and
+    must stay ``None`` when using that spatial-fermion shortcut.
+
+    Args:
+        jordan_wigner_coeff_atol: Optional positive cutoff on the InteractionOperator JW path: shells whose
+            combined coefficient magnitude is ``<= atol`` are skipped (fewer Pauli accumulations when tensors
+            are sparse). ``None`` or non-positive values preserve OpenFermion's exact JW aggregation.
+    """
+    from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
+
     h1a = np.asarray(h1, dtype=float)
-    h2a = np.asarray(h2, dtype=float)
+    h2a = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(np.asarray(h2, dtype=float))
     norb = int(h1a.shape[0])
     if h1a.shape != (norb, norb):
         raise ValueError("h1 must be (norb, norb)")
@@ -172,29 +424,46 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
     if n_electrons < 0 or n_electrons > 2 * norb or n_electrons % 2 != 0:
         raise ValueError("n_electrons must be even and fit in 2*norb spin orbitals")
 
-    # Input h2a is chemists' (pq|rs); convert to OpenFermion-compatible two-body
-    # tensor convention and apply 1/2 prefactor to avoid double counting.
-    h2_of = 0.5 * np.transpose(h2a, (0, 2, 3, 1))
-    h1_so, h2_so = spinorb_from_spatial(h1a, h2_of)
-    n_spin = int(h1_so.shape[0])
-    mol_op = InteractionOperator(float(constant), h1_so, h2_so)
-    qop = _interaction_operator_to_qubits(
-        mol_op,
-        fermion_qubit_mapping,
-        n_spin_orbitals=n_spin,
-        n_active_fermions=n_electrons,
-    )
+    n_spin = 2 * norb
+
+    if (
+        prefer_restricted_spatial_fermion_for_jordan_wigner
+        and fermion_qubit_mapping == "jordan_wigner"
+    ):
+        if jordan_wigner_coeff_atol is not None:
+            raise ValueError(
+                "jordan_wigner_coeff_atol applies only to the InteractionOperator JW path; "
+                "set prefer_restricted_spatial_fermion_for_jordan_wigner=False or atol=None."
+            )
+        fo = restricted_spatial_integrals_to_fermion_operator(float(constant), h1a, h2a)
+        qop = jordan_wigner(fo)
+        jw_build = "restricted_spatial_fermion_operator"
+    else:
+        h1_so, h2_so = spinorb_from_spatial(h1a, h2a)
+        mol_op = InteractionOperator(float(constant), h1_so, 0.5 * h2_so)
+        qop = _interaction_operator_to_qubits(
+            mol_op,
+            fermion_qubit_mapping,
+            n_spin_orbitals=n_spin,
+            n_active_fermions=n_electrons,
+            jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
+        )
+        jw_build = "interaction_operator"
     n_phys = int(count_qubits(qop))
     fs = FermionSpace(n_spin_orbitals=n_spin, n_electrons=n_electrons)
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
     meta: dict[str, Any] = {
         "fermion_to_qubit_map": fermion_qubit_mapping,
         "integral_source": integral_source,
+        "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+        "jw_build": jw_build,
         "n_active_orbitals": norb,
         "n_active_electrons": n_electrons,
         "n_qubits": n_phys,
         "hamiltonian_fingerprint": fp,
     }
+    if jordan_wigner_coeff_atol is not None:
+        meta["jordan_wigner_coeff_atol"] = float(jordan_wigner_coeff_atol)
     if fp_trunc:
         meta["hamiltonian_fingerprint_truncated"] = True
     if pyscf_driver_meta:

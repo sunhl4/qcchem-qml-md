@@ -1,0 +1,51 @@
+# Fe 原子「类氦」极限：+24 价态、2 电子、RHF，活性空间 CAS(2,2) 覆盖全部电子与最低两空间轨道，
+# 因而 JW 参考态与 PySCF RHF 总能在数值上对齐（见 active_space_integrals 与哈密顿量指纹测试）。
+# 化学上为高离化模型，仅作 **可运行 Fe 物种** 与管线烟测；不等价于中性 Fe / Fe4N2 工业案例。
+schema_version: "1"
+experiment_id: "fe_helike_sto3g_cas22_smoke"
+random_seed: 0
+
+molecule:
+  symbols: ["Fe"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+  charge: 24
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+  max_cycle: 120
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 512
+  qiskit_mode: "statevector"
+  ionstack_endpoint: null
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 0
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  variational_ansatz: "hea"
+  vqe_depth: 1
+  vqe_maxiter: 40
+  use_pauli_protocol: false
+  pauli_grouping: "tensor_product"

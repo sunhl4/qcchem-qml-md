@@ -2,6 +2,8 @@
 
 本目录为 **`qchem_qml_md` 仓库内** 的对标架构规格，用于指导后续「优于 InQuanto 公开站、适配模拟器云平台与量子化学流程」的自有文档站建设。**结构真源** 为 [`docs-site/scripts/inquanto-tree.yaml`](../docs-site/scripts/inquanto-tree.yaml)（与 `npm run check:mirror`、附录 A/B/C 同源）；manifest 与公开站对拍调整见下方变更记录，并需再跑 `scaffold:mirror` 与 `report:inquanto-appendix`。
 
+**`docs/` 归类入口**（本目录属「生成物与尽调」）：[../与InQuanto能力差距与实施计划.md](../与InQuanto能力差距与实施计划.md)（附录 B–F 为台账/签字/P2 等）· [../竞争定位与路线图_对标Quantinuum产品与技术路线.md](../竞争定位与路线图_对标Quantinuum产品与技术路线.md)。
+
 ---
 
 ## 阅读顺序
@@ -70,7 +72,7 @@ npm run check:node-backlog
 | Parity / 契约 | [`docs/parity/`](../docs-site/docs/parity/) |
 | 模拟器云（占位） | [`docs/cloud/`](../docs-site/docs/cloud/) |
 | 站点配置 | [`docs/.vitepress/config.ts`](../docs-site/docs/.vitepress/config.ts) |
-| IA  slug 映射 | [`docs-site/IA_MAPPING.md`](../docs-site/IA_MAPPING.md)、[`docs/meta/ia-mapping.md`](../docs-site/docs/meta/ia-mapping.md) |
+| IA  slug 映射 | [`docs-site/docs/meta/ia-mapping.md`](../docs-site/docs/meta/ia-mapping.md)（站内 `/meta/ia-mapping`） |
 
 **后续建议**：按 [vol-08](./vol-08-target-qchem-docs-and-cloud.md) 扩展 `/cloud/` 正文（已建最小占位）；补齐 EN parity 深度页；以本报告结论**收敛**首页 / 产品 / 导航文案，而非把附录全文搬进 VitePress。
 

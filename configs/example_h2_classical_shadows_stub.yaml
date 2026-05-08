@@ -1,0 +1,35 @@
+# H2 with classical-shadows **stub** mitigation node (identity trace on scalar energy).
+schema_version: "1"
+experiment_id: "h2_classical_shadows_stub"
+random_seed: 1
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+
+scf:
+  driver: pyscf
+  method: RHF
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+
+backend:
+  provider: statevector
+  shots_per_circuit: 256
+
+mitigation:
+  classical_shadows_stub_enabled: true
+  classical_shadows_budget_pairs: 128
+
+quantum:
+  algorithm: vqe
+  vqe_depth: 1
+  vqe_maxiter: 12
+  use_pauli_protocol: false

@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
 """
 Re-encode project text files to UTF-8 (no BOM).
 

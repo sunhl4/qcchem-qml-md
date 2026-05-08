@@ -37,6 +37,6 @@
 
 **workflow-preview ↔ repro（P1）**：默认 `repro.workflow_preview_v1` 与 `POST /v1/meta/workflow-preview` 在不含 `computables_rich` 时同源（`tests/test_workflow_preview_repro_alignment.py`）；rich 入 repro 见 `parity_integrations.include_computables_rich_in_repro`。
 
-**广义 P1 闭合**：矩阵/`inquanto_gap_categories`/差距总表与 §141 _residual_ 叙述已与本轮 YAML + pytest/export 对齐；完整条文见仓库 `docs/L1_InQuanto_alignment_signoff.md`。
+**广义 P1 闭合**：矩阵/`inquanto_gap_categories`/差距总表与 §141 _residual_ 叙述已与本轮 YAML + pytest/export 对齐；完整条文见仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 C）。
 
-**负责人 / 日期**：流程角色见仓库 `docs/MAINTAINERS.md`；合并前可替换为实名 / 2026-04-30
+**负责人 / 日期**：流程角色见仓库 `CONTRIBUTING.md`（维护角色）；合并前可替换为实名 / 2026-04-30

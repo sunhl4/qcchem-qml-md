@@ -12,23 +12,23 @@ import styles from './index.module.css';
 const quickCards = [
   {
     title: '产品能力',
-    description: '先了解 qchem-stack 能做什么、适合谁用。',
+    description: '先建立能力全景，再决定阅读路径。',
     to: '/product/features',
   },
   {
-    title: '快速上手',
-    description: '15 分钟跑通第一条端到端工作流。',
-    to: '/tutorial/quickstart',
+    title: '新手路径',
+    description: '按角色选择上手路径，减少信息噪音。',
+    to: '/guide/onboarding-three-paths',
   },
   {
-    title: 'HTTP 与作业',
-    description: '看 API、队列与可观测性契约。',
-    to: '/reference/http-api-sqlite-jobs',
+    title: 'CLI 与 HTTP',
+    description: '命令、脚本、API 的集成入口。',
+    to: '/reference/cli-and-scripts',
   },
   {
     title: '对标与路线',
     description: '查看 InQuanto 对标框架与收敛计划。',
-    to: '/parity/competitor-benchmark',
+    to: '/parity/public-matrix',
   },
 ];
 
@@ -140,8 +140,8 @@ export default function Home(): ReactNode {
             <div className={styles.pathwayCard}>
               <Heading as="h3">推荐阅读路径</Heading>
               <p>
-                产品能力 → 快速上手 → 三柱指南（P1/P2/P3）→ P4 作业可复现
-                → API/参考 → 对标与路线。
+                产品能力 → 新手路径 → 四柱指南（P1/P2/P3/P4）→ CLI/HTTP
+                → 对标与路线。
               </p>
             </div>
           </div>

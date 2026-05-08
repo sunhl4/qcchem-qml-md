@@ -4,8 +4,9 @@ from __future__ import annotations
 
 import time
 import uuid
+from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, ClassVar, Mapping
+from typing import Any, ClassVar
 
 
 @dataclass(frozen=True)

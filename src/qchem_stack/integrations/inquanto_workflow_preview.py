@@ -13,7 +13,12 @@ from __future__ import annotations
 from typing import Any
 
 from qchem_stack.config import ExperimentConfig
-from qchem_stack.protocols.computable import ComputableRef, computables_export_dict, list_computable_specs_for_config, list_computables_for_config
+from qchem_stack.protocols.computable import (
+    ComputableRef,
+    computables_export_dict,
+    list_computable_specs_for_config,
+    list_computables_for_config,
+)
 
 
 def _hints_instantiate(cfg: ExperimentConfig) -> list[str]:
@@ -33,7 +38,11 @@ def _hints_instantiate(cfg: ExperimentConfig) -> list[str]:
 def _hints_build(cfg: ExperimentConfig) -> list[str]:
     q = cfg.quantum
     lines = [f"algorithm={q.algorithm}"]
-    if q.algorithm == "vqe":
+    if q.algorithm_factory:
+        lines.append("variational_dispatch=yaml_algorithm_factory_v1")
+        lines.append(f"algorithm_factory={q.algorithm_factory}")
+        lines.append(f"VQE-shape depth knob (hea packing) depth={q.vqe_depth}")
+    elif q.algorithm == "vqe":
         lines.append(f"VQE depth={q.vqe_depth} maxiter={q.vqe_maxiter}")
         if q.variational_ansatz == "uccsd":
             if q.uccsd_trotter_steps is not None:
@@ -45,8 +54,12 @@ def _hints_build(cfg: ExperimentConfig) -> list[str]:
                 lines.append("variational_ansatz=uccsd (closed-shell cluster exponentials, JW)")
     elif q.algorithm == "adapt":
         lines.append(f"ADAPT max_iter={q.adapt_max_iter}")
-    else:
+    elif q.algorithm == "tetris_adapt":
+        lines.append(f"TETRIS_ADAPT max_iter={q.adapt_max_iter}")
+    elif q.algorithm == "iqeb":
         lines.append(f"IQEB max_rounds={q.iqeb_max_rounds} inner_VQE_depth={q.vqe_depth}")
+    else:
+        lines.append(f"registered_variational id={q.algorithm} inner_VQE_depth={q.vqe_depth}")
     lines.append(f"pauli_protocol={'on' if q.use_pauli_protocol else 'off'}")
     return lines
 
@@ -87,6 +100,8 @@ def _hints_run(cfg: ExperimentConfig) -> list[str]:
         lines.append("SCEOM after variational")
     if q.qpe_demo_track_requested():
         lines.append("QPE demo track")
+    if q.vqs_track_requested():
+        lines.append(f"VQS track mode={q.vqs_mode} n_times={q.vqs_n_times}")
     return lines
 
 
@@ -97,6 +112,8 @@ def _hints_evaluate(cfg: ExperimentConfig) -> list[str]:
         lines.append("evaluate: Hamiltonian expectation via Pauli averaging protocol")
     if q.vqd_after_variational or q.qse_after_variational or q.sceom_after_variational:
         lines.append("evaluate: excited-state computables")
+    if q.vqs_track_requested():
+        lines.append("evaluate: VQS/McLachlan toy trajectory sidecar")
     na = cfg.nexus_analog
     if na.enabled:
         lines.append("sidecar: nexus_analog ledger (local HQC units)")
@@ -131,6 +148,7 @@ _EXCITED_COMPUTABLES = frozenset(
         "excitation_energies_qse",
         "sceom_energies",
         "qpe_demo_track",
+        "vqs_track",
     }
 )
 
@@ -212,6 +230,18 @@ def computable_graph_v2(
         "edges": edges,
         "roots": roots,
     }
+    if cfg is not None:
+        fq = cfg.quantum.algorithm_factory
+        if fq:
+            out["variational_execution"] = {
+                "schema": "variational_yaml_plugin_dispatch_v1",
+                "algorithm_factory": fq,
+                "algorithm_label": cfg.quantum.algorithm,
+                "dag_note": (
+                    "ground_state_energy edges match built-in semantics; executor loaded from YAML factory "
+                    "at pipeline variational_done."
+                ),
+            }
     if cfg is not None and (cfg.quantum.computable_extra_edges or cfg.quantum.computable_remove_edges):
         out["declarative_edge_overrides"] = True
     return out
@@ -231,6 +261,49 @@ def computable_graph_v1(refs: list[ComputableRef]) -> dict[str, Any]:
     return {"schema": "computable_graph_v1", "nodes": nodes, "edges": edges}
 
 
+def workflow_preview_variational_execution_slice_v1(cfg: ExperimentConfig) -> dict[str, Any] | None:
+    """Light-weight slice aligned with parity export ``workflow_preview_variational_execution_v1``."""
+
+    fq = cfg.quantum.algorithm_factory
+    if not fq:
+        return None
+    return {
+        "schema": "variational_yaml_plugin_dispatch_v1",
+        "algorithm_factory": fq,
+        "algorithm_label": cfg.quantum.algorithm,
+    }
+
+
+def workflow_preview_vqs_track_slice_v1(cfg: ExperimentConfig) -> dict[str, Any] | None:
+    """Config-only slice for VQS/McLachlan sidecar (parity with ``workflow_preview_variational_execution_v1``)."""
+
+    if not cfg.quantum.vqs_track_requested():
+        return None
+    q = cfg.quantum
+    return {
+        "schema": "workflow_preview_vqs_track_v1",
+        "vqs_track_after_variational": q.vqs_track_after_variational,
+        "vqs_pipeline_integration": q.vqs_pipeline_integration,
+        "vqs_mode": q.vqs_mode,
+        "vqs_n_times": q.vqs_n_times,
+        "vqs_dt": float(q.vqs_dt),
+    }
+
+
+def workflow_preview_qpe_track_slice_v1(cfg: ExperimentConfig) -> dict[str, Any] | None:
+    """Config-only slice for QPE demo / Kitaev spectral sidecar (parity with ``workflow_preview_vqs_track_v1``)."""
+
+    if not cfg.quantum.qpe_demo_track_requested():
+        return None
+    q = cfg.quantum
+    return {
+        "schema": "workflow_preview_qpe_track_v1",
+        "qpe_demo_track_after_variational": q.qpe_demo_track_after_variational,
+        "qpe_pipeline_integration": q.qpe_pipeline_integration,
+        "qpe_demo_track_n_bits": int(q.qpe_demo_track_n_bits),
+    }
+
+
 def workflow_preview_payload(
     cfg: ExperimentConfig,
     *,
@@ -245,6 +318,15 @@ def workflow_preview_payload(
         "computable_graph": computable_graph_v2(refs, cfg),
         "computable_abstract": computables_export_dict(cfg, protocol_counts=None),
     }
+    ve = workflow_preview_variational_execution_slice_v1(cfg)
+    if ve is not None:
+        out["variational_execution"] = ve
+    vqs_sl = workflow_preview_vqs_track_slice_v1(cfg)
+    if vqs_sl is not None:
+        out["vqs_track_execution"] = vqs_sl
+    qpe_sl = workflow_preview_qpe_track_slice_v1(cfg)
+    if qpe_sl is not None:
+        out["qpe_track_execution"] = qpe_sl
     if include_computables_rich:
         specs = list_computable_specs_for_config(cfg)
         out["computables_rich"] = {
@@ -319,6 +401,7 @@ def slim_product_summary_from_pipeline_result(row: dict[str, Any]) -> dict[str, 
         "mitigation_dag_execution": bool(row.get("mitigation_dag_execution")),
         "tensornet_protocol_stub": bool(row.get("tensornet_protocol_stub")),
         "qpe_demo_track": bool(row.get("qpe_demo_track")),
+        "vqs_track": bool(row.get("vqs_track")),
     }
     out["sidecars_present"] = flags
 

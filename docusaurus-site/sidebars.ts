@@ -18,17 +18,20 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '产品',
-      items: ['product/features', 'product/positioning', 'product/roadmap'],
+      items: ['product/features', 'product/roadmap', 'product/positioning'],
     },
     {
       type: 'category',
       label: '指南',
       items: [
+        'guide/index',
+        'guide/onboarding-three-paths',
         'guide/overview',
         'guide/chemistry-and-embedding',
         'guide/program-construction',
         'guide/execution-and-analysis',
         'guide/jobs-and-reproducibility',
+        'guide/principles-and-reading',
       ],
     },
     {
@@ -50,17 +53,19 @@ const sidebars: SidebarsConfig = {
       type: 'category',
       label: '参考',
       items: [
-        'reference/cli-http',
+        'reference/cli-and-scripts',
         'reference/http-api-sqlite-jobs',
         'reference/circuitir-tket-jobs',
         'reference/qiskit-shot-counts',
         'reference/dmet-parity-snapshot',
+        'reference/cli-http',
       ],
     },
     {
       type: 'category',
-      label: '产品战略',
+      label: '概念与架构',
       items: [
+        'concept/engineering-architecture',
         'concept/competitive-positioning',
         'concept/inquanto-ia-architecture-report',
       ],

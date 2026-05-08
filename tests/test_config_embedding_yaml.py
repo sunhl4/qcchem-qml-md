@@ -5,7 +5,6 @@ from __future__ import annotations
 from pathlib import Path
 
 import pytest
-
 from pydantic import ValidationError
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config

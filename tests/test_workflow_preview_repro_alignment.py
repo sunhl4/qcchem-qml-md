@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from qchem_stack.config import load_experiment_config
 from qchem_stack.integrations.inquanto_workflow_preview import (
     slim_product_summary_from_pipeline_result,
@@ -60,3 +62,31 @@ def test_slim_summary_surfaces_projection_epistemic_bound() -> None:
     }
     slim = slim_product_summary_from_pipeline_result(row)
     assert slim.get("embedding_epistemic_bound") == row["repro"]["embedding_workflow"]["epistemic_bound"]
+
+
+@pytest.mark.skipif(
+    not Path(__file__).resolve().parents[1].joinpath("configs", "example_h2_vqs_track.yaml").is_file(),
+    reason="VQS track sample config missing",
+)
+def test_workflow_preview_vqs_track_nested_equals_repro_top_level_slice() -> None:
+    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2_vqs_track.yaml"
+    cfg = load_experiment_config(cfg_path)
+    repro = collect_repro_metadata(cfg, cfg_path=cfg_path)
+    top = repro.get("workflow_preview_vqs_track_v1")
+    assert isinstance(top, dict) and top.get("schema") == "workflow_preview_vqs_track_v1"
+    nested = (repro.get("workflow_preview_v1") or {}).get("vqs_track_execution")
+    assert nested == top
+
+
+@pytest.mark.skipif(
+    not Path(__file__).resolve().parents[1].joinpath("configs", "qpe_dual_track_demo.yaml").is_file(),
+    reason="QPE dual-track sample config missing",
+)
+def test_workflow_preview_qpe_track_nested_equals_repro_top_level_slice() -> None:
+    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "qpe_dual_track_demo.yaml"
+    cfg = load_experiment_config(cfg_path)
+    repro = collect_repro_metadata(cfg, cfg_path=cfg_path)
+    top = repro.get("workflow_preview_qpe_track_v1")
+    assert isinstance(top, dict) and top.get("schema") == "workflow_preview_qpe_track_v1"
+    nested = (repro.get("workflow_preview_v1") or {}).get("qpe_track_execution")
+    assert nested == top

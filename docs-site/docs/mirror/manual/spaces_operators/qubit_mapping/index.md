@@ -4,7 +4,7 @@ inquanto_anchor: "https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-
 diataxis: concept
 pillar: P2
 status: shipped
-qchem_module: qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf
+qchem_module: qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference
 milestone: ""
 i18n_key: manual.spaces_operators.qubit_mapping
 ---
@@ -17,7 +17,7 @@ i18n_key: manual.spaces_operators.qubit_mapping
 - **状态**: 已落地
 - **四柱归属**: P2 算法与协议
 - **Diátaxis**: Concept
-- **对应模块**: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf`
+- **对应模块**: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`
 - **里程碑**: —
 - **InQuanto 锚点**: [https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping](https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping)
 :::
@@ -28,7 +28,7 @@ i18n_key: manual.spaces_operators.qubit_mapping
 
 ## 我们的实现
 
-**已落地** — 对应模块: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf`
+**已落地** — 对应模块: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`
 
 ## 相关
 

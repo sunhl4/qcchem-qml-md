@@ -7,7 +7,6 @@ from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.vqe import VQE, VQEResult
 
 if TYPE_CHECKING:
-    from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.backends.spec import BackendSpec
     from qchem_stack.config import ExperimentConfig
 

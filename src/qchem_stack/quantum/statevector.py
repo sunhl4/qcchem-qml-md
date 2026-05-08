@@ -85,7 +85,6 @@ def hea_state(
 def _apply_one_qubit_unitary(state: np.ndarray, u2: np.ndarray, target: int, n_qubits: int) -> np.ndarray:
     dim = 2**n_qubits
     st = state.reshape((2,) * n_qubits)
-    axes = list(range(n_qubits))
     st = np.moveaxis(st, target, 0)
     new = np.tensordot(u2, st, axes=(1, 0))
     new = np.moveaxis(new, 0, target)

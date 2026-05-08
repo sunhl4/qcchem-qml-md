@@ -6,6 +6,10 @@ from pathlib import Path
 
 import pytest
 
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+from qchem_stack.chem.embedding.schmidt_production import build_schmidt_impurity_integrals
+from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_spatial_chemist_integrals
 from qchem_stack.config import (
     ActiveSpaceSpec,
     BackendSpecConfig,
@@ -15,9 +19,6 @@ from qchem_stack.config import (
     QuantumSpec,
     SCFSpec,
 )
-from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_spatial_chemist_integrals
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.embedding.schmidt_production import build_schmidt_impurity_integrals
 
 
 def test_embedding_spec_rejects_schmidt_with_uniform_toy() -> None:
@@ -72,6 +73,16 @@ def _have_pyscf() -> bool:
         return False
 
 
+def _as_reference(rhf) -> ClassicalMeanFieldReference:
+    return ClassicalMeanFieldReference(
+        mf=rhf.mf,
+        e_tot=float(rhf.e_tot),
+        mo_energy=rhf.mo_energy,
+        molecular_system=rhf.molecular_system,
+        driver_meta=dict(rhf.driver_meta),
+    )
+
+
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_build_schmidt_h2_single_atom_fragment() -> None:
     cfg = ExperimentConfig(
@@ -84,7 +95,7 @@ def test_build_schmidt_h2_single_atom_fragment() -> None:
     drv = PySCFDriver.from_config(cfg)
     rhf = drv.run_rhf()
     model = build_schmidt_impurity_integrals(
-        rhf,
+        _as_reference(rhf),
         fragment_atom_indices=[0],
         n_bath_orbitals=1,
         max_impurity_spatial_orbitals=8,

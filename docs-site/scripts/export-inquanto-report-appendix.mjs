@@ -167,7 +167,7 @@ function platformEngineeringBlock(e) {
     "- **云 / 租户**: `launch/retrieve`、Nexus、远程设备 — `n/a` 者写清 **SQLite+FastAPI 类比**；其余在 `/cloud/` 文档化 **workspace_label、配额、公平队列**。",
     "- **后端 / 可观测**: P3 对照 **BackendSpec**；作业 **trace/request id** 对齐 HTTP 契约。",
     "- **安全 / 合规**: 禁止示例 YAML 写生产密钥；PII 保留与审计日志策略进 `/cloud/`。",
-    "- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 IA_MAPPING 为真源。",
+    "- **SEO / URL**: 厂商锚点变更回写 manifest；本站 slug 以 docs-site/docs/meta/ia-mapping.md 为真源。",
     "- **i18n**: shipped/partial 优先 `/en/` 叙事；mirror 为审计入口。",
     "- **CI**: 外链存活巡检；教程命令可选 smoke。",
   ];

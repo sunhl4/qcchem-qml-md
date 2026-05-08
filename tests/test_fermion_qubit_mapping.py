@@ -59,4 +59,4 @@ def test_documented_fermion_mappings_includes_scbk() -> None:
 def test_algorithm_registry_sorted_ids() -> None:
     from qchem_stack.quantum.algorithm_registry import list_registered_algorithm_ids
 
-    assert list_registered_algorithm_ids() == ("adapt", "iqeb", "vqe")
+    assert list_registered_algorithm_ids() == ("adapt", "iqeb", "tetris_adapt", "vqe")

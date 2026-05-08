@@ -1,0 +1,52 @@
+# Parity/export sample: Z-matrix + heavy-atom ECP + density fitting (triple combo).
+# Export is config-only; running SCF requires PySCF with LANL2DZ/BSDF data.
+schema_version: "1"
+experiment_id: "hbr_zmatrix_ecp_df_parity_sample"
+random_seed: 42
+
+molecule:
+  symbols: ["Br", "H"]
+  zmatrix: |
+    Br
+    H 1 1.414
+  charge: 0
+  multiplicity: 1
+  basis: "lanl2dz"
+  ecp: "lanl2dz"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+  density_fit: true
+
+active_space:
+  ncas: 2
+  nelecas: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  qiskit_mode: "statevector"
+  ionstack_endpoint: null
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 200
+  adapt_max_iter: 4
+  use_pauli_protocol: true
+  pauli_grouping: "tensor_product"

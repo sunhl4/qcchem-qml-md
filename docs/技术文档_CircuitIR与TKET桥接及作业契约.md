@@ -4,6 +4,8 @@
 
 **读者**：维护者、需要做 Methods 级对标的合作者、写论文补充材料时需要说明「资源数字从哪来」的作者。
 
+**与 Pauli 协议的关系**：`PauliAveragingProtocol.compile` 对每条 `CircuitIR` 应用 `CompilerPassBundle` 后，`dataframe_circuit_shot_rows` / `resource_rows` 中的 **`spec`** 列即此处的 `CircuitIR` 资源行（与 `run_qiskit_shots` / 精确期望路径共用同一套 depth/2Q 叙事）。五阶段 `run` 的能量来源见 [技术文档_设备比特串与Qiskit采样路径.md](技术文档_设备比特串与Qiskit采样路径.md)。
+
 ---
 
 ## 1. 目的与边界
@@ -116,4 +118,4 @@ sequenceDiagram
 | [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) | 公开能力 vs 本包 |
 | [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md) | 路线图与判据落点 |
 | [launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) | Nexus 语义类比短表 |
-| [README.md](../README.md) | 目录与 InQuanto 分层对照 |
+| [README.md](../../README.md)（仓库根） | 安装、YAML 入口与四柱导航 |

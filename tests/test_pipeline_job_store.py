@@ -9,7 +9,6 @@ import pytest
 import yaml
 
 from qchem_stack.jobs.pipeline_jobs import enqueue_full_pipeline_run
-from qchem_stack.jobs.pipeline_runner import run_full_pipeline_job
 from qchem_stack.jobs.store import SqliteJobStore
 from qchem_stack.jobs.worker_dispatch import dispatch_job
 from qchem_stack.orchestration.run_context import RunContext

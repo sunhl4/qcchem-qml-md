@@ -4,7 +4,7 @@ inquanto_anchor: "https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-
 diataxis: concept
 pillar: P2
 status: shipped
-qchem_module: qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf
+qchem_module: qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference
 milestone: ""
 i18n_key: manual.spaces_operators.qubit_mapping
 ---
@@ -17,7 +17,7 @@ i18n_key: manual.spaces_operators.qubit_mapping
 - **Status**: Shipped
 - **Pillar**: P2 Algorithms & protocols
 - **Diátaxis**: Concept
-- **Module**: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf`
+- **Module**: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`
 - **Milestone**: —
 - **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping](https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping)
 :::
@@ -28,7 +28,7 @@ This page mirrors the corresponding node in the public InQuanto tree. Open the I
 
 ## Our implementation
 
-**Shipped** — Module: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_pyscf`
+**Shipped** — Module: `qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`
 
 ## Related
 

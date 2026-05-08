@@ -14,6 +14,6 @@ P4 是面向工程化落地新增的一柱：让实验可以异步运行、追�
 
 ## 相关文档
 
-- [命令与接口参考](../reference/cli-http)
+- [命令与接口参考](../reference/cli-and-scripts)
 - [HTTP API 与作业契约](../reference/http-api-sqlite-jobs)
 - [云与作业概览](../cloud/overview)

@@ -4,7 +4,7 @@ Open orchestration layer aligned with an InQuanto-style pipeline: **chemistry in
 
 ## Documentation map (all engineering docs)
 
-**Single index** (Chinese canonical, paths, merge log, reading order): [docs/技术文档_软件工程文档总索引.md](docs/技术文档_软件工程文档总索引.md).
+**对标三份母稿**：[竞争定位](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) · [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md) · [差距与实施计划](docs/与InQuanto能力差距与实施计划.md)（含 **附录 A–F**：P2 / Y1 / L1 / B→J / P1 审计 / 不排期项）。**契约矩阵**：[parity](docs/inquanto_public_parity_matrix.md)。**维护角色**：[CONTRIBUTING.md](CONTRIBUTING.md)。
 
 ## Boundaries and public parity
 
@@ -12,18 +12,18 @@ This project is an **independent open-source** stack: it does **not** copy Quant
 
 - **Documentation site (VitePress; `/product/` landing + pillar guides + optional public-doc benchmark map)**: [`docs-site/`](docs-site/) — `npm install && npm run docs:dev` (**preview opens in your default browser** at `http://localhost:5173/`; not an embedded IDE panel). Production build: `npm run docs:build`. After copying docs from `docs/`, run `npm run fix-links` if paths drift.
 
+- **Software-engineering documentation site (Docusaurus; guides, tutorials, parity, reference)**: [`docusaurus-site/`](docusaurus-site/) — `npm install && npm start` (local dev); production build: `npm run build`. Complements the VitePress site above; see that folder’s README.
+
 - **InQuanto public docs site — multi-volume report + appendices A/B/C + 295-node JSON backlog** (IA / Diátaxis / Nexus boundary analysis; **appendix-C ~21.7k lines**; machine backlog [`docs/inquanto-node-backlog.generated.json`](docs/inquanto-node-backlog.generated.json)): [`docs/architecture-report-quantinuum-inquanto-web/INDEX.md`](docs/architecture-report-quantinuum-inquanto-web/INDEX.md) — **stays in repo** to inform `docs-site` UX; not copied into the VitePress tree. Regenerate: `cd docs-site && npm run report:inquanto-appendix && npm run report:inquanto-backlog`; gate: `npm run check:mirror && npm run check:node-backlog`.
 
 - **Competitive positioning vs InQuanto and Tangelo (product + technical routes, P0–P3 roadmap)**: [docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) — what we **do** compete on (open orchestration, reproducibility, multi-backend, MD/ML, workflow discipline) and what we **do not** (Nexus, H-series lock-in, InQuanto binary parity).
-- **InQuanto public “How to use” → this repo (topic map)**：[docs/InQuanto_manual_howto_与_qchem_stack_映射.md](docs/InQuanto_manual_howto_与_qchem_stack_映射.md) — aligns [Quantinuum howto](https://docs.quantinuum.com/inquanto/manual/howto.html) sections (workflows, chemistry prep, computables/protocols, expert use) to **open, auditable** paths (`pipeline`, `protocols`, `chem`, optional TKET bridge); **not** closed-wheel parity.
+- **InQuanto public “How to use” → this repo (topic map)**：[工程记忆 §14](docs/工程记忆_Quantinuum对标与数据流技术文档.md) — aligns [Quantinuum howto](https://docs.quantinuum.com/inquanto/manual/howto.html) sections to **open, auditable** paths; **not** closed-wheel parity.
 - **Parity matrix (public API vs `qchem_stack`)**: [docs/inquanto_public_parity_matrix.md](docs/inquanto_public_parity_matrix.md).
 - **Software architecture (layering, typed errors, strict `repro` JSON export)**: [docs/ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md).
-- **Engineering memory (竞品数据流、判据表、激发态差距、A/B/C 路线图)**: [docs/工程记忆_Quantinuum对标与数据流技术文档.md](docs/工程记忆_Quantinuum对标与数据流技术文档.md).
+- **Engineering memory (物化链、判据、激发态差距、开放栈 §13)**: [docs/工程记忆_Quantinuum对标与数据流技术文档.md](docs/工程记忆_Quantinuum对标与数据流技术文档.md).
 - **Detailed technical doc (`CircuitIR`, TKET bridge, job contract)**: [docs/技术文档_CircuitIR与TKET桥接及作业契约.md](docs/技术文档_CircuitIR与TKET桥接及作业契约.md).
 - **Qiskit 设备 / Aer 比特串直方图 → Pauli 协议能量**（`get_counts` 路径，与 InQuanto 公开故事对齐的 shot 真链）: [docs/技术文档_设备比特串与Qiskit采样路径.md](docs/技术文档_设备比特串与Qiskit采样路径.md)。
-- **与 InQuanto 能力差距 + 分阶段计划**（差什么、不做什么、P0–P2）：[docs/与InQuanto能力差距与实施计划.md](docs/与InQuanto能力差距与实施计划.md)（`repro`、export **v2**、**§1 总表**与 [parity 矩阵](docs/inquanto_public_parity_matrix.md) 随代码维护同步）。  
-- **路线图 P2（研究深度 · WBS · 闸门）**：[docs/P2_详细实施计划.md](docs/P2_详细实施计划.md)；文档站可读镜像：`docs-site` 路由 **`/concept/p2-detailed-plan`**（英文摘要 **`/en/concept/p2-detailed-plan`**）。维护角色占位：[docs/MAINTAINERS.md](docs/MAINTAINERS.md)。  
-- **原「不排期」项落代码说明**（Nexus 类比、Qermit 图+运行时、张量网 stub+引擎、PBC/k 点/ddCOSMO 等，**非** 商业云/闭源同构）：[docs/不排期项_转排期与实现说明.md](docs/不排期项_转排期与实现说明.md)。
+- **与 InQuanto 能力差距 + 路线图附录**（§1 总表、维护约定、**附录 A–F**）：[docs/与InQuanto能力差距与实施计划.md](docs/与InQuanto能力差距与实施计划.md)。文档站镜像：`docs-site` **`/parity/gap-implementation-plan`**、`/concept/p2-detailed-plan`（摘要页，正文以仓库母稿为准）。  
 - **Competitor research notes** (same workspace root): `../PandM/materials/learning/quantum-chem/literature/Quantinuum_量子计算化学竞品研究总索引.md`.
 - **Launch/retrieve (Nexus 类比，本地 SQLite)**: [docs/launch_retrieve_nexus_analog.md](docs/launch_retrieve_nexus_analog.md)（`JobHandle.protocol_hash` 与 `PauliAveragingProtocol.launch` / `retrieve`）。
 
@@ -33,7 +33,7 @@ Public Quantinuum docs describe a chemistry orchestration **layer** (PySCF, algo
 
 | InQuanto (public) | `qchem_stack` |
 |-------------------|---------------|
-| PySCF / drivers / active space | `qchem_stack/chem/` (e.g. `chem/drivers/`, `chem/hamiltonian.py`)；**fermion→qubit**：`active_space.fermion_qubit_mapping`（`jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`）；扩展：`chemistry_extended` 上 **ddCOSMO**、**PBC**（`pbc_kpoint_mesh` → RHF@Γ 或 **KRHF** + 选 k 的 CASCI）、名称映射 `chem/inquanto_driver_surface.py` |
+| PySCF / drivers / active space | `qchem_stack/chem/`（`ChemIntegralSolver` / `create_solver` → **`ClassicalMeanFieldReference`**，可与后端类名解耦）；**现阶段端到端数值默认 `scf.driver=pyscf`**（受限活性空间 → qubit 哈密顿量主路径）；其它程序经 **`chem/solvers/registry.py`** 扩展（见 [竞争定位 §5.1](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md)、[ENGINEERING_ARCHITECTURE §1.1](docs/ENGINEERING_ARCHITECTURE.md)）；**fermion→qubit**：`active_space.fermion_qubit_mapping`（`jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`）；扩展：`chemistry_extended` 上 **ddCOSMO**、**PBC**（`pbc_kpoint_mesh` → RHF@Γ 或 **KRHF** + 选 k 的 CASCI）、名称映射 `chem/inquanto_driver_surface.py` |
 | `Algorithm*`, VQE / ADAPT / **IQEB** / VQD / QSE / SCEOM | `qchem_stack/quantum/`, `quantum/qse_transition.py`；**IQEB**：`quantum.algorithm=iqeb`，`configs/example_h2_iqeb.yaml` |
 | `Protocol` 五阶段、资源表 `dataframe_circuit_shot` | `qchem_stack/protocols/`, `backends/spec.py`；`protocols/computable.py` 薄层（非一等 `Computable` 图） |
 | Passes / TKET-style metrics (optional) | `backends/compile_passes.py`; optional `pip install qchem-stack[pytket]` then `backends/pytket_bridge.py` |
@@ -57,7 +57,7 @@ out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqli
 
 For an InQuanto-style **Methods sidecar** (computable abstract v2 + `hamiltonian_meta` fingerprint), use `WorkflowCoordinator` (`qchem_stack.orchestration.WorkflowCoordinator`): it wraps `run_pipeline_from_config` and sets `out["methods_sidecar"]`. A packaged **tutorial-shaped** chain (ROHF, DMET labels, ADAPT, PMSV, compiler pass lists) lives at `configs/tutorial_inquanto_chain_h2.yaml`.
 
-CI runs `python scripts/smoke_pipeline.py` then `python scripts/smoke_pipeline.py --excited-only` (`configs/example_h2_excited_smoke.yaml`, VQD without Pauli protocol), **`--iqeb`** (H2 IQEB), **`--projection-trace`** (projection L1 YAML), and marker subsets **`pytest -m l1_excited`** / **`pytest -m l1_md_ml`**. Locally, `python scripts/smoke_pipeline.py --excited` runs both packaged YAMLs in one go.
+CI runs `python scripts/smoke_pipeline.py` then `python scripts/smoke_pipeline.py --excited-only` (`configs/example_h2_excited_smoke.yaml`, VQD without Pauli protocol), **`--iqeb`** (H2 IQEB), **`--projection-trace`** (projection L1 YAML), and marker subsets **`pytest -m l1_excited`** / **`pytest -m l1_md_ml`**. Locally, `python scripts/smoke_pipeline.py --excited` runs both packaged YAMLs in one go. Optional **L3** numerical gate: `QCHEM_RUN_L3=1 pytest -m l3` (see `tests/test_l3_benchmark_smoke.py`, `integrations/l3_algorithm_benchmark.py`).
 
 P1 **backend / mapping conformance** (needs PySCF; Qiskit optional): `pytest tests/test_backend_conformance.py`.
 
@@ -69,7 +69,7 @@ With `pip install -e ".[dev]"` or `pip install -e ".[api]"`, run:
 uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-`GET /health` is a cheap liveness check; **`GET /health/ready`** pings the default SQLite job path. **`GET /v1/meta/parity-gaps`** is the gap list; **`GET /v1/meta/queue-stats`** counts jobs by status; **`POST /v1/meta/computables-preview`** returns InQuanto-style **Computable** items + **`computable_abstract` v2** from YAML alone (no chemistry run). **`GET /v1/runs`** lists jobs (`experiment_id` / **`api_workspace_label`** filters, **`offset`** / **`limit`**). **`GET /v1/runs/{id}/repro`** returns only **`repro` when DONE** (**409** while queued). **`GET /v1/runs/{id}/status`** and **`/events`** are lightweight polls. **`POST /v1/runs`** accepts YAML (`experiment_yaml`, `sync`, optional `job_db_path`, optional **`workspace_label`** → meta); async **202** + **`run_enqueue_response_v1`**; sync **`full_pipeline_job_result_v1`**. POST responses echo **`X-Trace-ID`** / **`X-Request-ID`**. Invalid YAML/config → **400** / **422**. Drain with `qchem-jobs-worker` / **`qchem-pipeline-worker`**. See [docs/ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md) §8–9.
+`GET /health` is a cheap liveness check; **`GET /health/ready`** pings the default SQLite job path. **`GET /v1/meta/parity-gaps`** is the gap list; **`GET /v1/meta/capability-surface`** returns **`object_map`**, **`gaps`**, **`mitigation_execution_model`**, **`open_stack_differentiators`**, and **`operator_pool_registry_export_v1`** (ADAPT/IQEB pool ids + **`pool_id_aliases`**, same schema as parity export where applicable); **`GET /v1/meta/queue-stats`** counts jobs by status; **`POST /v1/meta/computables-preview`** returns InQuanto-style **Computable** items + **`computable_abstract` v2** from YAML alone (no chemistry run). **`GET /v1/runs`** lists jobs (`experiment_id` / **`api_workspace_label`** filters, **`offset`** / **`limit`**). **`GET /v1/runs/{id}/repro`** returns only **`repro` when DONE** (**409** while queued). **`GET /v1/runs/{id}/status`** and **`/events`** are lightweight polls. **`POST /v1/runs`** accepts YAML (`experiment_yaml`, `sync`, optional `job_db_path`, optional **`workspace_label`** → meta); async **202** + **`run_enqueue_response_v1`**; sync **`full_pipeline_job_result_v1`**. POST responses echo **`X-Trace-ID`** / **`X-Request-ID`**. Invalid YAML/config → **400** / **422**. Drain with `qchem-jobs-worker` / **`qchem-pipeline-worker`**. See [docs/ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md) §8–9.
 
 ## Install
 
@@ -84,14 +84,30 @@ PySCF, Qiskit, and **pytket** (TKET bridge for resource stats) are optional extr
 
 ```python
 from qchem_stack.config import load_experiment_config
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
+from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
 
 cfg = load_experiment_config("configs/example_h2.yaml")
 drv = PySCFDriver.from_config(cfg)
 result = drv.run_rhf()
-h = molecular_hamiltonian_from_pyscf(result, n_active_orbitals=2, n_active_electrons=2)
+ref = ClassicalMeanFieldReference(
+    mf=result.mf,
+    e_tot=float(result.e_tot),
+    mo_energy=result.mo_energy,
+    molecular_system=result.molecular_system,
+    driver_meta=dict(result.driver_meta),
+)
+h = molecular_hamiltonian_from_classical_reference(
+    ref,
+    n_active_orbitals=2,
+    n_active_electrons=2,
+)
+# Optional JW knobs from YAML ``active_space``: ``prefer_restricted_spatial_fermion_for_jordan_wigner``,
+# ``jordan_wigner_coeff_atol`` (pass-through kwargs on ``molecular_hamiltonian_from_classical_reference``).
 ```
+
+**Unified classical mean field** (any `scf.driver` registered in `chem/solvers`): `classical_mean_field_via_solver_bridge(cfg)` in `qchem_stack.chem.bridges.facade` returns `MolecularMeanFieldResult` with canonical `driver_meta` headers — same interchange shape the pipeline uses after SCF.
 
 ### Simulators (Qiskit / IonStack)
 
@@ -124,7 +140,7 @@ h = molecular_hamiltonian_from_pyscf(result, n_active_orbitals=2, n_active_elect
 
 ## Layout
 
-- `qchem_stack/chem` — molecular spec, PySCF driver (incl. optional PBC + k-mesh, ddCOSMO), embedding hooks, qubit Hamiltonian (`active_space.fermion_qubit_mapping`: JW or BK), InQuanto-name alias table
+- `qchem_stack/chem` — molecular spec, **bridges** (`chem/bridges`: registry-backed mean field → interchange), PySCF driver (incl. optional PBC + k-mesh, ddCOSMO), embedding hooks, qubit Hamiltonian (`active_space.fermion_qubit_mapping`: JW or BK), InQuanto-name alias table
 - `qchem_stack/quantum` — ansätze, VQE / ADAPT / IQEB / VQD / QSE
 - `qchem_stack/protocols` — five-stage protocol, shot dataframe, `computable` helpers, job pickle surface
 - `qchem_stack/mitigation` — PMSV, SPAM, ZNE, `qermit_analog` (DAG report), `qermit_runtime` (linear trace)

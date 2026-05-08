@@ -1,0 +1,33 @@
+# Dense Bravyi–Kitaev UCCSD on H₂(2e, CAS(2,2)) sto-3g (PySCF RHF embedded integrals → BK Hamiltonian).
+schema_version: "1"
+experiment_id: "h2_uccsd_bravyi_kitaev_dense"
+random_seed: 41
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  basis: sto-3g
+
+scf:
+  driver: pyscf
+  method: RHF
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: bravyi_kitaev
+
+backend:
+  name: statevector_sim
+  provider: statevector
+
+embedding:
+  mode: none
+
+quantum:
+  algorithm: vqe
+  variational_ansatz: uccsd
+  vqe_maxiter: 300
+  use_pauli_protocol: false

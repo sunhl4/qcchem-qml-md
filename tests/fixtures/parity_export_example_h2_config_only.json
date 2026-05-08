@@ -7,7 +7,7 @@
       "H",
       "H"
     ],
-    "coordinates_bohr": [
+    "coordinates": [
       [
         0.0,
         0.0,
@@ -19,19 +19,53 @@
         1.4
       ]
     ],
+    "zmatrix": null,
+    "coordinate_unit": "bohr",
     "charge": 0,
     "multiplicity": 1,
-    "basis": "sto-3g"
+    "basis": "sto-3g",
+    "ecp": null
   },
   "scf_method": "RHF",
+  "scf_driver": "pyscf",
+  "registered_solvers": [
+    "psi4",
+    "pyscf"
+  ],
+  "solver_capabilities_snapshot": {
+    "backend_id": "pyscf",
+    "supports_molecular_scf": true,
+    "supports_pbc_scf": true,
+    "supports_rhf": true,
+    "supports_rohf": true,
+    "supports_uhf": true,
+    "supports_implicit_solvent_ddcosmo": true,
+    "supports_qmmm": false,
+    "supports_restricted_active_space_qubit_hamiltonian": true,
+    "supports_projection_fragment_mulliken_hamiltonian": true,
+    "supports_schmidt_atomic_hamiltonian": true,
+    "supports_embedding_input_ao_lowdin": true,
+    "supports_casscf_orbital_audit": true,
+    "supports_avas_active_space_projection": true,
+    "supports_rdm_correction_hooks": true,
+    "supports_rdm_nevpt2_casci": true,
+    "supports_get_integrals": false
+  },
   "active_space": {
+    "strategy": "cas",
     "n_active_orbitals": 2,
     "n_active_electrons": 2,
-    "fermion_qubit_mapping": "jordan_wigner"
+    "ncas": 2,
+    "nelecas": 2,
+    "frozen_orbitals": [],
+    "fermion_qubit_mapping": "jordan_wigner",
+    "prefer_restricted_spatial_fermion_for_jordan_wigner": false,
+    "jordan_wigner_coeff_atol": null
   },
   "fermion_to_qubit_map": "jordan_wigner",
   "pauli_grouping": "tensor_product",
   "quantum_algorithm": "vqe",
+  "quantum_algorithm_factory": null,
   "variational_ansatz": "hea",
   "uccsd_trotter_steps": null,
   "pauli_support_max_terms": null,
@@ -89,6 +123,12 @@
   },
   "qpe_demo_track_after_variational": false,
   "qpe_pipeline_integration": false,
+  "qpe_demo_track_n_bits": 4,
+  "vqs_track_after_variational": false,
+  "vqs_pipeline_integration": false,
+  "vqs_mode": "mclachlan_real_time",
+  "vqs_n_times": 6,
+  "vqs_dt": 0.05,
   "record_pauli_measurement_histograms": false,
   "computable_abstract": {
     "schema": "qchem_computable_abstract_v2",
@@ -178,8 +218,15 @@
       "id": "ucc_chem_ansatz",
       "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — ADAPT / IQEB / UCC",
       "inquanto_surface": "UCC / chemically aware pools",
-      "qchem_stack": "HEA + ADAPT + IQEB + optional JW-only UCCSD variational (quantum.variational_ansatz=uccsd; UCCSDVQE / UCCSDTrotterVQE reject BK/SCBK — use JW for UCCSD circuit; dense cluster exponentials: configs/example_h2_uccsd.yaml; first-order Trotter layers: quantum.uccsd_trotter_steps + configs/example_h2_uccsd_trotter.yaml) + integrations/ucc_reference + quantum/ansatz_registry.py; VQE+HEA on BK/SCBK Hamiltonians remains supported",
-      "status": "partial_jw_uccsd_and_trotter_packaged_bk_scbk_uccsd_na"
+      "qchem_stack": "HEA + ADAPT + IQEB + ``quantum.variational_ansatz=uccsd`` dense cluster ansatz (UCCSDVQE / UCCSDTrotterVQE — **Jordan–Wigner** with JW particle-sector projector, or **Bravyi–Kitaev** BK-matched exponentials without JW projector; rejects **symmetry_conserving_bravyi_kitaev** qubit truncation); JW & BK operator pools ``fermionic_uccsd*`` slices in ``operator_pool_registry_export_v1``; `configs/example_h2_uccsd.yaml`, `configs/example_h2_uccsd_trotter.yaml`, BK example `configs/example_h2_uccsd_bk.yaml` + integrations/ucc_reference; HEA+VQE stays valid on BK/SCBK Hamiltonians alone",
+      "status": "partial_jw_sector_projector_bk_dense_packaged_scbk_truncation_na"
+    },
+    {
+      "id": "adapt_iqeb_operator_pool_surface",
+      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — quantum.adapt_pool_id / iqeb_pool_id export",
+      "inquanto_surface": "Chemically motivated excitation / pool selection (vendor documentation narrative)",
+      "qchem_stack": "quantum.operator_pool_registry (JW spin-UCCSD + singles/doubles slices; BK-mapped pools ``fermionic_uccsd_bravyi_kitaev`` + BK singles/doubles/concat; iqeb qubit-excitation pool; toy_pair_xx; aliases `qubit_excitation`→`iqeb_qubit_excitation`, `uccsd_jw`→`fermionic_uccsd`, `uccsd_bravyi_kitaev`/`uccsd_bk`→`fermionic_uccsd_bravyi_kitaev` via `operator_pool_registry_export_v1.pool_id_aliases`); YAML quantum.adapt_pool_id / quantum.iqeb_pool_id; run_summary echoes pool ids when adapt/iqeb runs; operator_pool_registry_export_v1 in algorithm_registry_alignment_v1 parity export block",
+      "status": "executable_pools_partial_vs_vendor_full_excitation_taxonomy"
     },
     {
       "id": "dmet_scf_loop",
@@ -197,9 +244,9 @@
     },
     {
       "id": "integrations_closure_layer",
-      "parity_matrix_anchor": "docs/架构_InQuanto闭源能力闭合与可复现边界.md; open_gap_closure_reference",
+      "parity_matrix_anchor": "docs/工程记忆_Quantinuum对标与数据流技术文档.md §0; open_gap_closure_reference",
       "inquanto_surface": "Product defaults (TKET boxes, UCC regrouping, DMET, Nexus, Qermit, TN)",
-      "qchem_stack": "Package qchem_stack.integrations — see docs/架构_InQuanto闭源能力闭合与可复现边界.md (L1 not L0)",
+      "qchem_stack": "Package qchem_stack.integrations — see docs/工程记忆_Quantinuum对标与数据流技术文档.md §0 (L1 not L0)",
       "status": "reference_v1"
     },
     {
@@ -247,6 +294,7 @@
   ],
   "embedding": {
     "mode": "none",
+    "embedding_input_representation": "mo",
     "n_scf_cycles_embedding": null,
     "classical_reference_method": null,
     "projection_low_level": "HF",
@@ -280,6 +328,7 @@
     "oniom_layers_v1": []
   },
   "embedding_mode": "none",
+  "embedding_input_representation": "mo",
   "parity_integrations_dmet_stub_one_shot_ledger": true,
   "chemistry_extended": {
     "solvent_model": "none",
@@ -291,8 +340,24 @@
       1
     ],
     "pbc_active_space_kpoint_index": 0,
-    "casscf_orbital_optimization_audit": false
+    "casscf_orbital_optimization_audit": false,
+    "casscf_orbital_optimization_for_integrals": false,
+    "classical_benchmark_enabled": false,
+    "classical_benchmark_backend": "auto",
+    "rdm_correction_method": "none",
+    "avas_ao_labels": [],
+    "avas_threshold": 0.2,
+    "avas_minao": "minao",
+    "avas_with_iao": false,
+    "avas_openshell_option": 2,
+    "avas_canonicalize": true,
+    "avas_ncore": 0,
+    "pyscf_symmetry": false,
+    "mo_coeff_transform_hook": "",
+    "mo_coeff_transform_kwargs": {}
   },
+  "classical_benchmark_enabled": false,
+  "rdm_correction_method": "none",
   "nexus_analog": {
     "enabled": false,
     "project_label": "default",
@@ -319,7 +384,10 @@
     "schema": "methods_resource_preview_v1",
     "qpe_pipeline_integration": false,
     "qpe_demo_track_after_variational": false,
+    "qpe_demo_track_n_bits": 4,
     "use_pauli_protocol": true,
-    "parity_integrations_tket_first_circuit_stats": true
+    "parity_integrations_tket_first_circuit_stats": true,
+    "vqs_track_after_variational": false,
+    "vqs_pipeline_integration": false
   }
 }

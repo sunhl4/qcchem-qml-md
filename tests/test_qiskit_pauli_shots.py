@@ -4,6 +4,7 @@ import numpy as np
 import pytest
 from openfermion.ops import QubitOperator
 
+from qchem_stack.backends.factory import executor_from_spec
 from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.qiskit_pauli_shots import (
     _bit_reverse_n,
@@ -12,7 +13,6 @@ from qchem_stack.backends.qiskit_pauli_shots import (
 )
 from qchem_stack.backends.spec import BackendSpec
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
-from qchem_stack.backends.factory import executor_from_spec
 
 
 def test_bit_reverse_roundtrip() -> None:

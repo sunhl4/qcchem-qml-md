@@ -10,7 +10,12 @@ Mirrors **Chemical Specification** in the InQuanto hub: molecular / periodic sys
 
 ## Related pages
 
+- Active space, frozen orbitals & AVAS — **Chinese long-form** in repo [`docs/活性空间指定与AVAS_理论实践与开源对照.md`](../../../../docs/活性空间指定与AVAS_理论实践与开源对照.md)
 - [DMET · parity_snapshot](/en/reference/dmet-parity-snapshot)
+- [Unified backend adapter I/O contract](/en/guide/chemistry-and-embedding/backend-adapter-unified-io)
+- [Backend adapter quickstart (template + check)](/en/guide/chemistry-and-embedding/backend-adapter-quickstart)
+- [InQuanto-PySCF analog (quantum problem / AO / symmetry)](/en/guide/chemistry-and-embedding/inquanto-pyscf-problem-analog)
+- [Second quantization cheat sheet (Fock + fermionic Hamiltonian)](/en/guide/chemistry-and-embedding/second-quantization-fock-hamiltonian-readout)
 - [Architecture boundaries](/en/concept/architecture-boundaries)
 - [Public parity matrix §3](/en/parity/public-matrix)
 

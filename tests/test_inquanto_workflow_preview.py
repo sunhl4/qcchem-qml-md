@@ -139,6 +139,15 @@ def _semantic_graph_fingerprint(g: dict) -> dict:
     }
     if g.get("declarative_edge_overrides"):
         out["declarative_edge_overrides"] = True
+    ve = g.get("variational_execution")
+    if isinstance(ve, dict):
+        snap = {
+            k: ve[k]
+            for k in ("schema", "algorithm_factory", "algorithm_label", "dag_note")
+            if k in ve
+        }
+        if snap:
+            out["variational_execution"] = snap
     return out
 
 
@@ -241,6 +250,29 @@ def test_computable_graph_v2_unknown_name_uses_sequential() -> None:
     ]
     g = computable_graph_v2(refs)
     assert g["edges"] == [{"from": "computable_0", "to": "computable_1", "kind": "sequential"}]
+
+
+def test_workflow_preview_and_graph_mark_yaml_plugin_factory() -> None:
+    fac = "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
+    cfg = ExperimentConfig(
+        experiment_id="plugin_wf",
+        random_seed=0,
+        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        quantum=QuantumSpec(
+            algorithm="echo_label",
+            algorithm_factory=fac,
+            use_pauli_protocol=False,
+            vqe_depth=1,
+        ),
+    )
+    refs = list_computables_for_config(cfg)
+    assert refs[0].details.get("variational_dispatch") == "yaml_algorithm_factory_v1"
+    assert refs[0].details.get("algorithm_factory") == fac
+    p = workflow_preview_payload(cfg)
+    assert p.get("variational_execution", {}).get("schema") == "variational_yaml_plugin_dispatch_v1"
+    cg = p["computable_graph"]
+    assert cg.get("variational_execution", {}).get("algorithm_factory") == fac
 
 
 def test_computable_graph_single_node_no_edges() -> None:

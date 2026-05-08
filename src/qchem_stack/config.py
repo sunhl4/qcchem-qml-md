@@ -4,33 +4,255 @@ from pathlib import Path
 from typing import Any, Literal
 
 import yaml
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import AliasChoices, BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from qchem_stack.exceptions import ConfigurationError
 
+# CODATA-compatible: Bohr radius in ångströms (chemistry YAML often uses Å).
+_BOHR_RADIUS_IN_ANGSTROM = 0.529177210903
+ANGSTROM_TO_BOHR = 1.0 / _BOHR_RADIUS_IN_ANGSTROM
+
 
 class MoleculeSpec(BaseModel):
+    model_config = ConfigDict(populate_by_name=True)
+
     symbols: list[str]
-    coordinates_bohr: list[list[float]]
+    coordinates: list[list[float]] | None = Field(
+        default=None,
+        validation_alias=AliasChoices("coordinates", "coordinates_bohr"),
+        description=(
+            "Atomic Cartesian coordinates in ``coordinate_unit``. "
+            "YAML may use legacy key ``coordinates_bohr`` (values interpreted as Bohr unless "
+            "``coordinate_unit`` is set explicitly)."
+        ),
+    )
+    zmatrix: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("zmatrix", "z_matrix"),
+        description=(
+            "Optional Z-matrix molecular geometry text. When provided (and ``coordinates`` is omitted), "
+            "it is converted to Cartesian Bohr coordinates internally."
+        ),
+    )
+    coordinate_unit: Literal["angstrom", "bohr"] = Field(
+        default="angstrom",
+        description=(
+            "Length unit for ``coordinates``. Defaults to **ångström** for the canonical ``coordinates`` key; "
+            "if the legacy alias ``coordinates_bohr`` is used and this field is omitted, it defaults to **bohr**."
+        ),
+    )
     charge: int = 0
     multiplicity: int = 1
     basis: str = "sto-3g"
+    ecp: str | dict[str, str] | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _legacy_coordinates_bohr_unit(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        out = dict(data)
+        if "coordinates_bohr" in out and "coordinate_unit" not in out:
+            out["coordinate_unit"] = "bohr"
+        return out
+
+    @model_validator(mode="after")
+    def _validate_geometry_source(self) -> MoleculeSpec:
+        if self.coordinates is None and not (self.zmatrix and self.zmatrix.strip()):
+            raise ValueError("molecule requires either coordinates/coordinates_bohr or a non-empty zmatrix.")
+        if self.coordinates is not None and self.zmatrix:
+            raise ValueError("molecule.coordinates and molecule.zmatrix are mutually exclusive.")
+        return self
+
+    def coordinates_in_bohr(self):
+        """Positions as a float ndarray in Bohr (PySCF ``gto.M`` internal convention)."""
+        import numpy as np
+
+        if self.coordinates is not None:
+            arr = np.asarray(self.coordinates, dtype=float)
+            if self.coordinate_unit == "angstrom":
+                return arr * ANGSTROM_TO_BOHR
+            return arr.copy()
+        try:
+            from pyscf import gto
+        except ImportError as exc:
+            raise ConfigurationError(
+                "molecule.zmatrix requires PySCF to convert internal coordinates to Cartesian Bohr."
+            ) from exc
+        mol = gto.M(
+            atom=str(self.zmatrix),
+            basis=str(self.basis),
+            charge=int(self.charge),
+            spin=int(self.multiplicity) - 1,
+            unit="Angstrom",
+            ecp=self.ecp,
+            verbose=0,
+        )
+        return np.asarray(mol.atom_coords(unit="Bohr"), dtype=float)
 
 
 class SCFSpec(BaseModel):
-    driver: Literal["pyscf"] = "pyscf"
+    """Classical Hartree–Fock driver selection (Hamiltonian build path is PySCF-first today)."""
+
+    driver: Literal["pyscf", "psi4"] = "pyscf"
     method: Literal["RHF", "ROHF", "UHF"] = "RHF"
+    max_cycle: int | None = Field(
+        default=None,
+        ge=1,
+        le=512,
+        description="Optional PySCF ``mf.max_cycle`` override (open-shell / transition-metal SCF).",
+    )
+    chkfile: str | None = Field(
+        default=None,
+        description="Optional PySCF checkpoint path (``mf.chkfile``).",
+    )
+    init_guess: str | None = Field(
+        default=None,
+        description=(
+            "Optional PySCF ``mf.init_guess`` token (e.g. ``minao``, ``atom``, ``huckel``, ``chkfile``)."
+        ),
+    )
+    level_shift: float | None = Field(
+        default=None,
+        description="Optional mean-field ``level_shift`` when supported by PySCF SCF objects.",
+    )
+    use_newton: bool = Field(
+        default=False,
+        description="If True and method is RHF/ROHF, use ``scf.RHF(...).newton()`` pipeline when available.",
+    )
+    diis_space_dimension: int | None = Field(
+        default=None,
+        ge=2,
+        description="Optional ``mf.diis_space`` dimension override (PySCF-dependent).",
+    )
+    density_fit: bool = Field(
+        default=False,
+        description="Enable density-fitting / RI SCF when supported by the selected backend.",
+    )
+    density_fit_auxbasis: str | None = Field(
+        default=None,
+        description="Optional auxiliary basis for density-fitting (PySCF ``mf.density_fit(auxbasis=...)``).",
+    )
+
+    @model_validator(mode="after")
+    def _density_fit_auxbasis_consistency(self) -> SCFSpec:
+        if self.density_fit_auxbasis and not self.density_fit:
+            raise ValueError("scf.density_fit_auxbasis requires scf.density_fit=true.")
+        return self
 
 
 class ActiveSpaceSpec(BaseModel):
-    n_active_orbitals: int
-    n_active_electrons: int
+    strategy: Literal["manual", "cas", "avas_stub", "avas"] = "cas"
+    """
+    Active-space entry mode:
+
+    - ``cas``: canonical CAS notation via ``ncas/nelecas`` (or legacy ``n_active_*`` aliases).
+    - ``manual``: explicit active-space sizes plus optional ``frozen_orbitals`` bookkeeping.
+    - ``avas_stub``: **hook-only** — same **CAS** sizing as ``cas`` (``ncas`` / ``nelecas``); no AO threshold projection.
+      Honesty metadata is written by
+      :func:`~qchem_stack.chem.active_space.mean_field_meta.apply_active_space_strategy_to_mean_field_meta`
+      (e.g. ``avas_partial_stub``, ``avas_atomic_projection_executed``, ``avas_stub_semantics``).
+      Does **not** build InQuanto/PySCF-style ``frozen=avas.frozenf`` from atomic valence weights.
+    - ``avas``: **PySCF path** — run :class:`pyscf.mcscf.avas.AVAS` threshold projection using
+      ``chemistry_extended.avas_ao_labels`` and related AVAS knobs, rotate ``mf.mo_coeff``, then
+      patch YAML-sized ``ncas`` / ``nelecas`` via ``driver_meta.qchem_active_space_resolution_v1``
+      inside the pipeline (repro parity with AVAS-derived active dimensions).
+    """
+    n_active_orbitals: int | None = None
+    n_active_electrons: int | None = None
+    ncas: int | None = None
+    nelecas: int | None = None
+    frozen_orbitals: list[int] = Field(default_factory=list)
     fermion_qubit_mapping: Literal[
         "jordan_wigner",
         "bravyi_kitaev",
         "symmetry_conserving_bravyi_kitaev",
     ] = "jordan_wigner"
     """OpenFermion transform from :class:`openfermion.InteractionOperator` to :class:`openfermion.QubitOperator`."""
+    prefer_restricted_spatial_fermion_for_jordan_wigner: bool = Field(
+        default=False,
+        description=(
+            "Jordan–Wigner only: build :class:`openfermion.FermionOperator` from spatial MO integrals then JW, "
+            "avoiding a dense (2×ncas)⁴ spin ERI tensor for that mapping step (see "
+            ":func:`~qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`)."
+        ),
+    )
+    jordan_wigner_coeff_atol: float | None = Field(
+        default=None,
+        description=(
+            "Optional positive cutoff on the InteractionOperator JW path (skip negligible coefficient shells). "
+            "Must be omitted when prefer_restricted_spatial_fermion_for_jordan_wigner is True."
+        ),
+    )
+
+    @field_validator("frozen_orbitals")
+    @classmethod
+    def _validate_frozen_orbitals(cls, v: list[int]) -> list[int]:
+        if any(i < 0 for i in v):
+            raise ValueError("active_space.frozen_orbitals entries must be >= 0.")
+        if len(set(v)) != len(v):
+            raise ValueError("active_space.frozen_orbitals must not contain duplicates.")
+        return list(v)
+
+    @model_validator(mode="after")
+    def _normalize_active_space_entry(self) -> ActiveSpaceSpec:
+        if self.strategy in ("cas", "avas_stub", "avas"):
+            if self.ncas is not None and self.n_active_orbitals is not None and int(self.ncas) != int(
+                self.n_active_orbitals
+            ):
+                raise ValueError("active_space.ncas and n_active_orbitals disagree for strategy='cas'.")
+            if self.nelecas is not None and self.n_active_electrons is not None and int(self.nelecas) != int(
+                self.n_active_electrons
+            ):
+                raise ValueError("active_space.nelecas and n_active_electrons disagree for strategy='cas'.")
+            ncas = self.ncas if self.ncas is not None else self.n_active_orbitals
+            nelecas = self.nelecas if self.nelecas is not None else self.n_active_electrons
+            if ncas is None or nelecas is None:
+                raise ValueError(
+                    "active_space.strategy in {'cas','avas_stub','avas'} requires ncas/nelecas "
+                    "(or legacy n_active_orbitals/n_active_electrons)."
+                )
+            if int(ncas) < 1 or int(nelecas) < 1:
+                raise ValueError("active_space ncas/nelecas must both be >= 1.")
+            self.ncas = int(ncas)
+            self.nelecas = int(nelecas)
+            self.n_active_orbitals = int(ncas)
+            self.n_active_electrons = int(nelecas)
+            return self
+
+        # manual strategy
+        if self.n_active_orbitals is None or self.n_active_electrons is None:
+            raise ValueError(
+                "active_space.strategy='manual' requires n_active_orbitals and n_active_electrons."
+            )
+        if int(self.n_active_orbitals) < 1 or int(self.n_active_electrons) < 1:
+            raise ValueError("active_space n_active_orbitals/n_active_electrons must both be >= 1.")
+        if self.ncas is not None and int(self.ncas) != int(self.n_active_orbitals):
+            raise ValueError("active_space.ncas must equal n_active_orbitals when strategy='manual'.")
+        if self.nelecas is not None and int(self.nelecas) != int(self.n_active_electrons):
+            raise ValueError("active_space.nelecas must equal n_active_electrons when strategy='manual'.")
+        self.n_active_orbitals = int(self.n_active_orbitals)
+        self.n_active_electrons = int(self.n_active_electrons)
+        self.ncas = int(self.n_active_orbitals)
+        self.nelecas = int(self.n_active_electrons)
+        return self
+
+    @model_validator(mode="after")
+    def _jw_optimizer_flags_consistent(self) -> ActiveSpaceSpec:
+        if self.prefer_restricted_spatial_fermion_for_jordan_wigner:
+            if self.fermion_qubit_mapping != "jordan_wigner":
+                raise ValueError(
+                    "active_space.prefer_restricted_spatial_fermion_for_jordan_wigner requires "
+                    "active_space.fermion_qubit_mapping='jordan_wigner'."
+                )
+            if self.jordan_wigner_coeff_atol is not None:
+                raise ValueError(
+                    "active_space.jordan_wigner_coeff_atol cannot be set when "
+                    "prefer_restricted_spatial_fermion_for_jordan_wigner is True."
+                )
+        if self.jordan_wigner_coeff_atol is not None and float(self.jordan_wigner_coeff_atol) <= 0:
+            raise ValueError("active_space.jordan_wigner_coeff_atol must be positive when set.")
+        return self
 
 
 class BackendSpecConfig(BaseModel):
@@ -73,6 +295,15 @@ class MitigationSpec(BaseModel):
     Literature-facing placeholder for PEC / quasi-probability narratives — **not** Qermit MitRes and not a
     calibrated error cancellation executor.
     """
+    classical_shadows_stub_enabled: bool = False
+    """
+    Insert a ``classical_shadows_expectation_stub`` DAG node + runtime trace (identity on scalar energy).
+
+    Open-stack analog to randomized-measurement narratives in toolboxes such as Tangelo — **no** device
+    shadows sampling is performed here.
+    """
+    classical_shadows_budget_pairs: int = Field(default=256, ge=1, le=10_000_000)
+    """Opaque hint integer for Methods export only (not consumed by numeric kernels in this stub)."""
 
 
 class CompilerSpec(BaseModel):
@@ -101,11 +332,85 @@ class ChemistryExtendedSpec(BaseModel):
     """Which k-point in ``KRHF`` MO list to use for CASCI / active-space integrals (Γ is usually index ``0`` in PySCF ordering)."""
     casscf_orbital_optimization_audit: bool = False
     """
-    Molecular RHF branch only: run PySCF :class:`pyscf.mcscf.CASSCF` for the configured active-space
-    electron/orbital counts and record ``casscf_orbital_audit_v1`` in ``rhf.driver_meta`` (surfaced in
-    ``hamiltonian_meta.pyscf_driver``). The variational Hamiltonian still uses the existing CASCI integral
-    path unless a future change feeds CASSCF-optimized orbitals into ``active_space_integrals``.
+    Molecular RHF branch only: run PySCF :class:`pyscf.mcscf.CASSCF` for the resolved active-space
+    electron/orbital counts (after optional AVAS) and record ``casscf_orbital_audit_v1`` in ``driver_meta``
+    unless ``casscf_orbital_optimization_for_integrals`` alone is enabled (audit can be bundled with the same
+    CASSCF call when either flag is true).
     """
+
+    casscf_orbital_optimization_for_integrals: bool = False
+    """
+    When ``True`` (PySCF molecular RHF), rotate ``mf.mo_coeff`` using the optimized CASSCF orbitals **before**
+    CASCI-style active extracts used for ``CanonicalActiveSpaceIntegralPack`` / JW Hamiltonians.
+    Pairs naturally after ``active_space.strategy=avas`` while still respecting solver capability gates.
+
+    Implemented as a shared single ``CASSCF`` kernel with ``casscf_orbital_optimization_audit`` so enabling
+    both does **not** run CASSCF twice.
+    """
+    classical_benchmark_enabled: bool = False
+    """
+    When ``True``, pipeline attaches ``classical_benchmarks`` via
+    :func:`qchem_stack.chem.classical_benchmarks.run_classical_post_hf_benchmarks`
+    (HF/MP2/CCSD/CASCI status blocks; schema ``qchem_classical_post_hf_benchmarks_v1``).
+    """
+    classical_benchmark_backend: Literal["auto", "stub", "pyscf", "psi4"] = "auto"
+    """
+    Which chemistry backend executes post-HF benchmarks.
+
+    ``auto``: use PySCF benchmarks when the mean-field reference reports ``upstream_classical_software_tag=pyscf``;
+    otherwise attach a stub payload. ``pyscf`` / ``psi4`` force that registry path (``psi4`` is placeholder-only today).
+    """
+    rdm_correction_method: Literal["none", "stub_nevpt2", "stub_ac0", "pyscf_nevpt2_casci"] = "none"
+    """
+    Optional post-SCF RDM correction hook (Phase C / Phase 3).
+    ``stub_*``: machine-readable reports only (zero numerical correction).
+    ``pyscf_nevpt2_casci``: PySCF ``mrpt.NEVPT`` on a CASCI reference (open stack — not InQuanto L0).
+    """
+    avas_ao_labels: list[str] = Field(default_factory=list)
+    """
+    Atomic-orbital label strings interpreted by PySCF :class:`~pyscf.mcscf.avas.AVAS` **when**
+    ``active_space.strategy='avas'`` (required non-empty combination — validated on :class:`ExperimentConfig`).
+
+    When non-empty **and strategy is not** ``avas``: copied to ``driver_meta["avas_ao_labels_requested"]`` and
+    ``driver_meta["avas_ao_labels_logging_only"]=true`` without changing orbitals / integrals.
+
+    Stub intent without projection remains ``strategy=avas_stub``.
+    """
+
+    avas_threshold: float = Field(default=0.2, gt=0.0, le=1.0)
+    """AVAS orbital selection threshold forwarded to PySCF."""
+    avas_minao: str = Field(default="minao", min_length=1)
+    """Reference minimal basis forwarded to AVAS."""
+    avas_with_iao: bool = False
+    avas_openshell_option: int = Field(default=2, ge=0, le=10)
+    """PySCF ``avas.AVAS`` openshell option (consult PySCF docs for semantics)."""
+    avas_canonicalize: bool = True
+    avas_ncore: int = Field(default=0, ge=0, le=512)
+    """Frozen core orbital count forwarded to AVAS."""
+    pyscf_symmetry: bool | str = False
+    """
+    Forwarded to PySCF ``gto.M(..., symmetry=...)`` on the molecular branch (non-PBC).
+
+    ``True`` enables automatic subgroup detection; a non-empty **string** selects an explicit subgroup label
+    understood by your PySCF build.
+
+    This can reduce **classical** integral / SCF cost when symmetry applies. The bridge to OpenFermion for the
+    quantum stage still materializes **dense** active-space tensors — there is **no** drop-in equivalent to
+    InQuanto ``ChemistryRestrictedIntegralOperatorCompact`` in this repository yet.
+    """
+    mo_coeff_transform_hook: str = ""
+    """
+    Optional post-SCF MO transform hook name.
+
+    Built-ins:
+    - ``reverse_mo_columns``: deterministic column reversal for smoke/tests.
+    - ``identity``: explicit no-op.
+
+    Custom hooks may be provided as ``python_module:function_name`` and must return an array with the
+    same shape as ``mf.mo_coeff``.
+    """
+    mo_coeff_transform_kwargs: dict[str, Any] = Field(default_factory=dict)
+    """Opaque kwargs passed to the selected MO transform hook."""
 
     @model_validator(mode="after")
     def _validate_pbc_cell_matrix(self) -> ChemistryExtendedSpec:
@@ -233,6 +538,11 @@ class EmbeddingSpec(BaseModel):
     """Falsifiability fields for DMET / projection workflows (chemistry pre-stage)."""
 
     mode: Literal["none", "dmet", "projection", "plugin"] = "none"
+    embedding_input_representation: Literal["mo", "ao", "lowdin_orth_ao"] = "mo"
+    """
+    Pre-embedding chemistry representation preference (Phase B):
+    ``mo`` (default), ``ao`` (SCF object wrapper), or ``lowdin_orth_ao`` (localized orthogonal AO tensors).
+    """
     n_scf_cycles_embedding: int | None = None
     """How many self-consistent embedding sweeps; ``None`` if not used."""
     classical_reference_method: str | None = None
@@ -460,14 +770,53 @@ class QuantumSpec(BaseModel):
     Fermion→qubit mapping is selected on :class:`ActiveSpaceSpec` as ``fermion_qubit_mapping``.
     """
 
-    algorithm: Literal["vqe", "adapt", "iqeb"] = "vqe"
+    algorithm: str = "vqe"
+    """Built-in id (``vqe``, ``adapt``, ``iqeb``, ``tetris_adapt``) or an arbitrary label when ``algorithm_factory`` is set."""
+    algorithm_factory: str | None = None
+    """Import path ``module.path:callable`` returning a variational runner or plugin (see variational plug-in loader)."""
     variational_ansatz: Literal["hea", "uccsd"] = "hea"
-    """``hea``: hardware-efficient layers; ``uccsd``: JW-only cluster expansion (see ``quantum/algorithms/uccsd_vqe.py``)."""
+    """``hea``: hardware-efficient layers; ``uccsd``: cluster expansion on JW or BK Hamiltonians (`uccsd_vqe`)."""
     uccsd_trotter_steps: int | None = None
     """If set (>=1) with ``variational_ansatz='uccsd'``, use first-order product-formula layers (see :class:`~qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDTrotterVQE`). ``None`` keeps exact sequential ``expm`` factors per cluster generator."""
     vqe_depth: int = 1
     vqe_maxiter: int = 200
+    vqe_optimizer_method: Literal["COBYLA", "L-BFGS-B", "Nelder-Mead"] = "COBYLA"
+    """Classical optimizer for variational loops."""
+    vqe_initial_parameters_strategy: Literal["random_uniform", "zeros"] = "random_uniform"
+    """Initialization of variational parameters before optimization."""
     adapt_max_iter: int = 5
+    adapt_pool_id: Literal[
+        "fermionic_uccsd",
+        "uccsd_jw",
+        "uccsd_bravyi_kitaev",
+        "uccsd_bk",
+        "fermionic_uccsd_bravyi_kitaev",
+        "fermionic_uccsd_singles",
+        "fermionic_uccsd_doubles_only",
+        "fermionic_uccsd_singles_bravyi_kitaev",
+        "fermionic_uccsd_doubles_bravyi_kitaev_only",
+        "fermionic_uccsd_singles_then_doubles_bk_concat",
+        "iqeb_qubit_excitation",
+        "qubit_excitation",
+        "toy_pair_xx",
+    ] = "fermionic_uccsd"
+    iqeb_pool_id: Literal[
+        "fermionic_uccsd",
+        "uccsd_jw",
+        "uccsd_bravyi_kitaev",
+        "uccsd_bk",
+        "fermionic_uccsd_bravyi_kitaev",
+        "fermionic_uccsd_singles",
+        "fermionic_uccsd_doubles_only",
+        "fermionic_uccsd_singles_bravyi_kitaev",
+        "fermionic_uccsd_doubles_bravyi_kitaev_only",
+        "fermionic_uccsd_singles_then_doubles_bk_concat",
+        "iqeb_qubit_excitation",
+        "qubit_excitation",
+        "toy_pair_xx",
+    ] = "iqeb_qubit_excitation"
+    iqeb_n_grads: int = Field(default=3, ge=1, le=16)
+    iqeb_energy_tolerance: float = 1.0e-8
     iqeb_max_rounds: int = Field(default=2, ge=1, le=64)
     """Outer IQEB rounds (:class:`~qchem_stack.quantum.algorithms.iqeb.IQEBVQE`); ignored unless ``algorithm=='iqeb'``."""
     use_pauli_protocol: bool = True
@@ -482,6 +831,9 @@ class QuantumSpec(BaseModel):
     """If True, run :class:`~qchem_stack.quantum.algorithms.excited.VQD` after VQE/ADAPT/IQEB (same HEA depth)."""
     vqd_n_states: int = 2
     vqd_penalty_weight: float = 5.0
+    vqd_overlap_exponent: float = Field(default=1.0, ge=0.5, le=8.0)
+    """Penalty uses ``|(s|\\psi)|^{2×exponent}`` summed over pinned reference states."""
+    vqd_cobyla_maxiter: int = Field(default=150, ge=1, le=10_000)
     vqd_shots_objective: int = 0
     """Grouped Pauli shot budget per excited level for ``three_protocol.objective`` (0 = exact only)."""
     vqd_shots_overlap: int = 0
@@ -504,13 +856,42 @@ class QuantumSpec(BaseModel):
     sceom_subspace_dim: int = 4
     sceom_shots_per_matrix_element: int = 0
     """If > 0, symmetric Gaussian noise on real :math:`M` (placeholder shot model)."""
+    sceom_generator_strategy: Literal["legacy", "fermionic_singles_mapped", "pauli_xy_extended"] = "legacy"
+    """Excitation generators for SCEOM nested commutators (beyond default toy Paulis)."""
     qpe_demo_track_after_variational: bool = False
     """If True, attach :mod:`qpe_qec_demo` dense Kitaev + Bayesian toy block to pipeline output (no extra deps)."""
     qpe_pipeline_integration: bool = False
     """If True, same as enabling the QPE demo track (alias for dual-track YAML that avoids the longer flag name)."""
+    qpe_demo_track_n_bits: int = Field(default=4, ge=2, le=32)
+    """QPE demo sidecar: dense Kitaev / energy estimate register width (see ``qpe_demo_track_payload``)."""
+    qpe_three_pack_after_variational: bool = False
+    """If True, attach dense ``deterministic`` / ``kitaev`` / ``info_theory`` :mod:`qchem_stack.quantum.algorithms.qpe` reports."""
+    qpe_three_pack_time: float = Field(default=1.0, gt=0.0, le=1_000_000.0)
+    qpe_three_pack_deterministic_rounds: int = Field(default=4, ge=1, le=64)
+    qpe_three_pack_kitaev_bits: int = Field(default=6, ge=2, le=32)
+    qpe_three_pack_info_samples: int = Field(default=32, ge=1, le=65536)
+    vqs_track_after_variational: bool = False
+    """If True, run the open-stack VQS/McLachlan toy ODE track using variational angles (``quantum/algorithms/vqs.py``)."""
+    vqs_pipeline_integration: bool = False
+    """Alias for ``vqs_track_after_variational`` (ergonomic parity YAML, same semantics as QPE dual-track flags)."""
+    vqs_mode: Literal["vqs", "mclachlan_real_time", "mclachlan_imag_time"] = "mclachlan_real_time"
+    """Which ``vqs`` runner to use on the pipeline track (see :mod:`qchem_stack.quantum.algorithms.vqs_pipeline_track`)."""
+    vqs_n_times: int = Field(default=6, ge=2, le=513)
+    """Number of ODE time samples (uniform spacing ``vqs_dt``)."""
+    vqs_dt: float = Field(default=0.05, gt=0.0, le=10.0)
+    """Spacing between consecutive time samples (seconds are a nominal unit; toy dynamics only)."""
+    vqs_rhs_mode: Literal["linear_damping", "hea_mclachlan_tdvp"] = "linear_damping"
+    """RHS for McLachlan/VQS tracks (`linear_damping` toy flow vs finite-difference HEA TDVP tangent solve)."""
+    vqs_tangent_fd_epsilon: float = Field(default=5e-5, gt=0.0, le=1.0)
 
     def qpe_demo_track_requested(self) -> bool:
         return bool(self.qpe_demo_track_after_variational or self.qpe_pipeline_integration)
+
+    def qpe_three_pack_requested(self) -> bool:
+        return bool(self.qpe_three_pack_after_variational)
+
+    def vqs_track_requested(self) -> bool:
+        return bool(self.vqs_track_after_variational or self.vqs_pipeline_integration)
     pauli_support_max_terms: int | None = None
     """If set, cap ``protocol_counts['hamiltonian_pauli_strings']`` length; full count in ``n_hamiltonian_pauli_terms_full``."""
     tensornet_expectation_stub: bool = False
@@ -523,6 +904,37 @@ class QuantumSpec(BaseModel):
     """Append DAG edges for workflow preview / UX (open stack; does not change execution order)."""
     computable_remove_edges: list[ComputableGraphEdgeRemove] = Field(default_factory=list)
     """Drop matching auto/semantic edges (e.g. break default excited→Pauli dependency for custom layouts)."""
+
+    @field_validator("algorithm")
+    @classmethod
+    def _strip_algorithm(cls, v: str) -> str:
+        s = str(v).strip()
+        if not s:
+            raise ValueError("quantum.algorithm must be a non-empty string")
+        return s
+
+    @field_validator("algorithm_factory")
+    @classmethod
+    def _normalize_algorithm_factory(cls, v: str | None) -> str | None:
+        if v is None:
+            return None
+        s = str(v).strip()
+        return s if s else None
+
+    @model_validator(mode="after")
+    def _algorithm_registered_or_factory(self) -> QuantumSpec:
+        from qchem_stack.quantum.variational_plugins.loader import validate_factory_import_path
+        from qchem_stack.quantum.variational_plugins.registry import is_registered_variational_id
+
+        if self.algorithm_factory:
+            validate_factory_import_path(self.algorithm_factory)
+            return self
+        if not is_registered_variational_id(self.algorithm):
+            raise ValueError(
+                f"Unknown quantum.algorithm={self.algorithm!r}. "
+                "Use a built-in id or set quantum.algorithm_factory to an import path."
+            )
+        return self
 
     @model_validator(mode="after")
     def _pauli_shot_mode_mutually_exclusive(self) -> QuantumSpec:
@@ -620,15 +1032,37 @@ class ExperimentConfig(BaseModel):
         return self
 
     @model_validator(mode="after")
+    def _avas_strategy_requires_pyscf_labels(self) -> ExperimentConfig:
+        if self.active_space.strategy != "avas":
+            return self
+        if str(self.scf.driver).strip().lower() != "pyscf":
+            raise ValueError(
+                "active_space.strategy='avas' requires a backend that implements PySCF-style AVAS "
+                "in this milestone: set scf.driver='pyscf' (or register another adapter whose "
+                "SolverCapabilities.supports_avas_active_space_projection is True and wires the same hook). "
+                f"Got scf.driver={self.scf.driver!r}."
+            )
+        if not self.chemistry_extended.avas_ao_labels:
+            raise ValueError(
+                "active_space.strategy='avas' requires non-empty chemistry_extended.avas_ao_labels "
+                "(PySCF AVAS orbital projection inputs)."
+            )
+        return self
+
+    @model_validator(mode="after")
     def _uccsd_variational_constraints(self) -> ExperimentConfig:
         q = self.quantum
         if q.variational_ansatz != "uccsd":
             return self
-        if q.algorithm != "vqe":
-            raise ValueError("quantum.variational_ansatz='uccsd' requires quantum.algorithm='vqe'.")
-        if self.active_space.fermion_qubit_mapping != "jordan_wigner":
+        if q.algorithm != "vqe" and not q.algorithm_factory:
             raise ValueError(
-                "quantum.variational_ansatz='uccsd' requires active_space.fermion_qubit_mapping='jordan_wigner'."
+                "quantum.variational_ansatz='uccsd' requires quantum.algorithm='vqe' "
+                "or an explicit quantum.algorithm_factory (plug-in must honor UCCSD semantics)."
+            )
+        if self.active_space.fermion_qubit_mapping not in {"jordan_wigner", "bravyi_kitaev"}:
+            raise ValueError(
+                "quantum.variational_ansatz='uccsd' requires active_space.fermion_qubit_mapping in "
+                "{'jordan_wigner', 'bravyi_kitaev'} (square encodings; symmetry_conserving_bravyi_kitaev is unsupported)."
             )
         if q.use_pauli_protocol:
             raise ValueError(
@@ -654,8 +1088,18 @@ def load_experiment_config(path: str | Path) -> ExperimentConfig:
     return ExperimentConfig.from_yaml_dict(raw)
 
 
+def _strip_callables(obj: object) -> object:
+    """YAML repro dump must not embed runtime callables (e.g. IonStack ``expectation_fn`` tests)."""
+    if isinstance(obj, dict):
+        return {str(k): _strip_callables(v) for k, v in obj.items() if not callable(v)}
+    if isinstance(obj, (list, tuple)):
+        return type(obj)(_strip_callables(v) for v in obj if not callable(v))
+    return obj
+
+
 def dump_experiment_config(cfg: ExperimentConfig) -> str:
-    return yaml.safe_dump(cfg.model_dump(mode="json"), sort_keys=False, allow_unicode=True)
+    raw = _strip_callables(cfg.model_dump(mode="python"))
+    return yaml.safe_dump(raw, sort_keys=False, allow_unicode=True)
 
 
 def backend_spec_from_config(cfg: ExperimentConfig):
