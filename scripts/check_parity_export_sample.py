@@ -47,6 +47,7 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_h2_qpe_track_parity_integrations.yaml",
     "configs/example_h2_casscf_audit.yaml",
     "configs/example_h2_embedding_parity.yaml",
+    "configs/example_h2_md_ml_trajectory_hf.yaml",
 )
 
 

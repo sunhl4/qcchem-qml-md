@@ -1,0 +1,55 @@
+# Primary pipeline + one nested full_pipeline geometry (expensive; tests marked slow).
+schema_version: "1"
+experiment_id: "h2_md_ml_traj_fp"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  qiskit_mode: "statevector"
+  ionstack_endpoint: null
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 60
+  use_pauli_protocol: false
+
+md_ml_export:
+  attach_single_frame_to_repro: true
+  energy_reference: variational
+  include_hf_nuclear_gradient: false
+  trajectory_theory_level: full_pipeline
+  extra_coordinates_bohr:
+    - [[0.0, 0.0, 0.0], [0.0, 0.0, 1.55]]

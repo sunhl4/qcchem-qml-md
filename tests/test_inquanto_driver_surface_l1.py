@@ -2,12 +2,21 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 from qchem_stack.chem.inquanto_driver_surface import (
     INQUANTO_DRIVER_ALIAS_TO_CONFIG,
     PYSCF_MIN_VERSION_RECOMMENDED,
     SUPPORTED_SOLVENT_MODELS,
 )
 from qchem_stack.integrations.open_driver_surface import open_driver_coverage_matrix
+
+_ROOT = Path(__file__).resolve().parents[1]
+
+
+def test_parity_matrix_section3_mentions_driver_surface_module() -> None:
+    text = (_ROOT / "docs" / "inquanto_public_parity_matrix.md").read_text(encoding="utf-8")
+    assert "inquanto_driver_surface" in text
 
 
 def test_inquanto_alias_map_covers_documented_rows() -> None:

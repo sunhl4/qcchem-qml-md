@@ -39,6 +39,7 @@
 ## 3. 与量子 `repro` 的衔接（约定）
 
 - 从同一次实验写入 `QMFrame.repro_config_sha256_prefix` 时，应与 `repro.config_sha256` **前缀策略**一致（见 L1 signoff 与 pipeline 元数据）。  
+- 可选：管线在 `md_ml_export.attach_single_frame_to_repro: true` 时写入 **`repro.qmef_ml_attachment_v1`**（`schema: qmef_ml_attachment_v1`），内含 `QMEFDataset` JSON（单帧或多帧轨迹）；`energy_reference` 支持 `variational` \| `scf` \| `pauli_protocol`；`extra_coordinates_bohr` + `trajectory_theory_level`（`hf_scf` \| `full_pipeline`）语义见块内 `epistemic_bound` 与 `frame_meta`（实现：`md_bridge/from_pipeline.py`）。示例：`configs/example_h2_md_ml_qmef_attach.yaml`、`example_h2_md_ml_trajectory_hf.yaml`、`example_h2_md_ml_pauli_energy.yaml`。
 - 新增顶层 `repro` 键不得 shadow MD 侧字段名；若合并 JSON-LD 式导出，使用 **命名空间前缀**（例如 `md_bridge.*`）在 ADR 中另行登记。
 
 ---
@@ -46,4 +47,4 @@
 ## 4. 回归
 
 - `pytest -m l1_md_ml`（见 [CONTRIBUTING.md](../CONTRIBUTING.md)）。  
-- 代表测：`tests/test_md_bridge.py`。
+- 代表测：`tests/test_md_bridge.py`、`tests/test_md_ml_qmef_repro_attachment.py`。

@@ -32,6 +32,8 @@
 
 未列出的门名：`circuit_ir_to_pytket` 抛 `ValueError`，需扩展桥接模块。
 
+**代码锚点（与上表逐行一致）**：实现见 [`pytket_bridge.py`](../src/qchem_stack/backends/pytket_bridge.py) `circuit_ir_to_pytket`；矩阵 §4「默认 CircuitIR / 可选 pytket」叙事以此为单一事实源。
+
 ---
 
 ## 3. 自研 `circuit_resource_row` 与 pytket 统计为何可能不同

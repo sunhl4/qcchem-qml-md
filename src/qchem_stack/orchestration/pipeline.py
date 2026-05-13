@@ -948,6 +948,24 @@ def _resource_summary_excited_only(n_qubits: int, excited_rs: dict[str, Any]) ->
     return rs
 
 
+def _maybe_attach_md_ml_qmef_dataset(
+    out: dict[str, Any],
+    cfg: ExperimentConfig,
+    rhf: PySCFRHFResult,
+    *,
+    cfg_path: Path | None = None,
+) -> None:
+    """Optional ``repro.qmef_ml_attachment_v1`` for MD→ML export (see :mod:`qchem_stack.md_bridge`)."""
+    if not cfg.md_ml_export.attach_single_frame_to_repro:
+        return
+    repro = out.get("repro")
+    if not isinstance(repro, dict):
+        return
+    from qchem_stack.md_bridge.from_pipeline import build_qmef_ml_attachment_repro_block
+
+    repro["qmef_ml_attachment_v1"] = build_qmef_ml_attachment_repro_block(cfg, out, rhf, cfg_path=cfg_path)
+
+
 def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     """Merge machine-readable stage list and resource hints into ``out['repro']`` (single JSON blob for Methods)."""
     repro = out.get("repro")
@@ -1575,6 +1593,7 @@ def run_pipeline_sync(
         _attach_nexus_mitigation_tn(out, cfg, qh)
         _attach_qpe_demo_track_if_requested(out, cfg, qh)
         _finalize_open_stack_parity_snapshot(out, cfg, None)
+        _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
         profile.mark("pauli_protocol_skipped")
         _emit("pauli_protocol_skipped")
         profile.mark("finalize_repro")
@@ -1617,6 +1636,7 @@ def run_pipeline_sync(
     _attach_nexus_mitigation_tn(out, cfg, qh)
     _attach_qpe_demo_track_if_requested(out, cfg, qh)
     _finalize_open_stack_parity_snapshot(out, cfg, proto)
+    _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
     profile.mark("pauli_protocol_done")
     _emit("pauli_protocol_done")
     profile.mark("finalize_repro")

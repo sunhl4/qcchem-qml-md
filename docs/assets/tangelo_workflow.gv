@@ -1,0 +1,33 @@
+digraph TangeloWorkflow {
+    graph [fontname="Times New Roman", fontsize=16, labelfontsize=16,
+           rankdir=LR, splines=spline, nodesep=0.55, ranksep=0.82,
+           bgcolor="white", margin=0.2, pad=0.12]
+    node [fontname="Times New Roman", fontsize=16, shape=box, style="rounded,filled", fillcolor="#f8f9fa", color="#343a40", penwidth=2]
+    edge [fontname="Times New Roman", fontsize=16, color="#495057", penwidth=2]
+
+    subgraph cluster_tangelo {
+        label = "Tangelo Problem Solving Workflow"
+        fontsize=16
+        fontname="Times New Roman"
+        style = "rounded,filled"
+        fillcolor = "#e9ecef"
+        color = "#ced4da"
+
+        mol [label="SecondQuantizedMolecule\n(Geometry, Basis, Frozen Orbitals)", fillcolor="#dbe4ff", color="#4c6ef5"]
+        solver_opts [label="Solver Options\n(Ansatz, Qubit Mapping,\n Optimizer, Target Backend)", fillcolor="#dbe4ff", color="#4c6ef5"]
+        
+        solver [label="Solver Object\n(e.g., VQESolver, ADAPTSolver)", fillcolor="#d3f9d8", color="#37b24d"]
+        
+        build [label="build()\n1. Mean-Field (PySCF)\n2. Fermionic Hamiltonian\n3. Qubit Mapping\n4. Ansatz Circuit\n5. Backend Simulator", fillcolor="#fff3bf", color="#f08c00"]
+        
+        sim [label="simulate()\nOptimization Loop", fillcolor="#fff3bf", color="#f08c00"]
+        
+        results [label="Outputs\nOptimal Energy & Params\nResources (get_resources)\nRDM (get_rdm)", fillcolor="#ffd8a8", color="#f59f00"]
+    }
+
+    mol -> solver
+    solver_opts -> solver
+    solver -> build
+    build -> sim
+    sim -> results
+}

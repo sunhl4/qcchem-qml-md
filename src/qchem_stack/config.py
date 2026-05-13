@@ -66,6 +66,13 @@ class MitigationSpec(BaseModel):
     """Opaque key-value pass-through into ``protocol_counts['pmsv_report']`` (plugin / lab metadata)."""
     spam_calibration_enabled: bool = False
     """When true, include a readout-correction stub node in ``mitigation_graph_report`` (before PMSV/ZNE)."""
+    pec_literature_stub_enabled: bool = False
+    """
+    When true, emit ``mitigation_pec_literature_stub_v1`` under ``repro.parity_snapshot`` (P2-W4).
+
+    Literature-facing placeholder for PEC / quasi-probability narratives — **not** Qermit MitRes and not a
+    calibrated error cancellation executor.
+    """
 
 
 class CompilerSpec(BaseModel):
@@ -187,6 +194,38 @@ class ParityIntegrationsSpec(BaseModel):
     """
     When ``True``, ``export_parity_criteria_table`` may emit ``resource_estimation_preview_v1``
     (P2-W1 shallow Methods/resource narrative; no cloud pricing).
+    """
+
+
+class MdMlExportSpec(BaseModel):
+    """Optional snapshot of :mod:`~qchem_stack.md_bridge` training schema onto ``repro``."""
+
+    attach_single_frame_to_repro: bool = False
+    """When ``True``, attach ``repro.qmef_ml_attachment_v1`` after the pipeline completes."""
+    energy_reference: Literal["variational", "scf", "pauli_protocol"] = "variational"
+    """
+    Primary-frame total energy in Hartree: post-VQE ``energy_after_variational``, mean-field ``scf_energy``, or
+    ``energy_pauli_protocol`` (requires ``quantum.use_pauli_protocol: true`` and a completed Pauli stage).
+    Extra trajectory frames use nested pipeline energies only when ``trajectory_theory_level: full_pipeline``;
+    HF-only extras always record mean-field ``e_tot``.
+    """
+    include_hf_nuclear_gradient: bool = False
+    """
+    Attempt PySCF analytic HF forces (:math:`-\\partial E/\\partial R`) in Hartree/Bohr for molecular clusters.
+    Ignored on periodic / PBC drivers or when gradients raise.
+    """
+    extra_coordinates_bohr: list[list[list[float]]] = Field(default_factory=list)
+    """
+    Additional nuclear geometries (each ``n_atom × 3`` Bohr, same atom order as ``molecule.symbols``).
+
+    Evaluated according to ``trajectory_theory_level`` after the primary pipeline finishes.
+    """
+    trajectory_theory_level: Literal["hf_scf", "full_pipeline"] = "hf_scf"
+    """
+    ``hf_scf``: PySCF mean-field energy (+ optional HF gradient) per extra geometry only.
+
+    ``full_pipeline``: nested :func:`~qchem_stack.orchestration.pipeline.run_pipeline_sync` per geometry
+    (QMEF attachment disabled on nested runs to avoid recursion).
     """
 
 
@@ -522,6 +561,7 @@ class ExperimentConfig(BaseModel):
     nexus_analog: NexusAnalogSpec = Field(default_factory=NexusAnalogSpec)
     nexus_cloud: NexusCloudSpec = Field(default_factory=NexusCloudSpec)
     parity_integrations: ParityIntegrationsSpec = Field(default_factory=ParityIntegrationsSpec)
+    md_ml_export: MdMlExportSpec = Field(default_factory=MdMlExportSpec)
     extra: dict[str, Any] = Field(default_factory=dict)
 
     @classmethod
@@ -542,6 +582,41 @@ class ExperimentConfig(BaseModel):
                     f"embedding.projection_fragment_atom_indices: atom index {i} out of range "
                     f"(n_atom={n_atom})."
                 )
+        return self
+
+    @model_validator(mode="after")
+    def _md_ml_extra_coordinates_shape(self) -> ExperimentConfig:
+        from qchem_stack.md_bridge.from_pipeline import MD_ML_MAX_EXTRA_GEOMETRIES
+
+        spec = self.md_ml_export
+        n_atom = len(self.molecule.symbols)
+        if len(spec.extra_coordinates_bohr) > MD_ML_MAX_EXTRA_GEOMETRIES:
+            raise ValueError(
+                f"md_ml_export.extra_coordinates_bohr: at most {MD_ML_MAX_EXTRA_GEOMETRIES} geometries "
+                f"(got {len(spec.extra_coordinates_bohr)})."
+            )
+        for ei, coords in enumerate(spec.extra_coordinates_bohr):
+            if len(coords) != n_atom:
+                raise ValueError(
+                    f"md_ml_export.extra_coordinates_bohr[{ei}]: expected {n_atom} atoms, got {len(coords)}."
+                )
+            for ai, row in enumerate(coords):
+                if len(row) != 3:
+                    raise ValueError(
+                        f"md_ml_export.extra_coordinates_bohr[{ei}][{ai}]: expected 3 Cartesian floats."
+                    )
+        return self
+
+    @model_validator(mode="after")
+    def _md_ml_pauli_energy_requires_pauli_protocol(self) -> ExperimentConfig:
+        if not self.md_ml_export.attach_single_frame_to_repro:
+            return self
+        if self.md_ml_export.energy_reference != "pauli_protocol":
+            return self
+        if not self.quantum.use_pauli_protocol:
+            raise ValueError(
+                "md_ml_export.energy_reference='pauli_protocol' requires quantum.use_pauli_protocol=true."
+            )
         return self
 
     @model_validator(mode="after")

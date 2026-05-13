@@ -23,7 +23,7 @@
 | **`compiler_pass_bundle`** | 默认 `CompilerSpec`+CircuitIR；**非**默认全链 TKET | partial + 矩阵 §4「默认 / 可选 pytket」叙事 | Y1-Q4 | 见 MAINTAINERS | 可选 `pytket`；`test_pytket_bridge.py` |
 | **`computables_rich` 入 repro** | `parity_integrations.include_computables_rich_in_repro` | partial；golden 可选 | Y2-Q1 | 见 MAINTAINERS | `test_workflow_preview_repro_alignment.py` |
 | **矩阵 §3 分解插件** | `embedding.mode: plugin` 玩具 demo 与教程互链 | partial + 文档索引 | Y1-Q4 | 见 MAINTAINERS | `example_decomposition_plugin_toy.yaml`；[case-study-h2-family](../docs-site/docs/tutorial/case-study-h2-family.md) |
-| **`l1_md_ml` / QMEFDataset** | 长板字段与 `repro` 对齐清单 | partial + CONTRIBUTING 指针 | Y2-Q1 | 见 MAINTAINERS | `md_bridge/`、`tests/test_md_bridge.py`；见 CONTRIBUTING「CI markers」 |
+| **`ninety_day_checklist`** | D1–D90 台账 vs Cursor 计划 | **模板已填满**；缓冲周见 [`P2_buffer_week_playbook.md`](P2_buffer_week_playbook.md) | Y2-Q1 | 见 MAINTAINERS | [`P2_ninety_day_execution_checklist.md`](P2_ninety_day_execution_checklist.md)；`tests/test_gap_parity_matrix_anchors.py` |
 
 **签off 规则**
 

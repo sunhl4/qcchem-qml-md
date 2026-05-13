@@ -1,0 +1,44 @@
+digraph QChemArchitecture {
+    graph [fontname="Times New Roman", fontsize=16, labelfontsize=16,
+           rankdir=TB, splines=spline, nodesep=0.45, ranksep=0.58,
+           bgcolor="white", margin=0.18, pad=0.1]
+    node [fontname="Times New Roman", fontsize=16, shape=box, style="rounded,filled", fillcolor="#f8f9fa", color="#343a40", penwidth=2]
+    edge [fontname="Times New Roman", fontsize=16, color="#495057", penwidth=2]
+
+    config [label="ExperimentConfig (Strict YAML)\nMolecule, SCF, ActiveSpace,\nQuantum, Backend, Mitigation", fillcolor="#dbe4ff", color="#4c6ef5"]
+    
+    subgraph cluster_orchestration {
+        label = "Orchestration Pipeline (run_pipeline_from_config)"
+        fontsize=16
+        fontname="Times New Roman"
+        style = "rounded,filled"
+        fillcolor = "#e9ecef"
+        color = "#ced4da"
+
+        chem [label="Chemistry Layer\nPySCF Driver -> Qubit Hamiltonian", fillcolor="#d3f9d8", color="#37b24d"]
+        emb [label="Embedding-First\nDMET / Fragment Projection", fillcolor="#d3f9d8", color="#37b24d"]
+        
+        alg [label="Algorithm Registry\nVQE, ADAPT, IQEB, UCCSD\nExcited: VQD, QSE, SCEOM", fillcolor="#fff3bf", color="#f08c00"]
+        
+        proto [label="PauliAveragingProtocol\nCommuting Groups, Compile Passes", fillcolor="#fff3bf", color="#f08c00"]
+        
+        mitig [label="Mitigation DAG\nPMSV, ZNE, SPAM, Qermit-analog", fillcolor="#ffc9c9", color="#e03131"]
+        
+        back [label="Backend Factory\nStatevector / Qiskit (Aer/Hardware) / IonStack", fillcolor="#b197fc", color="#7048e8"]
+    }
+    
+    outputs [label="Products\nStrict Repro JSON, Parity Snapshot,\nResource Rows, Computable DAG", fillcolor="#ffd8a8", color="#f59f00"]
+    jobs [label="FastAPI + SQLite Jobs\nLocal Analog / Nexus Cloud", fillcolor="#c3fae8", color="#0ca678"]
+    mlmd [label="MD/ML Bridge\nQMEFDataset -> NequIP/MACE", fillcolor="#c3fae8", color="#0ca678"]
+
+    config -> chem
+    chem -> emb
+    chem -> alg
+    emb -> alg
+    alg -> proto
+    proto -> back
+    back -> mitig
+    mitig -> outputs
+    outputs -> jobs
+    outputs -> mlmd
+}

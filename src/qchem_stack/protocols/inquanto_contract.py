@@ -363,6 +363,7 @@ REPRO_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "run_summary",
         "pipeline_profile",
         "embedding_workflow",
+        "qmef_ml_attachment_v1",
     }
 )
 

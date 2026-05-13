@@ -20,15 +20,21 @@ from pydantic import BaseModel, Field, ValidationError
 
 from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import QChemStackError
-from qchem_stack.jobs.pipeline_jobs import enqueue_full_pipeline_run
-from qchem_stack.jobs.pipeline_runner import pipeline_result_for_job_store
-from qchem_stack.jobs.store import JobStatus, SqliteJobStore
-from qchem_stack.orchestration.pipeline import run_pipeline_sync
-from qchem_stack.orchestration.run_context import RunContext
 from qchem_stack.integrations.inquanto_workflow_preview import (
     slim_product_summary_from_pipeline_result,
     workflow_preview_payload,
 )
+from qchem_stack.jobs.pipeline_jobs import enqueue_full_pipeline_run
+from qchem_stack.jobs.pipeline_runner import pipeline_result_for_job_store
+from qchem_stack.jobs.store import JobStatus, SqliteJobStore
+from qchem_stack.md_bridge.http_surface import (
+    ml_md_bridge_surface_v1,
+    qmef_validate_response_dict,
+    trainer_stub_fit_response_dict,
+    validate_qmef_dict,
+)
+from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from qchem_stack.orchestration.run_context import RunContext
 from qchem_stack.protocols.computable import computables_export_dict, list_computables_for_config
 
 app = FastAPI(
@@ -41,6 +47,10 @@ app = FastAPI(
         {
             "name": "product",
             "description": "InQuanto-public-docs-shaped UX (workflow stages, computable graph) — open analog only.",
+        },
+        {
+            "name": "ml_md",
+            "description": "QMEFDataset validation + MLIP stub hooks (training exports live client-side).",
         },
         {"name": "runs", "description": "Submit experiments and poll SQLite-backed jobs."},
     ],
@@ -77,6 +87,15 @@ class YamlPreviewBody(BaseModel):
         default=False,
         description="Optional parallel field: adds computables_rich (schema computables_rich_v1) without removing computable_abstract",
     )
+
+
+class QMEFValidateBody(BaseModel):
+    qmef: dict[str, Any] = Field(..., description="JSON object matching QMEFDataset (frames + optional provenance_yaml)")
+
+
+class QMEFTrainerStubFitBody(BaseModel):
+    qmef: dict[str, Any] = Field(..., description="Validated QMEFDataset JSON")
+    hyperparams: dict[str, Any] = Field(default_factory=dict, description="Forwarded into StubTorchMLIPTrainer.fit meta")
 
 
 def experiment_config_from_request_yaml(experiment_yaml: str) -> ExperimentConfig:
@@ -137,9 +156,11 @@ def product_analog() -> dict[str, object]:
             "Computable DAG (semantic v2): POST /v1/meta/workflow-preview.",
             "Capability one-shot: GET /v1/meta/capability-surface (gaps + public object map).",
             "Job lifecycle: POST/GET /v1/runs (optional project_slug), GET /v1/runs/{id}/summary, repro GET /v1/runs/{id}/repro (DONE only); events use persisted timeline when available.",
+            "ML / MD bridge surface: GET /v1/meta/ml-md-bridge; validate QMEFDataset JSON: POST /v1/meta/qmef-validate; in-memory MLIP stub fit: POST /v1/meta/ml-md-trainer-stub-fit.",
         ],
         "gap_export": "/v1/meta/parity-gaps",
         "capability_surface": "/v1/meta/capability-surface",
+        "ml_md_bridge": "/v1/meta/ml-md-bridge",
     }
 
 
@@ -203,6 +224,32 @@ def computables_preview(body: YamlPreviewBody) -> dict[str, object]:
         "computables": [{"name": r.name, "kind": r.kind, "details": r.details} for r in refs],
         "computable_abstract": computables_export_dict(cfg, protocol_counts=None),
     }
+
+
+@app.get("/v1/meta/ml-md-bridge", tags=["ml_md"])
+def ml_md_bridge_meta() -> dict[str, object]:
+    """QMEF / exporter / stub-trainer import paths + JSON schema hints for MD→ML workflows."""
+    return ml_md_bridge_surface_v1()
+
+
+@app.post("/v1/meta/qmef-validate", tags=["ml_md"])
+def qmef_validate(body: QMEFValidateBody) -> dict[str, object]:
+    """Validate a client-built ``QMEFDataset`` JSON blob without running QC."""
+    try:
+        ds = validate_qmef_dict(body.qmef)
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=exc.errors(include_url=False)) from exc
+    return qmef_validate_response_dict(ds)
+
+
+@app.post("/v1/meta/ml-md-trainer-stub-fit", tags=["ml_md"])
+def ml_md_trainer_stub_fit(body: QMEFTrainerStubFitBody) -> dict[str, object]:
+    """Run :class:`StubTorchMLIPTrainer` in-process; does **not** persist torch checkpoints on the server."""
+    try:
+        ds = validate_qmef_dict(body.qmef)
+    except ValidationError as exc:
+        raise HTTPException(status_code=422, detail=exc.errors(include_url=False)) from exc
+    return trainer_stub_fit_response_dict(ds, dict(body.hyperparams or {}))
 
 
 @app.get("/v1/meta/queue-stats", tags=["meta"])

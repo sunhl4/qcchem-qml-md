@@ -92,13 +92,16 @@ HTTP 异步入队常见键：
 
 | 方法 | 路径 | `schema`（响应体内或约定） |
 |------|------|----------------------------|
-| GET | `/health` | — |
-| GET | `/health/ready` | — |
+| GET | `/health` | JSON：`{"status":"ok"}` |
+| GET | `/health/ready` | JSON：`{"status":"ready","job_db_default":"<resolved_path>"}`（SQLite ping 失败 → **503**） |
 | GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`object_map` + `gaps`） |
 | GET | `/v1/meta/parity-gaps` | `inquanto_gap_export_v1` |
 | GET | `/v1/meta/product-analog` | `product_analog_v1` |
 | POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`） |
 | POST | `/v1/meta/computables-preview` | `computables_preview_v1`（内嵌 `computable_abstract` v2） |
+| GET | `/v1/meta/ml-md-bridge` | `ml_md_bridge_surface_v1`（QMEF / 导出器 / stub trainer 指针） |
+| POST | `/v1/meta/qmef-validate` | `qmef_validate_v1`（请求体 `{ "qmef": { … } }`） |
+| POST | `/v1/meta/ml-md-trainer-stub-fit` | `ml_md_trainer_stub_fit_v1`（内存 stub ``fit``；**不落盘** checkpoint） |
 | GET | `/v1/meta/queue-stats` | `queue_stats_v1` |
 | GET | `/v1/runs` | `job_list_v1`（含 `limit`/`offset` 回显） |
 | POST | `/v1/runs` | 同步：`full_pipeline_job_result_v1`；异步 **202**：`run_enqueue_response_v1` |

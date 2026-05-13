@@ -38,6 +38,9 @@ keywords:
 | GET | `/v1/runs/{id}/status` | 轻量状态查询 |
 | GET | `/v1/runs/{id}/summary` | 产品侧摘要视图 |
 | GET | `/v1/runs/{id}/repro` | DONE 后拉取 repro |
+| GET | `/v1/meta/ml-md-bridge` | QMEF / MLIP stub 能力面（JSON） |
+| POST | `/v1/meta/qmef-validate` | 校验 `QMEFDataset` JSON |
+| POST | `/v1/meta/ml-md-trainer-stub-fit` | 内存 stub 训练演示（不落盘） |
 
 ## 状态码建议
 

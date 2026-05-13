@@ -1,0 +1,29 @@
+digraph MLBridge {
+    graph [fontname="Times New Roman", fontsize=16, labelfontsize=16,
+           rankdir=LR, splines=spline, nodesep=0.62, ranksep=0.72,
+           bgcolor="white", margin=0.22, pad=0.12]
+    node [fontname="Times New Roman", fontsize=16, shape=box, style="rounded,filled", fillcolor="#f8f9fa", color="#343a40", penwidth=2]
+    edge [fontname="Times New Roman", fontsize=16, color="#495057", penwidth=2]
+
+    qc [label="Quantum Chemistry Runs\n(High-fidelity Energy & Forces\nfrom qchem-stack)", fillcolor="#dbe4ff", color="#4c6ef5"]
+    
+    frame [label="QMFrame\n(Atomic Nums, Positions, Energy,\nForces, Repro Hash)", fillcolor="#d3f9d8", color="#37b24d"]
+    
+    dataset [label="QMEFDataset\n(Aggregated Training Data)", fillcolor="#fff3bf", color="#f08c00"]
+    
+    hooks [label="Trainer Hooks\n(NequIP / MACE configs)", fillcolor="#ffc9c9", color="#e03131"]
+    
+    ff [label="ML Surrogate / Force Field", fillcolor="#b197fc", color="#7048e8"]
+    
+    md [label="Molecular Dynamics\nLarge-scale Simulation Loop", fillcolor="#c3fae8", color="#0ca678"]
+    
+    al [label="Active Learning Loop\n(Identify High Variance States)", fillcolor="#ffd8a8", color="#f59f00"]
+
+    qc -> frame
+    frame -> dataset
+    dataset -> hooks
+    hooks -> ff
+    ff -> md
+    md -> al
+    al -> qc [label=" Request new\nQC calculations", style="dashed"]
+}
