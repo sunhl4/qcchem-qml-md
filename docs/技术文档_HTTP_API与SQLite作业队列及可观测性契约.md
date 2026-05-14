@@ -1,7 +1,7 @@
 # 技术文档：HTTP API、SQLite 作业队列与管线可观测性（开放契约）
 
 **文档性质**：描述可选 **`qchem-stack[api]`** 面与 **`jobs`** 存储的**可机读契约**；与 [ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md)（英文化分层）互补，本文偏**产品化 HTTP + 观测字段**与**竞品语义对照**。
-
+1
 **竞品对照（公开文档口径）**：[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md)、[inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。**不**声称实现 Quantinuum Nexus 真队列、真 HQC 或 OAuth。
 
 **源码入口**：`src/qchem_stack/api/app.py`、`src/qchem_stack/jobs/`、`src/qchem_stack/orchestration/run_context.py`、`src/qchem_stack/orchestration/pipeline.py`（`_attach_run_summary`、`run_pipeline_sync`）。
