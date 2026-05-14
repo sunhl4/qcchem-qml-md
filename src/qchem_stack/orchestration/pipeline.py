@@ -1303,7 +1303,9 @@ def _maybe_attach_md_ml_qmef_dataset(
         return
     from qchem_stack.md_bridge.from_pipeline import build_qmef_ml_attachment_repro_block
 
-    repro["qmef_ml_attachment_v1"] = build_qmef_ml_attachment_repro_block(cfg, out, rhf, cfg_path=cfg_path)
+    repro["qmef_ml_attachment_v1"] = build_qmef_ml_attachment_repro_block(
+        cfg, out, rhf, cfg_path=cfg_path
+    )
 
 
 def _classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:

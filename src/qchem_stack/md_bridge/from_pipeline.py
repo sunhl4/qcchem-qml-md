@@ -32,7 +32,9 @@ def _atomic_numbers_from_pyscf_mol(rhf: PySCFRHFResult) -> list[int]:
     return [int(mol.atom_charge(i)) for i in range(mol.natm)]
 
 
-def _hf_nuclear_forces_neg_gradient_hartree_bohr(rhf: PySCFRHFResult, method: str) -> list[list[float]] | None:
+def _hf_nuclear_forces_neg_gradient_hartree_bohr(
+    rhf: PySCFRHFResult, method: str
+) -> list[list[float]] | None:
     """
     Classical nuclear forces :math:`-\\partial E/\\partial R` (Hartree/Bohr) when PySCF gradients succeed.
 
@@ -62,7 +64,9 @@ def _hf_nuclear_forces_neg_gradient_hartree_bohr(rhf: PySCFRHFResult, method: st
 
 
 def _active_space_digest(cfg: ExperimentConfig) -> str:
-    blob = json.dumps(cfg.active_space.model_dump(mode="json"), sort_keys=True, separators=(",", ":"))
+    blob = json.dumps(
+        cfg.active_space.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
+    )
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
 
 
@@ -110,7 +114,9 @@ def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PyS
     child = cfg.model_copy(
         deep=True,
         update={
-            "molecule": cfg.molecule.model_copy(update={"coordinates_bohr": _normalize_coords(coords)}),
+            "molecule": cfg.molecule.model_copy(
+                update={"coordinates_bohr": _normalize_coords(coords)}
+            ),
             "md_ml_export": MdMlExportSpec(),
         },
     )
@@ -195,7 +201,9 @@ def _extra_frame_full_pipeline(
     child = cfg.model_copy(
         deep=True,
         update={
-            "molecule": cfg.molecule.model_copy(update={"coordinates_bohr": _normalize_coords(coords)}),
+            "molecule": cfg.molecule.model_copy(
+                update={"coordinates_bohr": _normalize_coords(coords)}
+            ),
             "md_ml_export": MdMlExportSpec(),
         },
     )
@@ -244,7 +252,9 @@ def build_qmef_ml_attachment_repro_block(
             "coordinates_source": "molecule.coordinates_bohr",
             "energy_theory": "primary_pipeline",
             "energy_reference_mode": spec.energy_reference,
-            "forces_theory": "hf_rhf_analytic_same_reference_geometry" if spec.include_hf_nuclear_gradient else "none",
+            "forces_theory": "hf_rhf_analytic_same_reference_geometry"
+            if spec.include_hf_nuclear_gradient
+            else "none",
         }
     ]
 
@@ -262,11 +272,11 @@ def build_qmef_ml_attachment_repro_block(
                 "index": idx,
                 "coordinates_source": f"md_ml_export.extra_coordinates_bohr[{i}]",
                 "energy_theory": fm_energy,
-                "energy_reference_mode": spec.energy_reference if fm_energy == "nested_full_pipeline" else "scf_total",
+                "energy_reference_mode": spec.energy_reference
+                if fm_energy == "nested_full_pipeline"
+                else "scf_total",
                 "forces_theory": (
-                    "hf_rhf_analytic_same_geometry"
-                    if spec.include_hf_nuclear_gradient
-                    else "none"
+                    "hf_rhf_analytic_same_geometry" if spec.include_hf_nuclear_gradient else "none"
                 ),
             }
         )

@@ -19,7 +19,17 @@ def main() -> int:
     ]
     for s in scripts:
         if s.name == "toy_dmrg_spin_chain.py":
-            argv = [sys.executable, str(s), "--L", "8", "--m-warmup", "10", "--m-sweeps", "10,10", "--exact"]
+            argv = [
+                sys.executable,
+                str(s),
+                "--L",
+                "8",
+                "--m-warmup",
+                "10",
+                "--m-sweeps",
+                "10,10",
+                "--exact",
+            ]
         else:
             argv = [sys.executable, str(s)]
         proc = subprocess.run(argv, cwd=str(root), check=False)

@@ -31,10 +31,14 @@ Sp1 = np.array([[0.0, 1.0], [0.0, 0.0]], dtype=np.float64)
 H1 = np.zeros((2, 2), dtype=np.float64)
 
 
-def _H2(Sz1_: np.ndarray, Sp1_: np.ndarray, Sz2_: np.ndarray, Sp2_: np.ndarray, j: float, jz: float) -> csr_matrix:
+def _H2(
+    Sz1_: np.ndarray, Sp1_: np.ndarray, Sz2_: np.ndarray, Sp2_: np.ndarray, j: float, jz: float
+) -> csr_matrix:
     sm1 = Sp1_.T
     sm2 = Sp2_.T
-    return (j / 2.0) * (kron(Sp1_, sm2, format="csr") + kron(sm1, Sp2_, format="csr")) + jz * kron(Sz1_, Sz2_, format="csr")
+    return (j / 2.0) * (kron(Sp1_, sm2, format="csr") + kron(sm1, Sp2_, format="csr")) + jz * kron(
+        Sz1_, Sz2_, format="csr"
+    )
 
 
 initial_block = Block(
@@ -68,7 +72,11 @@ def _enlarge_block(block: Block, j: float, jz: float) -> EnlargedBlock:
         "conn_Sz": kron(identity(mblock), Sz1, format="csr"),
         "conn_Sp": kron(identity(mblock), Sp1, format="csr"),
     }
-    return EnlargedBlock(length=block.length + 1, basis_size=block.basis_size * model_d, operator_dict=enlarged_operator_dict)
+    return EnlargedBlock(
+        length=block.length + 1,
+        basis_size=block.basis_size * model_d,
+        operator_dict=enlarged_operator_dict,
+    )
 
 
 def _rotate_and_truncate(op: csr_matrix, transformation_matrix: np.ndarray) -> csr_matrix:
@@ -89,9 +97,18 @@ def _single_dmrg_step(sys: Block, env: Block, m: int, j: float, jz: float) -> tu
     sys_enl_op = sys_enl.operator_dict
     env_enl_op = env_enl.operator_dict
 
-    superblock_hamiltonian = kron(sys_enl_op["H"], identity(m_env_enl), format="csr") + kron(
-        identity(m_sys_enl), env_enl_op["H"], format="csr"
-    ) + _H2(sys_enl_op["conn_Sz"], sys_enl_op["conn_Sp"], env_enl_op["conn_Sz"], env_enl_op["conn_Sp"], j=j, jz=jz)
+    superblock_hamiltonian = (
+        kron(sys_enl_op["H"], identity(m_env_enl), format="csr")
+        + kron(identity(m_sys_enl), env_enl_op["H"], format="csr")
+        + _H2(
+            sys_enl_op["conn_Sz"],
+            sys_enl_op["conn_Sp"],
+            env_enl_op["conn_Sz"],
+            env_enl_op["conn_Sp"],
+            j=j,
+            jz=jz,
+        )
+    )
 
     (energy,), psi0 = eigsh(superblock_hamiltonian, k=1, which="SA")
     psi0 = np.asarray(psi0).reshape([sys_enl.basis_size, -1], order="C")
@@ -106,7 +123,10 @@ def _single_dmrg_step(sys: Block, env: Block, m: int, j: float, jz: float) -> tu
     transformation_matrix = np.asfortranarray(evecs[:, :my_m])
 
     truncation_error = float(1.0 - np.sum(evals[:my_m]))
-    new_operator_dict = {name: _rotate_and_truncate(op, transformation_matrix) for name, op in sys_enl.operator_dict.items()}
+    new_operator_dict = {
+        name: _rotate_and_truncate(op, transformation_matrix)
+        for name, op in sys_enl.operator_dict.items()
+    }
 
     newblock = Block(length=sys_enl.length, basis_size=my_m, operator_dict=new_operator_dict)
     return newblock, float(energy), truncation_error
@@ -136,7 +156,12 @@ def finite_system_dmrg(
     last_trunc = 0.0
     while 2 * block.length < chain_length:
         if verbose:
-            print("warmup:", "=" * block.length + "**" + "-" * block.length, "L=", 2 * block.length + 2)
+            print(
+                "warmup:",
+                "=" * block.length + "**" + "-" * block.length,
+                "L=",
+                2 * block.length + 2,
+            )
         block, energy, last_trunc = _single_dmrg_step(block, block, m=m_warmup, j=j, jz=jz)
         if verbose:
             print("  E/(sites so far) =", energy / (2 * block.length))
@@ -251,13 +276,24 @@ def run_toy_dmrg(
 
 
 def main() -> None:
-    p = argparse.ArgumentParser(description="Toy finite-system DMRG for spin-1/2 Heisenberg/XXZ chain (OBC).")
+    p = argparse.ArgumentParser(
+        description="Toy finite-system DMRG for spin-1/2 Heisenberg/XXZ chain (OBC)."
+    )
     p.add_argument("--L", type=int, default=20, help="Even chain length (open boundary).")
     p.add_argument("--m-warmup", type=int, default=10)
-    p.add_argument("--m-sweeps", type=str, default="10,20,30", help="Comma-separated bond dimensions per sweep pass.")
+    p.add_argument(
+        "--m-sweeps",
+        type=str,
+        default="10,20,30",
+        help="Comma-separated bond dimensions per sweep pass.",
+    )
     p.add_argument("--J", type=float, default=1.0)
     p.add_argument("--Jz", type=float, default=1.0)
-    p.add_argument("--exact", action="store_true", help="Also compute exact ground state energy for small L (<=16).")
+    p.add_argument(
+        "--exact",
+        action="store_true",
+        help="Also compute exact ground state energy for small L (<=16).",
+    )
     p.add_argument("--verbose", action="store_true")
     args = p.parse_args()
 

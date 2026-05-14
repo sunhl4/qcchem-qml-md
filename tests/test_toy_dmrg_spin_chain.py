@@ -22,7 +22,9 @@ def test_toy_dmrg_matches_exact_small_chain():
     mod = _load_toy_module()
     L = 8
     exact = mod.exact_heisenberg_obc_energy(L, j=1.0, jz=1.0)
-    res = mod.run_toy_dmrg(chain_length=L, m_warmup=20, m_sweep_list=[20, 30], j=1.0, jz=1.0, verbose=False)
+    res = mod.run_toy_dmrg(
+        chain_length=L, m_warmup=20, m_sweep_list=[20, 30], j=1.0, jz=1.0, verbose=False
+    )
     assert abs(res.energy - exact) < 1e-6
 
 

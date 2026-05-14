@@ -105,3 +105,39 @@ def test_projection_mulliken_valid_config_loads() -> None:
     }
     cfg = ExperimentConfig.from_yaml_dict(raw)
     assert cfg.embedding.projection_quantum_hamiltonian == "fragment_mulliken_mo"
+
+
+def test_from_yaml_dict_merges_explicit_extra_and_unknown_top_level() -> None:
+    raw = {
+        "experiment_id": "e",
+        "random_seed": 0,
+        "molecule": {
+            "symbols": ["H", "H"],
+            "coordinates_bohr": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+        },
+        "active_space": {"n_active_orbitals": 2, "n_active_electrons": 2},
+        "extra": {"from_extra_block": 1},
+        "unknown_alpha": "a",
+        "unknown_beta": "b",
+    }
+    cfg = ExperimentConfig.from_yaml_dict(raw)
+    assert cfg.extra == {
+        "from_extra_block": 1,
+        "unknown_alpha": "a",
+        "unknown_beta": "b",
+    }
+
+
+def test_from_yaml_dict_rejects_non_mapping_extra() -> None:
+    raw = {
+        "experiment_id": "e",
+        "random_seed": 0,
+        "molecule": {
+            "symbols": ["H", "H"],
+            "coordinates_bohr": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+        },
+        "active_space": {"n_active_orbitals": 2, "n_active_electrons": 2},
+        "extra": ["not", "a", "mapping"],
+    }
+    with pytest.raises(TypeError, match="must be a mapping"):
+        ExperimentConfig.from_yaml_dict(raw)

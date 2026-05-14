@@ -94,12 +94,16 @@ class YamlPreviewBody(BaseModel):
 
 
 class QMEFValidateBody(BaseModel):
-    qmef: dict[str, Any] = Field(..., description="JSON object matching QMEFDataset (frames + optional provenance_yaml)")
+    qmef: dict[str, Any] = Field(
+        ..., description="JSON object matching QMEFDataset (frames + optional provenance_yaml)"
+    )
 
 
 class QMEFTrainerStubFitBody(BaseModel):
     qmef: dict[str, Any] = Field(..., description="Validated QMEFDataset JSON")
-    hyperparams: dict[str, Any] = Field(default_factory=dict, description="Forwarded into StubTorchMLIPTrainer.fit meta")
+    hyperparams: dict[str, Any] = Field(
+        default_factory=dict, description="Forwarded into StubTorchMLIPTrainer.fit meta"
+    )
 
 
 def experiment_config_from_request_yaml(experiment_yaml: str) -> ExperimentConfig:

@@ -77,7 +77,10 @@ def test_greedy_commuting_sampled_uses_one_joint_measurement_group() -> None:
     assert proto._logical_circuits[0].operations[-1]["name"] == "JOINT_PAULI_MEASURE"
     assert proto._counts["n_measurement_circuits"] == 1
     assert proto._counts["total_shots_budget"] == 25_000
-    assert proto._counts["shot_sim_meta"]["shot_noise_model"] == "grouped_simultaneous_or_joint_projective"
+    assert (
+        proto._counts["shot_sim_meta"]["shot_noise_model"]
+        == "grouped_simultaneous_or_joint_projective"
+    )
     rows = proto._counts["measurement_histogram_rows"]
     assert rows[0]["mode"] == "commuting_joint_projective"
     assert abs(proto.evaluate() - exact) < 0.04

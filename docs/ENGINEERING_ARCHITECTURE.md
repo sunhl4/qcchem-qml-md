@@ -18,6 +18,8 @@ This document complements the InQuanto **parity** and chemistry narrative docs. 
 
 **Rule of thumb:** algorithms and drivers never import orchestration. Orchestration imports everything below.
 
+Config schema/validator layering convention for maintainers: [`config_校验分层约定.md`](config_校验分层约定.md).
+
 ## 1.1 Architecture invariant (pinned)
 
 The project is pinned to this invariant:

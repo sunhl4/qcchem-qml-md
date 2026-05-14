@@ -13,7 +13,11 @@ class QChemStackError(Exception):
 
 
 class ConfigurationError(QChemStackError):
-    """Invalid experiment YAML / :class:`~qchem_stack.config.ExperimentConfig` combination."""
+    """Experiment config file I/O, invalid YAML root shape, or missing deps from config helpers.
+
+    Field-level and cross-field validation for :class:`~qchem_stack.config.ExperimentConfig` is
+    raised as ``pydantic.ValidationError`` by Pydantic (e.g. ``model_validate`` / ``from_yaml_dict``).
+    """
 
 
 class ReproExportError(QChemStackError):

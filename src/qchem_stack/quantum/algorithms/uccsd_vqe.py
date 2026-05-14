@@ -188,7 +188,9 @@ class UCCSDVQE:
         if initial_parameters is not None:
             x0 = np.asarray(initial_parameters, dtype=float).ravel()
             if x0.shape != (self.n_params,):
-                raise ValueError(f"initial_parameters must have shape ({self.n_params},), got {x0.shape}")
+                raise ValueError(
+                    f"initial_parameters must have shape ({self.n_params},), got {x0.shape}"
+                )
         else:
             x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
         nfev = 0
@@ -285,7 +287,9 @@ class UCCSDTrotterVQE(UCCSDVQE):
         if initial_parameters is not None:
             x0 = np.asarray(initial_parameters, dtype=float).ravel()
             if x0.shape != (self.n_params,):
-                raise ValueError(f"initial_parameters must have shape ({self.n_params},), got {x0.shape}")
+                raise ValueError(
+                    f"initial_parameters must have shape ({self.n_params},), got {x0.shape}"
+                )
         else:
             x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
         nfev = 0
