@@ -30,7 +30,9 @@ def _symplectic_inner(
 ) -> int:
     x1, z1 = xz1
     x2, z2 = xz2
-    return int((np.dot(x1.astype(int), z2.astype(int)) + np.dot(z1.astype(int), x2.astype(int))) % 2)
+    return int(
+        (np.dot(x1.astype(int), z2.astype(int)) + np.dot(z1.astype(int), x2.astype(int))) % 2
+    )
 
 
 def pauli_terms_commute(term_a: tuple, term_b: tuple, n_qubits: int) -> bool:
@@ -91,7 +93,9 @@ class PauliMeasurementPlan:
 
         metas: list[dict[str, Any]] = []
         if not self.groups:
-            return [{"group_id": 0, "terms": [], "n_terms": 0, "support_qubits": [], "basis_key": None}]
+            return [
+                {"group_id": 0, "terms": [], "n_terms": 0, "support_qubits": [], "basis_key": None}
+            ]
         for gid, g in enumerate(self.groups):
             qubits = sorted({i for t in g for i, _ in t})
             bk = self.basis_keys[gid] if gid < len(self.basis_keys) else None

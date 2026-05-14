@@ -4,6 +4,11 @@
 Reads experiment YAML and optionally merges keys from a pipeline results JSON
 (``run_pipeline_sync`` / ``run_pipeline_from_config`` output saved with json.dump).
 
+Stable top-level keys used by CI (subset: ``parity_export_schema_version``, ``experiment_id``,
+``geometry_source``, ``computable_abstract``, ``embedding``, …) are enumerated in
+``qchem_stack.protocols.inquanto_contract.PARITY_EXPORT_V2_STABLE_KEYS``; keep them in sync
+when extending this exporter.
+
 Usage::
 
     python scripts/export_parity_criteria_table.py configs/example_h2.yaml
@@ -18,6 +23,7 @@ import json
 import sys
 from pathlib import Path
 
+from qchem_stack.chem.bridges.facade import molecular_system_from_experiment
 from qchem_stack.chem.fermion_mapping_registry import DOCUMENTED_FERMION_QUBIT_MAPPINGS
 from qchem_stack.chem.solvers.registry import create_solver, registered_solver_ids
 from qchem_stack.config import compiler_bundle_signature_from_config, load_experiment_config
@@ -51,10 +57,13 @@ def _table_from_config(
 ) -> dict:
     cfg = load_experiment_config(cfg_path)
     solver = create_solver(cfg)
+    _ms = molecular_system_from_experiment(cfg)
+    geometry_source = str((_ms.meta or {}).get("geometry_source") or "cartesian")
     out = {
         "parity_export_schema_version": "2",
         "source_config": str(cfg_path),
         "experiment_id": cfg.experiment_id,
+        "geometry_source": geometry_source,
         "molecule": cfg.molecule.model_dump(),
         "scf_method": cfg.scf.method,
         "scf_driver": cfg.scf.driver,
@@ -380,7 +389,9 @@ def main() -> None:
                 out["vqs_track_ran_from_run_summary"] = True
             if isinstance(rsum, dict):
                 if rsum.get("vqd_three_protocol_present") is not None:
-                    out["vqd_three_protocol_present_from_run_summary"] = rsum["vqd_three_protocol_present"]
+                    out["vqd_three_protocol_present_from_run_summary"] = rsum[
+                        "vqd_three_protocol_present"
+                    ]
                 if rsum.get("qse_shot_mode") is not None:
                     out["qse_shot_mode_from_run_summary"] = rsum["qse_shot_mode"]
                 if rsum.get("sceom_shot_noise_model") is not None:
@@ -418,7 +429,9 @@ def main() -> None:
                 if isinstance(sm, dict):
                     out["sceom_shot_noise_model_from_run"] = sm.get("shot_noise_model")
                     if sm.get("shots_per_matrix_element") is not None:
-                        out["sceom_shots_per_matrix_element_from_run"] = sm["shots_per_matrix_element"]
+                        out["sceom_shots_per_matrix_element_from_run"] = sm[
+                            "shots_per_matrix_element"
+                        ]
     cfg_final = load_experiment_config(args.config)
     if cfg_final.parity_integrations.resource_estimation_preview:
         pdata: dict | None = None

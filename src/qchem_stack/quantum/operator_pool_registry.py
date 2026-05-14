@@ -53,7 +53,9 @@ def _fermionic_uccsd_doubles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOp
     fs = hamiltonian.fermion_space
     if fs is None:
         return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(
+        int(fs.n_spin_orbitals), int(fs.n_electrons)
+    )
     out: list[QubitOperator] = []
     for op in ferm_ops:
         qop = jordan_wigner(op)
@@ -67,7 +69,9 @@ def _fermionic_uccsd_singles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOp
     fs = hamiltonian.fermion_space
     if fs is None:
         return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_singles_only_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+    ferm_ops = build_spin_ucc_singles_only_fermion_generators(
+        int(fs.n_spin_orbitals), int(fs.n_electrons)
+    )
     out: list[QubitOperator] = []
     for op in ferm_ops:
         qop = jordan_wigner(op)
@@ -104,11 +108,15 @@ def _fermionic_uccsd_bravyi_kitaev_pool(hamiltonian: QubitHamiltonian) -> list[Q
     return out or _toy_pair_xx_pool(hamiltonian)
 
 
-def _fermionic_uccsd_singles_bravyi_kitaev_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+def _fermionic_uccsd_singles_bravyi_kitaev_pool(
+    hamiltonian: QubitHamiltonian,
+) -> list[QubitOperator]:
     fs = hamiltonian.fermion_space
     if fs is None:
         return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_singles_only_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+    ferm_ops = build_spin_ucc_singles_only_fermion_generators(
+        int(fs.n_spin_orbitals), int(fs.n_electrons)
+    )
     out: list[QubitOperator] = []
     for fer in ferm_ops:
         qop = bravyi_kitaev(fer)
@@ -118,11 +126,15 @@ def _fermionic_uccsd_singles_bravyi_kitaev_pool(hamiltonian: QubitHamiltonian) -
     return out or _toy_pair_xx_pool(hamiltonian)
 
 
-def _fermionic_uccsd_doubles_bravyi_kitaev_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+def _fermionic_uccsd_doubles_bravyi_kitaev_pool(
+    hamiltonian: QubitHamiltonian,
+) -> list[QubitOperator]:
     fs = hamiltonian.fermion_space
     if fs is None:
         return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(
+        int(fs.n_spin_orbitals), int(fs.n_electrons)
+    )
     out: list[QubitOperator] = []
     for fer in ferm_ops:
         qop = bravyi_kitaev(fer)
@@ -137,11 +149,18 @@ def _combined_bk_single_double_slices(hamiltonian: QubitHamiltonian) -> list[Qub
     d = _fermionic_uccsd_doubles_bravyi_kitaev_pool(hamiltonian)
     out = [*s, *d]
     return out or _toy_pair_xx_pool(hamiltonian)
+
+
 OPERATOR_POOL_ID_ALIASES: Final[dict[str, str]] = {
     "qubit_excitation": "iqeb_qubit_excitation",
     "uccsd_jw": "fermionic_uccsd",
+    "uccsd_singles": "fermionic_uccsd_singles",
+    "uccsd_doubles_only": "fermionic_uccsd_doubles_only",
     "uccsd_bravyi_kitaev": "fermionic_uccsd_bravyi_kitaev",
     "uccsd_bk": "fermionic_uccsd_bravyi_kitaev",
+    "uccsd_bk_singles": "fermionic_uccsd_singles_bravyi_kitaev",
+    "uccsd_bk_doubles_only": "fermionic_uccsd_doubles_bravyi_kitaev_only",
+    "uccsd_bk_singles_then_doubles": "fermionic_uccsd_singles_then_doubles_bk_concat",
 }
 
 
@@ -211,7 +230,9 @@ def list_registered_operator_pool_ids() -> tuple[str, ...]:
     return tuple(sorted(set(OPERATOR_POOL_REGISTRY) | set(OPERATOR_POOL_ID_ALIASES)))
 
 
-def build_registered_operator_pool(pool_id: str, hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+def build_registered_operator_pool(
+    pool_id: str, hamiltonian: QubitHamiltonian
+) -> list[QubitOperator]:
     requested = pool_id
     pool_id = resolve_operator_pool_id(pool_id)
     try:
@@ -238,7 +259,9 @@ def operator_pool_registry_export_v1() -> dict[str, Any]:
         "inquanto_alignment_note": (
             "Open pools are JW (default slices) plus explicit **BK** spin-UCCSD pools "
             "(`fermionic_uccsd_bravyi_kitaev`, singles/doubles slices, concatenated id). "
-            "Aliases (`uccsd_bravyi_kitaev`, `uccsd_bk`, `uccsd_jw`, `qubit_excitation`). "
+            "Aliases (`uccsd_jw`, `uccsd_singles`, `uccsd_doubles_only`, "
+            "`uccsd_bravyi_kitaev`, `uccsd_bk`, `uccsd_bk_singles`, "
+            "`uccsd_bk_doubles_only`, `uccsd_bk_singles_then_doubles`, `qubit_excitation`). "
             "Not vendor excitation-taxonomy parity."
         ),
     }

@@ -207,7 +207,9 @@ def main() -> int:
     if out.exists() and not args.force:
         raise SystemExit(f"Refusing to overwrite existing file: {out} (use --force)")
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(_render_solver_module(backend_id=backend_id, class_name=class_name), encoding="utf-8")
+    out.write_text(
+        _render_solver_module(backend_id=backend_id, class_name=class_name), encoding="utf-8"
+    )
 
     package_import = _package_import_for_solver_file(root, out)
     if package_import is not None:
@@ -220,7 +222,9 @@ def main() -> int:
     print(f"from {import_path} import {class_name}")
     print(f'register_solver("{backend_id}", {class_name}.from_experiment_config)')
     print("\n[contract checks]")
-    print(f"python scripts/check_solver_adapter_contract.py configs/example_h2.yaml --driver {backend_id}")
+    print(
+        f"python scripts/check_solver_adapter_contract.py configs/example_h2.yaml --driver {backend_id}"
+    )
     print(
         "python scripts/check_solver_adapter_contract.py "
         f"configs/example_h2.yaml --driver {backend_id} --run-mean-field"

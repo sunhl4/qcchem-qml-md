@@ -56,6 +56,26 @@ def test_documented_fermion_mappings_includes_scbk() -> None:
     assert "symmetry_conserving_bravyi_kitaev" in list_documented_fermion_qubit_mappings()
 
 
+def test_tangelo_mapping_alias_surface_v1_stable() -> None:
+    """L1 table: tutorial nicknames vs YAML literals; JKMN/HCB stay non-executable."""
+    from qchem_stack.chem.fermion_mapping_registry import (
+        DOCUMENTED_FERMION_QUBIT_MAPPINGS,
+        tangelo_public_mapping_alias_surface_v1,
+    )
+
+    blob = tangelo_public_mapping_alias_surface_v1()
+    assert blob["schema"] == "tangelo_public_mapping_alias_surface_v1"
+    assert blob["qchem_stack_documented_literals"] == list(DOCUMENTED_FERMION_QUBIT_MAPPINGS)
+    rows = blob["tutorial_alias_rows"]
+    assert len(rows) == 3 and all(r["executable"] for r in rows)
+    bad = blob["not_executable_named_in_research_stack"]
+    assert bad and bad[0]["executable"] is False
+    status_rows = blob.get("mapping_status_rows_v1")
+    assert isinstance(status_rows, list) and status_rows
+    assert any(r.get("execution_status") == "executable" for r in status_rows)
+    assert any(r.get("execution_status") == "planned_not_wired" for r in status_rows)
+
+
 def test_algorithm_registry_sorted_ids() -> None:
     from qchem_stack.quantum.algorithm_registry import list_registered_algorithm_ids
 

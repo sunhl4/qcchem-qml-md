@@ -16,8 +16,15 @@ _RESULTS_FIXTURE = _ROOT / "tests" / "fixtures" / "pipeline_results_minimal_expo
 
 
 def _export_json(cfg_rel: str, *, results: Path | None = None) -> dict:
-    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
-    cmd = [sys.executable, str(_ROOT / "scripts" / "export_parity_criteria_table.py"), str(_ROOT / cfg_rel)]
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
+    cmd = [
+        sys.executable,
+        str(_ROOT / "scripts" / "export_parity_criteria_table.py"),
+        str(_ROOT / cfg_rel),
+    ]
     if results is not None:
         cmd.extend(["--results", str(results)])
     proc = subprocess.run(cmd, cwd=str(_ROOT), capture_output=True, text=True, env=env, check=False)
@@ -50,6 +57,15 @@ def test_export_example_h2_matches_golden_fixture() -> None:
     assert "pyscf" in fresh["registered_solvers"]
     assert isinstance(fresh.get("solver_capabilities_snapshot"), dict)
     assert fresh["solver_capabilities_snapshot"].get("backend_id") == "pyscf"
+    assert fresh.get("geometry_source") == "cartesian"
+
+
+def test_export_zmatrix_yaml_geometry_source_parity() -> None:
+    zm = _ROOT / "configs" / "example_h2_zmatrix_sto3g.yaml"
+    if not zm.is_file():
+        pytest.skip("example_h2_zmatrix_sto3g.yaml missing")
+    fresh = _normalize_export(_export_json("configs/example_h2_zmatrix_sto3g.yaml"))
+    assert fresh.get("geometry_source") == "zmatrix"
 
 
 @pytest.mark.skipif(
@@ -64,7 +80,10 @@ def test_export_echo_variational_plugin_config_only_yaml_factory_dispatch() -> N
     abstract = fresh.get("computable_abstract")
     assert isinstance(abstract, dict)
     items = abstract.get("items") or []
-    assert items and items[0].get("details", {}).get("variational_dispatch") == "yaml_algorithm_factory_v1"
+    assert (
+        items
+        and items[0].get("details", {}).get("variational_dispatch") == "yaml_algorithm_factory_v1"
+    )
     wpex = fresh.get("workflow_preview_variational_execution_v1")
     assert isinstance(wpex, dict) and wpex.get("algorithm_factory") == fac
 
@@ -75,9 +94,24 @@ def test_export_echo_variational_plugin_config_only_yaml_factory_dispatch() -> N
 )
 def test_export_micro_vqe_variational_plugin_config_only() -> None:
     fresh = _normalize_export(_export_json("configs/example_h2_micro_vqe_plugin.yaml"))
-    fac = "qchem_stack.quantum.variational_plugins.examples.vqe_micro_plugin:micro_vqe_runner_factory"
+    fac = (
+        "qchem_stack.quantum.variational_plugins.examples.vqe_micro_plugin:micro_vqe_runner_factory"
+    )
     assert fresh.get("quantum_algorithm_factory") == fac
     assert fresh.get("quantum_algorithm") == "micro_vqe_yaml_plugin_demo"
+
+
+@pytest.mark.skipif(
+    not (_ROOT / "configs" / "example_h2_psi4_rhf_sto3g.yaml").is_file(),
+    reason="repo psi4 sample yaml missing",
+)
+def test_export_repo_psi4_example_yaml_capabilities_snapshot() -> None:
+    data = _normalize_export(_export_json("configs/example_h2_psi4_rhf_sto3g.yaml"))
+    assert data.get("scf_driver") == "psi4"
+    rs = data.get("registered_solvers")
+    assert isinstance(rs, list) and "psi4" in rs and "pyscf" in rs
+    caps = data.get("solver_capabilities_snapshot")
+    assert isinstance(caps, dict) and caps.get("backend_id") == "psi4"
 
 
 def test_export_parity_psi4_config_only_row_present() -> None:
@@ -139,6 +173,7 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
         "configs/example_h2_adapt_uccsd_jw_alias.yaml",
         "configs/example_h2_uccsd.yaml",
         "configs/example_h2_uccsd_trotter.yaml",
+        "configs/example_h2_vqd_uccsd.yaml",
         "configs/example_h2_uccsd_bk.yaml",
         "configs/example_h2_zne_circuit_fold.yaml",
         "configs/example_decomposition_plugin_toy.yaml",
@@ -201,7 +236,9 @@ def test_export_results_merge_includes_plugin_and_zne_run_summary_mirrors() -> N
     # Plugin path: decomposition summary mirrors.
     cfg_plugin_rel = "configs/example_decomposition_plugin_two_fragment.yaml"
     cfg_plugin_path = _ROOT / cfg_plugin_rel
-    out_plugin = run_pipeline_sync(load_experiment_config(cfg_plugin_path), cfg_path=cfg_plugin_path)
+    out_plugin = run_pipeline_sync(
+        load_experiment_config(cfg_plugin_path), cfg_path=cfg_plugin_path
+    )
     tmp_plugin = _ROOT / "tests" / "fixtures" / "_tmp_plugin_export_merge.json"
     try:
         tmp_plugin.write_text(json.dumps(out_plugin, indent=2) + "\n", encoding="utf-8")
@@ -223,4 +260,7 @@ def test_export_results_merge_includes_plugin_and_zne_run_summary_mirrors() -> N
         tmp_zne.unlink(missing_ok=True)
     assert exp_zne.get("mitigation_zne_mode_yaml_mirror_run_summary") == "circuit_scale_fold"
     assert isinstance(exp_zne.get("mitigation_zne_scales_yaml_mirror_run_summary"), list)
-    assert exp_zne.get("protocol_zne_mode_mirror_run_summary") in ("circuit_scale_fold", "scalar_stub")
+    assert exp_zne.get("protocol_zne_mode_mirror_run_summary") in (
+        "circuit_scale_fold",
+        "scalar_stub",
+    )

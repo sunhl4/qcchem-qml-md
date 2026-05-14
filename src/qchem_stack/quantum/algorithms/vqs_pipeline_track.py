@@ -53,7 +53,9 @@ def _select_runner(
             qh, theta, times, rhs_mode=rhs_mode, tangent_fd_epsilon=tangent_eps
         )
     if m in {"mclachlan_imag_time", "mclachlanimagtime", "imag"}:
-        return AlgorithmMcLachlanImagTime(qh, theta, times, rhs_mode=rhs_mode, tangent_fd_epsilon=tangent_eps)
+        return AlgorithmMcLachlanImagTime(
+            qh, theta, times, rhs_mode=rhs_mode, tangent_fd_epsilon=tangent_eps
+        )
     raise ValueError(
         f"Unknown vqs_mode={mode!r}. "
         "Use 'vqs', 'mclachlan_real_time', or 'mclachlan_imag_time' (quantum.vqs_mode)."
@@ -79,7 +81,9 @@ def vqs_track_payload(
     step = float(dt)
     times = np.linspace(0.0, step * float(nt - 1), num=nt, dtype=float)
     eff_rhs = _effective_rhs_mode(mode, rhs_mode_yaml)
-    algo = _select_runner(mode, qh, theta, times, rhs_mode=eff_rhs, tangent_eps=float(tangent_fd_epsilon_yaml))
+    algo = _select_runner(
+        mode, qh, theta, times, rhs_mode=eff_rhs, tangent_eps=float(tangent_fd_epsilon_yaml)
+    )
     _ = algo.build()
     res = algo.run()
 

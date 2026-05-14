@@ -28,7 +28,13 @@ def main() -> int:
         tmp = Path(f.name)
     try:
         subprocess.run(
-            [sys.executable, str(root / "scripts" / "export_parity_criteria_table.py"), str(cfg), "--results", str(tmp)],
+            [
+                sys.executable,
+                str(root / "scripts" / "export_parity_criteria_table.py"),
+                str(cfg),
+                "--results",
+                str(tmp),
+            ],
             cwd=str(root),
             check=True,
             env=env,

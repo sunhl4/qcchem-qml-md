@@ -14,7 +14,11 @@ def test_xy_anticommute_zi_commute() -> None:
 
 
 def test_greedy_fewer_groups_than_terms() -> None:
-    h = QubitOperator(((0, "Z"), (1, "Z")), 0.5) + QubitOperator(((0, "Z"),), 0.3) + QubitOperator(((1, "Z"),), 0.2)
+    h = (
+        QubitOperator(((0, "Z"), (1, "Z")), 0.5)
+        + QubitOperator(((0, "Z"),), 0.3)
+        + QubitOperator(((1, "Z"),), 0.2)
+    )
     plan = build_measurement_plan(h, 2)
     assert len(plan.groups) == 1
 

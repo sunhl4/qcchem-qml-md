@@ -163,7 +163,9 @@ def _mol() -> MoleculeSpec:
                 random_seed=0,
                 molecule=_mol(),
                 active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-                quantum=QuantumSpec(algorithm="adapt", adapt_pool_id="fermionic_uccsd", adapt_max_iter=2),
+                quantum=QuantumSpec(
+                    algorithm="adapt", adapt_pool_id="fermionic_uccsd", adapt_max_iter=2
+                ),
             ),
             {
                 "scf_energy": -1.0,
@@ -230,12 +232,18 @@ def test_run_summary_with_parity_snapshot_sidecars_whitelisted() -> None:
         "dmet_solver_mode": "parity_stub",
         "open_gap_closure_reference": {},
         "dmet_uniform_multifragment_toy": {},
-        "schmidt_per_fragment_vqe_summary": {"schema": "schmidt_per_fragment_vqe_summary_v1", "n_fragments": 0},
+        "schmidt_per_fragment_vqe_summary": {
+            "schema": "schmidt_per_fragment_vqe_summary_v1",
+            "n_fragments": 0,
+        },
     }
     repro["pipeline_profile"] = {
         "schema": "pipeline_profile_v1",
         "total_wall_ms": 12.0,
-        "stages": [{"stage": "scf_done", "duration_ms": 5.0}, {"stage": "done", "duration_ms": 7.0}],
+        "stages": [
+            {"stage": "scf_done", "duration_ms": 5.0},
+            {"stage": "done", "duration_ms": 7.0},
+        ],
     }
     repro["run_context"] = {"trace_id": "tid", "client_request_id": "rid"}
     out: dict = {

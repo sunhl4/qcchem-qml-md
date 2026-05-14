@@ -119,7 +119,9 @@ def _hints_evaluate(cfg: ExperimentConfig) -> list[str]:
         lines.append("sidecar: nexus_analog ledger (local HQC units)")
     m = cfg.mitigation
     if m.zne_enabled or m.pmsv_enabled or m.execution_class != "unspecified":
-        lines.append(f"mitigation: class={m.execution_class} zne={m.zne_enabled} pmsv={m.pmsv_enabled}")
+        lines.append(
+            f"mitigation: class={m.execution_class} zne={m.zne_enabled} pmsv={m.pmsv_enabled}"
+        )
     if cfg.parity_integrations.enabled and cfg.parity_integrations.open_qermit_reference:
         lines.append("parity: open_qermit_reference (capability matrix in snapshot)")
     return lines or ["evaluate: variational energy only"]
@@ -172,7 +174,9 @@ def computable_graph_v2(
     """
     nodes: list[dict[str, Any]] = []
     for i, c in enumerate(refs):
-        nodes.append({"id": f"computable_{i}", "name": c.name, "kind": c.kind, "details": dict(c.details)})
+        nodes.append(
+            {"id": f"computable_{i}", "name": c.name, "kind": c.kind, "details": dict(c.details)}
+        )
 
     name_to_id: dict[str, str] = {}
     for i, c in enumerate(refs):
@@ -190,11 +194,15 @@ def computable_graph_v2(
             continue
         if c.name == _PAULI:
             if ground_id is not None:
-                edges.append({"from": ground_id, "to": nid, "kind": "requires_variational_statevector"})
+                edges.append(
+                    {"from": ground_id, "to": nid, "kind": "requires_variational_statevector"}
+                )
             continue
         if c.name in _EXCITED_COMPUTABLES:
             if anchor_post_variational is not None and anchor_post_variational != nid:
-                edges.append({"from": anchor_post_variational, "to": nid, "kind": "requires_reference_state"})
+                edges.append(
+                    {"from": anchor_post_variational, "to": nid, "kind": "requires_reference_state"}
+                )
             continue
         if i > 0:
             prev = f"computable_{i - 1}"
@@ -242,7 +250,9 @@ def computable_graph_v2(
                     "at pipeline variational_done."
                 ),
             }
-    if cfg is not None and (cfg.quantum.computable_extra_edges or cfg.quantum.computable_remove_edges):
+    if cfg is not None and (
+        cfg.quantum.computable_extra_edges or cfg.quantum.computable_remove_edges
+    ):
         out["declarative_edge_overrides"] = True
     return out
 

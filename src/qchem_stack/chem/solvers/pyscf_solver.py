@@ -78,7 +78,7 @@ class PySCFIntegralSolver:
             supports_avas_active_space_projection=True,
             supports_rdm_correction_hooks=True,
             supports_rdm_nevpt2_casci=True,
-            supports_get_integrals=False,
+            supports_get_integrals=True,
         )
 
     @classmethod
@@ -119,7 +119,9 @@ class PySCFIntegralSolver:
                 int(self.diis_space_dimension) if self.diis_space_dimension is not None else None
             ),
             "scf_density_fit": bool(self.density_fit),
-            "scf_density_fit_auxbasis": str(self.density_fit_auxbasis) if self.density_fit_auxbasis else None,
+            "scf_density_fit_auxbasis": str(self.density_fit_auxbasis)
+            if self.density_fit_auxbasis
+            else None,
         }
 
     def _make_mol(self, gto: Any) -> Any:
@@ -160,11 +162,15 @@ class PySCFIntegralSolver:
             "scf_method": self.method,
             "integral_representation": "mo",
             "solvent_model": str(solv),
-            "ddcosmo_epsilon": float(self.chemistry_extended.ddcosmo_epsilon) if solv == "ddcosmo" else None,
+            "ddcosmo_epsilon": float(self.chemistry_extended.ddcosmo_epsilon)
+            if solv == "ddcosmo"
+            else None,
             "pbc": bool(pbc),
             "pbc_kpoint_mesh": list(pbc_kpoint_mesh) if pbc_kpoint_mesh is not None else None,
             "pbc_active_space_kpoint_index": (
-                int(pbc_active_space_kpoint_index) if pbc_active_space_kpoint_index is not None else None
+                int(pbc_active_space_kpoint_index)
+                if pbc_active_space_kpoint_index is not None
+                else None
             ),
             "energy_accounting_model": "mf_e_tot_direct",
             "pyscf_version": pyscf_version_or_unknown(),
@@ -260,15 +266,86 @@ class PySCFIntegralSolver:
         self.density_fit_auxbasis = scf.density_fit_auxbasis
 
     def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
-        """Not implemented in M1; backends will populate this in later milestones (cf. Tangelo)."""
-        raise NotImplementedError(
-            "PySCFIntegralSolver.get_integrals is not implemented yet. "
-            "Use the PySCF driver / molecular-problem path for MO integrals until M2 aligns this hook."
+        """
+        Return active-space MO integrals on the PySCF CASCI path.
+
+        Required kwargs:
+        - ``n_active_orbitals`` (alias ``ncas``)
+        - ``n_active_electrons`` (alias ``nelecas``)
+
+        Optional kwargs:
+        - ``frozen_orbitals``: list[int]
+        - ``run_scf``: bool (default True)
+        """
+        from pyscf import ao2mo, mcscf
+
+        from qchem_stack.chem.integral_convention import (
+            spatial_mo_eri_pyscf_to_openfermion_mo_ordering,
         )
+
+        ncas_raw = kwargs.get("n_active_orbitals", kwargs.get("ncas"))
+        nele_raw = kwargs.get("n_active_electrons", kwargs.get("nelecas"))
+        if ncas_raw is None or nele_raw is None:
+            raise ValueError(
+                "get_integrals requires n_active_orbitals/n_active_electrons "
+                "(aliases: ncas/nelecas)."
+            )
+        ncas = int(ncas_raw)
+        nelecas = int(nele_raw)
+        if ncas <= 0 or nelecas <= 0:
+            raise ValueError("n_active_orbitals and n_active_electrons must be positive integers.")
+        if self.method not in ("RHF", "ROHF"):
+            raise NotImplementedError(
+                f"get_integrals currently supports RHF/ROHF only (got method={self.method!r})."
+            )
+
+        run_scf = bool(kwargs.get("run_scf", True))
+        mf = self.build_molecular_mf_without_kernel()
+        if run_scf:
+            mf.kernel()
+        if not getattr(mf, "converged", False):
+            raise RuntimeError("SCF did not converge; cannot build active-space integrals.")
+        mo = np.asarray(mf.mo_coeff, dtype=float)
+        cas = mcscf.CASCI(mf, ncas, nelecas)
+        frozen = kwargs.get("frozen_orbitals")
+        if frozen is not None:
+            if not isinstance(frozen, (list, tuple)):
+                raise TypeError("frozen_orbitals must be a list/tuple of orbital indices.")
+            cas.frozen = sorted(set(int(i) for i in frozen))
+        h1, e_core = cas.get_h1eff(mo)
+        h2 = cas.get_h2eff(mo)
+        h1a = np.asarray(h1, dtype=complex)
+        h2a = np.asarray(h2, dtype=complex)
+        if h2a.ndim != 4:
+            h2a = np.asarray(ao2mo.restore(1, h2a, ncas), dtype=complex)
+        if np.max(np.abs(h1a.imag)) > 1e-7 or np.max(np.abs(h2a.imag)) > 1e-7:
+            raise ValueError("Active-space integrals have non-trivial imaginary part.")
+        h1_real = np.asarray(h1a.real, dtype=float)
+        h2_chemist = np.asarray(h2a.real, dtype=float)
+        h2_openfermion = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(h2_chemist)
+
+        return {
+            "schema": "pyscf_active_space_integrals_v1",
+            "backend_id": "pyscf",
+            "integral_representation": "mo",
+            "constant": float(e_core),
+            "n_active_orbitals": ncas,
+            "n_active_electrons": nelecas,
+            "h1_spatial_mo": h1_real,
+            "h2_spatial_mo_chemist": h2_chemist,
+            "h2_spatial_mo_openfermion": h2_openfermion,
+            "openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+            "scf_energy": float(mf.e_tot),
+            "pyscf_converged": bool(getattr(mf, "converged", False)),
+        }
 
     def compute_mean_field(self, *, periodic: bool = False) -> MolecularMeanFieldResult:
         """Tangelo ``compute_mean_field`` analog (molecule vs periodic)."""
-        return self._execute_periodic_mean_field() if periodic else self._execute_molecular_mean_field()
+        return (
+            self._execute_periodic_mean_field()
+            if periodic
+            else self._execute_molecular_mean_field()
+        )
 
     def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
         return self.compute_mean_field(periodic=False)
@@ -337,7 +414,9 @@ class PySCFIntegralSolver:
         meta = self._base_driver_meta(
             pbc=True,
             pbc_kpoint_mesh=mesh,
-            pbc_active_space_kpoint_index=int(self.chemistry_extended.pbc_active_space_kpoint_index),
+            pbc_active_space_kpoint_index=int(
+                self.chemistry_extended.pbc_active_space_kpoint_index
+            ),
         )
         meta.update(
             {
@@ -360,9 +439,7 @@ class PySCFIntegralSolver:
                 meta["solvent"] = "ddcosmo"
                 meta["ddcosmo_epsilon"] = float(self.chemistry_extended.ddcosmo_epsilon)
             except Exception as e:  # noqa: BLE001
-                raise RuntimeError(
-                    "ddCOSMO on this periodic mean-field object failed."
-                ) from e
+                raise RuntimeError("ddCOSMO on this periodic mean-field object failed.") from e
         e = float(mf.kernel())
         mo_ev = mf.mo_energy
         if isinstance(mo_ev, (list, tuple)):

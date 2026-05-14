@@ -102,7 +102,9 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     mf = rhf_pyscf.mf
     mo_coeff = mf.mo_coeff
     if not isinstance(mo_coeff, np.ndarray):
-        raise EmbeddingError("fragment_mulliken_mo requires a molecular (non-k-point) real MO coefficient matrix.")
+        raise EmbeddingError(
+            "fragment_mulliken_mo requires a molecular (non-k-point) real MO coefficient matrix."
+        )
     mo = np.asarray(mo_coeff, dtype=float)
     n_mo = int(mo.shape[1])
     ne = int(cfg.active_space.n_active_electrons)

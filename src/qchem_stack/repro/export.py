@@ -39,7 +39,9 @@ def repro_json_dumps(
 ) -> str:
     """Stable UTF-8 JSON text with no NaN/Infinity (RFC-compliant ``allow_nan=False``)."""
     safe = repro_dict_for_strict_json(repro)
-    return json.dumps(safe, indent=indent, ensure_ascii=ensure_ascii, allow_nan=False, sort_keys=False)
+    return json.dumps(
+        safe, indent=indent, ensure_ascii=ensure_ascii, allow_nan=False, sort_keys=False
+    )
 
 
 def _to_json_serializable(obj: Any, *, path: str, _seen: set[int]) -> Any:
@@ -49,7 +51,10 @@ def _to_json_serializable(obj: Any, *, path: str, _seen: set[int]) -> Any:
             raise ReproExportError(f"repro contains a cycle at {path}")
         _seen.add(oid)
         try:
-            return {str(k): _to_json_serializable(v, path=f"{path}.{k}", _seen=_seen) for k, v in obj.items()}
+            return {
+                str(k): _to_json_serializable(v, path=f"{path}.{k}", _seen=_seen)
+                for k, v in obj.items()
+            }
         finally:
             _seen.discard(oid)
 
@@ -59,7 +64,10 @@ def _to_json_serializable(obj: Any, *, path: str, _seen: set[int]) -> Any:
             raise ReproExportError(f"repro contains a cycle at {path}")
         _seen.add(oid)
         try:
-            return [_to_json_serializable(v, path=f"{path}[{i}]", _seen=_seen) for i, v in enumerate(obj)]
+            return [
+                _to_json_serializable(v, path=f"{path}[{i}]", _seen=_seen)
+                for i, v in enumerate(obj)
+            ]
         finally:
             _seen.discard(oid)
 

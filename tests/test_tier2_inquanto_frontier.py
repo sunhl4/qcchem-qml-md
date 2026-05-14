@@ -39,7 +39,9 @@ def test_nexus_ledger_disabled_is_none() -> None:
 
 
 def test_nexus_ledger_enabled() -> None:
-    c = _cfg().model_copy(update={"nexus_analog": NexusAnalogSpec(enabled=True, project_label="p1")})
+    c = _cfg().model_copy(
+        update={"nexus_analog": NexusAnalogSpec(enabled=True, project_label="p1")}
+    )
     led = nexus_analog_ledger_from_rows([{"total_shots": 1000, "depth": 0}], c)
     assert led is not None
     assert led["schema"] == "nexus_analog_v1"
@@ -48,7 +50,9 @@ def test_nexus_ledger_enabled() -> None:
 
 
 def test_nexus_billing_on_job_respects_nexus_spec() -> None:
-    na = NexusAnalogSpec(enabled=True, project_label="jobproj", unit_per_shot=0.2, unit_per_circuit=1.0)
+    na = NexusAnalogSpec(
+        enabled=True, project_label="jobproj", unit_per_shot=0.2, unit_per_circuit=1.0
+    )
     rows = [{"total_shots": 10, "depth": 0}]
     led = nexus_analog_ledger_from_spec(rows, na)
     bill = nexus_analog_billing_for_job_result(rows, na)
@@ -66,7 +70,11 @@ def test_default_job_billing() -> None:
 def test_qermit_report_when_pmsv() -> None:
     c = _cfg()
     c = c.model_copy(
-        update={"mitigation": c.mitigation.model_copy(update={"pmsv_enabled": True, "pmsv_stabilizers": ["Z0 Z1"]})}
+        update={
+            "mitigation": c.mitigation.model_copy(
+                update={"pmsv_enabled": True, "pmsv_stabilizers": ["Z0 Z1"]}
+            )
+        }
     )
     r = build_qermit_style_mitigation_report(c)
     assert r is not None
@@ -124,9 +132,14 @@ def test_mitigation_zne_scales_default() -> None:
 
 def test_qermit_runtime_trace() -> None:
     from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag
+
     c = _cfg()
     c = c.model_copy(
-        update={"mitigation": c.mitigation.model_copy(update={"pmsv_enabled": True, "zne_enabled": True})}
+        update={
+            "mitigation": c.mitigation.model_copy(
+                update={"pmsv_enabled": True, "zne_enabled": True}
+            )
+        }
     )
     r = build_qermit_style_mitigation_report(c)
     ex = execute_mitigation_dag(1.0, 0.1, r, c)

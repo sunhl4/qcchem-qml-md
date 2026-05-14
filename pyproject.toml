@@ -28,7 +28,7 @@ pytket = ["pytket>=1.25"]
 nexus = ["qnexus>=0.4"]
 api = ["fastapi>=0.100", "uvicorn[standard]>=0.23"]
 all = ["qchem-stack[chem,quantum,pytket,nexus]"]
-dev = ["qchem-stack[all,api]", "pytest>=7.4", "ruff>=0.3"]
+dev = ["qchem-stack[all,api]", "pytest>=7.4", "ruff>=0.3", "pre-commit>=3.8"]
 examples_viz = ["matplotlib>=3.7"]
 
 [project.scripts]
@@ -47,6 +47,10 @@ markers = [
     "l1_md_ml: MD/ML bridge smoke (pytest -m l1_md_ml)",
     "slow: optional heavier chemistry smoke (DMET multi-fragment exact, etc.)",
 ]
+
+# CI **lint** job: `ruff check` + `ruff format --check` on `src/qchem_stack`,
+# `tests`, `scripts`, `examples` (`.github/workflows/ci.yml`). Pre-commit mirrors
+# that scope in `.pre-commit-config.yaml` when `pre-commit install` has been run.
 
 [tool.ruff]
 line-length = 100

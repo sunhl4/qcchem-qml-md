@@ -79,7 +79,10 @@ class IQEBVQE(AlgorithmBase):
                     "top_gradients": [{"pool_index": int(i), "gradient": float(g)} for i, g in top],
                 }
             )
-            if prev_energy is not None and abs(float(prev_energy) - float(last.energy)) < self.energy_tolerance:
+            if (
+                prev_energy is not None
+                and abs(float(prev_energy) - float(last.energy)) < self.energy_tolerance
+            ):
                 break
             if r >= self.max_rounds - 1 or not top:
                 break

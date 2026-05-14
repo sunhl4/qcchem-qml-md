@@ -32,6 +32,7 @@ PySCF 是当前**实现最完整**的适配器，不是架构上的唯一真源�
 - 新增经典后端：实现 `ChemIntegralSolver` + `register_solver(name, factory)` + 填满 `SolverCapabilities`。
 - 新增编排阶段：只依赖 `ClassicalMeanFieldReference` / `CanonicalActiveSpaceIntegralPack` / capability，不直接 `import pyscf`。
 - 90 天执行日历：`docs/execution/day001_day090_unified_chemistry_interface_calendar.md`。
+- **Parity / Methods 导出**：`scripts/export_parity_criteria_table.py`（config-only）写出 **`registered_solvers`**（`chem.solvers.registered_solver_ids()`）与 **`solver_capabilities_snapshot`**（当前 YAML 选中驱动）；**`scf.driver=psi4`** 的代表样例：`configs/example_h2_psi4_rhf_sto3g.yaml`（已纳入 `scripts/check_parity_export_sample.py` 抽样）。完整经典路径仍以 PySCF 为主；Psi4 为 **能量/注册表** 浅接入，能力位见 `Psi4IntegralSolver.capabilities`。
 
 ## 5. 可选经典钩子：按 backend 插件挂载
 

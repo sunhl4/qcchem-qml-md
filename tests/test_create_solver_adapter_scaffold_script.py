@@ -19,7 +19,9 @@ def _load_scaffold_module():
 def test_package_import_for_solver_file_strips_src() -> None:
     mod, root = _load_scaffold_module()
     out = root / "src" / "qchem_stack" / "chem" / "solvers" / "foo_bar_solver.py"
-    assert mod._package_import_for_solver_file(root, out) == "qchem_stack.chem.solvers.foo_bar_solver"
+    assert (
+        mod._package_import_for_solver_file(root, out) == "qchem_stack.chem.solvers.foo_bar_solver"
+    )
 
 
 def test_create_solver_adapter_scaffold_writes_template(tmp_path: Path) -> None:

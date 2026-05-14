@@ -82,7 +82,9 @@ def hea_state(
     return state / np.linalg.norm(state)
 
 
-def _apply_one_qubit_unitary(state: np.ndarray, u2: np.ndarray, target: int, n_qubits: int) -> np.ndarray:
+def _apply_one_qubit_unitary(
+    state: np.ndarray, u2: np.ndarray, target: int, n_qubits: int
+) -> np.ndarray:
     dim = 2**n_qubits
     st = state.reshape((2,) * n_qubits)
     st = np.moveaxis(st, target, 0)

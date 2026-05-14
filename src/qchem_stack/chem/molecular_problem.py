@@ -94,7 +94,10 @@ def build_restricted_active_space_quantum_problem(
     mol_op = compact.to_interaction_operator()
     n_so = int(mol_op.one_body_tensor.shape[0])
     fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=n_active_electrons)
-    if prefer_restricted_spatial_fermion_for_jordan_wigner and fermion_qubit_mapping == "jordan_wigner":
+    if (
+        prefer_restricted_spatial_fermion_for_jordan_wigner
+        and fermion_qubit_mapping == "jordan_wigner"
+    ):
         if jordan_wigner_coeff_atol is not None:
             raise ValueError(
                 "jordan_wigner_coeff_atol applies only to the InteractionOperator JW path; "

@@ -59,7 +59,9 @@ def run_full_pipeline_job(store: SqliteJobStore, job_id: str) -> None:
     row = store.get_job_row(job_id)
     kind = row.get("job_kind") or "pauli_protocol"
     if kind != JOB_KIND_FULL_PIPELINE:
-        raise ValueError(f"job {job_id}: expected job_kind {JOB_KIND_FULL_PIPELINE!r}, got {kind!r}")
+        raise ValueError(
+            f"job {job_id}: expected job_kind {JOB_KIND_FULL_PIPELINE!r}, got {kind!r}"
+        )
     raw = row["payload"]
     if not isinstance(raw, bytes):
         raise TypeError("payload must be bytes")

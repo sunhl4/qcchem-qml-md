@@ -59,7 +59,9 @@ def _map_fermion_generator(
 
 def _reference_state_dense(*, mapping: str, n_spin_orbitals: int, n_electrons: int) -> np.ndarray:
     if mapping == "jordan_wigner":
-        v = np.asarray(of.jw_hartree_fock_state(int(n_electrons), int(n_spin_orbitals)), dtype=np.complex128).ravel()
+        v = np.asarray(
+            of.jw_hartree_fock_state(int(n_electrons), int(n_spin_orbitals)), dtype=np.complex128
+        ).ravel()
     elif mapping == "bravyi_kitaev":
         fop = _occupied_string_creation_op(int(n_electrons))
         q_op = bravyi_kitaev(fop)
@@ -116,7 +118,9 @@ class UCCSDVQE:
         self._n_so = int(fs.n_spin_orbitals)
         self._n_e = int(fs.n_electrons)
         if self._n_so != self.n_qubits:
-            raise ValueError(f"JW/BK-square UCCSD expects n_spin_orbitals == n_qubits ({self._n_so} vs {self.n_qubits}).")
+            raise ValueError(
+                f"JW/BK-square UCCSD expects n_spin_orbitals == n_qubits ({self._n_so} vs {self.n_qubits})."
+            )
 
         ferm_ops = build_spin_uccsd_fermion_generators(self._n_so, self._n_e)
         self._antiherm_mats: list[np.ndarray] = []
@@ -162,6 +166,10 @@ class UCCSDVQE:
                 raise ValueError("UCCSD state collapsed to zero norm.")
             psi = psi / nrm
         return self._post_propagation_state(psi)
+
+    def prepare_state(self, angles: np.ndarray) -> np.ndarray:
+        """Dense statevector for variational parameters (e.g. VQD deflation on the UCCSD ansatz)."""
+        return self._state_from_angles(np.asarray(angles, dtype=float))
 
     def run(
         self,
@@ -330,3 +338,37 @@ class UCCSDTrotterVQE(UCCSDVQE):
             nfev=nfev,
             meta=meta,
         )
+
+
+def uccsd_mapping_support_matrix_v1() -> dict[str, Any]:
+    """Machine-readable boundary for UCCSD ansatz mapping support."""
+    return {
+        "schema": "uccsd_mapping_support_matrix_v1",
+        "yaml_fields": {
+            "variational_ansatz": "quantum.variational_ansatz",
+            "fermion_qubit_mapping": "active_space.fermion_qubit_mapping",
+        },
+        "rows": [
+            {
+                "fermion_qubit_mapping": "jordan_wigner",
+                "support_status": "supported",
+                "mode": "dense_and_trotter",
+                "note": "Uses JW reference and optional fixed-electron-sector projection.",
+            },
+            {
+                "fermion_qubit_mapping": "bravyi_kitaev",
+                "support_status": "supported",
+                "mode": "dense_and_trotter",
+                "note": "Uses BK reference and BK-matched cluster generators.",
+            },
+            {
+                "fermion_qubit_mapping": "symmetry_conserving_bravyi_kitaev",
+                "support_status": "not_supported",
+                "mode": "n_a",
+                "note": (
+                    "Truncated qubit-space mapping; current UCCSD implementation requires square "
+                    "fermion encoding (n_spin_orbitals == n_qubits)."
+                ),
+            },
+        ],
+    }

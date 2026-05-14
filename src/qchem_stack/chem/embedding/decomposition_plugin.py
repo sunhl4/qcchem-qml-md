@@ -21,17 +21,25 @@ from openfermion.ops import QubitOperator
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.config import ExperimentConfig
 
-_DECOMPOSITION_PLUGIN_SCHEMAS = frozenset({"decomposition_plugin_toy_v1", "decomposition_plugin_contract_v1"})
+_DECOMPOSITION_PLUGIN_SCHEMAS = frozenset(
+    {"decomposition_plugin_toy_v1", "decomposition_plugin_contract_v1"}
+)
+
+
 class DecompositionPlugin(Protocol):
     """Load fragment payloads from disk or external stores."""
 
-    def load_fragments(self, cfg: ExperimentConfig, *, cfg_path: Path | None = None) -> dict[str, Any]: ...
+    def load_fragments(
+        self, cfg: ExperimentConfig, *, cfg_path: Path | None = None
+    ) -> dict[str, Any]: ...
 
 
 class UniformFragmentGuessPlugin:
     """Reads ``decomposition_plugin_*`` JSON and builds the primary fragment Hamiltonian."""
 
-    def load_fragments(self, cfg: ExperimentConfig, *, cfg_path: Path | None = None) -> dict[str, Any]:
+    def load_fragments(
+        self, cfg: ExperimentConfig, *, cfg_path: Path | None = None
+    ) -> dict[str, Any]:
         _, data = _resolve_decomposition_plugin_payload(cfg, cfg_path=cfg_path)
         return dict(data["fragments"])
 
@@ -94,6 +102,7 @@ def _validate_fragment_block(fid: str, block: Any) -> None:
             ) from e
         label = str(row["label"])
         _pauli_label_to_operator(label, n_qubits)
+
 
 def _fragment_pauli_term_counts(fragments: dict[str, Any]) -> dict[str, int]:
     counts: dict[str, int] = {}

@@ -27,7 +27,9 @@ def _h2_cfg(*, fragment_atoms: list[int]) -> ExperimentConfig:
     return ExperimentConfig(
         experiment_id="proj_h2",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+        ),
         scf=SCFSpec(method="RHF"),
         active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
         backend=BackendSpecConfig(provider="statevector"),

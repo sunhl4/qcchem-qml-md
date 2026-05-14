@@ -18,7 +18,9 @@ def test_collect_repro_metadata_parity_keys_whitelisted() -> None:
     snap = repro.get("parity_snapshot")
     assert isinstance(snap, dict)
     unknown = set(snap.keys()) - PARITY_SNAPSHOT_DOCUMENTED_KEYS
-    assert not unknown, f"Add keys to PARITY_SNAPSHOT_DOCUMENTED_KEYS or fix snapshot: {sorted(unknown)}"
+    assert not unknown, (
+        f"Add keys to PARITY_SNAPSHOT_DOCUMENTED_KEYS or fix snapshot: {sorted(unknown)}"
+    )
 
 
 def test_repro_quantum_snapshot_minimal_config_whitelisted() -> None:

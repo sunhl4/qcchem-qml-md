@@ -19,11 +19,11 @@ def export_extended_xyz(dataset: QMEFDataset, path: str | Path) -> None:
             f"Properties=species:S:1:pos:R:3:forces:R:3 "
             f"charge={fr.charge} mult={fr.multiplicity} method={fr.method_tag}"
         )
-        for z, r, f in zip(fr.atomic_numbers, fr.positions_bohr, fr.forces_hartree_bohr or [[0, 0, 0]] * n):
+        for z, r, f in zip(
+            fr.atomic_numbers, fr.positions_bohr, fr.forces_hartree_bohr or [[0, 0, 0]] * n
+        ):
             sym = {1: "H", 6: "C", 7: "N", 8: "O"}.get(int(z), "X")
-            lines.append(
-                f"{sym} {r[0]:.8f} {r[1]:.8f} {r[2]:.8f} {f[0]:.8f} {f[1]:.8f} {f[2]:.8f}"
-            )
+            lines.append(f"{sym} {r[0]:.8f} {r[1]:.8f} {r[2]:.8f} {f[0]:.8f} {f[1]:.8f} {f[2]:.8f}")
     p.write_text("\n".join(lines) + "\n", encoding="utf-8")
 
 

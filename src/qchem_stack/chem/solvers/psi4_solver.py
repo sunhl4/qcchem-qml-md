@@ -50,7 +50,10 @@ def psi4_hf_total_energy_au(
         return None, "psi4_import_missing"
     try:
         geom_block = _psi4_geometry_block(
-            charge=int(charge), multiplicity=int(multiplicity), symbols=list(symbols), coords_bohr=geom
+            charge=int(charge),
+            multiplicity=int(multiplicity),
+            symbols=list(symbols),
+            coords_bohr=geom,
         )
         mol = psi4.geometry(geom_block)
         psi4.set_options({"basis": basis})

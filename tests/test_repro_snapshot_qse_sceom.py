@@ -54,7 +54,11 @@ def test_parity_snapshot_embedding_and_pmsv_fields() -> None:
                 fragment_labels=["A"],
             ),
             "mitigation": cfg.mitigation.model_copy(
-                update={"pmsv_enabled": True, "pmsv_stabilizers": ["Z0"], "pmsv_retention_rate": 0.88}
+                update={
+                    "pmsv_enabled": True,
+                    "pmsv_stabilizers": ["Z0"],
+                    "pmsv_retention_rate": 0.88,
+                }
             ),
         }
     )
@@ -162,10 +166,15 @@ def test_parity_snapshot_open_stack_extensions_default_on() -> None:
     assert snap.get("open_stack_contract_schema") == "parity_open_stack_contract_v1"
     assert "qnexus_probe" in snap
     assert snap.get("open_qermit_capability_matrix", {}).get("schema") == "qermit_open_reference_v1"
-    assert snap.get("tensornet_closure_reference", {}).get("schema") == "tensornet_closure_reference_v1"
+    assert (
+        snap.get("tensornet_closure_reference", {}).get("schema")
+        == "tensornet_closure_reference_v1"
+    )
     assert "uccsd_reference_closed_shell" in snap
     assert snap["uccsd_reference_closed_shell"]["n_spin_orbitals"] == 4
-    assert snap.get("open_gap_closure_reference", {}).get("schema") == "open_gap_closure_reference_v1"
+    assert (
+        snap.get("open_gap_closure_reference", {}).get("schema") == "open_gap_closure_reference_v1"
+    )
 
 
 def test_parity_integrations_disabled_skips_open_block() -> None:

@@ -54,7 +54,9 @@ def test_enqueue_full_pipeline_then_dispatch_completes() -> None:
         tl = store.get_job_timeline_events(h.job_id)
         evs = tl.get("events") or []
         assert any(
-            isinstance(e, dict) and e.get("kind") == "pipeline_stage" and e.get("stage") == "scf_done"
+            isinstance(e, dict)
+            and e.get("kind") == "pipeline_stage"
+            and e.get("stage") == "scf_done"
             for e in evs
         )
         assert any(isinstance(e, dict) and e.get("kind") == "completed" for e in evs)

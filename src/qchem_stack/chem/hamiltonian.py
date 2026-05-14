@@ -42,11 +42,15 @@ def _classical_driver_meta_payload(reference: Any) -> tuple[dict[str, Any], str]
     if reference is None or not getattr(reference, "driver_meta", None):
         return {}, ""
     driver_meta = dict(reference.driver_meta)
-    backend_tag = str(
-        driver_meta.get("upstream_classical_software_tag")
-        or driver_meta.get("driver_family")
-        or ""
-    ).strip().lower()
+    backend_tag = (
+        str(
+            driver_meta.get("upstream_classical_software_tag")
+            or driver_meta.get("driver_family")
+            or ""
+        )
+        .strip()
+        .lower()
+    )
     return driver_meta, backend_tag
 
 
@@ -143,9 +147,9 @@ def molecular_hamiltonian_from_canonical_active_space_pack(
     if not isinstance(pack, CanonicalPack):
         raise TypeError(f"expected CanonicalActiveSpaceIntegralPack, got {type(pack)!r}")
     compact = pack.compact
-    if int(compact.n_active_orbitals) != int(n_active_orbitals) or int(compact.n_active_electrons) != int(
-        n_active_electrons
-    ):
+    if int(compact.n_active_orbitals) != int(n_active_orbitals) or int(
+        compact.n_active_electrons
+    ) != int(n_active_electrons):
         raise ValueError(
             f"active-space mismatch: pack compact has n_act={compact.n_active_orbitals}, "
             f"ne={compact.n_active_electrons}; got n_active_orbitals={n_active_orbitals}, "

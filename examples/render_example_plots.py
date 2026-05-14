@@ -42,7 +42,11 @@ def _plot_energy_ladder(
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
 
     scf = float(out["scf_energy"]) if out.get("scf_energy") is not None else float("nan")
-    ev = float(out["energy_after_variational"]) if out.get("energy_after_variational") is not None else float("nan")
+    ev = (
+        float(out["energy_after_variational"])
+        if out.get("energy_after_variational") is not None
+        else float("nan")
+    )
     ep = out.get("energy_pauli_protocol")
     ep_f = float(ep) if ep is not None else None
 
@@ -61,7 +65,9 @@ def _plot_energy_ladder(
     axes[0].bar(names, vals, color=colors, edgecolor="#2d3748", linewidth=0.6)
     axes[0].axhline(scf, color="#718096", linestyle="--", linewidth=0.9, label="SCF reference")
     if fci_ref_ha is not None:
-        axes[0].axhline(fci_ref_ha, color="#805ad5", linestyle=":", linewidth=1.0, label="FCI ref (H₂ sto-3g)")
+        axes[0].axhline(
+            fci_ref_ha, color="#805ad5", linestyle=":", linewidth=1.0, label="FCI ref (H₂ sto-3g)"
+        )
     axes[0].set_ylabel("Energy (Ha)")
     axes[0].set_title(f"Energies — {cfg.experiment_id}")
     axes[0].legend(loc="best", fontsize=8)
@@ -75,7 +81,9 @@ def _plot_energy_ladder(
         axes[1].set_title("pipeline_profile stages")
         axes[1].set_facecolor("#f7fafc")
     else:
-        axes[1].text(0.5, 0.5, "no pipeline_profile in repro", ha="center", va="center", fontsize=10)
+        axes[1].text(
+            0.5, 0.5, "no pipeline_profile in repro", ha="center", va="center", fontsize=10
+        )
         axes[1].set_axis_off()
 
     fig.patch.set_facecolor("#edf2f7")

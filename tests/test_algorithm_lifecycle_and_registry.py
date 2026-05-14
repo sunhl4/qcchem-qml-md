@@ -30,7 +30,9 @@ def test_vqe_lifecycle_report_with_gradient_expression() -> None:
     exe = StatevectorHeaExecutor()
     objective = ExpectationValue(qh.operator, qh.n_qubits, 1, exe)
     gradient = ExpectationValueDerivative(objective, parameter_index=0)
-    vqe = VQE(qh, depth=1, executor=exe, objective_expression=objective, gradient_expression=gradient)
+    vqe = VQE(
+        qh, depth=1, executor=exe, objective_expression=objective, gradient_expression=gradient
+    )
     vqe.build()
     r = vqe.run(maxiter=10, seed=1)
     rep = vqe.generate_report()
@@ -99,7 +101,24 @@ def test_operator_pool_aliases_match_canonical_pools() -> None:
     )
     fs = FermionSpace(n_spin_orbitals=4, n_electrons=2)
     qh2 = QubitHamiltonian(operator=h, n_qubits=4, fermion_space=fs)
-    assert build_registered_operator_pool("uccsd_jw", qh2) == build_registered_operator_pool("fermionic_uccsd", qh2)
+    assert build_registered_operator_pool("uccsd_jw", qh2) == build_registered_operator_pool(
+        "fermionic_uccsd", qh2
+    )
+    assert build_registered_operator_pool("uccsd_singles", qh2) == build_registered_operator_pool(
+        "fermionic_uccsd_singles", qh2
+    )
+    assert build_registered_operator_pool(
+        "uccsd_doubles_only", qh2
+    ) == build_registered_operator_pool("fermionic_uccsd_doubles_only", qh2)
+    assert build_registered_operator_pool(
+        "uccsd_bk_singles", qh2
+    ) == build_registered_operator_pool("fermionic_uccsd_singles_bravyi_kitaev", qh2)
+    assert build_registered_operator_pool(
+        "uccsd_bk_doubles_only", qh2
+    ) == build_registered_operator_pool("fermionic_uccsd_doubles_bravyi_kitaev_only", qh2)
+    assert build_registered_operator_pool(
+        "uccsd_bk_singles_then_doubles", qh2
+    ) == build_registered_operator_pool("fermionic_uccsd_singles_then_doubles_bk_concat", qh2)
 
 
 def test_unknown_operator_pool_id_preserves_requested_label() -> None:

@@ -249,7 +249,9 @@ def test_pipeline_schmidt_multifragment_h4_smoke() -> None:
 
     out = run_pipeline_sync(cfg)
     wf = out["embedding_workflow"]
-    assert "run_schmidt_multifragment_density_cycles" in wf.get("schmidt_dmet_density_feedback_module", "")
+    assert "run_schmidt_multifragment_density_cycles" in wf.get(
+        "schmidt_dmet_density_feedback_module", ""
+    )
     aud = out.get("hamiltonian_meta", {}).get("schmidt_production_audit", {})
     assert aud.get("schmidt_multifragment") is True
     assert aud.get("n_embedding_fragments") == 2

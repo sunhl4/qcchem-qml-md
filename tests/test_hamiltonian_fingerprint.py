@@ -126,7 +126,9 @@ def test_non_pyscf_reference_meta_stored_as_classical_driver() -> None:
         mf=None,
         e_tot=0.0,
         mo_energy=np.zeros(1, dtype=float),
-        molecular_system=MolecularSystem(symbols=["H"], coordinates_bohr=np.zeros((1, 3), dtype=float)),
+        molecular_system=MolecularSystem(
+            symbols=["H"], coordinates_bohr=np.zeros((1, 3), dtype=float)
+        ),
         driver_meta={"upstream_classical_software_tag": "mock_solver", "note": "contract-test"},
     )
     qh = qubit_hamiltonian_from_active_space_fermionic_operator(
@@ -137,5 +139,6 @@ def test_non_pyscf_reference_meta_stored_as_classical_driver() -> None:
         rhf=ref,
     )
     assert "classical_driver" in qh.meta
-    assert qh.meta.get("classical_driver", {}).get("upstream_classical_software_tag") == "mock_solver"
-
+    assert (
+        qh.meta.get("classical_driver", {}).get("upstream_classical_software_tag") == "mock_solver"
+    )

@@ -39,7 +39,12 @@ def main() -> int:
         out_z = run_pipeline_sync(load_experiment_config(p_zne), cfg_path=p_zne)
         print("tutorial_03: zne_mode", (out_z.get("protocol_counts") or {}).get("zne_mode"))
 
-    subprocess.run([sys.executable, str(root / "scripts" / "run_qpe_track_demo.py")], cwd=str(root), check=True, env=env)
+    subprocess.run(
+        [sys.executable, str(root / "scripts" / "run_qpe_track_demo.py")],
+        cwd=str(root),
+        check=True,
+        env=env,
+    )
     return 0
 
 

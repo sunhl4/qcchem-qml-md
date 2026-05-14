@@ -25,7 +25,9 @@ def hea_operations(n_qubits: int, depth: int, angles: np.ndarray) -> list[dict[s
     return ops
 
 
-def basis_change_operations(basis_key: tuple[tuple[int, str], ...], n_qubits: int) -> list[dict[str, Any]]:
+def basis_change_operations(
+    basis_key: tuple[tuple[int, str], ...], n_qubits: int
+) -> list[dict[str, Any]]:
     """Map eigenbasis of commuting Paulis to computational Z-readout (single-qubit Cliffords only)."""
     axis: dict[int, str] = {}
     for idx, p in basis_key:

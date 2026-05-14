@@ -327,7 +327,7 @@ P2 需在「不冒充 InQuanto 闭源分解产品」前提下，选一条 **最�
 **终局口径（与年度计划一致）**
 
 - **L1+**：除刻意 `n/a` 外，矩阵每行有 gap 锚点 / caveat / 证据链（模块 + 机读键 + 测试或脚本）；残余 `partial` 须有 SLA 或收束为 `yes`。
-- **L3（可选）**：`integrations.l3_algorithm_benchmark.L3_PYTEST_YAMLS` 为代表门禁集（当前 **6**：`pytest -m l3` 且 **`QCHEM_RUN_L3=1`**）；更宽对标表默认见 `DEFAULT_BENCHMARK_YAMLS` + `algorithm_benchmark_bundle_v1` / `scripts/l3_algorithm_benchmark_report.py`。**非**闭源 wheel 数值等价。
+- **L3（可选）**：`integrations.l3_algorithm_benchmark.L3_PYTEST_YAMLS` 为代表门禁集（当前 **7**：`pytest -m l3` 且 **`QCHEM_RUN_L3=1`**）；更宽对标表默认见 `DEFAULT_BENCHMARK_YAMLS` + `algorithm_benchmark_bundle_v1` / `scripts/l3_algorithm_benchmark_report.py`。**非**闭源 wheel 数值等价。
 - **排除**：真 Nexus/`qnexus`/HQC/OAuth/配额；硬件校准、原生门集专优、拓扑；Qermit/cuTensorNet **商业二进制**等价。
 
 ---
@@ -489,7 +489,7 @@ jq '.nodes[] | select(.pillar=="P2" and .status=="shipped" and .is_class_leaf==f
 ### 7.2 CI 策略
 
 - **主 CI**：仅 schema / config 校验 + **skip** 重型断言。
-- **夜间 / 可选 job**：`pytest -m l3`（`QCHEM_RUN_L3=1`，跑 **`L3_PYTEST_YAMLS`**，当前 **6** 条含 ADAPT/IQEB 池与别名）跑全量；论文表 JSON：`scripts/l3_algorithm_benchmark_report.py`。
+- **夜间 / 可选 job**：`pytest -m l3`（`QCHEM_RUN_L3=1`，跑 **`L3_PYTEST_YAMLS`**，当前 **7** 条含基线 VQE 与 ADAPT/IQEB 池及别名）跑全量；论文表 JSON：`scripts/l3_algorithm_benchmark_report.py`。
 
 ### 7.3 与 export
 

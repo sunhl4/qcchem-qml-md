@@ -71,5 +71,8 @@ def qermit_mitigation_execution_overlays(cfg: ExperimentConfig) -> dict[str, Any
             "note": "Matches sequential qermit_runtime trace; not hardware barrier timing.",
         }
     elif ex == "shot_postselect":
-        out["shot_postselect_model"] = {"retention_rate": m.pmsv_retention_rate, "kind": "PMSV_style"}
+        out["shot_postselect_model"] = {
+            "retention_rate": m.pmsv_retention_rate,
+            "kind": "PMSV_style",
+        }
     return out

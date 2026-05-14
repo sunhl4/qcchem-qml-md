@@ -15,7 +15,12 @@ from qchem_stack.config import ExperimentConfig
 
 
 def molecular_system_from_experiment(cfg: ExperimentConfig) -> MolecularSystem:
-    """Canonical :class:`~qchem_stack.chem.system.MolecularSystem` projection from YAML config."""
+    """
+    Canonical :class:`~qchem_stack.chem.system.MolecularSystem` projection from YAML config.
+
+    ``meta['geometry_source']`` is ``zmatrix`` when ``molecule.zmatrix`` is non-empty, else ``cartesian``;
+    the same lineage is surfaced on parity exports (see ``scripts/export_parity_criteria_table.py``).
+    """
     m = cfg.molecule
     meta: dict[str, Any] = {}
     if getattr(m, "zmatrix", None) and str(m.zmatrix).strip():

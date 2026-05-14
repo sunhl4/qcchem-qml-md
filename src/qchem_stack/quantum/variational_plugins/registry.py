@@ -51,7 +51,10 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_vqe_branch",
         "materialization_implementation": "qchem_stack.quantum.algorithms.vqe.VQE",
         "materialization_result_schema": "algorithm_vqe_report_v1",
-        "capabilities": {"supports_auxiliary_expression": True, "supports_gradient_expression": True},
+        "capabilities": {
+            "supports_auxiliary_expression": True,
+            "supports_gradient_expression": True,
+        },
     },
     "adapt": {
         "summary": "Fermionic-pool ADAPT-VQE (commutator-gradient selection).",
@@ -207,7 +210,9 @@ def variational_registry_export() -> dict[str, dict[str, Any]]:
     return out
 
 
-def resolve_variational_runner(*, algorithm: str, algorithm_factory: str | None) -> VariationalRunner:
+def resolve_variational_runner(
+    *, algorithm: str, algorithm_factory: str | None
+) -> VariationalRunner:
     if algorithm_factory:
         return load_variational_runner_from_factory(algorithm_factory)
     try:
@@ -221,5 +226,7 @@ def resolve_variational_runner(*, algorithm: str, algorithm_factory: str | None)
 
 def run_variational_stage(ctx: VariationalRunContext) -> VariationalStageOutcome:
     q = ctx.cfg.quantum
-    runner = resolve_variational_runner(algorithm=q.algorithm, algorithm_factory=q.algorithm_factory)
+    runner = resolve_variational_runner(
+        algorithm=q.algorithm, algorithm_factory=q.algorithm_factory
+    )
     return runner(ctx)

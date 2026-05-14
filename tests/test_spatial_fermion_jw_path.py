@@ -187,7 +187,9 @@ def test_jordan_wigner_sparse_zero_atol_matches_openfermion() -> None:
 
 def test_driver_from_config_inherits_prefer_spatial_fermion_from_yaml() -> None:
     cfg = load_experiment_config(_CFG_H2)
-    cx = cfg.active_space.model_copy(update={"prefer_restricted_spatial_fermion_for_jordan_wigner": True})
+    cx = cfg.active_space.model_copy(
+        update={"prefer_restricted_spatial_fermion_for_jordan_wigner": True}
+    )
     cfg2 = cfg.model_copy(update={"active_space": cx})
     drv = PySCFDriver.from_config(cfg2)
     prob = drv.get_restricted_active_space_quantum_problem(
@@ -201,7 +203,9 @@ def test_driver_from_config_inherits_prefer_spatial_fermion_from_yaml() -> None:
 
 def test_driver_explicit_false_overrides_yaml_prefer_spatial() -> None:
     cfg = load_experiment_config(_CFG_H2)
-    cx = cfg.active_space.model_copy(update={"prefer_restricted_spatial_fermion_for_jordan_wigner": True})
+    cx = cfg.active_space.model_copy(
+        update={"prefer_restricted_spatial_fermion_for_jordan_wigner": True}
+    )
     cfg2 = cfg.model_copy(update={"active_space": cx})
     drv = PySCFDriver.from_config(cfg2)
     prob = drv.get_restricted_active_space_quantum_problem(
@@ -258,10 +262,13 @@ def test_molecular_hamiltonian_from_classical_reference_prefers_spatial_matches_
         prefer_restricted_spatial_fermion_for_jordan_wigner=True,
     )
     n = qh0.n_qubits
-    assert _dense_max_diff(
-        get_sparse_operator(qh0.operator, n_qubits=n).toarray(),
-        get_sparse_operator(qh1.operator, n_qubits=n).toarray(),
-    ) < 1e-10
+    assert (
+        _dense_max_diff(
+            get_sparse_operator(qh0.operator, n_qubits=n).toarray(),
+            get_sparse_operator(qh1.operator, n_qubits=n).toarray(),
+        )
+        < 1e-10
+    )
     assert qh1.meta.get("jw_build") == "restricted_spatial_fermion_operator"
 
 

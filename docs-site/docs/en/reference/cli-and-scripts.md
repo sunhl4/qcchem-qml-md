@@ -49,7 +49,7 @@ Use an environment where `qchem_stack` is importable.
 | Script | Purpose |
 |--------|---------|
 | `python scripts/smoke_pipeline.py` | Smoke run (default `configs/example_h2.yaml`); flags such as `--excited`, `--sampled`, `--qiskit-shots`, `--iqeb`, `--projection-trace` (see file docstring) |
-| `python scripts/export_parity_criteria_table.py <config.yaml>` | Export parity / Methods-oriented field table; optional `--results out.json` |
+| `python scripts/export_parity_criteria_table.py <config.yaml>` | Export parity / Methods-oriented field table; config-only export includes stable **`geometry_source`** (aligned with `PARITY_EXPORT_V2_STABLE_KEYS`); optional `--results out.json` |
 | `python scripts/check_parity_export_sample.py` | Validate export samples (CI helper) |
 | `python scripts/check_solver_adapter_contract.py [config.yaml]` | Validate backend adapter contract for current `scf.driver`; supports `--driver`, `--run-mean-field`, `--require-mean-field-success` |
 | `python scripts/create_solver_adapter_scaffold.py <backend_id>` | Generate a solver scaffold (TODO[1/2/3]) and print register/check commands; add `--with-demo-register` to emit `scripts/register_<backend>_demo.py` (in-process contract checks) |

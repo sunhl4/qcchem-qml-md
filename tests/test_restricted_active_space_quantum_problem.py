@@ -18,7 +18,9 @@ def test_restricted_active_space_problem_matches_pipeline_geometry() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
-    prob = drv.get_restricted_active_space_quantum_problem(2, 2, fermion_qubit_mapping="jordan_wigner")
+    prob = drv.get_restricted_active_space_quantum_problem(
+        2, 2, fermion_qubit_mapping="jordan_wigner"
+    )
     assert prob.compact_mo_operator.storage_schema == "pyscf_casci_h2eff_compact_v1"
     assert prob.compact_mo_operator.n_active_orbitals == 2
     assert prob.fermion_space.n_electrons == 2

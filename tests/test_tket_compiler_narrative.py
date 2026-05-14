@@ -41,7 +41,9 @@ def test_compiler_bundle_signature_changes_with_optimization_level() -> None:
     cfg = ExperimentConfig.from_yaml_dict(yaml.safe_load(_minimal_h2_yaml()))
     sig0 = compiler_bundle_signature_from_config(cfg)
     alt = copy.deepcopy(cfg)
-    alt.compiler = CompilerSpec.model_validate({**cfg.compiler.model_dump(), "optimization_level": 99})
+    alt.compiler = CompilerSpec.model_validate(
+        {**cfg.compiler.model_dump(), "optimization_level": 99}
+    )
     assert compiler_bundle_signature_from_config(alt) != sig0
 
 

@@ -102,7 +102,9 @@ class SCEOMPlaceholder:
     note: str = "Use run_sceom_reference_subspace(hamiltonian, subspace_dim=...)."
 
 
-def nested_sceom_q_sc_eom_operator(h: QubitOperator, si: QubitOperator, sj: QubitOperator) -> QubitOperator:
+def nested_sceom_q_sc_eom_operator(
+    h: QubitOperator, si: QubitOperator, sj: QubitOperator
+) -> QubitOperator:
     """``[S_i^\\dagger, [H, S_j]]`` for q-sc-EOM (Chemical Science, D2SC05371C / arXiv:2206.10502)."""
     comm = h * sj - sj * h
     return si * comm - comm * si
@@ -120,7 +122,9 @@ def default_sceom_pauli_generators(n_qubits: int, k: int) -> list[QubitOperator]
     return ops[:k]
 
 
-def fermionic_singles_generators_matching_h_mapping(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+def fermionic_singles_generators_matching_h_mapping(
+    hamiltonian: QubitHamiltonian,
+) -> list[QubitOperator]:
     """Map spin-orbital singles to qubit Paulis using the Hamiltonian fermion-encoding metadata."""
 
     fs = hamiltonian.fermion_space
@@ -135,7 +139,9 @@ def fermionic_singles_generators_matching_h_mapping(hamiltonian: QubitHamiltonia
     if mmap not in {"jordan_wigner", "bravyi_kitaev"}:
         raise ValueError(f"Unsupported fermion_to_qubit_map for SCEOM singles: {mmap!r}")
     xf = {"jordan_wigner": jordan_wigner, "bravyi_kitaev": bravyi_kitaev}[mmap]
-    ferm_ops = build_spin_ucc_singles_only_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+    ferm_ops = build_spin_ucc_singles_only_fermion_generators(
+        int(fs.n_spin_orbitals), int(fs.n_electrons)
+    )
     ops: list[QubitOperator] = []
     for fer in ferm_ops:
         q = xf(fer)
@@ -232,10 +238,7 @@ def run_sceom_nested_commutator(
     meta_block: dict[str, Any] = {
         "reference": "10.1039/D2SC05371C (q-sc-EOM M matrix; nested commutator)",
         "subspace_dim": k,
-        "construction": (
-            "M_ij=<psi|[Si,[H,Sj]]|psi>; "
-            f"n_generators={k};strategy={strat_label}"
-        ),
+        "construction": (f"M_ij=<psi|[Si,[H,Sj]]|psi>; n_generators={k};strategy={strat_label}"),
         "tasking": task_meta[: min(8, len(task_meta))],
         "shot_noise_model": "symmetric_gaussian_on_real_M"
         if shots_per_matrix_element > 0

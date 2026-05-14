@@ -2,6 +2,15 @@
 
 ``L3_PYTEST_YAMLS`` is the slim set for ``pytest -m l3`` (`QCHEM_RUN_L3=1`); ``DEFAULT_BENCHMARK_YAMLS`` adds
 baseline H2 VQE, default IQEB, and QPE dual-track for paper-style ``l3_algorithm_benchmark_report.py`` defaults.
+
+**Increment rules (maintainers)**
+
+- **``L3_PYTEST_YAMLS``**: keep each entry **PySCF-runnable** and **CI-sized** (small molecules); prefer one config per
+  distinct algorithm/pool story (baseline VQE, ADAPT pools + YAML aliases, IQEB pools + aliases, excited smoke).
+  Update ``tests/test_l3_benchmark_smoke.py`` expectations only via tuple length / schema — no hard-coded counts in docs;
+  refresh narrative docs that cite “当前 N 条”.
+- **``DEFAULT_BENCHMARK_YAMLS``**: superset for ``scripts/l3_algorithm_benchmark_report.py`` paper tables; may include
+  configs **not** in ``L3_PYTEST_YAMLS`` if they add Methods breadth without exploding runtime (review in PR).
 """
 
 from __future__ import annotations
@@ -26,6 +35,7 @@ DEFAULT_BENCHMARK_YAMLS: tuple[str, ...] = (
 )
 
 L3_PYTEST_YAMLS: tuple[str, ...] = (
+    "configs/example_h2.yaml",
     "configs/example_h2_adapt_singles_pool.yaml",
     "configs/example_h2_adapt_doubles_pool.yaml",
     "configs/example_h2_adapt_uccsd_jw_alias.yaml",

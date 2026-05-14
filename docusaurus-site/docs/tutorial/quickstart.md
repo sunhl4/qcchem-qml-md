@@ -10,7 +10,13 @@ keywords:
 
 # 15 分钟上手
 
-本页聚焦最小可运行路径，帮助你快速验证 `qchem_qml_md` 的端到端流程。
+本页聚焦**最小可运行路径**：你会完成一次从 YAML 到结果的端到端执行。
+
+## 你将得到什么
+
+- 一次可运行的最小任务（`example_h2.yaml`）
+- 一个本地作业数据库（`jobs.sqlite`）
+- 一份可继续分析的运行结果对象（`out`）
 
 ## 1. 安装
 
@@ -21,7 +27,7 @@ pip install -e ".[dev]"
 
 可选：`pip install -e ".[all]"` 安装 PySCF、Qiskit、pytket 等扩展。
 
-## 2. 最小端到端（YAML）
+## 2. 跑最小端到端（YAML）
 
 ```python
 from pathlib import Path
@@ -29,6 +35,18 @@ from qchem_stack.orchestration.pipeline import run_pipeline_from_config
 
 out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqlite"))
 ```
+
+## 3. 快速验证输出
+
+```python
+print(out.get("status"))
+print(out.get("run_summary", {}).keys())
+```
+
+至少确认两点：
+
+- 任务已结束（通常是 `DONE` 语义）
+- `run_summary` 存在（用于后续对比和导出）
 
 ## 3. 可选 HTTP API
 
@@ -44,6 +62,12 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | 消费作业队列 | `qchem-jobs-worker --db ./jobs.sqlite` |
 | 启动 API | `uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000` |
 | 本地烟测 | `python scripts/smoke_pipeline.py` |
+
+## 5. 常见问题
+
+- **安装后找不到命令**：确认当前 shell 在正确 Python 虚拟环境中。
+- **任务失败**：先跑 `python scripts/smoke_pipeline.py`，排除环境问题。
+- **想切换后端**：先看 [切换后端对比](./switch-backend-compare)。
 
 ## 下一步
 

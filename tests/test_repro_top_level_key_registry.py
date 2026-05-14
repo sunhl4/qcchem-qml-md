@@ -20,11 +20,17 @@ def test_collect_repro_metadata_root_keys_whitelisted() -> None:
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "example_h2_echo_variational_plugin.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "example_h2_echo_variational_plugin.yaml")
+    .is_file(),
     reason="echo plugin config",
 )
 def test_collect_repro_metadata_includes_variational_execution_slice_when_factory_yaml() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2_echo_variational_plugin.yaml"
+    cfg_path = (
+        Path(__file__).resolve().parents[1] / "configs" / "example_h2_echo_variational_plugin.yaml"
+    )
     cfg = load_experiment_config(cfg_path)
     repro = collect_repro_metadata(cfg, cfg_path=cfg_path)
     unknown = set(repro.keys()) - REPRO_DOCUMENTED_KEYS
@@ -38,7 +44,11 @@ def test_collect_repro_metadata_includes_variational_execution_slice_when_factor
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "example_h2_vqs_track.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "example_h2_vqs_track.yaml")
+    .is_file(),
     reason="VQS track sample config missing",
 )
 def test_collect_repro_metadata_includes_vqs_workflow_slice_when_track_yaml() -> None:
@@ -52,7 +62,11 @@ def test_collect_repro_metadata_includes_vqs_workflow_slice_when_track_yaml() ->
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "qpe_dual_track_demo.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "qpe_dual_track_demo.yaml")
+    .is_file(),
     reason="QPE dual-track sample config missing",
 )
 def test_collect_repro_metadata_includes_qpe_workflow_slice_when_track_yaml() -> None:
@@ -86,7 +100,11 @@ def test_full_pipeline_repro_root_keys_whitelisted() -> None:
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "example_h2_vqs_track.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "example_h2_vqs_track.yaml")
+    .is_file(),
     reason="VQS track sample config missing",
 )
 def test_full_pipeline_vqs_yaml_repro_root_keys_whitelisted() -> None:
@@ -107,7 +125,11 @@ def test_full_pipeline_vqs_yaml_repro_root_keys_whitelisted() -> None:
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "qpe_dual_track_demo.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "qpe_dual_track_demo.yaml")
+    .is_file(),
     reason="QPE dual-track sample config missing",
 )
 def test_full_pipeline_qpe_dual_track_repro_root_keys_whitelisted() -> None:

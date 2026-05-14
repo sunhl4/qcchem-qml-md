@@ -25,7 +25,7 @@
 - **多后端可插拔**：同一 YAML 下 statevector / Qiskit / ionstack mock。
 - **MD/ML 扩展面**：`md_bridge` / QMEFDataset（相对纯化学闭合产品的长板）。
 
-机读汇总（与 HTTP 同源）：**`capability_surface.open_stack_differentiators`**（schema **`open_stack_differentiators_v1`**：`scope_excludes`、`beyond_public_doc_bundle`）与同响应体内的 **`operator_pool_registry_export_v1`**（ADAPT/IQEB 池 id 与 **`pool_id_aliases`**）。
+机读汇总（与 HTTP 同源）：同一响应体含 **`object_map`**、**`gaps`**、**`mitigation_execution_model`**、**`open_stack_differentiators`**（schema **`open_stack_differentiators_v1`**：`scope_excludes`、`beyond_public_doc_bundle`）、**`tangelo_public_mapping_alias_surface_v1`**、**`operator_pool_registry_export_v1`**（ADAPT/IQEB 池 id 与 **`pool_id_aliases`**）、**`algorithm_registry_export_v1`**、**`variational_registry_export_v1`**。
 
 ## 1. Protocols 与工作流
 
@@ -36,7 +36,7 @@
 | 公开 `Computable` / Methods 摘要（文档向） | API 与导出脚本 | `partial`→**可检证 L1**：YAML 机读 `POST /v1/meta/computables-preview`、`POST /v1/meta/workflow-preview`（五阶段 + `computable_graph_v2` + 可选 `include_computables_rich` → **`computables_rich_v1`**）；跑完后 slim 面板 `GET /v1/runs/{id}/summary`，完整 `repro` 见 `GET /v1/runs/{id}/repro`（`DONE`）；gap `composable_computable` 状态 **`analog_v2_semantic_graph_rich_optional`** |
 | 作业提交 / 列表 / 轮询（产品网关） | Nexus / 云侧 UX 叙事 | `partial`：**本地 FastAPI 类比** `qchem_stack.api`：`POST/GET /v1/runs`、`GET /v1/meta/parity-gaps`、**`POST /v1/meta/computables-preview`**、**`GET /v1/meta/queue-stats`**；无厂商身份与配额，见 [ENGINEERING_ARCHITECTURE.md](/concept/engineering-architecture) §9、[launch/retrieve 对照](/concept/launch-retrieve-nexus-analog) |
 | `qnexus` / HQC 计价 | 同上 | `n/a` + **本地类比**：`jobs/cost` + `nexus_analog` 权重（`nexus_analog_ledger` / 作业 `nexus_analog_billing`）；**不**伪造 HQC 货币。可选 `nexus_cloud`（`http`/`mock` 侧车条，非厂商 SDK） |
-| Qermit `MitRes`/`MitEx` | [Noise mitigation](https://docs.quantinuum.com/inquanto/manual/errmit.html) | `partial`：`PMSV`/`ZNE`/`SPAM` 存根；可选 **`mitigation.zne_mode=circuit_scale_fold`**（每尺度 HEA 放大 + `protocol_counts.zne_curve` 写入 **`mitigation_dag_execution`**）；**ZNE×Qiskit Pauli** 与 YAML 口径合一机读块 **`parity_snapshot.zne_qiskit_unification_v1`**（见 [mitigation_PMSV_ZNE_Qermit_mapping.md](/concept/mitigation-mapping)）；**机读图** `mitigation/qermit_analog`（`qermit_analog_v2`：`nodes`+`edges`+`topological_order`）；**线性执行迹** `mitigation/qermit_runtime` → `mitigation_dag_execution`（非 Qermit 商业运行时）；**L1 顺序不变量**：DAG 中 SPAM/PMSV/ZNE 节点 `kind` 序列与 `mitigation_dag_execution.trace[].node` 一致（`tests/test_mitigation_dag_trace_homology.py`） |
+| Qermit `MitRes`/`MitEx` | [Noise mitigation](https://docs.quantinuum.com/inquanto/manual/errmit.html) | `partial`：`PMSV`/`ZNE`/`SPAM` 存根；可选 **`mitigation.zne_mode=circuit_scale_fold`**（每尺度 HEA 放大 + `protocol_counts.zne_curve` 写入 **`mitigation_dag_execution`**）；**ZNE×Qiskit Pauli** 与 YAML 口径合一机读块 **`parity_snapshot.zne_qiskit_unification_v1`**（见 [mitigation_PMSV_ZNE_Qermit_mapping.md](/concept/mitigation-mapping)）；Methods：`resource_estimation_preview_v1` / `methods_resource_unified_v1` 镜像 **`mitigation_zne_mode_yaml`**、**`mitigation_zne_scales_yaml`**，`--results` 另附 **`parity_snapshot_mitigation_zne_*`**；**机读图** `mitigation/qermit_analog`（`qermit_analog_v2`：`nodes`+`edges`+`topological_order`）；**线性执行迹** `mitigation/qermit_runtime` → `mitigation_dag_execution`（非 Qermit 商业运行时）；**L1 顺序不变量**：DAG 中 SPAM/PMSV/ZNE 节点 `kind` 序列与 `mitigation_dag_execution.trace[].node` 一致（`tests/test_mitigation_dag_trace_homology.py`） |
 | `CuTensorNetProtocol` | [inquanto-cutensornet API](https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html) | `n/a`（诚实降级）：开放栈仅 `tensornet/cutensornet_protocol_stub` + 引擎探测键 **`tensornet_engine_resolved`** / **`tensornet_fallback_reason`**；**不**随仓库附带 `inquanto-cutensornet` 级化学尺度收缩或厂商二进制；若业务需要 L3 收缩 demo，走可选环境里 cuQuantum/cuPy，而非宣称产品 parity |
 
 ## 2. Algorithms（与 [algorithms API](https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html) 对照）
@@ -66,7 +66,7 @@
 | Projection embedding | `partial`：**L1 轨迹闭合** — `embedding.mode: projection` 写入 **`embedding_workflow`** + `parity_snapshot.projection_embedding_open_trace`。默认 `embedding.projection_quantum_hamiltonian: global_active_space` 时，变分阶段与全局 `ActiveSpaceSpec` 所选 fermion→qubit 映射相同（轨迹-only 元数据）。当设为 `fragment_mulliken_mo` 且提供 `projection_fragment_atom_indices` 时，变分 **`QubitHamiltonian`** 由 **RHF MO + 片段 Mulliken 排序 + PySCF CASCI 活性积分 + `active_space.fermion_qubit_mapping`** 构建（模块 `qchem_stack.chem.embedding.projection_hamiltonian`，**非** full many-body projection embedding，见快照 `epistemic_bound`）。样例：`configs/example_h2_projection_trace.yaml`、`configs/example_h4_projection_mulliken.yaml`。 |
 | InQuanto 全量 driver/方法名表（COSMO、PBC、多 k…） | `partial`：名称映射击 `chem/inquanto_driver_surface`；**PySCF** 上已实现 **ddCOSMO**、**PBC**（`pbc_kpoint_mesh`：Γ 为 `RHF`，否则 `KRHF`）、**PBC+ddCOSMO 尝试**（受 PySCF 版本约束）；**非** 与 InQuanto 闭源 `inquanto-pyscf` 行级一一覆盖 |
 
-**Parity export CI 抽样（几何 / SCF 扩展，config-only）**：`configs/example_h2_sto3g_density_fit.yaml`、`example_h2_zmatrix_sto3g.yaml`、`example_h2_zmatrix_sto3g_density_fit.yaml`、`example_mg_lanl2dz_ecp_rhf.yaml`、`example_mg_lanl2dz_ecp_density_fit.yaml`、`example_hbr_zmatrix_lanl2dz_ecp_density_fit.yaml` — 见 `scripts/check_parity_export_sample.py` 内 `SAMPLE_CONFIGS_REL`。
+**Parity export CI 抽样（几何 / SCF 扩展，config-only）**：`configs/example_h2_sto3g_density_fit.yaml`、`example_h2_zmatrix_sto3g.yaml`、`example_h2_zmatrix_sto3g_density_fit.yaml`、`example_mg_lanl2dz_ecp_rhf.yaml`、`example_mg_lanl2dz_ecp_density_fit.yaml`、`example_hbr_zmatrix_lanl2dz_ecp_density_fit.yaml` — 见 `scripts/check_parity_export_sample.py` 内 `SAMPLE_CONFIGS_REL`。导出顶键 **`geometry_source`**（`cartesian`|`zmatrix`）与 `PARITY_EXPORT_V2_STABLE_KEYS` 对齐。
 
 统一口径：`scf.driver` 可以替换；是否允许进入某条化学/嵌入分支由 `SolverCapabilities` 门控，不以后端品牌字符串硬编码。
 
@@ -78,7 +78,7 @@
 - **资源指标双轨**（与 InQuanto「resource estimation / TKET」叙事对齐，**非** 伪造云计价）：`spec.circuit_resource_row` 自研深度；可选 `pytket` 时 `enrich_row_with_pytket` 增加 `pytket_depth` 等，见同技术文档 §2–4。
 - **MD / ML**：`md_bridge/contracts.py` 与 `QMEFDataset` 长板。
 - **成本透明**：每电路 shots、stderr、分组数；**不**绑定 Nexus HQC。可选 `nexus_cloud` 与 `nexus_analog` 的 **repro/侧车** 便于 Methods 对表（仍非真云凭据流）。
-- **判据表导出**：`scripts/export_parity_criteria_table.py`（YAML + 可选运行结果 JSON）。
+- **判据表导出**：`scripts/export_parity_criteria_table.py`（YAML + 可选运行结果 JSON）；config-only 含 **`geometry_source`**（`cartesian`|`zmatrix`），与 `molecular_system_from_experiment` 同源。
 
 ## 5. PandM 文献对照
 

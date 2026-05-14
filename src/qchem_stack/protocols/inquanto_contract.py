@@ -32,7 +32,10 @@ INQUANTO_TO_QCHEM_OBJECT_MAP: dict[str, str] = {
         "examples/echo_runner.py; configs/example_h2_echo_variational_plugin.yaml"
     ),
     "AlgorithmIQEB": "qchem_stack.quantum.algorithms.iqeb.IQEBVQE (outer-loop Pauli correction + VQE; set quantum.algorithm=iqeb; configs/example_h2_iqeb.yaml)",
-    "AlgorithmVQD": "qchem_stack.quantum.algorithms.excited.VQD",
+    "AlgorithmVQD": (
+        "qchem_stack.quantum.algorithms.excited.VQD "
+        "(HEA: configs/example_h2_excited_smoke.yaml; UCCSD deflation: configs/example_h2_vqd_uccsd.yaml)"
+    ),
     "AlgorithmQSE": "qchem_stack.quantum.algorithms.excited.QSE + quantum.qse_transition (Pauli transition shot modes)",
     "AlgorithmSCEOM": "qchem_stack.quantum.algorithms.sceom.run_sceom_nested_commutator_from_hea",
     "Algorithm*QPE (track)": (
@@ -51,6 +54,16 @@ INQUANTO_TO_QCHEM_OBJECT_MAP: dict[str, str] = {
         "qubit_hamiltonian_from_spatial_chemist_integrals (JW or Bravyi–Kitaev via "
         "active_space.fermion_qubit_mapping)"
     ),
+    "Fermion→qubit names (Tangelo / tutorial aliases)": (
+        "qchem_stack.chem.fermion_mapping_registry.tangelo_public_mapping_alias_surface_v1() "
+        "(GET /v1/meta/capability-surface); YAML literals in DOCUMENTED_FERMION_QUBIT_MAPPINGS "
+        "only — JKMN/HCB not executable in open stack until separately wired"
+    ),
+    "IntegralSolver (Tangelo toolbox shape)": (
+        "qchem_stack.chem.solvers.base.ChemIntegralSolver "
+        "(set_physical_data, compute_mean_field, get_integrals hook; "
+        "PySCF get_integrals returns CASCI active-space MO blocks + OpenFermion reorder)"
+    ),
     "dataframe_circuit / shot rows": "qchem_stack.backends.spec.circuit_resource_row, dataframe_circuit_shot_rows",
     "Computable (expectation from circuits)": "qchem_stack.protocols.computable + integrations.inquanto_workflow_preview.computable_graph_v2 + POST /v1/meta/workflow-preview",
     "TKET / pytket pass metrics": "optional: qchem_stack.integrations.tket_fullchain + backends.pytket_bridge (parity_integrations.tket_first_circuit_stats)",
@@ -61,6 +74,11 @@ INQUANTO_TO_QCHEM_OBJECT_MAP: dict[str, str] = {
     "Noise mitigation (Qermit-style)": "qermit_analog (DAG) + qermit_runtime (linear trace) + mitigation/ (PMSV/ZNE/SPAM stubs)",
     "Device counts → expectation (Qiskit path)": "QuantumSpec.run_qiskit_shots_pauli_protocol + protocol Pauli evaluate path (see pauli_contract)",
     "Classical chemistry surface (COSMO / PBC names)": "chem.inquanto_driver_surface.INQUANTO_DRIVER_ALIAS_TO_CONFIG + PySCF drivers",
+    "Molecule geometry (Cartesian vs Z-matrix)": (
+        "config.MoleculeSpec (coordinates XOR zmatrix); "
+        "chem.bridges.facade.molecular_system_from_experiment → MolecularSystem.meta['geometry_source'] "
+        "(cartesian|zmatrix); parity export key geometry_source (config-only)"
+    ),
     "CuTensorNet-protocol stub": "tensornet.cutensornet_protocol_stub.run_cutensornet_expectation_stub",
 }
 
@@ -164,6 +182,33 @@ def open_stack_differentiators_public() -> dict[str, Any]:
                     "tests/test_mitigation_dag_trace_homology.py",
                 ],
             },
+            {
+                "id": "molecular_geometry_lineage_l1",
+                "summary": (
+                    "Explicit geometry_source (cartesian vs zmatrix) on MolecularSystem.meta from YAML and on "
+                    "parity export (Methods / competitor tables); aligns problem-construction transparency vs "
+                    "public InQuanto PySCF narratives without claiming closed-wheel parity."
+                ),
+                "evidence_modules": [
+                    "chem/bridges/facade.py",
+                    "chem/system.py",
+                    "config.py",
+                    "scripts/export_parity_criteria_table.py",
+                    "tests/test_classical_bridge_interchange.py",
+                    "configs/example_h2_zmatrix_sto3g.yaml",
+                ],
+            },
+            {
+                "id": "tangelo_fermion_mapping_alias_surface",
+                "summary": (
+                    "Static JW/BK/SCBK ↔ tutorial nickname table vs Tangelo/OpenFermion wording; JKMN/HCB "
+                    "disclosed as not executable until OpenFermion parity work lands."
+                ),
+                "evidence_modules": [
+                    "chem/fermion_mapping_registry.py",
+                    "api/app.py",
+                ],
+            },
         ],
         "epistemic_bound": (
             "Beyond means transparency and optional open extras — not numerical equivalence to closed "
@@ -213,6 +258,12 @@ PARITY_SNAPSHOT_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "vqd_after_variational",
         "vqd_n_states",
         "vqd_penalty_weight",
+        "vqd_penalty_weights",
+        "vqd_optimizer_method_yaml",
+        "vqd_init_strategy_yaml",
+        "vqd_init_noise_scale_yaml",
+        "vqd_max_overlap_warn_yaml",
+        "vqd_overlap_mode_yaml",
         "vqd_shots_objective",
         "vqd_shots_overlap",
         "vqd_shots_weight",
@@ -288,6 +339,7 @@ PARITY_EXPORT_V2_STABLE_KEYS: frozenset[str] = frozenset(
         "iqeb_implementation_path",
         "pauli_protocol_expectation_path",
         "protocol_expectation_semantics_v1",
+        "geometry_source",
         "embedding",
     }
 )
@@ -409,6 +461,11 @@ RUN_SUMMARY_DOCUMENTED_KEYS: frozenset[str] = frozenset(
         "vqd_shots_objective_yaml",
         "vqd_shots_overlap_yaml",
         "vqd_shots_weight_yaml",
+        "vqd_optimizer_method_yaml",
+        "vqd_init_strategy_yaml",
+        "vqd_overlap_mode_yaml",
+        "vqd_warnings_present",
+        "vqd_variety_yaml",
         "qse_shot_mode",
         "qse_subspace_dim_yaml",
         "qse_max_basis_yaml",
@@ -487,6 +544,131 @@ REPRO_DOCUMENTED_KEYS: frozenset[str] = frozenset(
 )
 
 
+# Keys emitted by ``integrations.resource_estimation_preview.build_resource_estimation_preview_v1``.
+RESOURCE_ESTIMATION_PREVIEW_V1_DOCUMENTED_KEYS: frozenset[str] = frozenset(
+    {
+        "schema",
+        "mode",
+        "epistemic_bound",
+        "quantum_algorithm_yaml",
+        "algorithm_factory_yaml",
+        "adapt_pool_id_yaml",
+        "iqeb_pool_id_yaml",
+        "variational_ansatz_yaml",
+        "fermion_qubit_mapping_yaml",
+        "backend_provider_yaml",
+        "zne_enabled_yaml",
+        "mitigation_zne_mode_yaml",
+        "mitigation_zne_scales_yaml",
+        "pmsv_enabled_yaml",
+        "run_sampled_pauli_protocol_yaml",
+        "run_qiskit_shots_pauli_protocol_yaml",
+        "pauli_protocol_expectation_path_yaml",
+        "qpe_demo_track_after_variational",
+        "qpe_pipeline_integration",
+        "qpe_demo_track_n_bits",
+        "qpe_three_pack_after_variational",
+        "qpe_three_pack_time_yaml",
+        "qpe_three_pack_deterministic_rounds_yaml",
+        "qpe_three_pack_kitaev_bits_yaml",
+        "qpe_three_pack_info_samples_yaml",
+        "vqs_track_after_variational",
+        "vqs_pipeline_integration",
+        "vqs_mode_yaml",
+        "vqs_n_times_yaml",
+        "vqs_dt_yaml",
+        "vqs_rhs_mode_yaml",
+        "vqs_tangent_fd_epsilon_yaml_preview",
+        "vqd_overlap_exponent_yaml",
+        "vqd_cobyla_maxiter_yaml",
+        "vqd_overlap_mode_yaml",
+        "sceom_generator_strategy_yaml",
+        "parity_integrations_tket_first_circuit_stats",
+        "use_pauli_protocol",
+        "spam_calibration_enabled_yaml",
+        "classical_shadows_stub_enabled_yaml",
+        "classical_shadows_budget_pairs_yaml",
+        "classical_benchmark_enabled_yaml",
+        "classical_benchmark_active",
+        "classical_benchmark_summary_schema",
+        "classical_benchmark_recommended_baseline_policy",
+        "classical_benchmark_recommended_baseline_method",
+        "classical_benchmark_recommended_baseline_energy_au",
+        "classical_benchmark_best_method",
+        "classical_benchmark_best_energy_au",
+        "resource_summary_n_circuits",
+        "resource_summary_n_qubits",
+        "resource_summary_sum_shots",
+        "resource_summary_max_depth",
+        "resource_summary_sum_twoq",
+        "resource_summary_n_pauli_terms",
+        "resource_summary_n_pauli_groups",
+        "resource_summary_pauli_averaging_protocol_ran",
+        "resource_summary_excited_shots_upper_bound",
+        "resource_summary_sum_shots_total_with_excited_upper_bound",
+        "run_summary_protocol_total_shots_budget",
+        "run_summary_protocol_n_measurement_circuits",
+        "run_summary_protocol_shots_per_circuit_effective",
+        "run_summary_protocol_energy_stderr",
+        "run_summary_protocol_expectation_source",
+        "run_summary_protocol_energy_stderr_model",
+        "run_summary_protocol_zne_mode",
+        "run_summary_excited_shots_upper_bound",
+        "run_summary_sum_shots_total_with_excited_upper_bound",
+        "run_summary_pauli_averaging_protocol_ran",
+        "run_summary_qpe_three_pack_ran",
+        "qpe_three_pack_deterministic_energy_est_from_run",
+        "qpe_three_pack_kitaev_energy_est_from_run",
+        "qpe_three_pack_info_theory_energy_est_from_run",
+        "parity_snapshot_mitigation_zne_scales",
+        "parity_snapshot_mitigation_zne_mode",
+    }
+)
+
+
+# Top-level keys on ``integrations.methods_resource_unified.build_methods_resource_unified_v1`` output.
+METHODS_RESOURCE_UNIFIED_V1_DOCUMENTED_KEYS: frozenset[str] = frozenset(
+    {
+        "schema",
+        "classical_backend_id",
+        "classical_benchmark_backend_yaml",
+        "quantum_algorithm_yaml",
+        "quantum_algorithm_factory_yaml",
+        "resource_summary",
+        "qpe_demo_track",
+        "run_summary_qpe_demo_track_ran",
+        "run_summary_qpe_three_pack_ran",
+        "qpe_three_pack_deterministic_energy_est",
+        "qpe_three_pack_kitaev_energy_est",
+        "qpe_three_pack_info_theory_energy_est",
+        "qpe_open_stack_contract_v1",
+        "run_summary_vqs_track_ran",
+        "vqs_open_stack_contract_v1",
+        "excited_protocol_contract_v1_present",
+        "tket_first_compiled_circuit_probe_schema",
+        "classical_benchmark_active",
+        "classical_benchmark_summary_schema",
+        "classical_benchmark_recommended_baseline_policy",
+        "classical_benchmark_recommended_baseline_method",
+        "classical_benchmark_recommended_baseline_energy_au",
+        "classical_benchmark_best_method",
+        "classical_benchmark_best_energy_au",
+        "mitigation_zne_mode_yaml",
+        "mitigation_zne_scales_yaml",
+        "run_summary_protocol_total_shots_budget",
+        "run_summary_protocol_n_measurement_circuits",
+        "run_summary_protocol_shots_per_circuit_effective",
+        "run_summary_protocol_energy_stderr",
+        "run_summary_protocol_expectation_source",
+        "run_summary_protocol_energy_stderr_model",
+        "run_summary_protocol_zne_mode",
+        "run_summary_excited_shots_upper_bound",
+        "run_summary_sum_shots_total_with_excited_upper_bound",
+        "run_summary_pauli_averaging_protocol_ran",
+    }
+)
+
+
 def classify_pauli_expectation_path(q: QuantumSpec) -> str:
     """
     How ``energy_pauli_protocol`` is produced when the Pauli averaging stage is **enabled in YAML**.
@@ -497,7 +679,9 @@ def classify_pauli_expectation_path(q: QuantumSpec) -> str:
     if not q.use_pauli_protocol:
         return PAULI_PATH_DISABLED
     if q.run_sampled_pauli_protocol and q.run_qiskit_shots_pauli_protocol:
-        raise ValueError("run_sampled_pauli_protocol and run_qiskit_shots_pauli_protocol are mutually exclusive")
+        raise ValueError(
+            "run_sampled_pauli_protocol and run_qiskit_shots_pauli_protocol are mutually exclusive"
+        )
     if q.run_sampled_pauli_protocol:
         return PAULI_PATH_STATEVECTOR_SHOT_SIM
     if q.run_qiskit_shots_pauli_protocol:
@@ -694,3 +878,65 @@ def inquanto_gap_categories() -> list[dict[str, Any]]:
             "status": "yes_qiskit",
         },
     ]
+
+
+def _gap_id_and_anchor_pairs(gaps: list[dict[str, Any]]) -> list[tuple[str, str]]:
+    pairs: list[tuple[str, str]] = []
+    for row in gaps:
+        rid = row.get("id")
+        anchor = row.get("parity_matrix_anchor")
+        if isinstance(rid, str) and rid and isinstance(anchor, str) and anchor:
+            pairs.append((rid, anchor))
+    return pairs
+
+
+def inquanto_gap_anchor_index_v1() -> dict[str, Any]:
+    """
+    Stable machine-readable index for gap ``id`` <-> ``parity_matrix_anchor`` mappings.
+
+    This is intentionally derived from :func:`inquanto_gap_categories` so parity dashboards can
+    compare list payloads and anchor mappings with a single schema.
+    """
+    gaps = inquanto_gap_categories()
+    pairs = _gap_id_and_anchor_pairs(gaps)
+    return {
+        "schema": "inquanto_gap_anchor_index_v1",
+        "id_to_anchor": {rid: anchor for rid, anchor in pairs},
+        "anchor_to_ids": {
+            anchor: sorted([rid for rid, anchor2 in pairs if anchor2 == anchor])
+            for anchor in sorted({anchor for _, anchor in pairs})
+        },
+    }
+
+
+def validate_inquanto_gap_categories() -> list[str]:
+    """
+    Validate row-level invariants for :func:`inquanto_gap_categories`.
+
+    Returns a list of error strings; empty list means valid.
+    """
+    gaps = inquanto_gap_categories()
+    errors: list[str] = []
+    if not isinstance(gaps, list) or not gaps:
+        return ["gaps must be a non-empty list"]
+    ids: list[str] = []
+    anchors: list[str] = []
+    for idx, row in enumerate(gaps):
+        if not isinstance(row, dict):
+            errors.append(f"row[{idx}] must be mapping")
+            continue
+        rid = row.get("id")
+        if not isinstance(rid, str) or not rid:
+            errors.append(f"row[{idx}] missing non-empty id")
+        else:
+            ids.append(rid)
+        anchor = row.get("parity_matrix_anchor")
+        if not isinstance(anchor, str) or not anchor:
+            errors.append(f"row[{idx}] missing non-empty parity_matrix_anchor")
+        else:
+            anchors.append(anchor)
+    if len(ids) != len(set(ids)):
+        errors.append("duplicated gap id detected")
+    if len(anchors) != len(set(anchors)):
+        errors.append("duplicated parity_matrix_anchor detected")
+    return errors

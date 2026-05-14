@@ -21,6 +21,8 @@ from pathlib import Path
 # M2-style sampling: VQE + ADAPT + excited + IQEB + projection + Pauli shot-path YAMLs (config-only export).
 SAMPLE_CONFIGS_REL = (
     "configs/example_h2.yaml",
+    # Second backend (`scf.driver=psi4`): registry + capabilities snapshot in export (no PySCF required).
+    "configs/example_h2_psi4_rhf_sto3g.yaml",
     "configs/tutorial_inquanto_chain_h2.yaml",
     "configs/example_h2_excited_smoke.yaml",
     "configs/example_h2_iqeb.yaml",

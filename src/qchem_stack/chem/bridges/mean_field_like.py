@@ -45,7 +45,9 @@ class GenericMeanFieldLike:
 
 class PySCFMeanFieldLike(GenericMeanFieldLike):
     def __init__(self, *, _raw: Any, _e_tot: float, _mo_energy: np.ndarray) -> None:
-        super().__init__(backend_tag="pyscf", _raw=_raw, _e_tot=float(_e_tot), _mo_energy=_mo_energy)
+        super().__init__(
+            backend_tag="pyscf", _raw=_raw, _e_tot=float(_e_tot), _mo_energy=_mo_energy
+        )
 
     def overlap_ao(self) -> np.ndarray:
         return np.asarray(self._raw.get_ovlp(), dtype=float)
@@ -60,10 +62,14 @@ class PySCFMeanFieldLike(GenericMeanFieldLike):
         return np.asarray(dm, dtype=float)
 
 
-def wrap_mean_field_like(*, backend_tag: str, raw_mf: Any, e_tot: float, mo_energy: np.ndarray) -> MeanFieldLike:
+def wrap_mean_field_like(
+    *, backend_tag: str, raw_mf: Any, e_tot: float, mo_energy: np.ndarray
+) -> MeanFieldLike:
     tag = str(backend_tag).strip().lower()
     if tag == "pyscf":
-        return PySCFMeanFieldLike(_raw=raw_mf, _e_tot=float(e_tot), _mo_energy=np.asarray(mo_energy, dtype=float))
+        return PySCFMeanFieldLike(
+            _raw=raw_mf, _e_tot=float(e_tot), _mo_energy=np.asarray(mo_energy, dtype=float)
+        )
     return GenericMeanFieldLike(
         backend_tag=tag or "unknown",
         _raw=raw_mf,

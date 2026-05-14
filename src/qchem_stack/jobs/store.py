@@ -44,7 +44,9 @@ class JobHandle:
 
 
 class JobStore(Protocol):
-    def enqueue(self, job_id: str, payload: bytes, protocol_hash: str | None = None) -> JobHandle: ...
+    def enqueue(
+        self, job_id: str, payload: bytes, protocol_hash: str | None = None
+    ) -> JobHandle: ...
     def result(self, job_id: str) -> dict[str, Any]: ...
 
 
@@ -207,14 +209,22 @@ class SqliteJobStore:
             except json.JSONDecodeError:
                 pass
         events_fb: list[dict[str, Any]] = [
-            {"t": float(created) if created is not None else 0.0, "kind": "submitted", "status": JobStatus.QUEUED.value},
+            {
+                "t": float(created) if created is not None else 0.0,
+                "kind": "submitted",
+                "status": JobStatus.QUEUED.value,
+            },
             {
                 "t": float(updated) if updated is not None else 0.0,
                 "kind": "state_snapshot",
                 "status": str(status),
             },
         ]
-        return {"schema": "job_timeline_v1", "source": "sqlite_coarse_timeline_v1", "events": events_fb}
+        return {
+            "schema": "job_timeline_v1",
+            "source": "sqlite_coarse_timeline_v1",
+            "events": events_fb,
+        }
 
     def mark_running(self, job_id: str) -> None:
         con = sqlite3.connect(self.path)

@@ -9,7 +9,9 @@ from qchem_stack.integrations.l3_algorithm_benchmark import (
 
 
 def test_algorithm_benchmark_bundle_missing_files_yields_empty_rows() -> None:
-    b = algorithm_benchmark_bundle_v1(repo_root=Path("/nonexistent_root"), config_rels=["nope.yaml"])
+    b = algorithm_benchmark_bundle_v1(
+        repo_root=Path("/nonexistent_root"), config_rels=["nope.yaml"]
+    )
     assert b["schema"] == "algorithm_benchmark_bundle_v1"
     assert b["rows"] == []
 
@@ -36,7 +38,10 @@ def test_merged_experiment_benchmark_groups_by_algorithm_yaml() -> None:
     assert m["n_configs"] == 4
     assert m["total_wall_time_ms"] == 36.0
     assert m["mean_wall_time_ms"] == 9.0
-    keys = [(g["quantum_algorithm_yaml"], g["n_configs"], g["total_wall_time_ms"]) for g in m["by_quantum_algorithm_yaml"]]
+    keys = [
+        (g["quantum_algorithm_yaml"], g["n_configs"], g["total_wall_time_ms"])
+        for g in m["by_quantum_algorithm_yaml"]
+    ]
     assert keys == [
         (None, 1, 1.0),
         ("adapt_v1", 2, 30.0),

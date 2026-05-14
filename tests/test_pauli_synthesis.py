@@ -47,7 +47,9 @@ def test_target_stderr_increases_effective_shots_in_counts() -> None:
     tight.instantiate()
     tight.build(np.array([0.1, 0.2, 0.3, 0.4]), hea_depth=1)
     tight.run()
-    assert tight._counts["shots_per_circuit_effective"] >= loose._counts["shots_per_circuit_effective"]
+    assert (
+        tight._counts["shots_per_circuit_effective"] >= loose._counts["shots_per_circuit_effective"]
+    )
 
 
 def test_pmsv_retention_scales_energy_stderr() -> None:

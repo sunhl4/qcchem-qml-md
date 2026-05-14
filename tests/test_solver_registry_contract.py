@@ -54,7 +54,9 @@ active_space:
     base = load_experiment_config(cfg_path)
     py = create_solver(base)
     assert isinstance(py, PySCFIntegralSolver)
-    ps = create_solver(base.model_copy(update={"scf": base.scf.model_copy(update={"driver": "psi4"})}))
+    ps = create_solver(
+        base.model_copy(update={"scf": base.scf.model_copy(update={"driver": "psi4"})})
+    )
     assert isinstance(ps, Psi4IntegralSolver)
 
 

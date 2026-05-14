@@ -41,7 +41,14 @@ def test_qiskit_shots_energy_near_exact(n_shots: int) -> None:
     angles = np.array([0.1, 0.2, 0.3, 0.4], dtype=float)
     plan = build_measurement_plan(h, nq, grouping="tensor_product")
     e_sh, se, meta = energy_estimate_grouped_qiskit_shots(
-        h, plan, nq, d, angles, n_shots, BackendSpec(name="aer", provider="qiskit"), np.random.default_rng(42)
+        h,
+        plan,
+        nq,
+        d,
+        angles,
+        n_shots,
+        BackendSpec(name="aer", provider="qiskit"),
+        np.random.default_rng(42),
     )
     ex = executor_from_spec(BackendSpec(name="q", provider="qiskit"))
     e_ex = ex.expectation_hea(h, nq, angles, d)

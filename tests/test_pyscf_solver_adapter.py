@@ -92,6 +92,18 @@ def test_density_fit_wires_into_meta_and_mf() -> None:
     assert run.driver_meta.get("scf_density_fit_auxbasis") == "weigend"
 
 
+def test_get_integrals_returns_openfermion_reordered_tensor() -> None:
+    sol = PySCFIntegralSolver(_h2_system(), "RHF", ChemistryExtendedSpec())
+    out = sol.get_integrals(n_active_orbitals=2, n_active_electrons=2)
+    assert out.get("schema") == "pyscf_active_space_integrals_v1"
+    assert out.get("integral_representation") == "mo"
+    assert out.get("openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
+    h2_c = out.get("h2_spatial_mo_chemist")
+    h2_of = out.get("h2_spatial_mo_openfermion")
+    assert isinstance(h2_c, np.ndarray) and h2_c.shape == (2, 2, 2, 2)
+    assert isinstance(h2_of, np.ndarray) and h2_of.shape == (2, 2, 2, 2)
+
+
 def test_ecp_is_forwarded_to_pyscf_mol() -> None:
     sys = MolecularSystem(
         symbols=["Na"],

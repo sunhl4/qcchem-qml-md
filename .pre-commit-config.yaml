@@ -1,0 +1,11 @@
+# Optional: after `pip install -e ".[dev]"`: `pre-commit install`
+# Match CI **lint** job: `ruff check` + `ruff format --check` on these paths:
+# - see `.github/workflows/ci.yml`
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.12
+    hooks:
+      - id: ruff
+        files: ^(src/qchem_stack|tests|scripts|examples)/
+      - id: ruff-format
+        files: ^(src/qchem_stack|tests|scripts|examples)/

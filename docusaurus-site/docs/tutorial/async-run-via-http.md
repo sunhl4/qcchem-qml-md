@@ -1,24 +1,74 @@
 # HTTP 异步运行教程
 
-本教程演示如何通过 API 异步提交任务并轮询状态。
+本教程演示如何通过 HTTP 提交异步任务，并在任务完成后获取 `summary` 与 `repro`。
 
-## 1. 启动服务
+## 目标
+
+- 提交一个异步 run
+- 轮询状态直到结束
+- 拉取结果摘要和可复现对象
+
+## 前置条件
+
+1. 在仓库根目录安装 API 依赖：`pip install -e ".[api]"`
+2. 本地有可用配置文件（例如 `configs/example_h2.yaml`）
+
+## 步骤 1：启动服务
 
 ```bash
 uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-## 2. 提交任务
+另开一个终端执行后续命令。
 
-向 `POST /v1/runs` 发送 `experiment_yaml`，并设置异步模式。
+## 步骤 2：提交异步任务
 
-## 3. 轮询状态
+`POST /v1/runs` 需要的是完整 `experiment_yaml` 文本。下面示例直接把文件内容注入请求体：
 
-- `GET /v1/runs/{id}/status`：轻量状态
-- `GET /v1/runs/{id}/summary`：产品摘要
-- `GET /v1/runs/{id}/repro`：完成后获取完整 repro
+```bash
+curl -sS -X POST "http://127.0.0.1:8000/v1/runs" \
+  -H "Content-Type: application/json" \
+  -H "X-Trace-ID: demo-async-001" \
+  -d "$(python - <<'PY'
+import json
+from pathlib import Path
+payload = {"experiment_yaml": Path("configs/example_h2.yaml").read_text(), "sync": False}
+print(json.dumps(payload))
+PY
+)"
+```
 
-## 4. 实践建议
+返回里记录 `job_id`，下文用 `$RUN_ID` 表示。
 
-- 在网关层统一传 `X-Trace-ID`
-- 把 `job_id` 和业务单号做映射存档
+## 步骤 3：轮询任务状态
+
+```bash
+curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/status"
+```
+
+建议每 1-2 秒轮询一次，直到状态进入终态（如 `DONE` / `FAILED`）。
+
+## 步骤 4：读取摘要与复现对象
+
+```bash
+curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/summary"
+curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/repro"
+```
+
+## 验证清单
+
+- `status` 能从排队/运行推进到终态
+- `summary` 可读，包含关键结果摘要
+- `repro` 可读，包含 `run_context`、`pipeline_profile`、`run_summary`
+
+## 常见问题
+
+- **404**：`RUN_ID` 不存在或拼写错误
+- **409**：任务未完成就请求 `repro`
+- **422**：`experiment_yaml` 不合法或配置无法通过校验
+
+## 下一步
+
+- [repro 关键字段速览](./read-repro-keys)
+- [命令行与脚本](../reference/cli-and-scripts)
+- [HTTP API 与作业队列](../reference/http-api-sqlite-jobs)

@@ -5,7 +5,7 @@
 **终局口径（与年度计划一致）**
 
 - **L1+**：除刻意 `n/a` 外，矩阵每行有 gap 锚点 / caveat / 证据链（模块 + 机读键 + 测试或脚本）；残余 `partial` 须有 SLA 或收束为 `yes`。
-- **L3（可选）**：`integrations.l3_algorithm_benchmark.L3_PYTEST_YAMLS` 门禁代表（当前 **6**），`QCHEM_RUN_L3=1` + `pytest -m l3`；更全见 `algorithm_benchmark_bundle_v1`。**非**闭源 wheel 数值等价。
+- **L3（可选）**：`integrations.l3_algorithm_benchmark.L3_PYTEST_YAMLS` 门禁代表（当前 **7**），`QCHEM_RUN_L3=1` + `pytest -m l3`；更全见 `algorithm_benchmark_bundle_v1`。**非**闭源 wheel 数值等价。
 - **排除**：真 Nexus/`qnexus`/HQC/OAuth/配额；硬件校准、原生门集专优、拓扑；Qermit/cuTensorNet **商业二进制**等价。
 
 ---
@@ -147,7 +147,7 @@
 ### 7.2 CI 策略
 
 - **主 CI**：仅 schema / config 校验 + **skip** 重型断言。
-- **夜间 / 可选 job**：`pytest -m l3`（`QCHEM_RUN_L3=1`，跑 **`L3_PYTEST_YAMLS`**，当前 **6**）跑全量；paper JSON：`scripts/l3_algorithm_benchmark_report.py`。
+- **夜间 / 可选 job**：`pytest -m l3`（`QCHEM_RUN_L3=1`，跑 **`L3_PYTEST_YAMLS`**，当前 **7**）跑全量；paper JSON：`scripts/l3_algorithm_benchmark_report.py`。
 
 ### 7.3 与 export
 

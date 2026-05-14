@@ -11,29 +11,29 @@ type FeatureItem = {
 
 const FeatureList: FeatureItem[] = [
   {
-    title: 'Chemical Specification',
+    title: 'P1 化学问题定义',
     Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
     description: (
       <>
-        用统一 YAML 组织分子、基组、活性空间与嵌入参数，先建立可复现的化学问题定义。
+        先把分子、基组、活性空间和嵌入参数定义清楚，减少后续调试中的语义歧义。
       </>
     ),
   },
   {
-    title: 'Program Construction',
+    title: 'P2 程序构建与协议',
     Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
     description: (
       <>
-        在算法、协议和编排层解耦构建程序，支持 VQE 类流程以及可追踪的中间产物输出。
+        把算法、协议和编排拆开，形成可演进、可验证、可追溯的执行计划。
       </>
     ),
   },
   {
-    title: 'Execution and Analysis',
+    title: 'P3/P4 执行与作业',
     Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
     description: (
       <>
-        多后端执行、作业队列和 repro 导出能力帮助你把实验从 notebook 推进到工程化流程。
+        从后端执行到作业状态机，再到 repro 导出，把实验升级为可维护的工程流程。
       </>
     ),
   },
@@ -58,8 +58,8 @@ export default function HomepageFeatures(): ReactNode {
     <section className={styles.features}>
       <div className="container">
         <div className={styles.featuresHeader}>
-          <Heading as="h2">三条能力主轴</Heading>
-          <p>对齐行业文档结构，同时覆盖你自己的工程化扩展路径。</p>
+          <Heading as="h2">从能跑到能维护</Heading>
+          <p>围绕 P1-P4 构建产品手册，让新用户和维护者都能快速找到下一步动作。</p>
         </div>
         <div className="row">
           {FeatureList.map((props, idx) => (

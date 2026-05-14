@@ -123,11 +123,7 @@ class FermionicAdaptVQE(AlgorithmBase):
                 for idx, g in grad_map:
                     if g < grad_tol:
                         continue
-                    term_qubits = {
-                        q
-                        for term in self.pool[idx].terms
-                        for (q, _p) in term
-                    }
+                    term_qubits = {q for term in self.pool[idx].terms for (q, _p) in term}
                     if used_qubits & term_qubits:
                         continue
                     selected_this_round.append(idx)

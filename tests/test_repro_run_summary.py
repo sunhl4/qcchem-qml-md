@@ -221,6 +221,7 @@ def test_attach_run_summary_vqd_energy_and_shot_yaml() -> None:
     assert sm["vqd_shots_objective_yaml"] == 10
     assert sm["vqd_shots_overlap_yaml"] == 20
     assert sm["vqd_shots_weight_yaml"] == 30
+    assert sm["vqd_overlap_mode_yaml"] == "statevector_overlap"
 
 
 def test_attach_run_summary_qse_schedule_fields() -> None:
@@ -291,7 +292,9 @@ def test_attach_run_summary_dmet_embedding_flags() -> None:
     cfg = ExperimentConfig(
         experiment_id="dmet_rsum",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+        ),
         active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
         quantum=QuantumSpec(use_pauli_protocol=False),
         embedding=EmbeddingSpec(

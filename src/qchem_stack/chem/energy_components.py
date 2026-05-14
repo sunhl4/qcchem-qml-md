@@ -22,7 +22,9 @@ def build_energy_components_v1(
     """Return ``energy_components_v1`` blob for ``run_summary`` / export mirrors."""
     return {
         "schema": "energy_components_v1",
-        "nuclear_repulsion_au": float(nuclear_repulsion_au) if nuclear_repulsion_au is not None else None,
+        "nuclear_repulsion_au": float(nuclear_repulsion_au)
+        if nuclear_repulsion_au is not None
+        else None,
         "mean_field_total_au": float(mean_field_total_au),
         "solvent_model": str(solvent_model),
         "solvent_dielectric": float(solvent_dielectric) if solvent_dielectric is not None else None,

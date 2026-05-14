@@ -30,4 +30,6 @@ def test_mock_external_solver_runs_pipeline_plugin_path() -> None:
     cfg.scf.driver = "mock_external"
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     assert float(out["scf_energy"]) < 0.0
-    assert (out.get("hamiltonian_meta") or {}).get("integral_source") == "decomposition_plugin_toy_v1"
+    assert (out.get("hamiltonian_meta") or {}).get(
+        "integral_source"
+    ) == "decomposition_plugin_toy_v1"

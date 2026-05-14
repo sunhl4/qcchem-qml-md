@@ -95,7 +95,9 @@ def test_decomposition_plugin_rejects_missing_primary_fragment(tmp_path: Path) -
         _ = qubit_hamiltonian_from_decomposition_plugin(cfg, cfg_path=cfg_path)
 
 
-def test_decomposition_plugin_rejects_invalid_secondary_fragment_pauli_shape(tmp_path: Path) -> None:
+def test_decomposition_plugin_rejects_invalid_secondary_fragment_pauli_shape(
+    tmp_path: Path,
+) -> None:
     root = Path(__file__).resolve().parents[1]
     cfg_path = root / "configs" / "example_decomposition_plugin_toy.yaml"
     cfg = load_experiment_config(cfg_path)

@@ -21,14 +21,25 @@ def interaction_operator_to_dataframe(
     cutoff_abs: float = 1e-14,
 ) -> pd.DataFrame:
     """Tabular view (spin-orbital sectors) analogous to chemistry-tutorial ``df()`` previews."""
-    rows: list[dict[str, Any]] = [{"sector": "constant", "p": None, "q": None, "r": None, "s": None, "value_Eh": float(op.constant)}]
+    rows: list[dict[str, Any]] = [
+        {
+            "sector": "constant",
+            "p": None,
+            "q": None,
+            "r": None,
+            "s": None,
+            "value_Eh": float(op.constant),
+        }
+    ]
     ob = np.asarray(op.one_body_tensor, dtype=float)
     n = int(ob.shape[0])
     for p in range(n):
         for q in range(n):
             v = float(ob[p, q])
             if abs(v) > cutoff_abs:
-                rows.append({"sector": "one_body_spin", "p": p, "q": q, "r": None, "s": None, "value_Eh": v})
+                rows.append(
+                    {"sector": "one_body_spin", "p": p, "q": q, "r": None, "s": None, "value_Eh": v}
+                )
     tb = np.asarray(op.two_body_tensor, dtype=float)
     count = 0
     for p in range(n):
@@ -38,7 +49,9 @@ def interaction_operator_to_dataframe(
                     v = float(tb[p, q, r, s])
                     if abs(v) <= cutoff_abs:
                         continue
-                    rows.append({"sector": "two_body_spin", "p": p, "q": q, "r": r, "s": s, "value_Eh": v})
+                    rows.append(
+                        {"sector": "two_body_spin", "p": p, "q": q, "r": r, "s": s, "value_Eh": v}
+                    )
                     count += 1
                     if max_spinorb_two_body is not None and count >= max_spinorb_two_body:
                         return pd.DataFrame(rows)
@@ -133,7 +146,9 @@ class RestrictedActiveSpaceIntegralOperatorCompact:
             for q in range(na):
                 v = float(h1[p, q])
                 if abs(v) > cutoff_abs:
-                    rows.append({"sector": "h1_mo", "p": p, "q": q, "r": None, "s": None, "value_Eh": v})
+                    rows.append(
+                        {"sector": "h1_mo", "p": p, "q": q, "r": None, "s": None, "value_Eh": v}
+                    )
         h2 = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(self.dense_h2_chemist_spatial())
         count = 0
         for p in range(na):
@@ -143,17 +158,22 @@ class RestrictedActiveSpaceIntegralOperatorCompact:
                         v = float(h2[p, q, r, s])
                         if abs(v) <= cutoff_abs:
                             continue
-                        rows.append({"sector": "h2_mo", "p": p, "q": q, "r": r, "s": s, "value_Eh": v})
+                        rows.append(
+                            {"sector": "h2_mo", "p": p, "q": q, "r": r, "s": s, "value_Eh": v}
+                        )
                         count += 1
                         if max_two_body is not None and count >= max_two_body:
                             return pd.DataFrame(rows)
         return pd.DataFrame(rows)
 
-    def df(self, *, mo_max_two_body: int | None = 10_000, spinorb_max_two_body: int | None = 8000) -> pd.DataFrame:
+    def df(
+        self, *, mo_max_two_body: int | None = 10_000, spinorb_max_two_body: int | None = 8000
+    ) -> pd.DataFrame:
         """Notebook-friendly union view: MO sectors then spin-orbital sectors (truncated)."""
         mo = self.df_mo_integrals(max_two_body=mo_max_two_body)
         mo.insert(0, "basis", "spatial_mo")
-        ferm = interaction_operator_to_dataframe(self.to_interaction_operator(), max_spinorb_two_body=spinorb_max_two_body)
+        ferm = interaction_operator_to_dataframe(
+            self.to_interaction_operator(), max_spinorb_two_body=spinorb_max_two_body
+        )
         ferm.insert(0, "basis", "spin_orbital_jw_order")
         return pd.concat([mo, ferm], ignore_index=True)
-

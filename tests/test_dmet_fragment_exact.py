@@ -23,6 +23,7 @@ def test_h4_dmet_multifragment_exact_shared_yaml() -> None:
     assert led.get("multifragment_shared_global_hamiltonian") is True
     frags = led.get("fragments") or []
     assert len(frags) == 2
+
     def _frag_solver(f: dict) -> str | None:
         return f.get("solver") or (f.get("meta") or {}).get("solver")
 

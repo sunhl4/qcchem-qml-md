@@ -51,7 +51,7 @@ def test_builtin_backend_capability_matrix_smoke() -> None:
     assert pyscf.supports_avas_active_space_projection
     assert pyscf.supports_rdm_correction_hooks
     assert pyscf.supports_rdm_nevpt2_casci
-    assert not pyscf.supports_get_integrals
+    assert pyscf.supports_get_integrals
 
 
 def test_canonical_pack_requires_backend_builder() -> None:
@@ -81,7 +81,9 @@ def test_rdm_correction_gate_requires_backend_capability() -> None:
     register_mock_external_solver()
     cfg.scf.driver = "mock_external"
     cfg.chemistry_extended.rdm_correction_method = "stub_nevpt2"
-    with pytest.raises(PipelineError, match="rdm_correction_method requires backend RDM extraction support"):
+    with pytest.raises(
+        PipelineError, match="rdm_correction_method requires backend RDM extraction support"
+    ):
         run_pipeline_sync(cfg, cfg_path=p)
 
 

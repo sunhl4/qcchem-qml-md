@@ -11,7 +11,11 @@ from qchem_stack.quantum.statevector import expectation_qubit_operator, hea_stat
 
 
 def test_grouped_shot_simulation_mean_near_exact() -> None:
-    h = QubitOperator(((0, "Z"), (1, "Z")), 0.35) + QubitOperator(((0, "X"),), 0.08) + QubitOperator((), 0.12)
+    h = (
+        QubitOperator(((0, "Z"), (1, "Z")), 0.35)
+        + QubitOperator(((0, "X"),), 0.08)
+        + QubitOperator((), 0.12)
+    )
     n_q = 2
     plan = build_measurement_plan(h, n_q, grouping="tensor_product")
     angles = np.array([0.2, -0.1, 0.3, 0.4])

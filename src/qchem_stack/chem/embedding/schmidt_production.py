@@ -42,7 +42,9 @@ def _fragment_ao_indices(mol: Any, atom_indices: list[int]) -> list[int]:
     if not atom_indices:
         raise SchmidtProductionError("fragment_atom_indices must be non-empty.")
     if min(atom_indices) < 0 or max(atom_indices) >= mol.natm:
-        raise SchmidtProductionError("atom_indices must be valid 0-based atom indices for mol.natm.")
+        raise SchmidtProductionError(
+            "atom_indices must be valid 0-based atom indices for mol.natm."
+        )
     ranges = _atom_ao_ranges(mol)
     idx: list[int] = []
     for ia in atom_indices:
@@ -55,7 +57,9 @@ def _orthonormalize_columns(C: np.ndarray, S: np.ndarray) -> np.ndarray:
     M = C.T @ S @ C
     w, v = eigh(M)
     if np.min(w) < 1e-12:
-        raise SchmidtProductionError("reduced overlap matrix for column orthonormalization is singular")
+        raise SchmidtProductionError(
+            "reduced overlap matrix for column orthonormalization is singular"
+        )
     return C @ v @ np.diag(1.0 / np.sqrt(w)) @ v.T
 
 
@@ -120,7 +124,9 @@ def build_schmidt_impurity_integrals(
             "ROHF/UHF require a follow-on implementation."
         )
     if getattr(mol, "nelectron", 0) % 2 != 0:
-        raise SchmidtProductionError("Schmidt production path requires an even electron count (closed shell).")
+        raise SchmidtProductionError(
+            "Schmidt production path requires an even electron count (closed shell)."
+        )
 
     nao = int(mol.nao_nr())
     S = np.asarray(mf.get_ovlp(), dtype=float)
@@ -171,7 +177,9 @@ def build_schmidt_impurity_integrals(
     metric = C_imp.T @ S @ C_imp
     res = float(np.max(np.abs(metric - np.eye(n_imp))))
     if res > 1e-8:
-        raise SchmidtProductionError(f"impurity MO block not S-orthonormal within tolerance (residual={res})")
+        raise SchmidtProductionError(
+            f"impurity MO block not S-orthonormal within tolerance (residual={res})"
+        )
 
     dm_mo = C_imp.T @ S @ D @ S @ C_imp
     nelec_mo = int(round(float(np.trace(dm_mo))))

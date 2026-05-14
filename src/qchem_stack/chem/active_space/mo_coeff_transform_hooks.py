@@ -41,9 +41,13 @@ def apply_mo_coeff_transform_hook(cfg: ExperimentConfig, rhf: ClassicalMeanField
     if mo_coeff is None:
         raise ValueError("mo_coeff_transform_hook requires mean-field handle with mo_coeff.")
     if not isinstance(mo_coeff, np.ndarray):
-        raise ValueError("mo_coeff_transform_hook currently supports molecular ndarray mo_coeff only.")
+        raise ValueError(
+            "mo_coeff_transform_hook currently supports molecular ndarray mo_coeff only."
+        )
     before_shape = tuple(mo_coeff.shape)
-    transformed = np.asarray(hook(mo_coeff, **dict(cfg.chemistry_extended.mo_coeff_transform_kwargs)))
+    transformed = np.asarray(
+        hook(mo_coeff, **dict(cfg.chemistry_extended.mo_coeff_transform_kwargs))
+    )
     if tuple(transformed.shape) != before_shape:
         raise ValueError(
             "mo_coeff_transform_hook must preserve mo_coeff shape: "

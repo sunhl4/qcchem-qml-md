@@ -124,7 +124,10 @@ chemistry_extended:
     assert rsum.get("classical_benchmark_summary_present") is True
     assert rsum.get("classical_benchmark_summary_schema") == "classical_benchmark_summary_v1"
     if cbs.get("recommended_baseline_method") is not None:
-        assert rsum.get("classical_benchmark_recommended_baseline_method") == cbs["recommended_baseline_method"]
+        assert (
+            rsum.get("classical_benchmark_recommended_baseline_method")
+            == cbs["recommended_baseline_method"]
+        )
 
 
 def test_qpe_dual_track_yaml_runs_via_pipeline() -> None:
@@ -616,11 +619,15 @@ def test_dmet_whole_active_system_impurity_vqe_matches_global_vqe() -> None:
     cfg = ExperimentConfig(
         experiment_id="dmet_whole_h2",
         random_seed=7,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+        ),
         scf=SCFSpec(method="RHF"),
         active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=120, use_pauli_protocol=False),
+        quantum=QuantumSpec(
+            algorithm="vqe", vqe_depth=1, vqe_maxiter=120, use_pauli_protocol=False
+        ),
         embedding=EmbeddingSpec(
             mode="dmet",
             fragment_labels=["impurity"],
@@ -640,6 +647,30 @@ def test_dmet_whole_active_system_impurity_vqe_matches_global_vqe() -> None:
     assert rsum.get("dmet_fragment_solve_present") is True
     assert rsum.get("dmet_fragment_solve_schema") == "dmet_one_shot_v1"
     assert rsum.get("dmet_hamiltonian_source_yaml") == "whole_active_system"
+
+
+def test_run_pipeline_sync_packaged_h2_vqd_uccsd_yaml() -> None:
+    """UCCSD ground + VQD deflation on the same UCCSD parameterization (open-stack P3 path)."""
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_vqd_uccsd.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_vqd_uccsd.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["vqe_meta"].get("variational_ansatz") == "uccsd"
+    vqd = out.get("vqd") or {}
+    assert vqd.get("schema") == "excited_vqd_bundle_v1"
+    assert len(vqd["energies"]) == 2
+    meta = vqd["meta"]
+    assert meta.get("vqd_variety_yaml") == "uccsd"
+    assert meta.get("reused_pipeline_ground") is True
+    assert meta.get("vqd_overlap_mode_yaml") == cfg.quantum.vqd_overlap_mode
+    assert isinstance(meta.get("tangelo_deflation_analogy_v1"), dict)
+    assert isinstance(meta.get("inquanto_vqd_semantics_v1"), dict)
+    assert vqd["energies"][0] == pytest.approx(float(out["energy_after_variational"]))
+    rsum = out["repro"]["run_summary"]
+    assert rsum.get("vqd_variety_yaml") == "uccsd"
+    assert rsum.get("vqd_overlap_mode_yaml") == cfg.quantum.vqd_overlap_mode
 
 
 def test_run_pipeline_sync_packaged_h2_uccsd_yaml() -> None:

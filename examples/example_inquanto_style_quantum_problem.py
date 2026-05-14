@@ -38,7 +38,13 @@ def main() -> int:
     )
     print("meta:", prob.meta)
     print("qubit_hamiltonian.meta jw_build:", prob.qubit_hamiltonian.meta.get("jw_build"))
-    print("FermionSpace:", prob.fermion_space.n_spin_orbitals, "spin orbitals,", prob.fermion_space.n_electrons, "electrons")
+    print(
+        "FermionSpace:",
+        prob.fermion_space.n_spin_orbitals,
+        "spin orbitals,",
+        prob.fermion_space.n_electrons,
+        "electrons",
+    )
     print("JW HF state dimension:", prob.hartree_fock_state_jw.shape)
     print("QubitHamiltonian n_qubits:", prob.qubit_hamiltonian.n_qubits)
 
@@ -47,11 +53,21 @@ def main() -> int:
         prob.hartree_fock_state_jw,
         n_qubits=prob.qubit_hamiltonian.n_qubits,
     )
-    print(f"Hartree–Fock energy expectation (JW state, dense reference): {float(np.real(e_hf)):.8f} Ha")
+    print(
+        f"Hartree–Fock energy expectation (JW state, dense reference): {float(np.real(e_hf)):.8f} Ha"
+    )
 
     co = prob.compact_mo_operator
-    print("compact ERIs:", co.symmetry_meta.get("eri_raw_ndim"), "D, size", co.symmetry_meta.get("eri_raw_n_elements"))
-    print("MO integral table (head):\n", co.df_mo_integrals(max_two_body=30).head(12).to_string(index=False))
+    print(
+        "compact ERIs:",
+        co.symmetry_meta.get("eri_raw_ndim"),
+        "D, size",
+        co.symmetry_meta.get("eri_raw_n_elements"),
+    )
+    print(
+        "MO integral table (head):\n",
+        co.df_mo_integrals(max_two_body=30).head(12).to_string(index=False),
+    )
 
     print("\n=== AO-wrapped SCF (cf. InQuanto get_system_ao) ===")
     ao = drv.get_system_ao(run_hf=True)
@@ -64,7 +80,14 @@ def main() -> int:
     cfg_sym = cfg.model_copy(update={"chemistry_extended": cx})
     drv_sym = PySCFDriver.from_config(cfg_sym)
     prob_sym = drv_sym.get_restricted_active_space_quantum_problem(2, 2)
-    print("symmetry snapshot:", {k: prob_sym.meta[k] for k in ("pyscf_symmetry_detected", "pyscf_symmetry_subgroup") if k in prob_sym.meta})
+    print(
+        "symmetry snapshot:",
+        {
+            k: prob_sym.meta[k]
+            for k in ("pyscf_symmetry_detected", "pyscf_symmetry_subgroup")
+            if k in prob_sym.meta
+        },
+    )
 
     return 0
 

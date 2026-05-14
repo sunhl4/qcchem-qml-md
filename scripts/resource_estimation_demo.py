@@ -13,7 +13,9 @@ from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 
 def main() -> None:
-    ap = argparse.ArgumentParser(description="Pauli protocol resource rows (InQuanto-style dataframe).")
+    ap = argparse.ArgumentParser(
+        description="Pauli protocol resource rows (InQuanto-style dataframe)."
+    )
     ap.add_argument(
         "--pytket",
         action="store_true",

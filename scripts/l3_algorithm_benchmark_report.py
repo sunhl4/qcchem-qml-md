@@ -3,12 +3,16 @@
 
 Requires PySCF for chemistry YAMLs. Typical use (opt-in heavy gate)::
 
-    QCHEM_RUN_L3=1 python scripts/l3_algorithm_benchmark_report.py
+    QCHEM_RUN_L3=1 pytest -m l3 -q
+    python scripts/l3_algorithm_benchmark_report.py
     python scripts/l3_algorithm_benchmark_report.py --config configs/example_h2.yaml
 
 ``--merged`` appends :func:`merged_experiment_benchmark_v1` (totals + ``by_quantum_algorithm_yaml`` rollup).
 
-Default bundled configs (when no ``--config``): base H2, ADAPT pools (incl. ``uccsd_jw`` alias), IQEB variants (incl. ``qubit_excitation`` alias), excited smoke, QPE dual-track — see :mod:`qchem_stack.integrations.l3_algorithm_benchmark`.
+**Config sources**
+
+- Default YAML list: ``DEFAULT_BENCHMARK_YAMLS`` in :mod:`qchem_stack.integrations.l3_algorithm_benchmark`.
+- L3 pytest gate list (subset): ``L3_PYTEST_YAMLS`` — same module (baseline VQE + ADAPT/IQEB/excited representatives).
 """
 
 from __future__ import annotations
@@ -30,7 +34,9 @@ def main() -> None:
         metavar="REL_PATH",
         help="Relative config path (repeatable); default: bundled representative set",
     )
-    ap.add_argument("--merged", action="store_true", help="Also print merged_experiment_benchmark_v1 summary")
+    ap.add_argument(
+        "--merged", action="store_true", help="Also print merged_experiment_benchmark_v1 summary"
+    )
     args = ap.parse_args()
     rels = list(args.configs) if args.configs else []
     if not rels:

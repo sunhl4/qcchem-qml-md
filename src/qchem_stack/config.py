@@ -59,7 +59,9 @@ class MoleculeSpec(BaseModel):
     @model_validator(mode="after")
     def _validate_geometry_source(self) -> MoleculeSpec:
         if self.coordinates is None and not (self.zmatrix and self.zmatrix.strip()):
-            raise ValueError("molecule requires either coordinates/coordinates_bohr or a non-empty zmatrix.")
+            raise ValueError(
+                "molecule requires either coordinates/coordinates_bohr or a non-empty zmatrix."
+            )
         if self.coordinates is not None and self.zmatrix:
             raise ValueError("molecule.coordinates and molecule.zmatrix are mutually exclusive.")
         return self
@@ -197,14 +199,22 @@ class ActiveSpaceSpec(BaseModel):
     @model_validator(mode="after")
     def _normalize_active_space_entry(self) -> ActiveSpaceSpec:
         if self.strategy in ("cas", "avas_stub", "avas"):
-            if self.ncas is not None and self.n_active_orbitals is not None and int(self.ncas) != int(
-                self.n_active_orbitals
+            if (
+                self.ncas is not None
+                and self.n_active_orbitals is not None
+                and int(self.ncas) != int(self.n_active_orbitals)
             ):
-                raise ValueError("active_space.ncas and n_active_orbitals disagree for strategy='cas'.")
-            if self.nelecas is not None and self.n_active_electrons is not None and int(self.nelecas) != int(
-                self.n_active_electrons
+                raise ValueError(
+                    "active_space.ncas and n_active_orbitals disagree for strategy='cas'."
+                )
+            if (
+                self.nelecas is not None
+                and self.n_active_electrons is not None
+                and int(self.nelecas) != int(self.n_active_electrons)
             ):
-                raise ValueError("active_space.nelecas and n_active_electrons disagree for strategy='cas'.")
+                raise ValueError(
+                    "active_space.nelecas and n_active_electrons disagree for strategy='cas'."
+                )
             ncas = self.ncas if self.ncas is not None else self.n_active_orbitals
             nelecas = self.nelecas if self.nelecas is not None else self.n_active_electrons
             if ncas is None or nelecas is None:
@@ -228,9 +238,13 @@ class ActiveSpaceSpec(BaseModel):
         if int(self.n_active_orbitals) < 1 or int(self.n_active_electrons) < 1:
             raise ValueError("active_space n_active_orbitals/n_active_electrons must both be >= 1.")
         if self.ncas is not None and int(self.ncas) != int(self.n_active_orbitals):
-            raise ValueError("active_space.ncas must equal n_active_orbitals when strategy='manual'.")
+            raise ValueError(
+                "active_space.ncas must equal n_active_orbitals when strategy='manual'."
+            )
         if self.nelecas is not None and int(self.nelecas) != int(self.n_active_electrons):
-            raise ValueError("active_space.nelecas must equal n_active_electrons when strategy='manual'.")
+            raise ValueError(
+                "active_space.nelecas must equal n_active_electrons when strategy='manual'."
+            )
         self.n_active_orbitals = int(self.n_active_orbitals)
         self.n_active_electrons = int(self.n_active_electrons)
         self.ncas = int(self.n_active_orbitals)
@@ -268,7 +282,9 @@ class BackendSpecConfig(BaseModel):
 class MitigationSpec(BaseModel):
     """Aligned with InQuanto docs: classify mitigation by **orchestration** (sync graph vs async batch)."""
 
-    execution_class: Literal["unspecified", "sync_graph", "async_batch", "shot_postselect"] = "unspecified"
+    execution_class: Literal["unspecified", "sync_graph", "async_batch", "shot_postselect"] = (
+        "unspecified"
+    )
     """``sync_graph``: Qermit-style DAG; ``async_batch``: launch/retrieve-friendly; ``shot_postselect``: PMSV-style."""
     pmsv_enabled: bool = False
     zne_enabled: bool = False
@@ -420,7 +436,9 @@ class ChemistryExtendedSpec(BaseModel):
         if pbc is None:
             return self
         if len(pbc) != 3 or any(len(row) != 3 for row in pbc):
-            raise ValueError("chemistry_extended.pbc_cell_vectors_bohr must be a 3×3 matrix (Bohr).")
+            raise ValueError(
+                "chemistry_extended.pbc_cell_vectors_bohr must be a 3×3 matrix (Bohr)."
+            )
         import numpy as np
 
         a = np.asarray(pbc, dtype=float)
@@ -698,7 +716,9 @@ class EmbeddingSpec(BaseModel):
                     )
                 groups = self.schmidt_multi_fragment_atom_groups
                 if any(not gg for gg in groups):
-                    raise ValueError("schmidt_multi_fragment_atom_groups: each inner list must be non-empty")
+                    raise ValueError(
+                        "schmidt_multi_fragment_atom_groups: each inner list must be non-empty"
+                    )
                 labs = [x for x in self.fragment_labels if str(x).strip()]
                 if labs and len(labs) != len(groups):
                     raise ValueError(
@@ -706,7 +726,9 @@ class EmbeddingSpec(BaseModel):
                         "must have the same length as groups (or be empty)."
                     )
                 if self.schmidt_multi_primary_fragment_index >= len(groups):
-                    raise ValueError("schmidt_multi_primary_fragment_index is out of range for fragment groups")
+                    raise ValueError(
+                        "schmidt_multi_primary_fragment_index is out of range for fragment groups"
+                    )
             else:
                 if not self.schmidt_fragment_atom_indices:
                     raise ValueError(
@@ -717,12 +739,17 @@ class EmbeddingSpec(BaseModel):
                 raise ValueError("schmidt_n_bath_spatial must be at least 1.")
             if self.schmidt_max_impurity_spatial_orbitals < 2:
                 raise ValueError("schmidt_max_impurity_spatial_orbitals must be at least 2.")
-        if self.dmet_uniform_multifragment_toy and self.dmet_hamiltonian_source == "schmidt_atomic_production":
+        if (
+            self.dmet_uniform_multifragment_toy
+            and self.dmet_hamiltonian_source == "schmidt_atomic_production"
+        ):
             raise ValueError(
                 "dmet_uniform_multifragment_toy cannot be combined with schmidt_atomic_production."
             )
         if self.schmidt_run_mu_bisection and self.dmet_target_fragment_electrons is None:
-            raise ValueError("schmidt_run_mu_bisection requires embedding.dmet_target_fragment_electrons.")
+            raise ValueError(
+                "schmidt_run_mu_bisection requires embedding.dmet_target_fragment_electrons."
+            )
         return self
 
     @model_validator(mode="after")
@@ -731,7 +758,9 @@ class EmbeddingSpec(BaseModel):
             if not (self.decomposition_plugin or "").strip():
                 raise ValueError("embedding.mode='plugin' requires embedding.decomposition_plugin")
             if not (self.decomposition_plugin_json_path or "").strip():
-                raise ValueError("embedding.mode='plugin' requires embedding.decomposition_plugin_json_path")
+                raise ValueError(
+                    "embedding.mode='plugin' requires embedding.decomposition_plugin_json_path"
+                )
         return self
 
     @model_validator(mode="after")
@@ -788,8 +817,13 @@ class QuantumSpec(BaseModel):
     adapt_pool_id: Literal[
         "fermionic_uccsd",
         "uccsd_jw",
+        "uccsd_singles",
+        "uccsd_doubles_only",
         "uccsd_bravyi_kitaev",
         "uccsd_bk",
+        "uccsd_bk_singles",
+        "uccsd_bk_doubles_only",
+        "uccsd_bk_singles_then_doubles",
         "fermionic_uccsd_bravyi_kitaev",
         "fermionic_uccsd_singles",
         "fermionic_uccsd_doubles_only",
@@ -803,8 +837,13 @@ class QuantumSpec(BaseModel):
     iqeb_pool_id: Literal[
         "fermionic_uccsd",
         "uccsd_jw",
+        "uccsd_singles",
+        "uccsd_doubles_only",
         "uccsd_bravyi_kitaev",
         "uccsd_bk",
+        "uccsd_bk_singles",
+        "uccsd_bk_doubles_only",
+        "uccsd_bk_singles_then_doubles",
         "fermionic_uccsd_bravyi_kitaev",
         "fermionic_uccsd_singles",
         "fermionic_uccsd_doubles_only",
@@ -828,12 +867,33 @@ class QuantumSpec(BaseModel):
     record_pauli_measurement_histograms: bool = False
     """With ``run_sampled`` or ``run_qiskit_shots_pauli_protocol``, store per-group histograms in ``protocol_counts``."""
     vqd_after_variational: bool = False
-    """If True, run :class:`~qchem_stack.quantum.algorithms.excited.VQD` after VQE/ADAPT/IQEB (same HEA depth)."""
+    """If True, run :class:`~qchem_stack.quantum.algorithms.excited.VQD` after the variational stage."""
     vqd_n_states: int = 2
     vqd_penalty_weight: float = 5.0
+    """Scalar penalty λ when ``vqd_penalty_weights`` is unset (Higgott-style overlap sum)."""
+    vqd_penalty_weights: list[float] | None = None
+    """Optional per deflation level ``λ_{level}`` (length ``vqd_n_states - 1``); overrides scalar weight."""
     vqd_overlap_exponent: float = Field(default=1.0, ge=0.5, le=8.0)
     """Penalty uses ``|(s|\\psi)|^{2×exponent}`` summed over pinned reference states."""
     vqd_cobyla_maxiter: int = Field(default=150, ge=1, le=10_000)
+    """Max iterations passed to SciPy for **all** VQD optimizer methods (historical name)."""
+    vqd_optimizer_method: Literal["COBYLA", "L-BFGS-B", "Nelder-Mead"] = "COBYLA"
+    """Classical optimizer for VQD inner loops (single collapsed objective)."""
+    vqd_init_strategy: Literal[
+        "legacy",
+        "reuse_ground_perturb",
+        "previous_layer_perturb",
+        "random_uniform",
+    ] = "legacy"
+    """``legacy``: match pre-2026 behavior (first excited starts from ground angles when shapes match)."""
+    vqd_init_noise_scale: float = Field(default=0.15, ge=0.0)
+    """Gaussian σ for ``reuse_ground_perturb`` / ``previous_layer_perturb`` (radians-scale)."""
+    vqd_max_overlap_warn: float | None = Field(default=0.05)
+    """Emit ``meta.vqd_warnings`` when summed squared overlaps exceed this; ``None`` disables."""
+    vqd_overlap_mode: Literal["statevector_overlap", "tangelo_circuit_analogy"] = (
+        "statevector_overlap"
+    )
+    """Overlap semantics selector for VQD metadata/export (current executor path remains statevector)."""
     vqd_shots_objective: int = 0
     """Grouped Pauli shot budget per excited level for ``three_protocol.objective`` (0 = exact only)."""
     vqd_shots_overlap: int = 0
@@ -856,7 +916,9 @@ class QuantumSpec(BaseModel):
     sceom_subspace_dim: int = 4
     sceom_shots_per_matrix_element: int = 0
     """If > 0, symmetric Gaussian noise on real :math:`M` (placeholder shot model)."""
-    sceom_generator_strategy: Literal["legacy", "fermionic_singles_mapped", "pauli_xy_extended"] = "legacy"
+    sceom_generator_strategy: Literal["legacy", "fermionic_singles_mapped", "pauli_xy_extended"] = (
+        "legacy"
+    )
     """Excitation generators for SCEOM nested commutators (beyond default toy Paulis)."""
     qpe_demo_track_after_variational: bool = False
     """If True, attach :mod:`qpe_qec_demo` dense Kitaev + Bayesian toy block to pipeline output (no extra deps)."""
@@ -892,6 +954,7 @@ class QuantumSpec(BaseModel):
 
     def vqs_track_requested(self) -> bool:
         return bool(self.vqs_track_after_variational or self.vqs_pipeline_integration)
+
     pauli_support_max_terms: int | None = None
     """If set, cap ``protocol_counts['hamiltonian_pauli_strings']`` length; full count in ``n_hamiltonian_pauli_terms_full``."""
     tensornet_expectation_stub: bool = False
@@ -951,10 +1014,35 @@ class QuantumSpec(BaseModel):
         if t is None:
             return self
         if self.variational_ansatz != "uccsd":
-            raise ValueError("quantum.uccsd_trotter_steps is only valid when variational_ansatz='uccsd'.")
+            raise ValueError(
+                "quantum.uccsd_trotter_steps is only valid when variational_ansatz='uccsd'."
+            )
         if int(t) < 1:
             raise ValueError("quantum.uccsd_trotter_steps must be >= 1 when set.")
         return self
+
+    @model_validator(mode="after")
+    def _vqd_penalty_weights_len(self) -> QuantumSpec:
+        pw = self.vqd_penalty_weights
+        if pw is None:
+            return self
+        need = max(0, int(self.vqd_n_states) - 1)
+        if len(pw) != need:
+            raise ValueError(
+                "quantum.vqd_penalty_weights must have length vqd_n_states - 1 "
+                f"({need}), got {len(pw)}"
+            )
+        return self
+
+    @field_validator("vqd_max_overlap_warn")
+    @classmethod
+    def _vqd_max_overlap_warn_nonneg(cls, v: float | None) -> float | None:
+        if v is None:
+            return None
+        x = float(v)
+        if x < 0.0:
+            raise ValueError("quantum.vqd_max_overlap_warn must be >= 0 when set")
+        return x
 
 
 class ExperimentConfig(BaseModel):
@@ -1069,9 +1157,10 @@ class ExperimentConfig(BaseModel):
                 "quantum.variational_ansatz='uccsd' is incompatible with use_pauli_protocol=True "
                 "(Pauli measurement circuits use HEA). Set use_pauli_protocol: false."
             )
-        if q.vqd_after_variational or q.qse_after_variational or q.sceom_after_variational:
+        # VQD + UCCSD is supported (same-parameterization deflation via ``prepare_state``).
+        if q.qse_after_variational or q.sceom_after_variational:
             raise ValueError(
-                "quantum.variational_ansatz='uccsd' cannot combine with VQD/QSE/SCEOM "
+                "quantum.variational_ansatz='uccsd' cannot combine with QSE/SCEOM "
                 "(those stages expect HEA angle packing)."
             )
         return self

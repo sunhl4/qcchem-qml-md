@@ -48,14 +48,19 @@ def main() -> int:
     try:
         import pyscf  # noqa: F401
     except ImportError:
-        print("smoke_pipeline: skip (install PySCF: pip install qchem-stack[chem])", file=sys.stderr)
+        print(
+            "smoke_pipeline: skip (install PySCF: pip install qchem-stack[chem])", file=sys.stderr
+        )
         return 0
     if "--qiskit-shots" in sys.argv[1:]:
         try:
             import qiskit  # noqa: F401
             import qiskit_aer  # noqa: F401
         except ImportError:
-            print("smoke_pipeline: skip --qiskit-shots (install: pip install qchem-stack[quantum])", file=sys.stderr)
+            print(
+                "smoke_pipeline: skip --qiskit-shots (install: pip install qchem-stack[quantum])",
+                file=sys.stderr,
+            )
             return 0
     root = Path(__file__).resolve().parents[1]
     argv = sys.argv[1:]

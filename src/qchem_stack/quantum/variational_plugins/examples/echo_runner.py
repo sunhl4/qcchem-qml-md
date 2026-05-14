@@ -18,7 +18,11 @@ def run_echo_variational(ctx: VariationalRunContext) -> VariationalStageOutcome:
     return VariationalStageOutcome(
         energy=energy,
         angles=angles,
-        algo_meta={"algorithm": ctx.cfg.quantum.algorithm, "nfev": 0, "variational_echo_plugin": True},
+        algo_meta={
+            "algorithm": ctx.cfg.quantum.algorithm,
+            "nfev": 0,
+            "variational_echo_plugin": True,
+        },
     )
 
 

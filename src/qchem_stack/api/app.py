@@ -70,7 +70,9 @@ class RunRequest(BaseModel):
         default=False,
         description="If true, run in-process and return full_pipeline_job_result_v1 (JSON-safe slim dict, same as async DONE payload)",
     )
-    job_db_path: str | None = Field(default=None, description="SQLite path for queued jobs; default from QCHEM_JOB_DB or temp")
+    job_db_path: str | None = Field(
+        default=None, description="SQLite path for queued jobs; default from QCHEM_JOB_DB or temp"
+    )
     workspace_label: str | None = Field(
         default=None,
         description="Optional Nexus-style project/workspace string stored in job meta (api_workspace_label)",
@@ -82,7 +84,9 @@ class RunRequest(BaseModel):
 
 
 class YamlPreviewBody(BaseModel):
-    experiment_yaml: str = Field(..., description="YAML to validate; returns computable list without running chemistry")
+    experiment_yaml: str = Field(
+        ..., description="YAML to validate; returns computable list without running chemistry"
+    )
     include_computables_rich: bool = Field(
         default=False,
         description="Optional parallel field: adds computables_rich (schema computables_rich_v1) without removing computable_abstract",
@@ -154,7 +158,7 @@ def product_analog() -> dict[str, object]:
         "emulation_notes": [
             "Five-stage protocol preview: POST /v1/meta/workflow-preview (YAML-only, no chemistry).",
             "Computable DAG (semantic v2): POST /v1/meta/workflow-preview.",
-            "Capability one-shot: GET /v1/meta/capability-surface (gaps + public object map + operator_pool_registry_export_v1).",
+            "Capability one-shot: GET /v1/meta/capability-surface (gaps + public object map + Tangelo/tutorial fermion→qubit alias table + operator_pool_registry_export_v1).",
             "Job lifecycle: POST/GET /v1/runs (optional project_slug), GET /v1/runs/{id}/summary, repro GET /v1/runs/{id}/repro (DONE only); events use persisted timeline when available.",
             "ML / MD bridge surface: GET /v1/meta/ml-md-bridge; validate QMEFDataset JSON: POST /v1/meta/qmef-validate; in-memory MLIP stub fit: POST /v1/meta/ml-md-trainer-stub-fit.",
         ],
@@ -168,31 +172,50 @@ def product_analog() -> dict[str, object]:
 def capability_surface() -> dict[str, object]:
     """
     Single fetch for landing / admin consoles: version, full gap rows, InQuanto-public name → implementation map,
+    **Tangelo/tutorial fermion→qubit alias surface** (executable vs disclosed-not-implemented only),
     plus **operator_pool_registry_export_v1** (ADAPT/IQEB pool ids and aliases).
 
     **Not** a substitute for narrative docs — aggregates machine-readable parity artifacts.
     """
     from qchem_stack import __version__
+    from qchem_stack.chem.fermion_mapping_registry import (
+        tangelo_public_mapping_alias_surface_v1,
+    )
     from qchem_stack.protocols.inquanto_contract import (
+        inquanto_gap_anchor_index_v1,
         inquanto_gap_categories,
         inquanto_object_map_for_docs,
         mitigation_execution_model_public,
         open_stack_differentiators_public,
+        validate_inquanto_gap_categories,
     )
     from qchem_stack.quantum.algorithm_registry import algorithm_registry_export
+    from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_mapping_support_matrix_v1
     from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
     from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
+    errs = validate_inquanto_gap_categories()
+    if errs:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "invalid inquanto_gap_categories contract",
+                "errors": errs,
+            },
+        )
     return {
         "schema": "capability_surface_v1",
         "qchem_stack_version": __version__,
         "object_map": inquanto_object_map_for_docs(),
         "gaps": inquanto_gap_categories(),
+        "gap_anchor_index_v1": inquanto_gap_anchor_index_v1(),
         "mitigation_execution_model": mitigation_execution_model_public(),
         "open_stack_differentiators": open_stack_differentiators_public(),
+        "tangelo_public_mapping_alias_surface_v1": tangelo_public_mapping_alias_surface_v1(),
         "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
         "algorithm_registry_export_v1": algorithm_registry_export(),
         "variational_registry_export_v1": variational_registry_export(),
+        "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
     }
 
 
@@ -200,12 +223,27 @@ def capability_surface() -> dict[str, object]:
 def parity_gaps() -> dict[str, object]:
     """Machine-readable gap list vs InQuanto public docs (dashboards / regression tooling)."""
     from qchem_stack import __version__
-    from qchem_stack.protocols.inquanto_contract import inquanto_gap_categories
+    from qchem_stack.protocols.inquanto_contract import (
+        inquanto_gap_anchor_index_v1,
+        inquanto_gap_categories,
+        validate_inquanto_gap_categories,
+    )
+
+    errs = validate_inquanto_gap_categories()
+    if errs:
+        raise HTTPException(
+            status_code=500,
+            detail={
+                "message": "invalid inquanto_gap_categories contract",
+                "errors": errs,
+            },
+        )
 
     return {
         "schema": "inquanto_gap_export_v1",
         "qchem_stack_version": __version__,
         "gaps": inquanto_gap_categories(),
+        "gap_anchor_index_v1": inquanto_gap_anchor_index_v1(),
     }
 
 
@@ -261,7 +299,9 @@ def ml_md_trainer_stub_fit(body: QMEFTrainerStubFitBody) -> dict[str, object]:
 
 @app.get("/v1/meta/queue-stats", tags=["meta"])
 def queue_stats(
-    job_db_path: str | None = Query(default=None, description="SQLite path; default QCHEM_JOB_DB or temp"),
+    job_db_path: str | None = Query(
+        default=None, description="SQLite path; default QCHEM_JOB_DB or temp"
+    ),
 ) -> dict[str, object]:
     """Per-status job counts (ops dashboard analog)."""
     db = Path(job_db_path) if job_db_path else default_job_db_path()
@@ -276,9 +316,13 @@ def queue_stats(
 
 @app.get("/v1/runs", tags=["runs"])
 def list_runs(
-    job_db_path: str | None = Query(default=None, description="SQLite path; default QCHEM_JOB_DB or temp"),
+    job_db_path: str | None = Query(
+        default=None, description="SQLite path; default QCHEM_JOB_DB or temp"
+    ),
     status: str | None = Query(default=None, description="Filter: QUEUED, RUNNING, DONE, FAILED"),
-    job_kind: str | None = Query(default=None, description="Filter e.g. full_pipeline, pauli_protocol"),
+    job_kind: str | None = Query(
+        default=None, description="Filter e.g. full_pipeline, pauli_protocol"
+    ),
     experiment_id: str | None = Query(
         default=None,
         description="Filter jobs whose store meta JSON contains this experiment_id",
@@ -440,13 +484,20 @@ def get_run_repro(
     repro = row.get("repro")
     if not isinstance(repro, dict):
         raise HTTPException(status_code=404, detail="result has no repro block")
-    return {"schema": "run_repro_only_v1", "job_id": job_id, "job_kind": row.get("job_kind"), "repro": repro}
+    return {
+        "schema": "run_repro_only_v1",
+        "job_id": job_id,
+        "job_kind": row.get("job_kind"),
+        "repro": repro,
+    }
 
 
 @app.get("/v1/runs/{job_id}", tags=["runs"])
 def get_run(
     job_id: str,
-    job_db_path: str | None = Query(default=None, description="Must match the DB used when enqueueing"),
+    job_db_path: str | None = Query(
+        default=None, description="Must match the DB used when enqueueing"
+    ),
 ) -> dict:
     db = Path(job_db_path) if job_db_path else default_job_db_path()
     store = SqliteJobStore(db)

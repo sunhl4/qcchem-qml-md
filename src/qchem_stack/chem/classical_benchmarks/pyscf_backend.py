@@ -13,7 +13,9 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
     """Requires ``ctx.mean_field_reference.backend_tag() == "pyscf"`` (enforced by registry)."""
     ref = ctx.mean_field_reference
     if ref is None or ref.backend_tag() != "pyscf":
-        raise RuntimeError("run_classical_post_hf_pyscf expects a PySCF-tagged ClassicalMeanFieldReference")
+        raise RuntimeError(
+            "run_classical_post_hf_pyscf expects a PySCF-tagged ClassicalMeanFieldReference"
+        )
     pr = unwrap_pyscf_rhf_for_backend_operations(ref.as_pyscf_rhf_result())
     mf = pr.mf
     method = ctx.reference_scf_method
@@ -64,7 +66,9 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
     na_o = ctx.n_active_orbitals
     na_e = ctx.n_active_electrons
     if na_o is None or na_e is None:
-        out["casci"] = _na("n_active_orbitals and n_active_electrons are required for CASCI benchmark.")
+        out["casci"] = _na(
+            "n_active_orbitals and n_active_electrons are required for CASCI benchmark."
+        )
     else:
         try:
             from pyscf import mcscf

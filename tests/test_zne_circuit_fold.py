@@ -38,7 +38,11 @@ def test_zne_circuit_fold_mitigation_dag_uses_protocol_curve() -> None:
     out = run_pipeline_sync(cfg, cfg_path=p)
     dex = out.get("mitigation_dag_execution")
     assert isinstance(dex, dict)
-    znodes = [t for t in dex.get("trace", []) if isinstance(t, dict) and t.get("node") == "ZNE_extrapolation_stub"]
+    znodes = [
+        t
+        for t in dex.get("trace", [])
+        if isinstance(t, dict) and t.get("node") == "ZNE_extrapolation_stub"
+    ]
     assert len(znodes) == 1
     zn = znodes[0]
     pc = out["protocol_counts"]

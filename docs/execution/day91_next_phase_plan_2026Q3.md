@@ -29,7 +29,7 @@
 ### Week 5–6：P2-W7 与发布前收口
 
 - 扩充 docs-site 与 examples 的索引闭环（新用户三路径）。
-- **算法 L3 可选门禁**：设置 `QCHEM_RUN_L3=1` 时跑 `pytest -m l3`（6 条代表配置：ADAPT singles/doubles、**ADAPT `uccsd_jw` 别名**、IQEB fermionic doubles、**IQEB `qubit_excitation` 别名**、excited-smoke），见 [`tests/test_l3_benchmark_smoke.py`](../tests/test_l3_benchmark_smoke.py)；汇总 JSON 可跑 `python scripts/l3_algorithm_benchmark_report.py`（可选 `--merged`）。
+- **算法 L3 可选门禁**：设置 `QCHEM_RUN_L3=1` 时跑 `pytest -m l3`（**7** 条代表配置：基线 **`example_h2.yaml`**（VQE）+ ADAPT singles/doubles、**ADAPT `uccsd_jw` 别名**、IQEB fermionic doubles、**IQEB `qubit_excitation` 别名**、excited-smoke），见 [`tests/test_l3_benchmark_smoke.py`](../tests/test_l3_benchmark_smoke.py)；汇总 JSON 可跑 `python scripts/l3_algorithm_benchmark_report.py`（可选 `--merged`）。
 - 做一轮总闸：
   - `pytest`
   - `python scripts/check_parity_export_sample.py`

@@ -40,7 +40,7 @@ class SinglesBeforeDoublesLexicographic:
             terms = list(op.terms.items())
             if len(terms) != 1:
                 return (99, ())
-            (t, _c), = terms
+            ((t, _c),) = terms
             rank = 0 if len(t) == 2 else 1
             return (rank, t)
 
@@ -159,5 +159,3 @@ def build_spin_uccsd_fermion_generators(
             ops.append(FermionOperator(((b, 1), (a, 1), (j, 0), (i, 0)), 1.0))
     pol = policy or IdentityRegrouping()
     return pol.regroup_generators(ops)
-
-

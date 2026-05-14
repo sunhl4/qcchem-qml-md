@@ -79,7 +79,9 @@ def test_pyscf_driver_from_mean_field_and_ncas_helper() -> None:
 
     mol = gto.M(atom="H 0 0 0; H 0 0 1.4", basis="sto3g")
     mf = scf.RHF(mol).run()
-    drv = PySCFDriver.from_pyscf_mean_field(mf, active_space=ActiveSpaceSpec(strategy="cas", ncas=2, nelecas=2))
+    drv = PySCFDriver.from_pyscf_mean_field(
+        mf, active_space=ActiveSpaceSpec(strategy="cas", ncas=2, nelecas=2)
+    )
     assert drv.classify_mean_field_spin_symmetry(mf) == "RHF"
     ref = ClassicalMeanFieldReference(
         mf=mf,
@@ -89,4 +91,3 @@ def test_pyscf_driver_from_mean_field_and_ncas_helper() -> None:
         driver_meta={"upstream_classical_software_tag": "pyscf"},
     )
     assert drv.get_ncas_nelec_couplet(resolved_reference=ref) == (2, 2)
-

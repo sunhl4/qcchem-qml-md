@@ -7,13 +7,23 @@ from typing import Any
 
 def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str, Any]:
     """
-    Merge ``resource_summary``, optional ``qpe_demo_track``, parity TKET probe, and optional
-    classical benchmark summary (when ``chemistry_extended.classical_benchmark_enabled``) into one blob.
+    Merge ``resource_summary``, optional ``qpe_demo_track``, parity TKET probe, optional
+    classical benchmark summary (when ``chemistry_extended.classical_benchmark_enabled``), and a
+    flat ``run_summary_protocol_*`` mirror (same names as ``resource_estimation_preview_v1`` under
+    ``--results``) into one blob.
 
     Intended for ``export_parity_criteria_table.py --results`` parity with plain VQE YAML exports.
     """
-    rs = pipeline_row.get("resource_summary") if isinstance(pipeline_row.get("resource_summary"), dict) else {}
-    qpe = pipeline_row.get("qpe_demo_track") if isinstance(pipeline_row.get("qpe_demo_track"), dict) else None
+    rs = (
+        pipeline_row.get("resource_summary")
+        if isinstance(pipeline_row.get("resource_summary"), dict)
+        else {}
+    )
+    qpe = (
+        pipeline_row.get("qpe_demo_track")
+        if isinstance(pipeline_row.get("qpe_demo_track"), dict)
+        else None
+    )
     repro = pipeline_row.get("repro") if isinstance(pipeline_row.get("repro"), dict) else {}
     ps = repro.get("parity_snapshot") if isinstance(repro.get("parity_snapshot"), dict) else {}
     tket = ps.get("tket_first_compiled_circuit_probe")
@@ -30,6 +40,8 @@ def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str,
             "pauli_averaging_protocol_ran",
             "n_pauli_terms",
             "n_pauli_groups",
+            "excited_shots_upper_bound",
+            "sum_shots_total_with_excited_upper_bound",
         )
         if k in rs and rs[k] is not None
     }
@@ -87,6 +99,23 @@ def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str,
     qpe_three_ke = rsum.get("qpe_three_pack_kitaev_energy_est")
     qpe_three_ie = rsum.get("qpe_three_pack_info_theory_energy_est")
 
+    proto_mirror: dict[str, Any] = {}
+    run_summary_protocol_keys = (
+        "protocol_total_shots_budget",
+        "protocol_n_measurement_circuits",
+        "protocol_shots_per_circuit_effective",
+        "protocol_energy_stderr",
+        "protocol_expectation_source",
+        "protocol_energy_stderr_model",
+        "protocol_zne_mode",
+        "excited_shots_upper_bound",
+        "sum_shots_total_with_excited_upper_bound",
+        "pauli_averaging_protocol_ran",
+    )
+    for k in run_summary_protocol_keys:
+        if k in rsum and rsum[k] is not None:
+            proto_mirror[f"run_summary_{k}"] = rsum[k]
+
     return {
         "schema": "methods_resource_unified_v1",
         "classical_backend_id": rsum.get("classical_backend_id"),
@@ -112,4 +141,7 @@ def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str,
         "classical_benchmark_recommended_baseline_energy_au": rec_energy,
         "classical_benchmark_best_method": best_m,
         "classical_benchmark_best_energy_au": best_e,
+        "mitigation_zne_mode_yaml": rsum.get("mitigation_zne_mode_yaml"),
+        "mitigation_zne_scales_yaml": rsum.get("mitigation_zne_scales_yaml"),
+        **proto_mirror,
     }

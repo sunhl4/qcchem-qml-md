@@ -1,4 +1,4 @@
-import type {ReactNode} from 'react';
+import {useCallback, useState, type ReactNode} from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useDocusaurusContext from '@docusaurus/useDocusaurusContext';
@@ -16,9 +16,9 @@ const quickCards = [
     to: '/product/features',
   },
   {
-    title: '新手路径',
-    description: '按角色选择上手路径，减少信息噪音。',
-    to: '/guide/onboarding-three-paths',
+    title: '按角色导航',
+    description: '研究者、平台工程师、维护者三条直达路径。',
+    to: '/guide/role-based-paths',
   },
   {
     title: 'CLI 与 HTTP',
@@ -32,10 +32,80 @@ const quickCards = [
   },
 ];
 
+const apiQuickCopy = [
+  {
+    title: '1) 提交异步任务',
+    command: `curl -sS -X POST "http://127.0.0.1:8000/v1/runs" \\
+  -H "Content-Type: application/json" \\
+  -d "$(python - <<'PY'
+import json
+from pathlib import Path
+payload = {"experiment_yaml": Path("configs/example_h2.yaml").read_text(), "sync": False}
+print(json.dumps(payload))
+PY
+)"`,
+  },
+  {
+    title: '2) 轮询状态',
+    command: `RUN_ID="<your_job_id>"
+curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/status"`,
+  },
+  {
+    title: '3) 拉取摘要与 repro',
+    command: `curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/summary"
+curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/repro"`,
+  },
+];
+
 type SiteDoc = {
   id: string;
   unversionedId?: string;
 };
+
+function CopyCommandButton({text}: {text: string}) {
+  const [copied, setCopied] = useState(false);
+  const [error, setError] = useState(false);
+
+  const onCopy = useCallback(async () => {
+    setError(false);
+    try {
+      if (typeof navigator !== 'undefined' && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(text);
+        setCopied(true);
+        window.setTimeout(() => setCopied(false), 2000);
+        return;
+      }
+    } catch {
+      /* fall through */
+    }
+    try {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.setAttribute('readonly', '');
+      ta.style.position = 'fixed';
+      ta.style.left = '-9999px';
+      document.body.appendChild(ta);
+      ta.select();
+      document.execCommand('copy');
+      document.body.removeChild(ta);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 2000);
+    } catch {
+      setError(true);
+      window.setTimeout(() => setError(false), 2500);
+    }
+  }, [text]);
+
+  return (
+    <button
+      type="button"
+      className={styles.copyButton}
+      onClick={onCopy}
+      aria-label={copied ? '已复制到剪贴板' : '复制命令到剪贴板'}>
+      {error ? '复制失败' : copied ? '已复制' : '复制'}
+    </button>
+  );
+}
 
 function HomepageHeader() {
   const {siteConfig} = useDocusaurusContext();
@@ -142,6 +212,29 @@ export default function Home(): ReactNode {
               <p>
                 产品能力 → 新手路径 → 四柱指南（P1/P2/P3/P4）→ CLI/HTTP
                 → 对标与路线。
+              </p>
+            </div>
+            <div className={styles.apiQuickCopyCard}>
+              <div className={styles.apiQuickCopyHeader}>
+                <Heading as="h3">API Quick Copy</Heading>
+                <p>给接入同学的三步最小联调命令。</p>
+              </div>
+              <div className={styles.apiCommandGrid}>
+                {apiQuickCopy.map((item) => (
+                  <article key={item.title} className={styles.apiCommandCard}>
+                    <div className={styles.apiCommandCardHeader}>
+                      <h4>{item.title}</h4>
+                      <CopyCommandButton text={item.command} />
+                    </div>
+                    <pre className={styles.apiCommandPre}>
+                      <code>{item.command}</code>
+                    </pre>
+                  </article>
+                ))}
+              </div>
+              <p className={styles.apiQuickCopyFooter}>
+                更多字段与返回示例见{' '}
+                <Link to="/reference/http-api-sqlite-jobs">HTTP API 参考页</Link>。
               </p>
             </div>
           </div>

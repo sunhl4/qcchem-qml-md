@@ -18,7 +18,9 @@ VariationalRunner = Callable[[VariationalRunContext], VariationalStageOutcome]
 def validate_factory_import_path(spec: str) -> tuple[str, str]:
     raw = spec.strip()
     if ":" not in raw:
-        raise ValueError(f"quantum.algorithm_factory must be 'module.path:callable_name', got {spec!r}")
+        raise ValueError(
+            f"quantum.algorithm_factory must be 'module.path:callable_name', got {spec!r}"
+        )
     mod_part, _, attr_part = raw.partition(":")
     mod = mod_part.strip()
     attrs = attr_part.strip()
@@ -66,7 +68,9 @@ def load_variational_runner_from_factory(spec: str) -> VariationalRunner:
             ) from exc
         run_m = getattr(inst, "run_variational", None)
         if not callable(run_m):
-            raise PipelineError(f"algorithm_factory plugin {spec!r} must define run_variational(ctx)")
+            raise PipelineError(
+                f"algorithm_factory plugin {spec!r} must define run_variational(ctx)"
+            )
         return run_m  # type: ignore[return-value]
 
     if callable(obj):

@@ -18,7 +18,9 @@ class EnergyUncertaintyEstimate:
     model: str = "conservative_sum_bound"
 
 
-def conservative_stderr_equal_shots(plan: PauliMeasurementPlan, h_terms: dict, shots_per_circuit: int) -> float:
+def conservative_stderr_equal_shots(
+    plan: PauliMeasurementPlan, h_terms: dict, shots_per_circuit: int
+) -> float:
     """
     Upper-bound style: per group ``g``, contribution std ≤ ``sum_{t∈g}|c_t| / sqrt(N)`` (all |λ(P)|≤1).
     Total variance ≤ sum of squares of these bounds (independence across circuits).

@@ -21,7 +21,9 @@ def dense_expectation_api_descriptor() -> dict[str, Any]:
     }
 
 
-def expectation_qubit_operator_dense(q_op: Any, statevec: np.ndarray, *, n_qubits: int | None = None) -> float:
+def expectation_qubit_operator_dense(
+    q_op: Any, statevec: np.ndarray, *, n_qubits: int | None = None
+) -> float:
     """Return ``Re ⟨ψ|H|ψ⟩`` for normalized ``statevec`` (length ``2**n``)."""
     psi = np.asarray(statevec, dtype=np.complex128).ravel()
     n = n_qubits if n_qubits is not None else int(np.log2(psi.size))

@@ -88,7 +88,9 @@ def _resolve_shot_backend(spec: BackendSpec) -> Any:
     try:
         import qiskit  # noqa: F401
     except ImportError as e:  # pragma: no cover
-        raise ImportError("Qiskit Pauli shots require qiskit. Install: pip install qchem-stack[quantum]") from e
+        raise ImportError(
+            "Qiskit Pauli shots require qiskit. Install: pip install qchem-stack[quantum]"
+        ) from e
     meta = spec.meta or {}
     b = meta.get("qiskit_shots_backend")
     if b is not None and not isinstance(b, str):
@@ -100,7 +102,9 @@ def _resolve_shot_backend(spec: BackendSpec) -> Any:
         try:
             from qiskit_aer import AerSimulator
         except ImportError as e:  # pragma: no cover
-            raise ImportError("Aer is required for default Qiskit shots. Install: pip install qiskit-aer") from e
+            raise ImportError(
+                "Aer is required for default Qiskit shots. Install: pip install qiskit-aer"
+            ) from e
         method = meta.get("aer_method", "automatic")
         return AerSimulator(method=method)
     raise ValueError(

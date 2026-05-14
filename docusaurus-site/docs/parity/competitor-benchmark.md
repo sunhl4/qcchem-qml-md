@@ -10,21 +10,22 @@ keywords:
 
 # 与 InQuanto 的对标框架
 
-本页用于内部产品规划和能力缺口讨论，不是用户使用手册。
+本页用于内部规划和能力差距讨论，不是用户入门手册。
 
 ## 对标主轴
 
-我们参考 InQuanto 文档公开结构，统一用三柱做能力映射：
+参考 InQuanto 公开结构，用三柱 + P4 做映射：
 
 - Chemical Specification
 - Program Construction
 - Execution and Analysis
+- Jobs & reproducibility（工程扩展柱）
 
 参考站点：
 
 - [InQuanto 官方文档](https://docs.quantinuum.com/inquanto/)
 
-## 当前站点的映射方式
+## 当前文档映射方式
 
 - `Chemical Specification` -> [P1 化学与嵌入](../guide/chemistry-and-embedding)
 - `Program Construction` -> [P2 程序构建](../guide/program-construction)
@@ -42,4 +43,4 @@ keywords:
 
 - 不以闭源组件等价为目标
 - 以开放可验证的工程路径为主
-- 通过文档和契约先形成稳定对外面
+- 对 `partial` 项要求可追溯的收敛计划或 `n-a` 说明

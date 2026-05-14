@@ -59,7 +59,11 @@ def main() -> int:
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
 
     scf = float(out["scf_energy"]) if out.get("scf_energy") is not None else float("nan")
-    ev = float(out["energy_after_variational"]) if out.get("energy_after_variational") is not None else float("nan")
+    ev = (
+        float(out["energy_after_variational"])
+        if out.get("energy_after_variational") is not None
+        else float("nan")
+    )
     ep = out.get("energy_pauli_protocol")
     ep_f = float(ep) if ep is not None else None
 

@@ -48,7 +48,9 @@ def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
         molecular_system=r.molecular_system,
         driver_meta=dict(r.driver_meta),
     )
-    qh = molecular_hamiltonian_from_classical_reference(ref, n_active_orbitals=2, n_active_electrons=2)
+    qh = molecular_hamiltonian_from_classical_reference(
+        ref, n_active_orbitals=2, n_active_electrons=2
+    )
     v = VQE(qh, depth=1).run(maxiter=100, seed=0)
     qse = QSE(qh, subspace_dim=8)
     sub = qse.run_from_vqe_hea_basis(v.angles, depth=1, max_basis=min(6, 2**qh.n_qubits))
@@ -79,6 +81,32 @@ def test_vqd_second_energy_finite() -> None:
     assert len(r.meta.get("vqd_channels", [])) == 2
     assert "three_protocol" in r.meta["vqd_channels"][0]
     assert "three_protocol" in r.meta["vqd_channels"][1]
+    td = r.meta.get("tangelo_deflation_analogy_v1")
+    assert isinstance(td, dict) and td.get("schema") == "tangelo_deflation_analogy_v1"
+    assert td.get("selected_overlap_mode") == "statevector_overlap"
+    iq = r.meta.get("inquanto_vqd_semantics_v1")
+    assert isinstance(iq, dict) and iq.get("schema") == "inquanto_vqd_semantics_v1"
+    assert r.meta.get("vqd_overlap_mode_yaml") == "statevector_overlap"
+    assert r.meta.get("vqd_variety_yaml") == "hea"
+
+
+def test_vqd_tangelo_overlap_mode_metadata() -> None:
+    op = QubitOperator(((0, "Z"),), 0.3) + QubitOperator((), 0.1)
+    qh = QubitHamiltonian(operator=op, n_qubits=1, fermion_space=FermionSpace(1, 1))
+    r = VQD(qh, n_states=2, depth=1, overlap_mode="tangelo_circuit_analogy").run(seed=0)
+    assert r.meta.get("vqd_overlap_mode_yaml") == "tangelo_circuit_analogy"
+    td = r.meta.get("tangelo_deflation_analogy_v1")
+    assert isinstance(td, dict)
+    assert td.get("selected_overlap_mode") == "tangelo_circuit_analogy"
+
+
+def test_vqd_overlap_warn_when_deflation_penalty_zero() -> None:
+    """With λ=0 the second level may collapse to the ground manifold; overlap diagnostics fire."""
+    op = QubitOperator(((0, "Z"),), 0.3) + QubitOperator((), 0.1)
+    qh = QubitHamiltonian(operator=op, n_qubits=1, fermion_space=FermionSpace(1, 1))
+    r = VQD(qh, n_states=2, depth=1, penalty_weight=0.0, max_overlap_warn=0.5).run(seed=0)
+    assert "vqd_warnings" in r.meta
+    assert any("overlap_squared_sum" in w for w in r.meta["vqd_warnings"])
 
 
 def test_vqd_three_states_and_qse_shot_noise() -> None:
@@ -108,7 +136,9 @@ def test_sceom_shot_noise_runs() -> None:
 
     op = QubitOperator(((0, "Z"),), 0.4) + QubitOperator(((1, "Z"),), 0.2) + QubitOperator((), 0.05)
     qh = QubitHamiltonian(operator=op, n_qubits=2, fermion_space=FermionSpace(2, 1))
-    res = run_sceom_reference_subspace_shot_noise(qh, subspace_dim=3, shots_per_matrix_element=500, seed=0)
+    res = run_sceom_reference_subspace_shot_noise(
+        qh, subspace_dim=3, shots_per_matrix_element=500, seed=0
+    )
     assert len(res.energies) == 3
     assert res.meta.get("shot_noise_model") == "symmetric_gaussian_on_real_H_sub"
 

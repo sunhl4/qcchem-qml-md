@@ -33,7 +33,7 @@ The project is pinned to this invariant:
 ## 2. Public surfaces (stability intent)
 
 - **Stable for integrators:** `run_pipeline_sync`, `run_pipeline_from_config`, `ExperimentConfig`, `load_experiment_config`, `repro_json_dumps` / `repro_dict_for_strict_json`, exception types under `qchem_stack.exceptions`.
-- **Stable for parity / Methods:** keys under `out["repro"]`, especially `parity_snapshot` and `run_summary` (see existing Chinese technical docs in `docs/`). The authoritative **whitelists** are `qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS` for `parity_snapshot` (see `技术文档_DMET与parity_snapshot开放契约.md` §3b) and `RUN_SUMMARY_DOCUMENTED_KEYS` for `run_summary` (merged by `orchestration.pipeline._attach_run_summary`).
+- **Stable for parity / Methods:** keys under `out["repro"]`, especially `parity_snapshot` and `run_summary` (see existing Chinese technical docs in `docs/`). The authoritative **whitelists** are `qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS` for `parity_snapshot` (see `技术文档_DMET与parity_snapshot开放契约.md` §3b) and `RUN_SUMMARY_DOCUMENTED_KEYS` for `run_summary` (merged by `orchestration.pipeline._attach_run_summary`). **VQD deflation** (algorithm semantics vs HEA/UCCSD YAML): `技术文档_VQD紧缩激发与跨栈对照.md`.
 - **Intentionally experimental:** specific keys inside `protocol_counts`, optional integrator stubs — version in export schema where applicable.
 
 ## 3. Error taxonomy
@@ -55,9 +55,11 @@ Gateway services should map these to HTTP/status codes and structured logs witho
 
 ## 5. CI & quality gates
 
-- `ruff check src tests`
-- `pytest`
-- Optional extras (PySCF, Qiskit, pytket) exercised in CI matrix and smoke scripts.
+- Jobs **`lint`** then **`test`**: **`lint`** runs **`ruff check`** + **`ruff format --check`** on `src/qchem_stack`, `tests`, `scripts`, `examples` (Ubuntu, Python **3.12** only); **`test`** is the pytest/smoke/API matrix (**3.10–3.12**) with **`needs: lint`**. **`docs-site`** has **`needs: lint`** too.
+- `pytest tests` (**`test` job**); CI also exercises marker subsets, `examples/run_all_smoke.py`, and additional smoke scripts — see `.github/workflows/ci.yml`.
+- **pip** wheels are cached in Actions (`setup-python` + `cache-dependency-path: pyproject.toml`).
+- Optional local hook: **`.pre-commit-config.yaml`** at the repository root (`ruff` + **`ruff-format`** hooks; after `pip install -e ".[dev]"`: `pre-commit install`; `pre-commit run --all-files`).
+- Optional extras (PySCF, Qiskit, pytket) exercised in **`test`** matrix and smoke scripts.
 
 ## 6. Versioning
 
@@ -88,7 +90,7 @@ Chinese contract tables (endpoints, `schema`, `meta`, observability): [技术文
 - **`GET /v1/meta/parity-gaps`** — `schema: inquanto_gap_export_v1`: package version + `gaps` from `inquanto_gap_categories()` (dashboard / CI against [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)).
 - **`GET /v1/meta/product-analog`** — `schema: product_analog_v1`: one-shot “what we emulate” vs InQuanto/Nexus *public* narratives (routes pointer list; no closed-source claims).
 - **`POST /v1/meta/workflow-preview`** — `schema: workflow_preview_v1`: five **protocol stages** (`instantiate`→`evaluate`) with config hints + **`computable_graph_v2`** (`semantic_dataflow_v1`; optional YAML **`quantum.computable_extra_edges`** / **`quantum.computable_remove_edges`**) + `roots` + `computable_abstract` — YAML only; core logic in `integrations/inquanto_workflow_preview.py`. On completed runs, the same blob is copied to **`repro.workflow_preview_v1`** (P1 alignment with the HTTP preview; regression `tests/test_workflow_preview_repro_alignment.py`). When enabled in YAML, the payload may also include nested **`variational_execution`**, **`qpe_track_execution`**, and **`vqs_track_execution`**; the latter two are duplicated at **`repro`** root as **`workflow_preview_qpe_track_v1`** and **`workflow_preview_vqs_track_v1`** for export / Methods parity. **`REPRO_DOCUMENTED_KEYS`** in `protocols/inquanto_contract.py` whitelists `repro` root keys; **`embedding_workflow`** is mirrored under `repro` after the pipeline builds it (including `mode: none` when embedding is off).
-- **`GET /v1/meta/capability-surface`** — `schema: capability_surface_v1`: `qchem_stack_version` + **`object_map`**（`inquanto_object_map_for_docs()`）+ **`gaps`**（`inquanto_gap_categories()`）+ **`mitigation_execution_model`**（`mitigation_execution_model_public()`）+ **`open_stack_differentiators`**（`open_stack_differentiators_public()`）+ **`operator_pool_registry_export_v1`**（`operator_pool_registry.operator_pool_registry_export_v1`，与 parity export 同 schema）；回归：`tests/test_api_runs.py::test_capability_surface_matches_inquanto_contract`。
+- **`GET /v1/meta/capability-surface`** — `schema: capability_surface_v1`: `qchem_stack_version` + **`object_map`**（`inquanto_object_map_for_docs()`）+ **`gaps`**（`inquanto_gap_categories()`）+ **`mitigation_execution_model`**（`mitigation_execution_model_public()`）+ **`open_stack_differentiators`**（`open_stack_differentiators_public()`）+ **`tangelo_public_mapping_alias_surface_v1`**（公开映射别名与非执行披露表）+ **`operator_pool_registry_export_v1`**（`operator_pool_registry.operator_pool_registry_export_v1`，与 parity export 同 schema）+ **`algorithm_registry_export_v1`** + **`variational_registry_export_v1`**；回归：`tests/test_api_runs.py::test_capability_surface_matches_inquanto_contract`。
 - **`POST /v1/meta/computables-preview`** — `schema: computables_preview_v1`: InQuanto-**Computable**-style list + **`computable_abstract` v2** from YAML only (no chemistry run); mirrors `scripts/export_parity_criteria_table` abstract block.
 - **`GET /v1/meta/ml-md-bridge`** — `schema: ml_md_bridge_surface_v1`: `QMFrame` field hints, exporter / NequIP·MACE stub hook import paths, `StubTorchMLIPTrainer` summary, lightweight ridge surrogate pointers (`tests/test_api_ml_md_bridge.py`).
 - **`POST /v1/meta/qmef-validate`** — `schema: qmef_validate_v1`: body `{ "qmef": { … } }` validated as **`QMEFDataset`** JSON (no QC run).

@@ -64,7 +64,9 @@ class AlgorithmVQS(AlgorithmBase):
 
     def _hea_state_normalized(self, theta: np.ndarray) -> np.ndarray:
         depth = self._hea_depth_from_parameters(theta)
-        st = np.asarray(hea_state(theta, self.hamiltonian.n_qubits, depth).ravel(), dtype=np.complex128)
+        st = np.asarray(
+            hea_state(theta, self.hamiltonian.n_qubits, depth).ravel(), dtype=np.complex128
+        )
         nrm = float(np.linalg.norm(st))
         if nrm < 1e-15:
             raise ValueError("HEA state has zero norm in VQS tangent construction.")
@@ -173,7 +175,11 @@ class AlgorithmVQS(AlgorithmBase):
         self._last = out
         self._set_report(
             metrics={"n_steps": out.meta["n_steps"], "hea_depth": depth},
-            artifacts={"times": out.times, "trajectory_len": len(out.trajectory), "rhs_model": rhs_label},
+            artifacts={
+                "times": out.times,
+                "trajectory_len": len(out.trajectory),
+                "rhs_model": rhs_label,
+            },
             diagnostics={"meta": dict(out.meta)},
         )
         return out

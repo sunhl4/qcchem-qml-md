@@ -25,6 +25,7 @@ const sidebars: SidebarsConfig = {
       label: '指南',
       items: [
         'guide/index',
+        'guide/role-based-paths',
         'guide/onboarding-three-paths',
         'guide/overview',
         'guide/chemistry-and-embedding',
@@ -45,6 +46,7 @@ const sidebars: SidebarsConfig = {
         'tutorial/switch-backend-compare',
         'tutorial/uccsd-trotter-export',
         'tutorial/zne-qiskit-repro',
+        'tutorial/vqd-inquanto-tangelo',
         'tutorial/projection-embedding-deep-dive',
         'tutorial/case-study-h2-family',
       ],

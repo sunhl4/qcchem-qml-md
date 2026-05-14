@@ -62,7 +62,10 @@ def validate_solver_adapter_contract(
         backend_id = str(caps.backend_id).strip() or "unknown"
         if backend_id == "unknown":
             errors.append("capabilities.backend_id must be non-empty.")
-        if caps.supports_restricted_active_space_qubit_hamiltonian and not caps.supports_molecular_scf:
+        if (
+            caps.supports_restricted_active_space_qubit_hamiltonian
+            and not caps.supports_molecular_scf
+        ):
             warnings.append(
                 "supports_restricted_active_space_qubit_hamiltonian=True while supports_molecular_scf=False; "
                 "ensure your adapter supplies canonical active-space integrals from an external source."

@@ -15,8 +15,13 @@ def test_operator_pool_registry_export_schema() -> None:
     assert blk.get("pool_id_aliases") == {
         "qubit_excitation": "iqeb_qubit_excitation",
         "uccsd_jw": "fermionic_uccsd",
+        "uccsd_singles": "fermionic_uccsd_singles",
+        "uccsd_doubles_only": "fermionic_uccsd_doubles_only",
         "uccsd_bravyi_kitaev": "fermionic_uccsd_bravyi_kitaev",
         "uccsd_bk": "fermionic_uccsd_bravyi_kitaev",
+        "uccsd_bk_singles": "fermionic_uccsd_singles_bravyi_kitaev",
+        "uccsd_bk_doubles_only": "fermionic_uccsd_doubles_bravyi_kitaev_only",
+        "uccsd_bk_singles_then_doubles": "fermionic_uccsd_singles_then_doubles_bk_concat",
     }
     canon = blk.get("canonical_operator_pool_ids")
     assert isinstance(canon, list) and "fermionic_uccsd_bravyi_kitaev" in canon

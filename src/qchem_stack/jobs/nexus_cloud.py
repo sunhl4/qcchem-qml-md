@@ -46,7 +46,7 @@ def _http_probe(cloud: NexusCloudSpec) -> dict[str, Any]:
     url = f"{base}/" if not base.endswith("/") else base
     req = urllib.request.Request(  # noqa: S310
         url,
-        headers={**( {"Authorization": f"Bearer {key}"} if key else {} )},
+        headers={**({"Authorization": f"Bearer {key}"} if key else {})},
         method="GET",
     )
     try:

@@ -49,7 +49,13 @@ def test_computable_spec_roundtrip() -> None:
 
 def test_protocol_stages_five_keys() -> None:
     stages = protocol_stages_preview_v1(_cfg())
-    assert [s["stage_key"] for s in stages] == ["instantiate", "build", "compile", "run", "evaluate"]
+    assert [s["stage_key"] for s in stages] == [
+        "instantiate",
+        "build",
+        "compile",
+        "run",
+        "evaluate",
+    ]
     assert all("hints" in s for s in stages)
 
 
@@ -87,7 +93,8 @@ def test_computable_graph_v2_ground_to_pauli() -> None:
     assert g["edge_model"] == "semantic_dataflow_v1"
     edges = g["edges"]
     assert any(
-        e["from"] == "computable_0" and e["to"] == "computable_1" and "variational" in e["kind"] for e in edges
+        e["from"] == "computable_0" and e["to"] == "computable_1" and "variational" in e["kind"]
+        for e in edges
     )
 
 
@@ -104,7 +111,9 @@ def test_computable_graph_v2_vqd_after_pauli() -> None:
     g = computable_graph_v2(refs)
     # vqd is last; depends on pauli (computable_2), not directly only ground
     assert any(
-        e["to"] == "computable_2" and e["from"] == "computable_1" and e["kind"] == "requires_reference_state"
+        e["to"] == "computable_2"
+        and e["from"] == "computable_1"
+        and e["kind"] == "requires_reference_state"
         for e in g["edges"]
     )
 
@@ -121,13 +130,18 @@ def test_computable_graph_v2_vqd_without_pauli() -> None:
     refs = list_computables_for_config(cfg)
     g = computable_graph_v2(refs)
     assert any(
-        e["from"] == "computable_0" and e["to"] == "computable_1" and e["kind"] == "requires_reference_state"
+        e["from"] == "computable_0"
+        and e["to"] == "computable_1"
+        and e["kind"] == "requires_reference_state"
         for e in g["edges"]
     )
 
 
 def _semantic_graph_fingerprint(g: dict) -> dict:
-    nodes = [{"name": n["name"], "kind": n["kind"], "details": dict(n.get("details") or {})} for n in g["nodes"]]
+    nodes = [
+        {"name": n["name"], "kind": n["kind"], "details": dict(n.get("details") or {})}
+        for n in g["nodes"]
+    ]
     edges = sorted((e["from"], e["to"], e["kind"]) for e in g["edges"])
     roots = sorted(g.get("roots") or [])
     out: dict = {
@@ -194,11 +208,14 @@ def test_computable_declarative_extra_and_remove() -> None:
     assert g.get("declarative_edge_overrides") is True
     edges = g["edges"]
     assert not any(
-        e["from"] == "computable_1" and e["to"] == "computable_2" and e["kind"] == "requires_reference_state"
+        e["from"] == "computable_1"
+        and e["to"] == "computable_2"
+        and e["kind"] == "requires_reference_state"
         for e in edges
     )
     assert any(
-        e["from"] == "computable_0" and e["to"] == "computable_2" and e["kind"] == "custom_fork" for e in edges
+        e["from"] == "computable_0" and e["to"] == "computable_2" and e["kind"] == "custom_fork"
+        for e in edges
     )
     refs2 = refs_from_computable_graph_v2(g)
     g2 = computable_graph_v2(refs2, cfg)
@@ -221,7 +238,9 @@ def test_slim_summary_api_labels() -> None:
 
 
 def test_slim_summary_partial_and_done() -> None:
-    slim_q = slim_product_summary_from_pipeline_result({"status": "QUEUED", "job_kind": "full_pipeline", "meta": {}})
+    slim_q = slim_product_summary_from_pipeline_result(
+        {"status": "QUEUED", "job_kind": "full_pipeline", "meta": {}}
+    )
     assert slim_q["partial"] is True
     assert slim_q["schema"] == "run_product_summary_v1"
 

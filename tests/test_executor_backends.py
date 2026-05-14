@@ -59,7 +59,9 @@ def test_qiskit_expectation_state_matches_numpy() -> None:
     spec = BackendSpec(name="q", provider="qiskit")
     q_ex = executor_from_spec(spec)
     n_ex = StatevectorHeaExecutor()
-    assert q_ex.expectation_state(st, h, 2) == pytest.approx(n_ex.expectation_state(st, h, 2), rel=1e-5, abs=1e-5)
+    assert q_ex.expectation_state(st, h, 2) == pytest.approx(
+        n_ex.expectation_state(st, h, 2), rel=1e-5, abs=1e-5
+    )
 
 
 def test_vqe_qiskit_vs_numpy() -> None:

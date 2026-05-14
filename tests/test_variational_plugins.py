@@ -35,7 +35,13 @@ def _minimal_cfg(**q_kw: object) -> ExperimentConfig:
 
 
 def _tiny_qh() -> QubitHamiltonian:
-    op = QubitOperator(((0, "Z"), (1, "Z"),), 1.0)
+    op = QubitOperator(
+        (
+            (0, "Z"),
+            (1, "Z"),
+        ),
+        1.0,
+    )
     return QubitHamiltonian(operator=op, n_qubits=2)
 
 

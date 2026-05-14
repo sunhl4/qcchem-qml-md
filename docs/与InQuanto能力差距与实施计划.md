@@ -34,10 +34,11 @@
   - 缓解 / 云 / 张量网：`mitigation_zne_scales`（snapshot）、`nexus_cloud` 入 snapshot；管线可写 **`mitigation_dag_execution`**、**`nexus_cloud_repro`**、**`tensornet_protocol_stub`**（见 `orchestration/pipeline.py` 与 `collect_repro_metadata`；导出见 `export_parity_criteria_table.py` 键集）  
   - Active-space：`active_space.strategy=cas|manual|avas_stub|avas`（**`strategy=avas`** 仅 `scf.driver=pyscf`，需非空 **`chemistry_extended.avas_ao_labels`**；**`strategy=avas` 以外的** `avas_ao_labels` 仍可 **仅日志**）。**`avas_stub`** 的诚实字段由 **`qchem_stack.chem.active_space.mean_field_meta`** 写入（CAS 同款尺寸语义，**无**阈值投影）。**`strategy=avas`**：管线 **`chem.active_space.pyscf_active_space_hooks`**，`driver_meta` 键 **`qchem_active_space_resolution_v1`**，并回填 YAML `active_space` 尺寸。以上均透传 **`hamiltonian_meta.pyscf_driver`**。  
   - 可选经典 benchmark：`chemistry_extended.classical_benchmark_enabled: true` 时，管线附加 `classical_benchmarks`（schema **`qchem_classical_post_hf_benchmarks_v1`**；**`classical_benchmark_backend`**：`auto|stub|pyscf|psi4`）与 `classical_benchmark_summary`（`classical_benchmark_summary_v1`，含推荐基线策略 `prefer_ccsd_else_mp2_else_hf`），并在 `repro.run_summary` 写入 `classical_bench_*` 与 `classical_benchmark_*` 镜像键。  
-  - 分子几何与经典 SCF 扩展：**`MoleculeSpec`**：`ecp`、`zmatrix`（与 `coordinates`/Cartesian **互斥**）；**`SCFSpec`**：`density_fit`、`density_fit_auxbasis` → `driver_meta` 中 `scf_density_fit*`；管线在 `_SCF` 后将非空 **`active_space.frozen_orbitals`** 写入 **`driver_meta.active_space_frozen_orbitals`**，供 CASCI 活性提取使用；**`chemistry_extended.mo_coeff_transform_hook`**（及 `mo_coeff_transform_kwargs`）在 AVAS/CASSCF 细化之后执行，审计块 **`mo_coeff_transform_hook_v1`**。物性/一电子算符为 **PySCF driver 侧 API**（`compute_one_electron_operator_*`），**不等价**闭源同名方法全集；导出键随 `MoleculeSpec`/`ChemistryExtendedSpec` **`model_dump()`** 进入 `export_parity_criteria_table`（见 `parity_export_example_h2_config_only.json` 等 fixtures）。Psi4：**已可**在安装绑定返回 **RHF 总能量占位** MF 结果（仍 **`supports_restricted_active_space_qubit_hamiltonian=False`**）；无 Psi4 时 `compute_mean_field` 报清晰 **import** 原因。  
+  - 分子几何与经典 SCF 扩展：**`MoleculeSpec`**：`ecp`、`zmatrix`（与 `coordinates`/Cartesian **互斥**）；**`SCFSpec`**：`density_fit`、`density_fit_auxbasis` → `driver_meta` 中 `scf_density_fit*`；管线在 `_SCF` 后将非空 **`active_space.frozen_orbitals`** 写入 **`driver_meta.active_space_frozen_orbitals`**，供 CASCI 活性提取使用；**`chemistry_extended.mo_coeff_transform_hook`**（及 `mo_coeff_transform_kwargs`）在 AVAS/CASSCF 细化之后执行，审计块 **`mo_coeff_transform_hook_v1`**。物性/一电子算符为 **PySCF driver 侧 API**（`compute_one_electron_operator_*`），**不等价**闭源同名方法全集；导出键随 `MoleculeSpec`/`ChemistryExtendedSpec` **`model_dump()`** 进入 `export_parity_criteria_table`（见 `parity_export_example_h2_config_only.json` 等 fixtures）。**判据导出顶键 `geometry_source`**（`cartesian`|`zmatrix`）与 **`molecular_system_from_experiment`** 同源，便于 Methods 与竞品「问题构造」表对读。Psi4：**已可**在安装绑定返回 **RHF 总能量占位** MF 结果（仍 **`supports_restricted_active_space_qubit_hamiltonian=False`**）；无 Psi4 时 `compute_mean_field` 报清晰 **import** 原因。  
   - **HTTP**：`GET /v1/meta/capability-surface` 含 **`open_stack_differentiators`**（`open_stack_differentiators_v1`），钉扎*非云、非专有硬件*下相对公开文档包的可检证长板（与 [parity 矩阵 §0](inquanto_public_parity_matrix.md) 一致）；源码证据链在 `protocols/inquanto_contract.py` 的 `open_stack_differentiators_public()`（含 **`mitigation_dag_trace_l1`**、**`iqeb_and_projection_l1_wiring`** 等 `beyond_public_doc_bundle` 条目）。  
-- **Export（可选 P2-W1 切片）**：`parity_integrations.resource_estimation_preview: true` 时，`export_parity_criteria_table.py` 顶键 **`resource_estimation_preview_v1`**（`integrations/resource_estimation_preview.py`；config-only 与 `--results` 两模式；**非**云计价 / 非闭源 resource estimator L0）。  
-- `export_parity_criteria_table.py` 导出同名字段，便于 Methods 与竞品表对齐。
+- **Export（可选 P2-W1 切片）**：`parity_integrations.resource_estimation_preview: true` 时，`export_parity_criteria_table.py` 顶键 **`resource_estimation_preview_v1`**（`integrations/resource_estimation_preview.py`；config-only 与 `--results` 两模式；**非**云计价 / 非闭源 resource estimator L0）。**`--results`** 下与 **`methods_resource_unified_v1`** 对齐：`run_summary_protocol_*` 镜像键及 **`classical_benchmark_*`** 摘要字段（与 `build_methods_resource_unified_v1` 同源语义）。  
+- `export_parity_criteria_table.py` 导出同名字段，便于 Methods 与竞品表对齐。  
+- **第二经典后端（Psi4，浅接入）**：`registered_solvers` + **`solver_capabilities_snapshot`** 与 `scf.driver` 同源；代表 YAML **`configs/example_h2_psi4_rhf_sto3g.yaml`** 已纳入 `scripts/check_parity_export_sample.py` 抽样（不强制安装 Psi4，config-only 导出可跑通）。
 - 统一经典化学入口维持 **adapter-first**：`create_solver` / registry 是化学后端唯一工厂，编排层分支由 `SolverCapabilities` 判定，不再以 `scf.driver` 品牌字符串硬编码。
 
 ---
@@ -58,6 +59,7 @@
 
 ### 3.1 下一步（Day91+，P2 下一阶段）
 
+- **维度级路线图（母页）**：[工程深度路线图_InQuanto_Tangelo_对标与交付.md](工程深度路线图_InQuanto_Tangelo_对标与交付.md)（能力轴 × WBS × 验收闸门 × 非目标；与附录 A–F 台账互补）。
 - **P2-W1 深化**：在 `resource_estimation_preview_v1` 基础上补深度资源估计字段（仍保持非云计价、非闭源 L0 口径）。  
 - **P2-W3/W4 组合**：保持 **产品级 AVAS/CASSCF**叙事 **`partial`** 边界表述；补一条可回归的 mitigation 进阶块（优先 ZNE 变体）。  
 - **P2-W7→P3 过渡**：教程/examples 索引继续扩充，并维持 docs/docs-site 双站同源更新。  
@@ -338,7 +340,7 @@ P2 需在「不冒充 InQuanto 闭源分解产品」前提下，选一条 **最�
 **终局口径（与年度计划一致）**
 
 - **L1+**：除刻意 `n/a` 外，矩阵每行有 gap 锚点 / caveat / 证据链（模块 + 机读键 + 测试或脚本）；残余 `partial` 须有 SLA 或收束为 `yes`。
-- **L3（可选）**：`integrations.l3_algorithm_benchmark.L3_PYTEST_YAMLS` 为代表门禁集（当前 **6**：`QCHEM_RUN_L3=1` + `pytest -m l3`）；更宽默认见 `DEFAULT_BENCHMARK_YAMLS`（`algorithm_benchmark_bundle_v1` / `scripts/l3_algorithm_benchmark_report.py`）。**非**闭源 wheel 数值等价。
+- **L3（可选）**：`integrations.l3_algorithm_benchmark.L3_PYTEST_YAMLS` 为代表门禁集（当前 **7**：含基线 H2 VQE + ADAPT/IQEB/激发；`QCHEM_RUN_L3=1` + `pytest -m l3`）；更宽默认见 `DEFAULT_BENCHMARK_YAMLS`（`algorithm_benchmark_bundle_v1` / `scripts/l3_algorithm_benchmark_report.py`）。**非**闭源 wheel 数值等价。
 - **排除**：真 Nexus/`qnexus`/HQC/OAuth/配额；硬件校准、原生门集专优、拓扑；Qermit/cuTensorNet **商业二进制**等价。
 
 ---
@@ -500,7 +502,7 @@ jq '.nodes[] | select(.pillar=="P2" and .status=="shipped" and .is_class_leaf==f
 ### 7.2 CI 策略
 
 - **主 CI**：仅 schema / config 校验 + **skip** 重型断言。
-- **夜间 / 可选 job**：`pytest -m l3`（`QCHEM_RUN_L3=1`，跑 **`L3_PYTEST_YAMLS`**，当前 **6** 条含 ADAPT/IQEB 池与别名）跑全量；论文表 JSON：`scripts/l3_algorithm_benchmark_report.py`。
+- **夜间 / 可选 job**：`pytest -m l3`（`QCHEM_RUN_L3=1`，跑 **`L3_PYTEST_YAMLS`**，当前 **7** 条含基线 VQE 与 ADAPT/IQEB 池及别名）跑全量；论文表 JSON：`scripts/l3_algorithm_benchmark_report.py`。
 
 ### 7.3 与 export
 

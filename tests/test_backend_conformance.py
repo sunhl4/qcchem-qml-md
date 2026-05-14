@@ -54,7 +54,9 @@ def _run_example_h2(cfg_path: Path, cfg_modifier):
         ("qiskit", "estimator"),
     ),
 )
-def test_example_h2_pipeline_repro_schema_backend_providers(provider: str, qiskit_mode: str | None) -> None:
+def test_example_h2_pipeline_repro_schema_backend_providers(
+    provider: str, qiskit_mode: str | None
+) -> None:
     _require_pyscf()
     if provider == "qiskit":
         _require_qiskit()

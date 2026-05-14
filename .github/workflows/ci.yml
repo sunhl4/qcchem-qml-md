@@ -7,7 +7,27 @@ on:
     branches: [main, master]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install Ruff
+        run: |
+          python -m pip install -U pip
+          pip install "ruff>=0.3"
+      - name: Ruff check (src + tests + scripts + examples)
+        run: ruff check src/qchem_stack tests scripts examples
+      - name: Ruff format (check only)
+        run: ruff format --check src/qchem_stack tests scripts examples
+
   test:
+    needs: lint
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -18,12 +38,12 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
       - name: Install
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]"
-      - name: Ruff (src + tests + scripts + examples)
-        run: ruff check src/qchem_stack tests scripts examples
       - name: Strict repro JSON API
         run: python -c "from qchem_stack.repro.export import repro_json_dumps; repro_json_dumps({'ok': True})"
       - name: Pytest
@@ -63,6 +83,7 @@ jobs:
         run: python scripts/run_qpe_track_demo.py
 
   docs-site:
+    needs: lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

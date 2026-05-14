@@ -48,12 +48,7 @@ def jordan_wigner_interaction_operator_sparse(
         if abs(coefficient) > eps:
             qubit_operator += jordan_wigner_one_body(p, q, coefficient)
 
-        coefficient = (
-            tb[p, q, p, q]
-            - tb[p, q, q, p]
-            - tb[q, p, p, q]
-            + tb[q, p, q, p]
-        )
+        coefficient = tb[p, q, p, q] - tb[p, q, q, p] - tb[q, p, p, q] + tb[q, p, q, p]
         if abs(coefficient) > eps:
             qubit_operator += jordan_wigner_two_body(p, q, p, q, coefficient)
 

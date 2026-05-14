@@ -2,6 +2,7 @@
   "parity_export_schema_version": "2",
   "source_config": "configs/example_h2.yaml",
   "experiment_id": "h2_sto3g_001",
+  "geometry_source": "cartesian",
   "molecule": {
     "symbols": [
       "H",
@@ -49,7 +50,7 @@
     "supports_avas_active_space_projection": true,
     "supports_rdm_correction_hooks": true,
     "supports_rdm_nevpt2_casci": true,
-    "supports_get_integrals": false
+    "supports_get_integrals": true
   },
   "active_space": {
     "strategy": "cas",

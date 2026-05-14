@@ -55,7 +55,9 @@ active_space:
     cfg = load_experiment_config(cfg_path)
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(_as_reference(r), n_active_orbitals=2, n_active_electrons=2)
+    qh = molecular_hamiltonian_from_classical_reference(
+        _as_reference(r), n_active_orbitals=2, n_active_electrons=2
+    )
     assert qh.meta.get("fermion_to_qubit_map") == "jordan_wigner"
     assert qh.meta.get("integral_source") == "pyscf_active_space"
     assert qh.meta.get("integral_openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
@@ -70,7 +72,9 @@ def test_h2_active_space_bravyi_kitaev_meta() -> None:
     cfg = ExperimentConfig(
         experiment_id="bk_meta",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+        ),
         active_space=ActiveSpaceSpec(
             n_active_orbitals=2,
             n_active_electrons=2,
@@ -92,7 +96,9 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
     cfg = ExperimentConfig(
         experiment_id="scbk_meta",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+        ),
         active_space=ActiveSpaceSpec(
             n_active_orbitals=2,
             n_active_electrons=2,

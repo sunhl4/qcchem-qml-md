@@ -60,7 +60,10 @@ class PySCFAOSystem:
             {"quantity": "spin", "value": int(mol.spin)},
             {"quantity": "basis_repr", "value": str(mol.basis)},
             {"quantity": "groupname", "value": getattr(mol, "groupname", None)},
-            {"quantity": "integral_representation", "value": self.driver_meta.get("integral_representation")},
+            {
+                "quantity": "integral_representation",
+                "value": self.driver_meta.get("integral_representation"),
+            },
             {"quantity": "ao_reference_kind", "value": self.driver_meta.get("ao_reference_kind")},
             {"quantity": "ao_run_hf", "value": self.driver_meta.get("ao_run_hf")},
         ]
@@ -381,7 +384,9 @@ class PySCFDriver:
             return self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(h, mo))
         with mol.with_common_origin(tuple(map(float, origin))):
             if oper in ("r", "dm"):
-                mats = np.asarray(mol.intor("int1e_r"), dtype=float).reshape(3, mo.shape[0], mo.shape[0])
+                mats = np.asarray(mol.intor("int1e_r"), dtype=float).reshape(
+                    3, mo.shape[0], mo.shape[0]
+                )
                 if oper == "dm":
                     mats = -mats
                 return [
@@ -389,7 +394,9 @@ class PySCFDriver:
                     for m in mats
                 ]
             if oper == "rr":
-                mats = np.asarray(mol.intor("int1e_rr"), dtype=float).reshape(9, mo.shape[0], mo.shape[0])
+                mats = np.asarray(mol.intor("int1e_rr"), dtype=float).reshape(
+                    9, mo.shape[0], mo.shape[0]
+                )
                 return [
                     self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(m, mo))
                     for m in mats
@@ -421,13 +428,17 @@ class PySCFDriver:
                 return jordan_wigner(op)
             if fermion_qubit_mapping == "bravyi_kitaev":
                 return bravyi_kitaev(op)
-            n_spin_orbitals = int(2 * np.asarray((rhf.mf if rhf else self.run_rhf().mf).mo_coeff).shape[1])
+            n_spin_orbitals = int(
+                2 * np.asarray((rhf.mf if rhf else self.run_rhf().mf).mo_coeff).shape[1]
+            )
             if n_electrons is None:
                 raise ValueError(
                     "compute_one_electron_operator_pauli(..., fermion_qubit_mapping='symmetry_conserving_bravyi_kitaev') "
                     "requires n_electrons."
                 )
-            return symmetry_conserving_bravyi_kitaev(op, n_spin_orbitals=n_spin_orbitals, n_electrons=int(n_electrons))
+            return symmetry_conserving_bravyi_kitaev(
+                op, n_spin_orbitals=n_spin_orbitals, n_electrons=int(n_electrons)
+            )
 
         if isinstance(fop, list):
             return [_map_one(x) for x in fop]
@@ -494,7 +505,9 @@ class PySCFDriver:
         return "RHF"
 
     @staticmethod
-    def reorder_molecular_orbitals_columns(mo_coeff: np.ndarray, column_order: list[int]) -> np.ndarray:
+    def reorder_molecular_orbitals_columns(
+        mo_coeff: np.ndarray, column_order: list[int]
+    ) -> np.ndarray:
         """Apply an MO column permutation ``i -> column_order.index`` analog to ``make_actives_contiguous`` steps."""
         m = np.asarray(mo_coeff, dtype=float)
         perm = list(column_order)
@@ -544,7 +557,9 @@ class PySCFDriver:
             if isinstance(blk, dict) and blk.get("n_active_orbitals") is not None:
                 return int(blk["n_active_orbitals"]), int(blk["n_active_electrons"])  # type: ignore[index]
         if self.active_space is None:
-            raise ValueError("active_space unavailable; construct PySCFDriver.from_config(...) first.")
+            raise ValueError(
+                "active_space unavailable; construct PySCFDriver.from_config(...) first."
+            )
         return int(self.active_space.n_active_orbitals), int(self.active_space.n_active_electrons)
 
     def get_system_ao(
@@ -599,7 +614,9 @@ class PySCFDriver:
         Build Löwdin-orthogonal AO integrals and 1-RDM for embedding workflows (DMET/FMO-style pre-stage).
         """
         if self.chemistry_extended.pbc_cell_vectors_bohr is not None:
-            raise ValueError("get_lowdin_system currently supports molecular branch only (non-PBC).")
+            raise ValueError(
+                "get_lowdin_system currently supports molecular branch only (non-PBC)."
+            )
         if rhf is None:
             rhf = self._run_mean_field()
         mf = rhf.mf
@@ -608,13 +625,19 @@ class PySCFDriver:
         # C_lowdin^T S C_lowdin = I
         evals, evecs = np.linalg.eigh(s)
         if np.min(evals) <= 1e-12:
-            raise ValueError("AO overlap matrix is near singular; cannot build stable Löwdin basis.")
-        c_low = np.asarray(evecs @ np.diag(evals ** -0.5) @ evecs.T, dtype=float)
+            raise ValueError(
+                "AO overlap matrix is near singular; cannot build stable Löwdin basis."
+            )
+        c_low = np.asarray(evecs @ np.diag(evals**-0.5) @ evecs.T, dtype=float)
         hcore = np.asarray(mf.get_hcore(), dtype=float)
         h1_low = np.einsum("pi,pq,qj->ij", c_low, hcore, c_low, optimize=True)
         n_ao = int(hcore.shape[0])
-        eri_ao = np.asarray(mol.intor("int2e", aosym="s1"), dtype=float).reshape(n_ao, n_ao, n_ao, n_ao)
-        h2_low = np.einsum("pa,qb,rc,sd,pqrs->abcd", c_low, c_low, c_low, c_low, eri_ao, optimize=True)
+        eri_ao = np.asarray(mol.intor("int2e", aosym="s1"), dtype=float).reshape(
+            n_ao, n_ao, n_ao, n_ao
+        )
+        h2_low = np.einsum(
+            "pa,qb,rc,sd,pqrs->abcd", c_low, c_low, c_low, c_low, eri_ao, optimize=True
+        )
         dm_ao_raw = mf.make_rdm1()
         if isinstance(dm_ao_raw, (tuple, list)):
             dm_ao = np.asarray(dm_ao_raw[0], dtype=float) + np.asarray(dm_ao_raw[1], dtype=float)

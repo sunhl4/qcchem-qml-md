@@ -106,7 +106,11 @@ def execute_mitigation_dag(
         if use_protocol_curve:
             curve = [float(x) for x in zcurve]
             ex_opt = pc_ex.get("zne_extrapolated_energy")
-            ex = float(ex_opt) if ex_opt is not None else float(np.mean(np.array(curve, dtype=float)))
+            ex = (
+                float(ex_opt)
+                if ex_opt is not None
+                else float(np.mean(np.array(curve, dtype=float)))
+            )
         else:
             curve = [zne_scale_energy(e, s) for s in scales]
             ex = float(np.mean(np.array(curve, dtype=float)))

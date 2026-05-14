@@ -49,7 +49,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | 脚本 | 说明 |
 |------|------|
 | `python scripts/smoke_pipeline.py` | CI/本地烟测：默认 `configs/example_h2.yaml`；可加 `--excited`、`--sampled`、`--qiskit-shots`、`--iqeb`、`--projection-trace` 等（见文件顶部 docstring） |
-| `python scripts/export_parity_criteria_table.py <config.yaml>` | 导出 parity / Methods 用字段表；可选 `--results out.json` |
+| `python scripts/export_parity_criteria_table.py <config.yaml>` | 导出 parity / Methods 用字段表；config-only 含稳定键 **`geometry_source`**（与 `PARITY_EXPORT_V2_STABLE_KEYS` 对齐）；可选 `--results out.json` |
 | `python scripts/check_parity_export_sample.py` | 校验导出样例（CI 相关） |
 | `python scripts/check_solver_adapter_contract.py [config.yaml]` | 检查当前 `scf.driver` 的后端适配合同；可配 `--driver`、`--run-mean-field`、`--require-mean-field-success` |
 | `python scripts/create_solver_adapter_scaffold.py <backend_id>` | 生成新的 solver 适配器骨架（含 TODO[1/2/3]），并打印注册与自检命令；加 `--with-demo-register` 另写 `scripts/register_<backend>_demo.py`（同进程跑合同检查） |

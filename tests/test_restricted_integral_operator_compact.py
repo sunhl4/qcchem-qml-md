@@ -24,12 +24,16 @@ def test_compact_restores_same_dense_quantities_as_active_space_integrals() -> N
     rhf = drv.run_rhf()
     na, ne = 2, 2
     c0, h1_ref, h2_ref = active_space_integrals(rhf, na, ne)
-    compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(rhf, n_active_orbitals=na, n_active_electrons=ne)
+    compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(
+        rhf, n_active_orbitals=na, n_active_electrons=ne
+    )
     assert compact.constant == pytest.approx(c0)
     np.testing.assert_allclose(compact.h1_active_mo, h1_ref, atol=1e-10)
     from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
 
-    h2_from_compact = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(compact.dense_h2_chemist_spatial())
+    h2_from_compact = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(
+        compact.dense_h2_chemist_spatial()
+    )
     np.testing.assert_allclose(h2_from_compact, h2_ref, atol=1e-10)
 
 
@@ -38,11 +42,15 @@ def test_df_mo_and_spin_sectors_have_rows() -> None:
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
     rhf = drv.run_rhf()
-    compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(rhf, n_active_orbitals=2, n_active_electrons=2)
+    compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(
+        rhf, n_active_orbitals=2, n_active_electrons=2
+    )
     mo_df = compact.df_mo_integrals(max_two_body=500)
     assert len(mo_df) >= 3
     assert "sector" in mo_df.columns
-    spin_df = interaction_operator_to_dataframe(compact.to_interaction_operator(), max_spinorb_two_body=500)
+    spin_df = interaction_operator_to_dataframe(
+        compact.to_interaction_operator(), max_spinorb_two_body=500
+    )
     assert len(spin_df) >= 3
 
 

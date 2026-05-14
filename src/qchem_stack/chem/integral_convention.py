@@ -24,6 +24,11 @@ def spatial_mo_eri_pyscf_to_openfermion_mo_ordering(h2_spatial: np.ndarray) -> n
         Transposed array suitable for :func:`openfermion.chem.molecular_data.spinorb_from_spatial`.
     """
     a = np.asarray(h2_spatial, dtype=float)
-    if a.ndim != 4 or a.shape[0] != a.shape[1] or a.shape[0] != a.shape[2] or a.shape[0] != a.shape[3]:
+    if (
+        a.ndim != 4
+        or a.shape[0] != a.shape[1]
+        or a.shape[0] != a.shape[2]
+        or a.shape[0] != a.shape[3]
+    ):
         raise ValueError("h2_spatial must be a real (norb, norb, norb, norb) array")
     return np.transpose(a, (0, 2, 3, 1))

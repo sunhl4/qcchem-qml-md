@@ -39,9 +39,7 @@ def test_vqs_track_payload_smoke() -> None:
     qh = _toy_hamiltonian()
     n_params = 2 * qh.n_qubits * 1
     init = np.zeros(n_params, dtype=float)
-    p = vqs_track_payload(
-        qh, init, mode="mclachlan_real_time", n_times=5, dt=0.02
-    )
+    p = vqs_track_payload(qh, init, mode="mclachlan_real_time", n_times=5, dt=0.02)
     assert p["schema"] == "vqs_track_v1"
     assert len(p["times"]) == 5
     assert p["algorithm_report"].get("algorithm") == "mclachlan_real_time"

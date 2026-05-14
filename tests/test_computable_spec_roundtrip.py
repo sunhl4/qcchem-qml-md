@@ -48,7 +48,9 @@ def test_list_specs_includes_iqeb_ground_energy_item() -> None:
         random_seed=0,
         molecule=MoleculeSpec(symbols=["H"], coordinates_bohr=[[0, 0, 0]]),
         active_space=ActiveSpaceSpec(n_active_orbitals=1, n_active_electrons=1),
-        quantum=QuantumSpec(algorithm="iqeb", iqeb_max_rounds=4, vqe_depth=2, use_pauli_protocol=False),
+        quantum=QuantumSpec(
+            algorithm="iqeb", iqeb_max_rounds=4, vqe_depth=2, use_pauli_protocol=False
+        ),
     )
     refs = list_computables_for_config(cfg)
     g = next(r for r in refs if r.name == "ground_state_energy")
@@ -66,7 +68,12 @@ def test_specs_from_graph_matches_refs_from_graph() -> None:
     graph = {
         "schema": "computable_graph_v2",
         "nodes": [
-            {"id": "computable_0", "name": "ground_state_energy", "kind": "energy", "details": {"algorithm": "vqe"}},
+            {
+                "id": "computable_0",
+                "name": "ground_state_energy",
+                "kind": "energy",
+                "details": {"algorithm": "vqe"},
+            },
         ],
         "edges": [],
         "roots": ["computable_0"],

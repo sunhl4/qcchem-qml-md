@@ -118,4 +118,8 @@ def run_cutensornet_expectation_stub(
             "note": "cuQuantum is importable; wire a real tensor network + cutensornet handle in a plugin for production.",
         }
 
-    return {**base, "status": "unknown_backend", "note": f"unhandled requested_backend={requested_backend!r}"}
+    return {
+        **base,
+        "status": "unknown_backend",
+        "note": f"unhandled requested_backend={requested_backend!r}",
+    }

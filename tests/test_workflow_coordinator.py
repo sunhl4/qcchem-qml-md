@@ -21,6 +21,8 @@ def test_workflow_coordinator_runs_and_has_sidecar() -> None:
     assert sc["computable_abstract"]["schema"] == "qchem_computable_abstract_v2"
     assert isinstance(out.get("hamiltonian_meta"), dict)
     assert out["hamiltonian_meta"].get("hamiltonian_fingerprint")
-    assert sc.get("hamiltonian_fingerprint") == out["hamiltonian_meta"].get("hamiltonian_fingerprint")
+    assert sc.get("hamiltonian_fingerprint") == out["hamiltonian_meta"].get(
+        "hamiltonian_fingerprint"
+    )
     if out.get("protocol_counts"):
         assert sc["computable_abstract"].get("support_set_exported_from_protocol") is True

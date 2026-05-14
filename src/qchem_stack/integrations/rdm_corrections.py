@@ -80,7 +80,10 @@ def run_pyscf_nevpt2_casci_correction(
             "energy_correction_au": None,
             "reference_wavefunction": "casci",
             "kernel_class": "pyscf_mrpt_nevpt2",
-            "pyscf_nevpt2": {"status": "failed", "reason": f"backend_not_supported:{ref.backend_tag()}"},
+            "pyscf_nevpt2": {
+                "status": "failed",
+                "reason": f"backend_not_supported:{ref.backend_tag()}",
+            },
             "note": "pyscf_nevpt2_casci requires upstream_classical_software_tag='pyscf'.",
         }
     mf = ref.mf

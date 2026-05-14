@@ -52,7 +52,5 @@ def create_solver(cfg: ExperimentConfig) -> ChemIntegralSolver:
     _ensure_bootstrap()
     key = cfg.scf.driver.strip().lower()
     if key not in _FACTORIES:
-        raise ValueError(
-            f"Unknown scf.driver={cfg.scf.driver!r}. Registered: {sorted(_FACTORIES)}"
-        )
+        raise ValueError(f"Unknown scf.driver={cfg.scf.driver!r}. Registered: {sorted(_FACTORIES)}")
     return _FACTORIES[key](cfg)

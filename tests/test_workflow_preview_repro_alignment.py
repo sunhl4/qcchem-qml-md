@@ -61,11 +61,18 @@ def test_slim_summary_surfaces_projection_epistemic_bound() -> None:
         },
     }
     slim = slim_product_summary_from_pipeline_result(row)
-    assert slim.get("embedding_epistemic_bound") == row["repro"]["embedding_workflow"]["epistemic_bound"]
+    assert (
+        slim.get("embedding_epistemic_bound")
+        == row["repro"]["embedding_workflow"]["epistemic_bound"]
+    )
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "example_h2_vqs_track.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "example_h2_vqs_track.yaml")
+    .is_file(),
     reason="VQS track sample config missing",
 )
 def test_workflow_preview_vqs_track_nested_equals_repro_top_level_slice() -> None:
@@ -79,7 +86,11 @@ def test_workflow_preview_vqs_track_nested_equals_repro_top_level_slice() -> Non
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "qpe_dual_track_demo.yaml").is_file(),
+    not Path(__file__)
+    .resolve()
+    .parents[1]
+    .joinpath("configs", "qpe_dual_track_demo.yaml")
+    .is_file(),
     reason="QPE dual-track sample config missing",
 )
 def test_workflow_preview_qpe_track_nested_equals_repro_top_level_slice() -> None:

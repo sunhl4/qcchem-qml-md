@@ -62,6 +62,10 @@ def restricted_spatial_integrals_to_fermion_operator(
                         ((2 * p + 1, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s + 1, 0)),
                         coeff,
                     )
-                    fo += FermionOperator(((2 * p, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s, 0)), coeff)
-                    fo += FermionOperator(((2 * p + 1, 1), (2 * q, 1), (2 * r, 0), (2 * s + 1, 0)), coeff)
+                    fo += FermionOperator(
+                        ((2 * p, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s, 0)), coeff
+                    )
+                    fo += FermionOperator(
+                        ((2 * p + 1, 1), (2 * q, 1), (2 * r, 0), (2 * s + 1, 0)), coeff
+                    )
     return fo

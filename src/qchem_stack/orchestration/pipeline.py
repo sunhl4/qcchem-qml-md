@@ -140,6 +140,12 @@ def _repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) 
         "vqd_after_variational": cfg.quantum.vqd_after_variational,
         "vqd_n_states": cfg.quantum.vqd_n_states,
         "vqd_penalty_weight": cfg.quantum.vqd_penalty_weight,
+        "vqd_penalty_weights": cfg.quantum.vqd_penalty_weights,
+        "vqd_optimizer_method_yaml": cfg.quantum.vqd_optimizer_method,
+        "vqd_init_strategy_yaml": cfg.quantum.vqd_init_strategy,
+        "vqd_init_noise_scale_yaml": float(cfg.quantum.vqd_init_noise_scale),
+        "vqd_max_overlap_warn_yaml": cfg.quantum.vqd_max_overlap_warn,
+        "vqd_overlap_mode_yaml": cfg.quantum.vqd_overlap_mode,
         "vqd_shots_objective": cfg.quantum.vqd_shots_objective,
         "vqd_shots_overlap": cfg.quantum.vqd_shots_overlap,
         "vqd_shots_weight": cfg.quantum.vqd_shots_weight,
@@ -375,7 +381,9 @@ def _finalize_open_stack_parity_snapshot(
             snap["dmet_solver_mode"] = cfg.embedding.dmet_hamiltonian_source
         else:
             labels = list(cfg.embedding.fragment_labels) or ["fragment_0"]
-            ctx = DMETContext(fragments=labels, solver=VQEFragmentSolverStub(depth=cfg.quantum.vqe_depth))
+            ctx = DMETContext(
+                fragments=labels, solver=VQEFragmentSolverStub(depth=cfg.quantum.vqe_depth)
+            )
             hams = {
                 fid: {
                     "open_stack_placeholder": True,
@@ -399,7 +407,9 @@ def _finalize_open_stack_parity_snapshot(
         eng = tnstub.get("engine_resolved") or tnstub.get("requested_backend")
         snap["tensornet_engine_resolved"] = str(eng if eng is not None else "stub")
         st = tnstub.get("status")
-        snap["tensornet_fallback_reason"] = str(st) if st is not None else "cutensornet_stub_no_status"
+        snap["tensornet_fallback_reason"] = (
+            str(st) if st is not None else "cutensornet_stub_no_status"
+        )
     elif pis.enabled:
         snap["tensornet_engine_resolved"] = str(cfg.quantum.tensornet_contraction_engine)
         if cfg.quantum.tensornet_expectation_stub:
@@ -446,13 +456,17 @@ def _run_dmet_fragment_solve_if_requested(
     mf_shared = emb.dmet_multifragment_one_shot_shared_hamiltonian
     if mf_shared:
         if len(labels) < 2:
-            out["dmet_fragment_solve_error"] = "expected at least two fragment labels for multifragment shared demo"
+            out["dmet_fragment_solve_error"] = (
+                "expected at least two fragment labels for multifragment shared demo"
+            )
             return
     elif len(labels) != 1:
         out["dmet_fragment_solve_error"] = "expected one fragment label (validator should catch)"
         return
     if emb.dmet_fragment_use_exact_solver:
-        solver: Any = QubitHamiltonianFragmentSolverExact(max_qubits=int(emb.dmet_fragment_exact_max_qubits))
+        solver: Any = QubitHamiltonianFragmentSolverExact(
+            max_qubits=int(emb.dmet_fragment_exact_max_qubits)
+        )
     else:
         solver = QubitHamiltonianFragmentSolverVQE(
             depth=cfg.quantum.vqe_depth,
@@ -460,7 +474,11 @@ def _run_dmet_fragment_solve_if_requested(
             executor=exe,
             random_seed=cfg.random_seed,
         )
-    bath_n = int(emb.schmidt_n_bath_spatial) if emb.dmet_hamiltonian_source == "schmidt_atomic_production" else None
+    bath_n = (
+        int(emb.schmidt_n_bath_spatial)
+        if emb.dmet_hamiltonian_source == "schmidt_atomic_production"
+        else None
+    )
     ctx = DMETContext(
         fragments=labels,
         solver=solver,
@@ -639,7 +657,9 @@ def _refine_mean_field_for_active_space(
     return cfg
 
 
-def _embedding_input_system_payload(cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference) -> dict[str, Any] | None:
+def _embedding_input_system_payload(
+    cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference
+) -> dict[str, Any] | None:
     rep = cfg.embedding.embedding_input_representation
     if rep == "mo":
         return None
@@ -650,10 +670,14 @@ def _embedding_input_system_payload(cfg: ExperimentConfig, rhf: ClassicalMeanFie
             f"'supports_embedding_input_ao_lowdin'; backend {caps.backend_id!r} lacks this capability."
         )
     if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
-        raise PipelineError("embedding_input_representation=ao/lowdin_orth_ao is currently molecular-only (non-PBC).")
+        raise PipelineError(
+            "embedding_input_representation=ao/lowdin_orth_ao is currently molecular-only (non-PBC)."
+        )
     drv = PySCFDriver.from_config(cfg)
     # TODO(capability): remove raw PySCF handle dependency once AO/Lowdin payload adapter is backend-neutral.
-    rhf_pyscf = _require_pyscf_reference(rhf, context="embedding_input_representation=ao/lowdin_orth_ao")
+    rhf_pyscf = _require_pyscf_reference(
+        rhf, context="embedding_input_representation=ao/lowdin_orth_ao"
+    )
     if rep == "ao":
         ao_sys = drv.get_system_ao(rhf_pyscf, run_hf=True)
         return {
@@ -769,11 +793,12 @@ def _schmidt_hamiltonian_and_context(
     if mu_report is not None:
         if mu_report.get("status") == "converged" and isinstance(mu_report.get("fci_at_mu"), dict):
             fci_ref = mu_report["fci_at_mu"]  # type: ignore[assignment]
-        elif mu_report.get("status") == "no_bracket" and isinstance(mu_report.get("fci_mu_zero"), dict):
+        elif mu_report.get("status") == "no_bracket" and isinstance(
+            mu_report.get("fci_mu_zero"), dict
+        ):
             fci_ref = mu_report["fci_mu_zero"]  # type: ignore[assignment]
-    elif (
-        emb.schmidt_attach_fci_reference
-        and model.n_spatial_orbitals <= int(emb.schmidt_fci_reference_max_spatial_orbitals)
+    elif emb.schmidt_attach_fci_reference and model.n_spatial_orbitals <= int(
+        emb.schmidt_fci_reference_max_spatial_orbitals
     ):
         fci_ref = fci_fragment_ground_state(model, mu=mu)
 
@@ -1212,7 +1237,9 @@ def _attach_qpe_three_algorithm_pack_if_requested(
             "meta": md,
         }
 
-    det = AlgorithmDeterministicQPE(qh, time=t_ev, n_rounds=int(qt.qpe_three_pack_deterministic_rounds))
+    det = AlgorithmDeterministicQPE(
+        qh, time=t_ev, n_rounds=int(qt.qpe_three_pack_deterministic_rounds)
+    )
     kit = AlgorithmKitaevQPE(qh, time=t_ev, n_bits=int(qt.qpe_three_pack_kitaev_bits))
     inf = AlgorithmInfoTheoryQPE(qh, time=t_ev, n_samples=int(qt.qpe_three_pack_info_samples))
 
@@ -1229,7 +1256,9 @@ def _attach_qpe_three_algorithm_pack_if_requested(
         "deterministic_qpe_report_v1": _row("deterministic_qpe", rd),
         "kitaev_qpe_report_v1": _row("kitaev_qpe", rk),
         "info_theory_qpe_report_v1": _row("info_theory_qpe", ri),
-        "yaml_flags": {"qpe_three_pack_after_variational": bool(qt.qpe_three_pack_after_variational)},
+        "yaml_flags": {
+            "qpe_three_pack_after_variational": bool(qt.qpe_three_pack_after_variational)
+        },
         "implementations": {
             "deterministic": "qchem_stack.quantum.algorithms.qpe.AlgorithmDeterministicQPE",
             "kitaev": "qchem_stack.quantum.algorithms.qpe.AlgorithmKitaevQPE",
@@ -1306,7 +1335,9 @@ def _classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:
             recommended_baseline_method = preferred
             break
     recommended_baseline_energy: float | None = (
-        float(ok_vals[recommended_baseline_method]) if recommended_baseline_method is not None else None
+        float(ok_vals[recommended_baseline_method])
+        if recommended_baseline_method is not None
+        else None
     )
     return {
         "schema": "classical_benchmark_summary_v1",
@@ -1319,7 +1350,9 @@ def _classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:
         "reference_hf_energy_au": hf,
         "best_method": best_method,
         "best_energy_au": best_energy,
-        "delta_best_vs_hf_au": (float(best_energy - hf) if (best_energy is not None and hf is not None) else None),
+        "delta_best_vs_hf_au": (
+            float(best_energy - hf) if (best_energy is not None and hf is not None) else None
+        ),
         "method_deltas_vs_hf_au": deltas_vs_hf,
     }
 
@@ -1394,7 +1427,9 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         frag_labels = [x for x in (emb.fragment_labels or []) if str(x).strip()]
         sm["dmet_fragment_count"] = len(frag_labels)
         sm["dmet_uniform_multifragment_toy_yaml"] = bool(emb.dmet_uniform_multifragment_toy)
-        sm["dmet_stub_one_shot_ledger_yaml"] = bool(cfg.parity_integrations.dmet_stub_one_shot_ledger)
+        sm["dmet_stub_one_shot_ledger_yaml"] = bool(
+            cfg.parity_integrations.dmet_stub_one_shot_ledger
+        )
     elif emb.mode == "plugin":
         sm["decomposition_plugin_yaml"] = emb.decomposition_plugin
         wf = out.get("embedding_workflow")
@@ -1423,9 +1458,10 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
                         ce = dmet.get("outer_cycles_executed")
                     if ce is not None:
                         sm["schmidt_dmet_cycles_executed"] = int(ce)
-                    if dmet.get("converged_early_on_gamma") is True or dmet.get(
-                        "converged_early_on_sweep_max_delta"
-                    ) is True:
+                    if (
+                        dmet.get("converged_early_on_gamma") is True
+                        or dmet.get("converged_early_on_sweep_max_delta") is True
+                    ):
                         sm["schmidt_dmet_converged_early"] = True
     spfv_rs = out.get("schmidt_per_fragment_vqe")
     if isinstance(spfv_rs, dict) and spfv_rs.get("schema") == "schmidt_per_fragment_vqe_v1":
@@ -1456,7 +1492,9 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         if cbs.get("schema") is not None:
             sm["classical_benchmark_summary_schema"] = cbs["schema"]
         if cbs.get("recommended_baseline_method") is not None:
-            sm["classical_benchmark_recommended_baseline_method"] = cbs["recommended_baseline_method"]
+            sm["classical_benchmark_recommended_baseline_method"] = cbs[
+                "recommended_baseline_method"
+            ]
         if cbs.get("recommended_baseline_energy_au") is not None:
             sm["classical_benchmark_recommended_baseline_energy_au"] = float(
                 cbs["recommended_baseline_energy_au"]
@@ -1492,7 +1530,9 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         if rr_ready.get("spin_model") is not None:
             sm["rdm_correction_readiness_spin_model"] = rr_ready["spin_model"]
         if rr_ready.get("reference_wavefunction") is not None:
-            sm["rdm_correction_readiness_reference_wavefunction"] = rr_ready["reference_wavefunction"]
+            sm["rdm_correction_readiness_reference_wavefunction"] = rr_ready[
+                "reference_wavefunction"
+            ]
         if rr_ready.get("kernel_class") is not None:
             sm["rdm_correction_readiness_kernel_class"] = rr_ready["kernel_class"]
         if rr_ready.get("nevpt2_pyscf_status") is not None:
@@ -1528,7 +1568,9 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     rs = out.get("resource_summary")
     if isinstance(rs, dict):
         if "sum_shots_total_with_excited_upper_bound" in rs:
-            sm["sum_shots_total_with_excited_upper_bound"] = rs["sum_shots_total_with_excited_upper_bound"]
+            sm["sum_shots_total_with_excited_upper_bound"] = rs[
+                "sum_shots_total_with_excited_upper_bound"
+            ]
         if "excited_shots_upper_bound" in rs:
             sm["excited_shots_upper_bound"] = rs["excited_shots_upper_bound"]
         if "pauli_averaging_protocol_ran" in rs:
@@ -1588,6 +1630,13 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
                 sm["vqd_shots_overlap_yaml"] = vm["shots_overlap"]
             if vm.get("shots_weight") is not None:
                 sm["vqd_shots_weight_yaml"] = vm["shots_weight"]
+            sm["vqd_optimizer_method_yaml"] = q.vqd_optimizer_method
+            sm["vqd_init_strategy_yaml"] = q.vqd_init_strategy
+            sm["vqd_overlap_mode_yaml"] = q.vqd_overlap_mode
+            if vm.get("vqd_warnings"):
+                sm["vqd_warnings_present"] = True
+            if vm.get("vqd_variety_yaml"):
+                sm["vqd_variety_yaml"] = vm["vqd_variety_yaml"]
     qse_out = out.get("qse")
     if isinstance(qse_out, dict):
         sm["qse_shot_mode"] = q.qse_shot_mode
@@ -1661,13 +1710,15 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     if isinstance(out.get("qpe_algorithm_three_pack"), dict):
         qp3 = out["qpe_algorithm_three_pack"]
         sm["qpe_three_pack_ran"] = True
-        sm["qpe_three_pack_deterministic_energy_est"] = (qp3.get("deterministic_qpe_report_v1") or {}).get(
+        sm["qpe_three_pack_deterministic_energy_est"] = (
+            qp3.get("deterministic_qpe_report_v1") or {}
+        ).get("energy_estimate")
+        sm["qpe_three_pack_kitaev_energy_est"] = (qp3.get("kitaev_qpe_report_v1") or {}).get(
             "energy_estimate"
         )
-        sm["qpe_three_pack_kitaev_energy_est"] = (qp3.get("kitaev_qpe_report_v1") or {}).get("energy_estimate")
-        sm["qpe_three_pack_info_theory_energy_est"] = (qp3.get("info_theory_qpe_report_v1") or {}).get(
-            "energy_estimate"
-        )
+        sm["qpe_three_pack_info_theory_energy_est"] = (
+            qp3.get("info_theory_qpe_report_v1") or {}
+        ).get("energy_estimate")
     if isinstance(out.get("vqs_track"), dict):
         sm["vqs_track_ran"] = True
         sm["vqs_open_stack_contract_v1"] = {
@@ -1708,7 +1759,11 @@ def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         if psnap.get("dmet_one_shot_open_ledger"):
             sm["dmet_one_shot_open_ledger_present"] = True
             led = psnap.get("dmet_one_shot_open_ledger")
-            if isinstance(led, dict) and isinstance(led.get("fragments"), list) and led["fragments"]:
+            if (
+                isinstance(led, dict)
+                and isinstance(led.get("fragments"), list)
+                and led["fragments"]
+            ):
                 fe = led["fragments"][0].get("energy")
                 if fe is not None:
                     sm["dmet_fragment_solve_energy"] = fe
@@ -1790,7 +1845,9 @@ def run_pipeline_sync(
         mean_field_total_au=float(rhf.e_tot),
         solvent_model=str(cfg.chemistry_extended.solvent_model),
         solvent_dielectric=solvent_eps,
-        energy_accounting_model=str(rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")),
+        energy_accounting_model=str(
+            rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")
+        ),
     )
     classical_benchmarks: dict[str, Any] | None = None
     rdm_bundle_meta: dict[str, Any] | None = None
@@ -1819,6 +1876,7 @@ def run_pipeline_sync(
             run_pyscf_nevpt2_casci_correction,
             run_rdm_correction,
         )
+
         if not solver_caps.supports_rdm_correction_hooks:
             raise PipelineError(
                 "rdm_correction_method requires backend RDM extraction support "
@@ -1941,7 +1999,9 @@ def run_pipeline_sync(
                     "run_schmidt_multifragment_density_cycles"
                 )
             else:
-                wf["schmidt_fragment_atom_indices"] = list(cfg.embedding.schmidt_fragment_atom_indices)
+                wf["schmidt_fragment_atom_indices"] = list(
+                    cfg.embedding.schmidt_fragment_atom_indices
+                )
                 wf["schmidt_dmet_density_feedback_module"] = (
                     "qchem_stack.integrations.schmidt_dmet_self_consistent.run_schmidt_density_feedback_cycles"
                 )
@@ -2055,7 +2115,9 @@ def run_pipeline_sync(
             "decomposition_fragment_pauli_term_counts": term_counts,
             "decomposition_total_pauli_terms": term_total,
             "decomposition_plugin_schema": hm.get("decomposition_plugin_schema"),
-            "decomposition_fragment_energy_terms_v1": hm.get("decomposition_fragment_energy_terms_v1"),
+            "decomposition_fragment_energy_terms_v1": hm.get(
+                "decomposition_fragment_energy_terms_v1"
+            ),
             "integral_source": hm.get("integral_source"),
             "epistemic_bound": (
                 "Open decomposition-plugin contract v1 (optional per-fragment energy-term stubs) "
@@ -2085,13 +2147,39 @@ def run_pipeline_sync(
     ang = np.asarray(angles, dtype=float)
 
     if q.vqd_after_variational:
+        prepare_state = None
+        n_vp: int | None = None
+        param_bounds: list[tuple[float, float]] | None = None
+        if q.variational_ansatz == "uccsd":
+            from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
+
+            if q.uccsd_trotter_steps is not None:
+                ucc = UCCSDTrotterVQE(
+                    qh,
+                    executor=exe,
+                    n_trotter_steps=int(q.uccsd_trotter_steps),
+                )
+            else:
+                ucc = UCCSDVQE(qh, executor=exe)
+            prepare_state = ucc.prepare_state
+            n_vp = int(ucc.n_params)
+            param_bounds = [(-4.0 * np.pi, 4.0 * np.pi)] * n_vp
         vqd = VQD(
             qh,
             n_states=q.vqd_n_states,
             depth=q.vqe_depth,
             penalty_weight=q.vqd_penalty_weight,
+            penalty_weights=q.vqd_penalty_weights,
             overlap_exponent=q.vqd_overlap_exponent,
             cobyla_maxiter=q.vqd_cobyla_maxiter,
+            optimizer_method=q.vqd_optimizer_method,
+            prepare_state=prepare_state,
+            n_var_parameters=n_vp,
+            parameter_bounds=param_bounds,
+            init_strategy=q.vqd_init_strategy,
+            init_noise_scale=q.vqd_init_noise_scale,
+            max_overlap_warn=q.vqd_max_overlap_warn,
+            overlap_mode=q.vqd_overlap_mode,
             executor=exe,
         )
         vqd_res = vqd.run(
@@ -2274,7 +2362,9 @@ def _protocol_for_job(
         backend=bspec,
         pass_bundle=bundle,
         pmsv=pmsv,
-        zne_scales=[float(s) for s in cfg.mitigation.zne_scales] if cfg.mitigation.zne_enabled else None,
+        zne_scales=[float(s) for s in cfg.mitigation.zne_scales]
+        if cfg.mitigation.zne_enabled
+        else None,
         zne_mode=cfg.mitigation.zne_mode,
         measurement_grouping=q.pauli_grouping,
         run_sampled=q.run_sampled_pauli_protocol,

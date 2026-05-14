@@ -211,4 +211,8 @@ def _coerce_float(x: Any) -> float | None:
 
 def _bath_to_json(b: DMETBathState) -> dict[str, Any]:
     meta = {k: v for k, v in b.meta.items() if k not in ("D_ao", "S_ao", "fragment_atoms")}
-    return {"iteration": b.iteration, "meta": meta, "note": "Large arrays (D_ao, S_ao, fragment_atoms) omitted from JSON."}
+    return {
+        "iteration": b.iteration,
+        "meta": meta,
+        "note": "Large arrays (D_ao, S_ao, fragment_atoms) omitted from JSON.",
+    }

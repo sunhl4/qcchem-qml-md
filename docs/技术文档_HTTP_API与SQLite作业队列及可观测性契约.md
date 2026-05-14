@@ -97,7 +97,7 @@ HTTP 异步入队常见键：
 |------|------|----------------------------|
 | GET | `/health` | 无 `schema`；体为 `{"status":"ok"}` |
 | GET | `/health/ready` | 无 `schema`；体为 `{"status":"ready","job_db_default":...}`；SQLite ping 失败 → **503** |
-| GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`qchem_stack_version`、`object_map`、`gaps`、`mitigation_execution_model`、`open_stack_differentiators`、`operator_pool_registry_export_v1`） |
+| GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`qchem_stack_version`、`object_map`、`gaps`、`mitigation_execution_model`、`open_stack_differentiators`、`tangelo_public_mapping_alias_surface_v1`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`） |
 | GET | `/v1/meta/parity-gaps` | `inquanto_gap_export_v1`：`qchem_stack_version`、`gaps` |
 | GET | `/v1/meta/product-analog` | `product_analog_v1`（控制台用路由指针 + `emulation_notes`） |
 | POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`；可选 `computables_rich`） |

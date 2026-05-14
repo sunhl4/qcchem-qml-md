@@ -71,7 +71,9 @@ def algorithm_registry_export() -> dict[str, dict[str, Any]]:
     return out
 
 
-def build_registered_algorithm(algorithm_id: str, hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+def build_registered_algorithm(
+    algorithm_id: str, hamiltonian: QubitHamiltonian, **kwargs: Any
+) -> Any:
     try:
         entry = ALGORITHM_REGISTRY[algorithm_id]
     except KeyError as exc:

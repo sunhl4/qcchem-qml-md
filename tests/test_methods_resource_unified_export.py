@@ -14,7 +14,10 @@ _ROOT = Path(__file__).resolve().parents[1]
 
 
 def _export_with_results(cfg_rel: str, results_path: Path) -> dict:
-    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
     cmd = [
         sys.executable,
         str(_ROOT / "scripts" / "export_parity_criteria_table.py"),
@@ -162,7 +165,10 @@ def test_methods_resource_unified_qpe_plus_tket_probe_schema() -> None:
 
 
 def test_resource_estimation_preview_v1_config_only_export() -> None:
-    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
     cfg = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
     proc = subprocess.run(
         [sys.executable, str(_ROOT / "scripts" / "export_parity_criteria_table.py"), str(cfg)],
@@ -183,10 +189,22 @@ def test_resource_estimation_preview_v1_config_only_export() -> None:
     assert rev.get("qpe_three_pack_time_yaml") == 1.0
     assert rev.get("vqs_rhs_mode_yaml") == "linear_damping"
     assert rev.get("classical_shadows_stub_enabled_yaml") is False
+    assert rev.get("classical_benchmark_enabled_yaml") is False
+    assert rev.get("mitigation_zne_mode_yaml") == "scalar_stub"
+    assert rev.get("mitigation_zne_scales_yaml") == [1.0, 1.5, 2.0]
+    assert rev.get("quantum_algorithm_yaml") == "vqe"
+    assert rev.get("backend_provider_yaml") == "statevector"
+    assert rev.get("fermion_qubit_mapping_yaml") == "jordan_wigner"
+    assert rev.get("zne_enabled_yaml") is False
+    assert rev.get("pmsv_enabled_yaml") is False
+    assert rev.get("pauli_protocol_expectation_path_yaml") == "exact_executor"
 
 
 def test_registry_and_mdml_blocks_in_config_only_export() -> None:
-    env = {**os.environ, "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
     cfg = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
     proc = subprocess.run(
         [sys.executable, str(_ROOT / "scripts" / "export_parity_criteria_table.py"), str(cfg)],
@@ -219,7 +237,9 @@ def test_registry_and_mdml_blocks_in_config_only_export() -> None:
     assert "protocol_hash" in (mdml.get("qmframe_fields") or [])
 
 
-def test_methods_resource_unified_v1_includes_classical_benchmark_fields_when_enabled(tmp_path) -> None:
+def test_methods_resource_unified_v1_includes_classical_benchmark_fields_when_enabled(
+    tmp_path,
+) -> None:
     pytest.importorskip("pyscf")
 
     from qchem_stack.config import load_experiment_config
@@ -264,8 +284,25 @@ chemistry_extended:
     uni = build_methods_resource_unified_v1(out)
     assert uni.get("schema") == "methods_resource_unified_v1"
     assert uni.get("classical_benchmark_active") is True
+    from qchem_stack.integrations.resource_estimation_preview import (
+        build_resource_estimation_preview_v1,
+    )
+
+    prv = build_resource_estimation_preview_v1(cfg=cfg, pipeline_row=out)
+    for ck in (
+        "classical_benchmark_active",
+        "classical_benchmark_summary_schema",
+        "classical_benchmark_recommended_baseline_policy",
+        "classical_benchmark_recommended_baseline_method",
+        "classical_benchmark_recommended_baseline_energy_au",
+        "classical_benchmark_best_method",
+        "classical_benchmark_best_energy_au",
+    ):
+        assert prv.get(ck) == uni.get(ck), ck
     assert uni.get("classical_benchmark_summary_schema") == "classical_benchmark_summary_v1"
-    assert uni.get("classical_benchmark_recommended_baseline_policy") == "prefer_ccsd_else_mp2_else_hf"
+    assert (
+        uni.get("classical_benchmark_recommended_baseline_policy") == "prefer_ccsd_else_mp2_else_hf"
+    )
     assert uni.get("classical_benchmark_recommended_baseline_method") in ("ccsd", "mp2", "hf")
     assert uni.get("classical_benchmark_recommended_baseline_energy_au") is not None
 
@@ -281,19 +318,24 @@ def test_resource_estimation_preview_pipeline_merges_qpe_three_from_run_summary(
         pytest.skip("configs/example_h2_qpe_track_parity_integrations.yaml missing")
     cfg = load_experiment_config(cfg_path)
     row = {
-        "resource_summary": {"n_circuits": 42},
+        "resource_summary": {"n_circuits": 42, "pauli_averaging_protocol_ran": True},
         "repro": {
             "run_summary": {
                 "qpe_three_pack_ran": True,
                 "qpe_three_pack_deterministic_energy_est": -1.23,
                 "qpe_three_pack_kitaev_energy_est": -1.22,
                 "qpe_three_pack_info_theory_energy_est": -1.21,
+                "protocol_total_shots_budget": 999,
+                "protocol_expectation_source": "executor_exact_or_device_mean",
             }
         },
     }
     p = build_resource_estimation_preview_v1(cfg=cfg, pipeline_row=row)
     assert p["mode"] == "pipeline"
     assert p["resource_summary_n_circuits"] == 42
+    assert p["resource_summary_pauli_averaging_protocol_ran"] is True
+    assert p["run_summary_protocol_total_shots_budget"] == 999
+    assert p["run_summary_protocol_expectation_source"] == "executor_exact_or_device_mean"
     assert p["run_summary_qpe_three_pack_ran"] is True
     assert p["qpe_three_pack_deterministic_energy_est_from_run"] == -1.23
     assert p["qpe_three_pack_kitaev_energy_est_from_run"] == -1.22

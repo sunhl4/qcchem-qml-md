@@ -131,9 +131,7 @@ def casscf_energy_and_maybe_orbitals(
     if tag != "pyscf":
         from qchem_stack.exceptions import PipelineError
 
-        raise PipelineError(
-            f"CASSCF orbital hooks require PySCF upstream (got tag {tag!r})."
-        )
+        raise PipelineError(f"CASSCF orbital hooks require PySCF upstream (got tag {tag!r}).")
     if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
         from qchem_stack.exceptions import PipelineError
 

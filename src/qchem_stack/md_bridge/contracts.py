@@ -35,7 +35,9 @@ class StubTorchMLIPTrainer:
 
     def export_openmm(self, path: str) -> None:
         with open(path, "w", encoding="utf-8") as f:
-            f.write("# OpenMM torch export placeholder — integrate OpenMM-ML / NNPOps in production.\n")
+            f.write(
+                "# OpenMM torch export placeholder — integrate OpenMM-ML / NNPOps in production.\n"
+            )
 
     def export_lammps(self, path: str) -> None:
         with open(path, "w", encoding="utf-8") as f:

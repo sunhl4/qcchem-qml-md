@@ -9,6 +9,8 @@
 | PMSV（原型） | `MitigationSpec.pmsv_*`；`protocol_counts["pmsv_report"]`；export `protocol_pmsv_report_from_run` | 存根 + 可扩展 report |
 | ZNE 标度 | `MitigationSpec.zne_scales`；parity / export | 与公开「多噪声标度」叙事对齐 |
 | PEC / quasi-probability（文献占位） | ``mitigation_pec_literature_stub_v1``（可选 YAML） | ``mitigation.pec_literature_stub_enabled``；非 MitRes |
+| ZNE mode（YAML） | `MitigationSpec.zne_mode`（`scalar_stub` \| `circuit_scale_fold`） | `resource_estimation_preview_v1` 顶键 **`mitigation_zne_mode_yaml`** / **`mitigation_zne_scales_yaml`**；**`--results`** 时另附 **`parity_snapshot_mitigation_zne_*`**（与 `repro.parity_snapshot` 同源）；**`methods_resource_unified_v1`** 从 **`run_summary`** 镜像相同 `_yaml` 键，便于与 preview 对拍 |
+| 设备 SPAM（若启用） | `mitigation` 包层级存根 | 矩阵中 `partial` |
 
 ### ZNE 端到端（开放栈 L1）
 

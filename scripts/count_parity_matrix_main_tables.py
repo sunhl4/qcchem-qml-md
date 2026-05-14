@@ -81,7 +81,9 @@ def main() -> None:
             other += 1
             if args.verbose:
                 print(f"OTHER {col1[:50]} :: {cell[:120]}", file=sys.stderr)
-    print(f"main_table_rows={len(lines)} yes={yes} partial={partial} n/a={na} no={no} other={other}")
+    print(
+        f"main_table_rows={len(lines)} yes={yes} partial={partial} n/a={na} no={no} other={other}"
+    )
 
 
 if __name__ == "__main__":

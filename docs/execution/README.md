@@ -2,6 +2,8 @@
 
 本目录记录 P2 连续执行证据链（按天与里程碑）。
 
+**工程深度总览（维度 × WBS × 闸门）**：[工程深度路线图_InQuanto_Tangelo_对标与交付.md](../工程深度路线图_InQuanto_Tangelo_对标与交付.md) — 与 InQuanto / Tangelo 公开叙事可对标的完整计划母页，承接差距文档附录与下列 Day 日志。
+
 ## Day logs
 
 - `day01_gap_inventory_2026Q2.md`
@@ -46,6 +48,19 @@
 - `day91_next_phase_plan_2026Q3.md`
 - `day91_day120_daily_breakdown_2026Q3.md`
 - `day120_gate_checklist_2026Q3.md`
+
+## InQuanto / Tangelo reconciliation sprint (Day121–Day180, 60 days)
+
+- `day121_day180_inquanto_tangelo_calendar_2026Q3.md` — 矩阵 × Tangelo 广度索引 × `capability_surface` 同源链，逐日 60 行日历 + 周闸门
+- `day121_kickoff_inquanto_tangelo_reconciliation_2026Q3.md` — Day121 启动（填 `PLAN_START_DATE`、锚点缺口表）
+- `day180_signoff_inquanto_tangelo_2026Q3.md` — Day180 封板勾选（周期末填写）
+- `inquanto_tangelo_comparative_rd_plan_strict_2026Q3Q4.md` — 对比研发计划（严格实施版，含外部证据与阶段闸门）
+- `inquanto_tangelo_comparative_backlog.yaml` — 机器可校验任务台账（任务级路径/测试/验收标准/证据）
+
+### Strict execution tooling
+
+- `scripts/check_inquanto_tangelo_comparative_backlog.py` — 台账结构与完成证据校验脚本
+- `tests/test_check_inquanto_tangelo_comparative_backlog_script.py` — 脚本回归测试（含负例）
 
 ### Day91-Day97 templates
 

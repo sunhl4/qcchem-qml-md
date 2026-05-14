@@ -330,6 +330,103 @@
   color: var(--ifm-color-emphasis-700);
 }
 
+.apiQuickCopyCard {
+  margin-top: 1rem;
+  border: 1px solid rgba(20, 99, 143, 0.16);
+  border-radius: 18px;
+  padding: 1rem 1.1rem;
+  background:
+    linear-gradient(135deg, rgba(20, 99, 143, 0.06), rgba(123, 209, 255, 0.05)),
+    rgba(255, 255, 255, 0.76);
+  box-shadow: 0 12px 36px rgba(9, 24, 44, 0.06);
+}
+
+.apiQuickCopyHeader h3 {
+  margin: 0 0 0.2rem;
+}
+
+.apiQuickCopyHeader p {
+  margin: 0 0 0.8rem;
+  color: var(--ifm-color-emphasis-700);
+}
+
+.apiCommandGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.apiCommandCard {
+  border: 1px solid rgba(20, 99, 143, 0.14);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.76);
+  padding: 0.75rem;
+}
+
+.apiCommandCardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  margin-bottom: 0.4rem;
+}
+
+.apiCommandCardHeader h4 {
+  margin: 0;
+  font-size: 0.95rem;
+  line-height: 1.35;
+  flex: 1;
+  min-width: 0;
+}
+
+.copyButton {
+  flex-shrink: 0;
+  appearance: none;
+  border: 1px solid rgba(20, 99, 143, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  color: var(--ifm-color-primary);
+  font-size: 0.72rem;
+  font-weight: 650;
+  padding: 0.22rem 0.55rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background 0.15s ease,
+    border-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.copyButton:hover {
+  background: rgba(20, 99, 143, 0.1);
+  border-color: var(--ifm-color-primary-light);
+}
+
+.copyButton:focus-visible {
+  outline: 2px solid var(--ifm-color-primary);
+  outline-offset: 2px;
+}
+
+.apiCommandPre {
+  margin: 0;
+  background: rgba(10, 22, 38, 0.94);
+  border-radius: 10px;
+  border: 1px solid rgba(110, 146, 184, 0.38);
+  padding: 0.55rem 0.62rem;
+  overflow-x: auto;
+}
+
+.apiCommandCard code {
+  font-size: 0.77rem;
+  line-height: 1.35;
+  white-space: pre;
+}
+
+.apiQuickCopyFooter {
+  margin: 0.7rem 0 0;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.92rem;
+}
+
 :global([data-theme='dark']) .quickCard,
 :global([data-theme='dark']) .metricCard {
   background: linear-gradient(180deg, rgba(35, 45, 59, 0.72), rgba(28, 35, 46, 0.86));
@@ -348,9 +445,35 @@
   border-color: rgba(62, 166, 222, 0.45);
 }
 
+:global([data-theme='dark']) .apiQuickCopyCard,
+:global([data-theme='dark']) .apiCommandCard {
+  background: linear-gradient(180deg, rgba(35, 45, 59, 0.72), rgba(28, 35, 46, 0.86));
+  border-color: rgba(135, 157, 184, 0.28);
+}
+
+:global([data-theme='dark']) .apiQuickCopyHeader p,
+:global([data-theme='dark']) .apiQuickCopyFooter {
+  color: rgba(232, 240, 252, 0.86);
+}
+
+:global([data-theme='dark']) .copyButton {
+  background: rgba(28, 35, 46, 0.9);
+  border-color: rgba(62, 166, 222, 0.45);
+  color: #7bd1ff;
+}
+
+:global([data-theme='dark']) .copyButton:hover {
+  background: rgba(62, 166, 222, 0.12);
+  border-color: #7bd1ff;
+}
+
 @media screen and (max-width: 996px) {
   .metricsGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .apiCommandGrid {
+    grid-template-columns: 1fr;
   }
 }
 

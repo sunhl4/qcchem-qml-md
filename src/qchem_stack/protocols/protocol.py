@@ -186,7 +186,9 @@ class PauliAveragingProtocol:
             pmsv_stderr_scale = 1.0 / math.sqrt(float(self.pmsv.retention_rate))
 
         if self.run_sampled and self.run_qiskit_shots:
-            raise ValueError("run_sampled and run_qiskit_shots are mutually exclusive in PauliAveragingProtocol")
+            raise ValueError(
+                "run_sampled and run_qiskit_shots are mutually exclusive in PauliAveragingProtocol"
+            )
         if self.run_sampled:
             from qchem_stack.backends.pauli_shot_sim import energy_estimate_grouped_shot_simulation
 
@@ -209,7 +211,9 @@ class PauliAveragingProtocol:
                 "shots_per_circuit_effective": shots,
                 "energy_stderr": stderr,
                 "n_measurement_circuits": plan.n_circuits,
-                "total_shots_budget": int(sim_meta.get("total_shots_used", shots * max(1, n_groups))),
+                "total_shots_budget": int(
+                    sim_meta.get("total_shots_used", shots * max(1, n_groups))
+                ),
                 "n_pauli_terms": len(terms_dict),
                 "n_pauli_groups": n_groups,
                 "pmsv_stderr_scale": pmsv_stderr_scale,
@@ -354,7 +358,9 @@ class PauliAveragingProtocol:
                 "retention_rate": rr,
                 "discard_fraction": discard,
                 "effective_kept_shots_fraction": rr,
-                "stderr_inflation_from_postselection": float(self._counts.get("pmsv_stderr_scale", 1.0)),
+                "stderr_inflation_from_postselection": float(
+                    self._counts.get("pmsv_stderr_scale", 1.0)
+                ),
                 "pmsv_stderr_scale": float(self._counts.get("pmsv_stderr_scale", 1.0)),
                 "kept_shots_simulated": self._counts.get("kept_shots"),
             }

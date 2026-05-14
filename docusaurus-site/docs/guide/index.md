@@ -5,7 +5,7 @@ description: 按 P1-P4 阅读 qchem-stack，从化学建模到作业与可复现
 
 # 指南总览
 
-按 **P1 -> P4** 阅读能力与用法。第一次进入建议先看 [产品功能](/product/features)，再走 [新用户三条路径](/guide/onboarding-three-paths)。
+按 **P1 -> P4** 阅读能力与用法。第一次进入建议先看 [产品功能](/product/features)，再走 [按角色导航](/guide/role-based-paths) 或 [新用户三条路径](/guide/onboarding-three-paths)。
 
 ## 按角色入口
 

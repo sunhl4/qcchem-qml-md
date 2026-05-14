@@ -39,7 +39,10 @@ class ChemistryProblemBundle:
         return {
             "schema": "chemistry_problem_bundle_v1",
             "constant_energies_au": dict(self.constant_energies_au),
-            "fermion_space": {"n_spin_orbitals": self.fermion_space.n_spin_orbitals, "n_electrons": self.fermion_space.n_electrons},
+            "fermion_space": {
+                "n_spin_orbitals": self.fermion_space.n_spin_orbitals,
+                "n_electrons": self.fermion_space.n_electrons,
+            },
             "interaction_operator_constant": float(self.interaction_operator_constant),
             "qubit_hamiltonian": {
                 "n_qubits": qh.n_qubits,

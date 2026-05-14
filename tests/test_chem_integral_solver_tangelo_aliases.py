@@ -56,11 +56,18 @@ active_space:
         sol.set_physical_data(bad_cfg)
 
 
-def test_pyscf_get_integrals_stub_raises() -> None:
+def test_pyscf_get_integrals_returns_active_space_blocks() -> None:
     cfg = load_experiment_config(_EXAMPLE_H2)
     sol = PySCFIntegralSolver.from_experiment_config(cfg)
-    with pytest.raises(NotImplementedError, match="get_integrals"):
-        sol.get_integrals()
+    d = sol.get_integrals(n_active_orbitals=2, n_active_electrons=2)
+    assert d.get("schema") == "pyscf_active_space_integrals_v1"
+    assert d.get("backend_id") == "pyscf"
+    assert d.get("openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
+    assert d.get("n_active_orbitals") == 2
+    assert d.get("n_active_electrons") == 2
+    assert d["h1_spatial_mo"].shape == (2, 2)
+    assert d["h2_spatial_mo_chemist"].shape == (2, 2, 2, 2)
+    assert d["h2_spatial_mo_openfermion"].shape == (2, 2, 2, 2)
 
 
 def test_registry_create_solver_returns_tangelo_surface() -> None:

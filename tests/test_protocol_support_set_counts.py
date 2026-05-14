@@ -12,7 +12,11 @@ from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 
 def test_protocol_counts_hamiltonian_pauli_support() -> None:
-    h = QubitOperator(((0, "Z"), (1, "Z")), 0.2) + QubitOperator(((0, "X"),), 0.3) + QubitOperator((), 0.1)
+    h = (
+        QubitOperator(((0, "Z"), (1, "Z")), 0.2)
+        + QubitOperator(((0, "X"),), 0.3)
+        + QubitOperator((), 0.1)
+    )
     proto = PauliAveragingProtocol(
         hamiltonian=h,
         n_qubits=2,
@@ -50,7 +54,11 @@ def test_pmsv_report_triad_fields() -> None:
 
 
 def test_pauli_support_max_terms_truncates() -> None:
-    h = QubitOperator(((0, "Z"), (1, "Z")), 0.2) + QubitOperator(((0, "X"),), 0.3) + QubitOperator((), 0.1)
+    h = (
+        QubitOperator(((0, "Z"), (1, "Z")), 0.2)
+        + QubitOperator(((0, "X"),), 0.3)
+        + QubitOperator((), 0.1)
+    )
     proto = PauliAveragingProtocol(
         hamiltonian=h,
         n_qubits=2,

@@ -22,7 +22,9 @@ AVAS_AO_LABELS_LOGGING_ONLY_META_KEY = "avas_ao_labels_logging_only"
 AVAS_ATOMIC_PROJECTION_EXECUTED_META_KEY = "avas_atomic_projection_executed"
 AVAS_STUB_SEMANTICS_META_KEY = "avas_stub_semantics"
 
-AVAS_STUB_SEMANTICS_CAS_EQUIVALENT_V1 = "cas_ncas_nelecas_equivalent_no_avas_threshold_projection_v1"
+AVAS_STUB_SEMANTICS_CAS_EQUIVALENT_V1 = (
+    "cas_ncas_nelecas_equivalent_no_avas_threshold_projection_v1"
+)
 
 
 def apply_active_space_strategy_to_mean_field_meta(

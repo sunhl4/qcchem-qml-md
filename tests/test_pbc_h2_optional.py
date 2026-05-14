@@ -52,7 +52,9 @@ chemistry_extended:
         molecular_system=r.molecular_system,
         driver_meta=dict(r.driver_meta),
     )
-    qh = molecular_hamiltonian_from_classical_reference(ref, n_active_orbitals=2, n_active_electrons=2)
+    qh = molecular_hamiltonian_from_classical_reference(
+        ref, n_active_orbitals=2, n_active_electrons=2
+    )
     assert qh.n_qubits == 4
     assert "pyscf_driver" in qh.meta
     mol = r.mf.mol

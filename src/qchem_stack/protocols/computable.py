@@ -84,7 +84,9 @@ class OverlapSquared:
     reference_parameters: np.ndarray
 
     def evaluate(self, parameters: np.ndarray) -> float:
-        psi_ref = hea_state(np.asarray(self.reference_parameters, dtype=float), self.n_qubits, self.hea_depth)
+        psi_ref = hea_state(
+            np.asarray(self.reference_parameters, dtype=float), self.n_qubits, self.hea_depth
+        )
         psi = hea_state(np.asarray(parameters, dtype=float), self.n_qubits, self.hea_depth)
         return float(abs(np.vdot(psi_ref, psi)) ** 2)
 
@@ -119,7 +121,9 @@ class MatrixElement:
 
     def evaluate(self, left_parameters: np.ndarray) -> complex:
         psi_l = hea_state(np.asarray(left_parameters, dtype=float), self.n_qubits, self.hea_depth)
-        psi_r = hea_state(np.asarray(self.right_parameters, dtype=float), self.n_qubits, self.hea_depth)
+        psi_r = hea_state(
+            np.asarray(self.right_parameters, dtype=float), self.n_qubits, self.hea_depth
+        )
         op = qubit_operator_to_sparse(self.operator, self.n_qubits)
         return complex(np.vdot(psi_l, op @ psi_r))
 
@@ -195,7 +199,11 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
             )
         )
     elif q.algorithm == "vqe":
-        out.append(ComputableRef("ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe_depth}))
+        out.append(
+            ComputableRef(
+                "ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe_depth}
+            )
+        )
     elif q.algorithm in ("adapt", "tetris_adapt"):
         out.append(
             ComputableRef(
@@ -242,11 +250,21 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
     if q.vqd_after_variational:
         out.append(ComputableRef("excited_energies_vqd", "spectrum", {"n_states": q.vqd_n_states}))
     if q.qse_after_variational:
-        out.append(ComputableRef("excitation_energies_qse", "spectrum", {"subspace_dim": q.qse_subspace_dim}))
+        out.append(
+            ComputableRef(
+                "excitation_energies_qse", "spectrum", {"subspace_dim": q.qse_subspace_dim}
+            )
+        )
     if q.sceom_after_variational:
-        out.append(ComputableRef("sceom_energies", "spectrum", {"subspace_dim": q.sceom_subspace_dim}))
+        out.append(
+            ComputableRef("sceom_energies", "spectrum", {"subspace_dim": q.sceom_subspace_dim})
+        )
     if q.qpe_demo_track_requested():
-        out.append(ComputableRef("qpe_demo_track", "phase", {"hook": "qpe_qec_demo.kitaev + bayesian_stub"}))
+        out.append(
+            ComputableRef(
+                "qpe_demo_track", "phase", {"hook": "qpe_qec_demo.kitaev + bayesian_stub"}
+            )
+        )
     if q.vqs_track_requested():
         out.append(
             ComputableRef(
@@ -303,6 +321,7 @@ def computables_export_dict(
         ),
         "support_set_exported_from_protocol": support_from,
         "items": [
-            {"name": c.name, "kind": c.kind, "details": c.details} for c in list_computables_for_config(cfg)
+            {"name": c.name, "kind": c.kind, "details": c.details}
+            for c in list_computables_for_config(cfg)
         ],
     }

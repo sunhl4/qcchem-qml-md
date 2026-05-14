@@ -27,6 +27,7 @@ class AnsatzRegistryEntry:
     factory: AnsatzFactory
     capabilities: dict[str, bool] = field(default_factory=dict)
 
+
 def _hea_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> VQE:
     return VQE(hamiltonian, **kwargs)
 

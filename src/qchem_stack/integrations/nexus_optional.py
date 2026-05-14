@@ -49,10 +49,16 @@ def nexus_public_workflow_blueprint() -> dict[str, Any]:
         "stages": [
             {"id": "auth", "description": "API key / workspace session (qnexus / portal)"},
             {"id": "project_context", "description": "Select project + versioning context"},
-            {"id": "compile_upload", "description": "Logical circuit + pass bundle → compiled artifact"},
+            {
+                "id": "compile_upload",
+                "description": "Logical circuit + pass bundle → compiled artifact",
+            },
             {"id": "job_submit", "description": "Queue job on target (simulator / H-series)"},
             {"id": "poll", "description": "Retrieve status + resource usage"},
-            {"id": "result_fetch", "description": "Counts / expectation estimates → local repro ledger"},
+            {
+                "id": "result_fetch",
+                "description": "Counts / expectation estimates → local repro ledger",
+            },
         ],
         "open_stack_analog_rows": [
             "qchem_stack.jobs.nexus_cloud (http/mock probe)",
