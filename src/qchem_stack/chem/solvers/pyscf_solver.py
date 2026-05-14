@@ -314,10 +314,16 @@ class PySCFIntegralSolver:
             cas.frozen = sorted(set(int(i) for i in frozen))
         h1, e_core = cas.get_h1eff(mo)
         h2 = cas.get_h2eff(mo)
-        h1a = np.asarray(h1, dtype=complex)
-        h2a = np.asarray(h2, dtype=complex)
+        h1a = np.asarray(h1)
+        h2a = np.asarray(h2)
+        # PySCF's ao2mo.restore only accepts real-valued ERI tensors.
         if h2a.ndim != 4:
-            h2a = np.asarray(ao2mo.restore(1, h2a, ncas), dtype=complex)
+            h2_restore_input = h2a
+            if np.iscomplexobj(h2_restore_input):
+                if np.max(np.abs(h2_restore_input.imag)) > 1e-7:
+                    raise ValueError("Active-space integrals have non-trivial imaginary part.")
+                h2_restore_input = np.asarray(h2_restore_input.real, dtype=float)
+            h2a = np.asarray(ao2mo.restore(1, h2_restore_input, ncas))
         if np.max(np.abs(h1a.imag)) > 1e-7 or np.max(np.abs(h2a.imag)) > 1e-7:
             raise ValueError("Active-space integrals have non-trivial imaginary part.")
         h1_real = np.asarray(h1a.real, dtype=float)

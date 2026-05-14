@@ -31,6 +31,7 @@ DEFAULT_BENCHMARK_YAMLS: tuple[str, ...] = (
     "configs/example_h2_iqeb_fermionic_doubles_pool.yaml",
     "configs/example_h2_iqeb_qubit_excitation_alias.yaml",
     "configs/example_h2_excited_smoke.yaml",
+    "configs/example_h2_vqd_uccsd.yaml",
     "configs/qpe_dual_track_demo.yaml",
 )
 

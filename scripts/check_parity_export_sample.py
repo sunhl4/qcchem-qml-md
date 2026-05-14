@@ -37,6 +37,7 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_h2_qiskit_shots.yaml",
     "configs/example_h2_uccsd.yaml",
     "configs/example_h2_uccsd_trotter.yaml",
+    "configs/example_h2_vqd_uccsd.yaml",
     "configs/example_h2_uccsd_bk.yaml",
     "configs/example_h2_zne_circuit_fold.yaml",
     "configs/qpe_dual_track_demo.yaml",

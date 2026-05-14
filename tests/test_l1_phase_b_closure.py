@@ -77,6 +77,10 @@ def test_mitigation_execution_model_public_stable_schema() -> None:
     assert mm["schema"] == "mitigation_execution_model_v1"
     assert "sync_dag" in mm and "async_batch_execution" in mm
     assert isinstance(mm.get("public_doc_urls"), list)
+    async_model = mm.get("async_batch_execution")
+    assert isinstance(async_model, dict)
+    assert async_model.get("open_stack") == "not_implemented_mitex_batch_scheduler"
+    assert "not a Qermit MitEx multi-task batch runtime" in str(async_model.get("note"))
 
 
 def test_qermit_analog_report_with_zne_only_has_schema() -> None:
@@ -121,6 +125,39 @@ def test_mitigation_runtime_spam_trace_matches_graph_order() -> None:
     rt = execute_mitigation_dag_runtime(cfg, out)
     assert rt is not None
     assert rt["trace"][0]["node"] == "SPAM_readout_calibration_stub"
+
+
+def test_mitigation_runtime_trace_is_reproducible_for_same_inputs() -> None:
+    cfg = ExperimentConfig(
+        experiment_id="l1_trace_repro",
+        random_seed=0,
+        molecule=MoleculeSpec(symbols=["H"], coordinates_bohr=[[0.0, 0.0, 0.0]]),
+        active_space=ActiveSpaceSpec(n_active_orbitals=1, n_active_electrons=1),
+        mitigation=MitigationSpec(
+            spam_calibration_enabled=True,
+            pmsv_enabled=True,
+            pmsv_retention_rate=0.5,
+            zne_enabled=True,
+            zne_mode="circuit_scale_fold",
+            zne_scales=[1.0, 1.5, 2.0],
+        ),
+    )
+    graph = build_qermit_style_mitigation_report(cfg)
+    protocol_counts = {
+        "energy_stderr": 0.1,
+        "zne_curve": [-1.0, -0.95, -0.9],
+        "zne_extrapolated_energy": -0.96,
+    }
+    out = {
+        "energy_pauli_protocol": -1.02,
+        "protocol_counts": protocol_counts,
+        "mitigation_graph_report": graph,
+    }
+    rt1 = execute_mitigation_dag_runtime(cfg, out)
+    rt2 = execute_mitigation_dag_runtime(cfg, out)
+    assert isinstance(rt1, dict) and isinstance(rt2, dict)
+    assert rt1["trace"] == rt2["trace"]
+    assert rt1["final_energy"] == pytest.approx(-0.96)
 
 
 def test_tensornet_stubs_whitelisted() -> None:

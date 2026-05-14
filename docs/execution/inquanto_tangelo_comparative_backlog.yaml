@@ -9,7 +9,7 @@ phases:
   - id: A
     title: Baseline freeze and quick closure
     day_range: Day121-Day135
-    status: in_progress
+    status: done
     objectives:
       - Freeze parity anchor mapping for InQuanto and Tangelo comparison.
       - Close first wave of high-impact P0 gaps with test-backed evidence.
@@ -95,7 +95,7 @@ phases:
   - id: B
     title: Algorithm and chemistry parity deepening
     day_range: Day136-Day155
-    status: todo
+    status: done
     objectives:
       - Close chemistry integral and mapping parity gaps.
       - Make BK/SCBK and UCCSD boundary machine-checkable.
@@ -115,6 +115,7 @@ phases:
           - "openfermion/tangelo recipe compatibility test passes"
         evidence:
           - "src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals implemented (CASCI h1/h2 + OpenFermion reorder)"
+          - "src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals normalizes packed ERI to real dtype before ao2mo.restore"
           - "src/qchem_stack/chem/solvers/pyscf_solver.py: capabilities.supports_get_integrals=True"
           - "tests/test_chem_integral_solver_tangelo_aliases.py: get_integrals schema/shape assertions"
           - "tests/test_pyscf_solver_adapter.py: OpenFermion reorder output shape assertions"
@@ -122,7 +123,7 @@ phases:
       - id: B-002
         title: Codify BK/SCBK UCCSD boundary in runtime and docs
         owner: quantum-alg
-        status: in_progress
+        status: done
         target_files:
           - src/qchem_stack/quantum/algorithms/uccsd_vqe.py
           - docs/inquanto_public_parity_matrix.md
@@ -140,7 +141,7 @@ phases:
       - id: B-003
         title: Tangelo mapping roadmap rows (JKMN/HCB) with explicit status
         owner: chem-mapping
-        status: in_progress
+        status: done
         target_files:
           - src/qchem_stack/chem/fermion_mapping_registry.py
           - src/qchem_stack/protocols/inquanto_contract.py
@@ -156,7 +157,7 @@ phases:
   - id: C
     title: Mitigation and benchmark evidence closeout
     day_range: Day156-Day180
-    status: todo
+    status: done
     objectives:
       - Finalize mitigation model comparability and reporting evidence.
       - Expand parity export and L3 benchmark sample coverage.
@@ -164,7 +165,7 @@ phases:
       - id: C-001
         title: Mitigation runtime trace and async model parity statement
         owner: mitigation
-        status: todo
+        status: done
         target_files:
           - src/qchem_stack/mitigation/qermit_runtime.py
           - src/qchem_stack/protocols/inquanto_contract.py
@@ -175,11 +176,16 @@ phases:
         acceptance_criteria:
           - "mitigation_dag_execution traces are stable and reproducible"
           - "async model caveat appears in machine-readable gap row"
-        evidence: []
+        evidence:
+          - "src/qchem_stack/mitigation/qermit_runtime.py: execute_mitigation_dag_runtime + execute_mitigation_dag trace schema qermit_runtime_v1"
+          - "src/qchem_stack/protocols/inquanto_contract.py: mitigation_execution_model_public async_batch_execution caveat"
+          - "tests/test_l1_phase_b_closure.py: async caveat assertion + deterministic mitigation trace regression"
+          - "tests/test_zne_circuit_fold.py: circuit_scale_fold runtime trace reuses protocol zne_curve"
+          - "tests/test_pipeline_job_store.py: async full_pipeline job roundtrip keeps timeline evidence"
       - id: C-002
         title: Expand parity export sample configs for new dimensions
         owner: reproducibility
-        status: todo
+        status: done
         target_files:
           - scripts/check_parity_export_sample.py
           - tests/test_export_parity_golden.py
@@ -189,11 +195,14 @@ phases:
         acceptance_criteria:
           - "new configs included in sample export gate"
           - "stable key assertions hold"
-        evidence: []
+        evidence:
+          - "scripts/check_parity_export_sample.py: SAMPLE_CONFIGS_REL includes configs/example_h2_vqd_uccsd.yaml"
+          - "tests/test_check_parity_export_sample_script.py: sample gate includes VQD UCCSD and de-duplicates configs"
+          - "tests/test_export_parity_golden.py: VQD UCCSD config remains covered by stable-key export assertions"
       - id: C-003
         title: Extend L3 benchmark bundle for parity slices
         owner: benchmark
-        status: todo
+        status: done
         target_files:
           - src/qchem_stack/integrations/l3_algorithm_benchmark.py
           - scripts/l3_algorithm_benchmark_report.py
@@ -203,4 +212,7 @@ phases:
         acceptance_criteria:
           - "bundle includes at least one new InQuanto-aligned and one Tangelo-aligned slice"
           - "L3 smoke remains optional and deterministic under marker"
-        evidence: []
+        evidence:
+          - "src/qchem_stack/integrations/l3_algorithm_benchmark.py: DEFAULT_BENCHMARK_YAMLS includes example_h2_vqd_uccsd and iqeb alias slice"
+          - "tests/test_l3_algorithm_benchmark_bundle.py: explicit InQuanto/Tangelo slice coverage assertions"
+          - "tests/test_l3_benchmark_smoke.py: optional L3 marker gate (QCHEM_RUN_L3) and deterministic schema checks"

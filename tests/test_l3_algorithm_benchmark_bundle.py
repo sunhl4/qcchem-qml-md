@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from qchem_stack.integrations.l3_algorithm_benchmark import (
+    DEFAULT_BENCHMARK_YAMLS,
     algorithm_benchmark_bundle_v1,
     merged_experiment_benchmark_v1,
 )
@@ -47,3 +48,10 @@ def test_merged_experiment_benchmark_groups_by_algorithm_yaml() -> None:
         ("adapt_v1", 2, 30.0),
         ("iqeb_v1", 1, 5.0),
     ]
+
+
+def test_default_benchmark_yaml_set_covers_inquanto_and_tangelo_slices() -> None:
+    # InQuanto-aligned: VQD UCCSD deflation sample.
+    assert "configs/example_h2_vqd_uccsd.yaml" in DEFAULT_BENCHMARK_YAMLS
+    # Tangelo-aligned: fermion mapping / pool-alias vocabulary sample.
+    assert "configs/example_h2_iqeb_qubit_excitation_alias.yaml" in DEFAULT_BENCHMARK_YAMLS
