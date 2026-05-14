@@ -121,8 +121,9 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     h2 = cas.get_h2eff(mo_perm)
     h1a = np.asarray(h1, dtype=float)
     h2a = np.asarray(h2, dtype=float)
-    enuc = float(mol.energy_nuc())
-    constant = float(enuc + float(e_core))
+    # Match :func:`active_space_integrals`: ``e_core`` from ``get_h1eff`` already includes
+    # ``energy_nuc()`` and inactive-core contributions; do not add ``mol.energy_nuc()`` again.
+    constant = float(e_core)
 
     audit: dict[str, Any] = {
         "schema": "projection_mulliken_mo_audit_v1",

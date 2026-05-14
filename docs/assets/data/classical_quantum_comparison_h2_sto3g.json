@@ -1,0 +1,82 @@
+{
+  "schema": "classical_quantum_comparison_v1",
+  "config_path": "configs/example_h2_vqe_figure_near_casci.yaml",
+  "vqe_trace_path": "docs/assets/data/vqe_h2_sto3g_jw_near_casci_trace.json",
+  "experiment_id": "h2_sto3g_vqe_figure_near_casci",
+  "molecule_basis": "sto-3g",
+  "reference_fci_like_method": "PySCF CASCI (2e/2o active space)",
+  "vqe_selection_note": "best_achievable_from_bounded_lbfgsb_scan",
+  "vqe_trace_final_ha": -1.1372759436170417,
+  "vqe_scan_safe_below_casci_mha": 0.5,
+  "vqe_best_safe_ha": -1.1372759436170417,
+  "vqe_scan_rows": [
+    {
+      "angle_bound_rad": 0.38,
+      "energy_ha": -1.1372759436170417,
+      "nfev": 30,
+      "variational_safe_vs_casci": true
+    },
+    {
+      "angle_bound_rad": 0.42,
+      "energy_ha": -1.1372759436170417,
+      "nfev": 30,
+      "variational_safe_vs_casci": true
+    },
+    {
+      "angle_bound_rad": 0.48,
+      "energy_ha": -1.1372759436170417,
+      "nfev": 30,
+      "variational_safe_vs_casci": true
+    },
+    {
+      "angle_bound_rad": 0.6,
+      "energy_ha": -1.1372759436170417,
+      "nfev": 30,
+      "variational_safe_vs_casci": true
+    },
+    {
+      "angle_bound_rad": 0.9,
+      "energy_ha": -1.1372759436170417,
+      "nfev": 30,
+      "variational_safe_vs_casci": true
+    },
+    {
+      "angle_bound_rad": 1.2,
+      "energy_ha": -1.1372759436170417,
+      "nfev": 30,
+      "variational_safe_vs_casci": true
+    }
+  ],
+  "rows": [
+    {
+      "method_key": "hartree_fock",
+      "method_label": "Hartree-Fock",
+      "energy_ha": -1.116714325062551,
+      "error_vs_fci_mha": 20.56161855449279
+    },
+    {
+      "method_key": "mp2",
+      "method_label": "MP2",
+      "energy_ha": -1.1298721951151875,
+      "error_vs_fci_mha": 7.403748501856322
+    },
+    {
+      "method_key": "ccsd",
+      "method_label": "CCSD",
+      "energy_ha": -1.1372761088623164,
+      "error_vs_fci_mha": 0.00016524527257644195
+    },
+    {
+      "method_key": "vqe_platform",
+      "method_label": "VQE (our platform)",
+      "energy_ha": -1.1372759436170417,
+      "error_vs_fci_mha": 2.220446049250313e-12
+    },
+    {
+      "method_key": "fci",
+      "method_label": "FCI (exact in active space)",
+      "energy_ha": -1.1372759436170439,
+      "error_vs_fci_mha": 0.0
+    }
+  ]
+}

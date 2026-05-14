@@ -16,8 +16,12 @@ Typography：正文四号 14 pt；**插图内**统一用更大磅值，补偿 
 Serif：拉丁文优先 Times New Roman；中文回退 Songti SC / SimSun / Noto Serif CJK（与 MD 一致）。
 """
 
-import numpy as np
+import json
+import math
 import textwrap
+from pathlib import Path
+
+import numpy as np
 
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
@@ -140,55 +144,122 @@ def _subplots_finalize(fig, **kwargs):
 # ─── 1. Why quantum chemistry ─────────────────────────────────────────────────
 
 def fig_why_quantum():
-    fig, axes = plt.subplots(1, 2, figsize=(15.8, 7.35))
-    fig.suptitle('Classical vs Quantum Simulation of Molecules',
-                 fontsize=FS_DISPLAY, fontweight='bold', color=C['navy'], y=0.965)
+    """
+    Left: classical *exact* many-body — Slater determinant basis size (half-filled
+    active space) grows combinatorially in n_so. Not comparable to DFT O(M³).
 
-    # ── Left: exponential scaling wall ──
+    Right: same active spin-orbital count — qubit count is linear in n_so (JW/BK);
+    typical second-quantized two-body Hamiltonian has O(n_so⁴) one-/two-electron
+    integrals / Pauli-term budget (still polynomial). State dimension 2^n_so is
+    encoded implicitly in qubits, not as a classical amplitude list.
+
+    Layout matches dual-panel benchmarks (classical_quantum_comparison): no
+    long transAxes callouts inside axes; footnotes via fig.text; legends placed
+    to avoid curve overlap.
+    """
+    fig, axes = plt.subplots(1, 2, figsize=(14.2, 7.55))
+    fig.patch.set_facecolor('white')
+
+    n_so = np.arange(4, 33, 2, dtype=int)
+    det_count = np.array([math.comb(int(n), int(n) // 2) for n in n_so], dtype=float)
+
+    # ── Left: FCI-type Slater basis ──
     ax = axes[0]
-    ax.set_title('Classical: Exponential Wall', fontsize=FS_HEAD,
-                 fontweight='bold', color=C['red'], pad=12)
-    n_elec = np.arange(2, 20)
-    ops = 2.0 ** n_elec
-    ax.semilogy(n_elec, ops, 'o-', color=C['red'], lw=2.5, ms=6, mfc='white', mew=2)
-    ax.fill_between(n_elec, 1, ops, alpha=0.12, color=C['red'])
+    ax.set_title(
+        r'FCI-type Slater basis ($\frac{1}{2}$-filled active space)',
+        fontsize=FS_HEAD,
+        fontweight='bold',
+        color=C['red'],
+        pad=12,
+    )
+    ax.semilogy(n_so, det_count, 'o-', color=C['red'], lw=2.5, ms=6,
+                mfc='white', mew=2, label='CI / FCI basis size')
+    ax.fill_between(n_so, 1.0, det_count, alpha=0.12, color=C['red'])
     ax.axhline(1e12, color=C['gray'], ls='--', lw=1.5,
-               label='Petaflop supercomputer limit')
-    ax.axvspan(14, 19, alpha=0.15, color=C['red'], label='Beyond any classical computer')
-    ax.set_xlabel('Number of electrons (N)', fontsize=FS_SUB)
-    ax.set_ylabel('Operations ~ 2^N', fontsize=FS_SUB)
-    ax.legend(fontsize=FS_LEGEND, framealpha=0.92, loc='lower left', borderpad=0.6)
-    ax.set_xlim(2, 19)
-    ax.set_ylim(1, 1e6)
+               label=r'$\sim 10^{12}$ coefficients (illustrative cutoff)')
+    ax.set_xlabel(r'Active spin-orbitals $n_{\mathrm{so}}$', fontsize=FS_SUB)
+    ax.set_ylabel(r'Slater determinants (half-filled)', fontsize=FS_SUB)
+    ax.legend(
+        fontsize=FS_LEGEND - 1,
+        framealpha=0.94,
+        loc='lower right',
+        borderaxespad=0.8,
+        borderpad=0.5,
+    )
+    ax.set_xlim(2, 34)
+    ymin = max(1.0, float(det_count.min()) * 0.35)
+    ymax = float(det_count.max()) * 4.0
+    ax.set_ylim(ymin, ymax)
+    ax.margins(x=0.02)
     ax.grid(True, alpha=0.25, ls='--')
-    ax.text(16.35, 3500.0, 'Impossible\nzone', ha='center', fontsize=FS_BODY,
-            color=C['red'], fontweight='bold')
 
-    # ── Right: quantum advantage ──
+    # ── Right: quantum — linear qubits, polynomial shell ──
     ax = axes[1]
-    ax.set_title('Quantum: Polynomial Scaling', fontsize=FS_HEAD,
-                 fontweight='bold', color=C['green'], pad=12)
-    n_elec = np.arange(2, 80)
-    q_ops = n_elec ** 3          # rough poly scaling
-    c_ops = 2.0 ** (n_elec / 5)  # classical (compressed scale)
-    ax.plot(n_elec, q_ops / q_ops.max() * 100, 'o-', color=C['green'],
-            lw=2.5, ms=4, mfc='white', mew=2, label='Quantum algorithm (poly)')
-    ax.plot(n_elec, c_ops / c_ops.max() * 100, 's--', color=C['red'],
-            lw=2, ms=4, mfc='white', mew=2, label='Classical (exp, rescaled)')
-    ax.fill_between(n_elec,
-                    q_ops / q_ops.max() * 100,
-                    c_ops / c_ops.max() * 100,
-                    where=(n_elec > 20), alpha=0.18, color=C['green'],
-                    label='Quantum advantage region')
-    ax.set_xlabel('System size (electrons / qubits)', fontsize=FS_SUB)
-    ax.set_ylabel('Computational cost (normalized)', fontsize=FS_SUB)
-    ax.legend(fontsize=FS_LEGEND, framealpha=0.92, loc='upper left')
-    ax.set_xlim(2, 79)
+    ax.set_title(
+        r'Quantum encoding: qubits $\sim n_{\mathrm{so}}$, shell $\sim n_{\mathrm{so}}^4$',
+        fontsize=FS_HEAD,
+        fontweight='bold',
+        color=C['green'],
+        pad=12,
+    )
+    qubits = n_so.astype(float)
+    ham_terms = n_so.astype(float) ** 4
+    scale = qubits.max() / ham_terms.max()
+    ax.plot(n_so, qubits, 'o-', color=C['green'], lw=2.5, ms=6, mfc='white', mew=2,
+            label=r'Physical qubits $\approx n_{\mathrm{so}}$ (JW / BK)')
+    ax.plot(n_so, ham_terms * scale, 's--', color=C['amber'], lw=2.0, ms=5,
+            mfc='white', mew=1.5,
+            label=r'Two-body shell $\propto n_{\mathrm{so}}^4$ (scaled)')
+    ax.set_xlabel(r'Active spin-orbitals $n_{\mathrm{so}}$', fontsize=FS_SUB)
+    ax.set_ylabel('Resource (arb. units, same scale)', fontsize=FS_SUB)
+    ax.legend(
+        fontsize=FS_LEGEND - 1,
+        framealpha=0.94,
+        loc='lower left',
+        bbox_to_anchor=(0.04, 0.06),
+        borderaxespad=0.0,
+        borderpad=0.45,
+    )
+    ax.set_xlim(2, 34)
+    ax.set_ylim(0.0, float(qubits.max()) * 1.22)
     ax.grid(True, alpha=0.25, ls='--')
-    ax.text(58, 22, 'Quantum\nadvantage', ha='center', fontsize=FS_BODY,
-            color=C['green'], fontweight='bold')
 
-    _subplots_finalize(fig, left=0.065, right=0.988, bottom=0.11, top=0.895, wspace=0.24)
+    fig.subplots_adjust(left=0.09, right=0.985, top=0.84, bottom=0.21, wspace=0.30)
+
+    fig.suptitle(
+        'Exact Many-Body Basis vs Quantum Encoding (Active Spin-Orbitals)',
+        fontsize=FS_DISPLAY,
+        fontweight='bold',
+        color=C['navy'],
+        y=0.965,
+    )
+
+    fig.text(
+        0.5,
+        0.095,
+        'Left: DFT / Kohn–Sham scales as $O(M^3)$ in basis size but is a mean-field + XC model — not this FCI determinant basis.',
+        ha='center',
+        va='top',
+        fontsize=FS_CAPTION - 1,
+        color=C['gray'],
+        style='italic',
+        wrap=True,
+        **_serif(),
+    )
+    fig.text(
+        0.5,
+        0.048,
+        r'Right: Hilbert space $\sim \mathbb{C}^{2^{n_{\mathrm{so}}}}$ is not stored as classical amplitudes; '
+        r'VQE / QPE target observables (e.g., energy), not full tomography.',
+        ha='center',
+        va='top',
+        fontsize=FS_CAPTION - 1,
+        color=C['gray'],
+        style='italic',
+        wrap=True,
+        **_serif(),
+    )
+
     save(fig, 'why_quantum_chemistry.png')
 
 
@@ -262,7 +333,7 @@ def fig_active_space():
                                    boxstyle='round,pad=0.1',
                                    facecolor=fc, edgecolor=ec, lw=2))
         ax.text(bx + bw / 2, by + bh / 2, label, ha='center', va='center',
-                fontsize=WF_FS, color=C['navy'])
+                fontsize=FS_INBOX, color=C['navy'])
 
     plt.tight_layout(pad=0.8)
     save(fig, 'active_space_embedding_sci.png')
@@ -600,7 +671,7 @@ def fig_tangelo_workflow():
     ax_side.set_ylim(0, 1)
     ax_side.axis('off')
 
-    lh_s = _AX_LH * 1.05
+    lh_s = _AX_LH_FLOW * 1.05
     pad_x = 0.038
     for by, bh_box, fc, ec, title, items in [
         (by_str, bh_str, '#eaf4fb', C['blue'], 'Strengths',
@@ -625,7 +696,7 @@ def fig_tangelo_workflow():
             title,
             ha='center',
             va='top',
-            fontsize=FS_SUB,
+            fontsize=WF_FS,
             fontweight='bold',
             color=color,
             linespacing=LS_BOX_TITLE,
@@ -703,14 +774,14 @@ def fig_three_platform():
 def fig_workflow_philosophy():
     """
     Three stacked rows (one platform each): horizontal L→R workflow in each row,
-    [+]/[-] trade-offs below the flow. Typography matches other report figures.
+    [+]/[-] trade-offs below the flow. Typography uses WF_FS (flow-diagram scale).
     """
-    fig = plt.figure(figsize=(15.35, 7.75))
+    fig = plt.figure(figsize=(15.35 * _FLOW_FIG_K, 7.75 * _FLOW_FIG_K))
     # Very tight vertical gutter between the three workflow rows.
     gs = fig.add_gridspec(3, 1, height_ratios=[1, 1, 1],
                           left=0.055, right=0.983, top=0.912, bottom=0.028,
                           hspace=0.032)
-    fig.suptitle('Three Workflow Philosophies', fontsize=FS_DISPLAY,
+    fig.suptitle('Three Workflow Philosophies', fontsize=WF_FS,
                  fontweight='bold', color=C['navy'], y=0.962)
 
     rows = [
@@ -747,12 +818,12 @@ def fig_workflow_philosophy():
         # Platform name vs subtitle: keep a clear vertical gap (was 0.936 / 0.864 — too tight).
         ax.text(
             0.026, 0.940, name,
-            fontsize=FS_SUB, fontweight='bold', color=col,
+            fontsize=WF_FS, fontweight='bold', color=col,
             transform=ax.transAxes, va='top',
         )
         ax.text(
             0.026, 0.818, subtitle,
-            fontsize=FS_BODY,
+            fontsize=WF_FS,
             style='italic', color=C['gray'], transform=ax.transAxes,
             va='top',
         )
@@ -773,7 +844,7 @@ def fig_workflow_philosophy():
             ax.text(
                 bx + step_w / 2, mid_y,
                 _wrap(step, wrap_step),
-                ha='center', va='center', fontsize=FS_SUB,
+                ha='center', va='center', fontsize=WF_FS,
                 linespacing=LS_BOX_TITLE,
                 fontweight='bold', color='#2c3e50',
                 **_serif(),
@@ -802,17 +873,17 @@ def fig_workflow_philosophy():
         wrapped_len_p = max(1, _nl(wp))
         ax.text(
             0.024, prose_anchor,
-            wp, fontsize=FS_SUB,
+            wp, fontsize=WF_FS,
             color='#1e8449', va='top', transform=ax.transAxes,
             linespacing=LS_BOX_BODY, **_serif(),
         )
         gap_pro_con = 0.066
-        y_con_start = prose_anchor - wrapped_len_p * _AX_LH * LS_BOX_BODY - gap_pro_con
+        y_con_start = prose_anchor - wrapped_len_p * _AX_LH_FLOW * LS_BOX_BODY - gap_pro_con
         ax.text(
             0.024,
             y_con_start,
             wm,
-            fontsize=FS_SUB,
+            fontsize=WF_FS,
             color='#c0392b',
             va='top',
             transform=ax.transAxes,
@@ -826,14 +897,18 @@ def fig_workflow_philosophy():
 # ─── 8. qchem-stack pipeline flow ────────────────────────────────────────────
 
 def fig_qchem_pipeline():
-    """Saves ``comparison_flow.png`` — pipeline + footer boxes at 60% prior height; 14 pt fonts."""
-    fig, ax = plt.subplots(figsize=(17.9, 8.85))
+    """Saves ``comparison_flow.png`` — WF_FS typography; canvas scaled by `_FLOW_FIG_K`."""
+    # Figure-specific balance: align with other workflow figures while keeping this
+    # dense 6-stage canvas readable after document embedding.
+    _pipe_k = 1.08
+    _pipe_fs = 18.2
+    fig, ax = plt.subplots(figsize=(17.9 * _pipe_k, 8.85 * _pipe_k))
     ax.set_xlim(0, 1)
     ax.set_ylim(0, 1)
     ax.axis('off')
     ax.set_title(
         'qchem-stack: End-to-End Pipeline Architecture',
-        fontsize=FS_DISPLAY, fontweight='bold', color=C['navy'], pad=2,
+        fontsize=_pipe_fs + 0.8, fontweight='bold', color=C['navy'], pad=-11,
     )
 
     n_stages = 6
@@ -842,27 +917,28 @@ def fig_qchem_pipeline():
     span = n_stages * bw + (n_stages - 1) * g_gap
     pad_side = (1 - span) / 2
     centers_x = [pad_side + bw / 2 + i * (bw + g_gap) for i in range(n_stages)]
-    # Six main stage boxes: height = 60% of prior 0.432 (typography unchanged → slightly tighter line spacing).
+    # Six main stage boxes: slightly taller than previous compact variant for better
+    # semantic grouping between stage title and stage detail.
     _bh_prev = 0.432
-    bh = _bh_prev * 0.6
-    cy = 0.644
+    bh = _bh_prev * 0.63
+    cy = 0.662
     # Title in upper half, body in lower half of the shorter box.
     y_title = cy + bh * 0.200
     y_body = cy - bh * 0.200
 
     stages_meta = [
         ('YAML Config\n(Pydantic)', C['navy'], '#e8eef7',
-         'ExperimentConfig\n(strict validation)'),
-        ('Classical SCF\n(PySCFDriver)', C['blue'], '#dbe4ff',
-         'RHF / ROHF / UHF\nddCOSMO / PBC'),
-        ('Hamiltonian\nBuilder', '#d4520d', '#fdebd0',
-         'Active space integrals\nJW / BK / SCBK mapping'),
-        ('Quantum\nAlgorithm', C['green'], '#d4f1ec',
+         'ExperimentConfig schema\nstrict validation + defaults'),
+        ('Classical Driver\n(PySCF)', C['blue'], '#dbe4ff',
+         'RHF / ROHF / UHF | ddCOSMO / PBC\nchemistry context extraction'),
+        ('Hamiltonian\nCompiler', '#d4520d', '#fdebd0',
+         'Active-space integrals\nJW / BK / SCBK mapping'),
+        ('Quantum Algorithm\nLayer', C['green'], '#d4f1ec',
          'VQE / ADAPT / IQEB\nUCCSD / VQD / QSE'),
-        ('Pauli Protocol\n(5-stage)', '#b8860b', '#fdf6d8',
-         'Commuting groups\ncircuit IR / shots'),
-        ('Repro &\nExport', C['gray'], '#f0f0f0',
-         'SHA-256 fingerprint\nstrict JSON log'),
+        ('Pauli Measurement\nProtocol', '#b8860b', '#fdf6d8',
+         'Commuting groups + shot budget\ncircuit IR / execution plan'),
+        ('Reproducibility\nExport', C['gray'], '#f0f0f0',
+         'SHA-256 fingerprint\nstrict JSON artifact log'),
     ]
 
     for cx, (title, ec, fc, desc) in zip(centers_x, stages_meta):
@@ -878,7 +954,7 @@ def fig_qchem_pipeline():
         )
         ax.text(
             cx, y_title, title, ha='center', va='bottom',
-            fontsize=FS_SUB,
+            fontsize=_pipe_fs,
             fontweight='bold',
             color='#2c3e50',
             linespacing=LS_BOX_TITLE,
@@ -888,7 +964,7 @@ def fig_qchem_pipeline():
             cx, y_body, desc,
             ha='center',
             va='top',
-            fontsize=WF_FS,
+            fontsize=_pipe_fs,
             style='italic',
             color='#555',
             linespacing=LS_BOX_BODY,
@@ -947,10 +1023,10 @@ def fig_qchem_pipeline():
     ax.text(
         bx_lo + bx_w / 2,
         bx_yy + bx_h - head_inset,
-        'FastAPI Local Job Manager',
+        'FastAPI Job Orchestrator',
         ha='center',
         va='top',
-        fontsize=FS_SUB,
+        fontsize=_pipe_fs,
         fontweight='bold',
         color=C['green'],
         linespacing=LS_BOX_TITLE,
@@ -960,12 +1036,12 @@ def fig_qchem_pipeline():
         bx_lo + bx_w / 2,
         bx_yy + bx_h * body_y_frac,
         _wrap(
-            'POST /v1/runs  |  GET /v1/jobs/{id}  |  workflow-preview',
+            'POST /v1/runs  |  GET /v1/jobs/{id}  |  workflow preview',
             wrap_footer,
         ),
         ha='center',
         va='center',
-        fontsize=FS_INBOX,
+        fontsize=_pipe_fs,
         color='#444',
         linespacing=LS_BOX_BODY,
         parse_math=False,
@@ -986,10 +1062,10 @@ def fig_qchem_pipeline():
     ax.text(
         bx_r + bx_w / 2,
         bx_yy + bx_h - head_inset,
-        'Pluggable backends via BackendSpec',
+        'Pluggable Execution Backends',
         ha='center',
         va='top',
-        fontsize=FS_SUB,
+        fontsize=_pipe_fs,
         fontweight='bold',
         color=C['blue'],
         linespacing=LS_BOX_TITLE,
@@ -999,12 +1075,12 @@ def fig_qchem_pipeline():
         bx_r + bx_w / 2,
         bx_yy + bx_h * body_y_frac,
         _wrap(
-            'statevector (exact)  |  Qiskit Aer (shots)  |  IonStack (real HW)',
+            'statevector (exact)  |  Qiskit Aer (shots)  |  IonStack (real hardware)',
             wrap_footer,
         ),
         ha='center',
         va='center',
-        fontsize=FS_INBOX,
+        fontsize=_pipe_fs,
         linespacing=LS_BOX_BODY,
         color='#444',
         parse_math=False,
@@ -1033,7 +1109,7 @@ def fig_qchem_pipeline():
         arrowprops=dash_kw_blue,
     )
 
-    plt.tight_layout(pad=0.14)
+    fig.subplots_adjust(left=0.055, right=0.985, top=0.994, bottom=0.052)
     save(fig, 'comparison_flow.png')
 
 
@@ -1044,7 +1120,7 @@ def fig_driver_interface():
     One pipeline layer per subplot row so headings / body text cannot spill onto
     neighbouring layers (overlap seen when everything shared one axes 0–1 frame).
     """
-    fig = plt.figure(figsize=(14.35, 10.45))
+    fig = plt.figure(figsize=(14.35 * _FLOW_FIG_K, 10.45 * _FLOW_FIG_K))
     gs = fig.add_gridspec(
         1,
         2,
@@ -1056,15 +1132,15 @@ def fig_driver_interface():
         bottom=0.055,
         wspace=0.15,
     )
-    # Left: shorter boxes (centered in each row) + tighter gutter vs right silhouette; halved column gap.
-    _bh_left = 0.58
+    # Left: shorter boxes (centered in each row) + tighter gutter vs right silhouette.
+    _bh_left = 0.52
     _bb_left = (1 - _bh_left) / 2
-    sub_main = gs[0, 0].subgridspec(4, 1, hspace=0.056)
+    sub_main = gs[0, 0].subgridspec(5, 1, hspace=0.050)
     # Same wide wrap as Tangelo workflow body — avoid mid-sentence breaks (was 46).
     _wrap_driver_body = 88
     fig.suptitle(
-        'Unified Classical Chemistry Interface  (PySCFDriver)',
-        fontsize=FS_DISPLAY,
+        'qchem-stack: Classical-to-Quantum Pipeline',
+        fontsize=WF_FS,
         fontweight='bold',
         color=C['navy'],
         y=0.965,
@@ -1080,12 +1156,17 @@ def fig_driver_interface():
          'from_config(cfg) → run_rhf() / ROHF / UHF / PBC gamma-k\n'
          'Extensions: ddCOSMO solvent | k-mesh | CASSCF audit'),
         ('#fdebd0', '#d4520d',
-         'Hamiltonian Builder',
-         'active_space_integrals() → spatial → InteractionOperator …\n'
-         'SHA-256 fingerprint | OpenFermion | QubitHamiltonian'),
+         'Hamiltonian + Mapping',
+         'active_space_integrals() → InteractionOperator\n'
+         'JW / BK / symmetry-conserving BK → QubitHamiltonian'),
+        ('#efe6ff', '#7b2cbf',
+         'Quantum Algorithm Layer',
+         'VQE / ADAPT-VQE / IQEB | UCCSD / VQD / QSE\n'
+         'Algorithms consume QubitHamiltonian, not PySCF objects'),
         ('#fde8e8', C['red'],
-         'Fermion-to-Qubit Mapping',
-         'JW | BK | symmetry_conserving BK\nOutput: QubitHamiltonian (n_qubits, terms, metadata)'),
+         'Measurement + Repro Export',
+         'Pauli grouping | shot budget | backend execution plan\n'
+         'energy trace + SHA-256 fingerprint + strict JSON log'),
     ]
 
     for i, (fc, ec, title, desc) in enumerate(layers):
@@ -1120,7 +1201,7 @@ def fig_driver_interface():
             title,
             ha='center',
             va='top',
-            fontsize=FS_SUB,
+            fontsize=WF_FS,
             fontweight='bold',
             color='#2c3e50',
             linespacing=LS_BOX_TITLE,
@@ -1179,19 +1260,20 @@ def fig_driver_interface():
         'Key design',
         ha='center',
         va='top',
-        fontsize=FS_SUB,
+        fontsize=WF_FS,
         fontweight='bold',
         color=C['blue'],
         linespacing=LS_BOX_TITLE,
         **_serif(),
     )
     # Heading → bullets air (aligned with Tangelo / workflow_philosophy panel spacing).
-    y_b = 0.678
-    _key_line_step = 0.148
+    y_b = 0.690
+    _key_line_step = 0.145
     for t in [
-        'Explicit data structures',
-        'Full audit via repro log',
-        'One-line backend swap',
+        'Classical tools\nstop at boundary',
+        'Algorithms see\nQubitHamiltonian',
+        'Backend + measurement\nare pluggable',
+        'Full audit via\nrepro log',
     ]:
         ax_sb.text(
             scx,
@@ -1199,7 +1281,7 @@ def fig_driver_interface():
             f'· {t}',
             ha='center',
             va='top',
-            fontsize=WF_FS,
+            fontsize=WF_FS - 2.6,
             color='#333',
             linespacing=LS_BOX_BODY,
             **_serif(),
@@ -1213,64 +1295,121 @@ def fig_driver_interface():
 
 def fig_vqe_convergence():
     """
-    H2 / sto-3g VQE convergence.  Energy values are reference literature values;
-    the convergence trajectory is schematic but consistent with typical VQE behavior.
-    """
-    np.random.seed(42)
-    exact = -1.13730   # FCI / sto-3g (well-known reference)
-    n_iter = 52
+    H$_2$ / sto-3g **UCCSD** (JW): bounded **L-BFGS-B** energy-evaluation trace for the packaged figure
+    config (see ``configs/example_h2_vqe_figure_near_casci.yaml`` + export script).
 
-    t = np.linspace(0, 1, n_iter)
-    decay = np.exp(-6 * t)
-    noise = np.exp(-4 * t) * 0.08 * np.random.randn(n_iter)
-    energies = exact + 0.48 * decay + noise
-    energies = np.clip(energies, exact - 0.02, exact + 0.7)
+    Data: ``docs/assets/data/vqe_h2_sto3g_jw_near_casci_trace.json`` (regenerate with
+    ``PYTHONPATH=src python docs/assets/export_vqe_convergence_trace.py``).
+    """
+    data_path = Path(__file__).resolve().parent / "data" / "vqe_h2_sto3g_jw_near_casci_trace.json"
+    if not data_path.is_file():
+        raise FileNotFoundError(
+            f"Missing {data_path}; run from repo root:\n"
+            "  PYTHONPATH=src python docs/assets/export_vqe_convergence_trace.py"
+        )
+    js = json.loads(data_path.read_text(encoding="utf-8"))
+    energies = [float(x) for x in js["energy_trace_ha"]]
+    ref = float(js["reference_casci_total_ha"]) if js.get("reference_casci_total_ha") is not None else float(
+        js["exact_ground_in_active_space_ha"]
+    )
+    n_eval = len(energies)
+    if n_eval < 2:
+        raise ValueError("energy_trace_ha must contain at least two evaluations")
+
+    xs = np.arange(n_eval, dtype=float)
+    ys = np.asarray(energies, dtype=float)
+    # Keep the trace fully real (no smoothing): add cumulative minimum for storytelling.
+    ys_best = np.minimum.accumulate(ys)
+    final_e = float(ys[-1])
+    err_mha = abs(final_e - ref) * 1000.0
+    y_min = float(min(np.min(ys_best), ref))
+    y_max = float(max(np.max(ys_best), ref))
+    y_pad = max(8e-4, 0.20 * (y_max - y_min))
 
     fig, ax = plt.subplots(figsize=(12, 6.5))
-    ax.plot(range(n_iter), energies, 'o-', color=C['blue'], lw=2.5,
-            ms=6, mfc='white', mew=2, label='VQE energy per iteration')
-    ax.axhline(exact, color=C['red'], ls='--', lw=2,
-               label=f'FCI reference  ({exact:.5f} Ha)')
-    ax.axhspan(exact - 0.001, exact + 0.001, alpha=0.15, color=C['green'],
-               label='Chemical accuracy  (±1 mHa)')
-    ax.axvspan(38, 51, alpha=0.08, color=C['green'])
-
-    final_e = float(energies[-1])
-    err_mha = abs(final_e - exact) * 1000
-    ax.annotate(f'Converged: {final_e:.5f} Ha\nError vs FCI: {err_mha:.2f} mHa',
-                xy=(51, final_e), xytext=(38, exact + 0.08),
-                fontsize=WF_FS, fontweight='bold', color=C['green'],
-                arrowprops=dict(arrowstyle='->', color=C['green'], lw=1.5),
-                bbox=dict(boxstyle='round,pad=0.3', fc='#e8f5e9', ec=C['green']))
-
-    ax.set_xlabel('Optimizer iteration', fontsize=FS_SUB)
-    ax.set_ylabel('Energy  (Hartree)', fontsize=FS_SUB)
-    ax.set_title('H$_2$ VQE Convergence  (sto-3g, JW mapping)\n'
-                 '[Reference energy values; schematic convergence trajectory]',
-                 fontsize=FS_HEAD, fontweight='bold', color=C['navy'])
-    ax.legend(
-        fontsize=FS_LEGEND, framealpha=0.93, loc='upper right',
-        borderpad=0.65, ncol=1,
+    # Monotone "best so far" from real trace.
+    ax.step(
+        xs,
+        ys_best,
+        where="post",
+        color=C["navy"],
+        lw=2.8,
+        label="Best-so-far energy (cumulative minimum)",
+        zorder=4,
     )
-    ax.grid(True, alpha=0.25, ls='--')
-    ax.set_xlim(-1, 52)
 
-    _subplots_finalize(fig, bottom=0.12, top=0.92)
-    save(fig, 'vqe_convergence_demo.png')
+    ax.axhline(ref, color=C["red"], ls="--", lw=2, label=f"CASCI reference  ({ref:.5f} Ha)")
+    ax.axhspan(ref - 0.001, ref + 0.001, alpha=0.15, color=C["green"], label="Chemical accuracy  (±1 mHa)")
+    ax.plot([xs[-1]], [final_e], marker="o", ms=8, color=C["green"], zorder=6)
+    ax.text(
+        0.02,
+        0.98,
+        f"Final: {final_e:.6f} Ha\n|Δ vs CASCI|: {err_mha:.3f} mHa",
+        transform=ax.transAxes,
+        fontsize=FS_INBOX,
+        color="#1b4332",
+        va="top",
+        ha="left",
+        bbox=dict(boxstyle="round,pad=0.28", fc="#e8f5e9", ec=C["green"]),
+        **_serif(),
+    )
+
+    ax.set_xlabel("L-BFGS-B evaluation index", fontsize=FS_SUB)
+    ax.set_ylabel("Energy  (Hartree)", fontsize=FS_SUB)
+    cfg_id = js.get("experiment_id", "")
+    sub = f"[Recorded trace — {js.get('config_path', 'configs/example_h2.yaml')}"
+    if cfg_id:
+        sub += f", {cfg_id}"
+    sub += "]"
+    ax.set_title(
+        "H$_2$ VQE / UCCSD  (sto-3g, JW mapping, bounded L-BFGS-B)\n" + sub,
+        fontsize=FS_HEAD,
+        fontweight="bold",
+        color=C["navy"],
+    )
+    ax.legend(
+        fontsize=FS_LEGEND,
+        framealpha=0.93,
+        loc='center left',
+        bbox_to_anchor=(1.0, 0.5),
+        borderpad=0.55,
+        ncol=1,
+    )
+    ax.grid(True, alpha=0.25, ls="--")
+    ax.set_xlim(0, float(n_eval - 1))
+    ax.set_ylim(y_min - y_pad, y_max + y_pad)
+
+    _subplots_finalize(fig, bottom=0.12, top=0.92, right=0.78)
+    save(fig, "vqe_convergence_demo.png")
 
 
 # ─── 11. Classical vs quantum energy comparison ───────────────────────────────
 
 def fig_classical_quantum():
-    """
-    H2 / sto-3g reference energies from literature and standard QC packages.
-    Values verified against PySCF + OpenFermion for this system.
-    """
-    methods = ['Hartree-Fock', 'MP2', 'CCSD', 'VQE  (our platform)', 'FCI  (exact)']
-    energies = [-1.11675, -1.13444, -1.13710, -1.13726, -1.13730]
+    """Classical-vs-quantum comparison from real exported run data (no hard-coded energies)."""
+    data_path = Path(__file__).resolve().parent / "data" / "classical_quantum_comparison_h2_sto3g.json"
+    if not data_path.is_file():
+        raise FileNotFoundError(
+            f"Missing {data_path}; run from repo root:\n"
+            "  PYTHONPATH=src python docs/assets/export_classical_quantum_comparison_data.py"
+        )
+    js = json.loads(data_path.read_text(encoding="utf-8"))
+    rows = list(js.get("rows") or [])
+    if not rows:
+        raise ValueError("classical_quantum_comparison JSON has no rows")
+
+    methods = [str(r["method_label"]) for r in rows]
+    energies = [float(r["energy_ha"]) for r in rows]
+    errors_mha = [float(r["error_vs_fci_mha"]) for r in rows]
+    color_by_key = {
+        "hartree_fock": C["gray"],
+        "mp2": "#7f8c8d",
+        "ccsd": "#2c3e50",
+        "vqe_platform": C["blue"],
+        "fci": C["green"],
+    }
+    colors = [color_by_key.get(str(r.get("method_key")), C["gray"]) for r in rows]
     fci = energies[-1]
-    errors_mha = [abs(e - fci) * 1000 for e in energies]
-    colors = [C['gray'], '#7f8c8d', '#2c3e50', C['blue'], C['green']]
 
     fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14.2, 6.75))
 
@@ -1287,7 +1426,9 @@ def fig_classical_quantum():
     ax1.set_xlabel('Ground state energy  (Hartree)', fontsize=FS_SUB)
     ax1.set_title('H$_2$ Ground State Energy\n(sto-3g, 2e/2o active space)',
                   fontsize=FS_HEAD, fontweight='bold', color=C['navy'])
-    ax1.set_xlim(-1.155, -1.100)
+    e_min, e_max = min(energies), max(energies)
+    pad = max(0.004, 0.12 * (e_max - e_min))
+    ax1.set_xlim(e_min - pad, e_max + pad)
     ax1.grid(axis='x', alpha=0.25, ls='--')
     ax1.legend(fontsize=FS_LEGEND)
 
@@ -1310,7 +1451,7 @@ def fig_classical_quantum():
 
     fig.text(
         0.5, 0.02,
-        '[Reference: PySCF / sto-3g benchmark — consistent with platform output]',
+        f"[Real runs; exported from {js.get('config_path', 'configs/example_h2_vqe_figure_near_casci.yaml')}]",
         ha='center', va='bottom', fontsize=FS_CAPTION,
         color=C['gray'], style='italic', **_serif(),
     )
@@ -1321,21 +1462,32 @@ def fig_classical_quantum():
 # ─── 12. Mapping comparison ───────────────────────────────────────────────────
 
 def fig_mapping_comparison():
-    """
-    JW vs BK vs SCBK for 2-electron, 2-orbital active space.
-    Qubit counts: JW=4, BK=4, SCBK=2 (analytically exact for 2e/2o).
-    CNOT depths are from published resource estimates.
-    """
-    mappings = ['Jordan-Wigner\n(JW)', 'Bravyi-Kitaev\n(BK)', 'Sym.-Conserving BK\n(SCBK)']
-    n_qubits = [4, 4, 2]
-    cnot_depth = [15, 11, 7]  # Approximate for H2 UCCSD; see Bravyi et al. 2017
-    colors = [C['blue'], C['blue'], C['green']]
+    """Mapping comparison from real exported pipeline metrics (no schematic depths)."""
+    data_path = Path(__file__).resolve().parent / "data" / "mapping_comparison_h2_sto3g.json"
+    if not data_path.is_file():
+        raise FileNotFoundError(
+            f"Missing {data_path}; run from repo root:\n"
+            "  PYTHONPATH=src python docs/assets/export_mapping_comparison_data.py"
+        )
+    js = json.loads(data_path.read_text(encoding="utf-8"))
+    rows = list(js.get("rows") or [])
+    if not rows:
+        raise ValueError("mapping_comparison JSON has no rows")
+
+    mappings = [str(r["mapping_label"]).replace(" (", "\n(") for r in rows]
+    n_qubits = [int(r["n_qubits"]) for r in rows]
+    twoq_counts = [int(r["compiled_sum_twoq"]) for r in rows]
+    colors = [C['green'] if "SCBK" in m else C['blue'] for m in mappings]
 
     fig, axes = plt.subplots(1, 2, figsize=(13.8, 6.55))
 
     for ax, (data, ylabel, ytitle) in zip(axes, [
         (n_qubits, 'Qubit count', 'Qubits required\n(2e / 2o active space)'),
-        (cnot_depth, 'CNOT gate depth (approx.)', 'Circuit depth (CNOT)\n[schematic, UCCSD]'),
+        (
+            twoq_counts,
+            'Two-qubit gates (sum over compiled protocol circuits)',
+            'Compiled two-qubit gate load\n(real run, same pipeline config)',
+        ),
     ]):
         bars = ax.bar(mappings, data, color=colors, alpha=0.85,
                       edgecolor='white', linewidth=2, width=0.54)

@@ -62,7 +62,7 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
     assert not h1.meta.get("hamiltonian_fingerprint_truncated")
 
 
-def test_h2_fingerprint_sensitive_to_active_electrons() -> None:
+def test_h2_fingerprint_sensitive_to_fermion_mapping() -> None:
     pytest.importorskip("pyscf")
     from qchem_stack.config import load_experiment_config
     from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
@@ -72,18 +72,17 @@ def test_h2_fingerprint_sensitive_to_active_electrons() -> None:
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
     r = drv.run_rhf()
-    if cfg.active_space.n_active_electrons < 2:
-        pytest.skip("need n_active_electrons >= 2 to compare")
-    h_same = molecular_hamiltonian_from_pyscf(
+    h_jw = molecular_hamiltonian_from_pyscf(
         r,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
+        fermion_qubit_mapping="jordan_wigner",
     )
-    # Different electron count in fermion_space / integrals → different operator
-    h_diff = molecular_hamiltonian_from_pyscf(
+    h_bk = molecular_hamiltonian_from_pyscf(
         r,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=max(1, cfg.active_space.n_active_electrons - 1),
+        n_active_electrons=cfg.active_space.n_active_electrons,
+        fermion_qubit_mapping="bravyi_kitaev",
     )
-    assert h_same.meta["hamiltonian_fingerprint"] != h_diff.meta["hamiltonian_fingerprint"]
+    assert h_jw.meta["hamiltonian_fingerprint"] != h_bk.meta["hamiltonian_fingerprint"]
 

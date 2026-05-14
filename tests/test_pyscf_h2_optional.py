@@ -93,3 +93,49 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
     assert qh.meta.get("fermion_to_qubit_map") == "symmetry_conserving_bravyi_kitaev"
     assert qh.n_qubits == 2
     assert qh.meta.get("n_qubits") == 2
+
+
+def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
+    """Figure-asset strategy: bounded UCCSD amplitudes + L-BFGS-B stays variational vs CASCI."""
+    import numpy as np
+    from pathlib import Path
+
+    from pyscf import mcscf
+
+    from qchem_stack.backends.factory import executor_from_spec
+    from qchem_stack.config import backend_spec_from_config, load_experiment_config
+    from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
+
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_h2_vqe_figure_near_casci.yaml")
+    drv = PySCFDriver.from_config(cfg)
+    r = drv.run_rhf()
+    qh = molecular_hamiltonian_from_pyscf(
+        r,
+        n_active_orbitals=int(cfg.active_space.n_active_orbitals),
+        n_active_electrons=int(cfg.active_space.n_active_electrons),
+        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+    )
+    exe = executor_from_spec(backend_spec_from_config(cfg))
+    mo = r.mf.mo_coeff
+    mo_arr = mo if isinstance(mo, np.ndarray) else np.asarray(mo[0], dtype=float)
+    casci = float(mcscf.CASCI(r.mf, 2, 2).kernel(mo_arr)[0])
+
+    b = 0.38
+    u = UCCSDVQE(qh, executor=exe)
+    npar = u.n_params
+    bounds = [(-b, b)] * npar
+    x0 = np.zeros(npar, dtype=float)
+    res = u.run(
+        maxiter=400,
+        seed=42,
+        executor=exe,
+        record_energy_trace=True,
+        scipy_method="L-BFGS-B",
+        bounds=bounds,
+        initial_parameters=x0,
+        scipy_options={"ftol": 1e-11, "gtol": 1e-7, "maxfun": 1200},
+    )
+    assert res.energy >= casci - 5e-4  # not below CASCI by >0.5 mHa (numerical slack)
+    assert res.energy <= casci + 0.02  # within ~20 mHa above (bounded ansatz)
+    assert len(res.meta.get("energy_trace", [])) == res.nfev

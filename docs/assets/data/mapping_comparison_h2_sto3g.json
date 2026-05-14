@@ -1,0 +1,37 @@
+{
+  "schema": "mapping_comparison_v1",
+  "config_path": "configs/example_h2.yaml",
+  "molecule_basis": "sto-3g",
+  "rows": [
+    {
+      "mapping_key": "jordan_wigner",
+      "mapping_label": "Jordan-Wigner (JW)",
+      "n_qubits": 4,
+      "compiled_max_depth": 8,
+      "compiled_sum_twoq": 15,
+      "n_circuits": 5,
+      "sum_shots": 10240,
+      "energy_pauli_protocol": -0.8581141632357923
+    },
+    {
+      "mapping_key": "bravyi_kitaev",
+      "mapping_label": "Bravyi-Kitaev (BK)",
+      "n_qubits": 4,
+      "compiled_max_depth": 8,
+      "compiled_sum_twoq": 9,
+      "n_circuits": 3,
+      "sum_shots": 6144,
+      "energy_pauli_protocol": -1.1140748407871548
+    },
+    {
+      "mapping_key": "symmetry_conserving_bravyi_kitaev",
+      "mapping_label": "Sym.-Conserving BK (SCBK)",
+      "n_qubits": 2,
+      "compiled_max_depth": 5,
+      "compiled_sum_twoq": 2,
+      "n_circuits": 2,
+      "sum_shots": 4096,
+      "energy_pauli_protocol": -1.137249383034911
+    }
+  ]
+}

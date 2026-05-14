@@ -148,8 +148,8 @@ dict_config → Solver → build() → simulate() → Result
 
 ![VQE Convergence](assets/vqe_convergence_demo.png)
 
-- 40-50 次迭代收敛到化学精度
-- 与 Full CI 误差 < 0.5 mHa
+- 图为 **UCCSD** + **有界 L-BFGS-B**（出图专用 YAML，`|θ|≤0.38` rad，零初值=HF）的真实能量评估序列；红色虚线为 **PySCF CASCI**
+- 与默认 `example_h2.yaml`（HEA+COBYLA）分离：无界优化易落入非物理浅阱（≈−1.192 Ha），出图配置刻意约束以贴近 CASCI（≈1 mHa 量级）
 
 **2. 经典 vs 量子方法对比**
 
@@ -158,12 +158,10 @@ dict_config → Solver → build() → simulate() → Result
 - HF：忽略关联，误差 20 mHa
 - **VQE（我们的平台）**：达到 CCSD 精度，误差 < 0.5 mHa
 
-**3. 映射方法效率对比**
+**3. 费米子–量子比特映射（提要）**
 
-![Mapping Comparison](assets/mapping_comparison.png)
-
-- SCBK：利用粒子数守恒，减少 2 个量子比特
-- 一键切换：`fermion_qubit_mapping: "symmetry_conserving_bravyi_kitaev"`
+- 支持 JW / BK / SCBK，YAML 键 `active_space.fermion_qubit_mapping` 一键切换。
+- 原理、实跑资源表与取舍见：**[费米子量子比特映射_JW_BK_SCBK_详细分析.md](费米子量子比特映射_JW_BK_SCBK_详细分析.md)**。
 
 ---
 

@@ -109,7 +109,12 @@ def molecular_hamiltonian_from_pyscf(
     constant, h1_sp, h2_sp = active_space_integrals(
         rhf, n_active_orbitals=n_active_orbitals, n_active_electrons=n_active_electrons
     )
-    h1_so, h2_so = spinorb_from_spatial(h1_sp, h2_sp)
+    # PySCF returns spatial ERIs in chemists' notation (pq|rs). OpenFermion's
+    # InteractionOperator two-body tensor uses a physicist-style slot ordering.
+    # For consistency with PySCF CASCI energies, map (pq|rs) -> (p r s q) and
+    # include the 1/2 prefactor before constructing the InteractionOperator.
+    h2_of = 0.5 * np.transpose(np.asarray(h2_sp, dtype=float), (0, 2, 3, 1))
+    h1_so, h2_so = spinorb_from_spatial(h1_sp, h2_of)
     n_spin = int(h1_so.shape[0])
     mol_op = InteractionOperator(float(constant), h1_so, h2_so)
     qop = _interaction_operator_to_qubits(
@@ -153,12 +158,24 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
     norb = int(h1a.shape[0])
     if h1a.shape != (norb, norb):
         raise ValueError("h1 must be (norb, norb)")
-    if h2a.shape != (norb, norb, norb, norb):
+    if h2a.ndim == 2:
+        from pyscf import ao2mo
+
+        packed = norb * (norb + 1) // 2
+        if h2a.shape != (packed, packed):
+            raise ValueError(
+                f"h2 must be (norb, norb, norb, norb) or packed ({packed}, {packed}); got {h2a.shape}"
+            )
+        h2a = np.asarray(ao2mo.restore(1, h2a, norb), dtype=float)
+    elif h2a.shape != (norb, norb, norb, norb):
         raise ValueError("h2 must be (norb, norb, norb, norb)")
     if n_electrons < 0 or n_electrons > 2 * norb or n_electrons % 2 != 0:
         raise ValueError("n_electrons must be even and fit in 2*norb spin orbitals")
 
-    h1_so, h2_so = spinorb_from_spatial(h1a, h2a)
+    # Input h2a is chemists' (pq|rs); convert to OpenFermion-compatible two-body
+    # tensor convention and apply 1/2 prefactor to avoid double counting.
+    h2_of = 0.5 * np.transpose(h2a, (0, 2, 3, 1))
+    h1_so, h2_so = spinorb_from_spatial(h1a, h2_of)
     n_spin = int(h1_so.shape[0])
     mol_op = InteractionOperator(float(constant), h1_so, h2_so)
     qop = _interaction_operator_to_qubits(

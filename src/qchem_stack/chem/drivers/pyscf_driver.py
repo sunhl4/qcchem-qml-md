@@ -35,12 +35,12 @@ def active_space_integrals(
     """Return (constant, h1_spatial, h2_spatial) for OpenFermion ``InteractionOperator``.
 
     ``h2_spatial[p,q,r,s]`` is chemists' notation (pq|rs) over active spatial orbitals.
-    Constant collects nuclear + frozen-core contributions from CASCI.
+    ``constant`` is PySCF CASCI ``energy_core`` from ``get_h1eff`` (nuclear repulsion plus
+    inactive-core contributions when ``ncore > 0``); it must not be summed again with ``energy_nuc``.
     """
     from pyscf import mcscf
 
     mf = rhf.mf
-    mol = mf.mol
     meta = getattr(rhf, "driver_meta", None) or {}
     ik = int(meta.get("pbc_active_space_kpoint_index", 0))
     mo_coeff = mf.mo_coeff
@@ -66,9 +66,24 @@ def active_space_integrals(
             raise ValueError(
                 f"Active space {label} has non-trivial imaginary part; use Gamma (mesh [1,1,1]) or a real k-point."
             )
-    enuc = float(mol.energy_nuc())
-    constant = float(enuc + e_core)
-    return constant, np.asarray(h1a.real, dtype=float), np.asarray(h2a.real, dtype=float)
+    # ``e_core`` from ``CASCI.get_h1eff`` / ``h1e_for_cas`` already starts at
+    # ``energy_nuc()`` and adds inactive-orbital contributions when ``ncore > 0``;
+    # do not add ``mol.energy_nuc()`` again (would double-count nuclear repulsion).
+    constant = float(e_core)
+    h1_out = np.asarray(h1a.real, dtype=float)
+    h2_real = np.asarray(h2a.real, dtype=float)
+    # PySCF 2.x ``get_h2eff`` often returns chemists' ERIs in compact 2D form
+    # (``n * (n + 1) // 2`` square); OpenFermion expects full ``(n, n, n, n)``.
+    n_act = int(n_active_orbitals)
+    if h2_real.ndim == 4:
+        h2_out = h2_real
+    elif h2_real.ndim == 2:
+        from pyscf import ao2mo
+
+        h2_out = np.asarray(ao2mo.restore(1, h2_real, n_act), dtype=float)
+    else:
+        raise ValueError(f"unexpected active-space h2 shape {h2_real.shape} (ndim={h2_real.ndim})")
+    return constant, h1_out, h2_out
 
 
 class PySCFDriver:

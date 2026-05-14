@@ -6,6 +6,7 @@ energy is therefore combined with ``use_pauli_protocol: false`` (validated on :c
 
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
@@ -97,29 +98,60 @@ class UCCSDVQE:
         *,
         seed: int = 0,
         executor: HamiltonianExpectationExecutor | None = None,
+        record_energy_trace: bool = False,
+        scipy_method: str = "COBYLA",
+        bounds: Sequence[tuple[float, float]] | None = None,
+        initial_parameters: np.ndarray | None = None,
+        scipy_options: dict[str, Any] | None = None,
     ) -> UCCSDVQEResult:
         exe = executor or self._executor
         rng = np.random.default_rng(seed)
-        x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
+        if initial_parameters is not None:
+            x0 = np.asarray(initial_parameters, dtype=float).ravel()
+            if x0.shape != (self.n_params,):
+                raise ValueError(f"initial_parameters must have shape ({self.n_params},), got {x0.shape}")
+        else:
+            x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
         nfev = 0
+        trace: list[float] = []
 
         def objective(x: np.ndarray) -> float:
             nonlocal nfev
             nfev += 1
             st = self._state_from_angles(x)
-            return float(exe.expectation_state(st, self.h_op, self.n_qubits))
+            val = float(exe.expectation_state(st, self.h_op, self.n_qubits))
+            if record_energy_trace:
+                trace.append(val)
+            return val
 
-        res = minimize(objective, x0, method="COBYLA", options={"maxiter": maxiter})
+        opts: dict[str, Any] = {"maxiter": int(maxiter)}
+        if scipy_options:
+            opts.update(scipy_options)
+        kwargs: dict[str, Any] = {
+            "fun": objective,
+            "x0": x0,
+            "method": str(scipy_method),
+            "options": opts,
+        }
+        if bounds is not None:
+            kwargs["bounds"] = list(bounds)
+        res = minimize(**kwargs)
+        meta: dict[str, Any] = {
+            "scipy_message": str(res.message),
+            "variational_ansatz": "uccsd",
+            "uccsd_n_parameters": self.n_params,
+            "fermion_to_qubit_map": "jordan_wigner",
+            "scipy_method": str(scipy_method),
+        }
+        if bounds is not None:
+            meta["uccsd_parameter_bounds"] = [list(b) for b in bounds]
+        if record_energy_trace:
+            meta["energy_trace"] = list(trace)
         return UCCSDVQEResult(
             energy=float(res.fun),
             angles=np.asarray(res.x, dtype=float),
             nfev=nfev,
-            meta={
-                "scipy_message": str(res.message),
-                "variational_ansatz": "uccsd",
-                "uccsd_n_parameters": self.n_params,
-                "fermion_to_qubit_map": "jordan_wigner",
-            },
+            meta=meta,
         )
 
 
@@ -161,29 +193,60 @@ class UCCSDTrotterVQE(UCCSDVQE):
         *,
         seed: int = 0,
         executor: HamiltonianExpectationExecutor | None = None,
+        record_energy_trace: bool = False,
+        scipy_method: str = "COBYLA",
+        bounds: Sequence[tuple[float, float]] | None = None,
+        initial_parameters: np.ndarray | None = None,
+        scipy_options: dict[str, Any] | None = None,
     ) -> UCCSDVQEResult:
         exe = executor or self._executor
         rng = np.random.default_rng(seed)
-        x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
+        if initial_parameters is not None:
+            x0 = np.asarray(initial_parameters, dtype=float).ravel()
+            if x0.shape != (self.n_params,):
+                raise ValueError(f"initial_parameters must have shape ({self.n_params},), got {x0.shape}")
+        else:
+            x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
         nfev = 0
+        trace: list[float] = []
 
         def objective(x: np.ndarray) -> float:
             nonlocal nfev
             nfev += 1
             st = self._state_from_angles(x)
-            return float(exe.expectation_state(st, self.h_op, self.n_qubits))
+            val = float(exe.expectation_state(st, self.h_op, self.n_qubits))
+            if record_energy_trace:
+                trace.append(val)
+            return val
 
-        res = minimize(objective, x0, method="COBYLA", options={"maxiter": maxiter})
+        opts: dict[str, Any] = {"maxiter": int(maxiter)}
+        if scipy_options:
+            opts.update(scipy_options)
+        kwargs: dict[str, Any] = {
+            "fun": objective,
+            "x0": x0,
+            "method": str(scipy_method),
+            "options": opts,
+        }
+        if bounds is not None:
+            kwargs["bounds"] = list(bounds)
+        res = minimize(**kwargs)
+        meta: dict[str, Any] = {
+            "scipy_message": str(res.message),
+            "variational_ansatz": "uccsd",
+            "uccsd_n_parameters": self.n_params,
+            "uccsd_trotter_steps": self._n_trotter_steps,
+            "uccsd_product_formula": "first_order_layer_repeat",
+            "fermion_to_qubit_map": "jordan_wigner",
+            "scipy_method": str(scipy_method),
+        }
+        if bounds is not None:
+            meta["uccsd_parameter_bounds"] = [list(b) for b in bounds]
+        if record_energy_trace:
+            meta["energy_trace"] = list(trace)
         return UCCSDVQEResult(
             energy=float(res.fun),
             angles=np.asarray(res.x, dtype=float),
             nfev=nfev,
-            meta={
-                "scipy_message": str(res.message),
-                "variational_ansatz": "uccsd",
-                "uccsd_n_parameters": self.n_params,
-                "uccsd_trotter_steps": self._n_trotter_steps,
-                "uccsd_product_formula": "first_order_layer_repeat",
-                "fermion_to_qubit_map": "jordan_wigner",
-            },
+            meta=meta,
         )

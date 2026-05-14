@@ -71,8 +71,67 @@ def _pauli_eigenvalue_on_comp_bit(
     return ev
 
 
-def _basis_key_for_term(term: tuple[tuple[int, str], ...]) -> tuple[tuple[int, str], ...]:
-    return tuple(sorted(((int(q), str(p)) for q, p in term), key=lambda x: x[0]))
+def _apply_pauli_word(
+    state: np.ndarray,
+    term: tuple[tuple[int, str], ...],
+    n_qubits: int,
+) -> np.ndarray:
+    out = np.asarray(state, dtype=complex).ravel()
+    for q, p in term:
+        out = _apply_one_qubit_unitary(out, _pauli_char_to_mat(str(p)), int(q), n_qubits)
+    return out
+
+
+def _joint_projective_commuting_group_samples(
+    psi_hea: np.ndarray,
+    coeffs: list[tuple[tuple[tuple[int, str], ...], float]],
+    n_qubits: int,
+    shots_per_circuit: int,
+    rng: np.random.Generator,
+    *,
+    return_histograms: bool,
+    group_id: int,
+) -> tuple[list[float], dict[str, Any] | None]:
+    """Sample one commuting group by sequential projective measurements.
+
+    For mutually commuting Pauli words, sequential projective measurement samples the
+    joint eigenvalue distribution of the group. This provides a real grouped-shot
+    path for commuting sets that are not a single tensor-product measurement basis.
+    """
+    draws: list[float] = []
+    eig_counter: Counter[str] = Counter()
+    term_order = [str(t) for t, _ in coeffs]
+    for _ in range(shots_per_circuit):
+        st = np.asarray(psi_hea, dtype=complex).ravel().copy()
+        outcomes: list[int] = []
+        val = 0.0
+        for t, c in coeffs:
+            p_st = _apply_pauli_word(st, t, n_qubits)
+            exp_val = float(np.real(np.vdot(st, p_st)))
+            exp_val = max(-1.0, min(1.0, exp_val))
+            outcome = 1 if float(rng.random()) < (1.0 + exp_val) / 2.0 else -1
+            projected = st + float(outcome) * p_st
+            norm = float(np.linalg.norm(projected))
+            if norm <= 1e-14:
+                # Numerical guard for probabilities rounded to exactly zero.
+                projected = st - float(outcome) * p_st
+                norm = float(np.linalg.norm(projected))
+                outcome *= -1
+            st = projected / (norm + 1e-30)
+            outcomes.append(outcome)
+            val += c * float(outcome)
+        draws.append(val)
+        if return_histograms:
+            eig_counter[",".join("+" if o > 0 else "-" for o in outcomes)] += 1
+    hist = None
+    if return_histograms:
+        hist = {
+            "group_id": group_id,
+            "mode": "commuting_joint_projective",
+            "pauli_terms": term_order,
+            "histogram_eigenvalues": {str(k): int(v) for k, v in eig_counter.items()},
+        }
+    return draws, hist
 
 
 def energy_estimate_grouped_shot_simulation(
@@ -112,37 +171,23 @@ def energy_estimate_grouped_shot_simulation(
             continue
 
         if bk is None:
-            sub_shots = max(1, shots_per_circuit // max(1, len(coeffs)))
-            mean_sum = 0.0
-            var_sum = 0.0
-            for t, c in coeffs:
-                bk1 = _basis_key_for_term(t)
-                psi_r = apply_pauli_tensor_basis_to_state(psi_hea, bk1, n_qubits)
-                probs = np.abs(psi_r) ** 2
-                probs = probs / (np.sum(probs) + 1e-30)
-                draws: list[float] = []
-                ctr: Counter[int] = Counter()
-                for _ in range(sub_shots):
-                    idx = int(rng.choice(dim, p=probs))
-                    if return_histograms:
-                        ctr[idx] += 1
-                    lam = _pauli_eigenvalue_on_comp_bit(t, idx, n_qubits, bk1)
-                    draws.append(c * lam)
-                if return_histograms:
-                    histogram_rows.append(
-                        {
-                            "group_id": gid,
-                            "mode": "greedy_sequential_term",
-                            "pauli_term": str(t),
-                            "histogram_comp_index": {str(k): int(v) for k, v in ctr.items()},
-                        }
-                    )
-                mean_sum += float(np.mean(draws))
-                if len(draws) > 1:
-                    var_sum += float(np.var(draws, ddof=1)) / sub_shots
-            total_shots_used += len(coeffs) * sub_shots
-            group_means.append(mean_sum)
-            per_group_stderr_sq.append(var_sum)
+            draws, hist = _joint_projective_commuting_group_samples(
+                psi_hea,
+                coeffs,
+                n_qubits,
+                shots_per_circuit,
+                rng,
+                return_histograms=return_histograms,
+                group_id=gid,
+            )
+            if hist is not None:
+                histogram_rows.append(hist)
+            group_means.append(float(np.mean(draws)))
+            if len(draws) > 1:
+                per_group_stderr_sq.append(float(np.var(draws, ddof=1)) / shots_per_circuit)
+            else:
+                per_group_stderr_sq.append(0.0)
+            total_shots_used += shots_per_circuit
             continue
 
         psi_r = apply_pauli_tensor_basis_to_state(psi_hea, bk, n_qubits)
@@ -178,7 +223,7 @@ def energy_estimate_grouped_shot_simulation(
     meta_out: dict[str, Any] = {
         "identity_coeff": ident,
         "n_groups_sampled": len(group_means),
-        "shot_noise_model": "grouped_simultaneous_or_sequential_fallback",
+        "shot_noise_model": "grouped_simultaneous_or_joint_projective",
         "total_shots_used": int(total_shots_used),
     }
     if return_histograms:

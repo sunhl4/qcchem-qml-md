@@ -1,0 +1,57 @@
+# Packaged config for ``docs/assets/export_vqe_convergence_trace.py`` only.
+# UCCSD (JW) + statevector; the export script uses **bounded L-BFGS-B** (±0.38 rad on cluster
+# amplitudes, zero = HF reference) to avoid the unphysical deep basin (~−1.192 Ha) that
+# unbounded COBYLA/L-BFGS-B often finds for this qubit Hamiltonian, landing instead within ~1 mHa
+# of PySCF CASCI for H₂/sto-3g in the (2e, 2o) active space.
+#
+# Production ``configs/example_h2.yaml`` / ``example_h2_uccsd.yaml`` are unchanged.
+schema_version: "1"
+experiment_id: "h2_sto3g_vqe_figure_near_casci"
+random_seed: 42
+
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  name: "statevector_sim"
+  provider: "statevector"
+  shots_per_circuit: 2048
+  qiskit_mode: "statevector"
+  ionstack_endpoint: null
+  meta: {}
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  variational_ansatz: "uccsd"
+  uccsd_trotter_steps: null
+  vqe_depth: 1
+  vqe_maxiter: 2000
+  adapt_max_iter: 4
+  use_pauli_protocol: false
+  pauli_grouping: "tensor_product"

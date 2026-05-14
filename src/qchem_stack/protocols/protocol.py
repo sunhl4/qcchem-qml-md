@@ -124,8 +124,9 @@ class PauliAveragingProtocol:
                     )
                 )
             else:
-                ops = [{"name": "PAULI_GROUP", "qubits": qs, "params": dict(meta)}]
-                circuits.append(CircuitIR(n_qubits=self.n_qubits, operations=ops, boxes=["PauliMeasure"]))
+                ops = hea_operations(self.n_qubits, hea_depth, self.angles)
+                ops.append({"name": "JOINT_PAULI_MEASURE", "qubits": qs, "params": dict(meta)})
+                circuits.append(CircuitIR(n_qubits=self.n_qubits, operations=ops, boxes=["HEA", "JointPauliMeasure"]))
         self._logical_circuits = circuits
 
     def compile(self) -> None:

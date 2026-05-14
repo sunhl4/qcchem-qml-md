@@ -1,8 +1,7 @@
 <style type="text/css">
 /*
-  与 docs/assets/generate_all_figures.py / Graphviz *.gv 对齐：
-  Markdown 正文与插图内可读文字一律四号 14 pt；**中文、英文混排同档**。
-  在 VS Code / Typora / 导出 HTML 时生效；贴入 Word 时请「正文样式」四号（Times + 宋体）。
+  正文：中文与英文混排均为四号 14 pt；与 docs/assets/generate_all_figures.py 插图内 14 pt 对齐。
+  VS Code / Typora / HTML 导出预览生效；贴入 Word 时请将「正文」设为四号（中英 Times New Roman + 宋体）。
 */
 body, .markdown-body, .markdown-preview-view, article {
   font-family: "Times New Roman", "Songti SC", "SimSun", "Noto Serif CJK SC", serif !important;
@@ -21,21 +20,6 @@ code, pre, tt {
   font-family: Consolas, "Courier New", "Noto Sans Mono CJK SC", monospace;
 }
 </style>
-
-# 组会汇报：量子计算化学平台 `qchem-stack` 架构进展
-
-> **汇报定位**
->
-> 面向全组同事（含非计算化学背景）。本次汇报分三个层次展开：
-> 1. **为什么**——量子计算对化学意味着什么，以直觉图解切入；
-> 2. **他山之石**——InQuanto 与 Tangelo 两大业界标杆的深度拆解与对比；
-> 3. **我们做了什么**——`qchem-stack` 的现阶段成熟模块、真实可运行示例与工程设计细节。
->
-> *高级模块（Strict Repro、真实硬件后端、MD/ML 桥接、高级 embedding）留作后续专题，本次汇报聚焦已完成的核心骨架。*
->
-> **排版**：文首 `<style>` 将 **正文 / 表格 / 列表 / 代码块** 均为 **四号（14 磅）**，**中文与英文混排同档**。**插图**（matplotlib PNG 与 Graphviz PNG）可读文字亦 **全部为 14 磅**。导出 Word 时请再确认「正文样式」为四号（Times New Roman + 宋体）。
-
----
 
 ## 一、为什么计算化学需要量子计算
 
