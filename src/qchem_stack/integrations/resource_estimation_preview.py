@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import Any
 
 from qchem_stack.config import ExperimentConfig
-from qchem_stack.protocols.inquanto_contract import pauli_protocol_expectation_path_for_config
+from qchem_stack.protocols.product_contract import pauli_protocol_expectation_path_for_config
 
 
 def _attach_classical_benchmark_preview_alignment(

@@ -16,7 +16,7 @@ from qchem_stack.quantum.variational_plugins.spec import (
 
 def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
     q = ctx.cfg.quantum
-    qh = ctx.hamiltonian
+    qh = ctx.resolved_hamiltonian()
     exe = ctx.executor
     if q.variational_ansatz == "uccsd":
         if q.uccsd_trotter_steps is not None:
@@ -57,8 +57,9 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
 
 def run_adapt_family(ctx: VariationalRunContext) -> VariationalStageOutcome:
     q = ctx.cfg.quantum
+    qh = ctx.resolved_hamiltonian()
     av = FermionicAdaptVQE(
-        ctx.hamiltonian,
+        qh,
         max_ops=q.adapt_max_iter,
         hea_depth=q.vqe_depth,
         pool_id=q.adapt_pool_id,
@@ -80,8 +81,9 @@ def run_adapt_family(ctx: VariationalRunContext) -> VariationalStageOutcome:
 
 def run_iqeb(ctx: VariationalRunContext) -> VariationalStageOutcome:
     q = ctx.cfg.quantum
+    qh = ctx.resolved_hamiltonian()
     iq = IQEBVQE(
-        ctx.hamiltonian,
+        qh,
         max_rounds=q.iqeb_max_rounds,
         n_grads=q.iqeb_n_grads,
         energy_tolerance=q.iqeb_energy_tolerance,

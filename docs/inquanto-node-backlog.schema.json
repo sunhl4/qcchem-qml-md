@@ -13,7 +13,7 @@
       "properties": {
         "schema_version": { "type": "integer", "minimum": 1 },
         "source_pin_date": { "type": ["string", "null"] },
-        "inquanto_version_seen": { "type": ["string", "null"] },
+        "upstream_doc_version_seen": { "type": ["string", "null"] },
         "source_root": { "type": ["string", "null"] },
         "node_count": { "type": "integer", "minimum": 1 },
         "manifest_path": { "type": "string" },
@@ -35,6 +35,7 @@
         "slug",
         "title_zh",
         "title_en",
+        "reference_doc_url",
         "mirror_site_path",
         "pillar",
         "diataxis",
@@ -48,7 +49,7 @@
         "suggested_internal_routes",
         "parity_doc_hint",
         "source_pin_date",
-        "inquanto_version_seen"
+        "upstream_doc_version_seen"
       ],
       "properties": {
         "appendix_c_node_index": { "type": "integer", "minimum": 1 },
@@ -59,7 +60,7 @@
         "slug": { "type": "string" },
         "title_zh": { "type": "string" },
         "title_en": { "type": "string" },
-        "inquanto_anchor": { "type": ["string", "null"] },
+        "reference_doc_url": { "type": ["string", "null"] },
         "mirror_site_path": { "type": "string", "pattern": "^/mirror/.+/$" },
         "pillar": { "type": "string", "enum": ["P1", "P2", "P3", "P4", "meta"] },
         "diataxis": { "type": "string" },
@@ -119,7 +120,7 @@
         },
         "parity_doc_hint": { "type": "string" },
         "source_pin_date": { "type": ["string", "null"] },
-        "inquanto_version_seen": { "type": ["string", "null"] }
+        "upstream_doc_version_seen": { "type": ["string", "null"] }
       }
     }
   }

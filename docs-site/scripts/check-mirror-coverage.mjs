@@ -3,7 +3,7 @@
  *
  * Validates docs/.vitepress/mirror-data.json against the markdown filesystem:
  *   - every entry has a corresponding zh + en placeholder page;
- *   - placeholder/partial entries that lack `inquanto_anchor` are reported;
+ *   - placeholder/partial entries that lack `reference_doc_url` in frontmatter are reported;
  *   - status counts match the manifest snapshot.
  *
  * Exits non-zero on any violation so CI can gate it.
@@ -29,8 +29,8 @@ for (const entry of data.entries) {
   const enPath = path.join(docsRoot, "en", "mirror", ...entry.breadcrumb, "index.md");
   if (!fs.existsSync(zhPath)) violations.push({ kind: "missing_zh", entry: entry.breadcrumb.join("/") });
   if (!fs.existsSync(enPath)) violations.push({ kind: "missing_en", entry: entry.breadcrumb.join("/") });
-  if (!entry.inquanto && !entry.isClassLeaf && entry.status !== "not-applicable") {
-    violations.push({ kind: "no_inquanto_anchor", entry: entry.breadcrumb.join("/") });
+  if (!entry.reference_url && !entry.isClassLeaf && entry.status !== "not-applicable") {
+    violations.push({ kind: "no_reference_doc_url", entry: entry.breadcrumb.join("/") });
   }
 }
 

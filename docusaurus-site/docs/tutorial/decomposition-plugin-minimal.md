@@ -15,7 +15,7 @@ sidebar_position: 48
 
 - `pytest tests/test_decomposition_plugin_pipeline.py`（端到端 `run_pipeline_sync`）
 - `python scripts/export_parity_criteria_table.py configs/example_decomposition_plugin_toy.yaml`
-- Parity 矩阵 §3「分解插件」行 — [公开矩阵](../parity/public-matrix)
+- 检查 `run_summary` 与导出结果中的分解插件字段
 
 ## 另见
 

@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+import numpy as np
 import pytest
 from openfermion.ops import QubitOperator
 
 from qchem_stack.backends.executor_base import StatevectorHeaExecutor
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import ActiveSpaceSpec, ExperimentConfig, MoleculeSpec, QuantumSpec, SCFSpec
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.quantum.variational_plugins.examples.echo_runner import (
@@ -43,6 +47,30 @@ def _tiny_qh() -> QubitHamiltonian:
         1.0,
     )
     return QubitHamiltonian(operator=op, n_qubits=2)
+
+
+def _tiny_pre_quantum_input(*, n_qubits: int) -> PreQuantumInput:
+    op = QubitOperator(tuple((i, "Z") for i in range(max(1, n_qubits))), 1.0)
+    qh = QubitHamiltonian(operator=op, n_qubits=n_qubits)
+    ref = ClassicalMeanFieldReference(
+        mf={"backend": "unit-test"},
+        e_tot=0.0,
+        mo_energy=np.asarray([0.0], dtype=float),
+        molecular_system=MolecularSystem(
+            symbols=["H"],
+            coordinates_bohr=np.asarray([[0.0, 0.0, 0.0]], dtype=float),
+            charge=0,
+            multiplicity=1,
+            basis="sto-3g",
+        ),
+        driver_meta={"upstream_classical_software_tag": "unit-test"},
+    )
+    return PreQuantumInput(
+        classical_reference=ref,
+        qubit_hamiltonian=qh,
+        canonical_active_space_integral_pack=None,
+        meta={"source": "unit-test"},
+    )
 
 
 def test_validate_factory_import_path_accepts_dotted_attr() -> None:
@@ -176,3 +204,42 @@ def test_algorithm_registry_synced_with_variational_builtins() -> None:
         assert pid in ALGORITHM_REGISTRY
         assert ALGORITHM_REGISTRY[pid].factory is not None
     assert ALGORITHM_REGISTRY["vqe"].result_schema == "algorithm_vqe_report_v1"
+
+
+def test_variational_context_prefers_pre_quantum_input_hamiltonian() -> None:
+    qh_fallback = _tiny_qh()
+    pqi = _tiny_pre_quantum_input(n_qubits=3)
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="custom_echo",
+            algorithm_factory=(
+                "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
+            ),
+            vqe_depth=1,
+        ),
+        hamiltonian=qh_fallback,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+        pre_quantum_input=pqi,
+    )
+    out = run_echo_variational(ctx)
+    assert out.angles.shape == (6,)
+
+
+def test_variational_context_falls_back_without_pre_quantum_input() -> None:
+    qh = _tiny_qh()
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="custom_echo",
+            algorithm_factory=(
+                "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
+            ),
+            vqe_depth=1,
+        ),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+        pre_quantum_input=None,
+    )
+    out = run_echo_variational(ctx)
+    assert out.angles.shape == (4,)

@@ -15,7 +15,7 @@ edit: false
 | # | breadcrumb | status | pillar | mirror | differentiator_focus |
 |---|------------|--------|--------|--------|----------------------|
 | 1 | `introduction` | shipped | meta | `/mirror/introduction/` | mirror_audit |
-| 2 | `introduction/overview` | shipped | meta | `/mirror/introduction/overview/` | mirror_audit |
+| 2 | `introduction/overview` | shipped | meta | `/mirror/introduction/overview/` | mirror_audit, parity_evidence |
 | 3 | `introduction/installation` | shipped | meta | `/mirror/introduction/installation/` | mirror_audit |
 | 4 | `introduction/installation/system_requirements` | shipped | meta | `/mirror/introduction/installation/system_requirements/` | mirror_audit |
 | 5 | `introduction/installation/troubleshooting` | shipped | meta | `/mirror/introduction/installation/troubleshooting/` | mirror_audit |

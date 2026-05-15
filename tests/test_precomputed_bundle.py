@@ -1,0 +1,75 @@
+from __future__ import annotations
+
+import json
+from pathlib import Path
+
+import pytest
+
+from qchem_stack.chem.precomputed_bundle import (
+    CLASSICAL_REFERENCE_BUNDLE_V1,
+    load_bundle_dict,
+    molecular_mean_field_result_from_bundle,
+    qubit_hamiltonian_from_bundle,
+)
+
+
+def _write_bundle(path: Path) -> None:
+    payload = {
+        "schema": CLASSICAL_REFERENCE_BUNDLE_V1,
+        "classical_reference": {
+            "e_tot": -1.0,
+            "mo_energy": [-0.5, 0.2],
+            "driver_meta": {"upstream_classical_software_tag": "dataset_demo"},
+        },
+        "pre_quantum_input": {
+            "schema": "pre_quantum_input_v1",
+            "qubit_hamiltonian": {
+                "n_qubits": 2,
+                "terms": [
+                    {"label": "II", "coeff": -0.5},
+                    {"label": "ZZ", "coeff": 0.25},
+                ],
+            },
+        },
+    }
+    path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+def test_load_bundle_dict_accepts_schema() -> None:
+    root = Path(__file__).resolve().parents[1]
+    path, data = load_bundle_dict(str(root / "configs" / "precomputed_classical_reference_h2.json"))
+    assert path.name == "precomputed_classical_reference_h2.json"
+    assert data["schema"] == CLASSICAL_REFERENCE_BUNDLE_V1
+
+
+def test_molecular_mean_field_result_from_bundle(tmp_path: Path) -> None:
+    p = tmp_path / "bundle.json"
+    _write_bundle(p)
+    out = molecular_mean_field_result_from_bundle(str(p))
+    assert out.e_tot == pytest.approx(-1.0)
+    assert out.mo_energy.shape == (2,)
+    assert out.driver_meta["driver_family"] == "precomputed"
+
+
+def test_qubit_hamiltonian_from_bundle_indexed_labels(tmp_path: Path) -> None:
+    p = tmp_path / "bundle_indexed.json"
+    payload = {
+        "schema": CLASSICAL_REFERENCE_BUNDLE_V1,
+        "classical_reference": {
+            "e_tot": -1.0,
+            "mo_energy": [-0.5, 0.2],
+        },
+        "pre_quantum_input": {
+            "qubit_hamiltonian": {
+                "n_qubits": 2,
+                "terms": [
+                    {"label": "I", "coeff": -1.0},
+                    {"label": "Z0 Z1", "coeff": 0.5},
+                ],
+            },
+        },
+    }
+    p.write_text(json.dumps(payload), encoding="utf-8")
+    qh = qubit_hamiltonian_from_bundle(str(p))
+    assert qh.n_qubits == 2
+    assert len(qh.operator.terms) == 2

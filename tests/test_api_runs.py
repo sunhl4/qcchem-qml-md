@@ -29,6 +29,11 @@ def _minimal_experiment_yaml() -> str:
     return (root / "configs" / "example_h2.yaml").read_text(encoding="utf-8")
 
 
+def _geometry_file_experiment_yaml() -> str:
+    root = Path(__file__).resolve().parents[1]
+    return (root / "configs" / "example_h2_geometry_file_xyz.yaml").read_text(encoding="utf-8")
+
+
 def test_post_run_async_returns_202_and_trace() -> None:
     with tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False) as f:
         db_path = f.name
@@ -79,6 +84,29 @@ def test_post_run_async_returns_202_and_trace() -> None:
         Path(db_path).unlink(missing_ok=True)
 
 
+def test_post_run_async_with_config_base_dir_for_relative_geometry_paths() -> None:
+    with tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False) as f:
+        db_path = f.name
+    try:
+        root = Path(__file__).resolve().parents[1]
+        client = TestClient(app)
+        r = client.post(
+            "/v1/runs",
+            json={
+                "experiment_yaml": _geometry_file_experiment_yaml(),
+                "sync": False,
+                "job_db_path": db_path,
+                "config_base_dir": str(root / "configs"),
+            },
+        )
+        assert r.status_code == 202
+        data = r.json()
+        assert data.get("status") == "QUEUED"
+        assert data.get("job_id")
+    finally:
+        Path(db_path).unlink(missing_ok=True)
+
+
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_post_run_sync_returns_job_result_schema_and_json() -> None:
     client = TestClient(app)
@@ -97,11 +125,11 @@ def test_post_run_sync_returns_job_result_schema_and_json() -> None:
     assert r.headers.get("x-trace-id")
 
 
-def test_product_analog_and_workflow_preview() -> None:
+def test_product_surface_and_workflow_preview() -> None:
     client = TestClient(app)
-    pa = client.get("/v1/meta/product-analog")
+    pa = client.get("/v1/meta/product-surface")
     assert pa.status_code == 200
-    assert pa.json().get("schema") == "product_analog_v1"
+    assert pa.json().get("schema") == "product_surface_v1"
     w = client.post(
         "/v1/meta/workflow-preview", json={"experiment_yaml": _minimal_experiment_yaml()}
     )
@@ -114,43 +142,36 @@ def test_product_analog_and_workflow_preview() -> None:
     assert cg.get("edge_model") == "semantic_dataflow_v1"
 
 
-def test_capability_surface_v1() -> None:
+def test_capability_surface_v2() -> None:
     client = TestClient(app)
     r = client.get("/v1/meta/capability-surface")
     assert r.status_code == 200
     d = r.json()
-    assert d.get("schema") == "capability_surface_v1"
+    assert d.get("schema") == "capability_surface_v2"
     assert d.get("qchem_stack_version")
-    assert isinstance(d.get("object_map"), dict) and d["object_map"]
+    assert isinstance(d.get("capability_map"), dict) and d["capability_map"]
     assert isinstance(d.get("gaps"), list) and d["gaps"]
     diff = d.get("open_stack_differentiators")
     assert isinstance(diff, dict)
     assert diff.get("schema") == "open_stack_differentiators_v1"
-    assert (
-        isinstance(diff.get("beyond_public_doc_bundle"), list) and diff["beyond_public_doc_bundle"]
-    )
-    tgt = d.get("tangelo_public_mapping_alias_surface_v1")
-    assert isinstance(tgt, dict) and tgt.get("schema") == "tangelo_public_mapping_alias_surface_v1"
+    assert isinstance(diff.get("bundle"), list) and diff["bundle"]
     pools = d.get("operator_pool_registry_export_v1")
     assert isinstance(pools, dict) and pools.get("schema") == "operator_pool_registry_export_v1"
     uccsd = d.get("uccsd_mapping_support_matrix_v1")
     assert isinstance(uccsd, dict) and uccsd.get("schema") == "uccsd_mapping_support_matrix_v1"
     gai = d.get("gap_anchor_index_v1")
-    assert isinstance(gai, dict) and gai.get("schema") == "inquanto_gap_anchor_index_v1"
+    assert isinstance(gai, dict) and gai.get("schema") == "product_gap_anchor_index_v1"
 
 
-def test_capability_surface_matches_inquanto_contract() -> None:
+def test_capability_surface_matches_product_contract() -> None:
     """Export / parity scripts must stay aligned with the one-shot HTTP surface (single source of truth)."""
     from qchem_stack import __version__
-    from qchem_stack.chem.fermion_mapping_registry import (
-        tangelo_public_mapping_alias_surface_v1,
-    )
-    from qchem_stack.protocols.inquanto_contract import (
-        inquanto_gap_anchor_index_v1,
-        inquanto_gap_categories,
-        inquanto_object_map_for_docs,
+    from qchem_stack.protocols.product_contract import (
         mitigation_execution_model_public,
         open_stack_differentiators_public,
+        product_capability_map_for_docs,
+        product_gap_anchor_index_v1,
+        product_gap_categories,
     )
     from qchem_stack.quantum.algorithm_registry import algorithm_registry_export
     from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_mapping_support_matrix_v1
@@ -162,14 +183,13 @@ def test_capability_surface_matches_inquanto_contract() -> None:
     assert r.status_code == 200
     body = r.json()
     expected = {
-        "schema": "capability_surface_v1",
+        "schema": "capability_surface_v2",
         "qchem_stack_version": __version__,
-        "object_map": inquanto_object_map_for_docs(),
-        "gaps": inquanto_gap_categories(),
-        "gap_anchor_index_v1": inquanto_gap_anchor_index_v1(),
+        "capability_map": product_capability_map_for_docs(),
+        "gaps": product_gap_categories(),
+        "gap_anchor_index_v1": product_gap_anchor_index_v1(),
         "mitigation_execution_model": mitigation_execution_model_public(),
         "open_stack_differentiators": open_stack_differentiators_public(),
-        "tangelo_public_mapping_alias_surface_v1": tangelo_public_mapping_alias_surface_v1(),
         "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
         "algorithm_registry_export_v1": algorithm_registry_export(),
         "variational_registry_export_v1": variational_registry_export(),
@@ -331,13 +351,13 @@ def test_parity_gaps_meta() -> None:
     r = client.get("/v1/meta/parity-gaps")
     assert r.status_code == 200
     d = r.json()
-    assert d.get("schema") == "inquanto_gap_export_v1"
+    assert d.get("schema") == "capability_gap_export_v1"
     assert d.get("qchem_stack_version")
     gaps = d.get("gaps")
     assert isinstance(gaps, list) and gaps
     gai = d.get("gap_anchor_index_v1")
     assert isinstance(gai, dict)
-    assert gai.get("schema") == "inquanto_gap_anchor_index_v1"
+    assert gai.get("schema") == "product_gap_anchor_index_v1"
 
 
 def test_computables_preview_v1() -> None:
@@ -410,16 +430,16 @@ def test_post_workspace_label_meta_and_list_filter() -> None:
                 "experiment_yaml": _minimal_experiment_yaml(),
                 "sync": False,
                 "job_db_path": db_path,
-                "workspace_label": " competitor-demo ",
+                "workspace_label": " workspace-demo ",
             },
         )
         assert p.status_code == 202
         jid = p.json()["job_id"]
         row = client.get(f"/v1/runs/{jid}", params={"job_db_path": db_path}).json()
-        assert row.get("meta", {}).get("api_workspace_label") == " competitor-demo ".strip()
+        assert row.get("meta", {}).get("api_workspace_label") == " workspace-demo ".strip()
         lst = client.get(
             "/v1/runs",
-            params={"job_db_path": db_path, "api_workspace_label": "competitor-demo", "limit": 5},
+            params={"job_db_path": db_path, "api_workspace_label": "workspace-demo", "limit": 5},
         ).json()
         assert any(j.get("job_id") == jid for j in (lst.get("jobs") or []))
     finally:
@@ -455,7 +475,7 @@ def test_capability_surface_has_mitigation_execution_model() -> None:
     r = client.get("/v1/meta/capability-surface")
     assert r.status_code == 200
     j = r.json()
-    assert j.get("schema") == "capability_surface_v1"
+    assert j.get("schema") == "capability_surface_v2"
     mm = j.get("mitigation_execution_model")
     assert isinstance(mm, dict)
     assert mm.get("schema") == "mitigation_execution_model_v1"

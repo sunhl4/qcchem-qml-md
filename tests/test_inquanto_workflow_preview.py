@@ -10,7 +10,7 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
-from qchem_stack.integrations.inquanto_workflow_preview import (
+from qchem_stack.internal_reports.competitor.inquanto_workflow_preview import (
     computable_graph_v1,
     computable_graph_v2,
     protocol_stages_preview_v1,

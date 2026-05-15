@@ -1,7 +1,7 @@
 /**
  * scaffold-mirror.mjs
  *
- * Reads scripts/inquanto-tree.yaml (the single source of truth) and writes:
+ * Reads scripts/mirror-doc-tree.yaml (the single source of truth) and writes:
  *
  *   1. docs/mirror/**\/index.md and docs/en/mirror/**\/index.md placeholder pages
  *      (idempotent: only created when target file does not yet exist; existing
@@ -23,11 +23,11 @@ import { flatten } from "./lib/inquanto-manifest-flatten.mjs";
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.join(__dirname, "..");
 const docsRoot = path.join(repoRoot, "docs");
-const manifestPath = path.join(__dirname, "inquanto-tree.yaml");
+const manifestPath = path.join(__dirname, "mirror-doc-tree.yaml");
 
 const STATUS_LABELS = {
   shipped: { zh: "已落地", en: "Shipped" },
-  partial: { zh: "部分对齐", en: "Partial" },
+  partial: { zh: "部分实现", en: "Partial" },
   placeholder: { zh: "占位", en: "Placeholder" },
   "not-applicable": { zh: "刻意不做", en: "Not applicable" },
 };
@@ -44,7 +44,7 @@ const DIATAXIS_LABELS = {
   concept: { zh: "Concept", en: "Concept" },
   tutorial: { zh: "Tutorial", en: "Tutorial" },
   reference: { zh: "Reference", en: "Reference" },
-  parity: { zh: "Parity", en: "Parity" },
+  parity: { zh: "产品计划", en: "Product planning" },
 };
 
 function ensureDir(p) {
@@ -69,7 +69,7 @@ function renderPage(entry, locale, descendantsCount = 0) {
   const title = locale === "zh" ? entry.title_zh : entry.title_en;
   const fm = {
     title,
-    inquanto_anchor: entry.inquanto || "",
+    reference_doc_url: entry.reference_url || "",
     diataxis: entry.diataxis,
     pillar: entry.pillar,
     status: entry.status,
@@ -102,16 +102,16 @@ function renderPage(entry, locale, descendantsCount = 0) {
           diataxis: "Diátaxis",
           module: "对应模块",
           milestone: "里程碑",
-          inquanto: "InQuanto 锚点",
+          ref_doc: "参考文档 URL",
           reason: "口径说明",
           fallback_what:
-            "本节为 InQuanto 公开树的对应位置。点开下面 InQuanto 锚点查看官方原始定义；本仓库的对应实现见「我们的实现」。",
+            "本节与第三方公开文档目录中的对应条目同构。点击下方参考锚点可查阅外部原始定义；本仓库实现见「我们的实现」。",
           fallback_module: "（占位，未实现 — 见里程碑）",
-          related_parity: "公开 parity 矩阵",
+          related_parity: "能力概览与路线图",
           related_engineering: "工程分层架构",
-          related_competitive: "竞争定位与路线图",
+          related_competitive: "产品路线图",
           related_quickstart: "教程：15 分钟上手",
-          breadcrumb_label: "InQuanto 镜像路径",
+          breadcrumb_label: "手册镜像节点路径",
           en_link_label: "English version",
         }
       : {
@@ -124,16 +124,16 @@ function renderPage(entry, locale, descendantsCount = 0) {
           diataxis: "Diátaxis",
           module: "Module",
           milestone: "Milestone",
-          inquanto: "InQuanto anchor",
+          ref_doc: "Reference doc URL",
           reason: "Scope note",
           fallback_what:
-            "This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under \"Our implementation\".",
+            "This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see \"Our implementation\" for this repository.",
           fallback_module: "(placeholder, not yet implemented — see milestone)",
-          related_parity: "Public parity matrix",
+          related_parity: "Capabilities & roadmap",
           related_engineering: "Engineering architecture",
-          related_competitive: "Competitive positioning",
+          related_competitive: "Product roadmap",
           related_quickstart: "Tutorial: 15-minute quickstart",
-          breadcrumb_label: "InQuanto mirror path",
+          breadcrumb_label: "Manual mirror node path",
           en_link_label: "中文版",
         };
 
@@ -141,8 +141,8 @@ function renderPage(entry, locale, descendantsCount = 0) {
     ? `/en${nodePath(entry)}`
     : nodePath(entry);
 
-  const inquantoLink = entry.inquanto
-    ? `[${entry.inquanto}](${entry.inquanto})`
+  const refDocLink = entry.reference_url
+    ? `[${entry.reference_url}](${entry.reference_url})`
     : "—";
 
   const moduleLine = entry.qchem
@@ -153,14 +153,14 @@ function renderPage(entry, locale, descendantsCount = 0) {
 
   const summaryBlock = summary ? summary : text.fallback_what;
 
-  const parityHref = `${localePrefix}/parity/public-matrix`;
+  const parityHref = `${localePrefix}/product/roadmap`;
   let ourBody;
   if (entry.status === "shipped") {
     ourBody = `**${statusLabel}** — ${text.module}: ${moduleLine}`;
   } else if (entry.status === "partial") {
     const partialNote = locale === "zh"
-      ? `字段或行为已落地但与 InQuanto 公开语义不完全等价；详细 caveat 见 [公开 parity 矩阵](${parityHref})。`
-      : `Fields or behavior are present but do not fully match InQuanto public semantics; see [Public parity matrix](${parityHref}) for caveats.`;
+      ? `字段或行为已落地，但与参考文档公开语义可能不完全一致；说明见 [能力概览与路线图](${parityHref})。`
+      : `Fields or behavior may differ from the public reference text; see [Capabilities & roadmap](${parityHref}).`;
     ourBody = `**${statusLabel}** — ${text.module}: ${moduleLine}\n\n${partialNote}`;
   } else if (entry.status === "placeholder") {
     const placeholderNote = locale === "zh"
@@ -176,16 +176,16 @@ function renderPage(entry, locale, descendantsCount = 0) {
 
   const relatedLinks = locale === "zh"
     ? [
-        ["公开 parity 矩阵", "/parity/public-matrix"],
+        ["能力概览与路线图", "/product/roadmap"],
         ["工程分层架构", "/concept/engineering-architecture"],
-        ["竞争定位与路线图", "/concept/competitive-positioning"],
+        ["产品路线图", "/product/roadmap"],
         ["15 分钟上手", "/tutorial/quickstart"],
         ["IA slug 映射", "/meta/ia-mapping"],
       ]
     : [
-        ["Public parity matrix", "/en/parity/public-matrix"],
+        ["Capabilities & roadmap", "/en/product/roadmap"],
         ["Engineering architecture", "/en/concept/engineering-architecture"],
-        ["Competitive positioning", "/en/concept/competitive-positioning"],
+        ["Product roadmap", "/en/product/roadmap"],
         ["15-minute quickstart", "/en/tutorial/quickstart"],
         ["IA slug map", "/en/meta/ia-mapping"],
       ];
@@ -214,7 +214,7 @@ ${fmYaml}
 - **${text.diataxis}**: ${diataxisLabel}
 - **${text.module}**: ${moduleLine}
 - **${text.milestone}**: ${entry.milestone || "—"}
-- **${text.inquanto}**: ${inquantoLink}${reasonBlock}
+- **${text.ref_doc}**: ${refDocLink}${reasonBlock}
 :::
 
 ## ${text.h_what}
@@ -297,7 +297,7 @@ function buildTreeData(entries) {
       pillar: e.pillar,
       qchem: e.qchem,
       milestone: e.milestone,
-      inquanto: e.inquanto,
+      reference_url: e.reference_url,
       isClassLeaf: e.isClassLeaf,
       slug: nodePath(e),
     };

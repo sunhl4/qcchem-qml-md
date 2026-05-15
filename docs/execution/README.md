@@ -38,6 +38,7 @@
 - `day001_day090_unified_chemistry_interface_calendar.md` — **统一 `ChemIntegralSolver` 入口、多程序适配、下游与 PySCF 解耦** 的 90 天逐日日历（与 `docs/统一经典化学接口_ChemIntegralSolver与下游无关性.md` 配套）。
 - `unified_chem_driver_audit_notes.md` — `scf.driver` / PySCF 在编排层出现点的审计台账。
 - `unified_chem_capabilities_matrix.md` — embedding/hamiltonian 分支与 `SolverCapabilities` 对照矩阵。
+- `dual_classical_ingress_acceptance_checklist_2026Q2.md` — 双线路经典输入（在线结构文件 + 离线 bundle）统一 `PreQuantumInput` 验收勾选表。
 - `week_unified_chem_w01.md` … `week_unified_chem_w13.md` — 每周交付与闸门执行记录骨架。
 - `psi4_get_integrals_design.md` — Psi4 `get_integrals` 返回形状草案。
 - `subprocess_chem_risk_checklist.md` — subprocess adapter 许可证/协议风险清单。

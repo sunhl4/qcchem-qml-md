@@ -11,7 +11,7 @@ import { flatten } from "./lib/inquanto-manifest-flatten.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const repoDocs = path.join(__dirname, "..", "..", "docs");
-const manifestPath = path.join(__dirname, "inquanto-tree.yaml");
+const manifestPath = path.join(__dirname, "mirror-doc-tree.yaml");
 const backlogPath = path.join(repoDocs, "inquanto-node-backlog.generated.json");
 const mirrorDataPath = path.join(__dirname, "..", "docs", ".vitepress", "mirror-data.json");
 

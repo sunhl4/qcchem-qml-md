@@ -25,4 +25,4 @@ This command generates static content into the `build` directory and can be serv
 - Tutorials and workflow examples
 - CLI/API references
 - Cloud/job orchestration notes
-- InQuanto benchmark-oriented parity pages
+- Product roadmap and acceptance pages

@@ -20,7 +20,7 @@ from pydantic import BaseModel, Field, ValidationError
 
 from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import QChemStackError
-from qchem_stack.integrations.inquanto_workflow_preview import (
+from qchem_stack.integrations.workflow_preview import (
     slim_product_summary_from_pipeline_result,
     workflow_preview_payload,
 )
@@ -40,13 +40,13 @@ from qchem_stack.protocols.computable import computables_export_dict, list_compu
 app = FastAPI(
     title="qchem-stack",
     version="0.1.0",
-    description="Local API + SQLite queue analog to cloud submit/poll; parity metadata mirrors docs/inquanto_public_parity_matrix.md.",
+    description="Local API + SQLite queue for product workflows and reproducibility metadata.",
     openapi_tags=[
         {"name": "health", "description": "Liveness and readiness probes."},
         {"name": "meta", "description": "Product / parity metadata for dashboards."},
         {
             "name": "product",
-            "description": "InQuanto-public-docs-shaped UX (workflow stages, computable graph) — open analog only.",
+            "description": "Workflow stages and computable graph previews for product UX.",
         },
         {
             "name": "ml_md",
@@ -81,6 +81,10 @@ class RunRequest(BaseModel):
         default=None,
         description="Optional Nexus/organization project slug stored in meta (api_project_slug); pairs with workspace for listing",
     )
+    config_base_dir: str | None = Field(
+        default=None,
+        description="Optional base directory for resolving relative geometry_file/precomputed paths in experiment_yaml",
+    )
 
 
 class YamlPreviewBody(BaseModel):
@@ -106,7 +110,11 @@ class QMEFTrainerStubFitBody(BaseModel):
     )
 
 
-def experiment_config_from_request_yaml(experiment_yaml: str) -> ExperimentConfig:
+def experiment_config_from_request_yaml(
+    experiment_yaml: str,
+    *,
+    config_base_dir: str | None = None,
+) -> ExperimentConfig:
     """Parse YAML and build :class:`ExperimentConfig`; raises :class:`HTTPException` on failure."""
     try:
         raw = yaml.safe_load(experiment_yaml)
@@ -114,8 +122,11 @@ def experiment_config_from_request_yaml(experiment_yaml: str) -> ExperimentConfi
         raise HTTPException(status_code=400, detail=f"Invalid YAML: {exc}") from exc
     if not isinstance(raw, dict):
         raise HTTPException(status_code=400, detail="experiment_yaml must parse to a mapping")
+    base_dir = None
+    if config_base_dir is not None and config_base_dir.strip():
+        base_dir = Path(config_base_dir).expanduser().resolve()
     try:
-        return ExperimentConfig.from_yaml_dict(raw)
+        return ExperimentConfig.from_yaml_dict(raw, geometry_files_base_dir=base_dir)
     except ValidationError as exc:
         raise HTTPException(status_code=422, detail=exc.errors(include_url=False)) from exc
 
@@ -147,22 +158,20 @@ def ready() -> dict[str, str]:
     return {"status": "ready", "job_db_default": str(p.resolve())}
 
 
-@app.get("/v1/meta/product-analog", tags=["product"])
-def product_analog() -> dict[str, object]:
+@app.get("/v1/meta/product-surface", tags=["product"])
+def product_surface() -> dict[str, object]:
     """
-    Single call for consoles: what this open API emulates vs InQuanto/Nexus *public* narratives.
-
-    Closed-source binaries are not described here — only our designed L1 analog surface.
+    Single call for consoles: what this open API exposes as product-level capability surfaces.
     """
     from qchem_stack import __version__
 
     return {
-        "schema": "product_analog_v1",
+        "schema": "product_surface_v1",
         "qchem_stack_version": __version__,
-        "emulation_notes": [
+        "capability_notes": [
             "Five-stage protocol preview: POST /v1/meta/workflow-preview (YAML-only, no chemistry).",
             "Computable DAG (semantic v2): POST /v1/meta/workflow-preview.",
-            "Capability one-shot: GET /v1/meta/capability-surface (gaps + public object map + Tangelo/tutorial fermion→qubit alias table + operator_pool_registry_export_v1).",
+            "Capability one-shot: GET /v1/meta/capability-surface (product capability map + product gaps + operator_pool_registry_export_v1).",
             "Job lifecycle: POST/GET /v1/runs (optional project_slug), GET /v1/runs/{id}/summary, repro GET /v1/runs/{id}/repro (DONE only); events use persisted timeline when available.",
             "ML / MD bridge surface: GET /v1/meta/ml-md-bridge; validate QMEFDataset JSON: POST /v1/meta/qmef-validate; in-memory MLIP stub fit: POST /v1/meta/ml-md-trainer-stub-fit.",
         ],
@@ -175,47 +184,42 @@ def product_analog() -> dict[str, object]:
 @app.get("/v1/meta/capability-surface", tags=["meta"])
 def capability_surface() -> dict[str, object]:
     """
-    Single fetch for landing / admin consoles: version, full gap rows, InQuanto-public name → implementation map,
-    **Tangelo/tutorial fermion→qubit alias surface** (executable vs disclosed-not-implemented only),
+    Single fetch for landing / admin consoles: version, full gap rows, product capability name → implementation map,
     plus **operator_pool_registry_export_v1** (ADAPT/IQEB pool ids and aliases).
 
-    **Not** a substitute for narrative docs — aggregates machine-readable parity artifacts.
+    **Not** a substitute for narrative docs — aggregates machine-readable capability artifacts.
     """
     from qchem_stack import __version__
-    from qchem_stack.chem.fermion_mapping_registry import (
-        tangelo_public_mapping_alias_surface_v1,
-    )
-    from qchem_stack.protocols.inquanto_contract import (
-        inquanto_gap_anchor_index_v1,
-        inquanto_gap_categories,
-        inquanto_object_map_for_docs,
+    from qchem_stack.protocols.product_contract import (
         mitigation_execution_model_public,
         open_stack_differentiators_public,
-        validate_inquanto_gap_categories,
+        product_capability_map_for_docs,
+        product_gap_anchor_index_v1,
+        product_gap_categories,
+        validate_product_gap_categories,
     )
     from qchem_stack.quantum.algorithm_registry import algorithm_registry_export
     from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_mapping_support_matrix_v1
     from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
     from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
-    errs = validate_inquanto_gap_categories()
+    errs = validate_product_gap_categories()
     if errs:
         raise HTTPException(
             status_code=500,
             detail={
-                "message": "invalid inquanto_gap_categories contract",
+                "message": "invalid product_gap_categories contract",
                 "errors": errs,
             },
         )
     return {
-        "schema": "capability_surface_v1",
+        "schema": "capability_surface_v2",
         "qchem_stack_version": __version__,
-        "object_map": inquanto_object_map_for_docs(),
-        "gaps": inquanto_gap_categories(),
-        "gap_anchor_index_v1": inquanto_gap_anchor_index_v1(),
+        "capability_map": product_capability_map_for_docs(),
+        "gaps": product_gap_categories(),
+        "gap_anchor_index_v1": product_gap_anchor_index_v1(),
         "mitigation_execution_model": mitigation_execution_model_public(),
         "open_stack_differentiators": open_stack_differentiators_public(),
-        "tangelo_public_mapping_alias_surface_v1": tangelo_public_mapping_alias_surface_v1(),
         "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
         "algorithm_registry_export_v1": algorithm_registry_export(),
         "variational_registry_export_v1": variational_registry_export(),
@@ -225,38 +229,36 @@ def capability_surface() -> dict[str, object]:
 
 @app.get("/v1/meta/parity-gaps", tags=["meta"])
 def parity_gaps() -> dict[str, object]:
-    """Machine-readable gap list vs InQuanto public docs (dashboards / regression tooling)."""
+    """Machine-readable product capability gap list for dashboards and regression tooling."""
     from qchem_stack import __version__
-    from qchem_stack.protocols.inquanto_contract import (
-        inquanto_gap_anchor_index_v1,
-        inquanto_gap_categories,
-        validate_inquanto_gap_categories,
+    from qchem_stack.protocols.product_contract import (
+        product_gap_anchor_index_v1,
+        product_gap_categories,
+        validate_product_gap_categories,
     )
 
-    errs = validate_inquanto_gap_categories()
+    errs = validate_product_gap_categories()
     if errs:
         raise HTTPException(
             status_code=500,
             detail={
-                "message": "invalid inquanto_gap_categories contract",
+                "message": "invalid product_gap_categories contract",
                 "errors": errs,
             },
         )
 
     return {
-        "schema": "inquanto_gap_export_v1",
+        "schema": "capability_gap_export_v1",
         "qchem_stack_version": __version__,
-        "gaps": inquanto_gap_categories(),
-        "gap_anchor_index_v1": inquanto_gap_anchor_index_v1(),
+        "gaps": product_gap_categories(),
+        "gap_anchor_index_v1": product_gap_anchor_index_v1(),
     }
 
 
 @app.post("/v1/meta/workflow-preview", tags=["product"])
 def workflow_preview(body: YamlPreviewBody) -> dict[str, object]:
     """
-    InQuanto-style **protocol stage** checklist + **computable DAG** from YAML alone (instantiate→evaluate).
-
-    Use before submit to drive a Nexus-like wizard or notebook cell summary.
+    Product protocol-stage checklist + computable DAG from YAML alone (instantiate→evaluate).
     """
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
     return workflow_preview_payload(cfg, include_computables_rich=body.include_computables_rich)
@@ -264,7 +266,7 @@ def workflow_preview(body: YamlPreviewBody) -> dict[str, object]:
 
 @app.post("/v1/meta/computables-preview", tags=["meta"])
 def computables_preview(body: YamlPreviewBody) -> dict[str, object]:
-    """InQuanto-style **Computable** list + ``computable_abstract`` v2 from YAML only (no PySCF run)."""
+    """Product computable list + ``computable_abstract`` v2 from YAML only (no PySCF run)."""
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
     refs = list_computables_for_config(cfg)
     return {
@@ -307,7 +309,7 @@ def queue_stats(
         default=None, description="SQLite path; default QCHEM_JOB_DB or temp"
     ),
 ) -> dict[str, object]:
-    """Per-status job counts (ops dashboard analog)."""
+    """Per-status job counts for operations dashboards."""
     db = Path(job_db_path) if job_db_path else default_job_db_path()
     store = SqliteJobStore(db)
     counts = store.count_by_status()
@@ -370,7 +372,10 @@ def list_runs(
 @app.post("/v1/runs", response_model=None, tags=["runs"])
 def post_run(request: Request, body: RunRequest) -> dict | JSONResponse:
     rc = RunContext.from_headers({str(k): str(v) for k, v in request.headers.items()})
-    cfg = experiment_config_from_request_yaml(body.experiment_yaml)
+    cfg = experiment_config_from_request_yaml(
+        body.experiment_yaml,
+        config_base_dir=body.config_base_dir,
+    )
     headers = _trace_response_headers(rc)
     if body.sync:
         try:
@@ -393,6 +398,7 @@ def post_run(request: Request, body: RunRequest) -> dict | JSONResponse:
     handle = enqueue_full_pipeline_run(
         store,
         config_yaml=body.experiment_yaml,
+        config_base_dir=body.config_base_dir,
         run_context=rc,
         meta_extra=meta_extra,
     )

@@ -1,8 +1,8 @@
 """
-Thin InQuanto-*Computable*-style descriptors (open stack).
+Thin computable descriptors for the open stack.
 
-InQuanto exposes ``Computable`` objects that bind observables to execution; here we attach
-**named, serializable** summaries for Methods / parity export without a second object graph.
+This module attaches **named, serializable** summaries for Methods / parity export
+without a second object graph.
 """
 
 from __future__ import annotations
@@ -15,7 +15,7 @@ from openfermion.ops import QubitOperator
 
 from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
 from qchem_stack.config import ExperimentConfig
-from qchem_stack.protocols.inquanto_contract import (
+from qchem_stack.protocols.product_contract import (
     classify_pauli_expectation_path,
     pauli_protocol_expectation_path_for_config,
 )
@@ -24,7 +24,7 @@ from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 @dataclass(frozen=True)
 class ComputableRef:
-    """A single high-level target (analog of a documented InQuanto computable)."""
+    """A single high-level computational target."""
 
     name: str
     """E.g. ``ground_state_energy_hea_pauli``."""
@@ -130,7 +130,7 @@ class MatrixElement:
 
 @dataclass
 class ProtocolRunner:
-    """Thin protocol adapter mirroring InQuanto build(protocol=...) usage."""
+    """Thin protocol adapter for build/run workflow usage."""
 
     objective: Computable
     auxiliary: dict[str, Computable] = field(default_factory=dict)
@@ -152,7 +152,7 @@ class ProtocolRunner:
 
 
 def refs_from_computable_graph_v2(graph: dict[str, Any]) -> list[ComputableRef]:
-    """Inverse of :func:`~qchem_stack.integrations.inquanto_workflow_preview.computable_graph_v2` on the ``nodes`` slice.
+    """Inverse of :func:`~qchem_stack.integrations.workflow_preview.computable_graph_v2` on the ``nodes`` slice.
 
     Reconstructs refs in **node list order** (same convention as the forward builder). YAML edge
     overrides in the graph are not represented here — re-emit with the same
@@ -289,7 +289,7 @@ def assert_computable_workflow_graph_roundtrip(cfg: ExperimentConfig) -> None:
 
     L1 / wave-F: guarantees workflow-preview DAG nodes round-trip to the same ref list (order + payloads).
     """
-    from qchem_stack.integrations.inquanto_workflow_preview import computable_graph_v2
+    from qchem_stack.integrations.workflow_preview import computable_graph_v2
 
     refs = list_computables_for_config(cfg)
     graph = computable_graph_v2(refs, cfg)
@@ -315,7 +315,7 @@ def computables_export_dict(
         "schema": "qchem_computable_abstract_v2",
         "pauli_protocol_expectation_path": pauli_protocol_expectation_path_for_config(cfg),
         "evaluate_note": (
-            "Strict InQuanto-style evaluate reuse (conservative): each required Pauli label must appear "
+            "Strict evaluate reuse (conservative): each required Pauli label must appear "
             "in hamiltonian_pauli_strings from protocol_counts; see "
             "qchem_stack.protocols.pauli_support.assert_evaluate_compatible."
         ),

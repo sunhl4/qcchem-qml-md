@@ -7,11 +7,15 @@ so users can copy the pattern and replace only the backend-specific sections.
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
 import numpy as np
 
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
 from qchem_stack.config import ExperimentConfig
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 @dataclass
@@ -82,6 +86,16 @@ class MockExternalIntegralSolver:
             "MockExternalIntegralSolver.get_integrals is a template hook; wire your backend integrals here."
         )
 
+    def build_embedding_input_system(
+        self,
+        reference: ClassicalMeanFieldReference,
+        *,
+        representation: str,
+    ) -> dict[str, object]:
+        raise NotImplementedError(
+            "MockExternalIntegralSolver.build_embedding_input_system is a template hook."
+        )
+
 
 def register_mock_external_solver() -> None:
     """Register demo backend id ``mock_external`` into solver registry.
@@ -91,4 +105,6 @@ def register_mock_external_solver() -> None:
     """
     from qchem_stack.chem.solvers.registry import register_solver
 
-    register_solver("mock_external", MockExternalIntegralSolver.from_experiment_config)
+    register_solver(
+        "mock_external", MockExternalIntegralSolver.from_experiment_config, overwrite=True
+    )

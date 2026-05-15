@@ -5,7 +5,7 @@ Fragment **Mulliken-weighted** MO selection for projection-mode variational Hami
 AOs on chosen atoms) are standard for *locality* screening of molecular orbitals. Integrals use PySCF
 :class:`pyscf.mcscf.CASCI` ``get_h1eff`` / ``get_h2eff`` on a **reordered** MO matrix so the active
 block matches a contiguous ``[ncore : ncore + ncas]`` slice — the same chemist-notation ``h2`` layout as
-:func:`qchem_stack.chem.drivers.pyscf_driver.active_space_integrals`.
+:func:`qchem_stack.chem.integrals.pyscf_active_space.active_space_integrals`.
 
 **Epistemic boundary**: this is *not* full many-body projection embedding (environment correlated
 wavefunction projected onto an impurity / active space, or bit-wise equivalence to proprietary drivers).

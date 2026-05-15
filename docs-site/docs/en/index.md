@@ -70,7 +70,7 @@ hero:
   <p class="inq-doc-home__lead">SQLite job ledgers and an optional Runs API carry async full pipelines; strict repro, timelines, and slim summaries support Methods and gateway integrations.</p>
   <p class="inq-doc-home__p"><strong>run_context</strong>, <strong>pipeline_profile</strong>, and API labels are written into <strong>repro</strong>; <strong>GET /v1/runs/…/summary|repro</strong> contracts and parity key whitelists live in Reference.</p>
   <p class="inq-doc-home__manual"><a href="/en/reference/http-api-sqlite-jobs">Reference — HTTP API &amp; SQLite jobs</a></p>
-  <p class="inq-doc-home__p">More: <a href="/en/guide/jobs-and-reproducibility/">P4 Jobs &amp; reproducibility</a> · <a href="/en/concept/launch-retrieve-nexus-analog">Launch / Retrieve (Nexus analog)</a> · <a href="/en/parity/public-matrix">Parity matrix</a>.</p>
+  <p class="inq-doc-home__p">More: <a href="/en/guide/jobs-and-reproducibility/">P4 Jobs &amp; reproducibility</a> · <a href="/en/concept/launch-retrieve-nexus-analog">Launch / Retrieve (Nexus analog)</a> · <a href="/en/product/roadmap">Parity matrix</a>.</p>
 </article>
 
 </section>
@@ -78,11 +78,11 @@ hero:
 <div class="inq-doc-home__trust">
   <p class="inq-doc-home__trust-inner">
     <span class="inq-doc-home__trust-label">Trust &amp; limits</span>
-    <a href="/en/parity/public-matrix">Parity matrix</a>
+    <a href="/en/product/roadmap">Parity matrix</a>
     <span class="inq-doc-home__trust-sep" aria-hidden="true">·</span>
-    <a href="/en/parity/l1-signoff">L1 sign-off</a>
+    <a href="/en/product/roadmap">L1 sign-off</a>
     <span class="inq-doc-home__trust-sep" aria-hidden="true">·</span>
-    <a href="/parity/gap-implementation-plan">Gap plan (ZH)</a>
+    <a href="/product/roadmap">Gap plan (ZH)</a>
   </p>
 </div>
 

@@ -31,7 +31,7 @@ description: 按研究者、平台工程师、维护者三类角色给出推荐�
 4. [HTTP 异步运行教程](/tutorial/async-run-via-http)
 5. [云与运维概览](/cloud/overview)
 
-## 维护者（对标 / 验收 / 规划）
+## 维护者（验收 / 规划）
 
 **目标**：维护文档契约、控制能力边界、推进差距收敛。
 
@@ -39,9 +39,9 @@ description: 按研究者、平台工程师、维护者三类角色给出推荐�
 
 1. [产品功能](/product/features)
 2. [定位与路线](/product/positioning)
-3. [公开契约矩阵](/parity/public-matrix)
-4. [差距与实施计划](/parity/gap-implementation-plan)
-5. [路线图](/product/roadmap)
+3. [工程架构](/concept/engineering-architecture)
+4. [路线图](/product/roadmap)
+5. [命令行与脚本](/reference/cli-and-scripts)
 
 ## 通用建议
 

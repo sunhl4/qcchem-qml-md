@@ -60,7 +60,7 @@ def _hea_angles_for_depth(
 
 # Pauli ``run``/``evaluate`` expectation paths (P0): exact executor vs grouped statevector MC vs Qiskit
 # ``get_counts`` — see ``docs/技术文档_设备比特串与Qiskit采样路径.md`` §2 and
-# ``protocols.inquanto_contract.protocol_expectation_semantics_public``.
+# ``protocols.product_contract.protocol_expectation_semantics_public``.
 
 
 class ProtocolPhase(str, Enum):

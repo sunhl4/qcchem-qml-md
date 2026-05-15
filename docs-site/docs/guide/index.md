@@ -9,7 +9,7 @@
 | 量子化学研究者 | [P1 化学与嵌入](/guide/chemistry-and-embedding/) · [手册 · 几何](/mirror/manual/geometry/) |
 | QC 算法 / 协议开发者 | [P2 算法与协议](/guide/algorithms-and-protocols/) · [命令行与脚本](/reference/cli-and-scripts) |
 | 平台集成 / 运维 | [P4 作业与可复现](/guide/jobs-and-reproducibility/) · [HTTP API 与作业](/reference/http-api-sqlite-jobs) |
-| 合规 / 采购 / 尽调 | [公开契约矩阵](/parity/public-matrix) · [安全与数据](/meta/security-and-data) |
+| 合规 / 采购 / 尽调 | [公开契约矩阵](/product/roadmap) · [安全与数据](/meta/security-and-data) |
 
 ## 四柱入口
 
@@ -22,6 +22,6 @@
 
 ## 信任与边界（诚实口径）
 
-能力以 **shipped / partial / placeholder / n-a** 标注；验收与残余 SLA 见 [契约矩阵](/parity/public-matrix)、[L1 签 off](/parity/l1-signoff)、[差距与实施计划](/parity/gap-implementation-plan)。不宣称闭源 wheel 或商业云对等。
+能力以 **shipped / partial / placeholder / n-a** 标注；验收与残余 SLA 见 [契约矩阵](/product/roadmap)、[L1 签 off](/product/roadmap)、[差距与实施计划](/product/roadmap)。不宣称闭源 wheel 或商业云对等。
 
 Concept / Tutorial / Reference / Parity 见顶栏。文档类型索引：[Diátaxis 索引](/meta/diataxis-index)。 [站点地图（IA）](/meta/ia-mapping) · [安全与数据](/meta/security-and-data)。

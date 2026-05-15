@@ -5,10 +5,10 @@ description: Public-site top-level and Manual L1 branches ↔ mirror routes and 
 
 # InQuanto public modules → site scaffold
 
-This page is an **editable IA template**: it keeps Quantinuum **public** InQuanto **module names and URL patterns** (for comparison and future edits), points to this repo’s **generated mirror tree** (same shape as `docs-site/scripts/inquanto-tree.yaml`), and lists **qchem-stack implementation entrypoints** you can update as the product evolves.
+This page is an **editable IA template**: it keeps Quantinuum **public** InQuanto **module names and URL patterns** (for comparison and future edits), points to this repo’s **generated mirror tree** (same shape as `docs-site/scripts/mirror-doc-tree.yaml`), and lists **qchem-stack implementation entrypoints** you can update as the product evolves.
 
 - Public root: `https://docs.quantinuum.com/inquanto/` (external)  
-- Machine source: `docs-site/scripts/inquanto-tree.yaml` (`site_meta.inquanto_version_seen`)  
+- Machine source: `docs-site/scripts/mirror-doc-tree.yaml` (`site_meta.upstream_doc_version_seen`)  
 - Regenerate mirror: `npm run scaffold:mirror`  
 
 Mirror pages are mostly audit/placeholder prose; **product truth** remains [Product features](/en/product/features), [Guides](/en/guide/), and [Reference](/en/reference/cli-and-scripts).
@@ -61,7 +61,7 @@ Mirror pages are mostly audit/placeholder prose; **product truth** remains [Prod
 ## 4. Maintenance rules
 
 1. **Product changes**: edit the “Suggested engineering links” cells only; mirror URLs stay generator-owned.  
-2. **Public tree changes**: edit `inquanto-tree.yaml`, run `npm run scaffold:mirror`, then **update this table** to match.  
+2. **Public tree changes**: edit `mirror-doc-tree.yaml`, run `npm run scaffold:mirror`, then **update this table** to match.  
 3. **Optional codegen**: add `scripts/sync-inquanto-scaffold.mjs` later if you want the middle column auto-filled.
 
 See also: [Site map](/en/meta/ia-mapping) · [Security & data](/en/meta/security-and-data).

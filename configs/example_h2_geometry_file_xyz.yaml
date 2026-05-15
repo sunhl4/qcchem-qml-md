@@ -1,0 +1,36 @@
+schema_version: "1"
+experiment_id: "h2_geometry_file_xyz_001"
+random_seed: 7
+
+molecule:
+  geometry_file: "structures_h2.xyz"
+  coordinate_unit: "angstrom"
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  provider: "statevector"
+  shots_per_circuit: 256
+
+compiler:
+  optimization_level: 1
+  native_twoq: "CX"
+
+embedding:
+  mode: "none"
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 40
+  use_pauli_protocol: false

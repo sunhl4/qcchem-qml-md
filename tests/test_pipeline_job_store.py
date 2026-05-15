@@ -60,3 +60,27 @@ def test_enqueue_full_pipeline_then_dispatch_completes() -> None:
             for e in evs
         )
         assert any(isinstance(e, dict) and e.get("kind") == "completed" for e in evs)
+
+
+@pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
+def test_enqueue_full_pipeline_with_config_base_dir_resolves_relative_paths() -> None:
+    root = Path(__file__).resolve().parents[1]
+    raw = yaml.safe_load(
+        (root / "configs" / "example_h2_geometry_file_xyz.yaml").read_text(encoding="utf-8")
+    )
+    assert isinstance(raw, dict)
+    raw.setdefault("quantum", {})["use_pauli_protocol"] = False
+    raw.setdefault("quantum", {})["vqe_maxiter"] = 4
+    yml = yaml.safe_dump(raw, sort_keys=False)
+    with tempfile.TemporaryDirectory() as d:
+        store = SqliteJobStore(f"{d}/jobs.sqlite")
+        h = enqueue_full_pipeline_run(
+            store,
+            config_yaml=yml,
+            config_base_dir=root / "configs",
+            meta_extra={"experiment_id": str(raw.get("experiment_id", ""))},
+        )
+        dispatch_job(store, h.job_id)
+        out = store.result(h.job_id)
+        assert out["status"] == "DONE"
+        assert out["job_kind"] == "full_pipeline"

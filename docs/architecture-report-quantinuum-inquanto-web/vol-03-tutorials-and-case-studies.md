@@ -1,7 +1,7 @@
 # Vol.03 Tutorials 与案例研究 — 叙事节奏与受众
 
 **读者**：开发者体验（DX）、培训材料设计者。  
-**真源**：[`inquanto-tree.yaml`](../../docs-site/scripts/inquanto-tree.yaml) `tutorials:` 子树；`tutorial_overview` 抓取 **超时** — 结构以 manifest 为准。
+**真源**：[`mirror-doc-tree.yaml`](../../docs-site/scripts/mirror-doc-tree.yaml) `tutorials:` 子树；`tutorial_overview` 抓取 **超时** — 结构以 manifest 为准。
 
 ---
 

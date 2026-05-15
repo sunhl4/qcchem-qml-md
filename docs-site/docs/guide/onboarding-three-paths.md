@@ -17,9 +17,9 @@ description: 从「能跑起来」「能对齐 InQuanto 公开契约」「MD/ML 
 
 适合：要对齐 `inquanto_gap_categories`、export 或 CI 闸门的维护者。
 
-1. [公开 parity 矩阵](/parity/public-matrix)  
-2. [L1 签字清单](/parity/l1-signoff)  
-3. [差距与实施计划](/parity/gap-implementation-plan) 与 [P2 详细计划](/concept/p2-detailed-plan) §6–§8  
+1. [公开 parity 矩阵](/product/roadmap)  
+2. [L1 签字清单](/product/roadmap)  
+3. [差距与实施计划](/product/roadmap) 与 [P2 详细计划](/concept/p2-detailed-plan) §6–§8  
 4. 克隆仓库根目录 **`CONTRIBUTING.md`**（CI markers、`check_parity_export_sample`、可选 extras）
 
 ## 路径 C：MD / ML 与 `QMEFDataset`

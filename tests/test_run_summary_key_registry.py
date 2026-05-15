@@ -12,8 +12,8 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
+from qchem_stack.internal_reports.competitor.inquanto_contract import RUN_SUMMARY_DOCUMENTED_KEYS
 from qchem_stack.orchestration.pipeline import _attach_run_summary, collect_repro_metadata
-from qchem_stack.protocols.inquanto_contract import RUN_SUMMARY_DOCUMENTED_KEYS
 
 
 def _mol() -> MoleculeSpec:

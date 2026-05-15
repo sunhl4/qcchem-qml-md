@@ -18,7 +18,7 @@ This document complements the InQuanto **parity** and chemistry narrative docs. 
 
 **Rule of thumb:** algorithms and drivers never import orchestration. Orchestration imports everything below.
 
-Config schema/validator layering convention for maintainers: [`config_校验分层约定.md`](config_校验分层约定.md).
+Config schema/validator layering convention for maintainers: [`config_校验分层约定.md`](config_校验分层约定.md). Dual-ingress offline bundle contract: [`技术文档_双线路经典输入与统一PreQuantumInput契约.md`](技术文档_双线路经典输入与统一PreQuantumInput契约.md).
 
 ## 1.1 Architecture invariant (pinned)
 
@@ -29,8 +29,25 @@ The project is pinned to this invariant:
 - **PySCF is an example backend, not a privileged architecture dependency**.
 - **Any backend-specific branch must be isolated at adapter/interchange boundaries with explicit capability gates** (`SolverCapabilities`), never by hidden assumptions in algorithm code.
 - **Compatibility fields are transitional only**: legacy PySCF-typed convenience slots may remain temporarily for migration, but all new public APIs must use backend-agnostic interchange types first and document deprecation windows.
+- **Dual classical ingress is supported**: live solver execution and offline precomputed bundles must converge to the same `PreQuantumInput` handoff before quantum stages.
 
 **Production milestone (pinned):** end-to-end **numerical** classical chemistry in CI and representative YAMLs targets **`scf.driver=pyscf`** until another backend implements `compute_mean_field` and (when building restricted active-space qubit Hamiltonians) satisfies `SolverCapabilities.supports_restricted_active_space_qubit_hamiltonian` plus interchange tests for `CanonicalActiveSpaceIntegralPack.from_classical_reference`. Additional codes register via `qchem_stack.chem.solvers.registry`. Product narrative and extension checklist (Chinese): [竞争定位与路线图 — §5.1](竞争定位与路线图_对标Quantinuum产品与技术路线.md).
+
+## 1.2 PySCF boundary refactor (maintainer note)
+
+To keep `PySCFDriver` as a compatibility facade (not a monolithic implementation file), PySCF-specific computation helpers are split by responsibility:
+
+- **Driver facade / onboarding / workflow glue**: `qchem_stack.chem.drivers.pyscf_driver`
+- **Active-space CASCI integral extraction**: `qchem_stack.chem.integrals.pyscf_active_space`
+- **One-electron operator builders (fermion / Pauli)**: `qchem_stack.chem.integrals.pyscf_onebody`
+- **Lowdin AO transformed views**: `qchem_stack.chem.integrals.pyscf_lowdin`
+- **AO / Lowdin data view dataclasses**: `qchem_stack.chem.systems.pyscf_views`
+
+Maintainer rule:
+
+- New PySCF math-heavy transformations go to `chem.integrals.*` or `chem.systems.*`.
+- `PySCFDriver` should only orchestrate, validate inputs, and preserve compatibility entry points.
+- Keep public import compatibility for existing integrators (`qchem_stack.chem.drivers.__init__` and legacy `pyscf_driver` exports) during migration windows.
 
 ## 2. Public surfaces (stability intent)
 

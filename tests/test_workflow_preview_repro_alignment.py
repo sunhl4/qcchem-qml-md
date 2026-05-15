@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from qchem_stack.config import load_experiment_config
-from qchem_stack.integrations.inquanto_workflow_preview import (
+from qchem_stack.integrations.workflow_preview import (
     slim_product_summary_from_pipeline_result,
     workflow_preview_payload,
 )

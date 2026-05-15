@@ -34,4 +34,4 @@ python scripts/smoke_pipeline.py --projection-trace
 
 - [工作流与 YAML](/tutorial/workflow-overview)
 - `configs/example_h2_projection_trace.yaml`、`configs/example_h4_projection_mulliken.yaml`
-- [公开 parity 矩阵](/parity/public-matrix) §3 Projection 行
+- [公开 parity 矩阵](/product/roadmap) §3 Projection 行

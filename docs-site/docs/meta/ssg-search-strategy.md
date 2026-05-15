@@ -19,7 +19,7 @@ description: 静态文档框架选型结论、侧边栏与本地搜索的实现�
 | 区域 | 策略 |
 |------|------|
 | 产品 / 指南 / 教程 / Concept / Reference / Parity / Cloud / Meta | **手工维护**于 `docs/.vitepress/config.ts` 的 `themeConfig.locales.*.themeConfig.sidebar`，保证顺序与对外叙事一致。 |
-| `/mirror/**`、`/en/mirror/**` | **`sidebar-mirror.json`** 由 `npm run scaffold:mirror` 从 `scripts/inquanto-tree.yaml` 生成，避免 295+ 节点手改。 |
+| `/mirror/**`、`/en/mirror/**` | **`sidebar-mirror.json`** 由 `npm run scaffold:mirror` 从 `scripts/mirror-doc-tree.yaml` 生成，避免 295+ 节点手改。 |
 
 ## 3. 搜索策略
 

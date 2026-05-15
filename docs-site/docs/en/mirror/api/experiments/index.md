@@ -1,6 +1,6 @@
 ---
-title: inquanto.experiments
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html"
+title: Reference API · inquanto.experiments
+reference_doc_url: "https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html"
 diataxis: reference
 pillar: P2
 status: partial
@@ -9,9 +9,9 @@ milestone: ""
 i18n_key: api.experiments
 ---
 
-# inquanto.experiments <StatusBadge :status="$frontmatter.status" />
+# Reference API · inquanto.experiments <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>api / experiments</code> · <a href="/mirror/api/experiments/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>api / experiments</code> · <a href="/mirror/api/experiments/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Partial
@@ -19,7 +19,7 @@ i18n_key: api.experiments
 - **Diátaxis**: Reference
 - **Module**: *(placeholder, not yet implemented — see milestone)*
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html](https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html](https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html)
 :::
 
 ## What it is
@@ -30,7 +30,7 @@ Demonstration-oriented API subtree paired with Knowledge Articles.
 
 **Partial** — Module: *(placeholder, not yet implemented — see milestone)*
 
-Fields or behavior are present but do not fully match InQuanto public semantics; see [Public parity matrix](/en/parity/public-matrix) for caveats.
+Fields or behavior may differ from the public reference text; see [Capabilities & roadmap](/en/product/roadmap).
 
 ## Children in this branch
 
@@ -39,8 +39,8 @@ Fields or behavior are present but do not fully match InQuanto public semantics;
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

@@ -1,6 +1,6 @@
-# Second quantization cheat sheet: Fock occupations & fermionic Hamiltonian (InQuanto–PySCF context)
+# Second quantization cheat sheet: Fock occupations & fermionic Hamiltonian
 
-Tutorial and debug dumps often print a **reference determinant (occupations)** plus a **fermionic Hamiltonian as strings of ladders**. This note breaks those tables into small, navigable chunks and points to [`qchem_stack`](./inquanto-pyscf-problem-analog.md) parity (`RestrictedActiveSpaceQuantumProblem`, ``integral_convention``).
+Tutorial and debug dumps often print a **reference determinant (occupations)** plus a **fermionic Hamiltonian as strings of ladders**. This note breaks those tables into small, navigable chunks and points to `qchem_stack` contracts (`RestrictedActiveSpaceQuantumProblem`, ``integral_convention``).
 
 Sections mirror the Chinese guide:
 

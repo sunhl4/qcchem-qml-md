@@ -11,7 +11,9 @@ _ROOT = Path(__file__).resolve().parents[1]
 
 def test_methods_resource_unified_v1_top_level_keys_registered() -> None:
     from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
-    from qchem_stack.protocols.inquanto_contract import METHODS_RESOURCE_UNIFIED_V1_DOCUMENTED_KEYS
+    from qchem_stack.internal_reports.competitor.inquanto_contract import (
+        METHODS_RESOURCE_UNIFIED_V1_DOCUMENTED_KEYS,
+    )
 
     row = {
         "resource_summary": {

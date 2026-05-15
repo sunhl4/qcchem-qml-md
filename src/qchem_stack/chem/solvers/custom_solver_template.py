@@ -6,12 +6,15 @@ Copy this module, replace ``backend_id``, and implement ``compute_mean_field`` /
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
 from qchem_stack.config import ExperimentConfig
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 class CustomExternalIntegralSolver:
@@ -67,6 +70,17 @@ class CustomExternalIntegralSolver:
     def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         raise NotImplementedError(
             "CustomExternalIntegralSolver.get_integrals is a template hook for MO/AO integrals."
+        )
+
+    def build_embedding_input_system(
+        self,
+        reference: ClassicalMeanFieldReference,
+        *,
+        representation: str,
+    ) -> dict[str, Any]:
+        raise NotImplementedError(
+            "CustomExternalIntegralSolver.build_embedding_input_system is a template hook for "
+            "embedding_input_representation payload exports."
         )
 
 

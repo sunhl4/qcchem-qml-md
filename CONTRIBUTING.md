@@ -61,6 +61,16 @@ Targeted markers (see `pyproject.toml`): `-m l1_excited`, `-m l1_md_ml`, `-m l3`
 
 **Parity / `computables_rich`（可选 repro）**：`parity_integrations.include_computables_rich_in_repro: true` 时的 workflow-preview 对齐见 `tests/test_workflow_preview_repro_alignment.py`；FastAPI 侧 `POST /v1/meta/workflow-preview` 烟测见 `tests/test_api_runs.py`（需 `pip install -e ".[api]"`，CI 已装）。
 
+## PySCF boundary coding rule
+
+For PySCF-related refactors, keep module boundaries stable:
+
+- Put active-space, one-body, and Lowdin matrix transformations in `src/qchem_stack/chem/integrals/`.
+- Put AO/Lowdin view dataclasses in `src/qchem_stack/chem/systems/`.
+- Keep `src/qchem_stack/chem/drivers/pyscf_driver.py` focused on compatibility facade and workflow orchestration.
+
+If you add new helper logic, prefer the new modules first and keep legacy import paths compatible where practical.
+
 ## Parity export / golden fixture
 
 Config-only Methods alignment (no PySCF run):

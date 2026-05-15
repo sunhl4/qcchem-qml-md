@@ -26,9 +26,9 @@ const quickCards = [
     to: '/reference/cli-and-scripts',
   },
   {
-    title: '对标与路线',
-    description: '查看 InQuanto 对标框架与收敛计划。',
-    to: '/parity/public-matrix',
+    title: '架构与路线',
+    description: '查看产品架构、能力边界与迭代计划。',
+    to: '/product/roadmap',
   },
 ];
 
@@ -172,7 +172,7 @@ export default function Home(): ReactNode {
     {label: '文档模块', value: `${moduleCount || 0}+`},
     {label: '教程专题', value: `${getPrefixCount('tutorial')}+`},
     {label: '参考页面', value: `${getPrefixCount('reference')}+`},
-    {label: '对标与路线', value: `${getPrefixCount('parity')}+`},
+    {label: '产品与架构页', value: `${getPrefixCount('product') + getPrefixCount('concept')}+`},
   ];
   return (
     <Layout
@@ -188,7 +188,7 @@ export default function Home(): ReactNode {
                 快速入口
               </Heading>
               <p className={styles.sectionSubtitle}>
-                按使用路径组织：先上手，再深入架构与接口，最后做对标与规划。
+                按使用路径组织：先上手，再深入架构与接口，再做工程规划。
               </p>
             </div>
             <div className={styles.quickGrid}>
@@ -211,7 +211,7 @@ export default function Home(): ReactNode {
               <Heading as="h3">推荐阅读路径</Heading>
               <p>
                 产品能力 → 新手路径 → 四柱指南（P1/P2/P3/P4）→ CLI/HTTP
-                → 对标与路线。
+                → 架构与路线。
               </p>
             </div>
             <div className={styles.apiQuickCopyCard}>

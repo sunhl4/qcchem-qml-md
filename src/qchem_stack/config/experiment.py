@@ -14,6 +14,7 @@ from typing import Any
 from pydantic import BaseModel, Field, model_validator
 
 from ._experiment_validation import (
+    preprocess_precomputed_bundle_path,
     preprocess_top_level_yaml_dict,
     validate_avas_strategy_requires_pyscf_labels,
     validate_embedding_atom_indices_within_molecule,
@@ -69,6 +70,7 @@ class ExperimentConfig(BaseModel):
             preprocess_experiment_dict_geometry_files(
                 top_level, base_dir=Path(geometry_files_base_dir)
             )
+            preprocess_precomputed_bundle_path(top_level, base_dir=Path(geometry_files_base_dir))
         return cls.model_validate(top_level)
 
     @model_validator(mode="after")

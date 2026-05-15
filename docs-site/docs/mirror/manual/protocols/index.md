@@ -1,6 +1,6 @@
 ---
 title: Protocols 概览（五阶段）
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/manual/protocols_overview.html"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/manual/protocols_overview.html"
 diataxis: concept
 pillar: P2
 status: partial
@@ -11,15 +11,15 @@ i18n_key: manual.protocols
 
 # Protocols 概览（五阶段） <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto 镜像路径: <code>manual / protocols</code> · <a href="/en/mirror/manual/protocols/">English version</a></p>
+<p class="mirror-breadcrumb">手册镜像节点路径: <code>manual / protocols</code> · <a href="/en/mirror/manual/protocols/">English version</a></p>
 
 ::: info 镜像元信息
-- **状态**: 部分对齐
+- **状态**: 部分实现
 - **四柱归属**: P2 算法与协议
 - **Diátaxis**: Concept
 - **对应模块**: `qchem_stack.protocols.PauliAveragingProtocol`
 - **里程碑**: —
-- **InQuanto 锚点**: [https://docs.quantinuum.com/inquanto/manual/protocols_overview.html](https://docs.quantinuum.com/inquanto/manual/protocols_overview.html)
+- **参考文档 URL**: [https://docs.quantinuum.com/inquanto/manual/protocols_overview.html](https://docs.quantinuum.com/inquanto/manual/protocols_overview.html)
 :::
 
 ## 它是什么
@@ -28,9 +28,9 @@ instantiate → build → compile → run → evaluate 五阶段；可挂噪声�
 
 ## 我们的实现
 
-**部分对齐** — 对应模块: `qchem_stack.protocols.PauliAveragingProtocol`
+**部分实现** — 对应模块: `qchem_stack.protocols.PauliAveragingProtocol`
 
-字段或行为已落地但与 InQuanto 公开语义不完全等价；详细 caveat 见 [公开 parity 矩阵](/parity/public-matrix)。
+字段或行为已落地，但与参考文档公开语义可能不完全一致；说明见 [能力概览与路线图](/product/roadmap)。
 
 ## 本节子树
 
@@ -39,8 +39,8 @@ instantiate → build → compile → run → evaluate 五阶段；可挂噪声�
 
 ## 相关
 
-- [公开 parity 矩阵](/parity/public-matrix)
+- [能力概览与路线图](/product/roadmap)
 - [工程分层架构](/concept/engineering-architecture)
-- [竞争定位与路线图](/concept/competitive-positioning)
+- [产品路线图](/product/roadmap)
 - [15 分钟上手](/tutorial/quickstart)
 - [IA slug 映射](/meta/ia-mapping)

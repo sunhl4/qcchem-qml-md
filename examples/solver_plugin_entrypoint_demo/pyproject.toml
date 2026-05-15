@@ -1,0 +1,16 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qchem-solver-entrypoint-demo"
+version = "0.1.0"
+description = "Minimal external solver plugin for qchem_stack entry-point discovery"
+requires-python = ">=3.10"
+dependencies = ["qchem-stack>=0.1.0", "numpy>=1.24"]
+
+[project.entry-points."qchem_stack.chem_solvers"]
+entrypoint_demo = "qchem_solver_entrypoint_demo.demo_solver:EntrypointDemoIntegralSolver"
+
+[tool.setuptools.packages.find]
+where = ["src"]

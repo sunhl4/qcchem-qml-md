@@ -31,4 +31,4 @@ description: 按 P1-P4 阅读 qchem-stack，从化学建模到作业与可复现
 2. [工作流与 YAML 概览](/tutorial/workflow)
 3. [P1-P4 指南](#四柱入口)
 4. [命令行与脚本](/reference/cli-and-scripts) 与 [HTTP API](/reference/http-api-sqlite-jobs)
-5. [公开对标矩阵](/parity/public-matrix)（参与验收或路线规划时）
+5. [产品路线图](/product/roadmap)（参与验收或路线规划时）

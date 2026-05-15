@@ -1,6 +1,6 @@
 ---
 title: Tackling larger systems with fragmentation
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html"
 diataxis: tutorial
 pillar: P1
 status: partial
@@ -11,7 +11,7 @@ i18n_key: tutorials.fragmentation.dmet_basic
 
 # Tackling larger systems with fragmentation <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>tutorials / fragmentation / dmet_basic</code> · <a href="/mirror/tutorials/fragmentation/dmet_basic/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>tutorials / fragmentation / dmet_basic</code> · <a href="/mirror/tutorials/fragmentation/dmet_basic/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Partial
@@ -19,23 +19,23 @@ i18n_key: tutorials.fragmentation.dmet_basic
 - **Diátaxis**: Tutorial
 - **Module**: `qchem_stack.chem.embedding.dmet`
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html](https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html](https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
 **Partial** — Module: `qchem_stack.chem.embedding.dmet`
 
-Fields or behavior are present but do not fully match InQuanto public semantics; see [Public parity matrix](/en/parity/public-matrix) for caveats.
+Fields or behavior may differ from the public reference text; see [Capabilities & roadmap](/en/product/roadmap).
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

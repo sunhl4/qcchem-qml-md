@@ -42,12 +42,41 @@ from qchem_stack.chem.solvers.my_backend_solver import MyBackendIntegralSolver
 register_solver("my_backend", MyBackendIntegralSolver.from_experiment_config)
 ```
 
+If the same solver id is already registered, the default is to raise `SolverRegistrationError`. Use `overwrite=True` only when you intentionally replace the implementation:
+
+```python
+register_solver("my_backend", MyBackendIntegralSolver.from_experiment_config, overwrite=True)
+```
+
 Then use:
 
 ```yaml
 scf:
   driver: my_backend
 ```
+
+`scf.driver` is any non-empty solver id string without internal whitespace (normalized to lower case). `create_solver` raises `UnknownSolverError` when the id is syntactically valid but not registered, and `InvalidSolverIdError` for malformed ids (e.g. all whitespace).
+
+### 3a) Installable plugins (pip + entry points)
+
+No in-repo `register_solver` call is required: declare the `qchem_stack.chem_solvers` entry point group in your plugin’s `pyproject.toml`; discovery runs on first registry access after install. See the repo guide [Solver Entry Point plugin install/publish](../../../../docs/solver_entrypoint_plugin_安装与发布指南.md) and the sample under `examples/solver_plugin_entrypoint_demo/`.
+
+### 3b) Introspection and entry-point conflict policy
+
+To debug “who registered this driver”:
+
+```python
+from qchem_stack.chem.solvers import registered_solvers_detail, set_entrypoint_conflict_policy
+
+# Read-only mapping: solver_id -> (source: builtin|entrypoint|runtime, provider string)
+for sid, meta in registered_solvers_detail().items():
+    print(sid, meta.source, meta.provider)
+```
+
+When multiple entry points target the **same** solver name:
+
+- `set_entrypoint_conflict_policy("warn")` (**default**): emit `RuntimeWarning` and keep the **first** successful registration after stable `(name, value)` sorting.
+- `set_entrypoint_conflict_policy("strict")`: raise `SolverRegistrationError` on conflict—useful for CI / hard gates.
 
 If you want a runnable reference first:
 
@@ -88,3 +117,5 @@ After implementing canonical-pack-equivalent integral support, switch that capab
 
 - [Unified backend adapter I/O contract](/en/guide/chemistry-and-embedding/backend-adapter-unified-io)
 - [CLI and scripts](/en/reference/cli-and-scripts)
+- In-repo: [Solver Entry Point plugin install/publish](../../../../docs/solver_entrypoint_plugin_安装与发布指南.md)
+- Docusaurus mirror (same repo): `docusaurus-site/docs/guide/backend-adapter-quickstart.md` (`cd docusaurus-site && npm start`)

@@ -1,6 +1,6 @@
 ---
 title: PMSV and SPAM
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam"
 diataxis: concept
 pillar: P3
 status: shipped
@@ -11,7 +11,7 @@ i18n_key: manual.noise_mitigation.pmsv_spam
 
 # PMSV and SPAM <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>manual / noise_mitigation / pmsv_spam</code> · <a href="/mirror/manual/noise_mitigation/pmsv_spam/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>manual / noise_mitigation / pmsv_spam</code> · <a href="/mirror/manual/noise_mitigation/pmsv_spam/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Shipped
@@ -19,12 +19,12 @@ i18n_key: manual.noise_mitigation.pmsv_spam
 - **Diátaxis**: Concept
 - **Module**: `qchem_stack.mitigation`
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam](https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam](https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
@@ -32,8 +32,8 @@ This page mirrors the corresponding node in the public InQuanto tree. Open the I
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

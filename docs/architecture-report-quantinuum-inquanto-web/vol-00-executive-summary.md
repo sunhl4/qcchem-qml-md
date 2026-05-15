@@ -2,7 +2,7 @@
 
 **读者**：架构师、产品线负责人、文档站负责人。  
 **证据等级**：本卷区分 **已证实**（直接抓取公开 HTML 或 manifest 钉扎）与 **推断**（由 URL 形态、交叉链接与行业惯例推出）。  
-**机器真源**：[`docs-site/scripts/inquanto-tree.yaml`](../../docs-site/scripts/inquanto-tree.yaml)（`site_meta.source_pin_date`、`inquanto_version_seen`）。
+**机器真源**：[`docs-site/scripts/mirror-doc-tree.yaml`](../../docs-site/scripts/mirror-doc-tree.yaml)（`site_meta.source_pin_date`、`upstream_doc_version_seen`）。
 
 ---
 
@@ -82,7 +82,7 @@ flowchart TB
 |------|-----------------|---------------------------|
 | 三柱营销枢纽 | 有 | 首页四柱 + `/product/` 产品叙事 |
 | 全树 URL 索引 | Sphinx 侧栏 + 搜索 | `/mirror/` + `MirrorTree` + YAML manifest |
-| 版本钉扎 | HTML title 中带版本 | `inquanto-tree.yaml` `site_meta` |
+| 版本钉扎 | HTML title 中带版本 | `mirror-doc-tree.yaml` `site_meta` |
 | 双语 | 以英文为主 | 根中文 + `/en/` 部分页 |
 | Nexus 真链 | 有 | 明确 `n/a` + 本地 FastAPI/SQLite 类比 |
 

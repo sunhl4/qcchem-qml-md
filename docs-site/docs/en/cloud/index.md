@@ -6,4 +6,4 @@ Contract stubs for a **self-hosted** multi-tenant simulator story — not Nexus.
 - [Backend registry](/en/cloud/backend-registry)
 - [Jobs & logs](/en/cloud/jobs-and-logs)
 
-See [HTTP API](/en/reference/http-api-sqlite-jobs) and [parity matrix](/en/parity/public-matrix) for scope boundaries.
+See [HTTP API](/en/reference/http-api-sqlite-jobs) and [parity matrix](/en/product/roadmap) for scope boundaries.

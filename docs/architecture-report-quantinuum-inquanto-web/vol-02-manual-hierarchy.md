@@ -1,7 +1,7 @@
 # Vol.02 Manual 全层级 — 目的、依赖与交叉引用模式
 
 **读者**：技术写作者、量子化学 / QC 架构师。  
-**真源**：[`inquanto-tree.yaml`](../../docs-site/scripts/inquanto-tree.yaml) 中 `manual:` 子树；抽样页面 **Protocols**、**Quick-start**（已抓取）。
+**真源**：[`mirror-doc-tree.yaml`](../../docs-site/scripts/mirror-doc-tree.yaml) 中 `manual:` 子树；抽样页面 **Protocols**、**Quick-start**（已抓取）。
 
 ---
 

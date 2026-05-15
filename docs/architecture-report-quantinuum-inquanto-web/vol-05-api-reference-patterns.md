@@ -34,7 +34,7 @@
 
 ## 4. manifest 中 `classes:` 块
 
-[`inquanto-tree.yaml`](../../docs-site/scripts/inquanto-tree.yaml) 在 `api.*.classes` 下列出 **算法 / 协议** 等级别的公开类；本站 `scaffold-mirror.mjs` 为每个类叶生成 **独立 mirror URL** — 这是对 Sphinx 默认「单页多锚」的 **信息架构增强**（利于分享与状态徽章）。
+[`mirror-doc-tree.yaml`](../../docs-site/scripts/mirror-doc-tree.yaml) 在 `api.*.classes` 下列出 **算法 / 协议** 等级别的公开类；本站 `scaffold-mirror.mjs` 为每个类叶生成 **独立 mirror URL** — 这是对 Sphinx 默认「单页多锚」的 **信息架构增强**（利于分享与状态徽章）。
 
 ---
 

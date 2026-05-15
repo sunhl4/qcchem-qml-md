@@ -1,9 +1,11 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any, Literal
 
 import numpy as np
 
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
 from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import ChemistryExtendedSpec, ExperimentConfig
@@ -83,15 +85,7 @@ class PySCFIntegralSolver:
 
     @classmethod
     def from_experiment_config(cls, cfg: ExperimentConfig) -> PySCFIntegralSolver:
-        m = cfg.molecule
-        sys = MolecularSystem(
-            symbols=m.symbols,
-            coordinates_bohr=np.asarray(m.coordinates_in_bohr(), dtype=float),
-            charge=m.charge,
-            multiplicity=m.multiplicity,
-            basis=m.basis,
-            ecp=m.ecp,
-        )
+        sys = cls._molecular_system_from_config(cfg)
         scf = cfg.scf
         inst = cls(
             sys,
@@ -109,6 +103,18 @@ class PySCFIntegralSolver:
         inst.set_physical_data(cfg)
         return inst
 
+    @staticmethod
+    def _molecular_system_from_config(cfg: ExperimentConfig) -> MolecularSystem:
+        m = cfg.molecule
+        return MolecularSystem(
+            symbols=m.symbols,
+            coordinates_bohr=np.asarray(m.coordinates_in_bohr(), dtype=float),
+            charge=m.charge,
+            multiplicity=m.multiplicity,
+            basis=m.basis,
+            ecp=m.ecp,
+        )
+
     def _scf_control_meta(self) -> dict[str, Any]:
         return {
             "scf_chkfile": self.chkfile,
@@ -125,10 +131,7 @@ class PySCFIntegralSolver:
         }
 
     def _make_mol(self, gto: Any) -> Any:
-        parts = []
-        for sym, xyz in zip(self.system.symbols, self.system.coordinates_bohr, strict=True):
-            parts.append(f"{sym} {float(xyz[0]):.12f} {float(xyz[1]):.12f} {float(xyz[2]):.12f}")
-        atom = "; ".join(parts)
+        atom = self._atom_block()
         symm_kw: dict[str, Any] = {}
         symm = self.chemistry_extended.pyscf_symmetry
         if symm is not False and symm is not None:
@@ -147,6 +150,12 @@ class PySCFIntegralSolver:
             unit="Bohr",
             **symm_kw,
         )
+
+    def _atom_block(self) -> str:
+        parts = []
+        for sym, xyz in zip(self.system.symbols, self.system.coordinates_bohr, strict=True):
+            parts.append(f"{sym} {float(xyz[0]):.12f} {float(xyz[1]):.12f} {float(xyz[2]):.12f}")
+        return "; ".join(parts)
 
     def _base_driver_meta(
         self,
@@ -194,6 +203,15 @@ class PySCFIntegralSolver:
         if self.diis_space_dimension is not None and hasattr(mf, "diis_space"):
             mf.diis_space = int(self.diis_space_dimension)
 
+    def _chkfile_present(self) -> bool:
+        return bool(self.chkfile and Path(self.chkfile).is_file())
+
+    def _augment_meta_with_ddcosmo(self, meta: dict[str, Any]) -> dict[str, Any]:
+        if self.chemistry_extended.solvent_model == "ddcosmo":
+            meta["solvent"] = "ddcosmo"
+            meta["ddcosmo_epsilon"] = float(self.chemistry_extended.ddcosmo_epsilon)
+        return meta
+
     def _build_mean_field_factory(self, gto_mod: Any, scf_mod: Any) -> Any:
         mol = self._make_mol(gto_mod)
         if self.method == "RHF":
@@ -219,10 +237,7 @@ class PySCFIntegralSolver:
     def build_molecular_mf_without_kernel(self) -> Any:
         gto, scf = require_pyscf()
         mf = self._build_mean_field_factory(gto, scf)
-        import os
-
-        chk_present = bool(self.chkfile and os.path.isfile(self.chkfile))
-        self._apply_scf_controls(mf, chkfile_present=chk_present)
+        self._apply_scf_controls(mf, chkfile_present=self._chkfile_present())
         return mf
 
     def idle_molecular_driver_meta(self) -> dict[str, Any]:
@@ -232,10 +247,7 @@ class PySCFIntegralSolver:
             pbc_kpoint_mesh=None,
             pbc_active_space_kpoint_index=None,
         )
-        if self.chemistry_extended.solvent_model == "ddcosmo":
-            meta["solvent"] = "ddcosmo"
-            meta["ddcosmo_epsilon"] = float(self.chemistry_extended.ddcosmo_epsilon)
-        return meta
+        return self._augment_meta_with_ddcosmo(meta)
 
     def set_physical_data(self, cfg: ExperimentConfig) -> None:
         """Re-bind physical system and SCF controls (Tangelo ``set_physical_data`` analog)."""
@@ -244,15 +256,7 @@ class PySCFIntegralSolver:
                 "PySCFIntegralSolver.set_physical_data requires cfg.scf.driver='pyscf' "
                 f"(got {cfg.scf.driver!r})."
             )
-        m = cfg.molecule
-        self.system = MolecularSystem(
-            symbols=m.symbols,
-            coordinates_bohr=np.asarray(m.coordinates_in_bohr(), dtype=float),
-            charge=m.charge,
-            multiplicity=m.multiplicity,
-            basis=m.basis,
-            ecp=m.ecp,
-        )
+        self.system = self._molecular_system_from_config(cfg)
         scf = cfg.scf
         self.method = scf.method
         self.chemistry_extended = cfg.chemistry_extended
@@ -264,6 +268,46 @@ class PySCFIntegralSolver:
         self.diis_space_dimension = scf.diis_space_dimension
         self.density_fit = scf.density_fit
         self.density_fit_auxbasis = scf.density_fit_auxbasis
+
+    def _resolve_active_space_spec(self, kwargs: dict[str, Any]) -> tuple[int, int]:
+        ncas_raw = kwargs.get("n_active_orbitals", kwargs.get("ncas"))
+        nele_raw = kwargs.get("n_active_electrons", kwargs.get("nelecas"))
+        if ncas_raw is None or nele_raw is None:
+            raise ValueError(
+                "get_integrals requires n_active_orbitals/n_active_electrons "
+                "(aliases: ncas/nelecas)."
+            )
+        ncas = int(ncas_raw)
+        nelecas = int(nele_raw)
+        if ncas <= 0 or nelecas <= 0:
+            raise ValueError("n_active_orbitals and n_active_electrons must be positive integers.")
+        return ncas, nelecas
+
+    @staticmethod
+    def _configure_cas_frozen_orbitals(cas: Any, frozen: Any) -> None:
+        if frozen is None:
+            return
+        if not isinstance(frozen, (list, tuple)):
+            raise TypeError("frozen_orbitals must be a list/tuple of orbital indices.")
+        cas.frozen = sorted(set(int(i) for i in frozen))
+
+    @staticmethod
+    def _ensure_real_tensor(arr: np.ndarray, *, label: str, tol: float = 1e-7) -> np.ndarray:
+        if np.max(np.abs(arr.imag)) > tol:
+            raise ValueError(f"{label} have non-trivial imaginary part.")
+        return np.asarray(arr.real, dtype=float)
+
+    @staticmethod
+    def _restore_eri_to_rank4(ao2mo_mod: Any, h2: np.ndarray, ncas: int) -> np.ndarray:
+        h2a = np.asarray(h2)
+        if h2a.ndim == 4:
+            return h2a
+        h2_restore_input = h2a
+        if np.iscomplexobj(h2_restore_input):
+            if np.max(np.abs(h2_restore_input.imag)) > 1e-7:
+                raise ValueError("Active-space integrals have non-trivial imaginary part.")
+            h2_restore_input = np.asarray(h2_restore_input.real, dtype=float)
+        return np.asarray(ao2mo_mod.restore(1, h2_restore_input, ncas))
 
     def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         """
@@ -283,17 +327,7 @@ class PySCFIntegralSolver:
             spatial_mo_eri_pyscf_to_openfermion_mo_ordering,
         )
 
-        ncas_raw = kwargs.get("n_active_orbitals", kwargs.get("ncas"))
-        nele_raw = kwargs.get("n_active_electrons", kwargs.get("nelecas"))
-        if ncas_raw is None or nele_raw is None:
-            raise ValueError(
-                "get_integrals requires n_active_orbitals/n_active_electrons "
-                "(aliases: ncas/nelecas)."
-            )
-        ncas = int(ncas_raw)
-        nelecas = int(nele_raw)
-        if ncas <= 0 or nelecas <= 0:
-            raise ValueError("n_active_orbitals and n_active_electrons must be positive integers.")
+        ncas, nelecas = self._resolve_active_space_spec(kwargs)
         if self.method not in ("RHF", "ROHF"):
             raise NotImplementedError(
                 f"get_integrals currently supports RHF/ROHF only (got method={self.method!r})."
@@ -307,27 +341,13 @@ class PySCFIntegralSolver:
             raise RuntimeError("SCF did not converge; cannot build active-space integrals.")
         mo = np.asarray(mf.mo_coeff, dtype=float)
         cas = mcscf.CASCI(mf, ncas, nelecas)
-        frozen = kwargs.get("frozen_orbitals")
-        if frozen is not None:
-            if not isinstance(frozen, (list, tuple)):
-                raise TypeError("frozen_orbitals must be a list/tuple of orbital indices.")
-            cas.frozen = sorted(set(int(i) for i in frozen))
+        self._configure_cas_frozen_orbitals(cas, kwargs.get("frozen_orbitals"))
         h1, e_core = cas.get_h1eff(mo)
         h2 = cas.get_h2eff(mo)
         h1a = np.asarray(h1)
-        h2a = np.asarray(h2)
-        # PySCF's ao2mo.restore only accepts real-valued ERI tensors.
-        if h2a.ndim != 4:
-            h2_restore_input = h2a
-            if np.iscomplexobj(h2_restore_input):
-                if np.max(np.abs(h2_restore_input.imag)) > 1e-7:
-                    raise ValueError("Active-space integrals have non-trivial imaginary part.")
-                h2_restore_input = np.asarray(h2_restore_input.real, dtype=float)
-            h2a = np.asarray(ao2mo.restore(1, h2_restore_input, ncas))
-        if np.max(np.abs(h1a.imag)) > 1e-7 or np.max(np.abs(h2a.imag)) > 1e-7:
-            raise ValueError("Active-space integrals have non-trivial imaginary part.")
-        h1_real = np.asarray(h1a.real, dtype=float)
-        h2_chemist = np.asarray(h2a.real, dtype=float)
+        h2a = self._restore_eri_to_rank4(ao2mo, np.asarray(h2), ncas)
+        h1_real = self._ensure_real_tensor(h1a, label="Active-space one-electron integrals")
+        h2_chemist = self._ensure_real_tensor(h2a, label="Active-space two-electron integrals")
         h2_openfermion = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(h2_chemist)
 
         return {
@@ -366,18 +386,13 @@ class PySCFIntegralSolver:
             )
         gto, scf = require_pyscf()
         mf = self._build_mean_field_factory(gto, scf)
-        import os
-
-        chk_present = bool(self.chkfile and os.path.isfile(self.chkfile))
-        self._apply_scf_controls(mf, chkfile_present=chk_present)
+        self._apply_scf_controls(mf, chkfile_present=self._chkfile_present())
         meta = self._base_driver_meta(
             pbc=False,
             pbc_kpoint_mesh=None,
             pbc_active_space_kpoint_index=None,
         )
-        if self.chemistry_extended.solvent_model == "ddcosmo":
-            meta["solvent"] = "ddcosmo"
-            meta["ddcosmo_epsilon"] = float(self.chemistry_extended.ddcosmo_epsilon)
+        meta = self._augment_meta_with_ddcosmo(meta)
         e = float(mf.kernel())
         return MolecularMeanFieldResult(
             mf=mf,
@@ -412,10 +427,7 @@ class PySCFIntegralSolver:
             mf = pbc_scf.hf.RHF(cell)
             n_k = 1
 
-        import os
-
-        chk_present = bool(self.chkfile and os.path.isfile(self.chkfile))
-        self._apply_scf_controls(mf, chkfile_present=chk_present)
+        self._apply_scf_controls(mf, chkfile_present=self._chkfile_present())
 
         meta = self._base_driver_meta(
             pbc=True,
@@ -464,10 +476,7 @@ class PySCFIntegralSolver:
         pbc = self.chemistry_extended.pbc_cell_vectors_bohr
         assert pbc is not None
         a = np.asarray(pbc, dtype=float)
-        parts = []
-        for sym, xyz in zip(self.system.symbols, self.system.coordinates_bohr, strict=True):
-            parts.append(f"{sym} {float(xyz[0]):.12f} {float(xyz[1]):.12f} {float(xyz[2]):.12f}")
-        atom = "; ".join(parts)
+        atom = self._atom_block()
         return gto_pbc.M(
             atom=atom,
             a=a,
@@ -476,3 +485,72 @@ class PySCFIntegralSolver:
             spin=self.system.multiplicity - 1,
             unit="Bohr",
         )
+
+    def build_embedding_input_system(
+        self,
+        reference: ClassicalMeanFieldReference,
+        *,
+        representation: str,
+    ) -> dict[str, Any]:
+        """Export AO/Lowdin embedding-input payload from a unified classical reference."""
+        if self.chemistry_extended.pbc_cell_vectors_bohr is not None:
+            raise ValueError(
+                "embedding_input_representation=ao/lowdin_orth_ao is currently molecular-only (non-PBC)."
+            )
+        rep = str(representation).strip().lower()
+        if rep not in ("ao", "lowdin_orth_ao"):
+            raise ValueError(f"Unsupported embedding input representation: {representation!r}")
+        if reference.backend_tag() != "pyscf":
+            raise ValueError(
+                "PySCFIntegralSolver.build_embedding_input_system requires a PySCF classical reference."
+            )
+        mf = reference.mf
+        if rep == "ao":
+            meta = dict(reference.driver_meta)
+            meta["integral_representation"] = "ao"
+            meta["ao_reference_kind"] = "scf_object"
+            meta["ao_run_hf"] = True
+            return {
+                "schema": "embedding_input_system_v1",
+                "representation": "ao",
+                "has_run_hf": True,
+                "e_tot": float(reference.e_tot),
+                "driver_meta": meta,
+                "epistemic_bound": (
+                    "AO wrapper keeps SCF object for fragment builders; "
+                    "no full InQuanto AO driver parity claim."
+                ),
+            }
+
+        mol = mf.mol
+        s = np.asarray(mf.get_ovlp(), dtype=float)
+        evals, evecs = np.linalg.eigh(s)
+        if np.min(evals) <= 1e-12:
+            raise ValueError(
+                "AO overlap matrix is near singular; cannot build stable Lowdin basis."
+            )
+        c_low = np.asarray(evecs @ np.diag(evals**-0.5) @ evecs.T, dtype=float)
+        hcore = np.asarray(mf.get_hcore(), dtype=float)
+        h1_low = np.einsum("pi,pq,qj->ij", c_low, hcore, c_low, optimize=True)
+        dm_ao_raw = mf.make_rdm1()
+        if isinstance(dm_ao_raw, (tuple, list)):
+            dm_ao = np.asarray(dm_ao_raw[0], dtype=float) + np.asarray(dm_ao_raw[1], dtype=float)
+        else:
+            dm_ao = np.asarray(dm_ao_raw, dtype=float)
+        c_inv = np.linalg.inv(c_low)
+        dm_low = np.asarray(c_inv @ dm_ao @ c_inv.T, dtype=float)
+        meta = dict(reference.driver_meta)
+        meta["integral_representation"] = "lowdin_orth_ao"
+        meta["lowdin_basis_transform"] = "s^-1/2"
+        return {
+            "schema": "embedding_input_system_v1",
+            "representation": "lowdin_orth_ao",
+            "n_spatial_orbitals": int(h1_low.shape[0]),
+            "rdm1_trace": float(np.trace(dm_low)),
+            "constant": float(mol.energy_nuc()),
+            "driver_meta": meta,
+            "epistemic_bound": (
+                "Lowdin AO tensors are provided for open embedding workflows "
+                "(not a closed-source embedding product clone)."
+            ),
+        }

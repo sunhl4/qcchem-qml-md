@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from qchem_stack.protocols.inquanto_contract import inquanto_gap_categories
+from qchem_stack.internal_reports.competitor.inquanto_contract import inquanto_gap_categories
 
 _ROOT = Path(__file__).resolve().parents[1]
 _MATRIX = _ROOT / "docs" / "inquanto_public_parity_matrix.md"
@@ -31,7 +31,8 @@ def _section_nums_from_anchor(anchor: str) -> set[int]:
 
 
 def _require_docs_md_exists(rel: str) -> None:
-    p = (_ROOT / rel.strip()).resolve()
+    rel_path = rel.split("§", 1)[0].strip()
+    p = (_ROOT / rel_path).resolve()
     assert p.is_file(), f"missing docs anchor path: {rel}"
 
 

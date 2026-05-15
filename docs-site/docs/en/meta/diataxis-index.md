@@ -12,12 +12,12 @@ How mother docs under `qchem_qml_md/docs/` map into this site. Full bilingual ta
 | Topic | Path |
 |-------|------|
 | Engineering architecture | [/en/concept/engineering-architecture](/en/concept/engineering-architecture) |
-| Competitive positioning | [/en/concept/competitive-positioning](/en/concept/competitive-positioning) |
+| Competitive positioning | [/en/product/roadmap](/en/product/roadmap) |
 | Architecture boundaries | [/en/concept/architecture-boundaries](/en/concept/architecture-boundaries) |
 | Launch / Retrieve (Nexus analog) | [/en/concept/launch-retrieve-nexus-analog](/en/concept/launch-retrieve-nexus-analog) |
 | Mitigation mapping | [/en/concept/mitigation-mapping](/en/concept/mitigation-mapping) |
 | HTTP API worker memory | [/en/concept/http-api-worker-memory](/en/concept/http-api-worker-memory) |
-| Engineering memory (Quantinuum) | [/en/concept/engineering-memory-quantinuum](/en/concept/engineering-memory-quantinuum) |
+| Engineering memory (Quantinuum) | [/en/concept/engineering-architecture](/en/concept/engineering-architecture) |
 
 ## Tutorial
 
@@ -41,6 +41,6 @@ How mother docs under `qchem_qml_md/docs/` map into this site. Full bilingual ta
 
 | Topic | Path |
 |-------|------|
-| Public matrix | [/en/parity/public-matrix](/en/parity/public-matrix) |
-| L1 sign-off | [/en/parity/l1-signoff](/en/parity/l1-signoff) |
+| Public matrix | [/en/product/roadmap](/en/product/roadmap) |
+| L1 sign-off | [/en/product/roadmap](/en/product/roadmap) |
 | Other rows | Nav **Parity** — some entries point to authoritative ZH docs |

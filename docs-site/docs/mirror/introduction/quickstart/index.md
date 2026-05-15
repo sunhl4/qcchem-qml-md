@@ -1,6 +1,6 @@
 ---
 title: 快速上手
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/introduction/quickstart.html"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/introduction/quickstart.html"
 diataxis: tutorial
 pillar: P2
 status: shipped
@@ -11,7 +11,7 @@ i18n_key: introduction.quickstart
 
 # 快速上手 <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto 镜像路径: <code>introduction / quickstart</code> · <a href="/en/mirror/introduction/quickstart/">English version</a></p>
+<p class="mirror-breadcrumb">手册镜像节点路径: <code>introduction / quickstart</code> · <a href="/en/mirror/introduction/quickstart/">English version</a></p>
 
 ::: info 镜像元信息
 - **状态**: 已落地
@@ -19,7 +19,7 @@ i18n_key: introduction.quickstart
 - **Diátaxis**: Tutorial
 - **对应模块**: `qchem_stack.express`
 - **里程碑**: —
-- **InQuanto 锚点**: [https://docs.quantinuum.com/inquanto/introduction/quickstart.html](https://docs.quantinuum.com/inquanto/introduction/quickstart.html)
+- **参考文档 URL**: [https://docs.quantinuum.com/inquanto/introduction/quickstart.html](https://docs.quantinuum.com/inquanto/introduction/quickstart.html)
 :::
 
 ## 它是什么
@@ -32,8 +32,8 @@ H2/STO-3G 上以 UCCSD ansatz 与 VQE 在态向量后端跑出的最小工作流
 
 ## 相关
 
-- [公开 parity 矩阵](/parity/public-matrix)
+- [能力概览与路线图](/product/roadmap)
 - [工程分层架构](/concept/engineering-architecture)
-- [竞争定位与路线图](/concept/competitive-positioning)
+- [产品路线图](/product/roadmap)
 - [15 分钟上手](/tutorial/quickstart)
 - [IA slug 映射](/meta/ia-mapping)

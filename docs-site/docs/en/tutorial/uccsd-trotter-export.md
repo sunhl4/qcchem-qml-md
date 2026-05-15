@@ -26,7 +26,7 @@ python scripts/export_parity_criteria_table.py configs/example_h2_uccsd_trotter.
 
 ## Caveat
 
-**Bravyi–Kitaev / SCBK**: this UCCSD Trotter ansatz is **JW-only**; use HEA for BK/SCBK-transformed Hamiltonians. See the [parity matrix](/parity/public-matrix) §2.
+**Bravyi–Kitaev / SCBK**: this UCCSD Trotter ansatz is **JW-only**; use HEA for BK/SCBK-transformed Hamiltonians. See the [parity matrix](/product/roadmap) §2.
 
 ## See also
 

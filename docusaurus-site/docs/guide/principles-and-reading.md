@@ -25,10 +25,9 @@ description: 不是操作教程，而是面向深入理解的阅读路线图。
 2. [HTTP API 与 SQLite 作业](/reference/http-api-sqlite-jobs)  
 3. [命令行与脚本](/reference/cli-and-scripts)
 
-## 对标与规划（按需）
+## 规划与演进（按需）
 
-如果你参与研发对标和计划管理，再补读：
+如果你参与研发规划和计划管理，再补读：
 
-- [竞争定位](/concept/competitive-positioning)
-- [公开 parity 矩阵](/parity/public-matrix)
-- [差距与实施计划](/parity/gap-implementation-plan)
+- [工程架构](/concept/engineering-architecture)
+- [产品路线图](/product/roadmap)

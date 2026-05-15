@@ -22,20 +22,20 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 
 1. 本页（P2 路线与边界）
 2. `docs/实施总计划_InQuanto_PySCF_Tangelo.md`（详细实施）
-3. [差距与实施计划](/parity/gap-implementation-plan)（年度台账与附录锚点）
+3. [差距与实施计划](/product/roadmap)（年度台账与附录锚点）
 
 ::: info
 本页继续承载路线图语义与里程碑框架；模块级动作与任务分解统一维护在总计划文档，避免双写漂移。
 :::
 
-**文档角色**：在 [竞争定位与路线图](/concept/competitive-positioning) §6、§141 残余与 [差距与实施计划](/parity/gap-implementation-plan) 之上，给出 **P2 阶段** 的可执行分解（WBS、里程碑、闸门、非目标）。  
-**术语**：本文 **路线图 P2** = 竞品文档中的「研究深度与大体系」阶段；**不等于**「主线结构增强」历史批次（QPE 演示轨接入、Computable 薄层、TKET CI 等——已交付并收进 [差距与实施计划](/parity/gap-implementation-plan) **§3 摘要表**）。
+**文档角色**：在 [竞争定位与路线图](/product/roadmap) §6、§141 残余与 [差距与实施计划](/product/roadmap) 之上，给出 **P2 阶段** 的可执行分解（WBS、里程碑、闸门、非目标）。  
+**术语**：本文 **路线图 P2** = 竞品文档中的「研究深度与大体系」阶段；**不等于**「主线结构增强」历史批次（QPE 演示轨接入、Computable 薄层、TKET CI 等——已交付并收进 [差距与实施计划](/product/roadmap) **§3 摘要表**）。
 
 ---
 
 ## 1. 与 P1 的边界
 
-**P1（广义已闭合）**：L1 公开契约下，`repro` / `parity_snapshot` / export / CI 与矩阵 **`n/a` 诚实降级**（含 TN、BK/SCBK UCCSD Trotter）对齐；UCCSD Trotter（JW）、ZNE 机读合一、Schmidt bath 侧车、ONIOM 玩具层、CASSCF 审计轨道一步、教程与双 parity 等已落地（见 [竞争定位](/concept/competitive-positioning) §6「已闭合批次」与仓库 `docs/与InQuanto能力差距与实施计划.md`（**附录 E**））。
+**P1（广义已闭合）**：L1 公开契约下，`repro` / `parity_snapshot` / export / CI 与矩阵 **`n/a` 诚实降级**（含 TN、BK/SCBK UCCSD Trotter）对齐；UCCSD Trotter（JW）、ZNE 机读合一、Schmidt bath 侧车、ONIOM 玩具层、CASSCF 审计轨道一步、教程与双 parity 等已落地（见 [竞争定位](/product/roadmap) §6「已闭合批次」与仓库 `docs/与InQuanto能力差距与实施计划.md`（**附录 E**））。
 
 **P2 增量**：在 **不冒充闭源 L0**、**不伪造 Nexus/H 系** 前提下，把仍为 **`partial`** 或 **研究级** 的能力推进到「可写 Methods + 可回归 YAML + 文档叙事闭合」，优先：
 
@@ -88,9 +88,9 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 | **M-P2-a** | Q1 | W1 闭合 + W5 文档/registry；月度台账刷新 |
 | **M-P2-b** | Q2 | W2 最小 demo + W4 选一.depth |
 | **M-P2-c** | Q3 | W3 路径 + W6 smoke |
-| **M-P2-d** | Q4 | W7 打包；残余 `partial` 填入 [Y1 对标台账 §6](/parity/y1-alignment-ledger#y1-residual-partial-sla-template) 或升级 Y3 项 |
+| **M-P2-d** | Q4 | W7 打包；残余 `partial` 填入 [Y1 对标台账 §6](/product/roadmap#y1-residual-partial-sla-template) 或升级 Y3 项 |
 
-（若与 **Y1 台账** Q3/Q4 重叠，以台账 [Y1 对标台账](/parity/y1-alignment-ledger) 季度 OKR 为准，本文 WBS 作二级拆分。）
+（若与 **Y1 台账** Q3/Q4 重叠，以台账 [Y1 对标台账](/product/roadmap) 季度 OKR 为准，本文 WBS 作二级拆分。）
 
 ---
 
@@ -98,7 +98,7 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 
 1. **`python -m pytest`**（含 parity/export 相关测）全绿。  
 2. **`python scripts/check_parity_export_sample.py`** 通过；新增 YAML 加入脚本列表。  
-3. **[公开契约矩阵](/parity/public-matrix)** 与 **`inquanto_gap_categories`** 无矛盾；禁止未文档化的 `parity_snapshot` 顶键。  
+3. **[公开契约矩阵](/product/roadmap)** 与 **`inquanto_gap_categories`** 无矛盾；禁止未文档化的 `parity_snapshot` 顶键。  
 4. **双站**：仓库 `docs/` 与 `docs-site` 关键入口（路线图、差距计划、L1 signoff）交叉链接更新。  
 5. **公开站钉扎**：重大改版记录在 L1 signoff 或台账 §1。
 
@@ -112,11 +112,11 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 
 ## 7. 相关索引
 
-- 战略总表：[竞争定位与路线图](/concept/competitive-positioning) §5–§6。  
-- 差距总表与维护约定：[差距与实施计划](/parity/gap-implementation-plan)。  
+- 战略总表：[竞争定位与路线图](/product/roadmap) §5–§6。  
+- 差距总表与维护约定：[差距与实施计划](/product/roadmap)。  
 - **本站路由**：`/concept/p2-detailed-plan`（VitePress）；修订请以仓库 `docs/与InQuanto能力差距与实施计划.md`（附录 A） 为母稿同步。  
 - 维护角色占位：仓库 `CONTRIBUTING.md`（维护角色）。  
-- 295 节点 backlog：仓库 `docs/inquanto-node-backlog.generated.json`（波次筛选见 [Y1 对标台账](/parity/y1-alignment-ledger) §3.5）。
+- 295 节点 backlog：仓库 `docs/inquanto-node-backlog.generated.json`（波次筛选见 [Y1 对标台账](/product/roadmap) §3.5）。
 - 执行归档：仓库 `docs/execution/`（含 Day12/W2、Day25/45/65/80/90 阶段收口页）。
 
 ---
@@ -127,6 +127,6 @@ description: 研究深度 · 大体系 · 产品化前置 — WBS、里程碑、
 
 ## 8. 附录 §9–§11（ADR · W3 · W5；正文以仓库母稿为准）
 
-**ADR（P2-W2 分解范围钉扎）、P2-W3（AVAS / CASSCF `partial` 边界）、P2-W5（算法 / ansatz / fermion 映射 registry 三表）** 的**完整技术正文**已并入仓库母稿 **`docs/与InQuanto能力差距与实施计划.md`（附录 A）** 的 **§9、§10、§11**（与 [公开矩阵](/parity/public-matrix) §2–§3 强交叉维护）。本站为防双写漂移**不重复粘贴**长表；请在本地打开该 Markdown 阅读或 PR 修改。
+**ADR（P2-W2 分解范围钉扎）、P2-W3（AVAS / CASSCF `partial` 边界）、P2-W5（算法 / ansatz / fermion 映射 registry 三表）** 的**完整技术正文**已并入仓库母稿 **`docs/与InQuanto能力差距与实施计划.md`（附录 A）** 的 **§9、§10、§11**（与 [公开矩阵](/product/roadmap) §2–§3 强交叉维护）。本站为防双写漂移**不重复粘贴**长表；请在本地打开该 Markdown 阅读或 PR 修改。
 
 本页保留上述 **三个锚点 id**，供 `fix-internal-links` 与历史链接跳转到「附录入口」；与母稿锚点同名，便于全仓 `grep`。

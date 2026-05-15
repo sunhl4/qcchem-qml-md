@@ -2,7 +2,7 @@
 
 **文档性质**：描述可选 **`qchem-stack[api]`** 面与 **`jobs`** 存储的**可机读契约**；与 [ENGINEERING_ARCHITECTURE.md](/concept/engineering-architecture)（英文化分层）互补，本文偏**产品化 HTTP + 观测字段**与**竞品语义对照**。
 
-**竞品对照（公开文档口径）**：[launch_retrieve_nexus_analog.md](/concept/launch-retrieve-nexus-analog)、[inquanto_public_parity_matrix.md](/parity/public-matrix)。**不**声称实现 Quantinuum Nexus 真队列、真 HQC 或 OAuth。
+**竞品对照（公开文档口径）**：[launch_retrieve_nexus_analog.md](/concept/launch-retrieve-nexus-analog)、[inquanto_public_parity_matrix.md](/product/roadmap)。**不**声称实现 Quantinuum Nexus 真队列、真 HQC 或 OAuth。
 
 **源码入口**：`src/qchem_stack/api/app.py`、`src/qchem_stack/jobs/`、`src/qchem_stack/orchestration/run_context.py`、`src/qchem_stack/orchestration/pipeline.py`（`_attach_run_summary`、`run_pipeline_sync`）。
 
@@ -85,7 +85,7 @@ HTTP 异步入队常见键：
 
 - `qchem-jobs-worker` / `qchem-pipeline-worker`：`drain_one_queued` → `jobs/worker_dispatch.dispatch_job`。
 - `full_pipeline` → `run_full_pipeline_job` → `pipeline_result_for_job_store` → `complete`。
-- 结果白名单含 **`nexus_analog_ledger`**、缓解/张量网/QPE 侧车等键（与同步管线对齐）；与 [pipeline 侧挂接](/concept/engineering-memory-quantinuum)一致。
+- 结果白名单含 **`nexus_analog_ledger`**、缓解/张量网/QPE 侧车等键（与同步管线对齐）；与 [pipeline 侧挂接](/concept/engineering-architecture)一致。
 
 ---
 
@@ -172,7 +172,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 1. 增删 HTTP 路由或响应 `schema`：更新本文 **§5**、[ENGINEERING_ARCHITECTURE.md](/concept/engineering-architecture) §9、[README.md](/tutorial/quickstart) HTTP 段、[launch_retrieve_nexus_analog.md](/concept/launch-retrieve-nexus-analog) 表格（若行为类比变）。
 2. 增减 `meta` 键或 `full_pipeline_job_result_v1` 白名单：更新 **`pipeline_runner.py`**、[ENGINEERING_ARCHITECTURE.md](/concept/engineering-architecture) §10。
 3. 观测字段变更：更新 **§2**、`tests/test_observability_pipeline.py`（PySCF）、`tests/test_api_runs.py`（FastAPI）。
-4. 机读差距分类：视需要更新 `inquanto_contract.inquanto_gap_categories()` 与 [inquanto_public_parity_matrix.md](/parity/public-matrix)。
+4. 机读差距分类：视需要更新 `inquanto_contract.inquanto_gap_categories()` 与 [inquanto_public_parity_matrix.md](/product/roadmap)。
 
 ---
 
@@ -211,8 +211,8 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | [ENGINEERING_ARCHITECTURE.md](/concept/engineering-architecture) | 英文化分层、稳定公共面、错误类型 |
 | **本文** | 中文 **schema/端点/存储** 契约 + 上表决策 |
 | [launch_retrieve_nexus_analog.md](/concept/launch-retrieve-nexus-analog) | Nexus **语义**短表 |
-| [inquanto_public_parity_matrix.md](/parity/public-matrix) | 公开能力矩阵 |
-| [工程记忆](/concept/engineering-memory-quantinuum) | 化学/Protocol/数据流总记忆 |
+| [inquanto_public_parity_matrix.md](/product/roadmap) | 公开能力矩阵 |
+| [工程记忆](/concept/engineering-architecture) | 化学/Protocol/数据流总记忆 |
 
 ### 9.5 变更 Checklist（逐项打勾）
 

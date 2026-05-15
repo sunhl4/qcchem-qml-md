@@ -18,4 +18,4 @@ Start from **`configs/example_h2.yaml`**: note top-level blocks (`molecule`, `sc
 
 ## Wrap-up
 
-Archive **`experiment_id` / `random_seed`** plus **`repro`** slices per run for CI or [Parity matrix](/en/parity/public-matrix) exports if you own acceptance.
+Archive **`experiment_id` / `random_seed`** plus **`repro`** slices per run for CI or [Parity matrix](/en/product/roadmap) exports if you own acceptance.

@@ -1,5 +1,5 @@
 """
-Thin workflow coordinator (InQuanto-style SDK entry) over :func:`run_pipeline_from_config`.
+Thin workflow coordinator over :func:`run_pipeline_from_config`.
 
 Adds a ``methods_sidecar`` blob with :func:`~qchem_stack.protocols.computable.computables_export_dict`
 and ``hamiltonian_fingerprint`` when present in pipeline output.
@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Any
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
-from qchem_stack.integrations.inquanto_workflow_preview import workflow_preview_payload
+from qchem_stack.integrations.workflow_preview import workflow_preview_payload
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config
 from qchem_stack.protocols.computable import computables_export_dict
 

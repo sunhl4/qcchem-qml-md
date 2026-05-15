@@ -72,18 +72,13 @@ const config: Config = {
         {to: '/guide/', label: '指南', position: 'left'},
         {to: '/tutorial/quickstart', label: '教程', position: 'left'},
         {to: '/reference/cli-and-scripts', label: '参考', position: 'left'},
-        {to: '/parity/public-matrix', label: '对标', position: 'left'},
+        {to: '/product/roadmap', label: '路线图', position: 'left'},
         {to: '/changelog/', label: '更新日志', position: 'left'},
         {
           type: 'docSidebar',
           sidebarId: 'mainSidebar',
           position: 'left',
           label: '文档目录',
-        },
-        {
-          href: 'https://docs.quantinuum.com/inquanto/',
-          label: 'InQuanto 参考',
-          position: 'right',
         },
         {
           href: 'https://github.com/sunhl4/qcchem-qml-md',
@@ -119,19 +114,12 @@ const config: Config = {
               label: '云端与作业',
               to: '/cloud/overview',
             },
-            {
-              label: '对标与差距',
-              to: '/parity/competitor-benchmark',
-            },
+            {label: '产品路线图', to: '/product/roadmap'},
           ],
         },
         {
           title: '外部链接',
           items: [
-            {
-              label: 'InQuanto 官方文档',
-              href: 'https://docs.quantinuum.com/inquanto/',
-            },
             {
               label: '项目 GitHub',
               href: 'https://github.com/sunhl4/qcchem-qml-md',

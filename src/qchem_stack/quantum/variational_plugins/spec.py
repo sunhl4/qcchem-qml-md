@@ -10,6 +10,7 @@ import numpy as np
 if TYPE_CHECKING:
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.chem.pre_quantum_input import PreQuantumInput
     from qchem_stack.config import ExperimentConfig
 
 
@@ -21,6 +22,13 @@ class VariationalRunContext:
     hamiltonian: QubitHamiltonian
     executor: HamiltonianExpectationExecutor
     seed: int
+    pre_quantum_input: PreQuantumInput | None = None
+
+    def resolved_hamiltonian(self) -> QubitHamiltonian:
+        """Prefer canonical pre-quantum handoff when available."""
+        if self.pre_quantum_input is not None:
+            return self.pre_quantum_input.qubit_hamiltonian
+        return self.hamiltonian
 
 
 @dataclass

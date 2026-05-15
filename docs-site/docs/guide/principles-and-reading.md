@@ -31,7 +31,7 @@ description: "底层机制与算法 — 建议的站内阅读顺序与深度材�
 
 ## 与竞品公开文档的关系（内部研发视角）
 
-若你负责**对标与验收**，再读 [竞争定位](/concept/competitive-positioning)、[工程记忆（Quantinuum）](/concept/engineering-memory-quantinuum) 及 [Parity 分区](/parity/public-matrix) 下各篇；它们服务**内部计划与目标**，不必作为终端用户的第一阅读材料。
+若你负责**对标与验收**，再读 [竞争定位](/product/roadmap)、[工程记忆（Quantinuum）](/concept/engineering-architecture) 及 [Parity 分区](/product/roadmap) 下各篇；它们服务**内部计划与目标**，不必作为终端用户的第一阅读材料。
 
 ## 外部教材与论文（建议）
 

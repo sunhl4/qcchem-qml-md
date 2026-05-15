@@ -1,6 +1,6 @@
-# 二次量子化读表：Fock 态与费米哈密顿量（对接 InQuanto-PySCF 叙事）
+# 二次量子化读表：Fock 态与费米哈密顿量
 
-教程或调试输出里常把电子体系写成 **福克态（占据数）+ 费米子哈密顿量（产生/湮灭算符串）**。本文把这类表格按块拆开，便于对照 [InQuanto-PySCF 量子问题对照](./inquanto-pyscf-problem-analog.md) 与 `qchem_stack` 的 ``get_restricted_active_space_quantum_problem`` 输出。
+教程或调试输出里常把电子体系写成 **福克态（占据数）+ 费米子哈密顿量（产生/湮灭算符串）**。本文把这类表格按块拆开，便于对照 `qchem_stack` 的 ``get_restricted_active_space_quantum_problem`` 输出。
 
 ---
 
@@ -93,7 +93,7 @@ Fock state:
 
 ---
 
-## 5. 与 `qchem_stack` / InQuanto 教程的衔接
+## 5. 与 `qchem_stack` 教程的衔接
 
 | 你在输出里看到的 | 在开源镜像里常对应 |
 |------------------|-------------------|
@@ -101,7 +101,7 @@ Fock state:
 | 费米哈密顿表格 | ``InteractionOperator`` 或 ``df()``/`df_mo_integrals()` 展平视角 |
 | 自旋轨道数 | \(2\times\) 活性 **空间** 轨道数（RHF/RKS 限制性路径） |
 
-入口仍见：[InQuanto-PySCF 叙事对照](./inquanto-pyscf-problem-analog.md) 第一节（``get_restricted_active_space_quantum_problem``）。
+入口可见：`qchem_stack.chem.drivers.pyscf_driver.PySCFDriver.get_restricted_active_space_quantum_problem`。
 
 ---
 

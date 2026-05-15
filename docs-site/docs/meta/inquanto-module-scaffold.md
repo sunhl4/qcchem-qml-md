@@ -5,10 +5,10 @@ description: 公开站顶层与 Manual 一级分支 ↔ 本站镜像路由与工
 
 # InQuanto 公开站模块 → 本站复现骨架
 
-本文是 **信息架构母版**：左侧沿用 Quantinuum **公开** InQuanto 文档站的 **模块名与 URL 规律**（便于对照与后续改写），中间是本站已生成的 **镜像树入口**（结构与 `docs-site/scripts/inquanto-tree.yaml` 一致），右侧是 **qchem-stack 实现侧** 推荐阅读入口（你可随工程迭代改链接与说明）。
+本文是 **信息架构母版**：左侧沿用 Quantinuum **公开** InQuanto 文档站的 **模块名与 URL 规律**（便于对照与后续改写），中间是本站已生成的 **镜像树入口**（结构与 `docs-site/scripts/mirror-doc-tree.yaml` 一致），右侧是 **qchem-stack 实现侧** 推荐阅读入口（你可随工程迭代改链接与说明）。
 
 - 公开站根：`https://docs.quantinuum.com/inquanto/`（外链，非本站内容）  
-- 机读真源：`docs-site/scripts/inquanto-tree.yaml`（版本见其中 `site_meta.inquanto_version_seen`）  
+- 机读真源：`docs-site/scripts/mirror-doc-tree.yaml`（版本见其中 `site_meta.upstream_doc_version_seen`）  
 - 镜像生成：`npm run scaffold:mirror`  
 
 **说明**：镜像页正文多为占位/审计摘要；**产品说明书**仍以 [产品功能](/product/features)、[四柱指南](/guide/) 与 [Reference](/reference/cli-and-scripts) 为准。
@@ -30,7 +30,7 @@ description: 公开站顶层与 Manual 一级分支 ↔ 本站镜像路由与工
 
 ## 2. Manual 一级分支（manifest 键序）
 
-与 `vol-02-manual-hierarchy` 及 `inquanto-tree.yaml` 中 `manual.children` **键顺序** 对齐；**镜像索引** 为审计入口，**实现叙事** 以四柱与 Reference 为主。
+与 `vol-02-manual-hierarchy` 及 `mirror-doc-tree.yaml` 中 `manual.children` **键顺序** 对齐；**镜像索引** 为审计入口，**实现叙事** 以四柱与 Reference 为主。
 
 | manifest 键 | 公开标题（中） | 镜像（ZH） | 建议工程侧（可改） |
 |-------------|----------------|------------|---------------------|
@@ -63,7 +63,7 @@ description: 公开站顶层与 Manual 一级分支 ↔ 本站镜像路由与工
 ## 4. 维护约定
 
 1. **改实现**：只改上表「建议工程侧」列链接与文案；**不必**改镜像 URL（由 manifest 驱动）。  
-2. **改公开树结构**：编辑 `inquanto-tree.yaml` 后 `npm run scaffold:mirror`，再在此页 **同步增减行**（本页为人工母版）。  
+2. **改公开树结构**：编辑 `mirror-doc-tree.yaml` 后 `npm run scaffold:mirror`，再在此页 **同步增减行**（本页为人工母版）。  
 3. **可选自动化**：若希望本表由脚本从 YAML 生成，可另加 `scripts/sync-inquanto-scaffold.mjs`（当前先保持 Markdown 易改）。
 
 另见：[IA slug 映射](/meta/ia-mapping) · [安全与数据](/meta/security-and-data)。

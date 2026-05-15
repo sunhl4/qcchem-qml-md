@@ -31,7 +31,7 @@ This is **not** a how-to checklist; it is a **reading order** after you can run 
 
 ## Public-doc benchmark (internal engineering)
 
-For alignment and acceptance work, read [competitive positioning](/en/concept/competitive-positioning), [engineering memory (Quantinuum)](/en/concept/engineering-memory-quantinuum), and [Parity](/en/parity/public-matrix) — **internal targets**, not the first stop for product users.
+For alignment and acceptance work, read [competitive positioning](/en/product/roadmap), [engineering memory (Quantinuum)](/en/concept/engineering-architecture), and [Parity](/en/product/roadmap) — **internal targets**, not the first stop for product users.
 
 ## External textbooks & papers
 

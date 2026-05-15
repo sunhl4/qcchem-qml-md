@@ -13,7 +13,7 @@ Default readers are **users** (R&D, computational chemistry, platform integratio
 | **2. Usage & interfaces** | YAML, Python, HTTP, CLI | [Pillar guides](/en/guide/) · [CLI & scripts](/en/reference/cli-and-scripts) · [HTTP API](/en/reference/http-api-sqlite-jobs) |
 | **3. Implementation & theory** | Contracts, compilation/sampling paths, mitigation semantics | [Reference pages](/en/reference/http-api-sqlite-jobs) · [Concept](/en/concept/engineering-architecture) · [Principles & reading](/en/guide/principles-and-reading) |
 
-**InQuanto public-doc mapping** (295 nodes, parity matrix, etc.) is an **internal engineering target**, not required to use the product — see [Positioning & roadmap](/en/product/) and [Parity](/en/parity/public-matrix). The top nav keeps **Parity** for R&D alignment; **end users can skip** it unless you join acceptance or procurement mapping.
+**InQuanto public-doc mapping** (295 nodes, parity matrix, etc.) is an **internal engineering target**, not required to use the product — see [Positioning & roadmap](/en/product/) and [Parity](/en/product/roadmap). The top nav keeps **Parity** for R&D alignment; **end users can skip** it unless you join acceptance or procurement mapping.
 
 ## Main features (user view)
 
@@ -22,7 +22,7 @@ Default readers are **users** (R&D, computational chemistry, platform integratio
 - **Execution & analysis**: backends (statevector, Qiskit, IonStack mock), sampling, resource summaries, mitigation-related fields ([P3](/en/guide/execution-and-analysis/)).
 - **Jobs & reproducibility**: optional SQLite jobs, FastAPI submit/poll, `repro` / parity exports ([P4](/en/guide/jobs-and-reproducibility/)).
 
-Scope and non-goals: [competitive positioning](/en/concept/competitive-positioning), [engineering architecture](/en/concept/engineering-architecture).
+Scope and non-goals: [competitive positioning](/en/product/roadmap), [engineering architecture](/en/concept/engineering-architecture).
 
 ## One-page diagram: YAML → results
 

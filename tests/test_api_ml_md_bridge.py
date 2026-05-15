@@ -70,9 +70,9 @@ def test_trainer_stub_fit_via_http() -> None:
     assert art.get("meta", {}).get("n_frames") == 1
 
 
-def test_product_analog_lists_ml_md_bridge_route() -> None:
+def test_product_surface_lists_ml_md_bridge_route() -> None:
     client = TestClient(app)
-    pa = client.get("/v1/meta/product-analog").json()
+    pa = client.get("/v1/meta/product-surface").json()
     assert pa.get("ml_md_bridge") == "/v1/meta/ml-md-bridge"
-    notes = "\n".join(str(x) for x in (pa.get("emulation_notes") or []))
+    notes = "\n".join(str(x) for x in (pa.get("capability_notes") or []))
     assert "ml-md-bridge" in notes

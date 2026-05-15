@@ -9,7 +9,7 @@ description: 产品边界、路线图与内部研发对标索引（面向规划�
 
 ## 产品边界（摘要）
 
-开放编排：YAML、多后端、strict repro。不宣称闭源 wheel、Nexus 真云或商业真机对等。展开见 [竞争定位](/concept/competitive-positioning) 与 [工程分层](/concept/engineering-architecture)。
+开放编排：YAML、多后端、strict repro。不宣称闭源 wheel、Nexus 真云或商业真机对等。展开见 [竞争定位](/product/roadmap) 与 [工程分层](/concept/engineering-architecture)。
 
 ## 路线图
 
@@ -27,4 +27,4 @@ description: 产品边界、路线图与内部研发对标索引（面向规划�
 | Program Construction | [P2](/guide/algorithms-and-protocols/) · [CircuitIR](/reference/circuitir-tket-jobs) · [Mirror API](/mirror/api/algorithms/) |
 | Execution and Analysis | [P3](/guide/execution-and-analysis/) · [P4](/guide/jobs-and-reproducibility/) · [云](/cloud/) |
 
-**契约与台账**：[契约矩阵](/parity/public-matrix) · [Y1 台账](/parity/y1-alignment-ledger) · [/mirror/](/mirror/) · [安全与数据](/meta/security-and-data)。机读 backlog：`docs/inquanto-node-backlog.generated.json`（`npm run report:inquanto-backlog`）。
+**契约与台账**：[契约矩阵](/product/roadmap) · [Y1 台账](/product/roadmap) · [/mirror/](/mirror/) · [安全与数据](/meta/security-and-data)。机读 backlog：`docs/inquanto-node-backlog.generated.json`（`npm run report:inquanto-backlog`）。

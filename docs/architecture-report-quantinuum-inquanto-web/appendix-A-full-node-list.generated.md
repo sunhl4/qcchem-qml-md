@@ -1,12 +1,12 @@
 ---
 title: Appendix A — Full node list (generated)
-description: Auto-generated from inquanto-tree.yaml; 295 entries.
+description: Auto-generated from mirror-doc-tree.yaml; 295 entries.
 edit: false
 ---
 
 > **Do not hand-edit.** Regenerate with `npm run report:inquanto-appendix` from `docs-site/`.
 
-**Source pin**: 2026-04-30 · **InQuanto version (manifest)**: 5.2.3
+**Source pin**: 2026-04-30 · **Upstream doc version (manifest)**: 5.2.3
 
 **姊妹附录**: 更深拆解见 [appendix-C-deep-node-architecture.generated.md](./appendix-C-deep-node-architecture.generated.md)（约 2 万行量级，规则生成）。
 
@@ -18,7 +18,7 @@ edit: false
 | **breadcrumb** | `introduction` |
 | **title_zh** | 介绍 |
 | **title_en** | Introduction |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/introduction/ |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/introduction/ |
 | **pillar** | meta |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -49,13 +49,13 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `introduction / overview` |
-| **title_zh** | 什么是 InQuanto |
-| **title_en** | What is InQuanto? |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/introduction/overview.html |
+| **title_zh** | 产品概览（参考文档镜像） |
+| **title_en** | Product overview (reference mirror) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/introduction/overview.html |
 | **pillar** | meta |
 | **diataxis** | concept |
 | **status** | shipped |
-| **qchem_module** | — |
+| **qchem_module** | qchem_stack |
 | **milestone** | — |
 | **summary_zh** | — |
 | **summary_en** | — |
@@ -84,7 +84,7 @@ edit: false
 | **breadcrumb** | `introduction / installation` |
 | **title_zh** | 安装 |
 | **title_en** | Installation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/introduction/installation.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/introduction/installation.html |
 | **pillar** | meta |
 | **diataxis** | tutorial |
 | **status** | shipped |
@@ -117,7 +117,7 @@ edit: false
 | **breadcrumb** | `introduction / installation / system_requirements` |
 | **title_zh** | 系统要求 |
 | **title_en** | System requirements |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/introduction/system_requirements.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/introduction/system_requirements.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -150,7 +150,7 @@ edit: false
 | **breadcrumb** | `introduction / installation / troubleshooting` |
 | **title_zh** | 故障排除 |
 | **title_en** | Troubleshooting |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/introduction/troubleshooting.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/introduction/troubleshooting.html |
 | **pillar** | meta |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -183,7 +183,7 @@ edit: false
 | **breadcrumb** | `introduction / quickstart` |
 | **title_zh** | 快速上手 |
 | **title_en** | Quick-start guide |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/introduction/quickstart.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/introduction/quickstart.html |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | shipped |
@@ -216,7 +216,7 @@ edit: false
 | **breadcrumb** | `manual` |
 | **title_zh** | 用户手册 |
 | **title_en** | Manual |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/ |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/ |
 | **pillar** | meta |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -247,9 +247,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `manual / howto` |
-| **title_zh** | 如何使用 InQuanto |
-| **title_en** | How to use InQuanto |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/howto.html |
+| **title_zh** | 参考手册 · 使用说明 |
+| **title_en** | Reference manual · How-to |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/howto.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -282,7 +282,7 @@ edit: false
 | **breadcrumb** | `manual / geometry` |
 | **title_zh** | 几何 |
 | **title_en** | Geometry |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/geometry.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/geometry.html |
 | **pillar** | P1 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -315,7 +315,7 @@ edit: false
 | **breadcrumb** | `manual / express` |
 | **title_zh** | Express 数据集 |
 | **title_en** | Express data sets |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/express.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/express.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -348,7 +348,7 @@ edit: false
 | **breadcrumb** | `manual / symmetry` |
 | **title_zh** | 对称性 |
 | **title_en** | Symmetry |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/symmetry.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/symmetry.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -381,7 +381,7 @@ edit: false
 | **breadcrumb** | `manual / spaces_operators` |
 | **title_zh** | 空间 / 算符 / 状态 / 映射 |
 | **title_en** | Spaces, operators, states and mappings |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/spaces.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/spaces.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -414,7 +414,7 @@ edit: false
 | **breadcrumb** | `manual / spaces_operators / interfacing_qchem` |
 | **title_zh** | 与外部量化包接口（FCIDUMP） |
 | **title_en** | Interfacing with quantum chemistry packages (FCIDUMP) |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/spaces.html#interfacing-quantum-chemistry |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/spaces.html#interfacing-quantum-chemistry |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -447,7 +447,7 @@ edit: false
 | **breadcrumb** | `manual / spaces_operators / qubit_mapping` |
 | **title_zh** | 量子比特映射 |
 | **title_en** | Qubit mapping |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -480,7 +480,7 @@ edit: false
 | **breadcrumb** | `manual / ansatze` |
 | **title_zh** | Ansatze 概览 |
 | **title_en** | Ansatze overview |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/ansatzae_overview.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/ansatzae_overview.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -513,7 +513,7 @@ edit: false
 | **breadcrumb** | `manual / ansatze / ucc_family` |
 | **title_zh** | UCC 家族 |
 | **title_en** | UCC family |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/ansatze/ucc_family.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/ansatze/ucc_family.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -546,7 +546,7 @@ edit: false
 | **breadcrumb** | `manual / ansatze / hardware_efficient` |
 | **title_zh** | 硬件高效 ansatz（HEA） |
 | **title_en** | Hardware-efficient ansatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/ansatze/hea.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/ansatze/hea.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -579,7 +579,7 @@ edit: false
 | **breadcrumb** | `manual / minimizers` |
 | **title_zh** | 极小化器 |
 | **title_en** | Minimizers |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/minimizers.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/minimizers.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -612,7 +612,7 @@ edit: false
 | **breadcrumb** | `manual / computables` |
 | **title_zh** | Computables 概览 |
 | **title_en** | Computables overview |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/computables_overview.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/computables_overview.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -645,7 +645,7 @@ edit: false
 | **breadcrumb** | `manual / computables / atomic` |
 | **title_zh** | 原子 computable |
 | **title_en** | Atomic computables |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/computables/atomic.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/computables/atomic.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -678,7 +678,7 @@ edit: false
 | **breadcrumb** | `manual / computables / composite` |
 | **title_zh** | 复合 computable |
 | **title_en** | Composite computables |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/computables/composite_computables.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/computables/composite_computables.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -711,7 +711,7 @@ edit: false
 | **breadcrumb** | `manual / computables / primitives` |
 | **title_zh** | 原语 computable |
 | **title_en** | Primitive computables |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/computables/primitives.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/computables/primitives.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -744,7 +744,7 @@ edit: false
 | **breadcrumb** | `manual / computables / evaluating_w_protocols` |
 | **title_zh** | 用 Protocol 求值 |
 | **title_en** | Evaluating with protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/computables/evaluating_w_protocols.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/computables/evaluating_w_protocols.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -777,7 +777,7 @@ edit: false
 | **breadcrumb** | `manual / protocols` |
 | **title_zh** | Protocols 概览（五阶段） |
 | **title_en** | Protocols overview (five stages) |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols_overview.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols_overview.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -810,7 +810,7 @@ edit: false
 | **breadcrumb** | `manual / protocols / statevector` |
 | **title_zh** | 态向量 Protocol |
 | **title_en** | Statevector protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols/statevector.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols/statevector.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -843,7 +843,7 @@ edit: false
 | **breadcrumb** | `manual / protocols / averaging` |
 | **title_zh** | 平均（Pauli）Protocol |
 | **title_en** | Averaging protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols/expval.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols/expval.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -876,7 +876,7 @@ edit: false
 | **breadcrumb** | `manual / protocols / overlap` |
 | **title_zh** | 重叠 / 投影 Protocol |
 | **title_en** | Overlap protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols/overlap.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols/overlap.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -909,7 +909,7 @@ edit: false
 | **breadcrumb** | `manual / protocols / derivatives` |
 | **title_zh** | 导数 Protocol |
 | **title_en** | Derivative protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols/derivative.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols/derivative.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -942,7 +942,7 @@ edit: false
 | **breadcrumb** | `manual / protocols / phase_estimation` |
 | **title_zh** | 量子相位估计 Protocol |
 | **title_en** | Quantum phase estimation protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols/qpe.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols/qpe.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -975,7 +975,7 @@ edit: false
 | **breadcrumb** | `manual / protocols / resource_estimation` |
 | **title_zh** | 资源估计 |
 | **title_en** | Resource estimation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/protocols/resource_estimation.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/protocols/resource_estimation.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -1008,7 +1008,7 @@ edit: false
 | **breadcrumb** | `manual / algorithms` |
 | **title_zh** | Algorithms 概览 |
 | **title_en** | Algorithms overview |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/algorithms_overview.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/algorithms_overview.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1041,7 +1041,7 @@ edit: false
 | **breadcrumb** | `manual / algorithms / vqe` |
 | **title_zh** | VQE |
 | **title_en** | VQE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_vqe.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_vqe.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -1074,7 +1074,7 @@ edit: false
 | **breadcrumb** | `manual / algorithms / adapt` |
 | **title_zh** | ADAPT-VQE 家族 |
 | **title_en** | ADAPT-VQE family |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_adapt.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_adapt.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1107,7 +1107,7 @@ edit: false
 | **breadcrumb** | `manual / algorithms / excited` |
 | **title_zh** | 激发态（VQD / QSE / SCEOM） |
 | **title_en** | Excited states (VQD / QSE / SCEOM) |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_excited.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_excited.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1140,7 +1140,7 @@ edit: false
 | **breadcrumb** | `manual / algorithms / qpe` |
 | **title_zh** | 量子相位估计算法 |
 | **title_en** | Quantum phase estimation algorithms |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_qpe.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_qpe.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -1173,7 +1173,7 @@ edit: false
 | **breadcrumb** | `manual / algorithms / time_evolution` |
 | **title_zh** | 时间演化（VQS / McLachlan） |
 | **title_en** | Time evolution (VQS / McLachlan) |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/algorithms/te_vqs.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/algorithms/te_vqs.html |
 | **pillar** | P2 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -1206,7 +1206,7 @@ edit: false
 | **breadcrumb** | `manual / embedding` |
 | **title_zh** | 嵌入与 DMET |
 | **title_en** | Embeddings and DMET |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/dmet.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/dmet.html |
 | **pillar** | P1 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1239,7 +1239,7 @@ edit: false
 | **breadcrumb** | `manual / embedding / dmet_intro` |
 | **title_zh** | DMET 概览 |
 | **title_en** | DMET overview |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/dmet.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/dmet.html |
 | **pillar** | P1 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1272,7 +1272,7 @@ edit: false
 | **breadcrumb** | `manual / embedding / projection_embedding` |
 | **title_zh** | 投影嵌入 |
 | **title_en** | Projection embedding |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/projection_embedding.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/projection_embedding.html |
 | **pillar** | P1 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1305,7 +1305,7 @@ edit: false
 | **breadcrumb** | `manual / embedding / nevpt2_ac0` |
 | **title_zh** | NEVPT2 / AC0 校正 |
 | **title_en** | NEVPT2 / AC0 corrections |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/nevpt2.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/nevpt2.html |
 | **pillar** | P1 |
 | **diataxis** | concept |
 | **status** | placeholder |
@@ -1338,7 +1338,7 @@ edit: false
 | **breadcrumb** | `manual / noise_mitigation` |
 | **title_zh** | 噪声缓解 |
 | **title_en** | Noise mitigation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/errmit.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/errmit.html |
 | **pillar** | P3 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1371,7 +1371,7 @@ edit: false
 | **breadcrumb** | `manual / noise_mitigation / qermit` |
 | **title_zh** | Qermit MitRes / MitEx 集成 |
 | **title_en** | Qermit MitRes / MitEx integration |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-qermit |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-qermit |
 | **pillar** | P3 |
 | **diataxis** | concept |
 | **status** | partial |
@@ -1404,7 +1404,7 @@ edit: false
 | **breadcrumb** | `manual / noise_mitigation / pmsv_spam` |
 | **title_zh** | PMSV 与 SPAM |
 | **title_en** | PMSV and SPAM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam |
 | **pillar** | P3 |
 | **diataxis** | concept |
 | **status** | shipped |
@@ -1437,7 +1437,7 @@ edit: false
 | **breadcrumb** | `tutorials` |
 | **title_zh** | 教程 |
 | **title_en** | Tutorials |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html |
 | **pillar** | meta |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1470,7 +1470,7 @@ edit: false
 | **breadcrumb** | `tutorials / core` |
 | **title_zh** | 核心教程 |
 | **title_en** | Core tutorials |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#core-tutorials |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#core-tutorials |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1503,7 +1503,7 @@ edit: false
 | **breadcrumb** | `tutorials / core / basic_vqe` |
 | **title_zh** | 基础 VQE |
 | **title_en** | A basic VQE simulation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE.html |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | shipped |
@@ -1536,7 +1536,7 @@ edit: false
 | **breadcrumb** | `tutorials / core / extended_vqe` |
 | **title_zh** | 扩展 VQE |
 | **title_en** | Extended VQE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE_extended.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE_extended.html |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1569,7 +1569,7 @@ edit: false
 | **breadcrumb** | `tutorials / core / vqd` |
 | **title_zh** | 激发态 VQD |
 | **title_en** | Variational quantum deflation for excited states |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQD.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQD.html |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1601,8 +1601,8 @@ edit: false
 | --- | --- |
 | **breadcrumb** | `tutorials / core / nglview` |
 | **title_zh** | nglview 可视化 |
-| **title_en** | Visualization with inquanto-nglview |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nglview.html |
+| **title_en** | Visualization with NGLView (reference) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nglview.html |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | not-applicable |
@@ -1635,7 +1635,7 @@ edit: false
 | **breadcrumb** | `tutorials / backends` |
 | **title_zh** | 后端教程 |
 | **title_en** | Backend tutorials |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#backend-tutorials |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#backend-tutorials |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1668,7 +1668,7 @@ edit: false
 | **breadcrumb** | `tutorials / backends / backends_setup` |
 | **title_zh** | 后端搭建 |
 | **title_en** | Setting up and accessing backends |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_backends.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_backends.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | shipped |
@@ -1701,7 +1701,7 @@ edit: false
 | **breadcrumb** | `tutorials / backends / nexus_intro` |
 | **title_zh** | Nexus 后端管理 |
 | **title_en** | Accessing and managing backends with Nexus |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nexus.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nexus.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | not-applicable |
@@ -1732,9 +1732,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `tutorials / backends / helios_selene` |
-| **title_zh** | Quantinuum Helios / Selene 提交 |
-| **title_en** | Submitting to Quantinuum Helios and Selene |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html |
+| **title_zh** | Helios / Selene 后端提交（参考教程） |
+| **title_en** | Helios / Selene backend submission (reference tutorial) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | not-applicable |
@@ -1767,7 +1767,7 @@ edit: false
 | **breadcrumb** | `tutorials / backends / aer_shots` |
 | **title_zh** | Aer 采样（shots） |
 | **title_en** | Hamiltonian averaging with the Aer simulator (shots) |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qiskit_shots.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qiskit_shots.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | shipped |
@@ -1800,7 +1800,7 @@ edit: false
 | **breadcrumb** | `tutorials / backends / circuit_compilation` |
 | **title_zh** | 电路编译流水线 |
 | **title_en** | Circuit compilation in protocols workflow |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1833,7 +1833,7 @@ edit: false
 | **breadcrumb** | `tutorials / backends / async` |
 | **title_zh** | 异步实验 |
 | **title_en** | Running asynchronous experiments |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_async.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_async.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1864,9 +1864,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `tutorials / backends / qse_quantinuum` |
-| **title_zh** | QSE on Quantinuum Systems |
-| **title_en** | Quantum Subspace Expansion with Quantinuum Systems |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qse.html |
+| **title_zh** | QSE 硬件后端教程（参考） |
+| **title_en** | QSE on hardware backends (reference tutorial) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qse.html |
 | **pillar** | P3 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -1899,7 +1899,7 @@ edit: false
 | **breadcrumb** | `tutorials / case_study_fe4n2` |
 | **title_zh** | Fe4N2 案例研究 |
 | **title_en** | Fe4N2 case study |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2 |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2 |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | placeholder |
@@ -1932,7 +1932,7 @@ edit: false
 | **breadcrumb** | `tutorials / case_study_fe4n2 / fe4n2_avas_casscf` |
 | **title_zh** | Fe4N2：AVAS + CASSCF |
 | **title_en** | Fe4N2 — AVAS + CASSCF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_1.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_1.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | placeholder |
@@ -1965,7 +1965,7 @@ edit: false
 | **breadcrumb** | `tutorials / case_study_fe4n2 / fe4n2_adapt` |
 | **title_zh** | Fe4N2：ADAPT 构造高效线路 |
 | **title_en** | Fe4N2 — ADAPT efficient circuits |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_2.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_2.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | placeholder |
@@ -1998,7 +1998,7 @@ edit: false
 | **breadcrumb** | `tutorials / case_study_fe4n2 / fe4n2_hardware` |
 | **title_zh** | Fe4N2：噪声硬件评估 |
 | **title_en** | Fe4N2 — running on noisy hardware |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_3.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_3.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | not-applicable |
@@ -2031,7 +2031,7 @@ edit: false
 | **breadcrumb** | `tutorials / fragmentation` |
 | **title_zh** | 碎片化教程 |
 | **title_en** | Fragmentation tutorials |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#fragmentation-tutorials |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#fragmentation-tutorials |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -2064,7 +2064,7 @@ edit: false
 | **breadcrumb** | `tutorials / fragmentation / dmet_basic` |
 | **title_zh** | 大体系 DMET 入门 |
 | **title_en** | Tackling larger systems with fragmentation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -2097,7 +2097,7 @@ edit: false
 | **breadcrumb** | `tutorials / fragmentation / projection_embedding` |
 | **title_zh** | 投影嵌入 |
 | **title_en** | Projection-based embedding |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_projection.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_projection.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | partial |
@@ -2130,7 +2130,7 @@ edit: false
 | **breadcrumb** | `tutorials / fragmentation / nevpt2_ac0` |
 | **title_zh** | NEVPT2 + AC0 校正 |
 | **title_en** | NEVPT2 + AC0 corrections |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nevpt2_AC0.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nevpt2_AC0.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | placeholder |
@@ -2163,7 +2163,7 @@ edit: false
 | **breadcrumb** | `tutorials / fragmentation / wft_dft` |
 | **title_zh** | WFT-in-DFT + NEVPT2 / AC0 |
 | **title_en** | WFT-in-DFT + NEVPT2 or AC0 |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_wft_dft_2.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_wft_dft_2.html |
 | **pillar** | P1 |
 | **diataxis** | tutorial |
 | **status** | placeholder |
@@ -2196,7 +2196,7 @@ edit: false
 | **breadcrumb** | `extensions` |
 | **title_zh** | 扩展 |
 | **title_en** | Extensions |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/extensions/extensions-overview.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/extensions/extensions-overview.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2227,9 +2227,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `extensions / inquanto_pyscf` |
-| **title_zh** | InQuanto-PySCF |
-| **title_en** | InQuanto-PySCF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/extensions/inquanto-pyscf.html |
+| **title_zh** | PySCF 扩展（参考文档） |
+| **title_en** | PySCF extension (reference) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/extensions/inquanto-pyscf.html |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2260,9 +2260,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `extensions / inquanto_nexus` |
-| **title_zh** | InQuanto-Nexus |
-| **title_en** | InQuanto-Nexus |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html |
+| **title_zh** | Nexus 集成（参考文档） |
+| **title_en** | Nexus integration (reference) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html |
 | **pillar** | P4 |
 | **diataxis** | reference |
 | **status** | not-applicable |
@@ -2293,9 +2293,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `extensions / inquanto_nglview` |
-| **title_zh** | InQuanto-NGLView |
-| **title_en** | InQuanto-NGLView |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/extensions/inquanto-nglview.html |
+| **title_zh** | NGLView 可视化（参考文档） |
+| **title_en** | NGLView visualization (reference) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/extensions/inquanto-nglview.html |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | not-applicable |
@@ -2326,9 +2326,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `extensions / inquanto_phayes` |
-| **title_zh** | InQuanto-Phayes |
-| **title_en** | InQuanto-Phayes |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/extensions/inquanto-phayes.html |
+| **title_zh** | Phayes 扩展（参考文档） |
+| **title_en** | Phayes extension (reference) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/extensions/inquanto-phayes.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2359,9 +2359,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `extensions / inquanto_cutensornet` |
-| **title_zh** | InQuanto-cuTensorNet |
-| **title_en** | InQuanto-cuTensorNet |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
+| **title_zh** | cuTensorNet 扩展（参考文档） |
+| **title_en** | cuTensorNet extension (reference) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
 | **pillar** | P3 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2394,7 +2394,7 @@ edit: false
 | **breadcrumb** | `api` |
 | **title_zh** | API 参考 |
 | **title_en** | API reference |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2425,9 +2425,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / api_intro_inquanto` |
-| **title_zh** | InQuanto API 总览 |
-| **title_en** | InQuanto API introduction |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto_api_intro.html |
+| **title_zh** | 参考文档 · API 总览 |
+| **title_en** | Reference documentation · API overview |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto_api_intro.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -2458,9 +2458,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / api_intro_extensions` |
-| **title_zh** | InQuanto 扩展 API 总览 |
-| **title_en** | InQuanto Extensions API introduction |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto-ext_api_intro.html |
+| **title_zh** | 参考文档 · 扩展 API 总览 |
+| **title_en** | Reference documentation · Extensions API overview |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto-ext_api_intro.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -2491,9 +2491,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / algorithms` |
-| **title_zh** | inquanto.algorithms |
-| **title_en** | inquanto.algorithms |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html |
+| **title_zh** | 参考 API · inquanto.algorithms |
+| **title_en** | Reference API · inquanto.algorithms |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2526,7 +2526,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmVQE` |
 | **title_zh** | AlgorithmVQE |
 | **title_en** | AlgorithmVQE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -2559,7 +2559,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmAdaptVQE` |
 | **title_zh** | AlgorithmAdaptVQE |
 | **title_en** | AlgorithmAdaptVQE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmAdaptVQE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmAdaptVQE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2592,7 +2592,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmFermionicAdaptVQE` |
 | **title_zh** | AlgorithmFermionicAdaptVQE |
 | **title_en** | AlgorithmFermionicAdaptVQE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmFermionicAdaptVQE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmFermionicAdaptVQE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2625,7 +2625,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmIQEB` |
 | **title_zh** | AlgorithmIQEB |
 | **title_en** | AlgorithmIQEB |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmIQEB |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmIQEB |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2658,7 +2658,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmVQD` |
 | **title_zh** | AlgorithmVQD |
 | **title_en** | AlgorithmVQD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2691,7 +2691,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmQSE` |
 | **title_zh** | AlgorithmQSE |
 | **title_en** | AlgorithmQSE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmQSE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmQSE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2724,7 +2724,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmSCEOM` |
 | **title_zh** | AlgorithmSCEOM |
 | **title_en** | AlgorithmSCEOM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmSCEOM |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmSCEOM |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2757,7 +2757,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmDeterministicQPE` |
 | **title_zh** | AlgorithmDeterministicQPE |
 | **title_en** | AlgorithmDeterministicQPE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmDeterministicQPE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmDeterministicQPE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2790,7 +2790,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmInfoTheoryQPE` |
 | **title_zh** | AlgorithmInfoTheoryQPE |
 | **title_en** | AlgorithmInfoTheoryQPE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmInfoTheoryQPE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmInfoTheoryQPE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2823,7 +2823,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmKitaevQPE` |
 | **title_zh** | AlgorithmKitaevQPE |
 | **title_en** | AlgorithmKitaevQPE |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmKitaevQPE |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmKitaevQPE |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2856,7 +2856,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmVQS` |
 | **title_zh** | AlgorithmVQS |
 | **title_en** | AlgorithmVQS |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQS |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQS |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2889,7 +2889,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmMcLachlanRealTime` |
 | **title_zh** | AlgorithmMcLachlanRealTime |
 | **title_en** | AlgorithmMcLachlanRealTime |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanRealTime |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanRealTime |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2922,7 +2922,7 @@ edit: false
 | **breadcrumb** | `api / algorithms / classes / AlgorithmMcLachlanImagTime` |
 | **title_zh** | AlgorithmMcLachlanImagTime |
 | **title_en** | AlgorithmMcLachlanImagTime |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanImagTime |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanImagTime |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -2953,9 +2953,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / ansatz` |
-| **title_zh** | inquanto.ansatzes |
-| **title_en** | inquanto.ansatzes |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html |
+| **title_zh** | 参考 API · inquanto.ansatzes |
+| **title_en** | Reference API · inquanto.ansatzes |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -2988,7 +2988,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / GeneralAnsatz` |
 | **title_zh** | GeneralAnsatz |
 | **title_en** | GeneralAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.GeneralAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.GeneralAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3021,7 +3021,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / CircuitAnsatz` |
 | **title_zh** | CircuitAnsatz |
 | **title_en** | CircuitAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.CircuitAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.CircuitAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3054,7 +3054,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / ComposedAnsatz` |
 | **title_zh** | ComposedAnsatz |
 | **title_en** | ComposedAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.ComposedAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.ComposedAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3087,7 +3087,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / TrotterAnsatz` |
 | **title_zh** | TrotterAnsatz |
 | **title_en** | TrotterAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.TrotterAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.TrotterAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3120,7 +3120,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceStateExp` |
 | **title_zh** | FermionSpaceStateExp |
 | **title_en** | FermionSpaceStateExp |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExp |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExp |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3153,7 +3153,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzUCCSD` |
 | **title_zh** | FermionSpaceAnsatzUCCSD |
 | **title_en** | FermionSpaceAnsatzUCCSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3186,7 +3186,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzUCCD` |
 | **title_zh** | FermionSpaceAnsatzUCCD |
 | **title_en** | FermionSpaceAnsatzUCCD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3219,7 +3219,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceStateExpChemicallyAware` |
 | **title_zh** | FermionSpaceStateExpChemicallyAware |
 | **title_en** | FermionSpaceStateExpChemicallyAware |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExpChemicallyAware |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExpChemicallyAware |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3252,7 +3252,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzChemicallyAwareUCCSD` |
 | **title_zh** | FermionSpaceAnsatzChemicallyAwareUCCSD |
 | **title_en** | FermionSpaceAnsatzChemicallyAwareUCCSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzChemicallyAwareUCCSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzChemicallyAwareUCCSD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3285,7 +3285,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzkUpCCGD` |
 | **title_zh** | FermionSpaceAnsatzkUpCCGD |
 | **title_en** | FermionSpaceAnsatzkUpCCGD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3318,7 +3318,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzkUpCCGSD` |
 | **title_zh** | FermionSpaceAnsatzkUpCCGSD |
 | **title_en** | FermionSpaceAnsatzkUpCCGSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3351,7 +3351,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzkUpCCGSDSinglet` |
 | **title_zh** | FermionSpaceAnsatzkUpCCGSDSinglet |
 | **title_en** | FermionSpaceAnsatzkUpCCGSDSinglet |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSDSinglet |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSDSinglet |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3384,7 +3384,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzUCCGD` |
 | **title_zh** | FermionSpaceAnsatzUCCGD |
 | **title_en** | FermionSpaceAnsatzUCCGD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3417,7 +3417,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzUCCGSD` |
 | **title_zh** | FermionSpaceAnsatzUCCGSD |
 | **title_en** | FermionSpaceAnsatzUCCGSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGSD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3450,7 +3450,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzUCCSDSinglet` |
 | **title_zh** | FermionSpaceAnsatzUCCSDSinglet |
 | **title_en** | FermionSpaceAnsatzUCCSDSinglet |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSDSinglet |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSDSinglet |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3483,7 +3483,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatzsUPS` |
 | **title_zh** | FermionSpaceAnsatzsUPS |
 | **title_en** | FermionSpaceAnsatzsUPS |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzsUPS |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzsUPS |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3516,7 +3516,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / FermionSpaceAnsatztUPS` |
 | **title_zh** | FermionSpaceAnsatztUPS |
 | **title_en** | FermionSpaceAnsatztUPS |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatztUPS |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatztUPS |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3549,7 +3549,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / MultiConfigurationAnsatz` |
 | **title_zh** | MultiConfigurationAnsatz |
 | **title_en** | MultiConfigurationAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3582,7 +3582,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / MultiConfigurationState` |
 | **title_zh** | MultiConfigurationState |
 | **title_en** | MultiConfigurationState |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationState |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationState |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3615,7 +3615,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / MultiConfigurationStateBox` |
 | **title_zh** | MultiConfigurationStateBox |
 | **title_en** | MultiConfigurationStateBox |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateBox |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateBox |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3648,7 +3648,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / MultiConfigurationAnsatzSparse` |
 | **title_zh** | MultiConfigurationAnsatzSparse |
 | **title_en** | MultiConfigurationAnsatzSparse |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatzSparse |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatzSparse |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3681,7 +3681,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / MultiConfigurationStateSparse` |
 | **title_zh** | MultiConfigurationStateSparse |
 | **title_en** | MultiConfigurationStateSparse |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateSparse |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateSparse |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3714,7 +3714,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / RealGeneralizedBasisRotationAnsatz` |
 | **title_zh** | RealGeneralizedBasisRotationAnsatz |
 | **title_en** | RealGeneralizedBasisRotationAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealGeneralizedBasisRotationAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealGeneralizedBasisRotationAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3747,7 +3747,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / RealRestrictedBasisRotationAnsatz` |
 | **title_zh** | RealRestrictedBasisRotationAnsatz |
 | **title_en** | RealRestrictedBasisRotationAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealRestrictedBasisRotationAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealRestrictedBasisRotationAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3780,7 +3780,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / RealUnrestrictedBasisRotationAnsatz` |
 | **title_zh** | RealUnrestrictedBasisRotationAnsatz |
 | **title_en** | RealUnrestrictedBasisRotationAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealUnrestrictedBasisRotationAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealUnrestrictedBasisRotationAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3813,7 +3813,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / HamiltonianVariationalAnsatz` |
 | **title_zh** | HamiltonianVariationalAnsatz |
 | **title_en** | HamiltonianVariationalAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HamiltonianVariationalAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HamiltonianVariationalAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3846,7 +3846,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / LayeredAnsatz` |
 | **title_zh** | LayeredAnsatz |
 | **title_en** | LayeredAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.LayeredAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.LayeredAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -3879,7 +3879,7 @@ edit: false
 | **breadcrumb** | `api / ansatz / classes / HardwareEfficientAnsatz` |
 | **title_zh** | HardwareEfficientAnsatz |
 | **title_en** | HardwareEfficientAnsatz |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HardwareEfficientAnsatz |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HardwareEfficientAnsatz |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -3910,9 +3910,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / computables` |
-| **title_zh** | inquanto.computables |
-| **title_en** | inquanto.computables |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html |
+| **title_zh** | 参考 API · inquanto.computables |
+| **title_en** | Reference API · inquanto.computables |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3945,7 +3945,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValue` |
 | **title_zh** | ExpectationValue |
 | **title_en** | ExpectationValue |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValue |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValue |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -3978,7 +3978,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueBraDerivative` |
 | **title_zh** | ExpectationValueBraDerivative |
 | **title_en** | ExpectationValueBraDerivative |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivative |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivative |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4011,7 +4011,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueBraDerivativeImag` |
 | **title_zh** | ExpectationValueBraDerivativeImag |
 | **title_en** | ExpectationValueBraDerivativeImag |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeImag |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeImag |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4044,7 +4044,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueBraDerivativeReal` |
 | **title_zh** | ExpectationValueBraDerivativeReal |
 | **title_en** | ExpectationValueBraDerivativeReal |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeReal |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeReal |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4077,7 +4077,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueDerivative` |
 | **title_zh** | ExpectationValueDerivative |
 | **title_en** | ExpectationValueDerivative |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueDerivative |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueDerivative |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4110,7 +4110,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueKetDerivative` |
 | **title_zh** | ExpectationValueKetDerivative |
 | **title_en** | ExpectationValueKetDerivative |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivative |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivative |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4143,7 +4143,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueKetDerivativeImag` |
 | **title_zh** | ExpectationValueKetDerivativeImag |
 | **title_en** | ExpectationValueKetDerivativeImag |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeImag |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeImag |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4176,7 +4176,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueKetDerivativeReal` |
 | **title_zh** | ExpectationValueKetDerivativeReal |
 | **title_en** | ExpectationValueKetDerivativeReal |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeReal |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeReal |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4209,7 +4209,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueNonHermitian` |
 | **title_zh** | ExpectationValueNonHermitian |
 | **title_en** | ExpectationValueNonHermitian |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueNonHermitian |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueNonHermitian |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4242,7 +4242,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / MetricTensorImag` |
 | **title_zh** | MetricTensorImag |
 | **title_en** | MetricTensorImag |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorImag |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorImag |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4275,7 +4275,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / MetricTensorReal` |
 | **title_zh** | MetricTensorReal |
 | **title_en** | MetricTensorReal |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorReal |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorReal |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4308,7 +4308,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / Overlap` |
 | **title_zh** | Overlap |
 | **title_en** | Overlap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Overlap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Overlap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4341,7 +4341,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / OverlapImag` |
 | **title_zh** | OverlapImag |
 | **title_en** | OverlapImag |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapImag |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapImag |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4374,7 +4374,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / OverlapReal` |
 | **title_zh** | OverlapReal |
 | **title_en** | OverlapReal |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapReal |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapReal |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4407,7 +4407,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / OverlapSquared` |
 | **title_zh** | OverlapSquared |
 | **title_en** | OverlapSquared |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapSquared |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapSquared |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4440,7 +4440,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ComputableFunction` |
 | **title_zh** | ComputableFunction |
 | **title_en** | ComputableFunction |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableFunction |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableFunction |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -4473,7 +4473,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ComputableInt` |
 | **title_zh** | ComputableInt |
 | **title_en** | ComputableInt |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableInt |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableInt |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -4506,7 +4506,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ComputableList` |
 | **title_zh** | ComputableList |
 | **title_en** | ComputableList |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableList |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableList |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -4539,7 +4539,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ComputableTuple` |
 | **title_zh** | ComputableTuple |
 | **title_en** | ComputableTuple |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableTuple |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableTuple |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -4572,7 +4572,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ComputableNode` |
 | **title_zh** | ComputableNode |
 | **title_en** | ComputableNode |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableNode |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableNode |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -4605,7 +4605,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ComputableSingleChild` |
 | **title_zh** | ComputableSingleChild |
 | **title_en** | ComputableSingleChild |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableSingleChild |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableSingleChild |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4638,7 +4638,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / Averageable` |
 | **title_zh** | Averageable |
 | **title_en** | Averageable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Averageable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Averageable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4671,7 +4671,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / Evaluatable` |
 | **title_zh** | Evaluatable |
 | **title_en** | Evaluatable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Evaluatable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Evaluatable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4704,7 +4704,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / CommutatorComputable` |
 | **title_zh** | CommutatorComputable |
 | **title_en** | CommutatorComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.CommutatorComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.CommutatorComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4737,7 +4737,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ExpectationValueSumComputable` |
 | **title_zh** | ExpectationValueSumComputable |
 | **title_en** | ExpectationValueSumComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueSumComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueSumComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4770,7 +4770,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / HoleGFComputable` |
 | **title_zh** | HoleGFComputable |
 | **title_en** | HoleGFComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.HoleGFComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.HoleGFComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4803,7 +4803,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / KrylovSubspace` |
 | **title_zh** | KrylovSubspace |
 | **title_en** | KrylovSubspace |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspace |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspace |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4836,7 +4836,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / KrylovSubspaceComputable` |
 | **title_zh** | KrylovSubspaceComputable |
 | **title_en** | KrylovSubspaceComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspaceComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspaceComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4869,7 +4869,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / LanczosCoefficientsComputable` |
 | **title_zh** | LanczosCoefficientsComputable |
 | **title_en** | LanczosCoefficientsComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosCoefficientsComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosCoefficientsComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4902,7 +4902,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / LanczosMatrixComputable` |
 | **title_zh** | LanczosMatrixComputable |
 | **title_en** | LanczosMatrixComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosMatrixComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosMatrixComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4935,7 +4935,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ManyBodyGFComputable` |
 | **title_zh** | ManyBodyGFComputable |
 | **title_en** | ManyBodyGFComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ManyBodyGFComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ManyBodyGFComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -4968,7 +4968,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / NonOrthogonalMatricesComputable` |
 | **title_zh** | NonOrthogonalMatricesComputable |
 | **title_en** | NonOrthogonalMatricesComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.NonOrthogonalMatricesComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.NonOrthogonalMatricesComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5001,7 +5001,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / OverlapMatrixComputable` |
 | **title_zh** | OverlapMatrixComputable |
 | **title_en** | OverlapMatrixComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapMatrixComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapMatrixComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5034,7 +5034,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / PDM1234RealComputable` |
 | **title_zh** | PDM1234RealComputable |
 | **title_en** | PDM1234RealComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.PDM1234RealComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.PDM1234RealComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5067,7 +5067,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / ParticleGFComputable` |
 | **title_zh** | ParticleGFComputable |
 | **title_en** | ParticleGFComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ParticleGFComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ParticleGFComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5100,7 +5100,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / QCM4Computable` |
 | **title_zh** | QCM4Computable |
 | **title_en** | QCM4Computable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QCM4Computable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QCM4Computable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5133,7 +5133,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / QSEMatricesComputable` |
 | **title_zh** | QSEMatricesComputable |
 | **title_en** | QSEMatricesComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QSEMatricesComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QSEMatricesComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -5166,7 +5166,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / RDM1234RealComputable` |
 | **title_zh** | RDM1234RealComputable |
 | **title_en** | RDM1234RealComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RDM1234RealComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RDM1234RealComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5199,7 +5199,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / RestrictedOneBodyRDMComputable` |
 | **title_zh** | RestrictedOneBodyRDMComputable |
 | **title_en** | RestrictedOneBodyRDMComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5232,7 +5232,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / RestrictedOneBodyRDMRealComputable` |
 | **title_zh** | RestrictedOneBodyRDMRealComputable |
 | **title_en** | RestrictedOneBodyRDMRealComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMRealComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMRealComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5265,7 +5265,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / SCEOMMatrixComputable` |
 | **title_zh** | SCEOMMatrixComputable |
 | **title_en** | SCEOMMatrixComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SCEOMMatrixComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SCEOMMatrixComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -5298,7 +5298,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / SpinlessNBodyPDMArrayRealComputable` |
 | **title_zh** | SpinlessNBodyPDMArrayRealComputable |
 | **title_en** | SpinlessNBodyPDMArrayRealComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyPDMArrayRealComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyPDMArrayRealComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5331,7 +5331,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / SpinlessNBodyRDMArrayRealComputable` |
 | **title_zh** | SpinlessNBodyRDMArrayRealComputable |
 | **title_en** | SpinlessNBodyRDMArrayRealComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyRDMArrayRealComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyRDMArrayRealComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5364,7 +5364,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / UnrestrictedOneBodyRDMComputable` |
 | **title_zh** | UnrestrictedOneBodyRDMComputable |
 | **title_en** | UnrestrictedOneBodyRDMComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5397,7 +5397,7 @@ edit: false
 | **breadcrumb** | `api / computables / classes / UnrestrictedOneBodyRDMRealComputable` |
 | **title_zh** | UnrestrictedOneBodyRDMRealComputable |
 | **title_en** | UnrestrictedOneBodyRDMRealComputable |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMRealComputable |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMRealComputable |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5428,9 +5428,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / operators` |
-| **title_zh** | inquanto.operators |
-| **title_en** | inquanto.operators |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html |
+| **title_zh** | 参考 API · inquanto.operators |
+| **title_en** | Reference API · inquanto.operators |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -5463,7 +5463,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / ChemistryRestrictedIntegralOperator` |
 | **title_zh** | ChemistryRestrictedIntegralOperator |
 | **title_en** | ChemistryRestrictedIntegralOperator |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperator |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperator |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -5496,7 +5496,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / ChemistryRestrictedIntegralOperatorCompact` |
 | **title_zh** | ChemistryRestrictedIntegralOperatorCompact |
 | **title_en** | ChemistryRestrictedIntegralOperatorCompact |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperatorCompact |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperatorCompact |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5529,7 +5529,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / ChemistryUnrestrictedIntegralOperator` |
 | **title_zh** | ChemistryUnrestrictedIntegralOperator |
 | **title_en** | ChemistryUnrestrictedIntegralOperator |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperator |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperator |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5562,7 +5562,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / ChemistryUnrestrictedIntegralOperatorCompact` |
 | **title_zh** | ChemistryUnrestrictedIntegralOperatorCompact |
 | **title_en** | ChemistryUnrestrictedIntegralOperatorCompact |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperatorCompact |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperatorCompact |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5595,7 +5595,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / DoubleFactorizedTwoBodyIntegrals` |
 | **title_zh** | DoubleFactorizedTwoBodyIntegrals |
 | **title_en** | DoubleFactorizedTwoBodyIntegrals |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.DoubleFactorizedTwoBodyIntegrals |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.DoubleFactorizedTwoBodyIntegrals |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5628,7 +5628,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / FCIDumpRestricted` |
 | **title_zh** | FCIDumpRestricted |
 | **title_en** | FCIDumpRestricted |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpRestricted |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpRestricted |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5661,7 +5661,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / FCIDumpUnrestricted` |
 | **title_zh** | FCIDumpUnrestricted |
 | **title_en** | FCIDumpUnrestricted |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpUnrestricted |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpUnrestricted |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5694,7 +5694,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / FermionOperator` |
 | **title_zh** | FermionOperator |
 | **title_en** | FermionOperator |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperator |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperator |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -5727,7 +5727,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / FermionOperatorList` |
 | **title_zh** | FermionOperatorList |
 | **title_en** | FermionOperatorList |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperatorList |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperatorList |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -5760,7 +5760,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / QubitOperator` |
 | **title_zh** | QubitOperator |
 | **title_en** | QubitOperator |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperator |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperator |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -5793,7 +5793,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / QubitOperatorList` |
 | **title_zh** | QubitOperatorList |
 | **title_en** | QubitOperatorList |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorList |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorList |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -5826,7 +5826,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / QubitOperatorString` |
 | **title_zh** | QubitOperatorString |
 | **title_en** | QubitOperatorString |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorString |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorString |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -5859,7 +5859,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / OrbitalTransformer` |
 | **title_zh** | OrbitalTransformer |
 | **title_en** | OrbitalTransformer |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.OrbitalTransformer |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.OrbitalTransformer |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5892,7 +5892,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / RestrictedDoubleFactorizedHamiltonian` |
 | **title_zh** | RestrictedDoubleFactorizedHamiltonian |
 | **title_en** | RestrictedDoubleFactorizedHamiltonian |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedDoubleFactorizedHamiltonian |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedDoubleFactorizedHamiltonian |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5925,7 +5925,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / RestrictedOneBodyRDM` |
 | **title_zh** | RestrictedOneBodyRDM |
 | **title_en** | RestrictedOneBodyRDM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedOneBodyRDM |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedOneBodyRDM |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5958,7 +5958,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / RestrictedTwoBodyRDM` |
 | **title_zh** | RestrictedTwoBodyRDM |
 | **title_en** | RestrictedTwoBodyRDM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedTwoBodyRDM |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedTwoBodyRDM |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -5991,7 +5991,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / UnrestrictedDoubleFactorizedHamiltonian` |
 | **title_zh** | UnrestrictedDoubleFactorizedHamiltonian |
 | **title_en** | UnrestrictedDoubleFactorizedHamiltonian |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedDoubleFactorizedHamiltonian |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedDoubleFactorizedHamiltonian |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6024,7 +6024,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / UnrestrictedOneBodyRDM` |
 | **title_zh** | UnrestrictedOneBodyRDM |
 | **title_en** | UnrestrictedOneBodyRDM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedOneBodyRDM |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedOneBodyRDM |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6057,7 +6057,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / UnrestrictedTwoBodyRDM` |
 | **title_zh** | UnrestrictedTwoBodyRDM |
 | **title_en** | UnrestrictedTwoBodyRDM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedTwoBodyRDM |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedTwoBodyRDM |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6090,7 +6090,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / SymmetryOperatorFermionic` |
 | **title_zh** | SymmetryOperatorFermionic |
 | **title_en** | SymmetryOperatorFermionic |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionic |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionic |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6123,7 +6123,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / SymmetryOperatorFermionicFactorized` |
 | **title_zh** | SymmetryOperatorFermionicFactorized |
 | **title_en** | SymmetryOperatorFermionicFactorized |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionicFactorized |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionicFactorized |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6156,7 +6156,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / SymmetryOperatorPauli` |
 | **title_zh** | SymmetryOperatorPauli |
 | **title_en** | SymmetryOperatorPauli |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauli |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauli |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6189,7 +6189,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / SymmetryOperatorPauliFactorized` |
 | **title_zh** | SymmetryOperatorPauliFactorized |
 | **title_en** | SymmetryOperatorPauliFactorized |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauliFactorized |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauliFactorized |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6222,7 +6222,7 @@ edit: false
 | **breadcrumb** | `api / operators / classes / XDFCoreTensor` |
 | **title_zh** | XDFCoreTensor |
 | **title_en** | XDFCoreTensor |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.XDFCoreTensor |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.XDFCoreTensor |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6253,9 +6253,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / spaces` |
-| **title_zh** | inquanto.spaces |
-| **title_en** | inquanto.spaces |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html |
+| **title_zh** | 参考 API · inquanto.spaces |
+| **title_en** | Reference API · inquanto.spaces |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6288,7 +6288,7 @@ edit: false
 | **breadcrumb** | `api / spaces / classes / FermionSpace` |
 | **title_zh** | FermionSpace |
 | **title_en** | FermionSpace |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpace |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpace |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6321,7 +6321,7 @@ edit: false
 | **breadcrumb** | `api / spaces / classes / FermionSpaceBrillouin` |
 | **title_zh** | FermionSpaceBrillouin |
 | **title_en** | FermionSpaceBrillouin |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceBrillouin |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceBrillouin |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6354,7 +6354,7 @@ edit: false
 | **breadcrumb** | `api / spaces / classes / FermionSpaceSupercell` |
 | **title_zh** | FermionSpaceSupercell |
 | **title_en** | FermionSpaceSupercell |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceSupercell |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceSupercell |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6387,7 +6387,7 @@ edit: false
 | **breadcrumb** | `api / spaces / classes / ParaFermionSpace` |
 | **title_zh** | ParaFermionSpace |
 | **title_en** | ParaFermionSpace |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.ParaFermionSpace |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.ParaFermionSpace |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6420,7 +6420,7 @@ edit: false
 | **breadcrumb** | `api / spaces / classes / QubitSpace` |
 | **title_zh** | QubitSpace |
 | **title_en** | QubitSpace |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.QubitSpace |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.QubitSpace |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6451,9 +6451,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / states` |
-| **title_zh** | inquanto.states |
-| **title_en** | inquanto.states |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/states.html |
+| **title_zh** | 参考 API · inquanto.states |
+| **title_en** | Reference API · inquanto.states |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/states.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6486,7 +6486,7 @@ edit: false
 | **breadcrumb** | `api / states / classes / FermionState` |
 | **title_zh** | FermionState |
 | **title_en** | FermionState |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.FermionState |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.FermionState |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6519,7 +6519,7 @@ edit: false
 | **breadcrumb** | `api / states / classes / QubitState` |
 | **title_zh** | QubitState |
 | **title_en** | QubitState |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.QubitState |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.QubitState |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6550,9 +6550,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / mappings` |
-| **title_zh** | inquanto.mappings |
-| **title_en** | inquanto.mappings |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html |
+| **title_zh** | 参考 API · inquanto.mappings |
+| **title_en** | Reference API · inquanto.mappings |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6585,7 +6585,7 @@ edit: false
 | **breadcrumb** | `api / mappings / classes / QubitMappingJordanWigner` |
 | **title_zh** | QubitMappingJordanWigner |
 | **title_en** | QubitMappingJordanWigner |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingJordanWigner |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingJordanWigner |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -6618,7 +6618,7 @@ edit: false
 | **breadcrumb** | `api / mappings / classes / QubitMappingBravyiKitaev` |
 | **title_zh** | QubitMappingBravyiKitaev |
 | **title_en** | QubitMappingBravyiKitaev |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingBravyiKitaev |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingBravyiKitaev |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6651,7 +6651,7 @@ edit: false
 | **breadcrumb** | `api / mappings / classes / QubitMappingParity` |
 | **title_zh** | QubitMappingParity |
 | **title_en** | QubitMappingParity |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingParity |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingParity |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6682,9 +6682,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / minimizers` |
-| **title_zh** | inquanto.minimizers |
-| **title_en** | inquanto.minimizers |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html |
+| **title_zh** | 参考 API · inquanto.minimizers |
+| **title_en** | Reference API · inquanto.minimizers |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6717,7 +6717,7 @@ edit: false
 | **breadcrumb** | `api / minimizers / classes / MinimizerScipy` |
 | **title_zh** | MinimizerScipy |
 | **title_en** | MinimizerScipy |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerScipy |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerScipy |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -6750,7 +6750,7 @@ edit: false
 | **breadcrumb** | `api / minimizers / classes / MinimizerNFT` |
 | **title_zh** | MinimizerNFT |
 | **title_en** | MinimizerNFT |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerNFT |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerNFT |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6783,7 +6783,7 @@ edit: false
 | **breadcrumb** | `api / minimizers / classes / MinimizerRotosolve` |
 | **title_zh** | MinimizerRotosolve |
 | **title_en** | MinimizerRotosolve |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerRotosolve |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerRotosolve |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6816,7 +6816,7 @@ edit: false
 | **breadcrumb** | `api / minimizers / classes / MinimizerSPSA` |
 | **title_zh** | MinimizerSPSA |
 | **title_en** | MinimizerSPSA |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSPSA |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSPSA |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6849,7 +6849,7 @@ edit: false
 | **breadcrumb** | `api / minimizers / classes / MinimizerSGD` |
 | **title_zh** | MinimizerSGD |
 | **title_en** | MinimizerSGD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSGD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSGD |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6880,9 +6880,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / symmetry` |
-| **title_zh** | inquanto.symmetry |
-| **title_en** | inquanto.symmetry |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/symmetry.html |
+| **title_zh** | 参考 API · inquanto.symmetry |
+| **title_en** | Reference API · inquanto.symmetry |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/symmetry.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -6913,9 +6913,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / core` |
-| **title_zh** | inquanto.core |
-| **title_en** | inquanto.core |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/core.html |
+| **title_zh** | 参考 API · inquanto.core |
+| **title_en** | Reference API · inquanto.core |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/core.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6946,9 +6946,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / embeddings` |
-| **title_zh** | inquanto.embeddings |
-| **title_en** | inquanto.embeddings |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/embeddings.html |
+| **title_zh** | 参考 API · inquanto.embeddings |
+| **title_en** | Reference API · inquanto.embeddings |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/embeddings.html |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -6979,9 +6979,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / experiments` |
-| **title_zh** | inquanto.experiments |
-| **title_en** | inquanto.experiments |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html |
+| **title_zh** | 参考 API · inquanto.experiments |
+| **title_en** | Reference API · inquanto.experiments |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7014,7 +7014,7 @@ edit: false
 | **breadcrumb** | `api / experiments / experiment_qec_qpe` |
 | **title_zh** | 量子纠错 QPE 演示 |
 | **title_en** | Quantum error-corrected QPE demonstration |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/experiments/experiment_qec_qpe.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/experiments/experiment_qec_qpe.html |
 | **pillar** | P2 |
 | **diataxis** | tutorial |
 | **status** | placeholder |
@@ -7045,9 +7045,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / express` |
-| **title_zh** | inquanto.express |
-| **title_en** | inquanto.express |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/express.html |
+| **title_zh** | 参考 API · inquanto.express |
+| **title_en** | Reference API · inquanto.express |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/express.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7078,9 +7078,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / geometries` |
-| **title_zh** | inquanto.geometries |
-| **title_en** | inquanto.geometries |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html |
+| **title_zh** | 参考 API · inquanto.geometries |
+| **title_en** | Reference API · inquanto.geometries |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7111,9 +7111,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / protocols` |
-| **title_zh** | inquanto.protocols |
-| **title_en** | inquanto.protocols |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html |
+| **title_zh** | 参考 API · inquanto.protocols |
+| **title_en** | Reference API · inquanto.protocols |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7146,7 +7146,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / PauliAveraging` |
 | **title_zh** | PauliAveraging |
 | **title_en** | PauliAveraging |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PauliAveraging |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PauliAveraging |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -7179,7 +7179,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / HadamardTest` |
 | **title_zh** | HadamardTest |
 | **title_en** | HadamardTest |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTest |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTest |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7212,7 +7212,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / ComputeUncompute` |
 | **title_zh** | ComputeUncompute |
 | **title_en** | ComputeUncompute |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncompute |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncompute |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7245,7 +7245,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / DestructiveSwapTest` |
 | **title_zh** | DestructiveSwapTest |
 | **title_en** | DestructiveSwapTest |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.DestructiveSwapTest |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.DestructiveSwapTest |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7278,7 +7278,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / SwapTest` |
 | **title_zh** | SwapTest |
 | **title_en** | SwapTest |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapTest |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapTest |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7311,7 +7311,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / HadamardTestOverlap` |
 | **title_zh** | HadamardTestOverlap |
 | **title_en** | HadamardTestOverlap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestOverlap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestOverlap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7344,7 +7344,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / FactorizedOverlap` |
 | **title_zh** | FactorizedOverlap |
 | **title_en** | FactorizedOverlap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.FactorizedOverlap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.FactorizedOverlap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7377,7 +7377,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / SwapFactorizedOverlap` |
 | **title_zh** | SwapFactorizedOverlap |
 | **title_en** | SwapFactorizedOverlap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapFactorizedOverlap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapFactorizedOverlap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7410,7 +7410,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / ComputeUncomputeFactorizedOverlap` |
 | **title_zh** | ComputeUncomputeFactorizedOverlap |
 | **title_en** | ComputeUncomputeFactorizedOverlap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncomputeFactorizedOverlap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncomputeFactorizedOverlap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7443,7 +7443,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / SparseStatevectorProtocol` |
 | **title_zh** | SparseStatevectorProtocol |
 | **title_en** | SparseStatevectorProtocol |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SparseStatevectorProtocol |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SparseStatevectorProtocol |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7476,7 +7476,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / BackendStatevectorProtocol` |
 | **title_zh** | BackendStatevectorProtocol |
 | **title_en** | BackendStatevectorProtocol |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendStatevectorProtocol |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendStatevectorProtocol |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7509,7 +7509,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / SymbolicProtocol` |
 | **title_zh** | SymbolicProtocol |
 | **title_en** | SymbolicProtocol |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SymbolicProtocol |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SymbolicProtocol |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7542,7 +7542,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / HadamardTestDerivativeOverlap` |
 | **title_zh** | HadamardTestDerivativeOverlap |
 | **title_en** | HadamardTestDerivativeOverlap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivativeOverlap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivativeOverlap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7575,7 +7575,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / HadamardTestDerivative` |
 | **title_zh** | HadamardTestDerivative |
 | **title_en** | HadamardTestDerivative |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivative |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivative |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7608,7 +7608,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / CanonicalPhaseEstimation` |
 | **title_zh** | CanonicalPhaseEstimation |
 | **title_en** | CanonicalPhaseEstimation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CanonicalPhaseEstimation |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CanonicalPhaseEstimation |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7641,7 +7641,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / IterativePhaseEstimation` |
 | **title_zh** | IterativePhaseEstimation |
 | **title_en** | IterativePhaseEstimation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimation |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimation |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7674,7 +7674,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / IterativePhaseEstimationSingleCircuit` |
 | **title_zh** | IterativePhaseEstimationSingleCircuit |
 | **title_en** | IterativePhaseEstimationSingleCircuit |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationSingleCircuit |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationSingleCircuit |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7707,7 +7707,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / IterativePhaseEstimationQuantinuum` |
 | **title_zh** | IterativePhaseEstimationQuantinuum |
 | **title_en** | IterativePhaseEstimationQuantinuum |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationQuantinuum |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationQuantinuum |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | not-applicable |
@@ -7740,7 +7740,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / IterativePhaseEstimationStatevector` |
 | **title_zh** | IterativePhaseEstimationStatevector |
 | **title_en** | IterativePhaseEstimationStatevector |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationStatevector |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationStatevector |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7773,7 +7773,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / ProjectiveMeasurements` |
 | **title_zh** | ProjectiveMeasurements |
 | **title_en** | ProjectiveMeasurements |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProjectiveMeasurements |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProjectiveMeasurements |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7806,7 +7806,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / ProtocolList` |
 | **title_zh** | ProtocolList |
 | **title_en** | ProtocolList |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProtocolList |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProtocolList |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7839,7 +7839,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / PMSV` |
 | **title_zh** | PMSV |
 | **title_en** | PMSV |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -7872,7 +7872,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / SPAM` |
 | **title_zh** | SPAM |
 | **title_en** | SPAM |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SPAM |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SPAM |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -7905,7 +7905,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / CombinedMitigation` |
 | **title_zh** | CombinedMitigation |
 | **title_en** | CombinedMitigation |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CombinedMitigation |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CombinedMitigation |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -7938,7 +7938,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / BackendResultBootstrap` |
 | **title_zh** | BackendResultBootstrap |
 | **title_en** | BackendResultBootstrap |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultBootstrap |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultBootstrap |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -7971,7 +7971,7 @@ edit: false
 | **breadcrumb** | `api / protocols / classes / BackendResultSplit` |
 | **title_zh** | BackendResultSplit |
 | **title_en** | BackendResultSplit |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultSplit |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultSplit |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8002,9 +8002,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / extensions_pyscf` |
-| **title_zh** | inquanto.extensions.pyscf |
-| **title_en** | inquanto.extensions.pyscf |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html |
+| **title_zh** | 参考 API · inquanto.extensions.pyscf |
+| **title_en** | Reference API · inquanto.extensions.pyscf |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8037,7 +8037,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / AVAS` |
 | **title_zh** | AVAS |
 | **title_en** | AVAS |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.AVAS |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.AVAS |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -8070,7 +8070,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / CASSCF` |
 | **title_zh** | CASSCF |
 | **title_en** | CASSCF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.CASSCF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.CASSCF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8103,7 +8103,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularRHF` |
 | **title_zh** | ChemistryDriverPySCFMolecularRHF |
 | **title_en** | ChemistryDriverPySCFMolecularRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8136,7 +8136,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularROHF` |
 | **title_zh** | ChemistryDriverPySCFMolecularROHF |
 | **title_en** | ChemistryDriverPySCFMolecularROHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8169,7 +8169,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularUHF` |
 | **title_zh** | ChemistryDriverPySCFMolecularUHF |
 | **title_en** | ChemistryDriverPySCFMolecularUHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8202,7 +8202,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularRHFQMMMCOSMO` |
 | **title_zh** | ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
 | **title_en** | ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8235,7 +8235,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularROHFQMMMCOSMO` |
 | **title_zh** | ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
 | **title_en** | ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8268,7 +8268,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularUHFQMMMCOSMO` |
 | **title_zh** | ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
 | **title_en** | ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8301,7 +8301,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFGammaRHF` |
 | **title_zh** | ChemistryDriverPySCFGammaRHF |
 | **title_en** | ChemistryDriverPySCFGammaRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8334,7 +8334,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFGammaROHF` |
 | **title_zh** | ChemistryDriverPySCFGammaROHF |
 | **title_en** | ChemistryDriverPySCFGammaROHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaROHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaROHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8367,7 +8367,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMomentumRHF` |
 | **title_zh** | ChemistryDriverPySCFMomentumRHF |
 | **title_en** | ChemistryDriverPySCFMomentumRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8400,7 +8400,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFMomentumROHF` |
 | **title_zh** | ChemistryDriverPySCFMomentumROHF |
 | **title_en** | ChemistryDriverPySCFMomentumROHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumROHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumROHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8433,7 +8433,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingRHF` |
 | **title_zh** | ChemistryDriverPySCFEmbeddingRHF |
 | **title_en** | ChemistryDriverPySCFEmbeddingRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8466,7 +8466,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingROHF` |
 | **title_zh** | ChemistryDriverPySCFEmbeddingROHF |
 | **title_en** | ChemistryDriverPySCFEmbeddingROHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8499,7 +8499,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingROHF_UHF` |
 | **title_zh** | ChemistryDriverPySCFEmbeddingROHF_UHF |
 | **title_en** | ChemistryDriverPySCFEmbeddingROHF_UHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF_UHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF_UHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8532,7 +8532,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingGammaRHF` |
 | **title_zh** | ChemistryDriverPySCFEmbeddingGammaRHF |
 | **title_en** | ChemistryDriverPySCFEmbeddingGammaRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8565,7 +8565,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingGammaROHF_UHF` |
 | **title_zh** | ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
 | **title_en** | ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8598,7 +8598,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ChemistryDriverPySCFIntegrals` |
 | **title_zh** | ChemistryDriverPySCFIntegrals |
 | **title_en** | ChemistryDriverPySCFIntegrals |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFIntegrals |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFIntegrals |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8631,7 +8631,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFActive` |
 | **title_zh** | DMETRHFFragmentPySCFActive |
 | **title_en** | DMETRHFFragmentPySCFActive |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFActive |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFActive |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8664,7 +8664,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFCCSD` |
 | **title_zh** | DMETRHFFragmentPySCFCCSD |
 | **title_en** | DMETRHFFragmentPySCFCCSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFCCSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFCCSD |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8697,7 +8697,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFFCI` |
 | **title_zh** | DMETRHFFragmentPySCFFCI |
 | **title_en** | DMETRHFFragmentPySCFFCI |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFFCI |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFFCI |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8730,7 +8730,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFMP2` |
 | **title_zh** | DMETRHFFragmentPySCFMP2 |
 | **title_en** | DMETRHFFragmentPySCFMP2 |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFMP2 |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFMP2 |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8763,7 +8763,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFRHF` |
 | **title_zh** | DMETRHFFragmentPySCFRHF |
 | **title_en** | DMETRHFFragmentPySCFRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -8796,7 +8796,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFActive` |
 | **title_zh** | ImpurityDMETROHFFragmentPySCFActive |
 | **title_en** | ImpurityDMETROHFFragmentPySCFActive |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFActive |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFActive |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8829,7 +8829,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFCCSD` |
 | **title_zh** | ImpurityDMETROHFFragmentPySCFCCSD |
 | **title_en** | ImpurityDMETROHFFragmentPySCFCCSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFCCSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFCCSD |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8862,7 +8862,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFFCI` |
 | **title_zh** | ImpurityDMETROHFFragmentPySCFFCI |
 | **title_en** | ImpurityDMETROHFFragmentPySCFFCI |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFFCI |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFFCI |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8895,7 +8895,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFMP2` |
 | **title_zh** | ImpurityDMETROHFFragmentPySCFMP2 |
 | **title_en** | ImpurityDMETROHFFragmentPySCFMP2 |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFMP2 |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFMP2 |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8928,7 +8928,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFROHF` |
 | **title_zh** | ImpurityDMETROHFFragmentPySCFROHF |
 | **title_en** | ImpurityDMETROHFFragmentPySCFROHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFROHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFROHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8961,7 +8961,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FromActiveOrbitals` |
 | **title_zh** | FromActiveOrbitals |
 | **title_en** | FromActiveOrbitals |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveOrbitals |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveOrbitals |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -8994,7 +8994,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FromActiveSpace` |
 | **title_zh** | FromActiveSpace |
 | **title_en** | FromActiveSpace |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveSpace |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveSpace |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9027,7 +9027,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FrozenCore` |
 | **title_zh** | FrozenCore |
 | **title_en** | FrozenCore |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FrozenCore |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FrozenCore |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9060,7 +9060,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FMO` |
 | **title_zh** | FMO |
 | **title_en** | FMO |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMO |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMO |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9093,7 +9093,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FMOFragment` |
 | **title_zh** | FMOFragment |
 | **title_en** | FMOFragment |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9126,7 +9126,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FMOFragmentPySCFActive` |
 | **title_zh** | FMOFragmentPySCFActive |
 | **title_en** | FMOFragmentPySCFActive |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFActive |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFActive |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9159,7 +9159,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FMOFragmentPySCFCCSD` |
 | **title_zh** | FMOFragmentPySCFCCSD |
 | **title_en** | FMOFragmentPySCFCCSD |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFCCSD |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFCCSD |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9192,7 +9192,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FMOFragmentPySCFMP2` |
 | **title_zh** | FMOFragmentPySCFMP2 |
 | **title_en** | FMOFragmentPySCFMP2 |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFMP2 |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFMP2 |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9225,7 +9225,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / FMOFragmentPySCFRHF` |
 | **title_zh** | FMOFragmentPySCFRHF |
 | **title_en** | FMOFragmentPySCFRHF |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFRHF |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFRHF |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9258,7 +9258,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / PySCFChemistryRestrictedIntegralOperator` |
 | **title_zh** | PySCFChemistryRestrictedIntegralOperator |
 | **title_en** | PySCFChemistryRestrictedIntegralOperator |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryRestrictedIntegralOperator |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryRestrictedIntegralOperator |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -9291,7 +9291,7 @@ edit: false
 | **breadcrumb** | `api / extensions_pyscf / classes / PySCFChemistryUnrestrictedIntegralOperator` |
 | **title_zh** | PySCFChemistryUnrestrictedIntegralOperator |
 | **title_en** | PySCFChemistryUnrestrictedIntegralOperator |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryUnrestrictedIntegralOperator |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryUnrestrictedIntegralOperator |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9322,9 +9322,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / extensions_cutensornet` |
-| **title_zh** | inquanto.extensions.cutensornet |
-| **title_en** | inquanto.extensions.cutensornet |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
+| **title_zh** | 参考 API · inquanto.extensions.cutensornet |
+| **title_en** | Reference API · inquanto.extensions.cutensornet |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
 | **pillar** | P3 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -9357,7 +9357,7 @@ edit: false
 | **breadcrumb** | `api / extensions_cutensornet / classes / CuTensorNetProtocol` |
 | **title_zh** | CuTensorNetProtocol |
 | **title_en** | CuTensorNetProtocol |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html#inquanto.extensions.cutensornet.CuTensorNetProtocol |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html#inquanto.extensions.cutensornet.CuTensorNetProtocol |
 | **pillar** | P3 |
 | **diataxis** | reference |
 | **status** | partial |
@@ -9388,9 +9388,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / extensions_nexus` |
-| **title_zh** | inquanto.extensions.nexus |
-| **title_en** | inquanto.extensions.nexus |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nexus_api.html |
+| **title_zh** | 参考 API · inquanto.extensions.nexus |
+| **title_en** | Reference API · inquanto.extensions.nexus |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nexus_api.html |
 | **pillar** | P4 |
 | **diataxis** | reference |
 | **status** | not-applicable |
@@ -9421,9 +9421,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / extensions_phayes` |
-| **title_zh** | inquanto.extensions.phayes |
-| **title_en** | inquanto.extensions.phayes |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-phayes_api.html |
+| **title_zh** | 参考 API · inquanto.extensions.phayes |
+| **title_en** | Reference API · inquanto.extensions.phayes |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-phayes_api.html |
 | **pillar** | P2 |
 | **diataxis** | reference |
 | **status** | placeholder |
@@ -9454,9 +9454,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `api / extensions_nglview` |
-| **title_zh** | inquanto.extensions.nglview |
-| **title_en** | inquanto.extensions.nglview |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nglview_api.html |
+| **title_zh** | 参考 API · inquanto.extensions.nglview |
+| **title_en** | Reference API · inquanto.extensions.nglview |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nglview_api.html |
 | **pillar** | P1 |
 | **diataxis** | reference |
 | **status** | not-applicable |
@@ -9489,7 +9489,7 @@ edit: false
 | **breadcrumb** | `misc` |
 | **title_zh** | 杂项 |
 | **title_en** | Misc |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/ |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/ |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -9522,7 +9522,7 @@ edit: false
 | **breadcrumb** | `misc / release_notes` |
 | **title_zh** | 发行说明 |
 | **title_en** | Release notes |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/changelog.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/changelog.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -9555,7 +9555,7 @@ edit: false
 | **breadcrumb** | `misc / bibliography` |
 | **title_zh** | 参考文献 |
 | **title_en** | Bibliography |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/bibliography.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/bibliography.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -9588,7 +9588,7 @@ edit: false
 | **breadcrumb** | `misc / contact_docs` |
 | **title_zh** | 联系支持（文档内页） |
 | **title_en** | Contact support (in-docs) |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/contact.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/contact.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | not-applicable |
@@ -9619,9 +9619,9 @@ edit: false
 | Field | Value |
 | --- | --- |
 | **breadcrumb** | `misc / how_to_cite` |
-| **title_zh** | 如何引用 InQuanto |
-| **title_en** | How to cite InQuanto |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/cite.html |
+| **title_zh** | 文献引用说明（参考镜像） |
+| **title_en** | Citing upstream documentation (mirror) |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/cite.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -9654,7 +9654,7 @@ edit: false
 | **breadcrumb** | `misc / license` |
 | **title_zh** | 许可与版本 |
 | **title_en** | License / Changelog |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/license.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/license.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -9687,7 +9687,7 @@ edit: false
 | **breadcrumb** | `misc / opensource_attribution` |
 | **title_zh** | 开源组件归属 |
 | **title_en** | Open-source attribution |
-| **inquanto_anchor** | https://docs.quantinuum.com/inquanto/misc/opensource.html |
+| **reference_doc_url** | https://docs.quantinuum.com/inquanto/misc/opensource.html |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |
@@ -9720,7 +9720,7 @@ edit: false
 | **breadcrumb** | `misc / contact` |
 | **title_zh** | 联系我们（官网门户） |
 | **title_en** | Contact (corporate portal) |
-| **inquanto_anchor** | https://www.quantinuum.com/contact/docs |
+| **reference_doc_url** | https://www.quantinuum.com/contact/docs |
 | **pillar** | meta |
 | **diataxis** | reference |
 | **status** | shipped |

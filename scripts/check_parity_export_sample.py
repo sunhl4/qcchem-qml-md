@@ -2,12 +2,12 @@
 """Smoke-check parity export JSON (config-only) for L1 regression.
 
 Runs ``export_parity_criteria_table`` (config-only) on ``SAMPLE_CONFIGS_REL`` and asserts
-stable keys + ``parity_matrix_anchor`` on every gap row.
+stable keys + ``release_anchor`` on every gap row.
 
 Does not require PySCF or a pipeline results file.
 
 When adding parity-driven ``configs/*.yaml``, extend ``SAMPLE_CONFIGS_REL`` so CI keeps
-schema coverage (see ``docs/与InQuanto能力差距与实施计划.md`` appendix E §5 item 12).
+schema coverage.
 """
 
 from __future__ import annotations
@@ -23,7 +23,6 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_h2.yaml",
     # Second backend (`scf.driver=psi4`): registry + capabilities snapshot in export (no PySCF required).
     "configs/example_h2_psi4_rhf_sto3g.yaml",
-    "configs/tutorial_inquanto_chain_h2.yaml",
     "configs/example_h2_excited_smoke.yaml",
     "configs/example_h2_iqeb.yaml",
     "configs/example_h2_adapt_singles_pool.yaml",
@@ -105,7 +104,7 @@ def main() -> int:
     src = root / "src"
     if str(src) not in sys.path:
         sys.path.insert(0, str(src))
-    from qchem_stack.protocols.inquanto_contract import PARITY_EXPORT_V2_STABLE_KEYS
+    from qchem_stack.protocols.product_contract import PARITY_EXPORT_V3_STABLE_KEYS
 
     env = {**os.environ, "PYTHONPATH": f"{src}" + os.pathsep + os.environ.get("PYTHONPATH", "")}
     try:
@@ -118,20 +117,20 @@ def main() -> int:
         if code != 0:
             sys.stderr.write(f"export failed for {cfg_rel}\n")
             return code
-        missing = sorted(PARITY_EXPORT_V2_STABLE_KEYS - set(data.keys()))
+        missing = sorted(PARITY_EXPORT_V3_STABLE_KEYS - set(data.keys()))
         if missing:
             sys.stderr.write(f"{cfg_rel}: export missing stable keys: {missing}\n")
             return 1
-        if data.get("parity_export_schema_version") != "2":
+        if data.get("parity_export_schema_version") != "3":
             sys.stderr.write(f"{cfg_rel}: unexpected parity_export_schema_version\n")
             return 1
-        gaps = data.get("inquanto_gap_categories")
+        gaps = data.get("capability_gap_categories")
         if not isinstance(gaps, list) or not gaps:
-            sys.stderr.write(f"{cfg_rel}: inquanto_gap_categories empty\n")
+            sys.stderr.write(f"{cfg_rel}: capability_gap_categories empty\n")
             return 1
         for g in gaps:
-            if not isinstance(g, dict) or not g.get("parity_matrix_anchor"):
-                sys.stderr.write(f"{cfg_rel}: gap row missing parity_matrix_anchor\n")
+            if not isinstance(g, dict) or not g.get("release_anchor"):
+                sys.stderr.write(f"{cfg_rel}: gap row missing release_anchor\n")
                 return 1
     return 0
 

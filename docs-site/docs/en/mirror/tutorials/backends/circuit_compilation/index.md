@@ -1,6 +1,6 @@
 ---
 title: Circuit compilation in protocols workflow
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html"
 diataxis: tutorial
 pillar: P3
 status: partial
@@ -11,7 +11,7 @@ i18n_key: tutorials.backends.circuit_compilation
 
 # Circuit compilation in protocols workflow <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>tutorials / backends / circuit_compilation</code> · <a href="/mirror/tutorials/backends/circuit_compilation/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>tutorials / backends / circuit_compilation</code> · <a href="/mirror/tutorials/backends/circuit_compilation/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Partial
@@ -19,23 +19,23 @@ i18n_key: tutorials.backends.circuit_compilation
 - **Diátaxis**: Tutorial
 - **Module**: `qchem_stack.backends.compile_passes`
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html](https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html](https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
 **Partial** — Module: `qchem_stack.backends.compile_passes`
 
-Fields or behavior are present but do not fully match InQuanto public semantics; see [Public parity matrix](/en/parity/public-matrix) for caveats.
+Fields or behavior may differ from the public reference text; see [Capabilities & roadmap](/en/product/roadmap).
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

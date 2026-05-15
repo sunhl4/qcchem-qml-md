@@ -9,7 +9,7 @@ This page is for **scope, roadmap, and internal targets**: mapping to published 
 
 ## Product scope (summary)
 
-Open orchestration: YAML, pluggable backends, strict repro. No claims of closed-wheel parity, real Nexus/HQC, or vendor hardware equivalence. Details: [competitive positioning](/en/concept/competitive-positioning), [engineering architecture](/en/concept/engineering-architecture).
+Open orchestration: YAML, pluggable backends, strict repro. No claims of closed-wheel parity, real Nexus/HQC, or vendor hardware equivalence. Details: [competitive positioning](/en/product/roadmap), [engineering architecture](/en/concept/engineering-architecture).
 
 ## Roadmap
 
@@ -25,4 +25,4 @@ Readable against the [public InQuanto hub](https://docs.quantinuum.com/inquanto/
 | Program Construction | [P2](/en/guide/algorithms-and-protocols/) · [CircuitIR](/en/reference/circuitir-tket-jobs) · [Mirror API](/en/mirror/api/algorithms/) |
 | Execution and Analysis | [P3](/en/guide/execution-and-analysis/) · [P4](/en/guide/jobs-and-reproducibility/) · [Cloud](/en/cloud/) |
 
-**Contracts & ledgers**: [parity matrix](/en/parity/public-matrix) · [Y1 ledger (ZH)](/parity/y1-alignment-ledger) · [/mirror/](/en/mirror/) · [Security & data](/en/meta/security-and-data). Machine backlog: `docs/inquanto-node-backlog.generated.json` (`npm run report:inquanto-backlog`).
+**Contracts & ledgers**: [parity matrix](/en/product/roadmap) · [Y1 ledger (ZH)](/product/roadmap) · [/mirror/](/en/mirror/) · [Security & data](/en/meta/security-and-data). Machine backlog: `docs/inquanto-node-backlog.generated.json` (`npm run report:inquanto-backlog`).

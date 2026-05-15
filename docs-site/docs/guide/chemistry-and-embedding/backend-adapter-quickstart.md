@@ -43,12 +43,41 @@ from qchem_stack.chem.solvers.my_backend_solver import MyBackendIntegralSolver
 register_solver("my_backend", MyBackendIntegralSolver.from_experiment_config)
 ```
 
+同名后端已存在时，默认会抛 `SolverRegistrationError`；若你**明确**要替换实现，使用 `overwrite=True`：
+
+```python
+register_solver("my_backend", MyBackendIntegralSolver.from_experiment_config, overwrite=True)
+```
+
 然后在配置里使用：
 
 ```yaml
 scf:
   driver: my_backend
 ```
+
+`scf.driver` 为任意非空、无内部空白的 **solver id** 字符串（会规范化为小写）；未知 id 在 `create_solver` 时抛 `UnknownSolverError`，非法 id（例如全空白）抛 `InvalidSolverIdError`。
+
+### 3a) 安装级插件（pip + entry points）
+
+无需在业务代码里 `register_solver`：在独立 Python 包的 `pyproject.toml` 中声明 entry point group `qchem_stack.chem_solvers`，安装后首次访问 registry 时会自动发现。详见仓库内 [Solver Entry Point 插件安装与发布指南](../../../../docs/solver_entrypoint_plugin_安装与发布指南.md) 与示例 `examples/solver_plugin_entrypoint_demo/`。
+
+### 3b) 可观测性与 entry point 冲突策略
+
+排查「谁注册了这个 driver」时：
+
+```python
+from qchem_stack.chem.solvers import registered_solvers_detail, set_entrypoint_conflict_policy
+
+# 只读映射：solver_id -> (source: builtin|entrypoint|runtime, provider 字符串)
+for sid, meta in registered_solvers_detail().items():
+    print(sid, meta.source, meta.provider)
+```
+
+多个插件对**同一** entry point 名称注册冲突时：
+
+- `set_entrypoint_conflict_policy("warn")`（**默认**）：打 `RuntimeWarning` 并**保留按 name/value 排序后最先成功注册**的那条。
+- `set_entrypoint_conflict_policy("strict")`：冲突时直接抛 `SolverRegistrationError`，适合 CI / 生产硬门禁。
 
 如果你想先看一份可运行示例（不改业务代码）：
 
@@ -89,3 +118,5 @@ python scripts/check_solver_adapter_contract.py configs/example_h2.yaml --driver
 
 - [多后端统一输入输出适配合同](/guide/chemistry-and-embedding/backend-adapter-unified-io)
 - [命令行与脚本](/reference/cli-and-scripts)
+- 仓库内：[Solver Entry Point 插件安装与发布指南](../../../../docs/solver_entrypoint_plugin_安装与发布指南.md)
+- Docusaurus 站点镜像（`npm start`）：仓库 `docusaurus-site/docs/guide/backend-adapter-quickstart.md`

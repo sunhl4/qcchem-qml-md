@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
         'guide/onboarding-three-paths',
         'guide/overview',
         'guide/chemistry-and-embedding',
+        'guide/backend-adapter-quickstart',
         'guide/program-construction',
         'guide/execution-and-analysis',
         'guide/jobs-and-reproducibility',
@@ -46,7 +47,6 @@ const sidebars: SidebarsConfig = {
         'tutorial/switch-backend-compare',
         'tutorial/uccsd-trotter-export',
         'tutorial/zne-qiskit-repro',
-        'tutorial/vqd-inquanto-tangelo',
         'tutorial/projection-embedding-deep-dive',
         'tutorial/case-study-h2-family',
       ],
@@ -68,8 +68,6 @@ const sidebars: SidebarsConfig = {
       label: '概念与架构',
       items: [
         'concept/engineering-architecture',
-        'concept/competitive-positioning',
-        'concept/inquanto-ia-architecture-report',
       ],
     },
     {
@@ -80,15 +78,6 @@ const sidebars: SidebarsConfig = {
         'cloud/tenant-and-quotas',
         'cloud/backend-registry',
         'cloud/jobs-and-logs',
-      ],
-    },
-    {
-      type: 'category',
-      label: '对标',
-      items: [
-        'parity/competitor-benchmark',
-        'parity/public-matrix',
-        'parity/gap-implementation-plan',
       ],
     },
     {

@@ -473,7 +473,7 @@ flowchart TB
 - 机读 driver 表面：`qchem_stack.chem.inquanto_driver_surface`、`qchem_stack.integrations.open_driver_surface.open_driver_coverage_matrix`
 - 经典化学主实现：`qchem_stack.chem.drivers.pyscf_driver`、`qchem_stack.chem.embedding.*`
 - **P1 跨后端 / 映射 conformance（pytest）**：`tests/test_backend_conformance.py`（`statevector`、`qiskit`·statevector/estimator、`ionstack`·注入、`JW/BK/SCBK`、TKET probe 字典；无 PySCF 则 skip，无 Qiskit/pytket 则对应 case skip）。
-- 站点镜像树：`docs-site/docs/.vitepress/mirror-data.json`、`docs-site/scripts/inquanto-tree.yaml`（各 mirror 页 `index.md` 的 `status` / `qchem_module`）
+- 站点镜像树：`docs-site/docs/.vitepress/mirror-data.json`、`docs-site/scripts/mirror-doc-tree.yaml`（各 mirror 页 `index.md` 的 `status` / `qchem_module`）
 
 ---
 
@@ -493,7 +493,7 @@ flowchart TB
 
 ### 1.3 镜像 `status` 与源码的关系
 
-- 镜像节点 `status` 来自站点生成配置（如 `inquanto-tree.yaml` → `mirror-data.json`），本质是 **IA 审计与导航标签**。
+- 镜像节点 `status` 来自站点生成配置（如 `mirror-doc-tree.yaml` → `mirror-data.json`），本质是 **IA 审计与导航标签**。
 - 个别页面存在 **标签与正文矛盾**（例如 `AVAS` 标 `shipped` 但 `qchem_module` 为空、正文仍写未实现）。**复现程度以源码与差距总表为准**；若需与附录 C / backlog 计数一致，应单独维护「镜像 status ↔ 源码证据」纠偏列。
 
 #### 1.3.1 纠偏清单（与 Phase0 对账同源）

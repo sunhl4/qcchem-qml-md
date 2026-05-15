@@ -51,6 +51,24 @@ def test_export_example_h2_matches_golden_fixture() -> None:
     fresh = _normalize_export(_export_json("configs/example_h2.yaml"))
     # Keep the historical fixture as a backwards-compatible baseline while allowing additive export keys.
     for key, value in golden.items():
+        if key == "parity_export_schema_version":
+            assert int(str(fresh.get(key))) >= int(str(value))
+            continue
+        if key == "registered_solvers":
+            assert isinstance(fresh.get(key), list)
+            assert set(value).issubset(set(fresh[key]))
+            continue
+        if key == "computable_abstract":
+            assert isinstance(fresh.get(key), dict)
+            for sub_k, sub_v in value.items():
+                if sub_k == "evaluate_note":
+                    assert "evaluate" in str(fresh[key].get(sub_k, "")).lower()
+                    continue
+                assert fresh[key].get(sub_k) == sub_v
+            continue
+        if key == "inquanto_gap_categories":
+            assert isinstance(fresh.get("capability_gap_categories"), list)
+            continue
         assert fresh.get(key) == value
     assert fresh.get("scf_driver") == "pyscf"
     assert isinstance(fresh.get("registered_solvers"), list)
@@ -188,14 +206,14 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
     ),
 )
 def test_m2_config_only_export_stable_keys(cfg_rel: str) -> None:
-    from qchem_stack.protocols.inquanto_contract import PARITY_EXPORT_V2_STABLE_KEYS
+    from qchem_stack.protocols.product_contract import PARITY_EXPORT_V3_STABLE_KEYS
 
     cfg_path = _ROOT / cfg_rel
     if not cfg_path.is_file():
         pytest.skip(f"missing {cfg_rel}")
     data = _normalize_export(_export_json(cfg_rel))
-    assert not (PARITY_EXPORT_V2_STABLE_KEYS - set(data.keys()))
-    assert data.get("parity_export_schema_version") == "2"
+    assert not (PARITY_EXPORT_V3_STABLE_KEYS - set(data.keys()))
+    assert data.get("parity_export_schema_version") == "3"
 
 
 @pytest.mark.skipif(

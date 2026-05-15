@@ -24,7 +24,7 @@ keywords:
 | 先理解配置怎么组织 | [工作流与 YAML 概览](./tutorial/workflow) |
 | 我是维护者，要看全局结构 | [指南总览（P1-P4）](./guide/) |
 | 我要接 HTTP / 队列 | [命令行与脚本](./reference/cli-and-scripts) + [HTTP API](./reference/http-api-sqlite-jobs) |
-| 我要做对标与计划 | [公开契约矩阵](./parity/public-matrix) + [差距实施计划](./parity/gap-implementation-plan) |
+| 我要做规划与验收 | [产品路线图](./product/roadmap) + [工程架构](./concept/engineering-architecture) |
 
 ## 站点结构（维护视角）
 
@@ -33,15 +33,15 @@ keywords:
 - `docs/tutorial`：可运行教程，强调“做什么 + 怎么验证”
 - `docs/reference`：CLI、HTTP、CircuitIR、DMET 等契约页
 - `docs/cloud`：本地/私有部署的云化治理实践
-- `docs/parity`：对标矩阵、差距计划和验收口径
+- `docs/product` / `docs/concept`：产品路线、架构边界和验收口径
 
 ## 维护原则（建议）
 
 - 教程必须“可运行 + 可验证”，不要只写概念描述
 - 参考页保持契约稳定，优先补字段和状态机，而不是口号
-- 对标页保持诚实口径：`yes / partial / n-a`，并给证据
+- 规划页保持诚实口径：能力范围、边界与证据可追溯
 - 首页与导航的链接只指向可维护、长期稳定的入口页
 
-## 外部参考（背景）
+## 外部参考（按需）
 
-- [Quantinuum InQuanto 文档](https://docs.quantinuum.com/inquanto/)
+- [项目仓库 README](https://github.com/sunhl4/qcchem-qml-md)

@@ -5,7 +5,6 @@ import { useRoute } from "vitepress";
 const route = useRoute();
 const en = computed(() => route.path.startsWith("/en"));
 
-const INQUANTO_PUBLIC = "https://docs.quantinuum.com/inquanto/";
 </script>
 
 <template>
@@ -64,7 +63,7 @@ const INQUANTO_PUBLIC = "https://docs.quantinuum.com/inquanto/";
         </div>
 
         <div class="qcs-site-mega-footer__col">
-          <h2 class="qcs-site-mega-footer__heading">{{ en ? "Reference & parity" : "参考与对标" }}</h2>
+          <h2 class="qcs-site-mega-footer__heading">{{ en ? "Reference" : "参考" }}</h2>
           <ul class="qcs-site-mega-footer__list">
             <li>
               <a :href="en ? '/en/reference/cli-and-scripts' : '/reference/cli-and-scripts'">{{
@@ -72,23 +71,17 @@ const INQUANTO_PUBLIC = "https://docs.quantinuum.com/inquanto/";
               }}</a>
             </li>
             <li>
-              <a :href="en ? '/en/parity/public-matrix' : '/parity/public-matrix'">{{ en ? "Parity matrix" : "公开契约矩阵" }}</a>
-            </li>
-            <li>
               <a :href="en ? '/en/mirror/' : '/mirror/'">{{ en ? "Manual mirror (root)" : "手册镜像（根）" }}</a>
-            </li>
-            <li>
-              <a :href="INQUANTO_PUBLIC" rel="noopener noreferrer">{{ en ? "Quantinuum InQuanto (external)" : "Quantinuum InQuanto（外部）" }}</a>
             </li>
           </ul>
         </div>
 
         <div class="qcs-site-mega-footer__col qcs-site-mega-footer__col--opensource">
-          <h2 class="qcs-site-mega-footer__heading">{{ en ? "Open QC ecosystem (external)" : "开放量子生态（外部）" }}</h2>
+          <h2 class="qcs-site-mega-footer__heading">{{ en ? "Open-source ecosystem (external)" : "开源生态（外部）" }}</h2>
           <ul class="qcs-site-mega-footer__list qcs-site-mega-footer__list--inline">
             <li><a href="https://tket.quantinuum.com/" rel="noopener noreferrer">pytket</a></li>
-            <li><a href="https://docs.quantinuum.com/nexus/" rel="noopener noreferrer">Q Nexus</a></li>
-            <li><a href="https://www.quantinuum.com/" rel="noopener noreferrer">Quantinuum</a></li>
+            <li><a href="https://pyscf.org/" rel="noopener noreferrer">PySCF</a></li>
+            <li><a href="https://qiskit.org/" rel="noopener noreferrer">Qiskit</a></li>
           </ul>
           <p class="qcs-site-mega-footer__note">
             {{ en ? "External links are informational only." : "外链仅供查阅，不代表背书。" }}

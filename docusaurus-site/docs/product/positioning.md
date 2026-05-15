@@ -1,10 +1,8 @@
 ---
 title: 定位与路线
-description: 产品定位、边界说明、用户价值与对标策略的统一入口页。
+description: 产品定位、边界说明、用户价值与路线规划入口页。
 keywords:
   - 产品定位
-  - 竞争分析
-  - InQuanto
   - 路线图
 ---
 
@@ -25,9 +23,9 @@ keywords:
 - **工程稳定性**：用作业状态机与结构化输出做可追踪运行
 - **协作成本**：通过参考页统一术语、字段和边界
 
-## 对标主线（对维护者）
+## 能力主线（对维护者）
 
-参考 InQuanto 公开文档三柱，并扩展工程化 P4：
+围绕产品能力主线，并扩展工程化 P4：
 
 - Chemical Specification -> [P1 化学与嵌入](../guide/chemistry-and-embedding)
 - Program Construction -> [P2 程序构建](../guide/program-construction)
@@ -37,6 +35,5 @@ keywords:
 ## 路线图入口
 
 - [路线图](./roadmap)
-- [竞争定位与分阶段目标](../concept/competitive-positioning)
-- [公开契约矩阵](../parity/public-matrix)
-- [差距与实施计划](../parity/gap-implementation-plan)
+- [工程架构](../concept/engineering-architecture)
+- [产品功能](./features)

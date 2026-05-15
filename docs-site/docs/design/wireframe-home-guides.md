@@ -68,15 +68,15 @@
 
 ### 2.5 信任块（Trust）
 
-- **公开对标矩阵** → `/parity/public-matrix`
-- **L1 签 off** → `/parity/l1-signoff`
+- **公开对标矩阵** → `/product/roadmap`
+- **L1 签 off** → `/product/roadmap`
 - **工程架构分层** → `/concept/engineering-architecture`
 
 简短说明：`yes` / `partial` / `n/a` 图例一眼可见（图标或色条）。
 
 ### 2.6 页脚
 
-Copyright · [parity](/parity/public-matrix) · [Architecture](/concept/engineering-architecture)
+Copyright · [parity](/product/roadmap) · [Architecture](/concept/engineering-architecture)
 
 ## 3. Guides 枢纽（`/guide/`）
 
@@ -90,7 +90,7 @@ Copyright · [parity](/parity/public-matrix) · [Architecture](/concept/engineer
 └──────────────────────────────────────────────────────────────┘
 … P2–P4 同理
 
-底部：[返回首页] [完整索引](/parity/public-matrix)
+底部：[返回首页] [完整索引](/product/roadmap)
 ```
 
 ## 4. 四柱子页（`/guide/{pillar-slug}/`）

@@ -27,7 +27,7 @@ python scripts/smoke_pipeline.py --config configs/example_h2_zne_circuit_fold.ya
 
 - `expectation_source` 是否为 shot 路径
 - `mitigation` 相关块是否完整
-- `parity_snapshot` 中是否保留对标所需键
+- `parity_snapshot` 中是否保留验收所需键
 
 ## 常见问题
 

@@ -1,6 +1,6 @@
 ---
-title: inquanto.geometries
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html"
+title: 参考 API · inquanto.geometries
+reference_doc_url: "https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html"
 diataxis: reference
 pillar: P1
 status: partial
@@ -9,33 +9,33 @@ milestone: ""
 i18n_key: api.geometries
 ---
 
-# inquanto.geometries <StatusBadge :status="$frontmatter.status" />
+# 参考 API · inquanto.geometries <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto 镜像路径: <code>api / geometries</code> · <a href="/en/mirror/api/geometries/">English version</a></p>
+<p class="mirror-breadcrumb">手册镜像节点路径: <code>api / geometries</code> · <a href="/en/mirror/api/geometries/">English version</a></p>
 
 ::: info 镜像元信息
-- **状态**: 部分对齐
+- **状态**: 部分实现
 - **四柱归属**: P1 化学与嵌入
 - **Diátaxis**: Reference
 - **对应模块**: `qchem_stack.chem.molecule`
 - **里程碑**: —
-- **InQuanto 锚点**: [https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html](https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html)
+- **参考文档 URL**: [https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html](https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html)
 :::
 
 ## 它是什么
 
-本节为 InQuanto 公开树的对应位置。点开下面 InQuanto 锚点查看官方原始定义；本仓库的对应实现见「我们的实现」。
+本节与第三方公开文档目录中的对应条目同构。点击下方参考锚点可查阅外部原始定义；本仓库实现见「我们的实现」。
 
 ## 我们的实现
 
-**部分对齐** — 对应模块: `qchem_stack.chem.molecule`
+**部分实现** — 对应模块: `qchem_stack.chem.molecule`
 
-字段或行为已落地但与 InQuanto 公开语义不完全等价；详细 caveat 见 [公开 parity 矩阵](/parity/public-matrix)。
+字段或行为已落地，但与参考文档公开语义可能不完全一致；说明见 [能力概览与路线图](/product/roadmap)。
 
 ## 相关
 
-- [公开 parity 矩阵](/parity/public-matrix)
+- [能力概览与路线图](/product/roadmap)
 - [工程分层架构](/concept/engineering-architecture)
-- [竞争定位与路线图](/concept/competitive-positioning)
+- [产品路线图](/product/roadmap)
 - [15 分钟上手](/tutorial/quickstart)
 - [IA slug 映射](/meta/ia-mapping)

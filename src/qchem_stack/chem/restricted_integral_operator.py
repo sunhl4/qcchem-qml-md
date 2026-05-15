@@ -10,8 +10,9 @@ import pandas as pd
 from openfermion import InteractionOperator
 from openfermion.chem.molecular_data import spinorb_from_spatial
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult, active_space_casci_raw_blocks
+from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
 from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
+from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
 
 
 def interaction_operator_to_dataframe(

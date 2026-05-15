@@ -13,4 +13,4 @@ Example YAML: **`configs/example_h2_zne_circuit_fold.yaml`**.
 
 Narrative mapping: repo `docs/mitigation_PMSV_ZNE_Qermit_mapping.md` (mirrored as [mitigation mapping](/concept/mitigation-mapping) when available).
 
-See also: [parity matrix](/parity/public-matrix), [Ten repro keys](/en/tutorial/read-repro-keys).
+See also: [parity matrix](/product/roadmap), [Ten repro keys](/en/tutorial/read-repro-keys).

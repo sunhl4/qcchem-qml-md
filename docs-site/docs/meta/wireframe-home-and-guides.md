@@ -17,7 +17,7 @@ description: 对标 InQuanto 枢纽 + 四柱扩展的页面线框（Quickstart�
 | B | **快捷链**（可选） | Runs API、路线图 — 高频工程入口 |
 | C | **能力主轴标题** | 眉题 + 一句副文案，引入下方卡片 |
 | D | **四柱能力卡片** | P1–P4；每卡：标题、lead、正文、**单一主深链**（手册镜像或指南） |
-| E | **信任区块**（紧凑） | 公开契约矩阵 + 诚实边界（partial / n/a）— 链到 `/parity/public-matrix` |
+| E | **信任区块**（紧凑） | 公开契约矩阵 + 诚实边界（partial / n/a）— 链到 `/product/roadmap` |
 | F | **页脚短链** | 安全与数据、原理与阅读 |
 
 ### 1.2 线框（ASCII）
@@ -63,7 +63,7 @@ description: 对标 InQuanto 枢纽 + 四柱扩展的页面线框（Quickstart�
 | 量子化学研究者 | P1 + `/mirror/manual/geometry/` |
 | QC 算法 / 协议开发者 | P2 + `/reference/cli-and-scripts` |
 | 平台集成 / 运维 | P4 + `/reference/http-api-sqlite-jobs` |
-| 合规 / 采购 | `/parity/public-matrix` + `/meta/security-and-data` |
+| 合规 / 采购 | `/product/roadmap` + `/meta/security-and-data` |
 
 3. **四柱表格**（与 IA 定稿一致）。
 4. **Diátaxis 提示**：Concept / Tutorial / Reference / Parity 见顶栏；链到 [文档类型索引](/meta/diataxis-index)。

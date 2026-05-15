@@ -13,7 +13,7 @@ description: 面向用户的能力说明：主要功能、用户接口、与实�
 | **2. 用法与接口** | 怎么配 YAML、怎么调 Python / HTTP / 命令行 | [四柱指南](/guide/) · [命令行与脚本](/reference/cli-and-scripts) · [HTTP API](/reference/http-api-sqlite-jobs) |
 | **3. 实现细节与原理** | 字段契约、编译与采样路径、缓解与对标语义 | [Reference 各篇](/reference/http-api-sqlite-jobs) · [Concept](/concept/engineering-architecture) 等 · [原理与阅读建议](/guide/principles-and-reading) |
 
-**与 InQuanto 公开文档的对标**（295 节点、契约矩阵等）属于**内部研发目标与验收**，放在 [定位与路线](/product/) 与 [Parity](/parity/public-matrix)，不是使用产品的必经路径。顶栏保留 **Parity** 便于研发对齐；**终端用户可跳过**该区，除非参与验收或采购对表。
+**与 InQuanto 公开文档的对标**（295 节点、契约矩阵等）属于**内部研发目标与验收**，放在 [定位与路线](/product/) 与 [Parity](/product/roadmap)，不是使用产品的必经路径。顶栏保留 **Parity** 便于研发对齐；**终端用户可跳过**该区，除非参与验收或采购对表。
 
 ## 主要功能（用户视角）
 
@@ -22,7 +22,7 @@ description: 面向用户的能力说明：主要功能、用户接口、与实�
 - **执行与分析**：多后端（如 statevector、Qiskit、IonStack mock）、采样与资源摘要、缓解相关配置与报告字段。
 - **作业与可复现**：可选 SQLite 作业表、FastAPI 提交与轮询、`repro` / parity 导出，便于流水线与回归（见 [P4 指南](/guide/jobs-and-reproducibility/)）。
 
-更细的**能力边界**（做什么、不做什么）见 [竞争定位](/concept/competitive-positioning) 与 [工程分层](/concept/engineering-architecture)。
+更细的**能力边界**（做什么、不做什么）见 [竞争定位](/product/roadmap) 与 [工程分层](/concept/engineering-architecture)。
 
 ## 一页图：从 YAML 到结果
 

@@ -5,8 +5,14 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
+from qchem_stack.chem.integrals.pyscf_lowdin import build_lowdin_system_from_rhf
+from qchem_stack.chem.integrals.pyscf_onebody import (
+    one_electron_operator_fermion_from_rhf,
+    one_electron_operator_pauli_from_rhf,
+)
 from qchem_stack.chem.solvers.pyscf_solver import PySCFIntegralSolver
 from qchem_stack.chem.system import MolecularSystem
+from qchem_stack.chem.systems.pyscf_views import PySCFAOSystem, PySCFLowdinSystem
 from qchem_stack.config import ActiveSpaceSpec, ChemistryExtendedSpec, ExperimentConfig
 
 if TYPE_CHECKING:
@@ -39,158 +45,13 @@ def unwrap_pyscf_rhf_for_backend_operations(rhf: PySCFRHFResult) -> PySCFRHFResu
     return rhf
 
 
-@dataclass
-class PySCFAOSystem:
-    """AO-oriented handle that keeps the underlying PySCF SCF object accessible."""
-
-    mf: Any
-    molecular_system: MolecularSystem
-    driver_meta: dict[str, Any] = field(default_factory=dict)
-    has_run_hf: bool = True
-    e_tot: float | None = None
-
-    def ao_driver_summary_df(self) -> Any:
-        """Notebook-friendly AO/system descriptor (cf. tutorials wrapping ``mf`` / ``mol``)."""
-        import pandas as pd
-
-        mol = self.mf.mol
-        rows = [
-            {"quantity": "nao_nr", "value": int(mol.nao_nr())},
-            {"quantity": "nelectron", "value": int(mol.nelectron)},
-            {"quantity": "spin", "value": int(mol.spin)},
-            {"quantity": "basis_repr", "value": str(mol.basis)},
-            {"quantity": "groupname", "value": getattr(mol, "groupname", None)},
-            {
-                "quantity": "integral_representation",
-                "value": self.driver_meta.get("integral_representation"),
-            },
-            {"quantity": "ao_reference_kind", "value": self.driver_meta.get("ao_reference_kind")},
-            {"quantity": "ao_run_hf", "value": self.driver_meta.get("ao_run_hf")},
-        ]
-        return pd.DataFrame(rows)
-
-
-@dataclass
-class PySCFLowdinSystem:
-    """Löwdin-orthogonal AO representation for embedding-style workflows."""
-
-    constant: float
-    h1_spatial: np.ndarray
-    h2_spatial: np.ndarray
-    rdm1_spatial: np.ndarray
-    molecular_system: MolecularSystem
-    driver_meta: dict[str, Any] = field(default_factory=dict)
-
-
-def active_space_casci_raw_blocks(
-    rhf: PySCFRHFResult,
-    n_active_orbitals: int,
-    n_active_electrons: int,
-) -> tuple[float, np.ndarray, np.ndarray]:
-    """CASCI MO integral blocks before OpenFermion reorder / dense restore.
-
-    ``h2_spatial[p,q,r,s]`` is chemists' notation (pq|rs) over active spatial orbitals after dense restore.
-    ``constant`` is PySCF CASCI ``energy_core`` from :meth:`pyscf.mcscf.CASCI.get_h1eff` (nuclear repulsion plus
-    inactive-core contributions when ``ncore > 0``); it must not be summed again with ``energy_nuc``.
-
-    ``h2eff`` from :meth:`pyscf.mcscf.CASCI.get_h2eff` may be **compact** (ndim ``!= 4``); callers should pass
-    through :func:`pyscf.ao2mo.restore` before spatial reordering.
-    """
-    from pyscf import mcscf
-
-    rhf = unwrap_pyscf_rhf_for_backend_operations(rhf)
-    mf = rhf.mf
-    meta = getattr(rhf, "driver_meta", None) or {}
-    _ik = meta.get("pbc_active_space_kpoint_index")
-    ik = int(_ik if _ik is not None else 0)
-    mo_coeff = mf.mo_coeff
-    if isinstance(mo_coeff, np.ndarray):
-        mo = mo_coeff
-    else:
-        moc = list(mo_coeff)
-        if ik >= len(moc):
-            ik = 0
-        mo = np.asarray(moc[ik], dtype=complex)
-        if np.max(np.abs(mo.imag)) < 1e-10:
-            mo = np.asarray(mo.real, dtype=float)
-    n_mo = int(mo.shape[1])
-    if n_active_orbitals > n_mo:
-        raise ValueError("active orbitals exceed MO count at chosen k-point")
-    cas = mcscf.CASCI(mf, n_active_orbitals, n_active_electrons)
-    frozen_cfg = list(meta.get("active_space_frozen_orbitals") or [])
-    if frozen_cfg:
-        if any(i < 0 for i in frozen_cfg):
-            raise ValueError("active_space_frozen_orbitals entries must be >= 0.")
-        if any(i >= n_mo for i in frozen_cfg):
-            raise ValueError(
-                f"active_space_frozen_orbitals index out of bounds for n_mo={n_mo}: {frozen_cfg}"
-            )
-        cas.frozen = sorted(set(int(i) for i in frozen_cfg))
-    h1, e_core = cas.get_h1eff(mo)
-    h2 = cas.get_h2eff(mo)
-    h1a = np.asarray(h1, dtype=complex)
-    h2a = np.asarray(h2, dtype=complex)
-    for label, arr in (("h1", h1a), ("h2", h2a)):
-        if np.max(np.abs(arr.imag)) > 1e-7:
-            raise ValueError(
-                f"Active space {label} has non-trivial imaginary part; use Gamma (mesh [1,1,1]) or a real k-point."
-            )
-    # ``e_core`` from ``CASCI.get_h1eff`` / ``h1e_for_cas`` already starts at
-    # ``energy_nuc()`` and adds inactive-orbital contributions when ``ncore > 0``;
-    # do not add ``mol.energy_nuc()`` again (would double-count nuclear repulsion).
-    constant = float(e_core)
-    h1_out = np.asarray(h1a.real, dtype=float)
-    h2_real = np.asarray(h2a.real, dtype=float)
-    # PySCF 2.x ``get_h2eff`` often returns chemists' ERIs in compact 2D form
-    # (``n * (n + 1) // 2`` square); OpenFermion expects full ``(n, n, n, n)``.
-    n_act = int(n_active_orbitals)
-    if h2_real.ndim == 4:
-        h2_out = h2_real
-    elif h2_real.ndim == 2:
-        from pyscf import ao2mo
-
-        h2_out = np.asarray(ao2mo.restore(1, h2_real, n_act), dtype=float)
-    else:
-        raise ValueError(f"unexpected active-space h2 shape {h2_real.shape} (ndim={h2_real.ndim})")
-    return constant, h1_out, h2_out
-
-
-def active_space_integrals(
-    rhf: PySCFRHFResult,
-    n_active_orbitals: int,
-    n_active_electrons: int,
-) -> tuple[float, np.ndarray, np.ndarray]:
-    """Return (constant, h1_spatial, h2_spatial) for OpenFermion ``InteractionOperator``.
-
-    ``h2_spatial`` is the active-space MO ERI tensor after **Tangelo/OpenFermion reordering**
-    (:func:`~qchem_stack.chem.integral_convention.spatial_mo_eri_pyscf_to_openfermion_mo_ordering`)
-    on PySCF ``get_h2eff`` / ``ao2mo.restore`` output. Callers then use
-    ``spinorb_from_spatial`` and ``InteractionOperator(..., 0.5 * h2_spin_orb)`` as in
-    SandboxAQ Tangelo's ``SecondQuantizedMolecule._get_fermionic_hamiltonian``.
-
-    The constant is PySCF ``get_h1eff``'s ``energy_core`` (nuclear repulsion plus
-    frozen-core electronic energy when ``ncore>0``); do not add ``energy_nuc`` again.
-    """
-    from pyscf import ao2mo
-
-    constant, h1_real, h2_store = active_space_casci_raw_blocks(
-        rhf, n_active_orbitals, n_active_electrons
-    )
-    if h2_store.ndim != 4:
-        h2a = np.asarray(
-            ao2mo.restore(1, np.asarray(h2_store, dtype=float), int(n_active_orbitals)),
-            dtype=float,
-        )
-    else:
-        h2a = np.asarray(h2_store, dtype=float)
-    from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
-
-    h2_spatial = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(h2a)
-    return constant, h1_real, h2_spatial
-
-
 class PySCFDriver:
-    """Minimal PySCF RHF/ROHF/UHF driver behind extension boundary."""
+    """Compatibility facade over :class:`PySCFIntegralSolver` for PySCF-specific workflows.
+
+    Main pipeline orchestration should prefer solver-registry + canonical pre-quantum
+    handoff objects. Keep this class for explicit PySCF-native helper surfaces
+    (AO/Lowdin handles, external MF onboarding, notebooks).
+    """
 
     def __init__(
         self,
@@ -331,28 +192,6 @@ class PySCFDriver:
     def run_uhf(self) -> PySCFRHFResult:
         return self._run_mean_field()
 
-    @staticmethod
-    def _spatial_one_body_to_fermion_operator(h1_spatial: np.ndarray) -> Any:
-        from openfermion import FermionOperator
-
-        h1 = np.asarray(h1_spatial, dtype=float)
-        n = int(h1.shape[0])
-        out = FermionOperator()
-        for p in range(n):
-            for q in range(n):
-                c = float(h1[p, q])
-                if abs(c) < 1e-14:
-                    continue
-                out += FermionOperator(((2 * p, 1), (2 * q, 0)), c)
-                out += FermionOperator(((2 * p + 1, 1), (2 * q + 1, 0)), c)
-        return out
-
-    @staticmethod
-    def _transform_ao_to_mo(ao_mat: np.ndarray, mo_coeff: np.ndarray) -> np.ndarray:
-        c = np.asarray(mo_coeff, dtype=float)
-        a = np.asarray(ao_mat, dtype=float)
-        return np.asarray(c.T @ a @ c, dtype=float)
-
     def compute_one_electron_operator_fermion(
         self,
         oper: Literal["kin", "nuc", "hcore", "ovlp", "r", "rr", "dm"],
@@ -367,41 +206,7 @@ class PySCFDriver:
         ``r`` / ``dm`` -> length 3, ``rr`` -> length 9.
         """
         pr = unwrap_pyscf_rhf_for_backend_operations(rhf if rhf is not None else self.run_rhf())
-        mf = pr.mf
-        mol = mf.mol
-        mo = np.asarray(mf.mo_coeff, dtype=float)
-        if oper == "kin":
-            h = mol.intor_symmetric("int1e_kin")
-            return self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(h, mo))
-        if oper == "nuc":
-            h = mol.intor_symmetric("int1e_nuc")
-            return self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(h, mo))
-        if oper == "hcore":
-            h = mf.get_hcore()
-            return self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(h, mo))
-        if oper == "ovlp":
-            h = mf.get_ovlp()
-            return self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(h, mo))
-        with mol.with_common_origin(tuple(map(float, origin))):
-            if oper in ("r", "dm"):
-                mats = np.asarray(mol.intor("int1e_r"), dtype=float).reshape(
-                    3, mo.shape[0], mo.shape[0]
-                )
-                if oper == "dm":
-                    mats = -mats
-                return [
-                    self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(m, mo))
-                    for m in mats
-                ]
-            if oper == "rr":
-                mats = np.asarray(mol.intor("int1e_rr"), dtype=float).reshape(
-                    9, mo.shape[0], mo.shape[0]
-                )
-                return [
-                    self._spatial_one_body_to_fermion_operator(self._transform_ao_to_mo(m, mo))
-                    for m in mats
-                ]
-        raise ValueError(f"Unsupported one-electron operator key: {oper!r}")
+        return one_electron_operator_fermion_from_rhf(pr, oper, origin=origin)
 
     def compute_one_electron_operator_pauli(
         self,
@@ -419,30 +224,14 @@ class PySCFDriver:
         """
         Map one-electron fermionic operator(s) to qubit-space Pauli operators.
         """
-        from openfermion import bravyi_kitaev, jordan_wigner, symmetry_conserving_bravyi_kitaev
-
-        fop = self.compute_one_electron_operator_fermion(oper, origin=origin, rhf=rhf)
-
-        def _map_one(op: Any) -> Any:
-            if fermion_qubit_mapping == "jordan_wigner":
-                return jordan_wigner(op)
-            if fermion_qubit_mapping == "bravyi_kitaev":
-                return bravyi_kitaev(op)
-            n_spin_orbitals = int(
-                2 * np.asarray((rhf.mf if rhf else self.run_rhf().mf).mo_coeff).shape[1]
-            )
-            if n_electrons is None:
-                raise ValueError(
-                    "compute_one_electron_operator_pauli(..., fermion_qubit_mapping='symmetry_conserving_bravyi_kitaev') "
-                    "requires n_electrons."
-                )
-            return symmetry_conserving_bravyi_kitaev(
-                op, n_spin_orbitals=n_spin_orbitals, n_electrons=int(n_electrons)
-            )
-
-        if isinstance(fop, list):
-            return [_map_one(x) for x in fop]
-        return _map_one(fop)
+        pr = unwrap_pyscf_rhf_for_backend_operations(rhf if rhf is not None else self.run_rhf())
+        return one_electron_operator_pauli_from_rhf(
+            pr,
+            oper,
+            origin=origin,
+            fermion_qubit_mapping=fermion_qubit_mapping,
+            n_electrons=n_electrons,
+        )
 
     @classmethod
     def from_pyscf_mean_field(
@@ -619,43 +408,7 @@ class PySCFDriver:
             )
         if rhf is None:
             rhf = self._run_mean_field()
-        mf = rhf.mf
-        mol = mf.mol
-        s = np.asarray(mf.get_ovlp(), dtype=float)
-        # C_lowdin^T S C_lowdin = I
-        evals, evecs = np.linalg.eigh(s)
-        if np.min(evals) <= 1e-12:
-            raise ValueError(
-                "AO overlap matrix is near singular; cannot build stable Löwdin basis."
-            )
-        c_low = np.asarray(evecs @ np.diag(evals**-0.5) @ evecs.T, dtype=float)
-        hcore = np.asarray(mf.get_hcore(), dtype=float)
-        h1_low = np.einsum("pi,pq,qj->ij", c_low, hcore, c_low, optimize=True)
-        n_ao = int(hcore.shape[0])
-        eri_ao = np.asarray(mol.intor("int2e", aosym="s1"), dtype=float).reshape(
-            n_ao, n_ao, n_ao, n_ao
-        )
-        h2_low = np.einsum(
-            "pa,qb,rc,sd,pqrs->abcd", c_low, c_low, c_low, c_low, eri_ao, optimize=True
-        )
-        dm_ao_raw = mf.make_rdm1()
-        if isinstance(dm_ao_raw, (tuple, list)):
-            dm_ao = np.asarray(dm_ao_raw[0], dtype=float) + np.asarray(dm_ao_raw[1], dtype=float)
-        else:
-            dm_ao = np.asarray(dm_ao_raw, dtype=float)
-        c_inv = np.linalg.inv(c_low)
-        dm_low = np.asarray(c_inv @ dm_ao @ c_inv.T, dtype=float)
-        meta = dict(rhf.driver_meta)
-        meta["integral_representation"] = "lowdin_orth_ao"
-        meta["lowdin_basis_transform"] = "s^-1/2"
-        return PySCFLowdinSystem(
-            constant=float(mol.energy_nuc()),
-            h1_spatial=np.asarray(h1_low, dtype=float),
-            h2_spatial=np.asarray(h2_low, dtype=float),
-            rdm1_spatial=np.asarray(dm_low, dtype=float),
-            molecular_system=self.system,
-            driver_meta=meta,
-        )
+        return build_lowdin_system_from_rhf(rhf, molecular_system=self.system)
 
     def get_restricted_active_space_quantum_problem(
         self,

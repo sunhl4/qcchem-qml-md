@@ -23,4 +23,4 @@
 
 ## 下一步
 
-[P4 作业与可复现](/guide/jobs-and-reproducibility/) · [工程记忆](/concept/engineering-memory-quantinuum)
+[P4 作业与可复现](/guide/jobs-and-reproducibility/) · [工程记忆](/concept/engineering-architecture)

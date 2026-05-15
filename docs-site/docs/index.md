@@ -70,7 +70,7 @@ hero:
   <p class="inq-doc-home__lead">以 SQLite 作业台账与可选 Runs API 承载异步全流水线；strict repro、队列时间线与 slim 摘要服务 Methods 与网关集成。</p>
   <p class="inq-doc-home__p"><strong>run_context</strong>、<strong>pipeline_profile</strong> 与 <code>meta</code> 标签写入 repro；<strong>GET /v1/runs/…/summary|repro</strong> 等契约与 parity 白名单见参考文档。</p>
   <p class="inq-doc-home__manual"><a href="/reference/http-api-sqlite-jobs">参考：HTTP API 与 SQLite 作业契约</a></p>
-  <p class="inq-doc-home__p">延伸：<a href="/guide/jobs-and-reproducibility/">P4 作业与可复现</a> · <a href="/concept/launch-retrieve-nexus-analog">Launch / Retrieve（Nexus 类比）</a> · <a href="/parity/public-matrix">公开契约矩阵</a>。</p>
+  <p class="inq-doc-home__p">延伸：<a href="/guide/jobs-and-reproducibility/">P4 作业与可复现</a> · <a href="/concept/launch-retrieve-nexus-analog">Launch / Retrieve（Nexus 类比）</a> · <a href="/product/roadmap">公开契约矩阵</a>。</p>
 </article>
 
 </section>
@@ -78,11 +78,11 @@ hero:
 <div class="inq-doc-home__trust">
   <p class="inq-doc-home__trust-inner">
     <span class="inq-doc-home__trust-label">信任与边界</span>
-    <a href="/parity/public-matrix">公开契约矩阵</a>
+    <a href="/product/roadmap">公开契约矩阵</a>
     <span class="inq-doc-home__trust-sep" aria-hidden="true">·</span>
-    <a href="/parity/l1-signoff">L1 签 off</a>
+    <a href="/product/roadmap">L1 签 off</a>
     <span class="inq-doc-home__trust-sep" aria-hidden="true">·</span>
-    <a href="/parity/gap-implementation-plan">差距与实施计划</a>
+    <a href="/product/roadmap">差距与实施计划</a>
   </p>
 </div>
 

@@ -3,7 +3,10 @@
 from __future__ import annotations
 
 from collections.abc import Mapping, Sequence
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
+
+from qchem_stack.exceptions import ConfigurationError
 
 if TYPE_CHECKING:
     from .experiment import ExperimentConfig
@@ -33,6 +36,29 @@ def preprocess_top_level_yaml_dict(
     if merged_extra or "extra" in top_level:
         top_level["extra"] = merged_extra
     return top_level
+
+
+def preprocess_precomputed_bundle_path(
+    data: dict[str, Any],
+    *,
+    base_dir: Path,
+) -> None:
+    """Resolve ``scf.precomputed_bundle_path`` relative to YAML location when present."""
+    scf = data.get("scf")
+    if not isinstance(scf, dict):
+        return
+    if str(scf.get("driver", "")).strip().lower() != "precomputed":
+        return
+    raw = scf.get("precomputed_bundle_path")
+    if raw is None:
+        return
+    if not isinstance(raw, str) or not raw.strip():
+        raise ConfigurationError(
+            "scf.precomputed_bundle_path must be a non-empty string when scf.driver='precomputed'."
+        )
+    p = Path(raw.strip())
+    resolved = p if p.is_absolute() else (base_dir / p).resolve()
+    scf["precomputed_bundle_path"] = str(resolved)
 
 
 def validate_embedding_atom_indices_within_molecule(spec: ExperimentConfig) -> None:

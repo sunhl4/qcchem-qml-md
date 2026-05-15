@@ -21,11 +21,11 @@ Recommended reading order:
 
 1. this page (P2 roadmap framing and boundaries)
 2. `docs/实施总计划_InQuanto_PySCF_Tangelo.md` (detailed implementation)
-3. [Gap implementation plan](/parity/gap-implementation-plan) (ledger and appendix anchors)
+3. [Gap implementation plan](/product/roadmap) (ledger and appendix anchors)
 
 ## Scope (roadmap P2 vs shipped “mainline structure” batch)
 
-- **Roadmap P2** here means the competitive-doc phase **research depth & large-system work**, not the gap-doc §3 batch already shipped (QPE track on pipeline, `computable` thin layer, TKET CI)—that batch is labeled **“mainline structure enhancement (delivered)”** on [Gap implementation plan](/parity/gap-implementation-plan).
+- **Roadmap P2** here means the competitive-doc phase **research depth & large-system work**, not the gap-doc §3 batch already shipped (QPE track on pipeline, `computable` thin layer, TKET CI)—that batch is labeled **“mainline structure enhancement (delivered)”** on [Gap implementation plan](/product/roadmap).
 
 ## P1 demo track vs P2 depth (QPE / export)
 
@@ -64,4 +64,4 @@ Execution evidence pages are archived in repo `docs/execution/` (including Day12
 
 ## Appendix §9–§11 (ADR · W3 · W5)
 
-The **full** ADR (P2-W2 decomposition scope), P2-W3 (AVAS / CASSCF boundary tables), and P2-W5 (registry tables) live only in the repo markdown **`docs/与InQuanto能力差距与实施计划.md`（附录 A）** sections **§9–§11**, co-maintained with the [public parity matrix](/parity/public-matrix). This English page keeps the **same anchor ids** for `fix-internal-links` compatibility; read the Chinese `/concept/p2-detailed-plan` §8 for the same pointer.
+The **full** ADR (P2-W2 decomposition scope), P2-W3 (AVAS / CASSCF boundary tables), and P2-W5 (registry tables) live only in the repo markdown **`docs/与InQuanto能力差距与实施计划.md`（附录 A）** sections **§9–§11**, co-maintained with the [public parity matrix](/product/roadmap). This English page keeps the **same anchor ids** for `fix-internal-links` compatibility; read the Chinese `/concept/p2-detailed-plan` §8 for the same pointer.

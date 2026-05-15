@@ -1,7 +1,7 @@
 # Vol.10 官方侧栏真源 ↔ manifest 闭合集
 
 **读者**：架构师、负责 mirror / parity 的工程 owner。  
-**目的**：把「**全站每一个 Sphinx 导航项**」与「**`inquanto-tree.yaml` 扁平节点（= `check:mirror` 条目）**」的关系写清楚，避免附录行数被误读为「已枚举互联网上全部 HTML」。
+**目的**：把「**全站每一个 Sphinx 导航项**」与「**`mirror-doc-tree.yaml` 扁平节点（= `check:mirror` 条目）**」的关系写清楚，避免附录行数被误读为「已枚举互联网上全部 HTML」。
 
 ---
 

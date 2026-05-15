@@ -5,6 +5,7 @@ import json
 import logging
 import sys
 from collections.abc import Callable
+from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
@@ -17,7 +18,6 @@ from qchem_stack.chem.active_space.mean_field_meta import (
 )
 from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver, PySCFRHFResult
 from qchem_stack.chem.embedding.dmet import (
     DMETContext,
     QubitHamiltonianFragmentSolverExact,
@@ -30,6 +30,8 @@ from qchem_stack.chem.hamiltonian import (
     molecular_hamiltonian_from_canonical_active_space_pack,
     qubit_hamiltonian_from_spatial_chemist_integrals,
 )
+from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+from qchem_stack.chem.precomputed_bundle import qubit_hamiltonian_from_bundle, resolve_bundle_path
 from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.config import (
     ExperimentConfig,
@@ -48,7 +50,7 @@ from qchem_stack.mitigation.pmsv import PMSVConfig
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
 from qchem_stack.orchestration.run_context import PipelineStageTimer, RunContext
-from qchem_stack.protocols.inquanto_contract import classify_pauli_expectation_path
+from qchem_stack.protocols.product_contract import classify_pauli_expectation_path
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
 from qchem_stack.quantum.algorithms.excited import QSE, VQD
 from qchem_stack.quantum.algorithms.vqe import VQE
@@ -56,6 +58,27 @@ from qchem_stack.quantum.variational_plugins.registry import run_variational_sta
 from qchem_stack.quantum.variational_plugins.spec import VariationalRunContext
 
 _pipeline_log = logging.getLogger(__name__)
+
+
+@dataclass(slots=True)
+class _ScfStageArtifacts:
+    cfg: ExperimentConfig
+    rhf: ClassicalMeanFieldReference
+    precomputed_mode: bool
+    solver_caps: Any
+    energy_components: dict[str, Any]
+    embedding_input_payload: dict[str, Any] | None
+    classical_benchmarks: dict[str, Any] | None
+    rdm_bundle_meta: dict[str, Any] | None
+    rdm_correction_report: dict[str, Any] | None
+    rdm_correction_readiness: dict[str, Any] | None
+
+
+@dataclass(slots=True)
+class _PreQuantumStageArtifacts:
+    pre_quantum_input: PreQuantumInput
+    schmidt_ctx: dict[str, Any] | None
+    qh: QubitHamiltonian
 
 
 def _package_versions() -> dict[str, str]:
@@ -499,7 +522,7 @@ def collect_repro_metadata(
     qh: QubitHamiltonian | None = None,
 ) -> dict[str, Any]:
     """Hashes and versions for job / publication reproducibility."""
-    from qchem_stack.integrations.inquanto_workflow_preview import (
+    from qchem_stack.integrations.workflow_preview import (
         workflow_preview_payload,
         workflow_preview_qpe_track_slice_v1,
         workflow_preview_variational_execution_slice_v1,
@@ -611,6 +634,184 @@ def _solver_capabilities(cfg: ExperimentConfig) -> Any:
     return create_solver(cfg).capabilities
 
 
+def _is_precomputed_driver(cfg: ExperimentConfig) -> bool:
+    return str(cfg.scf.driver).strip().lower() == "precomputed"
+
+
+def _normalize_precomputed_bundle_path(
+    cfg: ExperimentConfig, *, cfg_path: Path | None
+) -> ExperimentConfig:
+    if not _is_precomputed_driver(cfg):
+        return cfg
+    raw = str(cfg.scf.precomputed_bundle_path or "").strip()
+    if not raw:
+        return cfg
+    resolved = resolve_bundle_path(raw, cfg_path=cfg_path)
+    return cfg.model_copy(
+        update={"scf": cfg.scf.model_copy(update={"precomputed_bundle_path": str(resolved)})}
+    )
+
+
+def _precomputed_pre_quantum_input(
+    cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference, *, cfg_path: Path | None
+) -> PreQuantumInput:
+    raw = str(cfg.scf.precomputed_bundle_path or "").strip()
+    if not raw:
+        raise PipelineError(
+            "scf.driver='precomputed' requires scf.precomputed_bundle_path to load pre-quantum input."
+        )
+    qh = qubit_hamiltonian_from_bundle(raw, cfg_path=cfg_path)
+    return PreQuantumInput(
+        classical_reference=rhf,
+        qubit_hamiltonian=qh,
+        canonical_active_space_integral_pack=None,
+        meta={"source": "precomputed_bundle"},
+    )
+
+
+def _run_scf_stage(
+    cfg: ExperimentConfig,
+    *,
+    profile: PipelineStageTimer,
+    emit: Callable[[str], None],
+) -> _ScfStageArtifacts:
+    precomputed_mode = _is_precomputed_driver(cfg)
+    solver_caps = _solver_capabilities(cfg)
+    rhf = _run_scf(cfg)
+    if not precomputed_mode:
+        cfg = _refine_mean_field_for_active_space(cfg, rhf)
+    nuclear_au: float | None
+    try:
+        nuclear_au = float(rhf.mf.mol.energy_nuc())
+    except Exception:
+        nuclear_au = None
+    solvent_eps = (
+        float(cfg.chemistry_extended.ddcosmo_epsilon)
+        if cfg.chemistry_extended.solvent_model == "ddcosmo"
+        else None
+    )
+    energy_components = build_energy_components_v1(
+        nuclear_repulsion_au=nuclear_au,
+        mean_field_total_au=float(rhf.e_tot),
+        solvent_model=str(cfg.chemistry_extended.solvent_model),
+        solvent_dielectric=solvent_eps,
+        energy_accounting_model=str(
+            rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")
+        ),
+    )
+    classical_benchmarks: dict[str, Any] | None = None
+    rdm_bundle_meta: dict[str, Any] | None = None
+    rdm_correction_report: dict[str, Any] | None = None
+    rdm_correction_readiness: dict[str, Any] | None = None
+    embedding_input_payload = _embedding_input_system_payload(cfg, rhf)
+    if precomputed_mode and cfg.chemistry_extended.classical_benchmark_enabled:
+        raise PipelineError(
+            "classical_benchmark_enabled is unsupported with scf.driver='precomputed' "
+            "(no runtime post-HF backend attached)."
+        )
+    if cfg.chemistry_extended.classical_benchmark_enabled:
+        from qchem_stack.chem.classical_benchmarks import (
+            ClassicalBenchmarkContext,
+            run_classical_post_hf_benchmarks,
+        )
+
+        classical_benchmarks = run_classical_post_hf_benchmarks(
+            cfg,
+            ClassicalBenchmarkContext(
+                mean_field_reference=rhf,
+                reference_scf_method=str(cfg.scf.method),
+                n_active_orbitals=int(cfg.active_space.n_active_orbitals),
+                n_active_electrons=int(cfg.active_space.n_active_electrons),
+            ),
+        )
+    if precomputed_mode and cfg.chemistry_extended.rdm_correction_method != "none":
+        raise PipelineError(
+            "rdm_correction_method requires live backend hooks and is unsupported with "
+            "scf.driver='precomputed'."
+        )
+    if cfg.chemistry_extended.rdm_correction_method != "none":
+        from qchem_stack.integrations.rdm_corrections import (
+            build_rdm_correction_readiness,
+            rdm_bundle_from_mean_field,
+            run_pyscf_nevpt2_casci_correction,
+            run_rdm_correction,
+        )
+
+        if not solver_caps.supports_rdm_correction_hooks:
+            raise PipelineError(
+                "rdm_correction_method requires backend RDM extraction support "
+                f"(backend={solver_caps.backend_id!r})."
+            )
+        rdmb = rdm_bundle_from_mean_field(rhf)
+        rdm_bundle_meta = dict(rdmb.metadata)
+        rdm_m = cfg.chemistry_extended.rdm_correction_method
+        if rdm_m in ("stub_nevpt2", "stub_ac0"):
+            rdm_correction_report = run_rdm_correction(rdm_m, rdmb)
+        elif rdm_m == "pyscf_nevpt2_casci":
+            if not solver_caps.supports_rdm_nevpt2_casci:
+                raise PipelineError(
+                    "rdm_correction_method='pyscf_nevpt2_casci' requires backend support "
+                    f"(backend={solver_caps.backend_id!r})."
+                )
+            rdm_correction_report = run_pyscf_nevpt2_casci_correction(
+                rhf,
+                int(cfg.active_space.n_active_orbitals),
+                int(cfg.active_space.n_active_electrons),
+            )
+        else:
+            raise ValueError(f"Unsupported rdm_correction_method: {rdm_m!r}")
+        rdm_correction_readiness = build_rdm_correction_readiness(
+            requested_method=rdm_m,
+            correction_report=rdm_correction_report,
+            bundle_meta=rdm_bundle_meta,
+        )
+    profile.mark("scf_done")
+    emit("scf_done")
+    _pipeline_log.info(
+        "pipeline scf_done experiment_id=%s E_tot_au=%.10f",
+        cfg.experiment_id,
+        float(rhf.e_tot),
+    )
+    return _ScfStageArtifacts(
+        cfg=cfg,
+        rhf=rhf,
+        precomputed_mode=precomputed_mode,
+        solver_caps=solver_caps,
+        energy_components=energy_components,
+        embedding_input_payload=embedding_input_payload,
+        classical_benchmarks=classical_benchmarks,
+        rdm_bundle_meta=rdm_bundle_meta,
+        rdm_correction_report=rdm_correction_report,
+        rdm_correction_readiness=rdm_correction_readiness,
+    )
+
+
+def _build_pre_quantum_stage(
+    cfg: ExperimentConfig,
+    rhf: ClassicalMeanFieldReference,
+    *,
+    precomputed_mode: bool,
+    cfg_path: Path | None,
+    profile: PipelineStageTimer,
+    emit: Callable[[str], None],
+) -> _PreQuantumStageArtifacts:
+    if precomputed_mode:
+        pre_q_input = _precomputed_pre_quantum_input(cfg, rhf, cfg_path=cfg_path)
+        schmidt_ctx = None
+    else:
+        pre_q_input, schmidt_ctx = _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=cfg_path)
+    qh = pre_q_input.qubit_hamiltonian
+    profile.mark("hamiltonian_built")
+    emit("hamiltonian_built")
+    _pipeline_log.info(
+        "pipeline hamiltonian_ready experiment_id=%s n_qubits=%s integral_source=%s",
+        cfg.experiment_id,
+        qh.n_qubits,
+        (qh.meta or {}).get("integral_source"),
+    )
+    return _PreQuantumStageArtifacts(pre_quantum_input=pre_q_input, schmidt_ctx=schmidt_ctx, qh=qh)
+
+
 def _refine_mean_field_for_active_space(
     cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference
 ) -> ExperimentConfig:
@@ -673,31 +874,14 @@ def _embedding_input_system_payload(
         raise PipelineError(
             "embedding_input_representation=ao/lowdin_orth_ao is currently molecular-only (non-PBC)."
         )
-    drv = PySCFDriver.from_config(cfg)
-    # TODO(capability): remove raw PySCF handle dependency once AO/Lowdin payload adapter is backend-neutral.
-    rhf_pyscf = _require_pyscf_reference(
-        rhf, context="embedding_input_representation=ao/lowdin_orth_ao"
-    )
-    if rep == "ao":
-        ao_sys = drv.get_system_ao(rhf_pyscf, run_hf=True)
-        return {
-            "schema": "embedding_input_system_v1",
-            "representation": "ao",
-            "has_run_hf": bool(ao_sys.has_run_hf),
-            "e_tot": ao_sys.e_tot,
-            "driver_meta": dict(ao_sys.driver_meta),
-            "epistemic_bound": "AO wrapper keeps SCF object for fragment builders; no full InQuanto AO driver parity claim.",
-        }
-    low = drv.get_lowdin_system(rhf_pyscf)
-    return {
-        "schema": "embedding_input_system_v1",
-        "representation": "lowdin_orth_ao",
-        "n_spatial_orbitals": int(low.h1_spatial.shape[0]),
-        "rdm1_trace": float(np.trace(low.rdm1_spatial)),
-        "constant": float(low.constant),
-        "driver_meta": dict(low.driver_meta),
-        "epistemic_bound": "Löwdin AO tensors are provided for open embedding workflows (not a closed-source embedding product clone).",
-    }
+    solver = create_solver(cfg)
+    try:
+        return solver.build_embedding_input_system(rhf, representation=rep)
+    except NotImplementedError as exc:
+        raise PipelineError(
+            "embedding_input_representation export is not implemented for the selected backend "
+            f"{solver.capabilities.backend_id!r}."
+        ) from exc
 
 
 def _schmidt_hamiltonian_and_context(
@@ -902,17 +1086,38 @@ def _hamiltonian_with_schmidt_context(
     rhf: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
-) -> tuple[QubitHamiltonian, dict[str, Any] | None]:
+) -> tuple[PreQuantumInput, dict[str, Any] | None]:
     if cfg.embedding.mode == "plugin":
         from qchem_stack.chem.embedding.decomposition_plugin import (
             qubit_hamiltonian_from_decomposition_plugin,
         )
 
-        return qubit_hamiltonian_from_decomposition_plugin(cfg, cfg_path=cfg_path), None
+        qh = qubit_hamiltonian_from_decomposition_plugin(cfg, cfg_path=cfg_path)
+        qh_meta = dict(getattr(qh, "meta", {}) or {})
+        return (
+            PreQuantumInput(
+                classical_reference=rhf,
+                qubit_hamiltonian=qh,
+                canonical_active_space_integral_pack=None,
+                meta={
+                    "source": "embedding_plugin",
+                    "integral_source": qh_meta.get("integral_source"),
+                },
+            ),
+            None,
+        )
     sol = create_solver(cfg)
     if cfg.embedding.dmet_hamiltonian_source == "schmidt_atomic_production":
         qh, ctx = _schmidt_hamiltonian_and_context(cfg, rhf)
-        return qh, ctx
+        return (
+            PreQuantumInput(
+                classical_reference=rhf,
+                qubit_hamiltonian=qh,
+                canonical_active_space_integral_pack=None,
+                meta={"source": "schmidt_atomic_production"},
+            ),
+            ctx,
+        )
     if (
         cfg.embedding.mode == "projection"
         and cfg.embedding.projection_quantum_hamiltonian == "fragment_mulliken_mo"
@@ -927,7 +1132,15 @@ def _hamiltonian_with_schmidt_context(
         )
 
         qh, _audit = molecular_hamiltonian_fragment_mulliken_projection(rhf, cfg)
-        return qh, None
+        return (
+            PreQuantumInput(
+                classical_reference=rhf,
+                qubit_hamiltonian=qh,
+                canonical_active_space_integral_pack=None,
+                meta={"source": "projection_fragment_mulliken_mo"},
+            ),
+            None,
+        )
     if not sol.capabilities.supports_restricted_active_space_qubit_hamiltonian:
         raise PipelineError(
             "This pipeline stage builds a qubit Hamiltonian from restricted active-space MO integrals; "
@@ -939,7 +1152,7 @@ def _hamiltonian_with_schmidt_context(
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
     )
-    return molecular_hamiltonian_from_canonical_active_space_pack(
+    qh = molecular_hamiltonian_from_canonical_active_space_pack(
         pack,
         n_active_orbitals=cfg.active_space.n_active_orbitals,
         n_active_electrons=cfg.active_space.n_active_electrons,
@@ -947,12 +1160,21 @@ def _hamiltonian_with_schmidt_context(
         prefer_restricted_spatial_fermion_for_jordan_wigner=cfg.active_space.prefer_restricted_spatial_fermion_for_jordan_wigner,
         jordan_wigner_coeff_atol=cfg.active_space.jordan_wigner_coeff_atol,
         classical_reference_for_meta=rhf,
-    ), None
+    )
+    return (
+        PreQuantumInput(
+            classical_reference=rhf,
+            qubit_hamiltonian=qh,
+            canonical_active_space_integral_pack=pack,
+            meta={"source": "canonical_active_space_integral_pack"},
+        ),
+        None,
+    )
 
 
 def _hamiltonian(cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference) -> QubitHamiltonian:
-    qh, _ = _hamiltonian_with_schmidt_context(cfg, rhf)
-    return qh
+    pre_q, _ = _hamiltonian_with_schmidt_context(cfg, rhf)
+    return pre_q.qubit_hamiltonian
 
 
 def _excited_protocol_contract_v1_block() -> dict[str, Any]:
@@ -1291,7 +1513,7 @@ def _resource_summary_excited_only(n_qubits: int, excited_rs: dict[str, Any]) ->
 def _maybe_attach_md_ml_qmef_dataset(
     out: dict[str, Any],
     cfg: ExperimentConfig,
-    rhf: PySCFRHFResult,
+    reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
 ) -> None:
@@ -1304,8 +1526,419 @@ def _maybe_attach_md_ml_qmef_dataset(
     from qchem_stack.md_bridge.from_pipeline import build_qmef_ml_attachment_repro_block
 
     repro["qmef_ml_attachment_v1"] = build_qmef_ml_attachment_repro_block(
-        cfg, out, rhf, cfg_path=cfg_path
+        cfg, out, reference, cfg_path=cfg_path
     )
+
+
+def _apply_embedding_workflow_stage(
+    cfg: ExperimentConfig,
+    *,
+    out: dict[str, Any],
+    qh: QubitHamiltonian,
+    exe: Any,
+    embedding_input_payload: dict[str, Any] | None,
+    schmidt_ctx: dict[str, Any] | None,
+    rhf: ClassicalMeanFieldReference,
+    cfg_path: Path | None,
+    profile: PipelineStageTimer,
+    emit: Callable[[str], None],
+) -> None:
+    if cfg.embedding.mode == "dmet":
+        wf: dict[str, Any] = {
+            "mode": "dmet",
+            "fragment_count": len(cfg.embedding.fragment_labels),
+            "fragment_labels": list(cfg.embedding.fragment_labels),
+            "dmet_hamiltonian_source": cfg.embedding.dmet_hamiltonian_source,
+            "fragment_solver_protocol": "qchem_stack.chem.embedding.dmet.FragmentSolverProtocol",
+        }
+        if cfg.embedding.dmet_hamiltonian_source == "whole_active_system":
+            wf["impurity_solver_used"] = (
+                "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverExact"
+                if cfg.embedding.dmet_fragment_use_exact_solver
+                else "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverVQE"
+            )
+            if cfg.embedding.dmet_multifragment_one_shot_shared_hamiltonian:
+                wf["multifragment_one_shot_shared_hamiltonian"] = True
+        elif cfg.embedding.dmet_hamiltonian_source == "schmidt_atomic_production":
+            wf["impurity_hamiltonian"] = "qchem_stack.chem.embedding.schmidt_production"
+            wf["main_variational_target"] = "impurity_qubit_hamiltonian_jw"
+            wf["schmidt_dmet_max_cycles"] = int(cfg.embedding.schmidt_dmet_max_cycles)
+            if cfg.embedding.schmidt_multi_fragment_atom_groups:
+                wf["schmidt_multifragment_atom_groups"] = [
+                    list(g) for g in cfg.embedding.schmidt_multi_fragment_atom_groups
+                ]
+                wf["schmidt_multi_primary_fragment_index"] = int(
+                    cfg.embedding.schmidt_multi_primary_fragment_index
+                )
+                wf["schmidt_dmet_density_feedback_module"] = (
+                    "qchem_stack.integrations.schmidt_dmet_self_consistent."
+                    "run_schmidt_multifragment_density_cycles"
+                )
+            else:
+                wf["schmidt_fragment_atom_indices"] = list(
+                    cfg.embedding.schmidt_fragment_atom_indices
+                )
+                wf["schmidt_dmet_density_feedback_module"] = (
+                    "qchem_stack.integrations.schmidt_dmet_self_consistent.run_schmidt_density_feedback_cycles"
+                )
+        else:
+            wf["solver_stub"] = "qchem_stack.chem.embedding.dmet.VQEFragmentSolverStub"
+        bpath = (cfg.embedding.schmidt_bath_sidecar_json_path or "").strip()
+        if bpath:
+            if cfg.embedding.dmet_hamiltonian_source != "schmidt_atomic_production":
+                raise PipelineError(
+                    "embedding.schmidt_bath_sidecar_json_path requires "
+                    "dmet_hamiltonian_source=='schmidt_atomic_production'"
+                )
+            side_path = Path(bpath)
+            if not side_path.is_file() and cfg_path is not None:
+                side_path = (cfg_path.parent / bpath).resolve()
+            if not side_path.is_file():
+                raise PipelineError(
+                    f"schmidt_bath_sidecar_json_path not found: {bpath!r} (resolved {side_path})"
+                )
+            wf["schmidt_bath_sidecar_v1"] = json.loads(side_path.read_text(encoding="utf-8"))
+        if cfg.embedding.oniom_layers_v1:
+            wf["oniom_toy_v1"] = {
+                "schema": "oniom_toy_v1",
+                "layers": [dict(x) for x in cfg.embedding.oniom_layers_v1],
+            }
+        if embedding_input_payload is not None:
+            wf["embedding_input_system"] = embedding_input_payload
+        out["embedding_workflow"] = wf
+        _run_dmet_fragment_solve_if_requested(cfg, qh, exe, out)
+        if schmidt_ctx is not None:
+            spfv = _run_schmidt_per_fragment_vqe(cfg, rhf, schmidt_ctx, exe)
+            if spfv is not None:
+                out["schmidt_per_fragment_vqe"] = spfv
+                _pipeline_log.info(
+                    "pipeline schmidt_per_fragment_vqe_done experiment_id=%s n_fragments=%s total_nfev=%s",
+                    cfg.experiment_id,
+                    len(spfv.get("fragments") or []),
+                    sum(
+                        int(f.get("nfev", 0))
+                        for f in (spfv.get("fragments") or [])
+                        if isinstance(f, dict)
+                    ),
+                )
+        if cfg.embedding.dmet_uniform_multifragment_toy:
+            labs_mc = [x for x in cfg.embedding.fragment_labels if str(x).strip()]
+            if len(labs_mc) >= 2:
+                from qchem_stack.integrations.dmet_multifragment_toy import (
+                    run_uniform_hamiltonian_multifragment_toy,
+                )
+
+                out["dmet_uniform_multifragment_toy"] = run_uniform_hamiltonian_multifragment_toy(
+                    cfg, labs_mc, qh, exe, max_cycles=1
+                )
+        profile.mark("embedding_dmet")
+        emit("embedding_dmet")
+        return
+    if cfg.embedding.mode == "projection":
+        emb = cfg.embedding
+        wf: dict[str, Any] = {
+            "mode": "projection",
+            "schema": "projection_embedding_workflow_v1",
+            "projection_low_level": emb.projection_low_level,
+            "projection_high_level": emb.projection_high_level,
+            "projection_threshold": float(emb.projection_threshold),
+            "projection_quantum_hamiltonian": emb.projection_quantum_hamiltonian,
+            "parity_module": "qchem_stack.chem.embedding.projection",
+        }
+        hm = out.get("hamiltonian_meta") or {}
+        audit = hm.get("projection_mulliken_mo_audit_v1")
+        if audit:
+            wf["projection_selected_mo_indices"] = list(audit.get("selected_mo_indices") or [])
+            wf["projection_mulliken_weights"] = list(audit.get("mulliken_weights") or [])
+            wf["projection_integral_source"] = audit.get("integral_source")
+        if emb.projection_quantum_hamiltonian == "fragment_mulliken_mo":
+            wf["caveat"] = (
+                "Main-line VQE uses fragment Mulliken-selected active integrals "
+                "(qchem_stack.chem.embedding.projection_hamiltonian)."
+            )
+            wf["epistemic_bound"] = (
+                "Fragment-local MO screening + CASCI active Hamiltonian — not full projection embedding."
+            )
+        else:
+            wf["caveat"] = (
+                "Quantum stage uses global active-space JW Hamiltonian; this branch records projection trace metadata."
+            )
+            wf["epistemic_bound"] = (
+                "Open reproducibility — not closed-source projection driver parity."
+            )
+        if embedding_input_payload is not None:
+            wf["embedding_input_system"] = embedding_input_payload
+        out["embedding_workflow"] = wf
+        profile.mark("embedding_projection")
+        emit("embedding_projection")
+        return
+    if cfg.embedding.mode == "plugin":
+        emb = cfg.embedding
+        hm = out.get("hamiltonian_meta") or {}
+        resolved_json = hm.get("decomposition_plugin_json")
+        term_counts = hm.get("decomposition_fragment_pauli_term_counts")
+        term_total = 0
+        if isinstance(term_counts, dict):
+            term_total = sum(int(v) for v in term_counts.values())
+        out["embedding_workflow"] = {
+            "schema": "embedding_workflow_v1",
+            "mode": "plugin",
+            "decomposition_plugin": emb.decomposition_plugin,
+            "decomposition_plugin_json_path": emb.decomposition_plugin_json_path,
+            "decomposition_plugin_json_resolved_path": resolved_json,
+            "decomposition_primary_fragment_id": hm.get("decomposition_primary_fragment_id"),
+            "decomposition_fragment_count": hm.get("decomposition_fragment_count"),
+            "decomposition_fragment_ids": hm.get("decomposition_fragment_ids"),
+            "decomposition_fragment_pauli_term_counts": term_counts,
+            "decomposition_total_pauli_terms": term_total,
+            "decomposition_plugin_schema": hm.get("decomposition_plugin_schema"),
+            "decomposition_fragment_energy_terms_v1": hm.get(
+                "decomposition_fragment_energy_terms_v1"
+            ),
+            "integral_source": hm.get("integral_source"),
+            "epistemic_bound": (
+                "Open decomposition-plugin contract v1 (optional per-fragment energy-term stubs) "
+                "— not closed-source embedding/decomposition product parity."
+                if hm.get("decomposition_plugin_schema") == "decomposition_plugin_contract_v1"
+                else (
+                    "Open plugin boundary (toy v1 JSON) — not closed decomposition product parity."
+                )
+            ),
+            "note": "Toy decomposition-plugin Hamiltonian replaces molecular active-space build.",
+        }
+        if embedding_input_payload is not None:
+            out["embedding_workflow"]["embedding_input_system"] = embedding_input_payload
+        profile.mark("embedding_plugin")
+        emit("embedding_plugin")
+        return
+    out["embedding_workflow"] = {
+        "schema": "embedding_workflow_v1",
+        "mode": "none",
+        "note": "No DMET/projection embedding stage; variational Hamiltonian uses global active space.",
+    }
+    if embedding_input_payload is not None:
+        out["embedding_workflow"]["embedding_input_system"] = embedding_input_payload
+    profile.mark("embedding_none")
+    emit("embedding_none")
+
+
+def _run_excited_stages(
+    cfg: ExperimentConfig,
+    *,
+    qh: QubitHamiltonian,
+    exe: Any,
+    angles: Any,
+    energy_pre: float,
+    out: dict[str, Any],
+    profile: PipelineStageTimer,
+    emit: Callable[[str], None],
+) -> dict[str, Any] | None:
+    q = cfg.quantum
+    ang = np.asarray(angles, dtype=float)
+    if q.vqd_after_variational:
+        prepare_state = None
+        n_vp: int | None = None
+        param_bounds: list[tuple[float, float]] | None = None
+        if q.variational_ansatz == "uccsd":
+            from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
+
+            if q.uccsd_trotter_steps is not None:
+                ucc = UCCSDTrotterVQE(
+                    qh,
+                    executor=exe,
+                    n_trotter_steps=int(q.uccsd_trotter_steps),
+                )
+            else:
+                ucc = UCCSDVQE(qh, executor=exe)
+            prepare_state = ucc.prepare_state
+            n_vp = int(ucc.n_params)
+            param_bounds = [(-4.0 * np.pi, 4.0 * np.pi)] * n_vp
+        vqd = VQD(
+            qh,
+            n_states=q.vqd_n_states,
+            depth=q.vqe_depth,
+            penalty_weight=q.vqd_penalty_weight,
+            penalty_weights=q.vqd_penalty_weights,
+            overlap_exponent=q.vqd_overlap_exponent,
+            cobyla_maxiter=q.vqd_cobyla_maxiter,
+            optimizer_method=q.vqd_optimizer_method,
+            prepare_state=prepare_state,
+            n_var_parameters=n_vp,
+            parameter_bounds=param_bounds,
+            init_strategy=q.vqd_init_strategy,
+            init_noise_scale=q.vqd_init_noise_scale,
+            max_overlap_warn=q.vqd_max_overlap_warn,
+            overlap_mode=q.vqd_overlap_mode,
+            executor=exe,
+        )
+        vqd_res = vqd.run(
+            seed=cfg.random_seed,
+            shots_objective=q.vqd_shots_objective,
+            shots_overlap=q.vqd_shots_overlap,
+            shots_weight=q.vqd_shots_weight,
+            pauli_grouping=q.pauli_grouping,
+            ground_angles=ang,
+            ground_energy=float(energy_pre),
+        )
+        out["vqd"] = {
+            "schema": "excited_vqd_bundle_v1",
+            "energies": vqd_res.energies,
+            "meta": vqd_res.meta,
+        }
+    if q.qse_after_variational:
+        qse = QSE(qh, subspace_dim=q.qse_subspace_dim)
+        kb = q.qse_max_basis
+        if q.qse_shot_mode == "exact":
+            qse_res = qse.run_from_vqe_hea_basis(ang, q.vqe_depth, max_basis=kb)
+        elif q.qse_shot_mode == "gaussian_h":
+            qse_res = qse.run_from_vqe_hea_basis_shot_noise(
+                ang,
+                q.vqe_depth,
+                max_basis=kb,
+                shots_per_matrix_element=q.qse_shots_per_matrix_element,
+                seed=cfg.random_seed,
+            )
+        else:
+            qse_res = qse.run_from_vqe_hea_basis_pauli_transitions(
+                ang,
+                q.vqe_depth,
+                max_basis=kb,
+                shots_per_ij_term=q.qse_shots_per_ij_term,
+                seed=cfg.random_seed,
+            )
+        qse_meta = dict(qse_res.meta)
+        qse_meta["qse_shot_mode"] = q.qse_shot_mode
+        out["qse"] = {
+            "schema": "excited_qse_bundle_v1",
+            "excitation_energies": qse_res.excitation_energies,
+            "meta": qse_meta,
+        }
+    if q.sceom_after_variational:
+        from qchem_stack.quantum.algorithms.sceom import (
+            resolve_sceom_s_generators,
+            run_sceom_nested_commutator_from_hea,
+        )
+
+        sceom_kw: dict[str, Any] = {}
+        gens, _ = resolve_sceom_s_generators(
+            strategy=q.sceom_generator_strategy,
+            hamiltonian=qh,
+            subspace_dim=q.sceom_subspace_dim,
+        )
+        if gens is not None:
+            sceom_kw["s_generators"] = gens
+        sceom_kw["generator_strategy_yaml"] = q.sceom_generator_strategy
+        sceom_res = run_sceom_nested_commutator_from_hea(
+            qh,
+            ang,
+            q.vqe_depth,
+            subspace_dim=q.sceom_subspace_dim,
+            shots_per_matrix_element=q.sceom_shots_per_matrix_element,
+            seed=cfg.random_seed,
+            **sceom_kw,
+        )
+        out["sceom"] = {
+            "schema": "excited_sceom_bundle_v1",
+            "energies": sceom_res.energies,
+            "meta": sceom_res.meta,
+        }
+    excited_rs = _build_excited_resource_summary(cfg, out)
+    if excited_rs is not None:
+        out["excited_resource_summary"] = excited_rs
+    profile.mark("excited_stages")
+    emit("excited_stages")
+    return excited_rs
+
+
+def _run_protocol_and_finalize_stage(
+    cfg: ExperimentConfig,
+    *,
+    out: dict[str, Any],
+    qh: QubitHamiltonian,
+    angles: Any,
+    excited_rs: dict[str, Any] | None,
+    bspec: Any,
+    exe: Any,
+    bundle: Any,
+    rhf: ClassicalMeanFieldReference,
+    cfg_path: Path | None,
+    profile: PipelineStageTimer,
+    emit: Callable[[str], None],
+) -> dict[str, Any]:
+    q = cfg.quantum
+    profile.mark("pre_pauli_protocol")
+    emit("pre_pauli_protocol")
+    if not q.use_pauli_protocol:
+        if excited_rs is not None:
+            out["resource_summary"] = _resource_summary_excited_only(qh.n_qubits, excited_rs)
+        else:
+            out["resource_summary"] = {
+                "n_circuits": 0,
+                "sum_shots": 0,
+                "max_depth": 0,
+                "sum_twoq": 0,
+                "n_qubits": qh.n_qubits,
+                "n_pauli_terms": None,
+                "n_pauli_groups": None,
+                "pauli_averaging_protocol_ran": False,
+            }
+        _attach_nexus_mitigation_tn(out, cfg, qh)
+        _attach_qpe_demo_track_if_requested(out, cfg, qh)
+        _attach_qpe_three_algorithm_pack_if_requested(out, cfg, qh)
+        _attach_vqs_track_if_requested(out, cfg, qh)
+        _finalize_open_stack_parity_snapshot(out, cfg, None)
+        _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
+        profile.mark("pauli_protocol_skipped")
+        emit("pauli_protocol_skipped")
+        profile.mark("finalize_repro")
+        emit("finalize_repro")
+        out["repro"]["pipeline_profile"] = profile.to_profile_dict()
+        _attach_run_summary(out, cfg)
+        return out
+    proto = _protocol_for_job(cfg, qh, bspec=bspec, exe=exe, bundle=bundle)
+    proto.build(np.asarray(angles, dtype=float), hea_depth=q.vqe_depth)
+    proto.compile()
+    proto.run()
+    e_proto = proto.evaluate()
+    rows = proto.dataframe_circuit_shot_rows()
+    df_sum = summarize_circuit_shot_rows(rows)
+    pc = proto._counts
+    resource_summary = {
+        **df_sum,
+        "n_pauli_terms": pc.get("n_pauli_terms"),
+        "n_pauli_groups": pc.get("n_pauli_groups"),
+        "pauli_averaging_protocol_ran": True,
+    }
+    if excited_rs is not None:
+        resource_summary["excited_stages"] = excited_rs
+        ub = _excited_shots_upper_bound(excited_rs)
+        resource_summary["excited_shots_upper_bound"] = ub
+        resource_summary["sum_shots_total_with_excited_upper_bound"] = int(df_sum["sum_shots"]) + ub
+        if isinstance(excited_rs.get("shot_channel_upper_bounds"), dict):
+            resource_summary["excited_shot_accounting"] = excited_rs["shot_channel_upper_bounds"]
+        resource_summary["excited_methods_unified"] = _excited_methods_unified(excited_rs)
+    out.update(
+        {
+            "energy_pauli_protocol": float(e_proto),
+            "protocol_counts": proto._counts,
+            "resource_rows": rows,
+            "pauli_measurement_ledger": rows,
+            "resource_summary": resource_summary,
+        }
+    )
+    _attach_nexus_mitigation_tn(out, cfg, qh)
+    _attach_qpe_demo_track_if_requested(out, cfg, qh)
+    _attach_qpe_three_algorithm_pack_if_requested(out, cfg, qh)
+    _attach_vqs_track_if_requested(out, cfg, qh)
+    _finalize_open_stack_parity_snapshot(out, cfg, proto)
+    _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
+    profile.mark("pauli_protocol_done")
+    emit("pauli_protocol_done")
+    profile.mark("finalize_repro")
+    emit("finalize_repro")
+    out["repro"]["pipeline_profile"] = profile.to_profile_dict()
+    _attach_run_summary(out, cfg)
+    return out
 
 
 def _classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:
@@ -1820,8 +2453,8 @@ def run_pipeline_sync(
     (SCF, Hamiltonian build, variational energy, optional Schmidt per-fragment VQE) suitable for
     production job tracing.
     """
+    cfg = _normalize_precomputed_bundle_path(cfg, cfg_path=cfg_path)
     q = cfg.quantum
-    solver_caps = _solver_capabilities(cfg)
     profile = PipelineStageTimer()
 
     def _emit(stage: str) -> None:
@@ -1830,99 +2463,30 @@ def run_pipeline_sync(
                 {"kind": "pipeline_stage", "stage": stage, "status": "RUNNING"},
             )
 
-    rhf = _run_scf(cfg)
-    cfg = _refine_mean_field_for_active_space(cfg, rhf)
-    nuclear_au: float | None
-    try:
-        nuclear_au = float(rhf.mf.mol.energy_nuc())
-    except Exception:
-        nuclear_au = None
-    solvent_eps = (
-        float(cfg.chemistry_extended.ddcosmo_epsilon)
-        if cfg.chemistry_extended.solvent_model == "ddcosmo"
-        else None
+    scf_stage = _run_scf_stage(
+        cfg,
+        profile=profile,
+        emit=_emit,
     )
-    energy_components = build_energy_components_v1(
-        nuclear_repulsion_au=nuclear_au,
-        mean_field_total_au=float(rhf.e_tot),
-        solvent_model=str(cfg.chemistry_extended.solvent_model),
-        solvent_dielectric=solvent_eps,
-        energy_accounting_model=str(
-            rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")
-        ),
+    cfg = scf_stage.cfg
+    rhf = scf_stage.rhf
+    pre_q_stage = _build_pre_quantum_stage(
+        cfg,
+        rhf,
+        precomputed_mode=scf_stage.precomputed_mode,
+        cfg_path=cfg_path,
+        profile=profile,
+        emit=_emit,
     )
-    classical_benchmarks: dict[str, Any] | None = None
-    rdm_bundle_meta: dict[str, Any] | None = None
-    rdm_correction_report: dict[str, Any] | None = None
-    rdm_correction_readiness: dict[str, Any] | None = None
-    embedding_input_payload = _embedding_input_system_payload(cfg, rhf)
-    if cfg.chemistry_extended.classical_benchmark_enabled:
-        from qchem_stack.chem.classical_benchmarks import (
-            ClassicalBenchmarkContext,
-            run_classical_post_hf_benchmarks,
-        )
-
-        classical_benchmarks = run_classical_post_hf_benchmarks(
-            cfg,
-            ClassicalBenchmarkContext(
-                mean_field_reference=rhf,
-                reference_scf_method=str(cfg.scf.method),
-                n_active_orbitals=int(cfg.active_space.n_active_orbitals),
-                n_active_electrons=int(cfg.active_space.n_active_electrons),
-            ),
-        )
-    if cfg.chemistry_extended.rdm_correction_method != "none":
-        from qchem_stack.integrations.rdm_corrections import (
-            build_rdm_correction_readiness,
-            rdm_bundle_from_mean_field,
-            run_pyscf_nevpt2_casci_correction,
-            run_rdm_correction,
-        )
-
-        if not solver_caps.supports_rdm_correction_hooks:
-            raise PipelineError(
-                "rdm_correction_method requires backend RDM extraction support "
-                f"(backend={solver_caps.backend_id!r})."
-            )
-        rdmb = rdm_bundle_from_mean_field(rhf)
-        rdm_bundle_meta = dict(rdmb.metadata)
-        rdm_m = cfg.chemistry_extended.rdm_correction_method
-        if rdm_m in ("stub_nevpt2", "stub_ac0"):
-            rdm_correction_report = run_rdm_correction(rdm_m, rdmb)
-        elif rdm_m == "pyscf_nevpt2_casci":
-            if not solver_caps.supports_rdm_nevpt2_casci:
-                raise PipelineError(
-                    "rdm_correction_method='pyscf_nevpt2_casci' requires backend support "
-                    f"(backend={solver_caps.backend_id!r})."
-                )
-            rdm_correction_report = run_pyscf_nevpt2_casci_correction(
-                rhf,
-                int(cfg.active_space.n_active_orbitals),
-                int(cfg.active_space.n_active_electrons),
-            )
-        else:
-            raise ValueError(f"Unsupported rdm_correction_method: {rdm_m!r}")
-        rdm_correction_readiness = build_rdm_correction_readiness(
-            requested_method=rdm_m,
-            correction_report=rdm_correction_report,
-            bundle_meta=rdm_bundle_meta,
-        )
-    profile.mark("scf_done")
-    _emit("scf_done")
-    _pipeline_log.info(
-        "pipeline scf_done experiment_id=%s E_tot_au=%.10f",
-        cfg.experiment_id,
-        float(rhf.e_tot),
-    )
-    qh, schmidt_ctx = _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=cfg_path)
-    profile.mark("hamiltonian_built")
-    _emit("hamiltonian_built")
-    _pipeline_log.info(
-        "pipeline hamiltonian_ready experiment_id=%s n_qubits=%s integral_source=%s",
-        cfg.experiment_id,
-        qh.n_qubits,
-        (qh.meta or {}).get("integral_source"),
-    )
+    pre_q_input = pre_q_stage.pre_quantum_input
+    schmidt_ctx = pre_q_stage.schmidt_ctx
+    qh = pre_q_stage.qh
+    energy_components = scf_stage.energy_components
+    embedding_input_payload = scf_stage.embedding_input_payload
+    classical_benchmarks = scf_stage.classical_benchmarks
+    rdm_bundle_meta = scf_stage.rdm_bundle_meta
+    rdm_correction_report = scf_stage.rdm_correction_report
+    rdm_correction_readiness = scf_stage.rdm_correction_readiness
     if hamiltonian_out is not None:
         hamiltonian_out.clear()
         hamiltonian_out.append(qh)
@@ -1933,7 +2497,13 @@ def run_pipeline_sync(
     exe = executor_from_spec(bspec)
     bundle = compiler_pass_bundle_from_config(cfg)
 
-    vctx = VariationalRunContext(cfg=cfg, hamiltonian=qh, executor=exe, seed=cfg.random_seed)
+    vctx = VariationalRunContext(
+        cfg=cfg,
+        hamiltonian=qh,
+        executor=exe,
+        seed=cfg.random_seed,
+        pre_quantum_input=pre_q_input,
+    )
     stage = run_variational_stage(vctx)
     algo_meta = stage.algo_meta_must_include_algorithm(cfg.quantum.algorithm)
     angles = stage.angles
@@ -1956,6 +2526,7 @@ def run_pipeline_sync(
         "angles": angles.tolist() if isinstance(angles, np.ndarray) else list(angles),
         **algo_meta,
     }
+    out["pre_quantum_input"] = pre_q_input.as_summary_dict()
     if classical_benchmarks is not None:
         out["classical_benchmarks"] = classical_benchmarks
         out["classical_benchmark_summary"] = _classical_benchmark_summary(classical_benchmarks)
@@ -1969,376 +2540,43 @@ def run_pipeline_sync(
     if rdm_correction_readiness is not None:
         out["rdm_correction_readiness"] = rdm_correction_readiness
     out["hamiltonian_meta"] = dict(qh.meta)
-    if cfg.embedding.mode == "dmet":
-        wf: dict[str, Any] = {
-            "mode": "dmet",
-            "fragment_count": len(cfg.embedding.fragment_labels),
-            "fragment_labels": list(cfg.embedding.fragment_labels),
-            "dmet_hamiltonian_source": cfg.embedding.dmet_hamiltonian_source,
-            "fragment_solver_protocol": "qchem_stack.chem.embedding.dmet.FragmentSolverProtocol",
-        }
-        if cfg.embedding.dmet_hamiltonian_source == "whole_active_system":
-            wf["impurity_solver_used"] = (
-                "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverExact"
-                if cfg.embedding.dmet_fragment_use_exact_solver
-                else "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverVQE"
-            )
-            if cfg.embedding.dmet_multifragment_one_shot_shared_hamiltonian:
-                wf["multifragment_one_shot_shared_hamiltonian"] = True
-        elif cfg.embedding.dmet_hamiltonian_source == "schmidt_atomic_production":
-            wf["impurity_hamiltonian"] = "qchem_stack.chem.embedding.schmidt_production"
-            wf["main_variational_target"] = "impurity_qubit_hamiltonian_jw"
-            wf["schmidt_dmet_max_cycles"] = int(cfg.embedding.schmidt_dmet_max_cycles)
-            if cfg.embedding.schmidt_multi_fragment_atom_groups:
-                wf["schmidt_multifragment_atom_groups"] = [
-                    list(g) for g in cfg.embedding.schmidt_multi_fragment_atom_groups
-                ]
-                wf["schmidt_multi_primary_fragment_index"] = int(
-                    cfg.embedding.schmidt_multi_primary_fragment_index
-                )
-                wf["schmidt_dmet_density_feedback_module"] = (
-                    "qchem_stack.integrations.schmidt_dmet_self_consistent."
-                    "run_schmidt_multifragment_density_cycles"
-                )
-            else:
-                wf["schmidt_fragment_atom_indices"] = list(
-                    cfg.embedding.schmidt_fragment_atom_indices
-                )
-                wf["schmidt_dmet_density_feedback_module"] = (
-                    "qchem_stack.integrations.schmidt_dmet_self_consistent.run_schmidt_density_feedback_cycles"
-                )
-        else:
-            wf["solver_stub"] = "qchem_stack.chem.embedding.dmet.VQEFragmentSolverStub"
-        bpath = (cfg.embedding.schmidt_bath_sidecar_json_path or "").strip()
-        if bpath:
-            if cfg.embedding.dmet_hamiltonian_source != "schmidt_atomic_production":
-                raise PipelineError(
-                    "embedding.schmidt_bath_sidecar_json_path requires "
-                    "dmet_hamiltonian_source=='schmidt_atomic_production'"
-                )
-            side_path = Path(bpath)
-            if not side_path.is_file() and cfg_path is not None:
-                side_path = (cfg_path.parent / bpath).resolve()
-            if not side_path.is_file():
-                raise PipelineError(
-                    f"schmidt_bath_sidecar_json_path not found: {bpath!r} (resolved {side_path})"
-                )
-            wf["schmidt_bath_sidecar_v1"] = json.loads(side_path.read_text(encoding="utf-8"))
-        if cfg.embedding.oniom_layers_v1:
-            wf["oniom_toy_v1"] = {
-                "schema": "oniom_toy_v1",
-                "layers": [dict(x) for x in cfg.embedding.oniom_layers_v1],
-            }
-        if embedding_input_payload is not None:
-            wf["embedding_input_system"] = embedding_input_payload
-        out["embedding_workflow"] = wf
-        _run_dmet_fragment_solve_if_requested(cfg, qh, exe, out)
-        if schmidt_ctx is not None:
-            spfv = _run_schmidt_per_fragment_vqe(cfg, rhf, schmidt_ctx, exe)
-            if spfv is not None:
-                out["schmidt_per_fragment_vqe"] = spfv
-                _pipeline_log.info(
-                    "pipeline schmidt_per_fragment_vqe_done experiment_id=%s n_fragments=%s total_nfev=%s",
-                    cfg.experiment_id,
-                    len(spfv.get("fragments") or []),
-                    sum(
-                        int(f.get("nfev", 0))
-                        for f in (spfv.get("fragments") or [])
-                        if isinstance(f, dict)
-                    ),
-                )
-        if cfg.embedding.dmet_uniform_multifragment_toy:
-            labs_mc = [x for x in cfg.embedding.fragment_labels if str(x).strip()]
-            if len(labs_mc) >= 2:
-                from qchem_stack.integrations.dmet_multifragment_toy import (
-                    run_uniform_hamiltonian_multifragment_toy,
-                )
-
-                out["dmet_uniform_multifragment_toy"] = run_uniform_hamiltonian_multifragment_toy(
-                    cfg, labs_mc, qh, exe, max_cycles=1
-                )
-
-        profile.mark("embedding_dmet")
-        _emit("embedding_dmet")
-    elif cfg.embedding.mode == "projection":
-        emb = cfg.embedding
-        wf: dict[str, Any] = {
-            "mode": "projection",
-            "schema": "projection_embedding_workflow_v1",
-            "projection_low_level": emb.projection_low_level,
-            "projection_high_level": emb.projection_high_level,
-            "projection_threshold": float(emb.projection_threshold),
-            "projection_quantum_hamiltonian": emb.projection_quantum_hamiltonian,
-            "parity_module": "qchem_stack.chem.embedding.projection",
-        }
-        hm = out.get("hamiltonian_meta") or {}
-        audit = hm.get("projection_mulliken_mo_audit_v1")
-        if audit:
-            wf["projection_selected_mo_indices"] = list(audit.get("selected_mo_indices") or [])
-            wf["projection_mulliken_weights"] = list(audit.get("mulliken_weights") or [])
-            wf["projection_integral_source"] = audit.get("integral_source")
-        if emb.projection_quantum_hamiltonian == "fragment_mulliken_mo":
-            wf["caveat"] = (
-                "Main-line VQE uses fragment Mulliken-selected active integrals "
-                "(qchem_stack.chem.embedding.projection_hamiltonian)."
-            )
-            wf["epistemic_bound"] = (
-                "Fragment-local MO screening + CASCI active Hamiltonian — not full projection embedding."
-            )
-        else:
-            wf["caveat"] = (
-                "Quantum stage uses global active-space JW Hamiltonian; this branch records projection trace metadata."
-            )
-            wf["epistemic_bound"] = (
-                "Open reproducibility — not closed-source projection driver parity."
-            )
-        if embedding_input_payload is not None:
-            wf["embedding_input_system"] = embedding_input_payload
-        out["embedding_workflow"] = wf
-        profile.mark("embedding_projection")
-        _emit("embedding_projection")
-    elif cfg.embedding.mode == "plugin":
-        emb = cfg.embedding
-        hm = out.get("hamiltonian_meta") or {}
-        resolved_json = hm.get("decomposition_plugin_json")
-        term_counts = hm.get("decomposition_fragment_pauli_term_counts")
-        term_total = 0
-        if isinstance(term_counts, dict):
-            term_total = sum(int(v) for v in term_counts.values())
-        out["embedding_workflow"] = {
-            "schema": "embedding_workflow_v1",
-            "mode": "plugin",
-            "decomposition_plugin": emb.decomposition_plugin,
-            "decomposition_plugin_json_path": emb.decomposition_plugin_json_path,
-            "decomposition_plugin_json_resolved_path": resolved_json,
-            "decomposition_primary_fragment_id": hm.get("decomposition_primary_fragment_id"),
-            "decomposition_fragment_count": hm.get("decomposition_fragment_count"),
-            "decomposition_fragment_ids": hm.get("decomposition_fragment_ids"),
-            "decomposition_fragment_pauli_term_counts": term_counts,
-            "decomposition_total_pauli_terms": term_total,
-            "decomposition_plugin_schema": hm.get("decomposition_plugin_schema"),
-            "decomposition_fragment_energy_terms_v1": hm.get(
-                "decomposition_fragment_energy_terms_v1"
-            ),
-            "integral_source": hm.get("integral_source"),
-            "epistemic_bound": (
-                "Open decomposition-plugin contract v1 (optional per-fragment energy-term stubs) "
-                "— not closed-source embedding/decomposition product parity."
-                if hm.get("decomposition_plugin_schema") == "decomposition_plugin_contract_v1"
-                else (
-                    "Open plugin boundary (toy v1 JSON) — not closed decomposition product parity."
-                )
-            ),
-            "note": "Toy decomposition-plugin Hamiltonian replaces molecular active-space build.",
-        }
-        if embedding_input_payload is not None:
-            out["embedding_workflow"]["embedding_input_system"] = embedding_input_payload
-        profile.mark("embedding_plugin")
-        _emit("embedding_plugin")
-    else:
-        out["embedding_workflow"] = {
-            "schema": "embedding_workflow_v1",
-            "mode": "none",
-            "note": "No DMET/projection embedding stage; variational Hamiltonian uses global active space.",
-        }
-        if embedding_input_payload is not None:
-            out["embedding_workflow"]["embedding_input_system"] = embedding_input_payload
-        profile.mark("embedding_none")
-        _emit("embedding_none")
-
-    ang = np.asarray(angles, dtype=float)
-
-    if q.vqd_after_variational:
-        prepare_state = None
-        n_vp: int | None = None
-        param_bounds: list[tuple[float, float]] | None = None
-        if q.variational_ansatz == "uccsd":
-            from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
-
-            if q.uccsd_trotter_steps is not None:
-                ucc = UCCSDTrotterVQE(
-                    qh,
-                    executor=exe,
-                    n_trotter_steps=int(q.uccsd_trotter_steps),
-                )
-            else:
-                ucc = UCCSDVQE(qh, executor=exe)
-            prepare_state = ucc.prepare_state
-            n_vp = int(ucc.n_params)
-            param_bounds = [(-4.0 * np.pi, 4.0 * np.pi)] * n_vp
-        vqd = VQD(
-            qh,
-            n_states=q.vqd_n_states,
-            depth=q.vqe_depth,
-            penalty_weight=q.vqd_penalty_weight,
-            penalty_weights=q.vqd_penalty_weights,
-            overlap_exponent=q.vqd_overlap_exponent,
-            cobyla_maxiter=q.vqd_cobyla_maxiter,
-            optimizer_method=q.vqd_optimizer_method,
-            prepare_state=prepare_state,
-            n_var_parameters=n_vp,
-            parameter_bounds=param_bounds,
-            init_strategy=q.vqd_init_strategy,
-            init_noise_scale=q.vqd_init_noise_scale,
-            max_overlap_warn=q.vqd_max_overlap_warn,
-            overlap_mode=q.vqd_overlap_mode,
-            executor=exe,
-        )
-        vqd_res = vqd.run(
-            seed=cfg.random_seed,
-            shots_objective=q.vqd_shots_objective,
-            shots_overlap=q.vqd_shots_overlap,
-            shots_weight=q.vqd_shots_weight,
-            pauli_grouping=q.pauli_grouping,
-            ground_angles=ang,
-            ground_energy=float(energy_pre),
-        )
-        out["vqd"] = {
-            "schema": "excited_vqd_bundle_v1",
-            "energies": vqd_res.energies,
-            "meta": vqd_res.meta,
-        }
-    if q.qse_after_variational:
-        qse = QSE(qh, subspace_dim=q.qse_subspace_dim)
-        kb = q.qse_max_basis
-        if q.qse_shot_mode == "exact":
-            qse_res = qse.run_from_vqe_hea_basis(ang, q.vqe_depth, max_basis=kb)
-        elif q.qse_shot_mode == "gaussian_h":
-            qse_res = qse.run_from_vqe_hea_basis_shot_noise(
-                ang,
-                q.vqe_depth,
-                max_basis=kb,
-                shots_per_matrix_element=q.qse_shots_per_matrix_element,
-                seed=cfg.random_seed,
-            )
-        else:
-            qse_res = qse.run_from_vqe_hea_basis_pauli_transitions(
-                ang,
-                q.vqe_depth,
-                max_basis=kb,
-                shots_per_ij_term=q.qse_shots_per_ij_term,
-                seed=cfg.random_seed,
-            )
-        qse_meta = dict(qse_res.meta)
-        qse_meta["qse_shot_mode"] = q.qse_shot_mode
-        out["qse"] = {
-            "schema": "excited_qse_bundle_v1",
-            "excitation_energies": qse_res.excitation_energies,
-            "meta": qse_meta,
-        }
-
-    if q.sceom_after_variational:
-        from qchem_stack.quantum.algorithms.sceom import (
-            resolve_sceom_s_generators,
-            run_sceom_nested_commutator_from_hea,
-        )
-
-        sceom_kw: dict[str, Any] = {}
-        gens, _ = resolve_sceom_s_generators(
-            strategy=q.sceom_generator_strategy,
-            hamiltonian=qh,
-            subspace_dim=q.sceom_subspace_dim,
-        )
-        if gens is not None:
-            sceom_kw["s_generators"] = gens
-        sceom_kw["generator_strategy_yaml"] = q.sceom_generator_strategy
-        sceom_res = run_sceom_nested_commutator_from_hea(
-            qh,
-            ang,
-            q.vqe_depth,
-            subspace_dim=q.sceom_subspace_dim,
-            shots_per_matrix_element=q.sceom_shots_per_matrix_element,
-            seed=cfg.random_seed,
-            **sceom_kw,
-        )
-        out["sceom"] = {
-            "schema": "excited_sceom_bundle_v1",
-            "energies": sceom_res.energies,
-            "meta": sceom_res.meta,
-        }
-
-    excited_rs = _build_excited_resource_summary(cfg, out)
-    if excited_rs is not None:
-        out["excited_resource_summary"] = excited_rs
-
-    profile.mark("excited_stages")
-    _emit("excited_stages")
-
-    profile.mark("pre_pauli_protocol")
-    _emit("pre_pauli_protocol")
-
-    if not q.use_pauli_protocol:
-        if excited_rs is not None:
-            out["resource_summary"] = _resource_summary_excited_only(qh.n_qubits, excited_rs)
-        else:
-            out["resource_summary"] = {
-                "n_circuits": 0,
-                "sum_shots": 0,
-                "max_depth": 0,
-                "sum_twoq": 0,
-                "n_qubits": qh.n_qubits,
-                "n_pauli_terms": None,
-                "n_pauli_groups": None,
-                "pauli_averaging_protocol_ran": False,
-            }
-        _attach_nexus_mitigation_tn(out, cfg, qh)
-        _attach_qpe_demo_track_if_requested(out, cfg, qh)
-        _attach_qpe_three_algorithm_pack_if_requested(out, cfg, qh)
-        _attach_vqs_track_if_requested(out, cfg, qh)
-        _finalize_open_stack_parity_snapshot(out, cfg, None)
-        _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
-        profile.mark("pauli_protocol_skipped")
-        _emit("pauli_protocol_skipped")
-        profile.mark("finalize_repro")
-        _emit("finalize_repro")
-        out["repro"]["pipeline_profile"] = profile.to_profile_dict()
-        _attach_run_summary(out, cfg)
-        return out
-
-    proto = _protocol_for_job(cfg, qh, bspec=bspec, exe=exe, bundle=bundle)
-    proto.build(np.asarray(angles, dtype=float), hea_depth=q.vqe_depth)
-    proto.compile()
-    proto.run()
-    e_proto = proto.evaluate()
-    rows = proto.dataframe_circuit_shot_rows()
-    df_sum = summarize_circuit_shot_rows(rows)
-    pc = proto._counts
-    resource_summary = {
-        **df_sum,
-        "n_pauli_terms": pc.get("n_pauli_terms"),
-        "n_pauli_groups": pc.get("n_pauli_groups"),
-        "pauli_averaging_protocol_ran": True,
-    }
-    if excited_rs is not None:
-        resource_summary["excited_stages"] = excited_rs
-        ub = _excited_shots_upper_bound(excited_rs)
-        resource_summary["excited_shots_upper_bound"] = ub
-        resource_summary["sum_shots_total_with_excited_upper_bound"] = int(df_sum["sum_shots"]) + ub
-        if isinstance(excited_rs.get("shot_channel_upper_bounds"), dict):
-            resource_summary["excited_shot_accounting"] = excited_rs["shot_channel_upper_bounds"]
-        resource_summary["excited_methods_unified"] = _excited_methods_unified(excited_rs)
-    out.update(
-        {
-            "energy_pauli_protocol": float(e_proto),
-            "protocol_counts": proto._counts,
-            "resource_rows": rows,
-            "pauli_measurement_ledger": rows,
-            "resource_summary": resource_summary,
-        }
+    _apply_embedding_workflow_stage(
+        cfg,
+        out=out,
+        qh=qh,
+        exe=exe,
+        embedding_input_payload=embedding_input_payload,
+        schmidt_ctx=schmidt_ctx,
+        rhf=rhf,
+        cfg_path=cfg_path,
+        profile=profile,
+        emit=_emit,
     )
-    _attach_nexus_mitigation_tn(out, cfg, qh)
-    _attach_qpe_demo_track_if_requested(out, cfg, qh)
-    _attach_qpe_three_algorithm_pack_if_requested(out, cfg, qh)
-    _attach_vqs_track_if_requested(out, cfg, qh)
-    _finalize_open_stack_parity_snapshot(out, cfg, proto)
-    _maybe_attach_md_ml_qmef_dataset(out, cfg, rhf, cfg_path=cfg_path)
-    profile.mark("pauli_protocol_done")
-    _emit("pauli_protocol_done")
-    profile.mark("finalize_repro")
-    _emit("finalize_repro")
-    out["repro"]["pipeline_profile"] = profile.to_profile_dict()
-    _attach_run_summary(out, cfg)
-    return out
+    excited_rs = _run_excited_stages(
+        cfg,
+        qh=qh,
+        exe=exe,
+        angles=angles,
+        energy_pre=float(energy_pre),
+        out=out,
+        profile=profile,
+        emit=_emit,
+    )
+
+    return _run_protocol_and_finalize_stage(
+        cfg,
+        out=out,
+        qh=qh,
+        angles=angles,
+        excited_rs=excited_rs,
+        bspec=bspec,
+        exe=exe,
+        bundle=bundle,
+        rhf=rhf,
+        cfg_path=cfg_path,
+        profile=profile,
+        emit=_emit,
+    )
 
 
 def _protocol_for_job(

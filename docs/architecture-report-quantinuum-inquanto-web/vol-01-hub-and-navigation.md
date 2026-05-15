@@ -59,7 +59,7 @@
 | 三柱品牌枢纽 | 首页 Hero + 四柱 `PillarCard` | 可考虑在 `/product/` 增加 **与三柱映射的一屏图** |
 | 顶栏 Nexus | 无（刻意不做） | 用 **「本地 runs API」** 文案替代 |
 | 全站搜索 | VitePress Local Search | 已具备；可扩展 `minisearch` 字段权重 |
-| 版本号在 title | `inquanto-tree.yaml` 版本字段 | 可在 `/mirror/` 页眉展示 `inquanto_version_seen` |
+| 版本号在 title | `mirror-doc-tree.yaml` 版本字段 | 可在 `/mirror/` 页眉展示 `upstream_doc_version_seen` |
 
 ---
 

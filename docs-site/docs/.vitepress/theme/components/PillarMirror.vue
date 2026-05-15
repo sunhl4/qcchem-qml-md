@@ -45,8 +45,8 @@ const STATUS_KEYS = ["shipped", "partial", "placeholder", "not-applicable"];
 <template>
   <section class="qcs-pmirror">
     <header>
-      <h3 v-if="(props.locale ?? 'zh') === 'zh'">本柱在 InQuanto 镜像中的对应节点</h3>
-      <h3 v-else>InQuanto mirror nodes in this pillar</h3>
+      <h3 v-if="(props.locale ?? 'zh') === 'zh'">本柱在参考文档镜像中的对应节点</h3>
+      <h3 v-else>Reference-doc mirror nodes in this pillar</h3>
       <p class="qcs-pmirror__counts">
         <StatusBadge v-for="s in STATUS_KEYS" :key="s" :status="s" :locale="props.locale ?? 'zh'" />
         <span class="qcs-pmirror__count" v-for="s in STATUS_KEYS" :key="`c-${s}`">

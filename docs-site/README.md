@@ -68,7 +68,7 @@ VitePress **does not** embed a preview panel inside the IDE. View it in a **regu
 ## How the mirror is generated
 
 ```
-scripts/inquanto-tree.yaml   ← single source of truth
+scripts/mirror-doc-tree.yaml   ← single source of truth
        │
        │  npm run scaffold:mirror
        ▼
@@ -77,7 +77,7 @@ docs/.vitepress/sidebar-mirror.json         (consumed by config.ts)
 docs/.vitepress/mirror-data.json            (consumed by <MirrorTree>)
 ```
 
-To register a newly-discovered InQuanto leaf or change its status, **edit `scripts/inquanto-tree.yaml` only** and rerun `npm run scaffold:mirror`. Existing pages are not overwritten when they contain `<!-- generated:keep -->`.
+To register a newly-discovered reference-doc leaf or change its status, **edit `scripts/mirror-doc-tree.yaml` only** and rerun `npm run scaffold:mirror`. Existing pages are not overwritten when they contain `<!-- generated:keep -->`.
 
 ## IA reference
 
@@ -86,7 +86,7 @@ To register a newly-discovered InQuanto leaf or change its status, **edit `scrip
 
 ## Syncing from repo `docs/`
 
-Canonical narrative Markdown still lives in [`../docs/`](../docs/). When syncing copies into `docs/concept/`, `docs/parity/`, `docs/reference/`:
+Canonical narrative Markdown still lives in [`../docs/`](../docs/). When syncing copies into `docs/concept/`, `docs/product/`, `docs/reference/`:
 
 ```bash
 npm run fix-links

@@ -31,4 +31,4 @@ python scripts/smoke_pipeline.py --projection-trace
 ## See also
 
 - [Workflow & YAML](/en/tutorial/workflow-overview)
-- [Parity matrix](/parity/public-matrix) §3
+- [Parity matrix](/product/roadmap) §3

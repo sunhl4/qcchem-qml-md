@@ -12,8 +12,8 @@ InQuanto scatters this concern across Nexus and the manual; we **aggregate** loc
 
 - [HTTP API · SQLite](/en/reference/http-api-sqlite-jobs)
 - [Launch / Retrieve (Nexus analog)](/en/concept/launch-retrieve-nexus-analog)
-- [Public matrix §1](/en/parity/public-matrix)
-- [L1 sign-off](/en/parity/l1-signoff)
+- [Public matrix §1](/en/product/roadmap)
+- [L1 sign-off](/en/product/roadmap)
 
 ## InQuanto mirror nodes
 

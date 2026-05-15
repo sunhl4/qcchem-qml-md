@@ -43,15 +43,15 @@ export function openQuestionsDefault() {
 function acceptanceBlockRaw(e) {
   if (e.status === "shipped") {
     return [
-      "- [ ] 公开 InQuanto 页与 `qchem` 模块行为有可引用对照实验或 parity 行。",
+      "- [ ] 参考文档公开页与 `qchem` 模块行为有可引用对照实验或能力说明。",
       "- [ ] `npm run check:mirror` 通过且 Mirror 页 `StatusBadge` 为 shipped。",
       "- [ ] `repro` 或 `parity_snapshot` 中含本能力相关键（若适用）。",
     ].join("\n");
   }
   if (e.status === "partial") {
     return [
-      "- [ ] `docs/inquanto_public_parity_matrix.md` 中 caveat 段落与代码一致。",
-      "- [ ] Mirror 页 partial 说明链接到 parity 矩阵对应行。",
+      "- [ ] 能力说明（路线图/架构页）与代码一致。",
+      "- [ ] Mirror 页 partial 说明链接到 `/product/roadmap` 或相关参考页。",
     ].join("\n");
   }
   if (e.status === "placeholder") {
@@ -69,7 +69,7 @@ function acceptanceBlockRaw(e) {
 function riskBlockRaw(e) {
   const risks = [];
   if (e.status === "partial") risks.push("- **R1（语义漂移）**: 公开文档更新导致我们 `partial` 说明过时 — 需版本钉扎 + CI 文档检查。");
-  if (e.status === "placeholder") risks.push("- **R2（期望管理）**: 读者从 InQuanto 跳转时期望已实现 — Mirror 页必须醒目展示 **占位** 徽章与里程碑。");
+  if (e.status === "placeholder") risks.push("- **R2（期望管理）**: 读者从参考镜像跳转时期望已实现 — Mirror 页必须醒目展示 **占位** 徽章与里程碑。");
   if (e.isClassLeaf) risks.push("- **R3（API 巨石页）**: 上游单 HTML 过大 — 我们已拆类叶 URL；注意同步锚点若上游改符号名。");
   if (topBucket(e) === "extensions" && e.status !== "not-applicable")
     risks.push("- **R4（依赖地狱）**: 扩展版本与 core 不兼容 — 文档需锁定 **受支持版本矩阵**。");
@@ -109,7 +109,7 @@ export function suggestedInternalRoutes(e) {
     routes.add("/cloud/tenant-and-quotas");
     routes.add("/cloud/jobs-and-logs");
   }
-  if (focus.includes("parity_evidence") || e.status === "partial") routes.add("/parity/public-matrix");
+  if (focus.includes("parity_evidence") || e.status === "partial") routes.add("/product/roadmap");
   if (focus.includes("repro_contract")) routes.add("/guide/jobs-and-reproducibility/");
   if (e.pillar === "P1") routes.add("/guide/chemistry-and-embedding/");
   else if (e.pillar === "P2") routes.add("/guide/algorithms-and-protocols/");
@@ -125,8 +125,8 @@ export function suggestedInternalRoutes(e) {
 
 export function parityDocHint(e) {
   if (e.status === "not-applicable")
-    return "优先阅读 `docs/inquanto_public_parity_matrix.md` 与 `docs/concept/architecture-boundaries` 中的 n/a 口径。";
+    return "优先阅读 `/product/roadmap` 与 `docs/concept/architecture-boundaries` 中的 n/a 口径。";
   if (e.status === "partial" || e.status === "shipped")
-    return "`docs/inquanto_public_parity_matrix.md` — 按 `qchem_module` 或能力名检索对应行；无行则开新 gap 行。";
+    return "`/product/roadmap` — 按 `qchem_module` 或能力名检索说明；无对应条目则补充路线图备注。";
   return "`docs/inquanto_public_parity_matrix.md` — placeholder 能力在矩阵中保持诚实未宣称。";
 }

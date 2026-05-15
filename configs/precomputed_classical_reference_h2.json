@@ -1,0 +1,30 @@
+{
+  "schema": "classical_reference_bundle_v1",
+  "classical_reference": {
+    "e_tot": -1.116708174,
+    "mo_energy": [-0.580628, 0.676341],
+    "driver_meta": {
+      "upstream_classical_software_tag": "external_dataset",
+      "energy_accounting_model": "mf_e_tot_direct"
+    }
+  },
+  "pre_quantum_input": {
+    "schema": "pre_quantum_input_v1",
+    "meta": {
+      "source": "offline_dataset_demo"
+    },
+    "qubit_hamiltonian": {
+      "n_qubits": 2,
+      "meta": {
+        "fermion_to_qubit_map": "jordan_wigner"
+      },
+      "terms": [
+        { "label": "II", "coeff": -0.5500000000 },
+        { "label": "ZI", "coeff": -0.2000000000 },
+        { "label": "IZ", "coeff": -0.2000000000 },
+        { "label": "ZZ", "coeff": 0.0800000000 },
+        { "label": "XX", "coeff": 0.0300000000 }
+      ]
+    }
+  }
+}

@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import json
 import tempfile
+from pathlib import Path
 
 from qchem_stack.jobs.pipeline_jobs import enqueue_full_pipeline_run
 from qchem_stack.jobs.store import JobStatus, SqliteJobStore
@@ -116,3 +118,21 @@ def test_list_jobs_offset_pagination() -> None:
         two = store.list_jobs(limit=2, offset=0)
         assert [two[0]["job_id"], two[1]["job_id"]] == [h3.job_id, h2.job_id]
         assert {r["job_id"] for r in store.list_jobs(limit=10)} == {h1.job_id, h2.job_id, h3.job_id}
+
+
+def test_enqueue_payload_includes_config_base_dir_when_provided() -> None:
+    with tempfile.TemporaryDirectory() as d:
+        path = f"{d}/payload.sqlite"
+        store = SqliteJobStore(path)
+        rc = RunContext.new()
+        cfg_dir = Path(d).resolve()
+        h = enqueue_full_pipeline_run(
+            store,
+            config_yaml="experiment_id: payload\n",
+            config_base_dir=cfg_dir,
+            run_context=rc,
+            meta_extra={"experiment_id": "payload"},
+        )
+        row = store.get_job_row(h.job_id)
+        payload = json.loads(row["payload"].decode("utf-8"))
+        assert payload.get("config_base_dir") == str(cfg_dir)

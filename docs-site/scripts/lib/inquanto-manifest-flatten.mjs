@@ -4,7 +4,10 @@
  * export-inquanto-node-backlog.mjs, check-mirror-coverage (via mirror-data).
  */
 
-export const INQUANTO_BASE = "https://docs.quantinuum.com/inquanto/";
+export const REFERENCE_DOC_BASE = "https://docs.quantinuum.com/inquanto/";
+
+/** @deprecated use REFERENCE_DOC_BASE */
+export const INQUANTO_BASE = REFERENCE_DOC_BASE;
 
 /**
  * @param {object} node
@@ -17,7 +20,7 @@ export const INQUANTO_BASE = "https://docs.quantinuum.com/inquanto/";
  *   breadcrumb: string[],
  *   title_zh: string,
  *   title_en: string,
- *   inquanto: string | null,
+ *   reference_url: string | null,
  *   diataxis: string,
  *   pillar: string,
  *   status: string,
@@ -44,17 +47,21 @@ export function flatten(
   const pillar = node.pillar ?? inheritedPillar;
   const diataxis = node.diataxis ?? inheritedDiataxis;
 
+  const rawRef = node.reference_url ?? node.inquanto;
+  const resolvedRef =
+    rawRef == null || rawRef === ""
+      ? null
+      : String(rawRef).startsWith("http")
+        ? String(rawRef)
+        : REFERENCE_DOC_BASE + rawRef;
+
   if (slug !== "__root__" && slug !== "site_meta") {
     out.push({
       slug,
       breadcrumb,
       title_zh: node.title_zh ?? slug,
       title_en: node.title_en ?? slug,
-      inquanto: node.inquanto
-        ? node.inquanto.startsWith("http")
-          ? node.inquanto
-          : INQUANTO_BASE + node.inquanto
-        : null,
+      reference_url: resolvedRef,
       diataxis,
       pillar,
       status: node.status ?? "placeholder",
@@ -81,13 +88,20 @@ export function flatten(
       const milestone = (classNode && classNode.milestone) ?? null;
       const reason_zh = (classNode && classNode.reason_zh) ?? null;
       const reason_en = (classNode && classNode.reason_en) ?? null;
+      const parentRaw = node.reference_url ?? node.inquanto;
+      const parentBase =
+        parentRaw == null || parentRaw === ""
+          ? null
+          : String(parentRaw).startsWith("http")
+            ? String(parentRaw)
+            : REFERENCE_DOC_BASE + parentRaw;
       out.push({
         slug: className,
         breadcrumb: [...breadcrumb, "classes", className],
         title_zh: className,
         title_en: className,
-        inquanto: node.inquanto
-          ? (node.inquanto.startsWith("http") ? node.inquanto : INQUANTO_BASE + node.inquanto) +
+        reference_url: parentBase
+          ? parentBase +
             `#inquanto.${slug.replace(/^extensions_/, "extensions.")}.${className}`
           : null,
         diataxis,

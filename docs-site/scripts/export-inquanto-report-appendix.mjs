@@ -1,5 +1,5 @@
 /**
- * Reads scripts/inquanto-tree.yaml and writes:
+ * Reads scripts/mirror-doc-tree.yaml and writes:
  *   - appendix-A-full-node-list.generated.md (compact audit block per node)
  *   - appendix-B-url-inventory.generated.tsv
  *   - appendix-C-deep-node-architecture.generated.md (~2w lines: per-node IA decomposition)
@@ -15,7 +15,7 @@ import yaml from "js-yaml";
 import { buildSiblingsIndex, flatten, mirrorSitePath, topBucket } from "./lib/inquanto-manifest-flatten.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const manifestPath = path.join(__dirname, "inquanto-tree.yaml");
+const manifestPath = path.join(__dirname, "mirror-doc-tree.yaml");
 
 const defaultOut = path.join(__dirname, "..", "..", "docs", "architecture-report-quantinuum-inquanto-web");
 
@@ -237,7 +237,7 @@ function renderDeepArchitectureBlock(e, index, byParent, totalNodes) {
   lines.push(`| breadcrumb | \`${bcPath}\` |`);
   lines.push(`| slug | \`${e.slug}\` |`);
   lines.push(`| title_zh / en | ${e.title_zh} / ${e.title_en} |`);
-  lines.push(`| inquanto_anchor | ${e.inquanto ?? "—"} |`);
+  lines.push(`| reference_doc_url | ${e.reference_url ?? "—"} |`);
   lines.push(`| pillar / diataxis / class_leaf | ${e.pillar} / ${e.diataxis} / ${e.isClassLeaf ? "yes" : "no"} |`);
   lines.push(`| mirror_path | \`${mirrorSitePath(e)}\` |`);
   lines.push("");
@@ -289,7 +289,7 @@ function renderAppendixBlock(e, index) {
   lines.push(`| **breadcrumb** | \`${e.breadcrumb.join(" / ")}\` |`);
   lines.push(`| **title_zh** | ${String(e.title_zh).replace(/\|/g, "\\|")} |`);
   lines.push(`| **title_en** | ${String(e.title_en).replace(/\|/g, "\\|")} |`);
-  lines.push(`| **inquanto_anchor** | ${e.inquanto ?? "—"} |`);
+  lines.push(`| **reference_doc_url** | ${e.reference_url ?? "—"} |`);
   lines.push(`| **pillar** | ${e.pillar} |`);
   lines.push(`| **diataxis** | ${e.diataxis} |`);
   lines.push(`| **status** | ${e.status} |`);
@@ -340,13 +340,13 @@ function main() {
   const header = [
     "---",
     "title: Appendix A — Full node list (generated)",
-    `description: Auto-generated from inquanto-tree.yaml; ${entries.length} entries.`,
+    `description: Auto-generated from mirror-doc-tree.yaml; ${entries.length} entries.`,
     "edit: false",
     "---",
     "",
     "> **Do not hand-edit.** Regenerate with `npm run report:inquanto-appendix` from `docs-site/`.",
     "",
-    `**Source pin**: ${site_meta?.source_pin_date ?? "—"} · **InQuanto version (manifest)**: ${site_meta?.inquanto_version_seen ?? "—"}`,
+    `**Source pin**: ${site_meta?.source_pin_date ?? "—"} · **Upstream doc version (manifest)**: ${site_meta?.upstream_doc_version_seen ?? "—"}`,
     "",
     "**姊妹附录**: 更深拆解见 [appendix-C-deep-node-architecture.generated.md](./appendix-C-deep-node-architecture.generated.md)（约 2 万行量级，规则生成）。",
     "",
@@ -366,10 +366,10 @@ function main() {
     "edit: false",
     "---",
     "",
-    "> **Do not hand-edit.** 由 `inquanto-tree.yaml` **全量扁平节点** 规则生成；每一节结构相同，便于 diff 与评审。",
+    "> **Do not hand-edit.** 由 `mirror-doc-tree.yaml` **全量扁平节点** 规则生成；每一节结构相同，便于 diff 与评审。",
     "> 非「编造功能」，未在 manifest 出现的字段一律写 **—** 或 **推断** 模板句。",
     "",
-    `**Source pin**: ${site_meta?.source_pin_date ?? "—"} · **InQuanto version**: ${site_meta?.inquanto_version_seen ?? "—"} · **Nodes**: ${entries.length}`,
+    `**Source pin**: ${site_meta?.source_pin_date ?? "—"} · **Upstream doc version**: ${site_meta?.upstream_doc_version_seen ?? "—"} · **Nodes**: ${entries.length}`,
     "",
     "## 本附录的阅读方法",
     "",
@@ -391,7 +391,7 @@ function main() {
       "breadcrumb",
       "title_zh",
       "title_en",
-      "inquanto_anchor",
+      "reference_doc_url",
       "pillar",
       "diataxis",
       "status",
@@ -408,7 +408,7 @@ function main() {
         e.breadcrumb.join("/"),
         tsvEscape(e.title_zh),
         tsvEscape(e.title_en),
-        tsvEscape(e.inquanto),
+        tsvEscape(e.reference_url),
         e.pillar,
         e.diataxis,
         e.status,

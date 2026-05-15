@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 import yaml
@@ -72,7 +73,18 @@ def run_full_pipeline_job(store: SqliteJobStore, job_id: str) -> None:
     data = yaml.safe_load(cy)
     if not isinstance(data, dict):
         raise ValueError("config_yaml must parse to a mapping")
-    cfg = ExperimentConfig.from_yaml_dict(data)
+    base_dir_raw = body.get("config_base_dir")
+    base_dir: Path | None = None
+    if base_dir_raw is not None:
+        if not isinstance(base_dir_raw, str) or not base_dir_raw.strip():
+            raise ValueError("config_base_dir must be a non-empty string when provided")
+        base_dir = Path(base_dir_raw).expanduser().resolve()
+        if not base_dir.is_dir():
+            raise ValueError(f"config_base_dir is not a directory: {base_dir}")
+    cfg = ExperimentConfig.from_yaml_dict(
+        data,
+        geometry_files_base_dir=base_dir,
+    )
     rc = None
     rcd = body.get("run_context")
     if isinstance(rcd, dict) and rcd.get("trace_id"):

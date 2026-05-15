@@ -30,7 +30,7 @@ python scripts/export_parity_criteria_table.py configs/example_h2_uccsd_trotter.
 
 ## 边界（诚实）
 
-- **BK / SCBK**：同一套 UCCSD Trotter  ansatz **未**在非 JW 映射上实现；变分仍可用 HEA + BK/SCBK Hamiltonian。详见 [公开 parity 矩阵](/parity/public-matrix) §2。
+- **BK / SCBK**：同一套 UCCSD Trotter  ansatz **未**在非 JW 映射上实现；变分仍可用 HEA + BK/SCBK Hamiltonian。详见 [公开 parity 矩阵](/product/roadmap) §2。
 
 ## 相关
 

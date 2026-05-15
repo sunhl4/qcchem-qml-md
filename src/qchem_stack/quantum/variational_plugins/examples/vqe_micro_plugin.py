@@ -18,7 +18,7 @@ from qchem_stack.quantum.variational_plugins.spec import (
 
 
 def run_micro_vqe(ctx: VariationalRunContext) -> VariationalStageOutcome:
-    qh = ctx.hamiltonian
+    qh = ctx.resolved_hamiltonian()
     q = ctx.cfg.quantum
     capped = max(1, min(int(q.vqe_maxiter), 8))
     vr = VQE(

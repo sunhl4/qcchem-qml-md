@@ -1,6 +1,6 @@
 ---
 title: PMSV
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV"
 diataxis: reference
 pillar: P2
 status: shipped
@@ -11,7 +11,7 @@ i18n_key: api.protocols.classes.PMSV
 
 # PMSV <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>api / protocols / classes / PMSV</code> · <a href="/mirror/api/protocols/classes/PMSV/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>api / protocols / classes / PMSV</code> · <a href="/mirror/api/protocols/classes/PMSV/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Shipped
@@ -19,12 +19,12 @@ i18n_key: api.protocols.classes.PMSV
 - **Diátaxis**: Reference
 - **Module**: `qchem_stack.mitigation.pmsv`
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV](https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV](https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
@@ -32,8 +32,8 @@ This page mirrors the corresponding node in the public InQuanto tree. Open the I
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

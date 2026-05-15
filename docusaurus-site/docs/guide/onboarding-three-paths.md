@@ -1,6 +1,6 @@
 ---
 title: 新用户三条路径
-description: 根据你的目标选择上手路径：先跑通、先对标、先工程集成。
+description: 根据你的目标选择上手路径：先跑通、先规划、先工程集成。
 ---
 
 # 新用户三条路径
@@ -13,13 +13,13 @@ description: 根据你的目标选择上手路径：先跑通、先对标、先�
 2. [工作流与 YAML 概览](/tutorial/workflow)  
 3. 继续阅读 [案例：H2 家族](/tutorial/case-study-h2-family) 或 [UCCSD Trotter 导出](/tutorial/uccsd-trotter-export)
 
-## 路径 B：先理解对标与契约
+## 路径 B：先理解规划与契约
 
-适合：需要维护 parity、导出键、验收文档的维护者。
+适合：需要维护导出键、验收文档与路线图的维护者。
 
-1. [公开 parity 矩阵](/parity/public-matrix)  
-2. [差距与实施计划](/parity/gap-implementation-plan)  
-3. [产品定位与路线](/product/positioning) + [竞争定位](/concept/competitive-positioning)
+1. [产品定位与路线](/product/positioning)  
+2. [工程架构](/concept/engineering-architecture)  
+3. [路线图](/product/roadmap)
 
 ## 路径 C：先做工程集成与自动化
 

@@ -1,5 +1,5 @@
 /**
- * Writes machine-readable Y1 node backlog (295 rows) from inquanto-tree.yaml,
+ * Writes machine-readable Y1 node backlog (295 rows) from mirror-doc-tree.yaml,
  * aligned with appendix C contract fields + differentiator extensions.
  *
  * Default: ../../docs/inquanto-node-backlog.generated.{json,md}
@@ -21,7 +21,7 @@ import {
 } from "./lib/inquanto-manifest-node-contract.mjs";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const manifestPath = path.join(__dirname, "inquanto-tree.yaml");
+const manifestPath = path.join(__dirname, "mirror-doc-tree.yaml");
 const defaultDocsRoot = path.join(__dirname, "..", "..", "docs");
 
 function main() {
@@ -43,7 +43,7 @@ function main() {
     slug: e.slug,
     title_zh: e.title_zh,
     title_en: e.title_en,
-    inquanto_anchor: e.inquanto,
+    reference_doc_url: e.reference_url,
     mirror_site_path: mirrorSitePath(e),
     pillar: e.pillar,
     diataxis: e.diataxis,
@@ -63,17 +63,17 @@ function main() {
     suggested_internal_routes: suggestedInternalRoutes(e),
     parity_doc_hint: parityDocHint(e),
     source_pin_date: site_meta?.source_pin_date ?? null,
-    inquanto_version_seen: site_meta?.inquanto_version_seen ?? null,
+    upstream_doc_version_seen: site_meta?.upstream_doc_version_seen ?? null,
   }));
 
   const doc = {
     meta: {
       schema_version: 1,
       source_pin_date: site_meta?.source_pin_date ?? null,
-      inquanto_version_seen: site_meta?.inquanto_version_seen ?? null,
+      upstream_doc_version_seen: site_meta?.upstream_doc_version_seen ?? null,
       source_root: site_meta?.source_root ?? null,
       node_count: nodes.length,
-      manifest_path: "docs-site/scripts/inquanto-tree.yaml",
+      manifest_path: "docs-site/scripts/mirror-doc-tree.yaml",
       appendix_c_relative:
         "docs/architecture-report-quantinuum-inquanto-web/appendix-C-deep-node-architecture.generated.md",
     },

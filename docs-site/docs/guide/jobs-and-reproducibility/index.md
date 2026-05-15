@@ -12,8 +12,8 @@
 
 - [HTTP API · SQLite](/reference/http-api-sqlite-jobs)  
 - [Launch / Retrieve（Nexus 类比）](/concept/launch-retrieve-nexus-analog)  
-- [公开矩阵 §1](/parity/public-matrix) — 作业网关行  
-- [L1 签 off](/parity/l1-signoff)  
+- [公开矩阵 §1](/product/roadmap) — 作业网关行  
+- [L1 签 off](/product/roadmap)  
 
 ## 在 InQuanto 镜像中的对应位置
 
@@ -23,4 +23,4 @@
 
 ## 下一步
 
-[首页](/) · [Y1 对标台账](/parity/y1-alignment-ledger)
+[首页](/) · [Y1 对标台账](/product/roadmap)

@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import uuid
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.jobs.kinds import JOB_KIND_FULL_PIPELINE
@@ -17,6 +18,7 @@ def enqueue_full_pipeline_run(
     store: SqliteJobStore,
     *,
     config_yaml: str,
+    config_base_dir: str | Path | None = None,
     run_context: RunContext | None = None,
     meta_extra: dict[str, Any] | None = None,
 ) -> JobHandle:
@@ -26,6 +28,8 @@ def enqueue_full_pipeline_run(
     """
     job_id = str(uuid.uuid4())
     body: dict = {"config_yaml": config_yaml}
+    if config_base_dir is not None:
+        body["config_base_dir"] = str(Path(config_base_dir))
     if run_context is not None:
         body["run_context"] = run_context.to_repro_dict()
     payload = json.dumps(body, ensure_ascii=False).encode("utf-8")

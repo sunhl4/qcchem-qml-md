@@ -13,9 +13,9 @@ Hub for **P2-W7** (two-month plan). Details live in each linked tutorial and in 
 
 ## Path B — Parity / L1 before changing code
 
-1. [Public parity matrix](/en/parity/public-matrix)  
-2. [L1 signoff](/en/parity/l1-signoff)  
-3. [Gap plan](/parity/gap-implementation-plan) (ZH) and [P2 plan](/en/concept/p2-detailed-plan) (EN summary; full §6–§8 in repo `docs/与InQuanto能力差距与实施计划.md`（附录 A）)  
+1. [Public parity matrix](/en/product/roadmap)  
+2. [L1 signoff](/en/product/roadmap)  
+3. [Gap plan](/product/roadmap) (ZH) and [P2 plan](/en/concept/p2-detailed-plan) (EN summary; full §6–§8 in repo `docs/与InQuanto能力差距与实施计划.md`（附录 A）)  
 4. Repo root **`CONTRIBUTING.md`** (CI markers, parity export)
 
 ## Path C — MD/ML and `QMEFDataset`

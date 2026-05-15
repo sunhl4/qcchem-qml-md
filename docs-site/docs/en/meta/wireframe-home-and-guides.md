@@ -17,7 +17,7 @@ Implements the IA plan: **InQuanto-aligned three-column mental model** plus an e
 | B | **Utility links** | Runs API, Roadmap |
 | C | **Section header** | Eyebrow + one-line intro to cards |
 | D | **Four pillar cards** | P1–P4; each: title, lead, body, one deep link where useful |
-| E | **Trust strip** (optional) | Parity matrix + honest partial/n/a — link `/en/parity/public-matrix` |
+| E | **Trust strip** (optional) | Parity matrix + honest partial/n/a — link `/en/product/roadmap` |
 | F | **Short footer** | Security & data, Principles & reading |
 
 ### 1.2 ASCII wireframe

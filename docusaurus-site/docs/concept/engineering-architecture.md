@@ -25,4 +25,4 @@ description: qchem-stack 的分层架构、数据流与边界说明。
 
 - [指南总览](/guide/)
 - [HTTP API 与作业队列](/reference/http-api-sqlite-jobs)
-- [公开 parity 矩阵](/parity/public-matrix)
+- [产品路线图](/product/roadmap)

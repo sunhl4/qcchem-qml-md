@@ -19,7 +19,7 @@ InQuanto **混合** 在同一 HTML 中（尤其 Manual）— **非严格 Diátax
 
 ## 2. 将 manifest 的 `diataxis` 字段映射到四象限
 
-[`inquanto-tree.yaml`](../../docs-site/scripts/inquanto-tree.yaml) 使用 `concept | tutorial | reference | parity`：
+[`mirror-doc-tree.yaml`](../../docs-site/scripts/mirror-doc-tree.yaml) 使用 `concept | tutorial | reference | parity`：
 
 | manifest 值 | 推荐对应 Diátaxis | 说明 |
 |---------------|-------------------|------|

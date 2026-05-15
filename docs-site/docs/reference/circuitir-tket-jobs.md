@@ -111,7 +111,7 @@ sequenceDiagram
 
 | 文档 | 内容 |
 |------|------|
-| [inquanto_public_parity_matrix.md](/parity/public-matrix) | 公开能力 vs 本包 |
-| [工程记忆_Quantinuum对标与数据流技术文档.md](/concept/engineering-memory-quantinuum) | 路线图与判据落点 |
+| [inquanto_public_parity_matrix.md](/product/roadmap) | 公开能力 vs 本包 |
+| [工程记忆_Quantinuum对标与数据流技术文档.md](/concept/engineering-architecture) | 路线图与判据落点 |
 | [launch_retrieve_nexus_analog.md](/concept/launch-retrieve-nexus-analog) | Nexus 语义类比短表 |
 | [README.md](/tutorial/quickstart) | 目录与 InQuanto 分层对照 |

@@ -14,7 +14,7 @@ def test_resource_estimation_preview_keys_subset_of_contract_registry() -> None:
     from qchem_stack.integrations.resource_estimation_preview import (
         build_resource_estimation_preview_v1,
     )
-    from qchem_stack.protocols.inquanto_contract import (
+    from qchem_stack.internal_reports.competitor.inquanto_contract import (
         RESOURCE_ESTIMATION_PREVIEW_V1_DOCUMENTED_KEYS,
     )
 

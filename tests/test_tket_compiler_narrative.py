@@ -11,7 +11,7 @@ from qchem_stack.config import (
     ExperimentConfig,
     compiler_bundle_signature_from_config,
 )
-from qchem_stack.protocols.inquanto_contract import inquanto_gap_categories
+from qchem_stack.internal_reports.competitor.inquanto_contract import inquanto_gap_categories
 
 
 def _minimal_h2_yaml() -> str:
@@ -42,7 +42,7 @@ def test_compiler_bundle_signature_changes_with_optimization_level() -> None:
     sig0 = compiler_bundle_signature_from_config(cfg)
     alt = copy.deepcopy(cfg)
     alt.compiler = CompilerSpec.model_validate(
-        {**cfg.compiler.model_dump(), "optimization_level": 99}
+        {**cfg.compiler.model_dump(), "optimization_level": 3}
     )
     assert compiler_bundle_signature_from_config(alt) != sig0
 

@@ -50,4 +50,4 @@
 
 - [Projection 嵌入深入](/tutorial/projection-embedding-deep-dive)
 - [P1 化学与嵌入](/guide/chemistry-and-embedding)
-- [公开契约矩阵](/parity/public-matrix)
+- [工程架构](/concept/engineering-architecture)

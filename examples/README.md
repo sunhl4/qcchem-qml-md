@@ -16,6 +16,13 @@
 
 详细叙事见站点 [onboarding-three-paths](../docs-site/docs/guide/onboarding-three-paths.md)（`docs-site/` 下 `npm run docs:dev`）。
 
+## 外部插件（entry points）示例
+
+- 外部可安装插件骨架：`solver_plugin_entrypoint_demo/`
+- 安装：`pip install -e ./examples/solver_plugin_entrypoint_demo`
+- 配置：`scf.driver: entrypoint_demo`
+- 设计说明：`../docs/solver_entrypoint_plugin_安装与发布指南.md`
+
 ## 一次性烟测
 
 ```bash

@@ -1,7 +1,7 @@
 # Vol.09 补遗 — `api/` 模块面与 `misc/`（manifest 聚合索引）
 
 **读者**：库维护者、API 文档负责人。  
-**真源**：[`inquanto-tree.yaml`](../../docs-site/scripts/inquanto-tree.yaml) 中 `api:` 与 `misc:` 子树（本卷把 Vol.02 未逐条展开的 **API 模块级** 与 **杂项** 做聚合说明）。**与 Sphinx 侧栏的逐项对拍**见 [Vol.10](./vol-10-official-sidebar-vs-manifest.md)。
+**真源**：[`mirror-doc-tree.yaml`](../../docs-site/scripts/mirror-doc-tree.yaml) 中 `api:` 与 `misc:` 子树（本卷把 Vol.02 未逐条展开的 **API 模块级** 与 **杂项** 做聚合说明）。**与 Sphinx 侧栏的逐项对拍**见 [Vol.10](./vol-10-official-sidebar-vs-manifest.md)。
 
 ---
 

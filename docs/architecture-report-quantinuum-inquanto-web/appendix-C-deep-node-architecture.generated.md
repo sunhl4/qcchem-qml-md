@@ -4,10 +4,10 @@ description: Rule-based IA/security/cloud/test checklist per manifest node (295 
 edit: false
 ---
 
-> **Do not hand-edit.** 由 `inquanto-tree.yaml` **全量扁平节点** 规则生成；每一节结构相同，便于 diff 与评审。
+> **Do not hand-edit.** 由 `mirror-doc-tree.yaml` **全量扁平节点** 规则生成；每一节结构相同，便于 diff 与评审。
 > 非「编造功能」，未在 manifest 出现的字段一律写 **—** 或 **推断** 模板句。
 
-**Source pin**: 2026-04-30 · **InQuanto version**: 5.2.3 · **Nodes**: 295
+**Source pin**: 2026-04-30 · **Upstream doc version**: 5.2.3 · **Nodes**: 295
 
 ## 本附录的阅读方法
 
@@ -25,7 +25,7 @@ edit: false
 | breadcrumb | `introduction` |
 | slug | `introduction` |
 | title_zh / en | 介绍 / Introduction |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/introduction/ |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/introduction/ |
 | pillar / diataxis / class_leaf | meta / concept / no |
 | mirror_path | `/mirror/introduction/` |
 
@@ -88,8 +88,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `introduction / overview` |
 | slug | `overview` |
-| title_zh / en | 什么是 InQuanto / What is InQuanto? |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/introduction/overview.html |
+| title_zh / en | 产品概览（参考文档镜像） / Product overview (reference mirror) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/introduction/overview.html |
 | pillar / diataxis / class_leaf | meta / concept / no |
 | mirror_path | `/mirror/introduction/overview/` |
 
@@ -111,8 +111,9 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
-- **已绑定模块**: _manifest 未填 `qchem`_。
-- **工程动作**: 在 parity 评审中决定是 **占位** 还是 **刻意不做**；若占位，指定里程碑与最小可交付 API 面。
+- **已绑定模块（manifest `qchem`）**:
+  - `qchem_stack`
+- **工程动作**: 在 Python 包内定位该符号；更新 parity 矩阵行；为 `/reference/` 或 `/guide/` 写 Methods 段落时引用此路径。
 
 - **status（manifest）**: `shipped`
 - **milestone**: —
@@ -154,7 +155,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `introduction / installation` |
 | slug | `installation` |
 | title_zh / en | 安装 / Installation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/introduction/installation.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/introduction/installation.html |
 | pillar / diataxis / class_leaf | meta / tutorial / no |
 | mirror_path | `/mirror/introduction/installation/` |
 
@@ -171,7 +172,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `overview` — What is InQuanto?（什么是 InQuanto）· `shipped`
+- `overview` — Product overview (reference mirror)（产品概览（参考文档镜像））· `shipped`
 - `quickstart` — Quick-start guide（快速上手）· `shipped`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -219,7 +220,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `introduction / installation / system_requirements` |
 | slug | `system_requirements` |
 | title_zh / en | 系统要求 / System requirements |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/introduction/system_requirements.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/introduction/system_requirements.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/introduction/installation/system_requirements/` |
 
@@ -284,7 +285,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `introduction / installation / troubleshooting` |
 | slug | `troubleshooting` |
 | title_zh / en | 故障排除 / Troubleshooting |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/introduction/troubleshooting.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/introduction/troubleshooting.html |
 | pillar / diataxis / class_leaf | meta / concept / no |
 | mirror_path | `/mirror/introduction/installation/troubleshooting/` |
 
@@ -348,7 +349,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `introduction / quickstart` |
 | slug | `quickstart` |
 | title_zh / en | 快速上手 / Quick-start guide |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/introduction/quickstart.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/introduction/quickstart.html |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/introduction/quickstart/` |
 
@@ -367,7 +368,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `overview` — What is InQuanto?（什么是 InQuanto）· `shipped`
+- `overview` — Product overview (reference mirror)（产品概览（参考文档镜像））· `shipped`
 - `installation` — Installation（安装）· `shipped`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -416,7 +417,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual` |
 | slug | `manual` |
 | title_zh / en | 用户手册 / Manual |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/ |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/ |
 | pillar / diataxis / class_leaf | meta / concept / no |
 | mirror_path | `/mirror/manual/` |
 
@@ -479,8 +480,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `manual / howto` |
 | slug | `howto` |
-| title_zh / en | 如何使用 InQuanto / How to use InQuanto |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/howto.html |
+| title_zh / en | 参考手册 · 使用说明 / Reference manual · How-to |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/howto.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/howto/` |
 
@@ -555,7 +556,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / geometry` |
 | slug | `geometry` |
 | title_zh / en | 几何 / Geometry |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/geometry.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/geometry.html |
 | pillar / diataxis / class_leaf | P1 / concept / no |
 | mirror_path | `/mirror/manual/geometry/` |
 
@@ -572,7 +573,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
 - `spaces_operators` — Spaces, operators, states and mappings（空间 / 算符 / 状态 / 映射）· `partial`
@@ -629,7 +630,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / express` |
 | slug | `express` |
 | title_zh / en | Express 数据集 / Express data sets |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/express.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/express.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/manual/express/` |
 
@@ -646,7 +647,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
 - `spaces_operators` — Spaces, operators, states and mappings（空间 / 算符 / 状态 / 映射）· `partial`
@@ -704,7 +705,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / symmetry` |
 | slug | `symmetry` |
 | title_zh / en | 对称性 / Symmetry |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/symmetry.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/symmetry.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/symmetry/` |
 
@@ -721,7 +722,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `spaces_operators` — Spaces, operators, states and mappings（空间 / 算符 / 状态 / 映射）· `partial`
@@ -777,7 +778,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / spaces_operators` |
 | slug | `spaces_operators` |
 | title_zh / en | 空间 / 算符 / 状态 / 映射 / Spaces, operators, states and mappings |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/spaces.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/spaces.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/spaces_operators/` |
 
@@ -794,7 +795,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -851,7 +852,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / spaces_operators / interfacing_qchem` |
 | slug | `interfacing_qchem` |
 | title_zh / en | 与外部量化包接口（FCIDUMP） / Interfacing with quantum chemistry packages (FCIDUMP) |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/spaces.html#interfacing-quantum-chemistry |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/spaces.html#interfacing-quantum-chemistry |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/spaces_operators/interfacing_qchem/` |
 
@@ -914,7 +915,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / spaces_operators / qubit_mapping` |
 | slug | `qubit_mapping` |
 | title_zh / en | 量子比特映射 / Qubit mapping |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/spaces.html#qubit-mapping |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/spaces_operators/qubit_mapping/` |
 
@@ -979,7 +980,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / ansatze` |
 | slug | `ansatze` |
 | title_zh / en | Ansatze 概览 / Ansatze overview |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/ansatzae_overview.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/ansatzae_overview.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/ansatze/` |
 
@@ -996,7 +997,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -1053,7 +1054,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / ansatze / ucc_family` |
 | slug | `ucc_family` |
 | title_zh / en | UCC 家族 / UCC family |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/ansatze/ucc_family.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/ansatze/ucc_family.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/ansatze/ucc_family/` |
 
@@ -1116,7 +1117,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / ansatze / hardware_efficient` |
 | slug | `hardware_efficient` |
 | title_zh / en | 硬件高效 ansatz（HEA） / Hardware-efficient ansatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/ansatze/hea.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/ansatze/hea.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/ansatze/hardware_efficient/` |
 
@@ -1181,7 +1182,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / minimizers` |
 | slug | `minimizers` |
 | title_zh / en | 极小化器 / Minimizers |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/minimizers.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/minimizers.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/manual/minimizers/` |
 
@@ -1198,7 +1199,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -1256,7 +1257,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / computables` |
 | slug | `computables` |
 | title_zh / en | Computables 概览 / Computables overview |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/computables_overview.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/computables_overview.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/computables/` |
 
@@ -1273,7 +1274,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -1330,7 +1331,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / computables / atomic` |
 | slug | `atomic` |
 | title_zh / en | 原子 computable / Atomic computables |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/computables/atomic.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/computables/atomic.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/computables/atomic/` |
 
@@ -1395,7 +1396,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / computables / composite` |
 | slug | `composite` |
 | title_zh / en | 复合 computable / Composite computables |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/computables/composite_computables.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/computables/composite_computables.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/computables/composite/` |
 
@@ -1460,7 +1461,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / computables / primitives` |
 | slug | `primitives` |
 | title_zh / en | 原语 computable / Primitive computables |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/computables/primitives.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/computables/primitives.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/computables/primitives/` |
 
@@ -1525,7 +1526,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / computables / evaluating_w_protocols` |
 | slug | `evaluating_w_protocols` |
 | title_zh / en | 用 Protocol 求值 / Evaluating with protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/computables/evaluating_w_protocols.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/computables/evaluating_w_protocols.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/computables/evaluating_w_protocols/` |
 
@@ -1592,7 +1593,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols` |
 | slug | `protocols` |
 | title_zh / en | Protocols 概览（五阶段） / Protocols overview (five stages) |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols_overview.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols_overview.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/` |
 
@@ -1612,7 +1613,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -1669,7 +1670,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols / statevector` |
 | slug | `statevector` |
 | title_zh / en | 态向量 Protocol / Statevector protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols/statevector.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols/statevector.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/statevector/` |
 
@@ -1738,7 +1739,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols / averaging` |
 | slug | `averaging` |
 | title_zh / en | 平均（Pauli）Protocol / Averaging protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols/expval.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols/expval.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/averaging/` |
 
@@ -1808,7 +1809,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols / overlap` |
 | slug | `overlap` |
 | title_zh / en | 重叠 / 投影 Protocol / Overlap protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols/overlap.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols/overlap.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/overlap/` |
 
@@ -1876,7 +1877,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols / derivatives` |
 | slug | `derivatives` |
 | title_zh / en | 导数 Protocol / Derivative protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols/derivative.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols/derivative.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/derivatives/` |
 
@@ -1944,7 +1945,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols / phase_estimation` |
 | slug | `phase_estimation` |
 | title_zh / en | 量子相位估计 Protocol / Quantum phase estimation protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols/qpe.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols/qpe.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/phase_estimation/` |
 
@@ -2013,7 +2014,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / protocols / resource_estimation` |
 | slug | `resource_estimation` |
 | title_zh / en | 资源估计 / Resource estimation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/protocols/resource_estimation.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/protocols/resource_estimation.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/protocols/resource_estimation/` |
 
@@ -2083,7 +2084,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / algorithms` |
 | slug | `algorithms` |
 | title_zh / en | Algorithms 概览 / Algorithms overview |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/algorithms_overview.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/algorithms_overview.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/algorithms/` |
 
@@ -2101,7 +2102,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -2158,7 +2159,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / algorithms / vqe` |
 | slug | `vqe` |
 | title_zh / en | VQE / VQE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_vqe.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_vqe.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/algorithms/vqe/` |
 
@@ -2227,7 +2228,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / algorithms / adapt` |
 | slug | `adapt` |
 | title_zh / en | ADAPT-VQE 家族 / ADAPT-VQE family |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_adapt.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_adapt.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/algorithms/adapt/` |
 
@@ -2295,7 +2296,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / algorithms / excited` |
 | slug | `excited` |
 | title_zh / en | 激发态（VQD / QSE / SCEOM） / Excited states (VQD / QSE / SCEOM) |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_excited.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_excited.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/algorithms/excited/` |
 
@@ -2363,7 +2364,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / algorithms / qpe` |
 | slug | `qpe` |
 | title_zh / en | 量子相位估计算法 / Quantum phase estimation algorithms |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_qpe.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/algorithms/algorithms_qpe.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/algorithms/qpe/` |
 
@@ -2431,7 +2432,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / algorithms / time_evolution` |
 | slug | `time_evolution` |
 | title_zh / en | 时间演化（VQS / McLachlan） / Time evolution (VQS / McLachlan) |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/algorithms/te_vqs.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/algorithms/te_vqs.html |
 | pillar / diataxis / class_leaf | P2 / concept / no |
 | mirror_path | `/mirror/manual/algorithms/time_evolution/` |
 
@@ -2498,7 +2499,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / embedding` |
 | slug | `embedding` |
 | title_zh / en | 嵌入与 DMET / Embeddings and DMET |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/dmet.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/dmet.html |
 | pillar / diataxis / class_leaf | P1 / concept / no |
 | mirror_path | `/mirror/manual/embedding/` |
 
@@ -2515,7 +2516,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -2572,7 +2573,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / embedding / dmet_intro` |
 | slug | `dmet_intro` |
 | title_zh / en | DMET 概览 / DMET overview |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/dmet.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/dmet.html |
 | pillar / diataxis / class_leaf | P1 / concept / no |
 | mirror_path | `/mirror/manual/embedding/dmet_intro/` |
 
@@ -2637,7 +2638,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / embedding / projection_embedding` |
 | slug | `projection_embedding` |
 | title_zh / en | 投影嵌入 / Projection embedding |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/projection_embedding.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/projection_embedding.html |
 | pillar / diataxis / class_leaf | P1 / concept / no |
 | mirror_path | `/mirror/manual/embedding/projection_embedding/` |
 
@@ -2702,7 +2703,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / embedding / nevpt2_ac0` |
 | slug | `nevpt2_ac0` |
 | title_zh / en | NEVPT2 / AC0 校正 / NEVPT2 / AC0 corrections |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/nevpt2.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/nevpt2.html |
 | pillar / diataxis / class_leaf | P1 / concept / no |
 | mirror_path | `/mirror/manual/embedding/nevpt2_ac0/` |
 
@@ -2766,7 +2767,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / noise_mitigation` |
 | slug | `noise_mitigation` |
 | title_zh / en | 噪声缓解 / Noise mitigation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/errmit.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/errmit.html |
 | pillar / diataxis / class_leaf | P3 / concept / no |
 | mirror_path | `/mirror/manual/noise_mitigation/` |
 
@@ -2783,7 +2784,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `howto` — How to use InQuanto（如何使用 InQuanto）· `shipped`
+- `howto` — Reference manual · How-to（参考手册 · 使用说明）· `shipped`
 - `geometry` — Geometry（几何）· `partial`
 - `express` — Express data sets（Express 数据集）· `partial`
 - `symmetry` — Symmetry（对称性）· `placeholder`
@@ -2840,7 +2841,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / noise_mitigation / qermit` |
 | slug | `qermit` |
 | title_zh / en | Qermit MitRes / MitEx 集成 / Qermit MitRes / MitEx integration |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-qermit |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-qermit |
 | pillar / diataxis / class_leaf | P3 / concept / no |
 | mirror_path | `/mirror/manual/noise_mitigation/qermit/` |
 
@@ -2904,7 +2905,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `manual / noise_mitigation / pmsv_spam` |
 | slug | `pmsv_spam` |
 | title_zh / en | PMSV 与 SPAM / PMSV and SPAM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/manual/errmit.html#using-inquanto-s-pmsv-and-spam |
 | pillar / diataxis / class_leaf | P3 / concept / no |
 | mirror_path | `/mirror/manual/noise_mitigation/pmsv_spam/` |
 
@@ -2969,7 +2970,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials` |
 | slug | `tutorials` |
 | title_zh / en | 教程 / Tutorials |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html |
 | pillar / diataxis / class_leaf | meta / tutorial / no |
 | mirror_path | `/mirror/tutorials/` |
 
@@ -3032,7 +3033,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / core` |
 | slug | `core` |
 | title_zh / en | 核心教程 / Core tutorials |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#core-tutorials |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#core-tutorials |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/tutorials/core/` |
 
@@ -3097,7 +3098,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / core / basic_vqe` |
 | slug | `basic_vqe` |
 | title_zh / en | 基础 VQE / A basic VQE simulation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE.html |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/tutorials/core/basic_vqe/` |
 
@@ -3116,7 +3117,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `extended_vqe` — Extended VQE（扩展 VQE）· `partial`
 - `vqd` — Variational quantum deflation for excited states（激发态 VQD）· `partial`
-- `nglview` — Visualization with inquanto-nglview（nglview 可视化）· `not-applicable`
+- `nglview` — Visualization with NGLView (reference)（nglview 可视化）· `not-applicable`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3164,7 +3165,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / core / extended_vqe` |
 | slug | `extended_vqe` |
 | title_zh / en | 扩展 VQE / Extended VQE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE_extended.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQE_extended.html |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/tutorials/core/extended_vqe/` |
 
@@ -3183,7 +3184,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `basic_vqe` — A basic VQE simulation（基础 VQE）· `shipped`
 - `vqd` — Variational quantum deflation for excited states（激发态 VQD）· `partial`
-- `nglview` — Visualization with inquanto-nglview（nglview 可视化）· `not-applicable`
+- `nglview` — Visualization with NGLView (reference)（nglview 可视化）· `not-applicable`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3229,7 +3230,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / core / vqd` |
 | slug | `vqd` |
 | title_zh / en | 激发态 VQD / Variational quantum deflation for excited states |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQD.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_VQD.html |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/tutorials/core/vqd/` |
 
@@ -3248,7 +3249,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `basic_vqe` — A basic VQE simulation（基础 VQE）· `shipped`
 - `extended_vqe` — Extended VQE（扩展 VQE）· `partial`
-- `nglview` — Visualization with inquanto-nglview（nglview 可视化）· `not-applicable`
+- `nglview` — Visualization with NGLView (reference)（nglview 可视化）· `not-applicable`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3294,8 +3295,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `tutorials / core / nglview` |
 | slug | `nglview` |
-| title_zh / en | nglview 可视化 / Visualization with inquanto-nglview |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nglview.html |
+| title_zh / en | nglview 可视化 / Visualization with NGLView (reference) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nglview.html |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/tutorials/core/nglview/` |
 
@@ -3363,7 +3364,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / backends` |
 | slug | `backends` |
 | title_zh / en | 后端教程 / Backend tutorials |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#backend-tutorials |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#backend-tutorials |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/` |
 
@@ -3428,7 +3429,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / backends / backends_setup` |
 | slug | `backends_setup` |
 | title_zh / en | 后端搭建 / Setting up and accessing backends |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_backends.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_backends.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/backends_setup/` |
 
@@ -3446,11 +3447,11 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 ## 2. 同级兄弟（manifest 同父）
 
 - `nexus_intro` — Accessing and managing backends with Nexus（Nexus 后端管理）· `not-applicable`
-- `helios_selene` — Submitting to Quantinuum Helios and Selene（Quantinuum Helios / Selene 提交）· `not-applicable`
+- `helios_selene` — Helios / Selene backend submission (reference tutorial)（Helios / Selene 后端提交（参考教程））· `not-applicable`
 - `aer_shots` — Hamiltonian averaging with the Aer simulator (shots)（Aer 采样（shots））· `shipped`
 - `circuit_compilation` — Circuit compilation in protocols workflow（电路编译流水线）· `partial`
 - `async` — Running asynchronous experiments（异步实验）· `partial`
-- `qse_quantinuum` — Quantum Subspace Expansion with Quantinuum Systems（QSE on Quantinuum Systems）· `partial`
+- `qse_quantinuum` — QSE on hardware backends (reference tutorial)（QSE 硬件后端教程（参考））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3498,7 +3499,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / backends / nexus_intro` |
 | slug | `nexus_intro` |
 | title_zh / en | Nexus 后端管理 / Accessing and managing backends with Nexus |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nexus.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nexus.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/nexus_intro/` |
 
@@ -3516,11 +3517,11 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 ## 2. 同级兄弟（manifest 同父）
 
 - `backends_setup` — Setting up and accessing backends（后端搭建）· `shipped`
-- `helios_selene` — Submitting to Quantinuum Helios and Selene（Quantinuum Helios / Selene 提交）· `not-applicable`
+- `helios_selene` — Helios / Selene backend submission (reference tutorial)（Helios / Selene 后端提交（参考教程））· `not-applicable`
 - `aer_shots` — Hamiltonian averaging with the Aer simulator (shots)（Aer 采样（shots））· `shipped`
 - `circuit_compilation` — Circuit compilation in protocols workflow（电路编译流水线）· `partial`
 - `async` — Running asynchronous experiments（异步实验）· `partial`
-- `qse_quantinuum` — Quantum Subspace Expansion with Quantinuum Systems（QSE on Quantinuum Systems）· `partial`
+- `qse_quantinuum` — QSE on hardware backends (reference tutorial)（QSE 硬件后端教程（参考））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3569,8 +3570,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `tutorials / backends / helios_selene` |
 | slug | `helios_selene` |
-| title_zh / en | Quantinuum Helios / Selene 提交 / Submitting to Quantinuum Helios and Selene |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html |
+| title_zh / en | Helios / Selene 后端提交（参考教程） / Helios / Selene backend submission (reference tutorial) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/helios_selene/` |
 
@@ -3592,7 +3593,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - `aer_shots` — Hamiltonian averaging with the Aer simulator (shots)（Aer 采样（shots））· `shipped`
 - `circuit_compilation` — Circuit compilation in protocols workflow（电路编译流水线）· `partial`
 - `async` — Running asynchronous experiments（异步实验）· `partial`
-- `qse_quantinuum` — Quantum Subspace Expansion with Quantinuum Systems（QSE on Quantinuum Systems）· `partial`
+- `qse_quantinuum` — QSE on hardware backends (reference tutorial)（QSE 硬件后端教程（参考））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3641,7 +3642,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / backends / aer_shots` |
 | slug | `aer_shots` |
 | title_zh / en | Aer 采样（shots） / Hamiltonian averaging with the Aer simulator (shots) |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qiskit_shots.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qiskit_shots.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/aer_shots/` |
 
@@ -3660,10 +3661,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `backends_setup` — Setting up and accessing backends（后端搭建）· `shipped`
 - `nexus_intro` — Accessing and managing backends with Nexus（Nexus 后端管理）· `not-applicable`
-- `helios_selene` — Submitting to Quantinuum Helios and Selene（Quantinuum Helios / Selene 提交）· `not-applicable`
+- `helios_selene` — Helios / Selene backend submission (reference tutorial)（Helios / Selene 后端提交（参考教程））· `not-applicable`
 - `circuit_compilation` — Circuit compilation in protocols workflow（电路编译流水线）· `partial`
 - `async` — Running asynchronous experiments（异步实验）· `partial`
-- `qse_quantinuum` — Quantum Subspace Expansion with Quantinuum Systems（QSE on Quantinuum Systems）· `partial`
+- `qse_quantinuum` — QSE on hardware backends (reference tutorial)（QSE 硬件后端教程（参考））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3711,7 +3712,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / backends / circuit_compilation` |
 | slug | `circuit_compilation` |
 | title_zh / en | 电路编译流水线 / Circuit compilation in protocols workflow |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_compilation.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/circuit_compilation/` |
 
@@ -3730,10 +3731,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `backends_setup` — Setting up and accessing backends（后端搭建）· `shipped`
 - `nexus_intro` — Accessing and managing backends with Nexus（Nexus 后端管理）· `not-applicable`
-- `helios_selene` — Submitting to Quantinuum Helios and Selene（Quantinuum Helios / Selene 提交）· `not-applicable`
+- `helios_selene` — Helios / Selene backend submission (reference tutorial)（Helios / Selene 后端提交（参考教程））· `not-applicable`
 - `aer_shots` — Hamiltonian averaging with the Aer simulator (shots)（Aer 采样（shots））· `shipped`
 - `async` — Running asynchronous experiments（异步实验）· `partial`
-- `qse_quantinuum` — Quantum Subspace Expansion with Quantinuum Systems（QSE on Quantinuum Systems）· `partial`
+- `qse_quantinuum` — QSE on hardware backends (reference tutorial)（QSE 硬件后端教程（参考））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3780,7 +3781,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / backends / async` |
 | slug | `async` |
 | title_zh / en | 异步实验 / Running asynchronous experiments |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_async.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_async.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/async/` |
 
@@ -3799,10 +3800,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `backends_setup` — Setting up and accessing backends（后端搭建）· `shipped`
 - `nexus_intro` — Accessing and managing backends with Nexus（Nexus 后端管理）· `not-applicable`
-- `helios_selene` — Submitting to Quantinuum Helios and Selene（Quantinuum Helios / Selene 提交）· `not-applicable`
+- `helios_selene` — Helios / Selene backend submission (reference tutorial)（Helios / Selene 后端提交（参考教程））· `not-applicable`
 - `aer_shots` — Hamiltonian averaging with the Aer simulator (shots)（Aer 采样（shots））· `shipped`
 - `circuit_compilation` — Circuit compilation in protocols workflow（电路编译流水线）· `partial`
-- `qse_quantinuum` — Quantum Subspace Expansion with Quantinuum Systems（QSE on Quantinuum Systems）· `partial`
+- `qse_quantinuum` — QSE on hardware backends (reference tutorial)（QSE 硬件后端教程（参考））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -3848,8 +3849,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `tutorials / backends / qse_quantinuum` |
 | slug | `qse_quantinuum` |
-| title_zh / en | QSE on Quantinuum Systems / Quantum Subspace Expansion with Quantinuum Systems |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qse.html |
+| title_zh / en | QSE 硬件后端教程（参考） / QSE on hardware backends (reference tutorial) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_qse.html |
 | pillar / diataxis / class_leaf | P3 / tutorial / no |
 | mirror_path | `/mirror/tutorials/backends/qse_quantinuum/` |
 
@@ -3868,7 +3869,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `backends_setup` — Setting up and accessing backends（后端搭建）· `shipped`
 - `nexus_intro` — Accessing and managing backends with Nexus（Nexus 后端管理）· `not-applicable`
-- `helios_selene` — Submitting to Quantinuum Helios and Selene（Quantinuum Helios / Selene 提交）· `not-applicable`
+- `helios_selene` — Helios / Selene backend submission (reference tutorial)（Helios / Selene 后端提交（参考教程））· `not-applicable`
 - `aer_shots` — Hamiltonian averaging with the Aer simulator (shots)（Aer 采样（shots））· `shipped`
 - `circuit_compilation` — Circuit compilation in protocols workflow（电路编译流水线）· `partial`
 - `async` — Running asynchronous experiments（异步实验）· `partial`
@@ -3917,7 +3918,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / case_study_fe4n2` |
 | slug | `case_study_fe4n2` |
 | title_zh / en | Fe4N2 案例研究 / Fe4N2 case study |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2 |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2 |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/case_study_fe4n2/` |
 
@@ -3982,7 +3983,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / case_study_fe4n2 / fe4n2_avas_casscf` |
 | slug | `fe4n2_avas_casscf` |
 | title_zh / en | Fe4N2：AVAS + CASSCF / Fe4N2 — AVAS + CASSCF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_1.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_1.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/case_study_fe4n2/fe4n2_avas_casscf/` |
 
@@ -4046,7 +4047,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / case_study_fe4n2 / fe4n2_adapt` |
 | slug | `fe4n2_adapt` |
 | title_zh / en | Fe4N2：ADAPT 构造高效线路 / Fe4N2 — ADAPT efficient circuits |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_2.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_2.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/case_study_fe4n2/fe4n2_adapt/` |
 
@@ -4110,7 +4111,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / case_study_fe4n2 / fe4n2_hardware` |
 | slug | `fe4n2_hardware` |
 | title_zh / en | Fe4N2：噪声硬件评估 / Fe4N2 — running on noisy hardware |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_3.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_fe4n2_3.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/case_study_fe4n2/fe4n2_hardware/` |
 
@@ -4175,7 +4176,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / fragmentation` |
 | slug | `fragmentation` |
 | title_zh / en | 碎片化教程 / Fragmentation tutorials |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#fragmentation-tutorials |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#fragmentation-tutorials |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/fragmentation/` |
 
@@ -4240,7 +4241,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / fragmentation / dmet_basic` |
 | slug | `dmet_basic` |
 | title_zh / en | 大体系 DMET 入门 / Tackling larger systems with fragmentation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_dmet.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/fragmentation/dmet_basic/` |
 
@@ -4306,7 +4307,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / fragmentation / projection_embedding` |
 | slug | `projection_embedding` |
 | title_zh / en | 投影嵌入 / Projection-based embedding |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_projection.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_projection.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/fragmentation/projection_embedding/` |
 
@@ -4372,7 +4373,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / fragmentation / nevpt2_ac0` |
 | slug | `nevpt2_ac0` |
 | title_zh / en | NEVPT2 + AC0 校正 / NEVPT2 + AC0 corrections |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nevpt2_AC0.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_nevpt2_AC0.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/fragmentation/nevpt2_ac0/` |
 
@@ -4437,7 +4438,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `tutorials / fragmentation / wft_dft` |
 | slug | `wft_dft` |
 | title_zh / en | WFT-in-DFT + NEVPT2 / AC0 / WFT-in-DFT + NEVPT2 or AC0 |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_wft_dft_2.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_wft_dft_2.html |
 | pillar / diataxis / class_leaf | P1 / tutorial / no |
 | mirror_path | `/mirror/tutorials/fragmentation/wft_dft/` |
 
@@ -4502,7 +4503,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `extensions` |
 | slug | `extensions` |
 | title_zh / en | 扩展 / Extensions |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/extensions/extensions-overview.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/extensions/extensions-overview.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/extensions/` |
 
@@ -4566,8 +4567,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `extensions / inquanto_pyscf` |
 | slug | `inquanto_pyscf` |
-| title_zh / en | InQuanto-PySCF / InQuanto-PySCF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/extensions/inquanto-pyscf.html |
+| title_zh / en | PySCF 扩展（参考文档） / PySCF extension (reference) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/extensions/inquanto-pyscf.html |
 | pillar / diataxis / class_leaf | P1 / reference / no |
 | mirror_path | `/mirror/extensions/inquanto_pyscf/` |
 
@@ -4584,10 +4585,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `inquanto_nexus` — InQuanto-Nexus（InQuanto-Nexus）· `not-applicable`
-- `inquanto_nglview` — InQuanto-NGLView（InQuanto-NGLView）· `not-applicable`
-- `inquanto_phayes` — InQuanto-Phayes（InQuanto-Phayes）· `placeholder`
-- `inquanto_cutensornet` — InQuanto-cuTensorNet（InQuanto-cuTensorNet）· `partial`
+- `inquanto_nexus` — Nexus integration (reference)（Nexus 集成（参考文档））· `not-applicable`
+- `inquanto_nglview` — NGLView visualization (reference)（NGLView 可视化（参考文档））· `not-applicable`
+- `inquanto_phayes` — Phayes extension (reference)（Phayes 扩展（参考文档））· `placeholder`
+- `inquanto_cutensornet` — cuTensorNet extension (reference)（cuTensorNet 扩展（参考文档））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -4635,8 +4636,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `extensions / inquanto_nexus` |
 | slug | `inquanto_nexus` |
-| title_zh / en | InQuanto-Nexus / InQuanto-Nexus |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html |
+| title_zh / en | Nexus 集成（参考文档） / Nexus integration (reference) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html |
 | pillar / diataxis / class_leaf | P4 / reference / no |
 | mirror_path | `/mirror/extensions/inquanto_nexus/` |
 
@@ -4653,10 +4654,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `inquanto_pyscf` — InQuanto-PySCF（InQuanto-PySCF）· `partial`
-- `inquanto_nglview` — InQuanto-NGLView（InQuanto-NGLView）· `not-applicable`
-- `inquanto_phayes` — InQuanto-Phayes（InQuanto-Phayes）· `placeholder`
-- `inquanto_cutensornet` — InQuanto-cuTensorNet（InQuanto-cuTensorNet）· `partial`
+- `inquanto_pyscf` — PySCF extension (reference)（PySCF 扩展（参考文档））· `partial`
+- `inquanto_nglview` — NGLView visualization (reference)（NGLView 可视化（参考文档））· `not-applicable`
+- `inquanto_phayes` — Phayes extension (reference)（Phayes 扩展（参考文档））· `placeholder`
+- `inquanto_cutensornet` — cuTensorNet extension (reference)（cuTensorNet 扩展（参考文档））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -4707,8 +4708,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `extensions / inquanto_nglview` |
 | slug | `inquanto_nglview` |
-| title_zh / en | InQuanto-NGLView / InQuanto-NGLView |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/extensions/inquanto-nglview.html |
+| title_zh / en | NGLView 可视化（参考文档） / NGLView visualization (reference) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/extensions/inquanto-nglview.html |
 | pillar / diataxis / class_leaf | P1 / reference / no |
 | mirror_path | `/mirror/extensions/inquanto_nglview/` |
 
@@ -4725,10 +4726,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `inquanto_pyscf` — InQuanto-PySCF（InQuanto-PySCF）· `partial`
-- `inquanto_nexus` — InQuanto-Nexus（InQuanto-Nexus）· `not-applicable`
-- `inquanto_phayes` — InQuanto-Phayes（InQuanto-Phayes）· `placeholder`
-- `inquanto_cutensornet` — InQuanto-cuTensorNet（InQuanto-cuTensorNet）· `partial`
+- `inquanto_pyscf` — PySCF extension (reference)（PySCF 扩展（参考文档））· `partial`
+- `inquanto_nexus` — Nexus integration (reference)（Nexus 集成（参考文档））· `not-applicable`
+- `inquanto_phayes` — Phayes extension (reference)（Phayes 扩展（参考文档））· `placeholder`
+- `inquanto_cutensornet` — cuTensorNet extension (reference)（cuTensorNet 扩展（参考文档））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -4777,8 +4778,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `extensions / inquanto_phayes` |
 | slug | `inquanto_phayes` |
-| title_zh / en | InQuanto-Phayes / InQuanto-Phayes |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/extensions/inquanto-phayes.html |
+| title_zh / en | Phayes 扩展（参考文档） / Phayes extension (reference) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/extensions/inquanto-phayes.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/extensions/inquanto_phayes/` |
 
@@ -4795,10 +4796,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `inquanto_pyscf` — InQuanto-PySCF（InQuanto-PySCF）· `partial`
-- `inquanto_nexus` — InQuanto-Nexus（InQuanto-Nexus）· `not-applicable`
-- `inquanto_nglview` — InQuanto-NGLView（InQuanto-NGLView）· `not-applicable`
-- `inquanto_cutensornet` — InQuanto-cuTensorNet（InQuanto-cuTensorNet）· `partial`
+- `inquanto_pyscf` — PySCF extension (reference)（PySCF 扩展（参考文档））· `partial`
+- `inquanto_nexus` — Nexus integration (reference)（Nexus 集成（参考文档））· `not-applicable`
+- `inquanto_nglview` — NGLView visualization (reference)（NGLView 可视化（参考文档））· `not-applicable`
+- `inquanto_cutensornet` — cuTensorNet extension (reference)（cuTensorNet 扩展（参考文档））· `partial`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -4846,8 +4847,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `extensions / inquanto_cutensornet` |
 | slug | `inquanto_cutensornet` |
-| title_zh / en | InQuanto-cuTensorNet / InQuanto-cuTensorNet |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
+| title_zh / en | cuTensorNet 扩展（参考文档） / cuTensorNet extension (reference) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
 | pillar / diataxis / class_leaf | P3 / reference / no |
 | mirror_path | `/mirror/extensions/inquanto_cutensornet/` |
 
@@ -4864,10 +4865,10 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `inquanto_pyscf` — InQuanto-PySCF（InQuanto-PySCF）· `partial`
-- `inquanto_nexus` — InQuanto-Nexus（InQuanto-Nexus）· `not-applicable`
-- `inquanto_nglview` — InQuanto-NGLView（InQuanto-NGLView）· `not-applicable`
-- `inquanto_phayes` — InQuanto-Phayes（InQuanto-Phayes）· `placeholder`
+- `inquanto_pyscf` — PySCF extension (reference)（PySCF 扩展（参考文档））· `partial`
+- `inquanto_nexus` — Nexus integration (reference)（Nexus 集成（参考文档））· `not-applicable`
+- `inquanto_nglview` — NGLView visualization (reference)（NGLView 可视化（参考文档））· `not-applicable`
+- `inquanto_phayes` — Phayes extension (reference)（Phayes 扩展（参考文档））· `placeholder`
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
 
@@ -4916,7 +4917,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api` |
 | slug | `api` |
 | title_zh / en | API 参考 / API reference |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/api/` |
 
@@ -4980,8 +4981,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / api_intro_inquanto` |
 | slug | `api_intro_inquanto` |
-| title_zh / en | InQuanto API 总览 / InQuanto API introduction |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto_api_intro.html |
+| title_zh / en | 参考文档 · API 总览 / Reference documentation · API overview |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto_api_intro.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/api/api_intro_inquanto/` |
 
@@ -4999,16 +5000,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -5056,8 +5057,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / api_intro_extensions` |
 | slug | `api_intro_extensions` |
-| title_zh / en | InQuanto 扩展 API 总览 / InQuanto Extensions API introduction |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto-ext_api_intro.html |
+| title_zh / en | 参考文档 · 扩展 API 总览 / Reference documentation · Extensions API overview |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto-ext_api_intro.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/api/api_intro_extensions/` |
 
@@ -5075,16 +5076,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -5132,8 +5133,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / algorithms` |
 | slug | `algorithms` |
-| title_zh / en | inquanto.algorithms / inquanto.algorithms |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html |
+| title_zh / en | 参考 API · inquanto.algorithms / Reference API · inquanto.algorithms |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/algorithms/` |
 
@@ -5151,16 +5152,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -5209,7 +5210,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmVQE` |
 | slug | `AlgorithmVQE` |
 | title_zh / en | AlgorithmVQE / AlgorithmVQE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmVQE/` |
 
@@ -5286,7 +5287,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmAdaptVQE` |
 | slug | `AlgorithmAdaptVQE` |
 | title_zh / en | AlgorithmAdaptVQE / AlgorithmAdaptVQE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmAdaptVQE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmAdaptVQE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmAdaptVQE/` |
 
@@ -5363,7 +5364,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmFermionicAdaptVQE` |
 | slug | `AlgorithmFermionicAdaptVQE` |
 | title_zh / en | AlgorithmFermionicAdaptVQE / AlgorithmFermionicAdaptVQE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmFermionicAdaptVQE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmFermionicAdaptVQE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmFermionicAdaptVQE/` |
 
@@ -5440,7 +5441,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmIQEB` |
 | slug | `AlgorithmIQEB` |
 | title_zh / en | AlgorithmIQEB / AlgorithmIQEB |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmIQEB |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmIQEB |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmIQEB/` |
 
@@ -5517,7 +5518,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmVQD` |
 | slug | `AlgorithmVQD` |
 | title_zh / en | AlgorithmVQD / AlgorithmVQD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmVQD/` |
 
@@ -5594,7 +5595,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmQSE` |
 | slug | `AlgorithmQSE` |
 | title_zh / en | AlgorithmQSE / AlgorithmQSE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmQSE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmQSE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmQSE/` |
 
@@ -5671,7 +5672,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmSCEOM` |
 | slug | `AlgorithmSCEOM` |
 | title_zh / en | AlgorithmSCEOM / AlgorithmSCEOM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmSCEOM |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmSCEOM |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmSCEOM/` |
 
@@ -5748,7 +5749,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmDeterministicQPE` |
 | slug | `AlgorithmDeterministicQPE` |
 | title_zh / en | AlgorithmDeterministicQPE / AlgorithmDeterministicQPE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmDeterministicQPE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmDeterministicQPE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmDeterministicQPE/` |
 
@@ -5824,7 +5825,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmInfoTheoryQPE` |
 | slug | `AlgorithmInfoTheoryQPE` |
 | title_zh / en | AlgorithmInfoTheoryQPE / AlgorithmInfoTheoryQPE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmInfoTheoryQPE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmInfoTheoryQPE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmInfoTheoryQPE/` |
 
@@ -5900,7 +5901,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmKitaevQPE` |
 | slug | `AlgorithmKitaevQPE` |
 | title_zh / en | AlgorithmKitaevQPE / AlgorithmKitaevQPE |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmKitaevQPE |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmKitaevQPE |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmKitaevQPE/` |
 
@@ -5976,7 +5977,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmVQS` |
 | slug | `AlgorithmVQS` |
 | title_zh / en | AlgorithmVQS / AlgorithmVQS |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQS |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmVQS |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmVQS/` |
 
@@ -6052,7 +6053,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmMcLachlanRealTime` |
 | slug | `AlgorithmMcLachlanRealTime` |
 | title_zh / en | AlgorithmMcLachlanRealTime / AlgorithmMcLachlanRealTime |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanRealTime |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanRealTime |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmMcLachlanRealTime/` |
 
@@ -6128,7 +6129,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / algorithms / classes / AlgorithmMcLachlanImagTime` |
 | slug | `AlgorithmMcLachlanImagTime` |
 | title_zh / en | AlgorithmMcLachlanImagTime / AlgorithmMcLachlanImagTime |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanImagTime |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/algorithms.html#inquanto.algorithms.AlgorithmMcLachlanImagTime |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/algorithms/classes/AlgorithmMcLachlanImagTime/` |
 
@@ -6203,8 +6204,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / ansatz` |
 | slug | `ansatz` |
-| title_zh / en | inquanto.ansatzes / inquanto.ansatzes |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html |
+| title_zh / en | 参考 API · inquanto.ansatzes / Reference API · inquanto.ansatzes |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/ansatz/` |
 
@@ -6222,16 +6223,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -6280,7 +6281,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / GeneralAnsatz` |
 | slug | `GeneralAnsatz` |
 | title_zh / en | GeneralAnsatz / GeneralAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.GeneralAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.GeneralAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/GeneralAnsatz/` |
 
@@ -6356,7 +6357,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / CircuitAnsatz` |
 | slug | `CircuitAnsatz` |
 | title_zh / en | CircuitAnsatz / CircuitAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.CircuitAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.CircuitAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/CircuitAnsatz/` |
 
@@ -6432,7 +6433,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / ComposedAnsatz` |
 | slug | `ComposedAnsatz` |
 | title_zh / en | ComposedAnsatz / ComposedAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.ComposedAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.ComposedAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/ComposedAnsatz/` |
 
@@ -6508,7 +6509,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / TrotterAnsatz` |
 | slug | `TrotterAnsatz` |
 | title_zh / en | TrotterAnsatz / TrotterAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.TrotterAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.TrotterAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/TrotterAnsatz/` |
 
@@ -6584,7 +6585,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceStateExp` |
 | slug | `FermionSpaceStateExp` |
 | title_zh / en | FermionSpaceStateExp / FermionSpaceStateExp |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExp |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExp |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceStateExp/` |
 
@@ -6660,7 +6661,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzUCCSD` |
 | slug | `FermionSpaceAnsatzUCCSD` |
 | title_zh / en | FermionSpaceAnsatzUCCSD / FermionSpaceAnsatzUCCSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCSD/` |
 
@@ -6736,7 +6737,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzUCCD` |
 | slug | `FermionSpaceAnsatzUCCD` |
 | title_zh / en | FermionSpaceAnsatzUCCD / FermionSpaceAnsatzUCCD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCD/` |
 
@@ -6812,7 +6813,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceStateExpChemicallyAware` |
 | slug | `FermionSpaceStateExpChemicallyAware` |
 | title_zh / en | FermionSpaceStateExpChemicallyAware / FermionSpaceStateExpChemicallyAware |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExpChemicallyAware |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceStateExpChemicallyAware |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceStateExpChemicallyAware/` |
 
@@ -6888,7 +6889,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzChemicallyAwareUCCSD` |
 | slug | `FermionSpaceAnsatzChemicallyAwareUCCSD` |
 | title_zh / en | FermionSpaceAnsatzChemicallyAwareUCCSD / FermionSpaceAnsatzChemicallyAwareUCCSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzChemicallyAwareUCCSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzChemicallyAwareUCCSD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzChemicallyAwareUCCSD/` |
 
@@ -6964,7 +6965,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzkUpCCGD` |
 | slug | `FermionSpaceAnsatzkUpCCGD` |
 | title_zh / en | FermionSpaceAnsatzkUpCCGD / FermionSpaceAnsatzkUpCCGD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGD/` |
 
@@ -7040,7 +7041,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzkUpCCGSD` |
 | slug | `FermionSpaceAnsatzkUpCCGSD` |
 | title_zh / en | FermionSpaceAnsatzkUpCCGSD / FermionSpaceAnsatzkUpCCGSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGSD/` |
 
@@ -7116,7 +7117,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzkUpCCGSDSinglet` |
 | slug | `FermionSpaceAnsatzkUpCCGSDSinglet` |
 | title_zh / en | FermionSpaceAnsatzkUpCCGSDSinglet / FermionSpaceAnsatzkUpCCGSDSinglet |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSDSinglet |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzkUpCCGSDSinglet |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzkUpCCGSDSinglet/` |
 
@@ -7192,7 +7193,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzUCCGD` |
 | slug | `FermionSpaceAnsatzUCCGD` |
 | title_zh / en | FermionSpaceAnsatzUCCGD / FermionSpaceAnsatzUCCGD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCGD/` |
 
@@ -7268,7 +7269,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzUCCGSD` |
 | slug | `FermionSpaceAnsatzUCCGSD` |
 | title_zh / en | FermionSpaceAnsatzUCCGSD / FermionSpaceAnsatzUCCGSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCGSD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCGSD/` |
 
@@ -7344,7 +7345,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzUCCSDSinglet` |
 | slug | `FermionSpaceAnsatzUCCSDSinglet` |
 | title_zh / en | FermionSpaceAnsatzUCCSDSinglet / FermionSpaceAnsatzUCCSDSinglet |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSDSinglet |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzUCCSDSinglet |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzUCCSDSinglet/` |
 
@@ -7420,7 +7421,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatzsUPS` |
 | slug | `FermionSpaceAnsatzsUPS` |
 | title_zh / en | FermionSpaceAnsatzsUPS / FermionSpaceAnsatzsUPS |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzsUPS |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatzsUPS |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatzsUPS/` |
 
@@ -7496,7 +7497,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / FermionSpaceAnsatztUPS` |
 | slug | `FermionSpaceAnsatztUPS` |
 | title_zh / en | FermionSpaceAnsatztUPS / FermionSpaceAnsatztUPS |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatztUPS |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.FermionSpaceAnsatztUPS |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/FermionSpaceAnsatztUPS/` |
 
@@ -7572,7 +7573,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / MultiConfigurationAnsatz` |
 | slug | `MultiConfigurationAnsatz` |
 | title_zh / en | MultiConfigurationAnsatz / MultiConfigurationAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/MultiConfigurationAnsatz/` |
 
@@ -7648,7 +7649,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / MultiConfigurationState` |
 | slug | `MultiConfigurationState` |
 | title_zh / en | MultiConfigurationState / MultiConfigurationState |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationState |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationState |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/MultiConfigurationState/` |
 
@@ -7724,7 +7725,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / MultiConfigurationStateBox` |
 | slug | `MultiConfigurationStateBox` |
 | title_zh / en | MultiConfigurationStateBox / MultiConfigurationStateBox |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateBox |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateBox |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/MultiConfigurationStateBox/` |
 
@@ -7800,7 +7801,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / MultiConfigurationAnsatzSparse` |
 | slug | `MultiConfigurationAnsatzSparse` |
 | title_zh / en | MultiConfigurationAnsatzSparse / MultiConfigurationAnsatzSparse |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatzSparse |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationAnsatzSparse |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/MultiConfigurationAnsatzSparse/` |
 
@@ -7876,7 +7877,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / MultiConfigurationStateSparse` |
 | slug | `MultiConfigurationStateSparse` |
 | title_zh / en | MultiConfigurationStateSparse / MultiConfigurationStateSparse |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateSparse |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.MultiConfigurationStateSparse |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/MultiConfigurationStateSparse/` |
 
@@ -7952,7 +7953,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / RealGeneralizedBasisRotationAnsatz` |
 | slug | `RealGeneralizedBasisRotationAnsatz` |
 | title_zh / en | RealGeneralizedBasisRotationAnsatz / RealGeneralizedBasisRotationAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealGeneralizedBasisRotationAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealGeneralizedBasisRotationAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/RealGeneralizedBasisRotationAnsatz/` |
 
@@ -8028,7 +8029,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / RealRestrictedBasisRotationAnsatz` |
 | slug | `RealRestrictedBasisRotationAnsatz` |
 | title_zh / en | RealRestrictedBasisRotationAnsatz / RealRestrictedBasisRotationAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealRestrictedBasisRotationAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealRestrictedBasisRotationAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/RealRestrictedBasisRotationAnsatz/` |
 
@@ -8104,7 +8105,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / RealUnrestrictedBasisRotationAnsatz` |
 | slug | `RealUnrestrictedBasisRotationAnsatz` |
 | title_zh / en | RealUnrestrictedBasisRotationAnsatz / RealUnrestrictedBasisRotationAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealUnrestrictedBasisRotationAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.RealUnrestrictedBasisRotationAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/RealUnrestrictedBasisRotationAnsatz/` |
 
@@ -8180,7 +8181,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / HamiltonianVariationalAnsatz` |
 | slug | `HamiltonianVariationalAnsatz` |
 | title_zh / en | HamiltonianVariationalAnsatz / HamiltonianVariationalAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HamiltonianVariationalAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HamiltonianVariationalAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/HamiltonianVariationalAnsatz/` |
 
@@ -8256,7 +8257,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / LayeredAnsatz` |
 | slug | `LayeredAnsatz` |
 | title_zh / en | LayeredAnsatz / LayeredAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.LayeredAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.LayeredAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/LayeredAnsatz/` |
 
@@ -8332,7 +8333,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / ansatz / classes / HardwareEfficientAnsatz` |
 | slug | `HardwareEfficientAnsatz` |
 | title_zh / en | HardwareEfficientAnsatz / HardwareEfficientAnsatz |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HardwareEfficientAnsatz |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/ansatz.html#inquanto.ansatz.HardwareEfficientAnsatz |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/ansatz/classes/HardwareEfficientAnsatz/` |
 
@@ -8408,8 +8409,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / computables` |
 | slug | `computables` |
-| title_zh / en | inquanto.computables / inquanto.computables |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html |
+| title_zh / en | 参考 API · inquanto.computables / Reference API · inquanto.computables |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/computables/` |
 
@@ -8427,16 +8428,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -8485,7 +8486,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValue` |
 | slug | `ExpectationValue` |
 | title_zh / en | ExpectationValue / ExpectationValue |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValue |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValue |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValue/` |
 
@@ -8561,7 +8562,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueBraDerivative` |
 | slug | `ExpectationValueBraDerivative` |
 | title_zh / en | ExpectationValueBraDerivative / ExpectationValueBraDerivative |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivative |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivative |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueBraDerivative/` |
 
@@ -8637,7 +8638,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueBraDerivativeImag` |
 | slug | `ExpectationValueBraDerivativeImag` |
 | title_zh / en | ExpectationValueBraDerivativeImag / ExpectationValueBraDerivativeImag |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeImag |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeImag |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueBraDerivativeImag/` |
 
@@ -8713,7 +8714,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueBraDerivativeReal` |
 | slug | `ExpectationValueBraDerivativeReal` |
 | title_zh / en | ExpectationValueBraDerivativeReal / ExpectationValueBraDerivativeReal |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeReal |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueBraDerivativeReal |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueBraDerivativeReal/` |
 
@@ -8789,7 +8790,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueDerivative` |
 | slug | `ExpectationValueDerivative` |
 | title_zh / en | ExpectationValueDerivative / ExpectationValueDerivative |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueDerivative |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueDerivative |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueDerivative/` |
 
@@ -8865,7 +8866,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueKetDerivative` |
 | slug | `ExpectationValueKetDerivative` |
 | title_zh / en | ExpectationValueKetDerivative / ExpectationValueKetDerivative |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivative |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivative |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueKetDerivative/` |
 
@@ -8941,7 +8942,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueKetDerivativeImag` |
 | slug | `ExpectationValueKetDerivativeImag` |
 | title_zh / en | ExpectationValueKetDerivativeImag / ExpectationValueKetDerivativeImag |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeImag |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeImag |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueKetDerivativeImag/` |
 
@@ -9017,7 +9018,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueKetDerivativeReal` |
 | slug | `ExpectationValueKetDerivativeReal` |
 | title_zh / en | ExpectationValueKetDerivativeReal / ExpectationValueKetDerivativeReal |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeReal |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueKetDerivativeReal |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueKetDerivativeReal/` |
 
@@ -9093,7 +9094,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueNonHermitian` |
 | slug | `ExpectationValueNonHermitian` |
 | title_zh / en | ExpectationValueNonHermitian / ExpectationValueNonHermitian |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueNonHermitian |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueNonHermitian |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueNonHermitian/` |
 
@@ -9169,7 +9170,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / MetricTensorImag` |
 | slug | `MetricTensorImag` |
 | title_zh / en | MetricTensorImag / MetricTensorImag |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorImag |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorImag |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/MetricTensorImag/` |
 
@@ -9245,7 +9246,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / MetricTensorReal` |
 | slug | `MetricTensorReal` |
 | title_zh / en | MetricTensorReal / MetricTensorReal |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorReal |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.MetricTensorReal |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/MetricTensorReal/` |
 
@@ -9321,7 +9322,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / Overlap` |
 | slug | `Overlap` |
 | title_zh / en | Overlap / Overlap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Overlap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Overlap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/Overlap/` |
 
@@ -9397,7 +9398,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / OverlapImag` |
 | slug | `OverlapImag` |
 | title_zh / en | OverlapImag / OverlapImag |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapImag |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapImag |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/OverlapImag/` |
 
@@ -9473,7 +9474,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / OverlapReal` |
 | slug | `OverlapReal` |
 | title_zh / en | OverlapReal / OverlapReal |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapReal |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapReal |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/OverlapReal/` |
 
@@ -9549,7 +9550,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / OverlapSquared` |
 | slug | `OverlapSquared` |
 | title_zh / en | OverlapSquared / OverlapSquared |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapSquared |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapSquared |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/OverlapSquared/` |
 
@@ -9625,7 +9626,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ComputableFunction` |
 | slug | `ComputableFunction` |
 | title_zh / en | ComputableFunction / ComputableFunction |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableFunction |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableFunction |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ComputableFunction/` |
 
@@ -9701,7 +9702,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ComputableInt` |
 | slug | `ComputableInt` |
 | title_zh / en | ComputableInt / ComputableInt |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableInt |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableInt |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ComputableInt/` |
 
@@ -9777,7 +9778,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ComputableList` |
 | slug | `ComputableList` |
 | title_zh / en | ComputableList / ComputableList |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableList |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableList |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ComputableList/` |
 
@@ -9853,7 +9854,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ComputableTuple` |
 | slug | `ComputableTuple` |
 | title_zh / en | ComputableTuple / ComputableTuple |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableTuple |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableTuple |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ComputableTuple/` |
 
@@ -9929,7 +9930,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ComputableNode` |
 | slug | `ComputableNode` |
 | title_zh / en | ComputableNode / ComputableNode |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableNode |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableNode |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ComputableNode/` |
 
@@ -10005,7 +10006,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ComputableSingleChild` |
 | slug | `ComputableSingleChild` |
 | title_zh / en | ComputableSingleChild / ComputableSingleChild |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableSingleChild |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ComputableSingleChild |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ComputableSingleChild/` |
 
@@ -10081,7 +10082,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / Averageable` |
 | slug | `Averageable` |
 | title_zh / en | Averageable / Averageable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Averageable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Averageable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/Averageable/` |
 
@@ -10157,7 +10158,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / Evaluatable` |
 | slug | `Evaluatable` |
 | title_zh / en | Evaluatable / Evaluatable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Evaluatable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.Evaluatable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/Evaluatable/` |
 
@@ -10233,7 +10234,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / CommutatorComputable` |
 | slug | `CommutatorComputable` |
 | title_zh / en | CommutatorComputable / CommutatorComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.CommutatorComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.CommutatorComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/CommutatorComputable/` |
 
@@ -10309,7 +10310,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ExpectationValueSumComputable` |
 | slug | `ExpectationValueSumComputable` |
 | title_zh / en | ExpectationValueSumComputable / ExpectationValueSumComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueSumComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueSumComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ExpectationValueSumComputable/` |
 
@@ -10385,7 +10386,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / HoleGFComputable` |
 | slug | `HoleGFComputable` |
 | title_zh / en | HoleGFComputable / HoleGFComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.HoleGFComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.HoleGFComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/HoleGFComputable/` |
 
@@ -10461,7 +10462,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / KrylovSubspace` |
 | slug | `KrylovSubspace` |
 | title_zh / en | KrylovSubspace / KrylovSubspace |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspace |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspace |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/KrylovSubspace/` |
 
@@ -10537,7 +10538,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / KrylovSubspaceComputable` |
 | slug | `KrylovSubspaceComputable` |
 | title_zh / en | KrylovSubspaceComputable / KrylovSubspaceComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspaceComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.KrylovSubspaceComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/KrylovSubspaceComputable/` |
 
@@ -10613,7 +10614,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / LanczosCoefficientsComputable` |
 | slug | `LanczosCoefficientsComputable` |
 | title_zh / en | LanczosCoefficientsComputable / LanczosCoefficientsComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosCoefficientsComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosCoefficientsComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/LanczosCoefficientsComputable/` |
 
@@ -10689,7 +10690,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / LanczosMatrixComputable` |
 | slug | `LanczosMatrixComputable` |
 | title_zh / en | LanczosMatrixComputable / LanczosMatrixComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosMatrixComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.LanczosMatrixComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/LanczosMatrixComputable/` |
 
@@ -10765,7 +10766,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ManyBodyGFComputable` |
 | slug | `ManyBodyGFComputable` |
 | title_zh / en | ManyBodyGFComputable / ManyBodyGFComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ManyBodyGFComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ManyBodyGFComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ManyBodyGFComputable/` |
 
@@ -10841,7 +10842,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / NonOrthogonalMatricesComputable` |
 | slug | `NonOrthogonalMatricesComputable` |
 | title_zh / en | NonOrthogonalMatricesComputable / NonOrthogonalMatricesComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.NonOrthogonalMatricesComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.NonOrthogonalMatricesComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/NonOrthogonalMatricesComputable/` |
 
@@ -10917,7 +10918,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / OverlapMatrixComputable` |
 | slug | `OverlapMatrixComputable` |
 | title_zh / en | OverlapMatrixComputable / OverlapMatrixComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapMatrixComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.OverlapMatrixComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/OverlapMatrixComputable/` |
 
@@ -10993,7 +10994,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / PDM1234RealComputable` |
 | slug | `PDM1234RealComputable` |
 | title_zh / en | PDM1234RealComputable / PDM1234RealComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.PDM1234RealComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.PDM1234RealComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/PDM1234RealComputable/` |
 
@@ -11069,7 +11070,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / ParticleGFComputable` |
 | slug | `ParticleGFComputable` |
 | title_zh / en | ParticleGFComputable / ParticleGFComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ParticleGFComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ParticleGFComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/ParticleGFComputable/` |
 
@@ -11145,7 +11146,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / QCM4Computable` |
 | slug | `QCM4Computable` |
 | title_zh / en | QCM4Computable / QCM4Computable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QCM4Computable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QCM4Computable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/QCM4Computable/` |
 
@@ -11221,7 +11222,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / QSEMatricesComputable` |
 | slug | `QSEMatricesComputable` |
 | title_zh / en | QSEMatricesComputable / QSEMatricesComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QSEMatricesComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.QSEMatricesComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/QSEMatricesComputable/` |
 
@@ -11297,7 +11298,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / RDM1234RealComputable` |
 | slug | `RDM1234RealComputable` |
 | title_zh / en | RDM1234RealComputable / RDM1234RealComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RDM1234RealComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RDM1234RealComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/RDM1234RealComputable/` |
 
@@ -11373,7 +11374,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / RestrictedOneBodyRDMComputable` |
 | slug | `RestrictedOneBodyRDMComputable` |
 | title_zh / en | RestrictedOneBodyRDMComputable / RestrictedOneBodyRDMComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/RestrictedOneBodyRDMComputable/` |
 
@@ -11449,7 +11450,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / RestrictedOneBodyRDMRealComputable` |
 | slug | `RestrictedOneBodyRDMRealComputable` |
 | title_zh / en | RestrictedOneBodyRDMRealComputable / RestrictedOneBodyRDMRealComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMRealComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.RestrictedOneBodyRDMRealComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/RestrictedOneBodyRDMRealComputable/` |
 
@@ -11525,7 +11526,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / SCEOMMatrixComputable` |
 | slug | `SCEOMMatrixComputable` |
 | title_zh / en | SCEOMMatrixComputable / SCEOMMatrixComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SCEOMMatrixComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SCEOMMatrixComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/SCEOMMatrixComputable/` |
 
@@ -11601,7 +11602,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / SpinlessNBodyPDMArrayRealComputable` |
 | slug | `SpinlessNBodyPDMArrayRealComputable` |
 | title_zh / en | SpinlessNBodyPDMArrayRealComputable / SpinlessNBodyPDMArrayRealComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyPDMArrayRealComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyPDMArrayRealComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/SpinlessNBodyPDMArrayRealComputable/` |
 
@@ -11677,7 +11678,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / SpinlessNBodyRDMArrayRealComputable` |
 | slug | `SpinlessNBodyRDMArrayRealComputable` |
 | title_zh / en | SpinlessNBodyRDMArrayRealComputable / SpinlessNBodyRDMArrayRealComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyRDMArrayRealComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.SpinlessNBodyRDMArrayRealComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/SpinlessNBodyRDMArrayRealComputable/` |
 
@@ -11753,7 +11754,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / UnrestrictedOneBodyRDMComputable` |
 | slug | `UnrestrictedOneBodyRDMComputable` |
 | title_zh / en | UnrestrictedOneBodyRDMComputable / UnrestrictedOneBodyRDMComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/UnrestrictedOneBodyRDMComputable/` |
 
@@ -11829,7 +11830,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / computables / classes / UnrestrictedOneBodyRDMRealComputable` |
 | slug | `UnrestrictedOneBodyRDMRealComputable` |
 | title_zh / en | UnrestrictedOneBodyRDMRealComputable / UnrestrictedOneBodyRDMRealComputable |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMRealComputable |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.UnrestrictedOneBodyRDMRealComputable |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/computables/classes/UnrestrictedOneBodyRDMRealComputable/` |
 
@@ -11904,8 +11905,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / operators` |
 | slug | `operators` |
-| title_zh / en | inquanto.operators / inquanto.operators |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html |
+| title_zh / en | 参考 API · inquanto.operators / Reference API · inquanto.operators |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/operators/` |
 
@@ -11923,16 +11924,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -11981,7 +11982,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / ChemistryRestrictedIntegralOperator` |
 | slug | `ChemistryRestrictedIntegralOperator` |
 | title_zh / en | ChemistryRestrictedIntegralOperator / ChemistryRestrictedIntegralOperator |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperator |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperator |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/ChemistryRestrictedIntegralOperator/` |
 
@@ -12057,7 +12058,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / ChemistryRestrictedIntegralOperatorCompact` |
 | slug | `ChemistryRestrictedIntegralOperatorCompact` |
 | title_zh / en | ChemistryRestrictedIntegralOperatorCompact / ChemistryRestrictedIntegralOperatorCompact |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperatorCompact |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryRestrictedIntegralOperatorCompact |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/ChemistryRestrictedIntegralOperatorCompact/` |
 
@@ -12133,7 +12134,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / ChemistryUnrestrictedIntegralOperator` |
 | slug | `ChemistryUnrestrictedIntegralOperator` |
 | title_zh / en | ChemistryUnrestrictedIntegralOperator / ChemistryUnrestrictedIntegralOperator |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperator |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperator |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/ChemistryUnrestrictedIntegralOperator/` |
 
@@ -12209,7 +12210,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / ChemistryUnrestrictedIntegralOperatorCompact` |
 | slug | `ChemistryUnrestrictedIntegralOperatorCompact` |
 | title_zh / en | ChemistryUnrestrictedIntegralOperatorCompact / ChemistryUnrestrictedIntegralOperatorCompact |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperatorCompact |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.ChemistryUnrestrictedIntegralOperatorCompact |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/ChemistryUnrestrictedIntegralOperatorCompact/` |
 
@@ -12285,7 +12286,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / DoubleFactorizedTwoBodyIntegrals` |
 | slug | `DoubleFactorizedTwoBodyIntegrals` |
 | title_zh / en | DoubleFactorizedTwoBodyIntegrals / DoubleFactorizedTwoBodyIntegrals |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.DoubleFactorizedTwoBodyIntegrals |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.DoubleFactorizedTwoBodyIntegrals |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/DoubleFactorizedTwoBodyIntegrals/` |
 
@@ -12361,7 +12362,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / FCIDumpRestricted` |
 | slug | `FCIDumpRestricted` |
 | title_zh / en | FCIDumpRestricted / FCIDumpRestricted |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpRestricted |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpRestricted |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/FCIDumpRestricted/` |
 
@@ -12437,7 +12438,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / FCIDumpUnrestricted` |
 | slug | `FCIDumpUnrestricted` |
 | title_zh / en | FCIDumpUnrestricted / FCIDumpUnrestricted |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpUnrestricted |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FCIDumpUnrestricted |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/FCIDumpUnrestricted/` |
 
@@ -12513,7 +12514,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / FermionOperator` |
 | slug | `FermionOperator` |
 | title_zh / en | FermionOperator / FermionOperator |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperator |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperator |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/FermionOperator/` |
 
@@ -12589,7 +12590,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / FermionOperatorList` |
 | slug | `FermionOperatorList` |
 | title_zh / en | FermionOperatorList / FermionOperatorList |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperatorList |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.FermionOperatorList |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/FermionOperatorList/` |
 
@@ -12665,7 +12666,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / QubitOperator` |
 | slug | `QubitOperator` |
 | title_zh / en | QubitOperator / QubitOperator |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperator |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperator |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/QubitOperator/` |
 
@@ -12741,7 +12742,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / QubitOperatorList` |
 | slug | `QubitOperatorList` |
 | title_zh / en | QubitOperatorList / QubitOperatorList |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorList |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorList |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/QubitOperatorList/` |
 
@@ -12817,7 +12818,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / QubitOperatorString` |
 | slug | `QubitOperatorString` |
 | title_zh / en | QubitOperatorString / QubitOperatorString |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorString |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.QubitOperatorString |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/QubitOperatorString/` |
 
@@ -12893,7 +12894,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / OrbitalTransformer` |
 | slug | `OrbitalTransformer` |
 | title_zh / en | OrbitalTransformer / OrbitalTransformer |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.OrbitalTransformer |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.OrbitalTransformer |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/OrbitalTransformer/` |
 
@@ -12969,7 +12970,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / RestrictedDoubleFactorizedHamiltonian` |
 | slug | `RestrictedDoubleFactorizedHamiltonian` |
 | title_zh / en | RestrictedDoubleFactorizedHamiltonian / RestrictedDoubleFactorizedHamiltonian |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedDoubleFactorizedHamiltonian |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedDoubleFactorizedHamiltonian |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/RestrictedDoubleFactorizedHamiltonian/` |
 
@@ -13045,7 +13046,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / RestrictedOneBodyRDM` |
 | slug | `RestrictedOneBodyRDM` |
 | title_zh / en | RestrictedOneBodyRDM / RestrictedOneBodyRDM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedOneBodyRDM |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedOneBodyRDM |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/RestrictedOneBodyRDM/` |
 
@@ -13121,7 +13122,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / RestrictedTwoBodyRDM` |
 | slug | `RestrictedTwoBodyRDM` |
 | title_zh / en | RestrictedTwoBodyRDM / RestrictedTwoBodyRDM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedTwoBodyRDM |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.RestrictedTwoBodyRDM |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/RestrictedTwoBodyRDM/` |
 
@@ -13197,7 +13198,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / UnrestrictedDoubleFactorizedHamiltonian` |
 | slug | `UnrestrictedDoubleFactorizedHamiltonian` |
 | title_zh / en | UnrestrictedDoubleFactorizedHamiltonian / UnrestrictedDoubleFactorizedHamiltonian |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedDoubleFactorizedHamiltonian |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedDoubleFactorizedHamiltonian |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/UnrestrictedDoubleFactorizedHamiltonian/` |
 
@@ -13273,7 +13274,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / UnrestrictedOneBodyRDM` |
 | slug | `UnrestrictedOneBodyRDM` |
 | title_zh / en | UnrestrictedOneBodyRDM / UnrestrictedOneBodyRDM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedOneBodyRDM |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedOneBodyRDM |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/UnrestrictedOneBodyRDM/` |
 
@@ -13349,7 +13350,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / UnrestrictedTwoBodyRDM` |
 | slug | `UnrestrictedTwoBodyRDM` |
 | title_zh / en | UnrestrictedTwoBodyRDM / UnrestrictedTwoBodyRDM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedTwoBodyRDM |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.UnrestrictedTwoBodyRDM |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/UnrestrictedTwoBodyRDM/` |
 
@@ -13425,7 +13426,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / SymmetryOperatorFermionic` |
 | slug | `SymmetryOperatorFermionic` |
 | title_zh / en | SymmetryOperatorFermionic / SymmetryOperatorFermionic |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionic |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionic |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/SymmetryOperatorFermionic/` |
 
@@ -13501,7 +13502,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / SymmetryOperatorFermionicFactorized` |
 | slug | `SymmetryOperatorFermionicFactorized` |
 | title_zh / en | SymmetryOperatorFermionicFactorized / SymmetryOperatorFermionicFactorized |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionicFactorized |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorFermionicFactorized |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/SymmetryOperatorFermionicFactorized/` |
 
@@ -13577,7 +13578,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / SymmetryOperatorPauli` |
 | slug | `SymmetryOperatorPauli` |
 | title_zh / en | SymmetryOperatorPauli / SymmetryOperatorPauli |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauli |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauli |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/SymmetryOperatorPauli/` |
 
@@ -13653,7 +13654,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / SymmetryOperatorPauliFactorized` |
 | slug | `SymmetryOperatorPauliFactorized` |
 | title_zh / en | SymmetryOperatorPauliFactorized / SymmetryOperatorPauliFactorized |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauliFactorized |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.SymmetryOperatorPauliFactorized |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/SymmetryOperatorPauliFactorized/` |
 
@@ -13729,7 +13730,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / operators / classes / XDFCoreTensor` |
 | slug | `XDFCoreTensor` |
 | title_zh / en | XDFCoreTensor / XDFCoreTensor |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.XDFCoreTensor |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/operators.html#inquanto.operators.XDFCoreTensor |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/operators/classes/XDFCoreTensor/` |
 
@@ -13804,8 +13805,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / spaces` |
 | slug | `spaces` |
-| title_zh / en | inquanto.spaces / inquanto.spaces |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html |
+| title_zh / en | 参考 API · inquanto.spaces / Reference API · inquanto.spaces |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/spaces/` |
 
@@ -13823,16 +13824,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -13880,7 +13881,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / spaces / classes / FermionSpace` |
 | slug | `FermionSpace` |
 | title_zh / en | FermionSpace / FermionSpace |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpace |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpace |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/spaces/classes/FermionSpace/` |
 
@@ -13949,7 +13950,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / spaces / classes / FermionSpaceBrillouin` |
 | slug | `FermionSpaceBrillouin` |
 | title_zh / en | FermionSpaceBrillouin / FermionSpaceBrillouin |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceBrillouin |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceBrillouin |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/spaces/classes/FermionSpaceBrillouin/` |
 
@@ -14018,7 +14019,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / spaces / classes / FermionSpaceSupercell` |
 | slug | `FermionSpaceSupercell` |
 | title_zh / en | FermionSpaceSupercell / FermionSpaceSupercell |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceSupercell |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.FermionSpaceSupercell |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/spaces/classes/FermionSpaceSupercell/` |
 
@@ -14087,7 +14088,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / spaces / classes / ParaFermionSpace` |
 | slug | `ParaFermionSpace` |
 | title_zh / en | ParaFermionSpace / ParaFermionSpace |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.ParaFermionSpace |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.ParaFermionSpace |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/spaces/classes/ParaFermionSpace/` |
 
@@ -14156,7 +14157,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / spaces / classes / QubitSpace` |
 | slug | `QubitSpace` |
 | title_zh / en | QubitSpace / QubitSpace |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.QubitSpace |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/spaces.html#inquanto.spaces.QubitSpace |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/spaces/classes/QubitSpace/` |
 
@@ -14224,8 +14225,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / states` |
 | slug | `states` |
-| title_zh / en | inquanto.states / inquanto.states |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/states.html |
+| title_zh / en | 参考 API · inquanto.states / Reference API · inquanto.states |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/states.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/states/` |
 
@@ -14243,16 +14244,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -14300,7 +14301,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / states / classes / FermionState` |
 | slug | `FermionState` |
 | title_zh / en | FermionState / FermionState |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.FermionState |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.FermionState |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/states/classes/FermionState/` |
 
@@ -14366,7 +14367,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / states / classes / QubitState` |
 | slug | `QubitState` |
 | title_zh / en | QubitState / QubitState |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.QubitState |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/states.html#inquanto.states.QubitState |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/states/classes/QubitState/` |
 
@@ -14431,8 +14432,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / mappings` |
 | slug | `mappings` |
-| title_zh / en | inquanto.mappings / inquanto.mappings |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html |
+| title_zh / en | 参考 API · inquanto.mappings / Reference API · inquanto.mappings |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/mappings/` |
 
@@ -14450,16 +14451,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -14507,7 +14508,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / mappings / classes / QubitMappingJordanWigner` |
 | slug | `QubitMappingJordanWigner` |
 | title_zh / en | QubitMappingJordanWigner / QubitMappingJordanWigner |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingJordanWigner |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingJordanWigner |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/mappings/classes/QubitMappingJordanWigner/` |
 
@@ -14574,7 +14575,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / mappings / classes / QubitMappingBravyiKitaev` |
 | slug | `QubitMappingBravyiKitaev` |
 | title_zh / en | QubitMappingBravyiKitaev / QubitMappingBravyiKitaev |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingBravyiKitaev |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingBravyiKitaev |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/mappings/classes/QubitMappingBravyiKitaev/` |
 
@@ -14641,7 +14642,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / mappings / classes / QubitMappingParity` |
 | slug | `QubitMappingParity` |
 | title_zh / en | QubitMappingParity / QubitMappingParity |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingParity |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/mappings.html#inquanto.mappings.QubitMappingParity |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/mappings/classes/QubitMappingParity/` |
 
@@ -14707,8 +14708,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / minimizers` |
 | slug | `minimizers` |
-| title_zh / en | inquanto.minimizers / inquanto.minimizers |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html |
+| title_zh / en | 参考 API · inquanto.minimizers / Reference API · inquanto.minimizers |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/minimizers/` |
 
@@ -14726,16 +14727,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `symmetry` — inquanto.symmetry（inquanto.symmetry）· `placeholder`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `symmetry` — Reference API · inquanto.symmetry（参考 API · inquanto.symmetry）· `placeholder`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -14783,7 +14784,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / minimizers / classes / MinimizerScipy` |
 | slug | `MinimizerScipy` |
 | title_zh / en | MinimizerScipy / MinimizerScipy |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerScipy |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerScipy |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/minimizers/classes/MinimizerScipy/` |
 
@@ -14852,7 +14853,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / minimizers / classes / MinimizerNFT` |
 | slug | `MinimizerNFT` |
 | title_zh / en | MinimizerNFT / MinimizerNFT |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerNFT |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerNFT |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/minimizers/classes/MinimizerNFT/` |
 
@@ -14921,7 +14922,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / minimizers / classes / MinimizerRotosolve` |
 | slug | `MinimizerRotosolve` |
 | title_zh / en | MinimizerRotosolve / MinimizerRotosolve |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerRotosolve |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerRotosolve |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/minimizers/classes/MinimizerRotosolve/` |
 
@@ -14990,7 +14991,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / minimizers / classes / MinimizerSPSA` |
 | slug | `MinimizerSPSA` |
 | title_zh / en | MinimizerSPSA / MinimizerSPSA |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSPSA |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSPSA |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/minimizers/classes/MinimizerSPSA/` |
 
@@ -15059,7 +15060,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / minimizers / classes / MinimizerSGD` |
 | slug | `MinimizerSGD` |
 | title_zh / en | MinimizerSGD / MinimizerSGD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSGD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/minimizers.html#inquanto.minimizers.MinimizerSGD |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/minimizers/classes/MinimizerSGD/` |
 
@@ -15127,8 +15128,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / symmetry` |
 | slug | `symmetry` |
-| title_zh / en | inquanto.symmetry / inquanto.symmetry |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/symmetry.html |
+| title_zh / en | 参考 API · inquanto.symmetry / Reference API · inquanto.symmetry |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/symmetry.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/symmetry/` |
 
@@ -15146,16 +15147,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15202,8 +15203,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / core` |
 | slug | `core` |
-| title_zh / en | inquanto.core / inquanto.core |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/core.html |
+| title_zh / en | 参考 API · inquanto.core / Reference API · inquanto.core |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/core.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/api/core/` |
 
@@ -15221,16 +15222,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15277,8 +15278,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / embeddings` |
 | slug | `embeddings` |
-| title_zh / en | inquanto.embeddings / inquanto.embeddings |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/embeddings.html |
+| title_zh / en | 参考 API · inquanto.embeddings / Reference API · inquanto.embeddings |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/embeddings.html |
 | pillar / diataxis / class_leaf | P1 / reference / no |
 | mirror_path | `/mirror/api/embeddings/` |
 
@@ -15296,16 +15297,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15353,8 +15354,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `api / experiments` |
 | slug | `experiments` |
-| title_zh / en | inquanto.experiments / inquanto.experiments |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html |
+| title_zh / en | 参考 API · inquanto.experiments / Reference API · inquanto.experiments |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/experiments.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/experiments/` |
 
@@ -15374,16 +15375,16 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15431,7 +15432,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `api / experiments / experiment_qec_qpe` |
 | slug | `experiment_qec_qpe` |
 | title_zh / en | 量子纠错 QPE 演示 / Quantum error-corrected QPE demonstration |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/experiments/experiment_qec_qpe.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/experiments/experiment_qec_qpe.html |
 | pillar / diataxis / class_leaf | P2 / tutorial / no |
 | mirror_path | `/mirror/api/experiments/experiment_qec_qpe/` |
 
@@ -15494,8 +15495,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / express` |
 | slug | `express` |
-| title_zh / en | inquanto.express / inquanto.express |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/express.html |
+| title_zh / en | 参考 API · inquanto.express / Reference API · inquanto.express |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/express.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/express/` |
 
@@ -15513,16 +15514,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15570,8 +15571,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / geometries` |
 | slug | `geometries` |
-| title_zh / en | inquanto.geometries / inquanto.geometries |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html |
+| title_zh / en | 参考 API · inquanto.geometries / Reference API · inquanto.geometries |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/geometry.html |
 | pillar / diataxis / class_leaf | P1 / reference / no |
 | mirror_path | `/mirror/api/geometries/` |
 
@@ -15589,16 +15590,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15646,8 +15647,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / protocols` |
 | slug | `protocols` |
-| title_zh / en | inquanto.protocols / inquanto.protocols |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html |
+| title_zh / en | 参考 API · inquanto.protocols / Reference API · inquanto.protocols |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/protocols/` |
 
@@ -15665,16 +15666,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -15723,7 +15724,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / PauliAveraging` |
 | slug | `PauliAveraging` |
 | title_zh / en | PauliAveraging / PauliAveraging |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PauliAveraging |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PauliAveraging |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/PauliAveraging/` |
 
@@ -15800,7 +15801,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / HadamardTest` |
 | slug | `HadamardTest` |
 | title_zh / en | HadamardTest / HadamardTest |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTest |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTest |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/HadamardTest/` |
 
@@ -15876,7 +15877,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / ComputeUncompute` |
 | slug | `ComputeUncompute` |
 | title_zh / en | ComputeUncompute / ComputeUncompute |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncompute |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncompute |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/ComputeUncompute/` |
 
@@ -15952,7 +15953,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / DestructiveSwapTest` |
 | slug | `DestructiveSwapTest` |
 | title_zh / en | DestructiveSwapTest / DestructiveSwapTest |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.DestructiveSwapTest |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.DestructiveSwapTest |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/DestructiveSwapTest/` |
 
@@ -16028,7 +16029,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / SwapTest` |
 | slug | `SwapTest` |
 | title_zh / en | SwapTest / SwapTest |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapTest |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapTest |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/SwapTest/` |
 
@@ -16104,7 +16105,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / HadamardTestOverlap` |
 | slug | `HadamardTestOverlap` |
 | title_zh / en | HadamardTestOverlap / HadamardTestOverlap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestOverlap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestOverlap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/HadamardTestOverlap/` |
 
@@ -16180,7 +16181,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / FactorizedOverlap` |
 | slug | `FactorizedOverlap` |
 | title_zh / en | FactorizedOverlap / FactorizedOverlap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.FactorizedOverlap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.FactorizedOverlap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/FactorizedOverlap/` |
 
@@ -16256,7 +16257,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / SwapFactorizedOverlap` |
 | slug | `SwapFactorizedOverlap` |
 | title_zh / en | SwapFactorizedOverlap / SwapFactorizedOverlap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapFactorizedOverlap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SwapFactorizedOverlap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/SwapFactorizedOverlap/` |
 
@@ -16332,7 +16333,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / ComputeUncomputeFactorizedOverlap` |
 | slug | `ComputeUncomputeFactorizedOverlap` |
 | title_zh / en | ComputeUncomputeFactorizedOverlap / ComputeUncomputeFactorizedOverlap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncomputeFactorizedOverlap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ComputeUncomputeFactorizedOverlap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/ComputeUncomputeFactorizedOverlap/` |
 
@@ -16408,7 +16409,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / SparseStatevectorProtocol` |
 | slug | `SparseStatevectorProtocol` |
 | title_zh / en | SparseStatevectorProtocol / SparseStatevectorProtocol |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SparseStatevectorProtocol |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SparseStatevectorProtocol |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/SparseStatevectorProtocol/` |
 
@@ -16484,7 +16485,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / BackendStatevectorProtocol` |
 | slug | `BackendStatevectorProtocol` |
 | title_zh / en | BackendStatevectorProtocol / BackendStatevectorProtocol |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendStatevectorProtocol |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendStatevectorProtocol |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/BackendStatevectorProtocol/` |
 
@@ -16560,7 +16561,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / SymbolicProtocol` |
 | slug | `SymbolicProtocol` |
 | title_zh / en | SymbolicProtocol / SymbolicProtocol |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SymbolicProtocol |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SymbolicProtocol |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/SymbolicProtocol/` |
 
@@ -16636,7 +16637,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / HadamardTestDerivativeOverlap` |
 | slug | `HadamardTestDerivativeOverlap` |
 | title_zh / en | HadamardTestDerivativeOverlap / HadamardTestDerivativeOverlap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivativeOverlap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivativeOverlap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/HadamardTestDerivativeOverlap/` |
 
@@ -16712,7 +16713,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / HadamardTestDerivative` |
 | slug | `HadamardTestDerivative` |
 | title_zh / en | HadamardTestDerivative / HadamardTestDerivative |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivative |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.HadamardTestDerivative |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/HadamardTestDerivative/` |
 
@@ -16788,7 +16789,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / CanonicalPhaseEstimation` |
 | slug | `CanonicalPhaseEstimation` |
 | title_zh / en | CanonicalPhaseEstimation / CanonicalPhaseEstimation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CanonicalPhaseEstimation |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CanonicalPhaseEstimation |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/CanonicalPhaseEstimation/` |
 
@@ -16864,7 +16865,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / IterativePhaseEstimation` |
 | slug | `IterativePhaseEstimation` |
 | title_zh / en | IterativePhaseEstimation / IterativePhaseEstimation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimation |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimation |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/IterativePhaseEstimation/` |
 
@@ -16940,7 +16941,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / IterativePhaseEstimationSingleCircuit` |
 | slug | `IterativePhaseEstimationSingleCircuit` |
 | title_zh / en | IterativePhaseEstimationSingleCircuit / IterativePhaseEstimationSingleCircuit |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationSingleCircuit |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationSingleCircuit |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/IterativePhaseEstimationSingleCircuit/` |
 
@@ -17016,7 +17017,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / IterativePhaseEstimationQuantinuum` |
 | slug | `IterativePhaseEstimationQuantinuum` |
 | title_zh / en | IterativePhaseEstimationQuantinuum / IterativePhaseEstimationQuantinuum |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationQuantinuum |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationQuantinuum |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/IterativePhaseEstimationQuantinuum/` |
 
@@ -17092,7 +17093,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / IterativePhaseEstimationStatevector` |
 | slug | `IterativePhaseEstimationStatevector` |
 | title_zh / en | IterativePhaseEstimationStatevector / IterativePhaseEstimationStatevector |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationStatevector |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.IterativePhaseEstimationStatevector |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/IterativePhaseEstimationStatevector/` |
 
@@ -17168,7 +17169,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / ProjectiveMeasurements` |
 | slug | `ProjectiveMeasurements` |
 | title_zh / en | ProjectiveMeasurements / ProjectiveMeasurements |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProjectiveMeasurements |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProjectiveMeasurements |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/ProjectiveMeasurements/` |
 
@@ -17244,7 +17245,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / ProtocolList` |
 | slug | `ProtocolList` |
 | title_zh / en | ProtocolList / ProtocolList |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProtocolList |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.ProtocolList |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/ProtocolList/` |
 
@@ -17320,7 +17321,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / PMSV` |
 | slug | `PMSV` |
 | title_zh / en | PMSV / PMSV |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.PMSV |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/PMSV/` |
 
@@ -17397,7 +17398,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / SPAM` |
 | slug | `SPAM` |
 | title_zh / en | SPAM / SPAM |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SPAM |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.SPAM |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/SPAM/` |
 
@@ -17474,7 +17475,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / CombinedMitigation` |
 | slug | `CombinedMitigation` |
 | title_zh / en | CombinedMitigation / CombinedMitigation |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CombinedMitigation |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.CombinedMitigation |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/CombinedMitigation/` |
 
@@ -17550,7 +17551,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / BackendResultBootstrap` |
 | slug | `BackendResultBootstrap` |
 | title_zh / en | BackendResultBootstrap / BackendResultBootstrap |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultBootstrap |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultBootstrap |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/BackendResultBootstrap/` |
 
@@ -17626,7 +17627,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / protocols / classes / BackendResultSplit` |
 | slug | `BackendResultSplit` |
 | title_zh / en | BackendResultSplit / BackendResultSplit |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultSplit |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/inquanto/protocols.html#inquanto.protocols.BackendResultSplit |
 | pillar / diataxis / class_leaf | P2 / reference / yes |
 | mirror_path | `/mirror/api/protocols/classes/BackendResultSplit/` |
 
@@ -17701,8 +17702,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / extensions_pyscf` |
 | slug | `extensions_pyscf` |
-| title_zh / en | inquanto.extensions.pyscf / inquanto.extensions.pyscf |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html |
+| title_zh / en | 参考 API · inquanto.extensions.pyscf / Reference API · inquanto.extensions.pyscf |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html |
 | pillar / diataxis / class_leaf | P1 / reference / no |
 | mirror_path | `/mirror/api/extensions_pyscf/` |
 
@@ -17720,16 +17721,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -17778,7 +17779,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / AVAS` |
 | slug | `AVAS` |
 | title_zh / en | AVAS / AVAS |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.AVAS |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.AVAS |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/AVAS/` |
 
@@ -17854,7 +17855,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / CASSCF` |
 | slug | `CASSCF` |
 | title_zh / en | CASSCF / CASSCF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.CASSCF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.CASSCF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/CASSCF/` |
 
@@ -17930,7 +17931,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularRHF` |
 | slug | `ChemistryDriverPySCFMolecularRHF` |
 | title_zh / en | ChemistryDriverPySCFMolecularRHF / ChemistryDriverPySCFMolecularRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularRHF/` |
 
@@ -18006,7 +18007,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularROHF` |
 | slug | `ChemistryDriverPySCFMolecularROHF` |
 | title_zh / en | ChemistryDriverPySCFMolecularROHF / ChemistryDriverPySCFMolecularROHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularROHF/` |
 
@@ -18082,7 +18083,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularUHF` |
 | slug | `ChemistryDriverPySCFMolecularUHF` |
 | title_zh / en | ChemistryDriverPySCFMolecularUHF / ChemistryDriverPySCFMolecularUHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularUHF/` |
 
@@ -18158,7 +18159,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularRHFQMMMCOSMO` |
 | slug | `ChemistryDriverPySCFMolecularRHFQMMMCOSMO` |
 | title_zh / en | ChemistryDriverPySCFMolecularRHFQMMMCOSMO / ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularRHFQMMMCOSMO |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularRHFQMMMCOSMO/` |
 
@@ -18234,7 +18235,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularROHFQMMMCOSMO` |
 | slug | `ChemistryDriverPySCFMolecularROHFQMMMCOSMO` |
 | title_zh / en | ChemistryDriverPySCFMolecularROHFQMMMCOSMO / ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularROHFQMMMCOSMO |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularROHFQMMMCOSMO/` |
 
@@ -18310,7 +18311,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMolecularUHFQMMMCOSMO` |
 | slug | `ChemistryDriverPySCFMolecularUHFQMMMCOSMO` |
 | title_zh / en | ChemistryDriverPySCFMolecularUHFQMMMCOSMO / ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMolecularUHFQMMMCOSMO |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMolecularUHFQMMMCOSMO/` |
 
@@ -18386,7 +18387,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFGammaRHF` |
 | slug | `ChemistryDriverPySCFGammaRHF` |
 | title_zh / en | ChemistryDriverPySCFGammaRHF / ChemistryDriverPySCFGammaRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFGammaRHF/` |
 
@@ -18462,7 +18463,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFGammaROHF` |
 | slug | `ChemistryDriverPySCFGammaROHF` |
 | title_zh / en | ChemistryDriverPySCFGammaROHF / ChemistryDriverPySCFGammaROHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaROHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFGammaROHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFGammaROHF/` |
 
@@ -18538,7 +18539,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMomentumRHF` |
 | slug | `ChemistryDriverPySCFMomentumRHF` |
 | title_zh / en | ChemistryDriverPySCFMomentumRHF / ChemistryDriverPySCFMomentumRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMomentumRHF/` |
 
@@ -18614,7 +18615,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFMomentumROHF` |
 | slug | `ChemistryDriverPySCFMomentumROHF` |
 | title_zh / en | ChemistryDriverPySCFMomentumROHF / ChemistryDriverPySCFMomentumROHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumROHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFMomentumROHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFMomentumROHF/` |
 
@@ -18690,7 +18691,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingRHF` |
 | slug | `ChemistryDriverPySCFEmbeddingRHF` |
 | title_zh / en | ChemistryDriverPySCFEmbeddingRHF / ChemistryDriverPySCFEmbeddingRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingRHF/` |
 
@@ -18766,7 +18767,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingROHF` |
 | slug | `ChemistryDriverPySCFEmbeddingROHF` |
 | title_zh / en | ChemistryDriverPySCFEmbeddingROHF / ChemistryDriverPySCFEmbeddingROHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingROHF/` |
 
@@ -18842,7 +18843,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingROHF_UHF` |
 | slug | `ChemistryDriverPySCFEmbeddingROHF_UHF` |
 | title_zh / en | ChemistryDriverPySCFEmbeddingROHF_UHF / ChemistryDriverPySCFEmbeddingROHF_UHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF_UHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingROHF_UHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingROHF_UHF/` |
 
@@ -18918,7 +18919,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingGammaRHF` |
 | slug | `ChemistryDriverPySCFEmbeddingGammaRHF` |
 | title_zh / en | ChemistryDriverPySCFEmbeddingGammaRHF / ChemistryDriverPySCFEmbeddingGammaRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingGammaRHF/` |
 
@@ -18994,7 +18995,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFEmbeddingGammaROHF_UHF` |
 | slug | `ChemistryDriverPySCFEmbeddingGammaROHF_UHF` |
 | title_zh / en | ChemistryDriverPySCFEmbeddingGammaROHF_UHF / ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFEmbeddingGammaROHF_UHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFEmbeddingGammaROHF_UHF/` |
 
@@ -19070,7 +19071,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ChemistryDriverPySCFIntegrals` |
 | slug | `ChemistryDriverPySCFIntegrals` |
 | title_zh / en | ChemistryDriverPySCFIntegrals / ChemistryDriverPySCFIntegrals |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFIntegrals |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ChemistryDriverPySCFIntegrals |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ChemistryDriverPySCFIntegrals/` |
 
@@ -19146,7 +19147,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFActive` |
 | slug | `DMETRHFFragmentPySCFActive` |
 | title_zh / en | DMETRHFFragmentPySCFActive / DMETRHFFragmentPySCFActive |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFActive |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFActive |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFActive/` |
 
@@ -19222,7 +19223,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFCCSD` |
 | slug | `DMETRHFFragmentPySCFCCSD` |
 | title_zh / en | DMETRHFFragmentPySCFCCSD / DMETRHFFragmentPySCFCCSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFCCSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFCCSD |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFCCSD/` |
 
@@ -19298,7 +19299,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFFCI` |
 | slug | `DMETRHFFragmentPySCFFCI` |
 | title_zh / en | DMETRHFFragmentPySCFFCI / DMETRHFFragmentPySCFFCI |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFFCI |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFFCI |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFFCI/` |
 
@@ -19374,7 +19375,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFMP2` |
 | slug | `DMETRHFFragmentPySCFMP2` |
 | title_zh / en | DMETRHFFragmentPySCFMP2 / DMETRHFFragmentPySCFMP2 |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFMP2 |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFMP2 |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFMP2/` |
 
@@ -19450,7 +19451,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / DMETRHFFragmentPySCFRHF` |
 | slug | `DMETRHFFragmentPySCFRHF` |
 | title_zh / en | DMETRHFFragmentPySCFRHF / DMETRHFFragmentPySCFRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.DMETRHFFragmentPySCFRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/DMETRHFFragmentPySCFRHF/` |
 
@@ -19526,7 +19527,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFActive` |
 | slug | `ImpurityDMETROHFFragmentPySCFActive` |
 | title_zh / en | ImpurityDMETROHFFragmentPySCFActive / ImpurityDMETROHFFragmentPySCFActive |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFActive |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFActive |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFActive/` |
 
@@ -19602,7 +19603,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFCCSD` |
 | slug | `ImpurityDMETROHFFragmentPySCFCCSD` |
 | title_zh / en | ImpurityDMETROHFFragmentPySCFCCSD / ImpurityDMETROHFFragmentPySCFCCSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFCCSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFCCSD |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFCCSD/` |
 
@@ -19678,7 +19679,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFFCI` |
 | slug | `ImpurityDMETROHFFragmentPySCFFCI` |
 | title_zh / en | ImpurityDMETROHFFragmentPySCFFCI / ImpurityDMETROHFFragmentPySCFFCI |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFFCI |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFFCI |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFFCI/` |
 
@@ -19754,7 +19755,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFMP2` |
 | slug | `ImpurityDMETROHFFragmentPySCFMP2` |
 | title_zh / en | ImpurityDMETROHFFragmentPySCFMP2 / ImpurityDMETROHFFragmentPySCFMP2 |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFMP2 |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFMP2 |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFMP2/` |
 
@@ -19830,7 +19831,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / ImpurityDMETROHFFragmentPySCFROHF` |
 | slug | `ImpurityDMETROHFFragmentPySCFROHF` |
 | title_zh / en | ImpurityDMETROHFFragmentPySCFROHF / ImpurityDMETROHFFragmentPySCFROHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFROHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.ImpurityDMETROHFFragmentPySCFROHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/ImpurityDMETROHFFragmentPySCFROHF/` |
 
@@ -19906,7 +19907,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FromActiveOrbitals` |
 | slug | `FromActiveOrbitals` |
 | title_zh / en | FromActiveOrbitals / FromActiveOrbitals |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveOrbitals |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveOrbitals |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FromActiveOrbitals/` |
 
@@ -19982,7 +19983,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FromActiveSpace` |
 | slug | `FromActiveSpace` |
 | title_zh / en | FromActiveSpace / FromActiveSpace |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveSpace |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FromActiveSpace |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FromActiveSpace/` |
 
@@ -20058,7 +20059,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FrozenCore` |
 | slug | `FrozenCore` |
 | title_zh / en | FrozenCore / FrozenCore |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FrozenCore |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FrozenCore |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FrozenCore/` |
 
@@ -20134,7 +20135,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FMO` |
 | slug | `FMO` |
 | title_zh / en | FMO / FMO |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMO |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMO |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FMO/` |
 
@@ -20210,7 +20211,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FMOFragment` |
 | slug | `FMOFragment` |
 | title_zh / en | FMOFragment / FMOFragment |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FMOFragment/` |
 
@@ -20286,7 +20287,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FMOFragmentPySCFActive` |
 | slug | `FMOFragmentPySCFActive` |
 | title_zh / en | FMOFragmentPySCFActive / FMOFragmentPySCFActive |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFActive |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFActive |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFActive/` |
 
@@ -20362,7 +20363,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FMOFragmentPySCFCCSD` |
 | slug | `FMOFragmentPySCFCCSD` |
 | title_zh / en | FMOFragmentPySCFCCSD / FMOFragmentPySCFCCSD |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFCCSD |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFCCSD |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFCCSD/` |
 
@@ -20438,7 +20439,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FMOFragmentPySCFMP2` |
 | slug | `FMOFragmentPySCFMP2` |
 | title_zh / en | FMOFragmentPySCFMP2 / FMOFragmentPySCFMP2 |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFMP2 |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFMP2 |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFMP2/` |
 
@@ -20514,7 +20515,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / FMOFragmentPySCFRHF` |
 | slug | `FMOFragmentPySCFRHF` |
 | title_zh / en | FMOFragmentPySCFRHF / FMOFragmentPySCFRHF |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFRHF |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragmentPySCFRHF |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/FMOFragmentPySCFRHF/` |
 
@@ -20590,7 +20591,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / PySCFChemistryRestrictedIntegralOperator` |
 | slug | `PySCFChemistryRestrictedIntegralOperator` |
 | title_zh / en | PySCFChemistryRestrictedIntegralOperator / PySCFChemistryRestrictedIntegralOperator |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryRestrictedIntegralOperator |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryRestrictedIntegralOperator |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/PySCFChemistryRestrictedIntegralOperator/` |
 
@@ -20666,7 +20667,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_pyscf / classes / PySCFChemistryUnrestrictedIntegralOperator` |
 | slug | `PySCFChemistryUnrestrictedIntegralOperator` |
 | title_zh / en | PySCFChemistryUnrestrictedIntegralOperator / PySCFChemistryUnrestrictedIntegralOperator |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryUnrestrictedIntegralOperator |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.PySCFChemistryUnrestrictedIntegralOperator |
 | pillar / diataxis / class_leaf | P1 / reference / yes |
 | mirror_path | `/mirror/api/extensions_pyscf/classes/PySCFChemistryUnrestrictedIntegralOperator/` |
 
@@ -20741,8 +20742,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / extensions_cutensornet` |
 | slug | `extensions_cutensornet` |
-| title_zh / en | inquanto.extensions.cutensornet / inquanto.extensions.cutensornet |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
+| title_zh / en | 参考 API · inquanto.extensions.cutensornet / Reference API · inquanto.extensions.cutensornet |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html |
 | pillar / diataxis / class_leaf | P3 / reference / no |
 | mirror_path | `/mirror/api/extensions_cutensornet/` |
 
@@ -20760,16 +20761,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -20818,7 +20819,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `api / extensions_cutensornet / classes / CuTensorNetProtocol` |
 | slug | `CuTensorNetProtocol` |
 | title_zh / en | CuTensorNetProtocol / CuTensorNetProtocol |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html#inquanto.extensions.cutensornet.CuTensorNetProtocol |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-cutensornet_api.html#inquanto.extensions.cutensornet.CuTensorNetProtocol |
 | pillar / diataxis / class_leaf | P3 / reference / yes |
 | mirror_path | `/mirror/api/extensions_cutensornet/classes/CuTensorNetProtocol/` |
 
@@ -20884,8 +20885,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / extensions_nexus` |
 | slug | `extensions_nexus` |
-| title_zh / en | inquanto.extensions.nexus / inquanto.extensions.nexus |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nexus_api.html |
+| title_zh / en | 参考 API · inquanto.extensions.nexus / Reference API · inquanto.extensions.nexus |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nexus_api.html |
 | pillar / diataxis / class_leaf | P4 / reference / no |
 | mirror_path | `/mirror/api/extensions_nexus/` |
 
@@ -20903,16 +20904,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -20963,8 +20964,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / extensions_phayes` |
 | slug | `extensions_phayes` |
-| title_zh / en | inquanto.extensions.phayes / inquanto.extensions.phayes |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-phayes_api.html |
+| title_zh / en | 参考 API · inquanto.extensions.phayes / Reference API · inquanto.extensions.phayes |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-phayes_api.html |
 | pillar / diataxis / class_leaf | P2 / reference / no |
 | mirror_path | `/mirror/api/extensions_phayes/` |
 
@@ -20982,16 +20983,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -21038,8 +21039,8 @@ _（manifest 中此父节点下无其它兄弟项）_
 | --- | --- |
 | breadcrumb | `api / extensions_nglview` |
 | slug | `extensions_nglview` |
-| title_zh / en | inquanto.extensions.nglview / inquanto.extensions.nglview |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nglview_api.html |
+| title_zh / en | 参考 API · inquanto.extensions.nglview / Reference API · inquanto.extensions.nglview |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/api/extensions/inquanto-nglview_api.html |
 | pillar / diataxis / class_leaf | P1 / reference / no |
 | mirror_path | `/mirror/api/extensions_nglview/` |
 
@@ -21057,16 +21058,16 @@ _（manifest 中此父节点下无其它兄弟项）_
 
 ## 2. 同级兄弟（manifest 同父）
 
-- `api_intro_inquanto` — InQuanto API introduction（InQuanto API 总览）· `shipped`
-- `api_intro_extensions` — InQuanto Extensions API introduction（InQuanto 扩展 API 总览）· `shipped`
-- `algorithms` — inquanto.algorithms（inquanto.algorithms）· `partial`
-- `ansatz` — inquanto.ansatzes（inquanto.ansatzes）· `partial`
-- `computables` — inquanto.computables（inquanto.computables）· `partial`
-- `operators` — inquanto.operators（inquanto.operators）· `partial`
-- `spaces` — inquanto.spaces（inquanto.spaces）· `partial`
-- `states` — inquanto.states（inquanto.states）· `partial`
-- `mappings` — inquanto.mappings（inquanto.mappings）· `partial`
-- `minimizers` — inquanto.minimizers（inquanto.minimizers）· `partial`
+- `api_intro_inquanto` — Reference documentation · API overview（参考文档 · API 总览）· `shipped`
+- `api_intro_extensions` — Reference documentation · Extensions API overview（参考文档 · 扩展 API 总览）· `shipped`
+- `algorithms` — Reference API · inquanto.algorithms（参考 API · inquanto.algorithms）· `partial`
+- `ansatz` — Reference API · inquanto.ansatzes（参考 API · inquanto.ansatzes）· `partial`
+- `computables` — Reference API · inquanto.computables（参考 API · inquanto.computables）· `partial`
+- `operators` — Reference API · inquanto.operators（参考 API · inquanto.operators）· `partial`
+- `spaces` — Reference API · inquanto.spaces（参考 API · inquanto.spaces）· `partial`
+- `states` — Reference API · inquanto.states（参考 API · inquanto.states）· `partial`
+- `mappings` — Reference API · inquanto.mappings（参考 API · inquanto.mappings）· `partial`
+- `minimizers` — Reference API · inquanto.minimizers（参考 API · inquanto.minimizers）· `partial`
 - _… 另有 11 个兄弟项（见 appendix-B TSV 同父路径）_
 
 ## 3. qchem_stack 映射、Parity、自有站 IA
@@ -21115,7 +21116,7 @@ _（manifest 中此父节点下无其它兄弟项）_
 | breadcrumb | `misc` |
 | slug | `misc` |
 | title_zh / en | 杂项 / Misc |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/ |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/ |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/` |
 
@@ -21180,7 +21181,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `misc / release_notes` |
 | slug | `release_notes` |
 | title_zh / en | 发行说明 / Release notes |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/changelog.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/changelog.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/release_notes/` |
 
@@ -21199,7 +21200,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `bibliography` — Bibliography（参考文献）· `shipped`
 - `contact_docs` — Contact support (in-docs)（联系支持（文档内页））· `not-applicable`
-- `how_to_cite` — How to cite InQuanto（如何引用 InQuanto）· `shipped`
+- `how_to_cite` — Citing upstream documentation (mirror)（文献引用说明（参考镜像））· `shipped`
 - `license` — License / Changelog（许可与版本）· `shipped`
 - `opensource_attribution` — Open-source attribution（开源组件归属）· `shipped`
 - `contact` — Contact (corporate portal)（联系我们（官网门户））· `shipped`
@@ -21250,7 +21251,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `misc / bibliography` |
 | slug | `bibliography` |
 | title_zh / en | 参考文献 / Bibliography |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/bibliography.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/bibliography.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/bibliography/` |
 
@@ -21269,7 +21270,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `release_notes` — Release notes（发行说明）· `shipped`
 - `contact_docs` — Contact support (in-docs)（联系支持（文档内页））· `not-applicable`
-- `how_to_cite` — How to cite InQuanto（如何引用 InQuanto）· `shipped`
+- `how_to_cite` — Citing upstream documentation (mirror)（文献引用说明（参考镜像））· `shipped`
 - `license` — License / Changelog（许可与版本）· `shipped`
 - `opensource_attribution` — Open-source attribution（开源组件归属）· `shipped`
 - `contact` — Contact (corporate portal)（联系我们（官网门户））· `shipped`
@@ -21320,7 +21321,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `misc / contact_docs` |
 | slug | `contact_docs` |
 | title_zh / en | 联系支持（文档内页） / Contact support (in-docs) |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/contact.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/contact.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/contact_docs/` |
 
@@ -21339,7 +21340,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 
 - `release_notes` — Release notes（发行说明）· `shipped`
 - `bibliography` — Bibliography（参考文献）· `shipped`
-- `how_to_cite` — How to cite InQuanto（如何引用 InQuanto）· `shipped`
+- `how_to_cite` — Citing upstream documentation (mirror)（文献引用说明（参考镜像））· `shipped`
 - `license` — License / Changelog（许可与版本）· `shipped`
 - `opensource_attribution` — Open-source attribution（开源组件归属）· `shipped`
 - `contact` — Contact (corporate portal)（联系我们（官网门户））· `shipped`
@@ -21391,8 +21392,8 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | --- | --- |
 | breadcrumb | `misc / how_to_cite` |
 | slug | `how_to_cite` |
-| title_zh / en | 如何引用 InQuanto / How to cite InQuanto |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/cite.html |
+| title_zh / en | 文献引用说明（参考镜像） / Citing upstream documentation (mirror) |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/cite.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/how_to_cite/` |
 
@@ -21462,7 +21463,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `misc / license` |
 | slug | `license` |
 | title_zh / en | 许可与版本 / License / Changelog |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/license.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/license.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/license/` |
 
@@ -21482,7 +21483,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - `release_notes` — Release notes（发行说明）· `shipped`
 - `bibliography` — Bibliography（参考文献）· `shipped`
 - `contact_docs` — Contact support (in-docs)（联系支持（文档内页））· `not-applicable`
-- `how_to_cite` — How to cite InQuanto（如何引用 InQuanto）· `shipped`
+- `how_to_cite` — Citing upstream documentation (mirror)（文献引用说明（参考镜像））· `shipped`
 - `opensource_attribution` — Open-source attribution（开源组件归属）· `shipped`
 - `contact` — Contact (corporate portal)（联系我们（官网门户））· `shipped`
 
@@ -21532,7 +21533,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `misc / opensource_attribution` |
 | slug | `opensource_attribution` |
 | title_zh / en | 开源组件归属 / Open-source attribution |
-| inquanto_anchor | https://docs.quantinuum.com/inquanto/misc/opensource.html |
+| reference_doc_url | https://docs.quantinuum.com/inquanto/misc/opensource.html |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/opensource_attribution/` |
 
@@ -21552,7 +21553,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - `release_notes` — Release notes（发行说明）· `shipped`
 - `bibliography` — Bibliography（参考文献）· `shipped`
 - `contact_docs` — Contact support (in-docs)（联系支持（文档内页））· `not-applicable`
-- `how_to_cite` — How to cite InQuanto（如何引用 InQuanto）· `shipped`
+- `how_to_cite` — Citing upstream documentation (mirror)（文献引用说明（参考镜像））· `shipped`
 - `license` — License / Changelog（许可与版本）· `shipped`
 - `contact` — Contact (corporate portal)（联系我们（官网门户））· `shipped`
 
@@ -21602,7 +21603,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 | breadcrumb | `misc / contact` |
 | slug | `contact` |
 | title_zh / en | 联系我们（官网门户） / Contact (corporate portal) |
-| inquanto_anchor | https://www.quantinuum.com/contact/docs |
+| reference_doc_url | https://www.quantinuum.com/contact/docs |
 | pillar / diataxis / class_leaf | meta / reference / no |
 | mirror_path | `/mirror/misc/contact/` |
 
@@ -21622,7 +21623,7 @@ _（根段无同级兄弟；见 manifest 顶层键）_
 - `release_notes` — Release notes（发行说明）· `shipped`
 - `bibliography` — Bibliography（参考文献）· `shipped`
 - `contact_docs` — Contact support (in-docs)（联系支持（文档内页））· `not-applicable`
-- `how_to_cite` — How to cite InQuanto（如何引用 InQuanto）· `shipped`
+- `how_to_cite` — Citing upstream documentation (mirror)（文献引用说明（参考镜像））· `shipped`
 - `license` — License / Changelog（许可与版本）· `shipped`
 - `opensource_attribution` — Open-source attribution（开源组件归属）· `shipped`
 

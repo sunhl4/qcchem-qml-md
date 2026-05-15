@@ -1,6 +1,6 @@
 ---
 title: Fe4N2 case study
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2"
 diataxis: tutorial
 pillar: P1
 status: placeholder
@@ -11,7 +11,7 @@ i18n_key: tutorials.case_study_fe4n2
 
 # Fe4N2 case study <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>tutorials / case_study_fe4n2</code> · <a href="/mirror/tutorials/case_study_fe4n2/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>tutorials / case_study_fe4n2</code> · <a href="/mirror/tutorials/case_study_fe4n2/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Placeholder
@@ -19,12 +19,12 @@ i18n_key: tutorials.case_study_fe4n2
 - **Diátaxis**: Tutorial
 - **Module**: *(placeholder, not yet implemented — see milestone)*
 - **Milestone**: 2027
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2](https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2](https://docs.quantinuum.com/inquanto/tutorials/tutorial_overview.html#case-study-tutorials-fe4n2)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
@@ -37,8 +37,8 @@ This page mirrors the corresponding node in the public InQuanto tree. Open the I
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

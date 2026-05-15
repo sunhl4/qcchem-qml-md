@@ -26,5 +26,5 @@ description: zne_qiskit_unification_v1 在 parity_snapshot 中的含义与代表
 
 ## 相关
 
-- [公开 parity 矩阵](/parity/public-matrix) §1 Qermit 行
+- [公开 parity 矩阵](/product/roadmap) §1 Qermit 行
 - [read repro 键](/tutorial/read-repro-keys)

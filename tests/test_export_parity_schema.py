@@ -1,4 +1,4 @@
-"""Parity export schema v2 fields (no PySCF)."""
+"""Parity export schema fields (config-only export path)."""
 
 from __future__ import annotations
 
@@ -19,16 +19,16 @@ def _load_export_script():
     return mod
 
 
-def test_table_from_config_has_v2_fields() -> None:
+def test_table_from_config_has_v3_fields() -> None:
     ep = _load_export_script()
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "example_h2.yaml"
     d = ep._table_from_config(p)
-    assert d.get("parity_export_schema_version") == "2"
+    assert d.get("parity_export_schema_version") == "3"
     assert d["computable_abstract"]["schema"] == "qchem_computable_abstract_v2"
     assert d["computable_abstract"].get("support_set_exported_from_protocol") is False
     assert "evaluate_note" in d["computable_abstract"]
-    assert isinstance(d["inquanto_gap_categories"], list)
+    assert isinstance(d["capability_gap_categories"], list)
     assert d["embedding"]["mode"] == "none"
 
 

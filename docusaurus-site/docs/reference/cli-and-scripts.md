@@ -11,7 +11,7 @@ description: 安装后可用的控制台命令与仓库 scripts/ 常用入口。
 
 - 本地跑 smoke、回归和导出
 - 启 worker 处理异步作业
-- 生成对标或验收所需材料
+- 生成验收所需材料
 
 ## 安装
 
@@ -59,6 +59,12 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | `python scripts/run_qpe_track_demo.py` | QPE 演示轨 |
 | `python scripts/resource_estimation_demo.py` | 资源估计演示 |
 
+## Solver 注册表（`scf.driver`）
+
+- **内置**：`pyscf`、`psi4` 在首次访问 solver registry 时注册。
+- **外部插件**：`pyproject.toml` 中 `[project.entry-points."qchem_stack.chem_solvers"]`；说明见仓库 `docs/solver_entrypoint_plugin_安装与发布指南.md`，示例 `examples/solver_plugin_entrypoint_demo/`。
+- **排障**：`registered_solvers_detail()`、`set_entrypoint_conflict_policy("warn"|"strict")`。完整步骤见站内 [后端适配快速接入](/guide/backend-adapter-quickstart)（与 VitePress 母稿 `docs-site/docs/guide/chemistry-and-embedding/backend-adapter-quickstart.md` 对齐）。
+
 ## 推荐执行顺序（维护者）
 
 1. `smoke_pipeline.py` 保证基本可运行  
@@ -74,5 +80,6 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 ## 另见
 
 - [快速上手](/tutorial/quickstart)
+- [后端适配快速接入](/guide/backend-adapter-quickstart)
 - [P4 作业与可复现](/guide/jobs-and-reproducibility)
 - [HTTP API 与作业队列](/reference/http-api-sqlite-jobs)

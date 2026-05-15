@@ -13,6 +13,7 @@ from qchem_stack.exceptions import PipelineError
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
     from qchem_stack.config import ExperimentConfig
 
@@ -115,7 +116,7 @@ def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PyS
         deep=True,
         update={
             "molecule": cfg.molecule.model_copy(
-                update={"coordinates_bohr": _normalize_coords(coords)}
+                update={"coordinates": _normalize_coords(coords), "coordinate_unit": "bohr"}
             ),
             "md_ml_export": MdMlExportSpec(),
         },
@@ -128,6 +129,15 @@ def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PyS
     if child.scf.method == "ROHF":
         return drv.run_rohf()
     return drv.run_uhf()
+
+
+def _as_pyscf_rhf(reference: ClassicalMeanFieldReference) -> PySCFRHFResult:
+    if reference.backend_tag() != "pyscf":
+        raise PipelineError(
+            "QMEF attachment currently requires a PySCF-backed classical reference "
+            f"(got backend={reference.backend_tag()!r})."
+        )
+    return reference.as_pyscf_rhf_result()
 
 
 def _qmframe_from_rhf(
@@ -163,7 +173,7 @@ def _qmframe_from_rhf(
 
 def _primary_qmframe(cfg: ExperimentConfig, out: dict[str, Any], rhf: PySCFRHFResult) -> QMFrame:
     energy = _energy_hartree_from_pipeline_out(cfg, out)
-    positions = _normalize_coords(cfg.molecule.coordinates_bohr)
+    positions = _normalize_coords(cfg.molecule.coordinates_in_bohr().tolist())
     tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.fermion_qubit_mapping}"
     return _qmframe_from_rhf(cfg, out, rhf, positions, energy_hartree=energy, method_tag=tag)
 
@@ -202,7 +212,7 @@ def _extra_frame_full_pipeline(
         deep=True,
         update={
             "molecule": cfg.molecule.model_copy(
-                update={"coordinates_bohr": _normalize_coords(coords)}
+                update={"coordinates": _normalize_coords(coords), "coordinate_unit": "bohr"}
             ),
             "md_ml_export": MdMlExportSpec(),
         },
@@ -236,7 +246,7 @@ def _extra_frame_full_pipeline(
 def build_qmef_ml_attachment_repro_block(
     cfg: ExperimentConfig,
     out: dict[str, Any],
-    rhf: PySCFRHFResult,
+    reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
 ) -> dict[str, Any]:
@@ -245,6 +255,7 @@ def build_qmef_ml_attachment_repro_block(
     **extra** geometries (HF-SCF-only or full nested pipelines per ``md_ml_export.trajectory_theory_level``).
     """
     spec = cfg.md_ml_export
+    rhf = _as_pyscf_rhf(reference)
     frames: list[QMFrame] = [_primary_qmframe(cfg, out, rhf)]
     frame_meta: list[dict[str, Any]] = [
         {
@@ -314,12 +325,12 @@ def build_qmef_ml_attachment_repro_block(
 def build_qmef_dataset_single_frame_repro_block(
     cfg: ExperimentConfig,
     out: dict[str, Any],
-    rhf: PySCFRHFResult,
+    reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
 ) -> dict[str, Any]:
     """Backward-compatible name — delegates to :func:`build_qmef_ml_attachment_repro_block`."""
-    return build_qmef_ml_attachment_repro_block(cfg, out, rhf, cfg_path=cfg_path)
+    return build_qmef_ml_attachment_repro_block(cfg, out, reference, cfg_path=cfg_path)
 
 
 __all__ = [

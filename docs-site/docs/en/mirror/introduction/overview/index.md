@@ -1,39 +1,39 @@
 ---
-title: What is InQuanto?
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/introduction/overview.html"
+title: Product overview (reference mirror)
+reference_doc_url: "https://docs.quantinuum.com/inquanto/introduction/overview.html"
 diataxis: concept
 pillar: meta
 status: shipped
-qchem_module: ""
+qchem_module: qchem_stack
 milestone: ""
 i18n_key: introduction.overview
 ---
 
-# What is InQuanto? <StatusBadge :status="$frontmatter.status" />
+# Product overview (reference mirror) <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>introduction / overview</code> · <a href="/mirror/introduction/overview/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>introduction / overview</code> · <a href="/mirror/introduction/overview/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Shipped
 - **Pillar**: Meta (navigation)
 - **Diátaxis**: Concept
-- **Module**: *(placeholder, not yet implemented — see milestone)*
+- **Module**: `qchem_stack`
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/introduction/overview.html](https://docs.quantinuum.com/inquanto/introduction/overview.html)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/introduction/overview.html](https://docs.quantinuum.com/inquanto/introduction/overview.html)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
-**Shipped** — Module: *(placeholder, not yet implemented — see milestone)*
+**Shipped** — Module: `qchem_stack`
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

@@ -27,4 +27,6 @@ P1 对应化学问题定义层：把“要算什么”描述清楚，再交给�
 
 ## 下一步
 
-进入 [P2 程序构建](./program-construction)。
+- [后端适配快速接入](./backend-adapter-quickstart)（新经典后端、`scf.driver`、entry points）
+- [双线路经典输入（在线 + 离线）](./dual-classical-ingress)（`geometry_file` 在线求解 + `precomputed` 离线数据集）
+- 进入 [P2 程序构建](./program-construction)。

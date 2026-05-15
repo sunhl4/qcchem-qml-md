@@ -1,6 +1,6 @@
 ---
 title: FMOFragment
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment"
+reference_doc_url: "https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment"
 diataxis: reference
 pillar: P1
 status: placeholder
@@ -11,7 +11,7 @@ i18n_key: api.extensions_pyscf.classes.FMOFragment
 
 # FMOFragment <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>api / extensions_pyscf / classes / FMOFragment</code> · <a href="/mirror/api/extensions_pyscf/classes/FMOFragment/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>api / extensions_pyscf / classes / FMOFragment</code> · <a href="/mirror/api/extensions_pyscf/classes/FMOFragment/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Placeholder
@@ -19,12 +19,12 @@ i18n_key: api.extensions_pyscf.classes.FMOFragment
 - **Diátaxis**: Reference
 - **Module**: *(placeholder, not yet implemented — see milestone)*
 - **Milestone**: 2027
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment](https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment](https://docs.quantinuum.com/inquanto/api/extensions/inquanto-pyscf_api.html#inquanto.extensions.pyscf.FMOFragment)
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
@@ -32,8 +32,8 @@ This page mirrors the corresponding node in the public InQuanto tree. Open the I
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

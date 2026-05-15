@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
-"""Emit a JSON/YAML-friendly dict for competitor Methods parity (Quantinuum §7 style).
+"""Emit a JSON/YAML-friendly dict for product Methods parity.
 
 Reads experiment YAML and optionally merges keys from a pipeline results JSON
 (``run_pipeline_sync`` / ``run_pipeline_from_config`` output saved with json.dump).
 
 Stable top-level keys used by CI (subset: ``parity_export_schema_version``, ``experiment_id``,
 ``geometry_source``, ``computable_abstract``, ``embedding``, …) are enumerated in
-``qchem_stack.protocols.inquanto_contract.PARITY_EXPORT_V2_STABLE_KEYS``; keep them in sync
+``qchem_stack.protocols.product_contract.PARITY_EXPORT_V3_STABLE_KEYS``; keep them in sync
 when extending this exporter.
 
 Usage::
@@ -27,21 +27,21 @@ from qchem_stack.chem.bridges.facade import molecular_system_from_experiment
 from qchem_stack.chem.fermion_mapping_registry import DOCUMENTED_FERMION_QUBIT_MAPPINGS
 from qchem_stack.chem.solvers.registry import create_solver, registered_solver_ids
 from qchem_stack.config import compiler_bundle_signature_from_config, load_experiment_config
-from qchem_stack.integrations.inquanto_workflow_preview import (
-    workflow_preview_qpe_track_slice_v1,
-    workflow_preview_variational_execution_slice_v1,
-    workflow_preview_vqs_track_slice_v1,
-)
 from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
 from qchem_stack.integrations.resource_estimation_preview import (
     build_resource_estimation_preview_v1,
 )
+from qchem_stack.integrations.workflow_preview import (
+    workflow_preview_qpe_track_slice_v1,
+    workflow_preview_variational_execution_slice_v1,
+    workflow_preview_vqs_track_slice_v1,
+)
 from qchem_stack.md_bridge import QMFrame
 from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
 from qchem_stack.protocols.computable import computables_export_dict
-from qchem_stack.protocols.inquanto_contract import (
+from qchem_stack.protocols.product_contract import (
     classify_pauli_expectation_path,
-    inquanto_gap_categories,
+    product_gap_categories,
     protocol_expectation_semantics_public,
 )
 from qchem_stack.quantum.algorithm_registry import ALGORITHM_REGISTRY
@@ -60,7 +60,7 @@ def _table_from_config(
     _ms = molecular_system_from_experiment(cfg)
     geometry_source = str((_ms.meta or {}).get("geometry_source") or "cartesian")
     out = {
-        "parity_export_schema_version": "2",
+        "parity_export_schema_version": "3",
         "source_config": str(cfg_path),
         "experiment_id": cfg.experiment_id,
         "geometry_source": geometry_source,
@@ -100,7 +100,7 @@ def _table_from_config(
         "record_pauli_measurement_histograms": cfg.quantum.record_pauli_measurement_histograms,
         "computable_abstract": computables_export_dict(cfg, protocol_counts=protocol_counts),
         "excited_resource_from_config": build_excited_resource_summary_for_export(cfg),
-        "inquanto_gap_categories": inquanto_gap_categories(),
+        "capability_gap_categories": product_gap_categories(),
         "vqd_after_variational": cfg.quantum.vqd_after_variational,
         "vqd_n_states": cfg.quantum.vqd_n_states,
         "vqd_penalty_weight": cfg.quantum.vqd_penalty_weight,

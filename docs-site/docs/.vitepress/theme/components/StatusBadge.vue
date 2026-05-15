@@ -8,7 +8,7 @@ const props = defineProps<{
 
 const LABELS: Record<string, { zh: string; en: string; tone: string }> = {
   shipped: { zh: "已落地", en: "Shipped", tone: "ok" },
-  partial: { zh: "部分对齐", en: "Partial", tone: "warn" },
+  partial: { zh: "部分实现", en: "Partial", tone: "warn" },
   placeholder: { zh: "占位", en: "Placeholder", tone: "info" },
   "not-applicable": { zh: "刻意不做", en: "Not applicable", tone: "muted" },
 };

@@ -16,26 +16,26 @@ const MAP = [
   ["技术文档_DMET与parity_snapshot开放契约.md", "/reference/dmet-parity-snapshot"],
   ["launch_retrieve_nexus_analog.md", "/concept/launch-retrieve-nexus-analog"],
   ["mitigation_PMSV_ZNE_Qermit_mapping.md", "/concept/mitigation-mapping"],
-  ["inquanto_public_parity_matrix.md", "/parity/public-matrix"],
-  ["L1_InQuanto_alignment_signoff.md", "/parity/l1-signoff"],
-  ["InQuanto_Y1_public_alignment_ledger.md", "/parity/y1-alignment-ledger"],
-  ["Y1_residual_partial_SLA_template.md", "/parity/y1-alignment-ledger#y1-residual-partial-sla-template"],
-  ["与InQuanto能力差距与实施计划.md", "/parity/gap-implementation-plan"],
-  ["与Inquanto能力差距与实施计划.md", "/parity/gap-implementation-plan"],
-  ["竞争定位与路线图_对标Quantinuum产品与技术路线.md", "/concept/competitive-positioning"],
-  ["工程记忆_Quantinuum对标与数据流技术文档.md", "/concept/engineering-memory-quantinuum"],
-  ["L3_benchmark_suite_roadmap.md", "/parity/y1-alignment-ledger#l3-benchmark-suite-roadmap"],
-  ["记忆_开放栈对标完成度与待闭合项.md", "/concept/engineering-memory-quantinuum#13-开放栈对标完成度与待闭合项原独立记忆合并"],
+  ["inquanto_public_parity_matrix.md", "/product/roadmap"],
+  ["L1_InQuanto_alignment_signoff.md", "/product/roadmap"],
+  ["InQuanto_Y1_public_alignment_ledger.md", "/product/roadmap"],
+  ["Y1_residual_partial_SLA_template.md", "/product/roadmap#y1-residual-partial-sla-template"],
+  ["与InQuanto能力差距与实施计划.md", "/product/roadmap"],
+  ["与Inquanto能力差距与实施计划.md", "/product/roadmap"],
+  ["竞争定位与路线图_对标Quantinuum产品与技术路线.md", "/product/roadmap"],
+  ["工程记忆_Quantinuum对标与数据流技术文档.md", "/concept/engineering-architecture"],
+  ["L3_benchmark_suite_roadmap.md", "/product/roadmap#l3-benchmark-suite-roadmap"],
+  ["记忆_开放栈对标完成度与待闭合项.md", "/concept/engineering-architecture#13-开放栈对标完成度与待闭合项原独立记忆合并"],
   ["记忆_HTTP_API与作业队列_工程记忆.md", "/reference/http-api-sqlite-jobs#9-工程决策与范围原独立http-工程记忆合并"],
-  ["不排期项_转排期与实现说明.md", "/parity/backlog-to-schedule"],
+  ["不排期项_转排期与实现说明.md", "/product/roadmap"],
   ["架构_InQuanto闭源能力闭合与可复现边界.md", "/concept/architecture-boundaries"],
-  ["ADR_P2_decomposition_scope.md", "/parity/gap-implementation-plan#adr-p2-w2-decomposition-scope"],
-  ["P2_W3_classical_avas_casscf_boundary.md", "/parity/gap-implementation-plan#p2-w3-avas-casscf-boundary"],
-  ["P2_W5_algorithm_registry_alignment.md", "/parity/gap-implementation-plan#p2-w5-algorithm-registry-alignment"],
-  ["P2_详细实施计划.md", "/parity/gap-implementation-plan#appendix-a"],
-  ["P1_completion_audit.md", "/parity/gap-implementation-plan#appendix-e"],
-  ["InQuanto_B_J_逐项闭合计划.md", "/parity/gap-implementation-plan#appendix-d"],
-  ["InQuanto_manual_howto_与_qchem_stack_映射.md", "/concept/engineering-memory-quantinuum"],
+  ["ADR_P2_decomposition_scope.md", "/product/roadmap#adr-p2-w2-decomposition-scope"],
+  ["P2_W3_classical_avas_casscf_boundary.md", "/product/roadmap#p2-w3-avas-casscf-boundary"],
+  ["P2_W5_algorithm_registry_alignment.md", "/product/roadmap#p2-w5-algorithm-registry-alignment"],
+  ["P2_详细实施计划.md", "/product/roadmap#appendix-a"],
+  ["P1_completion_audit.md", "/product/roadmap#appendix-e"],
+  ["InQuanto_B_J_逐项闭合计划.md", "/product/roadmap#appendix-d"],
+  ["InQuanto_manual_howto_与_qchem_stack_映射.md", "/concept/engineering-architecture"],
 ];
 
 // Skip auto-generated trees so this one-shot fixer never overwrites them.
@@ -63,7 +63,7 @@ for (const file of walk(docsRoot)) {
   n = n.replace(/\]\(\.\.\/README\.md\)/g, "](/tutorial/quickstart)");
   n = n.replace(
     /\[`docs\/inquanto_public_parity_matrix\.md`\]\([^)]*\)/g,
-    "[公开 parity 矩阵](/parity/public-matrix)"
+    "[公开 parity 矩阵](/product/roadmap)"
   );
   if (n !== s) fs.writeFileSync(file, n, "utf8");
 }

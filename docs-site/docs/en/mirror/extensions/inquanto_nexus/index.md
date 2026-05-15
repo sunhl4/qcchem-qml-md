@@ -1,6 +1,6 @@
 ---
-title: InQuanto-Nexus
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html"
+title: Nexus integration (reference)
+reference_doc_url: "https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html"
 diataxis: reference
 pillar: P4
 status: not-applicable
@@ -9,9 +9,9 @@ milestone: ""
 i18n_key: extensions.inquanto_nexus
 ---
 
-# InQuanto-Nexus <StatusBadge :status="$frontmatter.status" />
+# Nexus integration (reference) <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto mirror path: <code>extensions / inquanto_nexus</code> · <a href="/mirror/extensions/inquanto_nexus/">中文版</a></p>
+<p class="mirror-breadcrumb">Manual mirror node path: <code>extensions / inquanto_nexus</code> · <a href="/mirror/extensions/inquanto_nexus/">中文版</a></p>
 
 ::: info Mirror metadata
 - **Status**: Not applicable
@@ -19,13 +19,13 @@ i18n_key: extensions.inquanto_nexus
 - **Diátaxis**: Reference
 - **Module**: `qchem_stack.api`
 - **Milestone**: —
-- **InQuanto anchor**: [https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html](https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html)
+- **Reference doc URL**: [https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html](https://docs.quantinuum.com/inquanto/extensions/inquanto-nexus.html)
 > Scope note: Real cloud / HQC / OAuth / quota not in scope; we provide a local FastAPI analog.
 :::
 
 ## What it is
 
-This page mirrors the corresponding node in the public InQuanto tree. Open the InQuanto anchor for the official definition; our implementation is described under "Our implementation".
+This page mirrors a third-party public documentation entry. Use the reference anchor for upstream wording; see "Our implementation" for this repository.
 
 ## Our implementation
 
@@ -33,8 +33,8 @@ This page mirrors the corresponding node in the public InQuanto tree. Open the I
 
 ## Related
 
-- [Public parity matrix](/en/parity/public-matrix)
+- [Capabilities & roadmap](/en/product/roadmap)
 - [Engineering architecture](/en/concept/engineering-architecture)
-- [Competitive positioning](/en/concept/competitive-positioning)
+- [Product roadmap](/en/product/roadmap)
 - [15-minute quickstart](/en/tutorial/quickstart)
 - [IA slug map](/en/meta/ia-mapping)

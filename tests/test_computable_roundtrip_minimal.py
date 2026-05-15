@@ -5,7 +5,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from qchem_stack.config import load_experiment_config
-from qchem_stack.integrations.inquanto_workflow_preview import computable_graph_v2
+from qchem_stack.integrations.workflow_preview import computable_graph_v2
 from qchem_stack.protocols.computable import (
     list_computables_for_config,
     refs_from_computable_graph_v2,

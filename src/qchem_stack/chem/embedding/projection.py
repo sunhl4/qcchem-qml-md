@@ -4,7 +4,7 @@ Projection **workflow** labels and a small config dataclass used in L1 parity tr
 **Variational Hamiltonian (non-stub path)** when ``EmbeddingSpec.projection_quantum_hamiltonian`` is
 ``fragment_mulliken_mo``: see :mod:`qchem_stack.chem.embedding.projection_hamiltonian` — RHF
 ``mo_coeff``, Mulliken AO weights on fragment atoms, PySCF :class:`pyscf.mcscf.CASCI` ``get_h1eff`` /
-``get_h2eff`` (same chemist ``h2`` convention as :func:`~qchem_stack.chem.drivers.pyscf_driver.active_space_integrals`),
+``get_h2eff`` (same chemist ``h2`` convention as :func:`~qchem_stack.chem.integrals.pyscf_active_space.active_space_integrals`),
 then Jordan–Wigner.
 
 **References (surface / Methods wording)**: Mulliken populations and MO locality screening are standard

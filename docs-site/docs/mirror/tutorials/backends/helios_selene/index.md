@@ -1,6 +1,6 @@
 ---
-title: Quantinuum Helios / Selene 提交
-inquanto_anchor: "https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html"
+title: Helios / Selene 后端提交（参考教程）
+reference_doc_url: "https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html"
 diataxis: tutorial
 pillar: P3
 status: not-applicable
@@ -9,9 +9,9 @@ milestone: ""
 i18n_key: tutorials.backends.helios_selene
 ---
 
-# Quantinuum Helios / Selene 提交 <StatusBadge :status="$frontmatter.status" />
+# Helios / Selene 后端提交（参考教程） <StatusBadge :status="$frontmatter.status" />
 
-<p class="mirror-breadcrumb">InQuanto 镜像路径: <code>tutorials / backends / helios_selene</code> · <a href="/en/mirror/tutorials/backends/helios_selene/">English version</a></p>
+<p class="mirror-breadcrumb">手册镜像节点路径: <code>tutorials / backends / helios_selene</code> · <a href="/en/mirror/tutorials/backends/helios_selene/">English version</a></p>
 
 ::: info 镜像元信息
 - **状态**: 刻意不做
@@ -19,13 +19,13 @@ i18n_key: tutorials.backends.helios_selene
 - **Diátaxis**: Tutorial
 - **对应模块**: *（占位，未实现 — 见里程碑）*
 - **里程碑**: —
-- **InQuanto 锚点**: [https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html](https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html)
+- **参考文档 URL**: [https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html](https://docs.quantinuum.com/inquanto/tutorials/InQ_tut_helios.html)
 > 口径说明: 不接入 H 系硬件。
 :::
 
 ## 它是什么
 
-本节为 InQuanto 公开树的对应位置。点开下面 InQuanto 锚点查看官方原始定义；本仓库的对应实现见「我们的实现」。
+本节与第三方公开文档目录中的对应条目同构。点击下方参考锚点可查阅外部原始定义；本仓库实现见「我们的实现」。
 
 ## 我们的实现
 
@@ -33,8 +33,8 @@ i18n_key: tutorials.backends.helios_selene
 
 ## 相关
 
-- [公开 parity 矩阵](/parity/public-matrix)
+- [能力概览与路线图](/product/roadmap)
 - [工程分层架构](/concept/engineering-architecture)
-- [竞争定位与路线图](/concept/competitive-positioning)
+- [产品路线图](/product/roadmap)
 - [15 分钟上手](/tutorial/quickstart)
 - [IA slug 映射](/meta/ia-mapping)

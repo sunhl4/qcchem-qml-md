@@ -20,7 +20,7 @@
 | `run_context` | 追踪链路信息（trace/request 等） | 在线问题定位必留 |
 | `pipeline_profile` | 阶段耗时与总耗时 | 做性能回归时必留 |
 | `run_summary` | 对外结果摘要 | 给上游系统优先读取 |
-| `parity_snapshot` | 对标与契约快照 | 验收与对齐场景保留 |
+| `parity_snapshot` | 契约快照 | 验收与对齐场景保留 |
 
 ## 最小读取示例（Python）
 
@@ -36,7 +36,7 @@ print(repro.get("run_summary", {}).keys())
 - 是否存在 `run_context`
 - 是否存在 `run_summary`
 - `pipeline_profile` 是否包含阶段耗时
-- 对标流程中是否包含 `parity_snapshot`
+- 验收流程中是否包含 `parity_snapshot`
 
 ## 归档建议
 

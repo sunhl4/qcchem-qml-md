@@ -11,7 +11,7 @@ from qchem_stack.quantum.variational_plugins.spec import (
 
 
 def run_echo_variational(ctx: VariationalRunContext) -> VariationalStageOutcome:
-    qh = ctx.hamiltonian
+    qh = ctx.resolved_hamiltonian()
     depth = int(ctx.cfg.quantum.vqe_depth)
     angles = np.zeros(2 * qh.n_qubits * depth, dtype=float)
     energy = float(ctx.executor.expectation_hea(qh.operator, qh.n_qubits, angles, depth))
