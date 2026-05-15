@@ -76,3 +76,15 @@ def wrap_mean_field_like(
         _e_tot=float(e_tot),
         _mo_energy=np.asarray(mo_energy, dtype=float),
     )
+
+
+def nuclear_repulsion_energy_au(mf_like: MeanFieldLike) -> float | None:
+    """Best-effort nuclear repulsion extraction across backends."""
+    raw = mf_like.raw_handle()
+    try:
+        mol = getattr(raw, "mol", None)
+        if mol is not None and hasattr(mol, "energy_nuc"):
+            return float(mol.energy_nuc())
+    except Exception:  # noqa: BLE001
+        return None
+    return None

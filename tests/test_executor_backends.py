@@ -5,7 +5,11 @@ import pytest
 from openfermion.ops import QubitOperator
 
 from qchem_stack.backends.executor_base import StatevectorHeaExecutor
-from qchem_stack.backends.factory import executor_from_spec
+from qchem_stack.backends.factory import (
+    executor_from_spec,
+    register_backend_provider,
+    registered_backend_provider_ids,
+)
 from qchem_stack.backends.ionstack_executor import IonStackHeaExecutor
 from qchem_stack.backends.spec import BackendSpec
 
@@ -79,3 +83,13 @@ def test_vqe_qiskit_vs_numpy() -> None:
     ).run(maxiter=80, seed=2)
     r_n = VQE(qh, depth=1).run(maxiter=80, seed=2)
     assert r_q.energy == pytest.approx(r_n.energy, rel=1e-4, abs=1e-4)
+
+
+def test_runtime_backend_registration_works() -> None:
+    class _DummyExecutor(StatevectorHeaExecutor):
+        pass
+
+    register_backend_provider("dummy_runtime", lambda spec: _DummyExecutor())
+    assert "dummy_runtime" in registered_backend_provider_ids()
+    ex = executor_from_spec(BackendSpec(name="dummy", provider="dummy_runtime"))  # type: ignore[arg-type]
+    assert isinstance(ex, _DummyExecutor)

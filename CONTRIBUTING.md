@@ -2,6 +2,14 @@
 
 **对标与工程母稿（三份 + 契约矩阵）**：[竞争定位](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) · [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md) · [差距与实施计划](docs/与InQuanto能力差距与实施计划.md)（含 **附录 A–F**：P2 / Y1 / L1 / B→J / P1 审计 / 不排期项）· [parity 矩阵](docs/inquanto_public_parity_matrix.md)。**详细技术契约**：`docs/技术文档_*.md`、`mitigation_PMSV_ZNE_Qermit_mapping.md`、`launch_retrieve_nexus_analog.md`。
 
+## Local Python environment (hard-pinned)
+
+This repository pins local command execution to:
+
+- `/home/sunhl/projects/qchem_qml_md/.venv/bin/python`
+
+Use `./scripts/venv-run ...` for local lint/test/script commands.
+
 ## 维护角色（原 `docs/MAINTAINERS.md`）
 
 | 角色 | 职责 |
@@ -12,17 +20,17 @@
 
 ## Lint
 
-From the repo root (after `pip install -e ".[dev]"`):
+From the repo root (hard-pinned local venv runner):
 
 ```bash
-ruff check src/qchem_stack tests scripts examples
-ruff format --check src/qchem_stack tests scripts examples
+./scripts/venv-run ruff check src/qchem_stack tests scripts examples
+./scripts/venv-run ruff format --check src/qchem_stack tests scripts examples
 ```
 
 To apply the formatter locally (when `format --check` fails):
 
 ```bash
-ruff format src/qchem_stack tests scripts examples
+./scripts/venv-run ruff format src/qchem_stack tests scripts examples
 ```
 
 GitHub Actions runs these in the dedicated **`lint` job** (Python 3.12); **`test`** (matrix 3.10–3.12) and **`docs-site`** both **`needs: lint`**.
@@ -30,25 +38,25 @@ GitHub Actions runs these in the dedicated **`lint` job** (Python 3.12); **`test
 Optional [pre-commit](https://pre-commit.com) hooks (same paths as CI). The **`pre-commit` CLI ships with `pip install -e ".[dev]"`**:
 
 ```bash
-pre-commit install
+./scripts/venv-run pre-commit install
 # one-off full tree (like CI scope; runs ruff + ruff-format hooks):
-pre-commit run --all-files
+./scripts/venv-run pre-commit run --all-files
 ```
 
 Uses `.pre-commit-config.yaml` at the repo root.
 
 ## Tests
 
-From the repo root (with `src` on `PYTHONPATH`, or after `pip install -e ".[dev]"`):
+From the repo root:
 
 ```bash
-pytest tests -q --tb=short
+./scripts/venv-run pytest tests -q --tb=short
 ```
 
 Optional heavier chemistry smoke (multi-fragment DMET exact, etc.):
 
 ```bash
-pytest -m slow tests/test_dmet_fragment_exact.py -q --tb=short
+./scripts/venv-run pytest -m slow tests/test_dmet_fragment_exact.py -q --tb=short
 ```
 
 Targeted markers (see `pyproject.toml`): `-m l1_excited`, `-m l1_md_ml`, `-m l3`. CI **`lint`** job runs **`ruff check`** + **`ruff format --check`** before the **`test`** matrix installs the package.
@@ -76,8 +84,8 @@ If you add new helper logic, prefer the new modules first and keep legacy import
 Config-only Methods alignment (no PySCF run):
 
 ```bash
-python scripts/export_parity_criteria_table.py configs/example_h2.yaml
-python scripts/check_parity_export_sample.py
+./scripts/venv-run python scripts/export_parity_criteria_table.py configs/example_h2.yaml
+./scripts/venv-run python scripts/check_parity_export_sample.py
 ```
 
 After intentional contract changes to `inquanto_gap_categories()`, **`PARITY_EXPORT_V2_STABLE_KEYS`**, or export columns (e.g. **`geometry_source`**), regenerate `tests/fixtures/parity_export_example_h2_config_only.json` from `configs/example_h2.yaml` and normalize `source_config` to `configs/example_h2.yaml` if the exporter emits OS-specific separators.
@@ -87,7 +95,7 @@ After intentional contract changes to `inquanto_gap_categories()`, **`PARITY_EXP
 ### 算符池与 L3 基准（ADAPT / IQEB）
 
 - **新池 id 或 YAML 别名**：除 `quantum/operator_pool_registry.py`、`config.py` 中 `adapt_pool_id` / `iqeb_pool_id` Literal 外，按需更新 `tests/test_operator_pool_registry_export.py`、`tests/test_methods_resource_unified_export.py`、`docs/inquanto_public_parity_matrix.md` 与 [算法面广度索引](docs/算法面广度_InQuanto_Tangelo对照索引.md)。若增加**代表运行配置**，同步 `scripts/check_parity_export_sample.py`、`tests/test_export_parity_golden.py` 参数表，并评估是否加入 `integrations/l3_algorithm_benchmark.py` 的 `L3_PYTEST_YAMLS` / `DEFAULT_BENCHMARK_YAMLS`。HTTP **`GET /v1/meta/capability-surface`** 与 `capability_surface_v1` 顶层键同源（含 **`object_map`**、**`gaps`**、**`mitigation_execution_model`**、**`open_stack_differentiators`**、**`tangelo_public_mapping_alias_surface_v1`**、**`operator_pool_registry_export_v1`**、**`algorithm_registry_export_v1`**、**`variational_registry_export_v1`**），与 `tests/test_api_runs.py::test_capability_surface_matches_inquanto_contract` 对拍。
-- **可选重型门禁**：`QCHEM_RUN_L3=1 pytest -m l3`（`tests/test_l3_benchmark_smoke.py`）。
+- **可选重型门禁**：`QCHEM_RUN_L3=1 ./scripts/venv-run pytest -m l3`（`tests/test_l3_benchmark_smoke.py`）。
 
 ## Dependabot（依赖与 Actions）
 
@@ -98,9 +106,9 @@ After intentional contract changes to `inquanto_gap_categories()`, **`PARITY_EXP
 Requires PySCF (`pip install qchem-stack[chem]`):
 
 ```bash
-python scripts/smoke_pipeline.py
-python scripts/smoke_pipeline.py --iqeb
-python scripts/smoke_pipeline.py --projection-trace
+./scripts/venv-run python scripts/smoke_pipeline.py
+./scripts/venv-run python scripts/smoke_pipeline.py --iqeb
+./scripts/venv-run python scripts/smoke_pipeline.py --projection-trace
 ```
 
 ## Examples / tutorials

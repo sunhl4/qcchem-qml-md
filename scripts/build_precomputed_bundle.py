@@ -15,6 +15,9 @@ import json
 from pathlib import Path
 from typing import Any
 
+from qchem_stack.config import load_experiment_config
+from qchem_stack.orchestration.precomputed_stage import precomputed_config_fingerprint
+
 
 def _read_json(path: Path) -> dict[str, Any]:
     data = json.loads(path.read_text(encoding="utf-8"))
@@ -82,6 +85,14 @@ def main() -> int:
         default="external_dataset",
         help="driver_meta.upstream_classical_software_tag value (default: external_dataset).",
     )
+    p.add_argument(
+        "--config-yaml",
+        default=None,
+        help=(
+            "Optional ExperimentConfig YAML path; when provided, embed precomputed manifest "
+            "(active space, mapping, symbols, config_fingerprint)."
+        ),
+    )
     args = p.parse_args()
 
     dec_path = Path(args.decomposition_json).resolve()
@@ -89,6 +100,18 @@ def main() -> int:
     payload = _read_json(dec_path)
     n_qubits, terms, source_schema = _extract_terms_from_decomposition_payload(payload)
     mo_energy = _parse_mo_energy(args.mo_energy)
+    manifest: dict[str, Any] | None = None
+    if args.config_yaml:
+        cfg = load_experiment_config(Path(str(args.config_yaml)))
+        manifest = {
+            "schema": "precomputed_manifest_v1",
+            "n_active_orbitals": int(cfg.active_space.n_active_orbitals),
+            "n_active_electrons": int(cfg.active_space.n_active_electrons),
+            "fermion_qubit_mapping": str(cfg.active_space.fermion_qubit_mapping),
+            "n_qubits": int(n_qubits),
+            "molecule_symbols": [str(x) for x in cfg.molecule.symbols],
+            "config_fingerprint": precomputed_config_fingerprint(cfg),
+        }
 
     bundle = {
         "schema": "classical_reference_bundle_v1",
@@ -113,9 +136,13 @@ def main() -> int:
             },
         },
     }
+    if manifest is not None:
+        bundle["manifest"] = manifest
 
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    tmp_path = out_path.with_suffix(out_path.suffix + ".tmp")
+    tmp_path.write_text(json.dumps(bundle, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    tmp_path.replace(out_path)
     print(f"[ok] wrote bundle: {out_path}")
     return 0
 

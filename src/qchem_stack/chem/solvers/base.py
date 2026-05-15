@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
 import numpy as np
 
+from qchem_stack.chem.bridges.mean_field_like import MeanFieldLike
 from qchem_stack.config import ExperimentConfig
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 @dataclass(frozen=True)
@@ -44,7 +48,7 @@ class SolverCapabilities:
 class MolecularMeanFieldResult:
     """Converged (or prepared) mean-field container used by drivers and pipeline."""
 
-    mf: Any
+    mf: MeanFieldLike | Any
     e_tot: float
     mo_energy: np.ndarray
     driver_meta: dict[str, Any] = field(default_factory=dict)
@@ -85,3 +89,11 @@ class ChemIntegralSolver(Protocol):
         Backends that do not implement this are expected to raise ``NotImplementedError`` and
         keep :attr:`SolverCapabilities.supports_get_integrals` as ``False``.
         """
+
+    def build_embedding_input_system(
+        self,
+        reference: ClassicalMeanFieldReference,
+        *,
+        representation: str,
+    ) -> dict[str, Any]:
+        """Optional embedding-input export hook for AO/Lowdin representations."""

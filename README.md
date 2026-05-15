@@ -63,10 +63,10 @@ P1 **backend / mapping conformance** (needs PySCF; Qiskit optional): `pytest tes
 
 ### Optional HTTP API (`fastapi`)
 
-With `pip install -e ".[dev]"` or `pip install -e ".[api]"`, run:
+With local pinned venv runner, run:
 
 ```bash
-uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
+./scripts/venv-run uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 ```
 
 `GET /health` is a cheap liveness check; **`GET /health/ready`** pings the default SQLite job path. **`GET /v1/meta/parity-gaps`** is the gap list; **`GET /v1/meta/capability-surface`** returns **`object_map`**, **`gaps`**, **`mitigation_execution_model`**, **`open_stack_differentiators`**, **`tangelo_public_mapping_alias_surface_v1`** (JW/BK/SCBK aliases vs tutorial names plus JKMN/HCB non-executable disclosures), **`operator_pool_registry_export_v1`** (ADAPT/IQEB pool ids + **`pool_id_aliases`**, parity-export schema where applicable), **`algorithm_registry_export_v1`**, and **`variational_registry_export_v1`**; **`GET /v1/meta/queue-stats`** counts jobs by status; **`POST /v1/meta/computables-preview`** returns InQuanto-style **Computable** items + **`computable_abstract` v2** from YAML alone (no chemistry run). **`GET /v1/runs`** lists jobs (`experiment_id` / **`api_workspace_label`** filters, **`offset`** / **`limit`**). **`GET /v1/runs/{id}/repro`** returns only **`repro` when DONE** (**409** while queued). **`GET /v1/runs/{id}/status`** and **`/events`** are lightweight polls. **`POST /v1/runs`** accepts YAML (`experiment_yaml`, `sync`, optional `job_db_path`, optional **`workspace_label`** → meta); async **202** + **`run_enqueue_response_v1`**; sync **`full_pipeline_job_result_v1`**. POST responses echo **`X-Trace-ID`** / **`X-Request-ID`**. Invalid YAML/config → **400** / **422**. Drain with `qchem-jobs-worker` / **`qchem-pipeline-worker`**. See [docs/ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md) §8–9.
@@ -78,14 +78,20 @@ cd qchem_qml_md
 pip install -e ".[dev]"
 ```
 
+Local development commands in this repository are hard-pinned to:
+
+- `/home/sunhl/projects/qchem_qml_md/.venv/bin/python`
+
+via `./scripts/venv-run ...`.
+
 PySCF, Qiskit, and **pytket** (TKET bridge for resource stats) are optional extras: `pip install -e ".[all]"` includes all declared extras, or `pip install -e ".[pytket]"` alone.
 
 ## Lint and tests (CI parity)
 
 ```bash
-ruff check src/qchem_stack tests scripts examples
-ruff format --check src/qchem_stack tests scripts examples
-pytest tests -q --tb=short
+./scripts/venv-run ruff check src/qchem_stack tests scripts examples
+./scripts/venv-run ruff format --check src/qchem_stack tests scripts examples
+./scripts/venv-run pytest tests -q --tb=short
 ```
 
 Smoke scripts and marker subsets mirror [.github/workflows/ci.yml](.github/workflows/ci.yml) (**`lint`** job runs Ruff; **`test`** is the Python matrix and smoke steps). See [CONTRIBUTING.md](CONTRIBUTING.md) for merge gates, optional markers, and optional **pre-commit** (the `pre-commit` CLI ships with **`pip install -e ".[dev]"`**; same Ruff paths as CI).

@@ -2,7 +2,11 @@ from qchem_stack.backends.executor_base import (
     HamiltonianExpectationExecutor,
     StatevectorHeaExecutor,
 )
-from qchem_stack.backends.factory import executor_from_spec
+from qchem_stack.backends.factory import (
+    executor_from_spec,
+    register_backend_provider,
+    registered_backend_provider_ids,
+)
 from qchem_stack.backends.ionstack_executor import IonStackHeaExecutor
 from qchem_stack.backends.pauli_grouping import (
     PauliMeasurementPlan,
@@ -42,6 +46,8 @@ __all__ = [
     "HamiltonianExpectationExecutor",
     "StatevectorHeaExecutor",
     "executor_from_spec",
+    "register_backend_provider",
+    "registered_backend_provider_ids",
     "QiskitStatevectorHeaExecutor",
     "QiskitPrimitivesHeaExecutor",
     "IonStackHeaExecutor",

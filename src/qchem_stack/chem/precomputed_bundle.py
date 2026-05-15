@@ -20,6 +20,7 @@ from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
 
 CLASSICAL_REFERENCE_BUNDLE_V1 = "classical_reference_bundle_v1"
 PRE_QUANTUM_INPUT_SCHEMA_V1 = "pre_quantum_input_v1"
+PRECOMPUTED_MANIFEST_SCHEMA_V1 = "precomputed_manifest_v1"
 
 
 def resolve_bundle_path(raw_path: str, *, cfg_path: Path | None = None) -> Path:
@@ -89,6 +90,14 @@ def qubit_hamiltonian_from_bundle(
     cfg_path: Path | None = None,
 ) -> QubitHamiltonian:
     path, data = load_bundle_dict(raw_path, cfg_path=cfg_path)
+    return qubit_hamiltonian_from_bundle_payload(data, path=path)
+
+
+def qubit_hamiltonian_from_bundle_payload(
+    data: dict[str, Any],
+    *,
+    path: Path,
+) -> QubitHamiltonian:
     pqi = data.get("pre_quantum_input")
     if not isinstance(pqi, dict):
         raise ValueError("bundle.pre_quantum_input must be an object.")
@@ -141,6 +150,54 @@ def qubit_hamiltonian_from_bundle(
         fermion_space=None,
         meta=qh_meta,
     )
+
+
+def parse_precomputed_manifest(data: dict[str, Any]) -> dict[str, Any] | None:
+    """Return validated optional precomputed manifest payload."""
+    raw = data.get("manifest")
+    if raw is None:
+        return None
+    if not isinstance(raw, dict):
+        raise ValueError("bundle.manifest must be an object when present.")
+    schema = str(raw.get("schema") or "")
+    if schema and schema != PRECOMPUTED_MANIFEST_SCHEMA_V1:
+        raise ValueError(
+            f"bundle.manifest.schema must be {PRECOMPUTED_MANIFEST_SCHEMA_V1!r} when provided "
+            f"(got {schema!r})."
+        )
+    out: dict[str, Any] = {"schema": PRECOMPUTED_MANIFEST_SCHEMA_V1}
+    if "config_fingerprint" in raw and raw["config_fingerprint"] is not None:
+        out["config_fingerprint"] = str(raw["config_fingerprint"])
+    if "n_active_orbitals" in raw and raw["n_active_orbitals"] is not None:
+        n_orb = int(raw["n_active_orbitals"])
+        if n_orb < 1:
+            raise ValueError("bundle.manifest.n_active_orbitals must be >= 1.")
+        out["n_active_orbitals"] = n_orb
+    if "n_active_electrons" in raw and raw["n_active_electrons"] is not None:
+        n_ele = int(raw["n_active_electrons"])
+        if n_ele < 1:
+            raise ValueError("bundle.manifest.n_active_electrons must be >= 1.")
+        out["n_active_electrons"] = n_ele
+    if "fermion_qubit_mapping" in raw and raw["fermion_qubit_mapping"] is not None:
+        map_name = str(raw["fermion_qubit_mapping"]).strip().lower()
+        if not map_name:
+            raise ValueError(
+                "bundle.manifest.fermion_qubit_mapping must be non-empty when present."
+            )
+        out["fermion_qubit_mapping"] = map_name
+    if "n_qubits" in raw and raw["n_qubits"] is not None:
+        nq = int(raw["n_qubits"])
+        if nq < 1:
+            raise ValueError("bundle.manifest.n_qubits must be >= 1.")
+        out["n_qubits"] = nq
+    if "molecule_symbols" in raw and raw["molecule_symbols"] is not None:
+        symbols_raw = raw["molecule_symbols"]
+        if not isinstance(symbols_raw, list) or not symbols_raw:
+            raise ValueError(
+                "bundle.manifest.molecule_symbols must be a non-empty list when present."
+            )
+        out["molecule_symbols"] = [str(x) for x in symbols_raw]
+    return out
 
 
 _INDEXED_LABEL_TOKEN = re.compile(r"^([XYZ])(\d+)$")

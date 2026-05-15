@@ -9,6 +9,7 @@ from qchem_stack.chem.precomputed_bundle import (
     CLASSICAL_REFERENCE_BUNDLE_V1,
     load_bundle_dict,
     molecular_mean_field_result_from_bundle,
+    parse_precomputed_manifest,
     qubit_hamiltonian_from_bundle,
 )
 
@@ -73,3 +74,36 @@ def test_qubit_hamiltonian_from_bundle_indexed_labels(tmp_path: Path) -> None:
     qh = qubit_hamiltonian_from_bundle(str(p))
     assert qh.n_qubits == 2
     assert len(qh.operator.terms) == 2
+
+
+def test_parse_precomputed_manifest_validates_fields(tmp_path: Path) -> None:
+    p = tmp_path / "bundle_with_manifest.json"
+    payload = {
+        "schema": CLASSICAL_REFERENCE_BUNDLE_V1,
+        "manifest": {
+            "schema": "precomputed_manifest_v1",
+            "n_active_orbitals": 2,
+            "n_active_electrons": 2,
+            "fermion_qubit_mapping": "jordan_wigner",
+            "n_qubits": 2,
+            "molecule_symbols": ["H", "H"],
+        },
+        "classical_reference": {
+            "e_tot": -1.0,
+            "mo_energy": [-0.5, 0.2],
+        },
+        "pre_quantum_input": {
+            "qubit_hamiltonian": {
+                "n_qubits": 2,
+                "terms": [
+                    {"label": "I", "coeff": -1.0},
+                ],
+            },
+        },
+    }
+    p.write_text(json.dumps(payload), encoding="utf-8")
+    _, data = load_bundle_dict(str(p))
+    manifest = parse_precomputed_manifest(data)
+    assert manifest is not None
+    assert manifest["n_active_orbitals"] == 2
+    assert manifest["fermion_qubit_mapping"] == "jordan_wigner"
