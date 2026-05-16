@@ -1,6 +1,6 @@
 """Restricted closed-shell active-space objects for variational quantum workflows.
 
-Analogous to InQuanto-PySCF ``get_system()``-style tuples:
+Analogous to PySCF ``get_system()``-style tuples:
 :class:`~qchem_stack.chem.restricted_integral_operator.RestrictedActiveSpaceIntegralOperatorCompact`
 (PySCF-compact MO ERIs + pandas ``df`` hooks),
 :class:`openfermion.InteractionOperator`, :class:`~qchem_stack.chem.fermion.FermionSpace`,

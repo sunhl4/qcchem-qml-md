@@ -1,7 +1,7 @@
 """
-Open reference: **driver / solvent / PBC** surface vs InQuanto marketing names.
+Open reference **driver / solvent / PBC** surface with parity-matrix-facing labels.
 
-Maps what this repository actually calls in PySCF — not a closed-source driver clone.
+Maps what this repository actually wires through PySCF — not a closed vendor driver clone.
 """
 
 from __future__ import annotations
@@ -16,17 +16,17 @@ def open_driver_coverage_matrix() -> dict[str, Any]:
         "stack": "qchem_stack.chem.drivers.pyscf_driver",
         "rows": [
             {
-                "inquanto_adjacent_name": "gas-phase RHF/UHF/ROHF",
+                "parity_matrix_row_label": "gas-phase RHF/UHF/ROHF",
                 "status": "yes_pyscf",
                 "implementation": "PySCFDriver.run_rhf / run_uhf / run_rohf",
             },
             {
-                "inquanto_adjacent_name": "ddCOSMO / implicit solvent",
+                "parity_matrix_row_label": "ddCOSMO / implicit solvent",
                 "status": "partial_ddCOSMO",
                 "implementation": "ChemistryExtendedSpec.solvent_model == ddcosmo → pyscf.solvent.ddCOSMO",
             },
             {
-                "inquanto_adjacent_name": "PBC / k-point mesh",
+                "parity_matrix_row_label": "PBC / k-point mesh",
                 "status": "partial_kmesh",
                 "implementation": (
                     "chemistry_extended.pbc_cell_vectors_bohr + pbc_kpoint_mesh; "
@@ -34,17 +34,17 @@ def open_driver_coverage_matrix() -> dict[str, Any]:
                 ),
             },
             {
-                "inquanto_adjacent_name": "Full COSMO/PBC feature parity with InQuanto drivers",
+                "parity_matrix_row_label": "Full COSMO/PBC feature parity with closed vendor drivers",
                 "status": "not_claimed",
                 "note": "Use PySCF ecosystem + explicit benchmarks; no vendor binary.",
             },
             {
-                "inquanto_adjacent_name": "AVAS / full CASSCF product workflows (Fe4N2-style tutorials)",
+                "parity_matrix_row_label": "AVAS / full CASSCF product workflows (Fe4N2-style tutorials)",
                 "status": "not_claimed",
                 "note": "No AVAS driver; CASCI-sized active integrals only where documented (projection path).",
             },
             {
-                "inquanto_adjacent_name": "CASSCF orbital optimization loop (InQuanto-pyscf class surface)",
+                "parity_matrix_row_label": "CASSCF orbital optimization loop (vendor PySCF extension class surface)",
                 "status": "not_claimed",
                 "note": "classical_reference_method and matrix rows are documentation hooks unless PySCF CASCI-only path applies.",
             },

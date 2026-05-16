@@ -16,7 +16,11 @@ if TYPE_CHECKING:
     from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
 
 
-def load_experiment_config(path: str | Path) -> ExperimentConfig:
+def load_experiment_config(
+    path: str | Path,
+    *,
+    strict_top_level_keys: bool = False,
+) -> ExperimentConfig:
     p = Path(path)
     try:
         text = p.read_text(encoding="utf-8")
@@ -30,7 +34,11 @@ def load_experiment_config(path: str | Path) -> ExperimentConfig:
         raise ConfigurationError(f"Invalid YAML in {p}: {exc}") from exc
     if not isinstance(raw, Mapping):
         raise ConfigurationError(f"Config must be a mapping: {p}")
-    return ExperimentConfig.from_yaml_dict(raw, geometry_files_base_dir=p.parent)
+    return ExperimentConfig.from_yaml_dict(
+        raw,
+        geometry_files_base_dir=p.parent,
+        strict_top_level_keys=strict_top_level_keys,
+    )
 
 
 def _strip_callables(obj: object) -> object:

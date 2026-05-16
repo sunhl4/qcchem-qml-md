@@ -68,8 +68,8 @@ def run_pyscf_nevpt2_casci_correction(
     """
     Strongly-contracted NEVPT2 correlation energy from PySCF ``mrpt.NEVPT`` on a **CASCI** reference.
 
-    This is an **open-stack numerical hook** (Phase 3): not claimed equivalent to InQuanto-closed
-    ``inquanto-pyscf`` kernels or AC0-style workflows.
+    This is an **open-stack numerical hook** (Phase 3): not claimed equivalent to closed vendor
+    PySCF extension kernels or AC0-style workflows.
     """
     ref = rhf
     if ref.backend_tag() != "pyscf":
@@ -103,7 +103,7 @@ def run_pyscf_nevpt2_casci_correction(
             "pyscf_nevpt2": {"status": "ok", "pyscf_entrypoint": "mrpt.NEVPT(CASCI(...))"},
             "note": (
                 "PySCF mrpt.NEVPT correlation increment relative to the CASCI reference; "
-                "open-stack hook — not InQuanto-binary equivalent."
+                "open-stack hook — not vendor-binary equivalent."
             ),
         }
     except Exception as e:  # noqa: BLE001

@@ -12,7 +12,7 @@
 2. 引入 NEVPT2/AC0 风格的校正插件接口（先做占位与数据流，后做数值细化）。
 3. 在 parity 报告中新增「RDM correction readiness」维度。
 
-**收益**：形成与 InQuanto 思路接近的「量子测量 + 经典高阶校正」能力链。
+**收益**：形成与 Vendor platform 思路接近的「量子测量 + 经典高阶校正」能力链。
 
 ---
 

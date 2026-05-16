@@ -19,7 +19,7 @@ def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig)
     snap["open_stack_contract_schema"] = "parity_open_stack_contract_v1"
     snap["open_stack_design_intent"] = (
         "Engineered open paths where vendor code is closed: keep the same workflow *stages* and "
-        "auditable artifacts described in public InQuanto docs. Implementations use peer-reviewed "
+        "auditable artifacts described in public vendor documentation. Implementations use peer-reviewed "
         "building blocks or explicit user hooks (DMET bath updates, UCC regrouping, TN topology)."
     )
     snap["tket_closure_layer_descriptor"] = describe_tket_closure_layer()

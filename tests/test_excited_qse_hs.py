@@ -84,8 +84,8 @@ def test_vqd_second_energy_finite() -> None:
     td = r.meta.get("tangelo_deflation_analogy_v1")
     assert isinstance(td, dict) and td.get("schema") == "tangelo_deflation_analogy_v1"
     assert td.get("selected_overlap_mode") == "statevector_overlap"
-    iq = r.meta.get("inquanto_vqd_semantics_v1")
-    assert isinstance(iq, dict) and iq.get("schema") == "inquanto_vqd_semantics_v1"
+    iq = r.meta.get("vqd_cross_stack_semantics_v1")
+    assert isinstance(iq, dict) and iq.get("schema") == "vqd_cross_stack_semantics_v1"
     assert r.meta.get("vqd_overlap_mode_yaml") == "statevector_overlap"
     assert r.meta.get("vqd_variety_yaml") == "hea"
 

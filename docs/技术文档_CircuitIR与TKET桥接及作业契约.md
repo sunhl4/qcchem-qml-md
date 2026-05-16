@@ -1,6 +1,6 @@
 # 技术文档：`CircuitIR`、TKET 桥接与异步作业契约
 
-**版本**：与 `qchem-stack` 源码同步；依据为仓库实现与 [InQuanto 公开文档](https://docs.quantinuum.com/inquanto/) 的概念对照，**不**声称与闭源 InQuanto 或 Nexus 二进制 API 兼容。
+**版本**：与 `qchem-stack` 源码同步；依据为仓库实现与 [Vendor platform 公开文档](https://www.quantinuum.com/) 的概念对照，**不**声称与闭源 Vendor platform 或 Nexus 二进制 API 兼容。
 
 **读者**：维护者、需要做 Methods 级对标的合作者、写论文补充材料时需要说明「资源数字从哪来」的作者。
 
@@ -43,7 +43,7 @@
 - **自研**（[`spec.py`](../src/qchem_stack/backends/spec.py)）：`_depth_estimate` 按门在 qubit 上的层推进；`_twoq_gate_count` 统计名称属于集合 `CX|CNOT|ZZ|ZZPhase|MS|CP` 等。`ANNOTATION` 若带 `qubits` 可能仍影响层数（取决于实现细节）；**与 pytket 不完全同构**。
 - **pytket**：跳过 `ANNOTATION` / `PAULI_GROUP` 后建图，故 `pytket_depth` 可与表内 `depth` **不同**（演示中常见：`pytket_depth` 更小，因忽略 ANNOTATION 推层）。
 
-**论文建议**：同时报告「编排器自研行」与「TKET 行」（若安装），并在补充材料写清：前者用于与历史 `qchem_stack` 结果一致，后者用于与 **TKET/InQuanto 文档** 叙事对齐。
+**论文建议**：同时报告「编排器自研行」与「TKET 行」（若安装），并在补充材料写清：前者用于与历史 `qchem_stack` 结果一致，后者用于与 **TKET/Vendor platform 文档** 叙事对齐。
 
 ---
 
@@ -115,7 +115,7 @@ sequenceDiagram
 
 | 文档 | 内容 |
 |------|------|
-| [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) | 公开能力 vs 本包 |
+| [public_parity_matrix.md](public_parity_matrix.md) | 公开能力 vs 本包 |
 | [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md) | 路线图与判据落点 |
 | [launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) | Nexus 语义类比短表 |
 | [README.md](../../README.md)（仓库根） | 安装、YAML 入口与四柱导航 |

@@ -24,7 +24,7 @@ class ActiveSpaceSpec(BaseModel):
       threshold projection. Honesty metadata is written by
       :func:`~qchem_stack.chem.active_space.mean_field_meta.apply_active_space_strategy_to_mean_field_meta`
       (e.g. ``avas_partial_stub``, ``avas_atomic_projection_executed``, ``avas_stub_semantics``).
-      Does **not** build InQuanto/PySCF-style ``frozen=avas.frozenf`` from atomic valence weights.
+      Does **not** build vendor/PySCF-style ``frozen=avas.frozenf`` from atomic valence weights.
     - ``avas``: **PySCF path** — run :class:`pyscf.mcscf.avas.AVAS` threshold projection using
       ``chemistry_extended.avas_ao_labels`` and related AVAS knobs, rotate ``mf.mo_coeff``, then
       patch YAML-sized ``ncas`` / ``nelecas`` via ``driver_meta.qchem_active_space_resolution_v1``

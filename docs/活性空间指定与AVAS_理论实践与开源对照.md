@@ -1,8 +1,8 @@
-# 活性空间指定与 AVAS：理论、公式推导与工程实践（InQuanto 教程对照）
+# 活性空间指定与 AVAS：理论、公式推导与工程实践（Vendor platform 教程对照）
 
 > **行文约定：**行内公式用单美元 `$...$`；行间独立公式块用双美元 `$$...$$`。
 
-本文从**二次量子化与能量划分**出发，系统说明 **为何要截断 Hilbert 空间**、如何在 **HF 分子轨道（MO）基**中用 **`frozen` / FromActiveSpace / AVAS`** 选定活性自由度，并结合 **Quantinuum InQuanto‑PySCF 教程范例**给出分子图像解读；末节对照 **`qchem_stack`** 中与活性空间相关的**真实能力与诚实边界**。与 Fock 表占位列的读法可参考：`docs-site/docs/guide/chemistry-and-embedding/second-quantization-fock-hamiltonian-readout.md`（站内 VitePress 镜像）或同路径英文页。
+本文从**二次量子化与能量划分**出发，系统说明 **为何要截断 Hilbert 空间**、如何在 **HF 分子轨道（MO）基**中用 **`frozen` / FromActiveSpace / AVAS`** 选定活性自由度，并结合 **Quantinuum Vendor platform‑PySCF 教程范例**给出分子图像解读；末节对照 **`qchem_stack`** 中与活性空间相关的**真实能力与诚实边界**。与 Fock 表占位列的读法可参考：`docusaurus-site/docs/guide/chemistry-and-embedding.md`（站内 `/guide/chemistry-and-embedding`，含二次量子化读法小节）。
 
 ---
 
@@ -46,14 +46,14 @@ $$
 
 ### 2.1 RHF 行列式作为参考向量
 
-闭壳 HF 给定 **$N_{\mathrm{elec}}/2$ 个占据空间轨道** $\{ \psi_i \}$，每项自旋双倍。其二阶量子化解为 **Vacuum $\lvert \mathrm{vac}\rangle$**，上填入 **occupied 自旋轨道**上的产生算符序列；InQuanto 的 `print_state` 本质是 **所选 `FermionSpace`的一组有序自旋模式**各自 **占据数 $n_p\in\{0,1\}$**。
+闭壳 HF 给定 **$N_{\mathrm{elec}}/2$ 个占据空间轨道** $\{ \psi_i \}$，每项自旋双倍。其二阶量子化解为 **Vacuum $\lvert \mathrm{vac}\rangle$**，上填入 **occupied 自旋轨道**上的产生算符序列；Vendor platform 的 `print_state` 本质是 **所选 `FermionSpace`的一组有序自旋模式**各自 **占据数 $n_p\in\{0,1\}$**。
 
 教程中 **H₂O / 6‑31G** 第一幅长表：**10 对（20 电子）在低能 MO 填满**，对应 **$N=10$ 闭壳**。后续 **截断活性后**仅剩 **8 条「模式」**：即 **CAS(4 e , 4 o)** 在自旋轨道上 **4 空间 ×2 自旋 = 8 费米模式**，其中仍有 **四个电子**：占据图显示 **`1,1,1,1,0,0,0,0`**（与教程一致）。
 
 阅读要点：
 
 - **`a/b`**：自旋 $\alpha/\beta$ 成对出现于同一 **空间轨道指标**上。
-- 截断前后 **序号重排**：InQuanto 在构造约化 `FermionSpace`** 时对模式重新枚举**；不要盲目把「缩减表里的序号」与原始全 HF 序号混用——除非对照 driver 源码或显式 orbital map。
+- 截断前后 **序号重排**：Vendor platform 在构造约化 `FermionSpace`** 时对模式重新枚举**；不要盲目把「缩减表里的序号」与原始全 HF 序号混用——除非对照 driver 源码或显式 orbital map。
 
 与本仓库：**费米空间中模式顺序**必须与 **`InteractionOperator` / JW 向量维度**一致；若在 pipeline 外用别的排序，会破坏与 `hartree_fock_state_jw` 的对齐。
 
@@ -133,7 +133,7 @@ $$
 \hat{P}_{\mathcal{S}}|\psi_J\rangle
 $$
 
-是 **$|\psi_J\rangle$「只保留能落在 $\mathcal{S}$‑成分上的那一部分』**。实现上可选用 **加权 Mulliken‑型人口**、**IAO/极小基嵌入**或对 $S_{\mathcal{S}}$ **广义本征**，细节以 PySCF / InQuanto 所用例程为准。
+是 **$|\psi_J\rangle$「只保留能落在 $\mathcal{S}$‑成分上的那一部分』**。实现上可选用 **加权 Mulliken‑型人口**、**IAO/极小基嵌入**或对 $S_{\mathcal{S}}$ **广义本征**，细节以 PySCF / Vendor platform 所用例程为准。
 
 **关键点**：$\mathcal{S}$ 不是「整条 HF MO」，而是事先选好的 **原子价层 AO（或其线性张成）**，保证化学标签 $\mathcal{L}$ → 几何与子空间对齐。
 
@@ -167,7 +167,7 @@ AVAS **分岔处理**：
 
 #### 步 4 · **`avas.frozenf` 是什么？**
 
-在完成上面分类之后，驱动器生成 **`frozen`** 一列 **MO 序号**：即 **永远不进入活性 CAS/Fock 自由度**的那些轨道。**`frozen` 等价于前文「整块移出相关性」**。InQuanto 把该列表暴露在 **`avas.frozenf`**，供构造函数 **`frozen=avas.frozenf`** 直接使用。
+在完成上面分类之后，驱动器生成 **`frozen`** 一列 **MO 序号**：即 **永远不进入活性 CAS/Fock 自由度**的那些轨道。**`frozen` 等价于前文「整块移出相关性」**。Vendor platform 把该列表暴露在 **`avas.frozenf`**，供构造函数 **`frozen=avas.frozenf`** 直接使用。
 
 ---
 
@@ -219,9 +219,9 @@ AVAS **分岔处理**：
 
 ## 6. **`qchem_stack` 对齐与已知局限**
 
-本节据 **`ActiveSpaceSpec`、**`chem.active_space.mean_field_meta`**、**`inquanto_driver_surface`、CASCI glue**写成；随代码演进请以 **`src/qchem_stack/chem/active_space/`、`config.py`、`pyscf_driver.py`** 为准。
+本节据 **`ActiveSpaceSpec`、**`chem.active_space.mean_field_meta`**、`chem/drivers/pyscf_driver.py`、`integrations/open_driver_surface`、CASCI glue**写成；随代码演进请以 **`src/qchem_stack/chem/active_space/`、`config.py`、`pyscf_driver.py`** 为准。
 
-| InQuanto 教程概念 | **`qchem_stack` 近似 / 等价** |
+| Vendor platform 教程概念 | **`qchem_stack` 近似 / 等价** |
 |-------------------|------------------------------|
 | `frozen=[…]` 驱动级改变活性 MO 集合 | **`active_space.strategy=manual`** + **`frozen_orbitals`** 当前 **记入 `driver_meta` / recipe**（`pipeline._run_scf`），**不等价于自动重排 **`mo_coeff`**；默认 **`active_space_casci_raw_blocks`** 仍按 **PySCF `CASCI` 与传入 MO 次序**截取——需非连续 frozen 时请 **自行置换 MO 列**或走 **embedding/projection** 路径。 |
 | `FromActiveSpace` | **`strategy=cas`** + **`ncas` / `nelecas`**（或 legacy `n_active_*`）；对应 **CAS(n e , n o)** **尺寸**。 |
@@ -229,13 +229,13 @@ AVAS **分岔处理**：
 | **`AVAS` stub（parity 钩子，无阈值投影）** | **`strategy=avas_stub`**（CAS 同款 **`ncas`/`nelecas`**）；**meta**：`avas_partial_stub`、`avas_atomic_projection_executed=false`、`avas_stub_semantics`。**`avas_ao_labels`** 在非 **`strategy=avas`** 下仍为 **仅日志**。 |
 | `get_restricted_active_space_quantum_problem`（量子哈密顿流水线） | 提供 **`RestrictedActiveSpaceQuantumProblem`**：**紧凑 MO 积分、`InteractionOperator`、费米/qubit哈密顿**。 |
 
-嵌入路径 **`projection_hamiltonian`** 另有一套 **fragment Mulliken 排序 + CASCI**：属于 **局域片段「选轨」**，与 InQuanto‑driver‑级 **全局 frozen 列表语义**不同层级。
+嵌入路径 **`projection_hamiltonian`** 另有一套 **fragment Mulliken 排序 + CASCI**：属于 **局域片段「选轨」**，与 Vendor platform‑driver‑级 **全局 frozen 列表语义**不同层级。
 
 ### 诚实边界（避免误用）
 
-- **`strategy=avas`**：**阈值投影选轨 + 回填活性空间尺寸**已由 PySCF 路径接入（见上表）；**不构成**「与 InQuanto **闭源产品 driver** 全流程」的二进制/L0 等价。**`frozen=avas.frozenf` 风格的自动 frozen 列表**若以独立元数据字段暴露，仍为 roadmap（当前以 **`qchem_active_space_resolution_v1`** 收敛尺寸为主）。  
+- **`strategy=avas`**：**阈值投影选轨 + 回填活性空间尺寸**已由 PySCF 路径接入（见上表）；**不构成**「与 Vendor platform **闭源产品 driver** 全流程」的二进制/L0 等价。**`frozen=avas.frozenf` 风格的自动 frozen 列表**若以独立元数据字段暴露，仍为 roadmap（当前以 **`qchem_active_space_resolution_v1`** 收敛尺寸为主）。  
 - **`strategy=avas_stub`**：仍为 **钩子 / 诚实 partial**，不改变 MO。
-- 若你只设 **`frozen_orbitals`** 但未改 **MO ordering**，CASCI **`get_h1eff`**拿到的 **不一定是**你想要的那个化学 active block——应 **自检 PySCF 文档**或通过 **embedding / 自定义 permutation**显式对齐 InQuanto 教程。
+- 若你只设 **`frozen_orbitals`** 但未改 **MO ordering**，CASCI **`get_h1eff`**拿到的 **不一定是**你想要的那个化学 active block——应 **自检 PySCF 文档**或通过 **embedding / 自定义 permutation**显式对齐 Vendor platform 教程。
 
 ---
 
@@ -243,8 +243,8 @@ AVAS **分岔处理**：
 
 | 材料 |
 |------|
-| InQuanto 官方 extensions API：`AVAS`、`FromActiveSpace`、`ChemistryDriverPySCFMolecularRHF` |
+| Vendor platform 官方 extensions API：`AVAS`、`FromActiveSpace`、`ChemistryDriverPySCFMolecularRHF` |
 | PySCF：`mcscf.CASCI`、`Mcscf.fast_newton_casscf`‑族、内建 **`avas`**‑辅助（具体API以 PySCF 版本为准） |
 | AVAS / 极小活性空间自动生成：以 **PySCF `mcscf.avas`** 及各版本说明书中的文献引用为准 |
 
-仓库内：**《[技术分析_InQuanto_PySCF_vs_原生PySCF\_及工程借鉴](./技术分析_InQuanto_PySCF_vs_原生PySCF_及工程借鉴.md)》§ 3.5**；parity 综述 **engineering_memory／public matrix** **`AVAS`** 行。
+仓库内：**《[技术分析_Vendor platform_PySCF_vs_原生PySCF\_及工程借鉴](./技术分析_Vendor platform_PySCF_vs_原生PySCF_及工程借鉴.md)》§ 3.5**；parity 综述 **engineering_memory／public matrix** **`AVAS`** 行。

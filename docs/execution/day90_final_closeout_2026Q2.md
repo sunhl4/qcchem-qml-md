@@ -6,7 +6,7 @@
 
 1. 测试回归：`pytest`（相关子集 + 关键链路）通过。  
 2. parity 抽样：`scripts/check_parity_export_sample.py` 通过。  
-3. 契约一致：`pipeline` / `inquanto_contract` / `export` 新键一致。  
+3. 契约一致：`pipeline` / **`product_contract`**（`product_gap_categories` / export）/ `export` 新键一致。  
 4. 文档一致：执行记录与差距文档口径一致，`partial`/`n/a` 无越界升级。  
 
 ## 本轮关键新增（Day12+）

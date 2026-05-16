@@ -1,6 +1,6 @@
 # 密度拟合、RI‑JK 与 PySCF 中周期性 GDF 方法
 
-本文聚焦 **Gaussian Density Fitting（GDF / 周期 RI‑JK）**的数学结构与 PySCF 实现；**更广义的 PBC 思想、Γ 与 k 点网格、驱动级对照与费米空间的 k 量子数**见姊妹篇《[周期性体系模拟：PBC、布里渊区与 InQuanto/开源驱动对照](./周期性体系模拟_PBC_Brillouin与InQuanto驱动对照.md)》。
+本文聚焦 **Gaussian Density Fitting（GDF / 周期 RI‑JK）**的数学结构与 PySCF 实现；**更广义的 PBC 思想、Γ 与 k 点网格、驱动级对照与费米空间的 k 量子数**见姊妹篇《[周期性体系模拟：PBC、布里渊区与 Vendor platform/开源驱动对照](./周期性体系模拟_PBC_Brillouin与Vendor platform驱动对照.md)》。
 
 ---
 

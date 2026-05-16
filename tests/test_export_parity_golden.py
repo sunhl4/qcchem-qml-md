@@ -66,10 +66,11 @@ def test_export_example_h2_matches_golden_fixture() -> None:
                     continue
                 assert fresh[key].get(sub_k) == sub_v
             continue
-        if key == "inquanto_gap_categories":
+        if key in ("capability_gap_categories",):
             assert isinstance(fresh.get("capability_gap_categories"), list)
             continue
         assert fresh.get(key) == value
+    assert isinstance(fresh.get("capability_gap_categories"), list)
     assert fresh.get("scf_driver") == "pyscf"
     assert isinstance(fresh.get("registered_solvers"), list)
     assert "pyscf" in fresh["registered_solvers"]
@@ -181,7 +182,7 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
     "cfg_rel",
     (
         "configs/example_h2.yaml",
-        "configs/tutorial_inquanto_chain_h2.yaml",
+        "configs/tutorial_chain_h2.yaml",
         "configs/example_h2_excited_smoke.yaml",
         "configs/example_h2_iqeb.yaml",
         "configs/example_h2_adapt_singles_pool.yaml",

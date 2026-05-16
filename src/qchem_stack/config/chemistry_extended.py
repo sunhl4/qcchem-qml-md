@@ -10,7 +10,7 @@ from ._chemistry_extended_validation import validate_pbc_mesh_and_cell
 
 
 class ChemistryExtendedSpec(BaseModel):
-    """Extended driver surface (InQuanto-adjacent names; PySCF where implemented)."""
+    """Extended driver surface (parity-matrix-facing labels; PySCF where implemented)."""
 
     solvent_model: Literal["none", "ddcosmo"] = "none"
     """``ddcosmo``: wrap SCF with :class:`pyscf.solvent.ddCOSMO` before ``kernel``."""
@@ -56,7 +56,7 @@ class ChemistryExtendedSpec(BaseModel):
     """
     Optional post-SCF RDM correction hook (Phase C / Phase 3).
     ``stub_*``: machine-readable reports only (zero numerical correction).
-    ``pyscf_nevpt2_casci``: PySCF ``mrpt.NEVPT`` on a CASCI reference (open stack — not InQuanto L0).
+    ``pyscf_nevpt2_casci``: PySCF ``mrpt.NEVPT`` on a CASCI reference (open stack — not vendor L0).
     """
     avas_ao_labels: list[str] = Field(default_factory=list)
     """
@@ -88,7 +88,7 @@ class ChemistryExtendedSpec(BaseModel):
 
     This can reduce **classical** integral / SCF cost when symmetry applies. The bridge to OpenFermion for the
     quantum stage still materializes **dense** active-space tensors — there is **no** drop-in equivalent to
-    InQuanto ``ChemistryRestrictedIntegralOperatorCompact`` in this repository yet.
+    vendor ``ChemistryRestrictedIntegralOperatorCompact`` in this repository yet.
     """
     mo_coeff_transform_hook: str = ""
     """

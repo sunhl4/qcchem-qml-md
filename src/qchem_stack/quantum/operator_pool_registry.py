@@ -256,7 +256,7 @@ def operator_pool_registry_export_v1() -> dict[str, Any]:
         "pools": pools,
         "adapt_pool_yaml_field": "quantum.adapt_pool_id",
         "iqeb_pool_yaml_field": "quantum.iqeb_pool_id",
-        "inquanto_alignment_note": (
+        "export_alignment_note": (
             "Open pools are JW (default slices) plus explicit **BK** spin-UCCSD pools "
             "(`fermionic_uccsd_bravyi_kitaev`, singles/doubles slices, concatenated id). "
             "Aliases (`uccsd_jw`, `uccsd_singles`, `uccsd_doubles_only`, "

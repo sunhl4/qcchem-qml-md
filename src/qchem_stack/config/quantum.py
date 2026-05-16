@@ -53,7 +53,7 @@ class ComputableGraphEdgeRemove(BaseModel):
 
 
 class QuantumSpec(BaseModel):
-    """Quantum stage after PySCF + qubit Hamiltonian (InQuanto-style chain).
+    """Quantum stage after PySCF + qubit Hamiltonian (instantiate/build/run/evaluate chain).
 
     Fermion→qubit mapping is selected on :class:`ActiveSpaceSpec` as ``fermion_qubit_mapping``.
     """

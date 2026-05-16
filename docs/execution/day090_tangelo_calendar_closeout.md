@@ -6,8 +6,8 @@
 
 1. **pytest**：相关子集随 PR；季度节点建议全量。
 2. **`python scripts/check_parity_export_sample.py`**：抽样 YAML → export / contract 一致性。
-3. **`inquanto_contract` / export / `RUN_SUMMARY_DOCUMENTED_KEYS`**：同源键注册。
-4. **`docs/` 与 `docs-site/`**：入口互链抽检。
+3. **`product_contract`（`product_gap_categories` / export）** / export / **`RUN_SUMMARY_DOCUMENTED_KEYS`**：同源键注册。
+4. **`docs/` 与 `docusaurus-site/`**：入口互链抽检。
 5. **新能力**：对应 **示例 YAML + 最小测试**。
 
 ## 主线交付对照
@@ -28,7 +28,7 @@
 
 - **三条用户路径**：见仓库根 [`examples/README.md`](../../examples/README.md)（教程脚本 / YAML 管线 / `md_bridge`）。
 - **QMEF trainer smoke**：`tests/test_qmef_trainer_smoke.py`（`StubTorchMLIPTrainer`）。
-- **契约稳定**：上述闸门 + `docs/inquanto_public_parity_matrix.md` 矩阵行更新（mitigation、经典化学 embedding）。
+- **契约稳定**：上述闸门 + `docs/public_parity_matrix.md` 矩阵行更新（mitigation、经典化学 embedding）。
 
 ## _residual / 下一季度指针
 

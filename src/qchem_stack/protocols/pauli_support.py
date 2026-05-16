@@ -1,7 +1,7 @@
 """
 Pauli support sets and strict ``evaluate``-compatibility checks.
 
-InQuanto-style protocols can reuse shot data only when a new observable lies in the
+Evaluate-stage protocols can reuse shot data only when a new observable lies in the
 **measurement plan support** (see public docs on ``evaluate_expectation_value``). This
 module implements a conservative **set-containment** criterion: every required Pauli string
 must have been in the set measured (same canonical string encoding). It does *not* attempt
@@ -70,7 +70,7 @@ def assert_evaluate_compatible(measured_support: set[str], required_paulis: set[
     """
     Raise ``ValueError`` if any ``required_paulis`` string was not in ``measured_support``.
 
-    This encodes the strict "no free lunch" case from InQuanto-style evaluate docs:
+    This encodes the strict "no free lunch" case from public evaluate-stage documentation:
     you cannot obtain an expectation for a Pauli that was never measured (in this
     conservative encoding).
     """

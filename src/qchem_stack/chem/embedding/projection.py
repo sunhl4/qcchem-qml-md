@@ -11,7 +11,7 @@ then Jordan–Wigner.
 in electronic structure texts; the implementation stays on public PySCF APIs only.
 
 **Epistemic boundary**: this stack does **not** implement full many-body projection embedding of the
-environment wavefunction onto an active space, nor claim parity with proprietary InQuanto–PySCF extensions.
+environment wavefunction onto an active space, nor claim parity with proprietary vendor PySCF extensions.
 """
 
 from __future__ import annotations

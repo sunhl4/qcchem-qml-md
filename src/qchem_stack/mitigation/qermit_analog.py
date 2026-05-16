@@ -1,7 +1,7 @@
 """
 Qermit *style* mitigation **DAG** report (open stack — not Quantinuum Qermit).
 
-InQuanto describes :mod:`Qermit` task graphs; we emit nodes + edges + a topological
+Vendor documentation describes :mod:`Qermit` task graphs; we emit nodes + edges + a topological
 walk order for auditability (no closed-source Qermit execution).
 """
 

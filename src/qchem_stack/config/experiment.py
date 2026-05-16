@@ -64,8 +64,13 @@ class ExperimentConfig(BaseModel):
         data: Mapping[str, Any],
         *,
         geometry_files_base_dir: Path | str | None = None,
+        strict_top_level_keys: bool = False,
     ) -> ExperimentConfig:
-        top_level = preprocess_top_level_yaml_dict(data, known_fields=set(cls.model_fields))
+        top_level = preprocess_top_level_yaml_dict(
+            data,
+            known_fields=set(cls.model_fields),
+            strict_unknown_top_level=strict_top_level_keys,
+        )
         if geometry_files_base_dir is not None:
             preprocess_experiment_dict_geometry_files(
                 top_level, base_dir=Path(geometry_files_base_dir)

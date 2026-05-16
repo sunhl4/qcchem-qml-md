@@ -1,7 +1,7 @@
 """
 Strategy map for **tensor-network expectation** vs statevector — open “closure” around the stub.
 
-InQuanto ``inquanto-cutensornet`` binds vendor GPU paths; we keep **contract-level** switches
+Vendor CuTensorNet-style stacks bind proprietary GPU paths; we keep **contract-level** switches
 that point to :mod:`qchem_stack.tensornet.cutensornet_protocol_stub` and future engines.
 """
 
@@ -32,6 +32,6 @@ def tensornet_closure_strategy() -> dict[str, Any]:
         "stub_entrypoint": "qchem_stack.tensornet.cutensornet_protocol_stub.run_cutensornet_expectation_stub",
         "cross_check_note": (
             "Small systems: compare SV energy to stub/opt_einsum demo; "
-            "full chemistry hypergraph → TN is user-defined (no InQuanto graph clone)."
+            "full chemistry hypergraph → TN is user-defined (no vendor hypergraph clone)."
         ),
     }

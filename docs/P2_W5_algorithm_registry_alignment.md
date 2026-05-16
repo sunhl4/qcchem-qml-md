@@ -1,4 +1,4 @@
-# P2-W5：公开算法 / ansatz / 映射 — 机读 registry 对照（Tangelo / InQuanto 叙事）
+# P2-W5：公开算法 / ansatz / 映射 — 机读 registry 对照（Tangelo / Vendor platform 叙事）
 
 **角色**：把「研究包里常见的算法名」钉到本仓 **registry 模块**与 **parity 矩阵 §2**，避免口头对齐。不声称与闭源类名 L0 同构。
 
@@ -11,7 +11,7 @@
 | Registry `id` | 实现入口（摘要） | 公开文档类比（叙事级） |
 |-----------------|------------------|-------------------------|
 | `vqe` | `quantum.algorithms.vqe.VQE` | 通用 VQE / HEA 变分层 |
-| `adapt` | `adapt.FermionicAdaptVQE` | ADAPT-VQE；pool 与日程见 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) §2 |
+| `adapt` | `adapt.FermionicAdaptVQE` | ADAPT-VQE；pool 与日程见 [public_parity_matrix.md](public_parity_matrix.md) §2 |
 | `iqeb` | `iqeb.IQEBVQE` | IQEB 类外环；`configs/example_h2_iqeb.yaml` |
 
 源码：`src/qchem_stack/quantum/algorithm_registry.py`。
@@ -41,7 +41,7 @@
 | `bravyi_kitaev` | 全栈 Hamiltonian 构建 |
 | `symmetry_conserving_bravyi_kitaev` | OpenFermion SCBK |
 
-源码：`src/qchem_stack/chem/fermion_mapping_registry.py`；conformance：`tests/test_backend_conformance.py`。
+源码：`src/qchem_stack/chem/fermion_mapping_registry.py`；conformance：`tests/test_backend_capability_conformance.py`、`tests/test_fermion_qubit_mapping.py`。
 
 ---
 
@@ -55,7 +55,7 @@
 | ADAPT / IQEB 求解器 | `quantum.algorithm` ∈ `{adapt, iqeb}` | 见 §1 registry |
 | QPE / DMET / problem decomposition notebooks | `qpe_qec_demo`、`embedding`、`configs/example_*` | 分解插件玩具：`embedding.mode: plugin` |
 | PySCF / Psi4 驱动 | 主路径 `scf.driver: pyscf` | Psi4 未接；parity 矩阵标 `partial` |
-| 激发态 / 采样高级教程 | `quantum.*_after_variational`、Pauli 协议 | 见 `inquanto_public_parity_matrix.md` §2 |
+| 激发态 / 采样高级教程 | `quantum.*_after_variational`、Pauli 协议 | 见 `public_parity_matrix.md` §2 |
 
 **迁移提示**：从 Tangelo notebook 迁到本栈时，优先选 `examples/tangelo_facade_demo.py` 指向的 **封装 YAML**，再渐进改成自定义 YAML（保持 Pydantic 校验）。
 
@@ -69,5 +69,5 @@
 
 ## 5. 维护
 
-- 新增 registry 键：同步本表 + [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) §2（若影响对外叙事）+ `export_parity_criteria_table` 稳定列（若导出暴露名称）。  
+- 新增 registry 键：同步本表 + [public_parity_matrix.md](public_parity_matrix.md) §2（若影响对外叙事）+ `export_parity_criteria_table` 稳定列（若导出暴露名称）。  
 - P2 双月闸门见 [P2_详细实施计划.md](P2_详细实施计划.md) §5。

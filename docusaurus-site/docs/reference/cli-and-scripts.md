@@ -63,7 +63,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 - **内置**：`pyscf`、`psi4` 在首次访问 solver registry 时注册。
 - **外部插件**：`pyproject.toml` 中 `[project.entry-points."qchem_stack.chem_solvers"]`；说明见仓库 `docs/solver_entrypoint_plugin_安装与发布指南.md`，示例 `examples/solver_plugin_entrypoint_demo/`。
-- **排障**：`registered_solvers_detail()`、`set_entrypoint_conflict_policy("warn"|"strict")`。完整步骤见站内 [后端适配快速接入](/guide/backend-adapter-quickstart)（与 VitePress 母稿 `docs-site/docs/guide/chemistry-and-embedding/backend-adapter-quickstart.md` 对齐）。
+- **排障**：`registered_solvers_detail()`、`set_entrypoint_conflict_policy("warn"|"strict")`。完整步骤见本站 [后端适配快速接入](/guide/backend-adapter-quickstart)；仓库 [solver 插件安装与发布指南](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/solver_entrypoint_plugin_%E5%AE%89%E8%A3%85%E4%B8%8E%E5%8F%91%E5%B8%83%E6%8C%87%E5%8D%97.md) 含安装与发布步骤。
 
 ## 推荐执行顺序（维护者）
 

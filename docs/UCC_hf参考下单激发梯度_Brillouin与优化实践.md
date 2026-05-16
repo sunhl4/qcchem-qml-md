@@ -58,7 +58,7 @@ $$
 
 ---
 
-## 4. 常见工程策略（InQuanto / 通用 VQE）
+## 4. 常见工程策略（Vendor platform / 通用 VQE）
 
 1. **`θ_singles ≡ 0` 且 freeze**：删掉优化变量或等价 mask。  
 2. **Ansatz = UCCD**：省掉 singles blocks。  
@@ -123,9 +123,9 @@ $$
 
 以上仍须 **脚注式诚实**：「解析」消除的是 **$\delta\to 0$ 的建模偏差**，**并不**消灭 **有限 shots**；最终仍是 **蒙特卡洛精度 vs 迭代轮数** 的折中。
 
-### 7.3 InQuanto 与 **`qchem_stack` 占位符**（勿混）
+### 7.3 Vendor platform 与 **`qchem_stack` 占位符**（勿混）
 
-- **InQuanto**：工作流里常把 **期望值及其对参数的导数** 组织为可执行的 **Computable** 图（官方 API 中的 `ExpectationValueDerivative` 等节点以上游文档为准），便于与编译 / 后端调度 **同一套采样与 cost 模型**。  
+- **Vendor platform**：工作流里常把 **期望值及其对参数的导数** 组织为可执行的 **Computable** 图（官方 API 中的 `ExpectationValueDerivative` 等节点以上游文档为准），便于与编译 / 后端调度 **同一套采样与 cost 模型**。  
 - **本仓库**：`src/qchem_stack/protocols/computable.py` 中的 `ExpectationValueDerivative` 当前实现为 **对 `ExpectationValue.evaluate` 的中心有限差分**（默认步长 `1e-4`），**不是**生产级 parameter-shift 后端；**§5** 的 `UCCSDVQE` 亦走 **SciPy 无 `jac` 的 L‑BFGS‑B**，同样是 **经典侧数值 Jacobian** 路线。  
 若你要 **论文级或硬件对齐的解析梯度 VQE**，须在 **量子侧** 实现 shift 规则或伴随法，并把 **解析 Jacobian** 显式传入优化器，而不是默认上述占位。
 
@@ -133,7 +133,7 @@ $$
 
 - **成本账本**：对常见单参数旋转门，parameter-shift 与 **中心化两点差分**在「每坐标两次期望」粗算下 **同阶**；解析法的主要收益是 **无 $\delta$ 偏置、少试凑、高阶信息更结构化**，从而常在 **总 shots / 总外层迭代**上更省。  
 - **收敛**：更干净的梯度方向有利于线搜索与 **BFGS / 自然梯度** 等；Brillouin 相关的 **真零梯度** 在解析形式下可辨识，便于 **freeze / mask**。  
-- **本仓库现状**：默认 VQE / UCCSD 路径仍为 **经典数值 Jacobian 或 FD 占位**，与 InQuanto 全栈 **导数 Computable** **不对等**（§7.3）。
+- **本仓库现状**：默认 VQE / UCCSD 路径仍为 **经典数值 Jacobian 或 FD 占位**，与 Vendor platform 全栈 **导数 Computable** **不对等**（§7.3）。
 - **数值侧为何仍吃香**：原型开发、硬件与黑箱目标等场景下，数值梯度常与 **§8** 并排阅读。
 
 ---
@@ -196,13 +196,13 @@ $$
 2. **要上规模 / 要上论文**：在 **可推导**门集上切换到 **parameter-shift / adjoint**，并用 **§8.5** 的数值 Jacobian **对拍**。  
 3. **强噪声、低维权衡、病态 landscape**：优先考虑 **§8.4** 的零阶外层，或对坐标做 **mask / freeze**（与 §4 一致）。
 
-你看到 **InQuanto**教程里大量使用解析导数流水线，很大程度是因为平台已替你完成了 **移位规则与 Executable 组合的工程化**；而自研新 ansatz 时，从零写 **SciPy + 不传 `jac` 或与 SPSA 对接**反而是第一块砖——这与「解析梯度更优」在 **成熟度轴**上不矛盾。
+你看到 **Vendor platform**教程里大量使用解析导数流水线，很大程度是因为平台已替你完成了 **移位规则与 Executable 组合的工程化**；而自研新 ansatz 时，从零写 **SciPy + 不传 `jac` 或与 SPSA 对接**反而是第一块砖——这与「解析梯度更优」在 **成熟度轴**上不矛盾。
 
 ---
 
 ## 参阅
 
-- 公开矩阵：`docs-site` parity — `AlgorithmVQE` + **`uccsd`**。  
-- 生成元构建：`src/qchem_stack/integrations/ucc_reference.py`；parity：`docs/inquanto_public_parity_matrix.md`（`AlgorithmVQE` + `uccsd`）。  
-- InQuanto 官方：`ExpectationValueDerivative` [API 锚点](https://docs.quantinuum.com/inquanto/api/inquanto/computables.html#inquanto.computables.ExpectationValueDerivative)；本站镜像 `/mirror/api/computables/classes/ExpectationValueDerivative/`。  
+- 公开矩阵：`docusaurus-site` parity — `AlgorithmVQE` + **`uccsd`**。  
+- 生成元构建：`src/qchem_stack/integrations/ucc_reference.py`；parity：`docs/public_parity_matrix.md`（`AlgorithmVQE` + `uccsd`）。  
+- Vendor platform 官方：`ExpectationValueDerivative` [API 锚点](https://www.quantinuum.com/)；本站镜像 `/mirror/api/computables/classes/ExpectationValueDerivative/`。  
 - 本仓库 HEA 导数占位：`src/qchem_stack/protocols/computable.py`（`ExpectationValueDerivative` · 中心差分）；VQE 入口示例：`src/qchem_stack/quantum/algorithms/vqe.py`。

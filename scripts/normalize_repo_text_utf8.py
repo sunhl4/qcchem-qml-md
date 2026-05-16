@@ -33,7 +33,7 @@ SKIP_DIR_NAMES = frozenset(
         ".mypy_cache",
         ".ruff_cache",
         ".pytest_cache",
-        ".vitepress",
+        ".docusaurus",
     }
 )
 

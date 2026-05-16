@@ -1,7 +1,7 @@
 """
 UCC / **chemically aware** reference layer (open fermion generators + regrouping hook).
 
-InQuanto *chemically aware* synthesis (2210.14834-style regrouping) is **not** replicated here;
+Vendor *chemically aware* synthesis (2210.14834-style regrouping) is **not** replicated here;
 :class:`IdentityRegrouping` preserves generators for gate-count baselines. Plug in a policy later.
 """
 
@@ -15,7 +15,7 @@ from openfermion.ops import FermionOperator
 
 @runtime_checkable
 class ChemicallyAwareUCCPolicy(Protocol):
-    """InQuanto-style *regrouping* hook (implement with published algorithms only)."""
+    """Published-regrouping hook (implement with algorithms from the literature only)."""
 
     def regroup_generators(self, ops: list[FermionOperator]) -> list[FermionOperator]:
         """Return reordered or merged fermionic generators (same algebra up to Trotter error)."""
@@ -32,7 +32,7 @@ class SinglesBeforeDoublesLexicographic:
     """
     **Open** chemically-motivated ordering: singles (two fermionic indices) before doubles (four).
 
-    Lexicographic tie-break on the term tuple. Not identical to InQuanto proprietary regrouping.
+    Lexicographic tie-break on the term tuple. Not identical to proprietary vendor regrouping.
     """
 
     def regroup_generators(self, ops: list[FermionOperator]) -> list[FermionOperator]:

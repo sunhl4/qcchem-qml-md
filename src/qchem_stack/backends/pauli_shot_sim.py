@@ -1,4 +1,4 @@
-"""Grouped Pauli shot simulation on a statevector (InQuanto-style sample-then-recombine)."""
+"""Grouped Pauli shot simulation on a statevector (sample-then-recombine convention)."""
 
 from __future__ import annotations
 

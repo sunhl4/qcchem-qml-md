@@ -5,8 +5,8 @@
 ## 预签字清单
 
 - 执行记录链：Day1–Day80 保持连续。
-- 机读键链：`pipeline` → `inquanto_contract` → `export` → `tests`。
-- 双站口径：仓库文档与 docs-site 对同一锚点保持引用一致。
+- 机读键链：`pipeline` → **`product_contract`** → `export` → `tests`。
+- 双站口径：仓库文档与 docusaurus-site 对同一锚点保持引用一致。
 
 ## 收口策略
 

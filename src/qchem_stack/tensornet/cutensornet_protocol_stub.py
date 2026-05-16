@@ -26,7 +26,7 @@ def run_cutensornet_expectation_stub(
     requested_backend: str = "stub",
 ) -> dict[str, Any]:
     """
-    InQuanto ``CuTensorNetProtocol``-style **machine-readable** row (open stack).
+    Vendor ``CuTensorNetProtocol``-style **machine-readable** row (open stack).
 
     Parameters
     ----------

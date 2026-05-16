@@ -1095,7 +1095,7 @@
     "parent": "/slide[7]",
     "type": "shape",
     "props": {
-      "text": "• 融合InQuanto的工作流纪律与Tangelo的算法广度",
+      "text": "• 融合商业全栈产品的流程纪律与开源工具箱的算法广度",
       "x": "1.5cm",
       "y": "8.1cm",
       "width": "14cm",
@@ -1232,7 +1232,7 @@
     "parent": "/slide[8]",
     "type": "shape",
     "props": {
-      "text": "竞品分析：InQuanto 与 Tangelo",
+      "text": "竞品分析：商业全栈 vs 开源工具箱",
       "x": "2cm",
       "y": "8cm",
       "width": "29.87cm",
@@ -1252,7 +1252,7 @@
     "parent": "/slide[8]",
     "type": "notes",
     "props": {
-      "text": "进入第 02 部分：竞品分析：InQuanto 与 Tangelo。"
+      "text": "进入第 02 部分：竞品分析：商业全栈 vs 开源工具箱。"
     }
   },
   {
@@ -1269,7 +1269,7 @@
     "parent": "/slide[9]",
     "type": "shape",
     "props": {
-      "text": "InQuanto：商业平台标杆",
+      "text": "商业闭源全栈：标杆特征",
       "x": "1.5cm",
       "y": "1cm",
       "width": "30cm",
@@ -1469,7 +1469,7 @@
     "parent": "/slide[9]",
     "type": "notes",
     "props": {
-      "text": "对比卡片讲解：InQuanto：商业平台标杆"
+      "text": "对比卡片讲解：商业闭源全栈：标杆特征"
     }
   },
   {
@@ -1486,7 +1486,7 @@
     "parent": "/slide[10]",
     "type": "shape",
     "props": {
-      "text": "InQuanto 工作流原理",
+      "text": "商业全栈工作流（示意）",
       "x": "1.5cm",
       "y": "1cm",
       "width": "30cm",
@@ -1546,7 +1546,7 @@
     "parent": "/slide[10]",
     "type": "shape",
     "props": {
-      "text": "• 通过Computable和Protocol构建量子作业",
+      "text": "• 通过对象化协议构建量子作业",
       "x": "1.5cm",
       "y": "8.1cm",
       "width": "14cm",
@@ -1566,7 +1566,7 @@
     "parent": "/slide[10]",
     "type": "shape",
     "props": {
-      "text": "• 提交到云端(Nexus)执行并回收资源报告",
+      "text": "• 提交到云端执行并回收资源报告",
       "x": "1.5cm",
       "y": "10.399999999999999cm",
       "width": "14cm",
@@ -1646,7 +1646,7 @@
     "parent": "/slide[10]",
     "type": "notes",
     "props": {
-      "text": "讲解内容：InQuanto 工作流原理。"
+      "text": "讲解内容：商业全栈工作流（示意）。"
     }
   },
   {
@@ -2078,7 +2078,7 @@
     "type": "chart",
     "props": {
       "chartType": "column",
-      "series1.name": "InQuanto",
+      "series1.name": "Vendor platform (closed)",
       "series1.values": "9,8,4,7",
       "series1.color": "1E2761",
       "series2.name": "Our Platform",
@@ -2137,7 +2137,7 @@
     "parent": "/slide[13]",
     "type": "shape",
     "props": {
-      "text": "InQuanto在工作流占优，但MD/ML缺乏；我们将在MD/ML及复现性上超越。",
+      "text": "竞品A在工作流占优，但MD/ML缺乏；我们将在MD/ML及复现性上超越。",
       "x": "23cm",
       "y": "5.5cm",
       "width": "9cm",
@@ -2194,7 +2194,7 @@
     "parent": "/slide[14]",
     "type": "shape",
     "props": {
-      "text": "• InQuanto强在工程与产品体验(对象化，报告化)",
+      "text": "• 商业闭源栈强在工程与产品体验(对象化，报告化)",
       "x": "1.5cm",
       "y": "3.5cm",
       "width": "14cm",
@@ -2214,7 +2214,7 @@
     "parent": "/slide[14]",
     "type": "shape",
     "props": {
-      "text": "• Tangelo强在算法广度和自由度",
+      "text": "• 开源工具箱强在算法广度和自由度",
       "x": "1.5cm",
       "y": "5.8cm",
       "width": "14cm",
@@ -2274,7 +2274,7 @@
     "parent": "/slide[14]",
     "type": "shape",
     "props": {
-      "text": "InQuanto",
+      "text": "闭源全栈",
       "x": "16.7cm",
       "y": "4cm",
       "width": "4.4cm",
@@ -2314,7 +2314,7 @@
     "parent": "/slide[14]",
     "type": "shape",
     "props": {
-      "text": "闭源封闭",
+      "text": "厂商锁定",
       "x": "16.7cm",
       "y": "10cm",
       "width": "4.4cm",
@@ -3022,7 +3022,7 @@
     "parent": "/slide[18]",
     "type": "shape",
     "props": {
-      "text": "• 不做InQuanto的无脑克隆，不强求商业云UI的一比一",
+      "text": "• 不做闭源产品的无脑克隆，不强求商业云UI的一比一",
       "x": "1.5cm",
       "y": "3.5cm",
       "width": "14cm",
@@ -3062,7 +3062,7 @@
     "parent": "/slide[18]",
     "type": "shape",
     "props": {
-      "text": "• 把Tangelo的算法装入InQuanto的纪律里",
+      "text": "• 把开源算法生态装入我们自己的工程纪律里",
       "x": "1.5cm",
       "y": "8.1cm",
       "width": "14cm",
@@ -4007,7 +4007,7 @@
     "parent": "/slide[23]",
     "type": "shape",
     "props": {
-      "text": "• 先挑选 InQuanto 和 Tangelo 中最典型的功能(如VQE, DMET)",
+      "text": "• 先挑选闭源全栈与开源工具箱中最典型的功能(如VQE, DMET)",
       "x": "1.5cm",
       "y": "3.5cm",
       "width": "14cm",
@@ -4935,7 +4935,7 @@
     "parent": "/slide[27]",
     "type": "shape",
     "props": {
-      "text": "• 长期：迭代算法，打磨开发者文档与VitePress知识库",
+      "text": "• 长期：迭代算法，打磨开发者文档与Docusaurus用户站",
       "x": "1.5cm",
       "y": "10.399999999999999cm",
       "width": "14cm",

@@ -1,6 +1,6 @@
 # 90 日计划交付包摘要（D90）
 
-**计划原文**：用户确认的 Cursor 计划「90 天对标 InQuanto / 借鉴 Tangelo」（本地 `.cursor/plans/`）；**逐日核对台账**：[`P2_ninety_day_execution_checklist.md`](P2_ninety_day_execution_checklist.md)。
+**计划原文**：用户确认的 Cursor 计划「90 天对标 Vendor platform / 借鉴 Tangelo」（本地 `.cursor/plans/`）；**逐日核对台账**：[`P2_ninety_day_execution_checklist.md`](P2_ninety_day_execution_checklist.md)。
 
 ## 闸门最小集合（D15/D30/D45/D60/D69/D76/D82/D88）
 

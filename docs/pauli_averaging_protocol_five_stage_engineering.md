@@ -33,7 +33,7 @@ def instantiate(self) -> None:
 - `measurement_grouping`: Pauli 分组策略
 - `run_sampled` / `run_qiskit_shots`: 运行时是否走 shots histogram 路径
 
-因此，`instantiate` 更接近 InQuanto 风格的“协议已实例化”阶段，而不是数值计算阶段。
+因此，`instantiate` 更接近 Vendor platform 风格的“协议已实例化”阶段，而不是数值计算阶段。
 
 ## 2. build：Pauli 分组与逻辑测量电路构建
 

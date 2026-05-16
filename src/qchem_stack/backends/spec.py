@@ -87,7 +87,7 @@ def circuit_resource_row(
 
 
 def dataframe_circuit_shot(rows: list[dict[str, Any]]) -> pd.DataFrame:
-    """InQuanto-style resource summary table."""
+    """Resource summary table aligned with workflow-export conventions."""
     return pd.DataFrame(rows)
 
 

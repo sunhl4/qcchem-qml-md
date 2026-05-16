@@ -1,7 +1,7 @@
 # VQD 紧缩激发栈：行为、YAML 与机读出口
 
 **定位**：说明开放栈内 **变分量子紧缩（VQD）** 的**可重复工程语义**（算法核、编排边界、JSON 契约）。  
-**非目标**：声称与 Quantinuum InQuanto 闭源包或 SandboxAQ Tangelo 默认实现的逐比特等价。
+**非目标**：声称与 Quantinuum Vendor platform 闭源包或 SandboxAQ Tangelo 默认实现的逐比特等价。
 
 **实现入口**：`qchem_stack.quantum.algorithms.excited.VQD`；管线挂载：`qchem_stack.orchestration.pipeline`（`quantum.vqd_after_variational`）。
 
@@ -18,7 +18,7 @@
 其中 \(|\psi_j\rangle\) 为已接受的较低能级态（归一化），\(p=\) `quantum.vqd_overlap_exponent`（代码内对 \(\texttt{overlap\_exponent}\) 有下界裁剪）。  
 **一层一次** `scipy.optimize.minimize`，方法由 `quantum.vqd_optimizer_method` 选择（`COBYLA` / `L-BFGS-B` / `Nelder-Mead`）；`quantum.vqd_cobyla_maxiter` 在各方法上用作迭代上限的共用命名。
 
-**与 InQuanto `AlgorithmVQD` 的边界**：公开文档中可将 Hamiltonian 期望值、重叠平方、权重等建模为多个 `Computable`；本栈在优化阶段将它们**折叠为上述单一标量**，便于与经典优化器直接对接。优化完成后仍可按通道写出 **`three_protocol`** 报告块（能量 / 重叠 / 权重及其可选 shot 估计），见 §4。
+**与 Vendor platform `AlgorithmVQD` 的边界**：公开文档中可将 Hamiltonian 期望值、重叠平方、权重等建模为多个 `Computable`；本栈在优化阶段将它们**折叠为上述单一标量**，便于与经典优化器直接对接。优化完成后仍可按通道写出 **`three_protocol`** 报告块（能量 / 重叠 / 权重及其可选 shot 估计），见 §4。
 
 **与 Tangelo「deflation」叙事的边界**：Tangelo 侧常见叙事为在测量流程中附加 `deflation_circuits` 与系数；本栈在 **态向量或给定 executor** 上直接计算振幅重叠并写入正则项，机读块 `meta.tangelo_deflation_analogy_v1` 仅作**叙事对齐**，不声称电路逆合成路径一致。
 
@@ -66,14 +66,14 @@
 - **顶层**：`out["vqd"]` → `schema`: `excited_vqd_bundle_v1`；`energies` 为各层能量；`meta` 含算法元数据与通道列表。
 - **`meta.vqd_channels`**：每层一条；第 0 层为基态引用；更高层含 `three_protocol`（`objective` / `overlap` / `weight` 三块汇报）。
 - **`meta.vqd_variety_yaml`**：`hea` 或 `uccsd`，标明参数化来源。
-- **`meta.tangelo_deflation_analogy_v1`** / **`meta.inquanto_vqd_semantics_v1`**：跨栈叙事用的结构化摘要（**不等价于**闭源产品内部对象）。
+- **`meta.tangelo_deflation_analogy_v1`** / **`meta.vqd_cross_stack_semantics_v1`**：跨栈叙事用的结构化摘要（**不等价于**闭源产品内部对象）。
 - **`meta.vqd_warnings`**：可选，重叠过大时的可读告警列表。
-- **复现**：`repro.run_summary` / `repro.parity_snapshot` 镜像部分 YAML 与运行态（键集合以 `inquanto_contract.RUN_SUMMARY_DOCUMENTED_KEYS`、`PARITY_SNAPSHOT_DOCUMENTED_KEYS` 为准）。
+- **复现**：`repro.run_summary` / `repro.parity_snapshot` 镜像部分 YAML 与运行态（键集合以编排与导出门禁为准；导出块见 `product_contract.PARITY_EXPORT_V3_STABLE_KEYS`）。
 
 ---
 
 ## 5. 与其它文档的关系
 
-- 公开能力矩阵总表：`docs/inquanto_public_parity_matrix.md` §2（`AlgorithmVQD` 行）。
+- 公开能力矩阵总表：`docs/public_parity_matrix.md` §2（`AlgorithmVQD` 行）。
 - UCCSD 电路与映射边界：`docs/技术文档_UCCSD_JW与BK_SCBK电路边界.md`
 - Parity 快照白名单：`docs/技术文档_DMET与parity_snapshot开放契约.md`

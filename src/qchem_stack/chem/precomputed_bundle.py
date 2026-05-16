@@ -20,10 +20,11 @@ from qchem_stack.chem.hamiltonian import (
     hamiltonian_fingerprint_from_qubit_operator,
 )
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
-
-CLASSICAL_REFERENCE_BUNDLE_V1 = "classical_reference_bundle_v1"
-PRE_QUANTUM_INPUT_SCHEMA_V1 = "pre_quantum_input_v1"
-PRECOMPUTED_MANIFEST_SCHEMA_V1 = "precomputed_manifest_v1"
+from qchem_stack.contracts.schema_ids import (
+    CLASSICAL_REFERENCE_BUNDLE_V1,
+    PRECOMPUTED_MANIFEST_SCHEMA_V1,
+    PRE_QUANTUM_INPUT_SCHEMA_V1,
+)
 
 
 def resolve_bundle_path(raw_path: str, *, cfg_path: Path | None = None) -> Path:

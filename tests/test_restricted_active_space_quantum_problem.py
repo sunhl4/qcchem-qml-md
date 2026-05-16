@@ -1,4 +1,4 @@
-"""Restricted active-space quantum problem (InQuanto ``get_system`` analog)."""
+"""Restricted active-space quantum problem (PySCF ``get_system`` analog)."""
 
 from __future__ import annotations
 

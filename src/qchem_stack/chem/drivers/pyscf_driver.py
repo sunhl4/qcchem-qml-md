@@ -30,7 +30,7 @@ class PySCFRHFResult:
     mo_energy: np.ndarray
     molecular_system: MolecularSystem
     driver_meta: dict[str, Any] = field(default_factory=dict)
-    """e.g. ``ddcosmo`` flags — parity with InQuanto-PySCF *surface* (not product parity)."""
+    """e.g. ``ddcosmo`` flags — parity with documented vendor PySCF *surface* (not full product parity)."""
 
 
 def unwrap_pyscf_rhf_for_backend_operations(rhf: PySCFRHFResult) -> PySCFRHFResult:
@@ -248,7 +248,7 @@ class PySCFDriver:
         experiment_config: ExperimentConfig | None = None,
         inferred_method: Literal["RHF", "ROHF", "UHF"] | None = None,
     ) -> PySCFDriver:
-        """Build a driver pointing at an existing PySCF ``mf`` (InQuanto ``from_mf``-style onboarding).
+        """Build a driver pointing at an existing PySCF ``mf`` (library-style ``from_mf`` onboarding).
 
         The underlying ``Mol`` geometry / basis seed an internal :class:`MolecularSystem`. ``mf``
         stays live for subsequent AO / Lowdin helpers.
@@ -364,7 +364,7 @@ class PySCFDriver:
         """
         Return an AO-facing wrapper around the PySCF SCF object.
 
-        This mirrors the InQuanto-PySCF ``get_system_ao`` design intent:
+        This mirrors common PySCF ``get_system_ao`` onboarding intent:
         keep AO data and the underlying SCF object available for fragment builders.
         """
         if self.chemistry_extended.pbc_cell_vectors_bohr is not None:
@@ -428,7 +428,7 @@ class PySCFDriver:
         prefer_restricted_spatial_fermion_for_jordan_wigner: bool | None = None,
         jordan_wigner_coeff_atol: float | None = None,
     ) -> "RestrictedActiveSpaceQuantumProblem":  # noqa: UP037, F821
-        """Open-stack analog to InQuanto ``get_system()`` for MO active-space restricted problems.
+        """Open-stack analog to vendor ``get_system()`` helpers for MO active-space restricted problems.
 
         Returns :class:`~qchem_stack.chem.molecular_problem.RestrictedActiveSpaceQuantumProblem`:
         :class:`~qchem_stack.chem.restricted_integral_operator.RestrictedActiveSpaceIntegralOperatorCompact`

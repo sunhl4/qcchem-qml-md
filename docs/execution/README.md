@@ -2,9 +2,9 @@
 
 本目录记录 P2 连续执行证据链（按天与里程碑）。
 
-**parity / gap 机读契约与 `workflow-preview` 的稳定 import / 文件分层**（re-export vs `internal_reports/competitor/` 字面量）：见仓库根目录 [CONTRIBUTING.md — Parity and workflow-preview](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)。
+**产品 export / gap 机读契约与 `workflow-preview` 维护入口**：见仓库根目录 [CONTRIBUTING.md — Product contracts and workflow-preview](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)。
 
-**工程深度总览（维度 × WBS × 闸门）**：[工程深度路线图_InQuanto_Tangelo_对标与交付.md](../工程深度路线图_InQuanto_Tangelo_对标与交付.md) — 与 InQuanto / Tangelo 公开叙事可对标的完整计划母页，承接差距文档附录与下列 Day 日志。
+**工程深度总览（维度 × WBS × 闸门）**：以 `docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md` 与仓库根目录 `CONTRIBUTING.md` 为入口（历史独立 roadmap 文档已合并/下线）。
 
 ## Day logs
 
@@ -31,7 +31,7 @@
 - `month1_baseline_signoff_2026Q2.md`
 - `week1_regression_report_2026Q2.md`
 
-## Tangelo / InQuanto gap calendar (Day1–Day90)
+## Tangelo / Vendor platform gap calendar (Day1–Day90)
 
 - `day001_day090_tangelo_gap_calendar.md` — 三个月逐日台账（差距收口 + Tangelo 设计参考），含周闸门与 Day90 封板指针。
 
@@ -52,18 +52,15 @@
 - `day91_day120_daily_breakdown_2026Q3.md`
 - `day120_gate_checklist_2026Q3.md`
 
-## InQuanto / Tangelo reconciliation sprint (Day121–Day180, 60 days)
+## Comparative execution sprint (Day121–Day180, 历史命名)
 
-- `day121_day180_inquanto_tangelo_calendar_2026Q3.md` — 矩阵 × Tangelo 广度索引 × `capability_surface` 同源链，逐日 60 行日历 + 周闸门
-- `day121_kickoff_inquanto_tangelo_reconciliation_2026Q3.md` — Day121 启动（填 `PLAN_START_DATE`、锚点缺口表）
-- `day180_signoff_inquanto_tangelo_2026Q3.md` — Day180 封板勾选（周期末填写）
-- `inquanto_tangelo_comparative_rd_plan_strict_2026Q3Q4.md` — 对比研发计划（严格实施版，含外部证据与阶段闸门）
-- `inquanto_tangelo_comparative_backlog.yaml` — 机器可校验任务台账（任务级路径/测试/验收标准/证据）
+- 逐日日历与 kickoff/signoff 的 **历史第三方品牌文件名版本已删除**；请只使用：
+- `comparative_execution_rd_plan_strict_2026Q3Q4.md` — 对比研发计划（严格实施版）
+- `comparative_execution_backlog.yaml` — 机器可校验任务台账
 
 ### Strict execution tooling
 
-- `scripts/check_inquanto_tangelo_comparative_backlog.py` — 台账结构与完成证据校验脚本
-- `tests/test_check_inquanto_tangelo_comparative_backlog_script.py` — 脚本回归测试（含负例）
+- `scripts/check_comparative_execution_backlog.py` — 台账结构与完成证据校验脚本（在 CI/本地对 `comparative_execution_backlog.yaml` 运行）
 
 ### Day91-Day97 templates
 

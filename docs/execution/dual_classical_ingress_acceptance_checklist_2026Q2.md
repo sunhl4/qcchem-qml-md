@@ -80,8 +80,7 @@
 - `docs/技术文档_双线路经典输入与统一PreQuantumInput契约.md`
 - `docs/ENGINEERING_ARCHITECTURE.md`
 - `docusaurus-site/docs/guide/dual-classical-ingress.md`
-- `docs-site/docs/guide/chemistry-and-embedding/dual-classical-ingress.md`
-- `docs-site/docs/en/guide/chemistry-and-embedding/dual-classical-ingress.md`
+- `docusaurus-site/docs/guide/dual-classical-ingress.md`（中文；站点路由 `/guide/dual-classical-ingress`）
 
 ## 建议验收命令
 

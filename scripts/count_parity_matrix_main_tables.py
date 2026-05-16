@@ -32,7 +32,7 @@ def main() -> None:
     ap.add_argument("--verbose", action="store_true")
     args = ap.parse_args()
     root = Path(__file__).resolve().parents[1]
-    text = (root / "docs" / "inquanto_public_parity_matrix.md").read_text(encoding="utf-8")
+    text = (root / "docs" / "public_parity_matrix.md").read_text(encoding="utf-8")
     chunk = text.split("## 4.", 1)[0]
     if "## 1." in chunk:
         chunk = chunk.split("## 1.", 1)[1]

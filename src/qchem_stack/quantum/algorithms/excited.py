@@ -92,7 +92,7 @@ def _vqd_three_protocol_channels(
     rng: np.random.Generator,
     pauli_grouping: str = "tensor_product",
 ) -> dict[str, Any]:
-    """InQuanto-style three channels: Hamiltonian expectation, overlap(s), deflation weight (product)."""
+    """Three-channel reporting model: Hamiltonian expectation, overlap(s), deflation weight (product)."""
     g_new = np.asarray(g_new, dtype=complex).ravel()
     g_new = g_new / (np.linalg.norm(g_new) + 1e-15)
     h_dense = qubit_operator_to_sparse(h_op, n_qubits)
@@ -472,7 +472,7 @@ class VQD:
 
 
 def _vqd_cross_stack_semantics_meta(vqd: VQD) -> dict[str, Any]:
-    """InQuanto / Tangelo narrative hooks without claiming closed-source parity."""
+    """Cross-stack narrative hooks without claiming closed-source parity."""
     pw = vqd._resolve_penalties() if vqd.n_states >= 2 else []
     coeff = float(pw[0]) if pw else float(vqd.penalty_weight)
     overlap_repr = (
@@ -492,12 +492,12 @@ def _vqd_cross_stack_semantics_meta(vqd: VQD) -> dict[str, Any]:
                 "on measured overlaps; this stack collapses overlaps into one classical objective."
             ),
         },
-        "inquanto_vqd_semantics_v1": {
-            "schema": "inquanto_vqd_semantics_v1",
+        "vqd_cross_stack_semantics_v1": {
+            "schema": "vqd_cross_stack_semantics_v1",
             "optimization_model": "single_objective_collapsed",
             "three_protocol_role": "reporting_and_optional_shots_not_triple_optimizer",
             "note": (
-                "InQuanto AlgorithmVQD exposes separate ExpectationValue / OverlapSquared computables; "
+                "Closed vendor AlgorithmVQD exposes separate ExpectationValue / OverlapSquared computables; "
                 "open stack matches Higgott et al. scalar penalty + optional Pauli/swap-test channels."
             ),
         },

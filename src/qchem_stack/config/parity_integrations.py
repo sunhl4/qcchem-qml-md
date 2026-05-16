@@ -12,7 +12,7 @@ class ParityIntegrationsSpec(BaseModel):
     Fills reproducibility JSON where vendor defaults are closed: we record *designed* public-contract
     analogs (TKET-shaped compile probe, UCCSD counts, DMET orchestration ledger, qnexus import health,
     Qermit-field mapping, TN strategy map). This is **L1 auditability**, not L0 binary parity with
-    InQuanto wheels.
+    closed vendor wheels.
     """
 
     enabled: bool = True

@@ -1,0 +1,217 @@
+version: 1
+program: comparative_execution_rd_2026q3q4
+source_of_truth:
+  plan_doc: docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md
+  contract: src/qchem_stack/protocols/product_contract.py
+  capability_surface: src/qchem_stack/api/app.py
+
+phases:
+  - id: A
+    title: Baseline freeze and quick closure
+    day_range: Day121-Day135
+    status: done
+    objectives:
+      - Freeze parity anchor mapping for public reference documentation comparison (Tangelo index + matrix).
+      - Close first wave of high-impact P0 gaps with test-backed evidence.
+    tasks:
+      - id: A-000
+        title: Establish strict execution governance artifacts
+        owner: program
+        status: done
+        target_files:
+          - docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md
+          - docs/execution/comparative_execution_backlog.yaml
+          - scripts/check_comparative_execution_backlog.py
+        tests:
+          - scripts/check_comparative_execution_backlog.py --path docs/execution/comparative_execution_backlog.yaml
+        acceptance_criteria:
+          - "strict plan document exists and links external capability baselines"
+          - "backlog validator enforces done->evidence invariant"
+          - "validators can reproduce backlog validation locally via scripts/check_comparative_execution_backlog.py"
+        evidence:
+          - "docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md"
+          - "scripts/check_comparative_execution_backlog.py"
+      - id: A-001
+        title: Align parity gap anchors with capability-surface payload
+        owner: core-protocol
+        status: done
+        target_files:
+          - src/qchem_stack/protocols/product_contract.py
+          - src/qchem_stack/api/app.py
+        tests:
+          - tests/test_api_runs.py::test_capability_surface_matches_product_contract
+          - tests/test_api_runs.py::test_parity_gaps_meta
+        acceptance_criteria:
+          - "gap categories are exported by both contract and HTTP meta routes"
+          - "all rows include parity_matrix_anchor"
+        evidence:
+          - "src/qchem_stack/protocols/product_contract.py: validate_product_gap_categories"
+          - "src/qchem_stack/protocols/product_contract.py: product_gap_anchor_index_v1"
+          - "src/qchem_stack/api/app.py: /v1/meta/capability-surface and /v1/meta/parity-gaps include gap_anchor_index_v1"
+          - "tests/test_api_runs.py: test_capability_surface_matches_product_contract"
+          - "tests/test_api_runs.py: test_parity_gaps_meta (product_gap_anchor_index_v1)"
+      - id: A-002
+        title: Expand operator pool registry coverage and aliases
+        owner: quantum-alg
+        status: done
+        target_files:
+          - src/qchem_stack/quantum/operator_pool_registry.py
+          - src/qchem_stack/quantum/algorithms/adapt.py
+          - src/qchem_stack/quantum/algorithms/iqeb.py
+        tests:
+          - tests/test_operator_pool_registry_export.py
+          - tests/test_methods_resource_unified_export.py
+        acceptance_criteria:
+          - "operator_pool_registry_export_v1 includes new pool ids and aliases"
+          - "ADAPT and IQEB configs resolve pool ids without fallback warnings"
+        evidence:
+          - "src/qchem_stack/quantum/operator_pool_registry.py: add uccsd_singles/doubles and BK slice aliases"
+          - "src/qchem_stack/config.py: adapt_pool_id/iqeb_pool_id literals include new alias ids"
+          - "tests/test_operator_pool_registry_export.py: alias export assertions expanded"
+          - "tests/test_algorithm_lifecycle_and_registry.py: alias->canonical runtime equivalence checks expanded"
+      - id: A-003
+        title: VQD dual-overlap mode feature flag design and skeleton
+        owner: excited-state
+        status: done
+        target_files:
+          - src/qchem_stack/quantum/algorithms/excited.py
+          - src/qchem_stack/config.py
+          - configs/example_h2_vqd_uccsd.yaml
+        tests:
+          - tests/test_excited_qse_hs.py
+          - tests/test_orchestration_pipeline.py
+        acceptance_criteria:
+          - "configuration can select overlap_mode"
+          - "run summary captures selected mode"
+        evidence:
+          - "src/qchem_stack/config.py: quantum.vqd_overlap_mode literal field"
+          - "src/qchem_stack/quantum/algorithms/excited.py: VQD overlap_mode validation + metadata export"
+          - "src/qchem_stack/orchestration/pipeline.py: VQD constructor + parity_snapshot/run_summary include vqd_overlap_mode_yaml"
+          - "tests/test_excited_qse_hs.py: overlap-mode metadata assertions"
+          - "configs/example_h2_vqd_uccsd.yaml: tangelo_circuit_analogy sample"
+
+  - id: B
+    title: Algorithm and chemistry parity deepening
+    day_range: Day136-Day155
+    status: done
+    objectives:
+      - Close chemistry integral and mapping parity gaps.
+      - Make BK/SCBK and UCCSD boundary machine-checkable.
+    tasks:
+      - id: B-001
+        title: Implement and validate PySCF get_integrals path
+        owner: chem-stack
+        status: done
+        target_files:
+          - src/qchem_stack/chem/solvers/pyscf_solver.py
+          - src/qchem_stack/chem/solvers/base.py
+        tests:
+          - tests/test_chem_integral_solver_tangelo_aliases.py
+          - tests/test_integral_openfermion_tangelo_recipe.py
+        acceptance_criteria:
+          - "get_integrals returns stable shape and metadata"
+          - "openfermion/tangelo recipe compatibility test passes"
+        evidence:
+          - "src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals implemented (CASCI h1/h2 + OpenFermion reorder)"
+          - "src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals normalizes packed ERI to real dtype before ao2mo.restore"
+          - "src/qchem_stack/chem/solvers/pyscf_solver.py: capabilities.supports_get_integrals=True"
+          - "tests/test_chem_integral_solver_tangelo_aliases.py: get_integrals schema/shape assertions"
+          - "tests/test_pyscf_solver_adapter.py: OpenFermion reorder output shape assertions"
+          - "tests/test_backend_capability_conformance.py: supports_get_integrals expectation updated"
+      - id: B-002
+        title: Codify BK/SCBK UCCSD boundary in runtime and docs
+        owner: quantum-alg
+        status: done
+        target_files:
+          - src/qchem_stack/quantum/algorithms/uccsd_vqe.py
+          - docs/public_parity_matrix.md
+        tests:
+          - tests/test_backend_capability_conformance.py
+          - tests/test_algorithm_lifecycle_and_registry.py
+        acceptance_criteria:
+          - "unsupported combinations fail with explicit boundary reason"
+          - "parity matrix row reflects runtime behavior"
+        evidence:
+          - "src/qchem_stack/quantum/algorithms/uccsd_vqe.py: uccsd_mapping_support_matrix_v1"
+          - "src/qchem_stack/api/app.py: capability_surface exports uccsd_mapping_support_matrix_v1"
+          - "tests/test_uccsd_mapping_support_matrix.py: machine-readable boundary assertions"
+          - "tests/test_api_runs.py: capability surface schema assertion includes uccsd mapping matrix"
+      - id: B-003
+        title: Tangelo mapping roadmap rows (JKMN/HCB) with explicit status
+        owner: chem-mapping
+        status: done
+        target_files:
+          - src/qchem_stack/chem/fermion_mapping_registry.py
+          - src/qchem_stack/api/app.py
+        tests:
+          - tests/test_fermion_qubit_mapping.py
+        acceptance_criteria:
+          - "alias surface explicitly marks executable vs planned mappings"
+          - "capability-surface exports consistent mapping statuses"
+        evidence:
+          - "src/qchem_stack/chem/fermion_mapping_registry.py: mapping_status_rows_v1 with executable/planned_not_wired"
+          - "tests/test_fermion_qubit_mapping.py: mapping status surface assertions"
+
+  - id: C
+    title: Mitigation and benchmark evidence closeout
+    day_range: Day156-Day180
+    status: done
+    objectives:
+      - Finalize mitigation model comparability and reporting evidence.
+      - Expand parity export and L3 benchmark sample coverage.
+    tasks:
+      - id: C-001
+        title: Mitigation runtime trace and async model parity statement
+        owner: mitigation
+        status: done
+        target_files:
+          - src/qchem_stack/mitigation/qermit_runtime.py
+          - src/qchem_stack/protocols/product_contract.py
+          - src/qchem_stack/jobs/store.py
+        tests:
+          - tests/test_api_runs.py::test_capability_surface_has_mitigation_execution_model
+          - tests/test_zne_circuit_fold.py
+          - tests/test_pipeline_job_store.py
+        acceptance_criteria:
+          - "mitigation_dag_execution traces are stable and reproducible"
+          - "async model caveat appears in machine-readable gap row"
+        evidence:
+          - "src/qchem_stack/mitigation/qermit_runtime.py: execute_mitigation_dag_runtime + execute_mitigation_dag trace schema qermit_runtime_v1"
+          - "src/qchem_stack/protocols/product_contract.py: mitigation_execution_model_public async_batch_execution caveat"
+          - "tests/test_api_runs.py: test_capability_surface_has_mitigation_execution_model alignment with product_contract"
+          - "tests/test_zne_circuit_fold.py: circuit_scale_fold runtime trace reuses protocol zne_curve"
+          - "tests/test_pipeline_job_store.py: async full_pipeline job roundtrip keeps timeline evidence"
+      - id: C-002
+        title: Expand parity export sample configs for new dimensions
+        owner: reproducibility
+        status: done
+        target_files:
+          - scripts/check_parity_export_sample.py
+          - tests/test_export_parity_golden.py
+          - configs/example_h2_vqd_uccsd.yaml
+        tests:
+          - tests/test_export_parity_golden.py
+        acceptance_criteria:
+          - "new configs included in sample export gate"
+          - "stable key assertions hold"
+        evidence:
+          - "scripts/check_parity_export_sample.py: SAMPLE_CONFIGS_REL includes configs/example_h2_vqd_uccsd.yaml"
+          - "tests/test_check_parity_export_sample_script.py: sample gate includes VQD UCCSD and de-duplicates configs"
+          - "tests/test_export_parity_golden.py: VQD UCCSD config remains covered by stable-key export assertions"
+      - id: C-003
+        title: Extend L3 benchmark bundle for parity slices
+        owner: benchmark
+        status: done
+        target_files:
+          - src/qchem_stack/integrations/l3_algorithm_benchmark.py
+          - scripts/l3_algorithm_benchmark_report.py
+        tests:
+          - tests/test_l3_algorithm_benchmark_bundle.py
+          - tests/test_l3_benchmark_smoke.py
+        acceptance_criteria:
+          - "bundle includes at least one commercial-stack-aligned and one Tangelo-aligned slice"
+          - "L3 smoke remains optional and deterministic under marker"
+        evidence:
+          - "src/qchem_stack/integrations/l3_algorithm_benchmark.py: DEFAULT_BENCHMARK_YAMLS includes example_h2_vqd_uccsd and iqeb alias slice"
+          - "tests/test_l3_algorithm_benchmark_bundle.py: explicit commercial-stack/Tangelo slice coverage assertions"
+          - "tests/test_l3_benchmark_smoke.py: optional L3 marker gate (QCHEM_RUN_L3) and deterministic schema checks"

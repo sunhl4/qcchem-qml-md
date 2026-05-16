@@ -14,6 +14,14 @@ from typing import Any
 
 from qchem_stack.exceptions import ReproExportError
 
+try:
+    import numpy as _np
+except ImportError:  # pragma: no cover - optional dependency
+    _np = None  # type: ignore[assignment]
+
+_NP_GENERIC_TYPE = _np.generic if _np is not None else ()
+_NP_ARRAY_TYPE = _np.ndarray if _np is not None else ()
+
 
 def repro_dict_for_strict_json(repro: dict[str, Any], *, _path: str = "$") -> dict[str, Any]:
     """
@@ -84,15 +92,10 @@ def _to_json_serializable(obj: Any, *, path: str, _seen: set[int]) -> Any:
     if isinstance(obj, Path):
         return str(obj)
 
-    try:
-        import numpy as np
-    except ImportError:
-        np = None  # type: ignore[assignment]
-
-    if np is not None:
-        if isinstance(obj, np.generic):
+    if _np is not None:
+        if isinstance(obj, _NP_GENERIC_TYPE):
             return _to_json_serializable(obj.item(), path=path, _seen=_seen)
-        if isinstance(obj, np.ndarray):
+        if isinstance(obj, _NP_ARRAY_TYPE):
             return _to_json_serializable(obj.tolist(), path=path, _seen=_seen)
 
     raise ReproExportError(f"unsupported type {type(obj).__name__} at {path}")

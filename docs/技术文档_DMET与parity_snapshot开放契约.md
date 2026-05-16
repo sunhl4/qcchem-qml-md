@@ -47,22 +47,19 @@
 
 `collect_repro_metadata` 仅包含配置阶段字段；**`dmet_one_shot_open_ledger` / `dmet_solver_mode` / TKET 首电路探测** 在 `run_pipeline_sync` 末尾 `_finalize_open_stack_parity_snapshot` 合并进 **同一** `out["repro"]` 字典。
 
-## 3b. `parity_snapshot` 顶层键注册（维护 CI）
+## 3b. `parity_snapshot` 顶层键与维护惯例
 
-权威集合：`qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS`（新增快照字段时必须同步更新）。单测 `tests/test_parity_snapshot_key_registry.py`：`test_collect_repro_metadata_parity_keys_whitelisted`、`test_repro_quantum_snapshot_minimal_config_whitelisted`（配置期）；`test_finalize_adds_tensornet_parity_keys_when_stub_runs`（finalize 追加键）。两阶段写入与完整维护说明见 **§3c**。
+**已无单文件 frozenset 白名单**：历史上 `PARITY_SNAPSHOT_DOCUMENTED_KEYS` 曾与 dedicated 单测对齐；该注册表已从默认发行树移除。新增或更名 `parity_snapshot` 顶层键时，开发者应：
 
-条件键（ParityIntegrations / DMET / Schmidt / TN stub）的实现溯源：`orchestration/pipeline._repro_quantum_snapshot`、`_append_open_stack_parity_fields`、`_finalize_open_stack_parity_snapshot`。
+1. 在 **`qchem_stack.orchestration.pipeline`**（及 `parity_finalize`、`repro_metadata` / `repro_snapshot` 等快照装配处）写明字段语义并保证 JSON 安全；
+2. 更新本节 §3 **摘要表**与相关中文技术文档（尤其是 DMET / 嵌入 / TKET 小节）；
+3. 根据需要扩展 **`scripts/export_parity_criteria_table.py`**、**`scripts/check_parity_export_sample.py`**、`tests/fixtures/` Golden、以及 **`tests/test_orchestration_pipeline.py`**（或新增的聚焦用例）。
 
-### 3c. `PARITY_SNAPSHOT_DOCUMENTED_KEYS` 与 CI（权威键集合）
+**导出块稳定键**：config-only 「判据」类 JSON **仍**须满足 **`qchem_stack.protocols.product_contract.PARITY_EXPORT_V3_STABLE_KEYS`**（由 `tests/test_export_parity_golden.py` 与 **`scripts/check_parity_export_sample.py`** 兜底）。
 
-**源码**：`qchem_stack.protocols.inquanto_contract.PARITY_SNAPSHOT_DOCUMENTED_KEYS`（`frozenset`）。**任何**写入 `repro["parity_snapshot"]` 的新顶层键必须先加入该集合，否则 `tests/test_parity_snapshot_key_registry.py` 中 `test_collect_repro_metadata_parity_keys_whitelisted`、`test_repro_quantum_snapshot_minimal_config_whitelisted` 等会失败。
+### 3c. 与 CI（两阶段快照）
 
-**键从哪来（两阶段）**：
-
-1. **配置 / 量子契约基线**：`_repro_quantum_snapshot` 合并 `QuantumSpec` / `BackendSpec` / `MitigationSpec` / `CompilerSpec`、激发态开关、`embedding` 摘要、`chemistry_extended`、`nexus_*`、`tensornet_*` 等；随后在 **`parity_integrations.enabled`** 时由 `_append_open_stack_parity_fields` 追加开放栈叙事块（`open_stack_*`、`dmet_open_loop_architecture`、`projection_embedding_open_trace` 等，依 `EmbeddingSpec.mode` 与 flags）。
-2. **运行结束后验字段**：`_finalize_open_stack_parity_snapshot` 在管线尾部按实际输出写入或覆盖 **`tket_first_compiled_circuit_probe`**、**`dmet_one_shot_open_ledger`** / **`dmet_solver_mode`**、**`schmidt_embedding_production`**、**`schmidt_per_fragment_vqe_summary`**、**`dmet_uniform_multifragment_toy`**、**`tensornet_engine_resolved`** / **`tensornet_fallback_reason`**、**`uccsd_n_parameters`**（若变分元数据统计）、**`zne_qiskit_unification_v1`** 等。
-
-**文档维护**：§3 表为 **DMET/嵌入/投影** 视角的摘要；**完整键名列表** 以 `inquanto_contract.py` 中 `frozenset` 字面量为准（可用 `python -c "from qchem_stack.protocols.inquanto_contract import PARITY_SNAPSHOT_DOCUMENTED_KEYS; print('\\n'.join(sorted(PARITY_SNAPSHOT_DOCUMENTED_KEYS)))"` 打印对照）。
+写入 `parity_snapshot` 的常见阶段仍分为 **配置期** (`_repro_quantum_snapshot` + `_append_open_stack_parity_fields`) 与 **收尾期** (`_finalize_open_stack_parity_snapshot`)，详见前文 §3 表与各函数 docstring。**键名集合则以源码与上述脚本/测试为准**，不再从一个 `frozenset` 单点导出。
 
 ## 4. 求解器类
 

@@ -5,6 +5,7 @@ import json
 import pytest
 
 from qchem_stack.config import load_experiment_config
+from qchem_stack.exceptions import ConfigurationError
 
 
 def test_density_fit_auxbasis_requires_density_fit(tmp_path) -> None:
@@ -167,3 +168,29 @@ active_space:
     )
     cfg = load_experiment_config(p)
     assert cfg.scf.precomputed_bundle_path == str(bundle.resolve())
+
+
+def test_strict_top_level_keys_rejects_unknown_yaml_keys(tmp_path) -> None:
+    p = tmp_path / "bad_unknown_top_level.yaml"
+    p.write_text(
+        """
+schema_version: "1"
+experiment_id: cfg_inputs_strict_unknown
+random_seed: 0
+unknown_feature_flag: true
+molecule:
+  symbols: ["H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+active_space:
+  n_active_orbitals: 2
+  n_active_electrons: 2
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ConfigurationError, match="Unknown top-level config keys"):
+        load_experiment_config(p, strict_top_level_keys=True)

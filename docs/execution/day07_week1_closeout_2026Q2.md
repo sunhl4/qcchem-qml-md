@@ -14,7 +14,7 @@
 
 ## 同步更新点
 
-- 差距文档：`docs/与InQuanto能力差距与实施计划.md` 增加周进度入口。
+- 差距文档：`docs/public_parity_matrix.md` 增加周进度入口。
 - 路线图文档：`docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md` 增加执行周报入口。
 
 ## 结论

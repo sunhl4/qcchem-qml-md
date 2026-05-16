@@ -1,5 +1,5 @@
 {
-  "parity_export_schema_version": "2",
+  "parity_export_schema_version": "3",
   "source_config": "configs/example_h2.yaml",
   "experiment_id": "h2_sto3g_001",
   "geometry_source": "cartesian",
@@ -134,7 +134,7 @@
   "computable_abstract": {
     "schema": "qchem_computable_abstract_v2",
     "pauli_protocol_expectation_path": "exact_executor",
-    "evaluate_note": "Strict InQuanto-style evaluate reuse (conservative): each required Pauli label must appear in hamiltonian_pauli_strings from protocol_counts; see qchem_stack.protocols.pauli_support.assert_evaluate_compatible.",
+    "evaluate_note": "Strict evaluate reuse (conservative): each required Pauli label must appear in hamiltonian_pauli_strings from protocol_counts; see qchem_stack.protocols.pauli_support.assert_evaluate_compatible.",
     "support_set_exported_from_protocol": false,
     "items": [
       {
@@ -156,115 +156,6 @@
     ]
   },
   "excited_resource_from_config": null,
-  "inquanto_gap_categories": [
-    {
-      "id": "cloud_nexus",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — qnexus/HQC (non-cloud L1 parity: analog only)",
-      "inquanto_surface": "Nexus / qnexus / HQC (cloud + local ledger)",
-      "qchem_stack": "jobs/nexus_analog + jobs/nexus_cloud + integrations/nexus_optional (import probe)",
-      "status": "analog_v1_plus_adapter"
-    },
-    {
-      "id": "http_submit_poll_workspace",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — 作业提交/列表/轮询",
-      "inquanto_surface": "HTTPS job submit, list, poll status (Nexus-shaped product UX)",
-      "qchem_stack": "qchem_stack.api FastAPI: capability-surface, POST/GET /v1/runs (project_slug + workspace), GET /v1/runs/{id}/summary, GET /v1/runs/{id}/events (timeline_json), GET /v1/meta/product-analog, POST /v1/meta/workflow-preview, GET /v1/meta/parity-gaps, POST /v1/meta/computables-preview, GET /v1/meta/queue-stats, SQLite JobStore.list_jobs",
-      "status": "local_analog_v1"
-    },
-    {
-      "id": "qermit_graph",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — Qermit; see mitigation_execution_model",
-      "inquanto_surface": "Qermit MitRes / MitEx graphs and execution",
-      "qchem_stack": "qermit_analog + qermit_runtime + integrations/qermit_reference (capability matrix); MitigationSpec.zne_mode=circuit_scale_fold wires Pauli protocol zne_curve into mitigation_dag_execution",
-      "status": "analog_v2_runtime",
-      "dag_trace_order_invariant": "L1: ``mitigation_graph_report.nodes`` (excluding in/out shells) kinds sequence equals ``mitigation_dag_execution.trace[].node`` order — ``tests/test_mitigation_dag_trace_homology.py``",
-      "mitigation_execution_model": {
-        "schema": "mitigation_execution_model_v1",
-        "sync_dag": {
-          "open_stack": "mitigation/qermit_analog.py JSON graph + optional mitigation_dag_execution trace on pipeline result",
-          "public_doc_anchor": "MitRes-style graphs (Quantinuum errmit manual — URL below)"
-        },
-        "async_batch_execution": {
-          "open_stack": "not_implemented_mitex_batch_scheduler",
-          "note": "Local SQLite jobs run whole experiments; not a Qermit MitEx multi-task batch runtime."
-        },
-        "public_doc_urls": [
-          "https://docs.quantinuum.com/inquanto/manual/errmit.html"
-        ],
-        "epistemic_bound": "Open analog only — not the closed Qermit wheel or vendor execution engine."
-      }
-    },
-    {
-      "id": "composable_computable",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — Computable / workflow-preview",
-      "inquanto_surface": "Computable graph",
-      "qchem_stack": "list_computables_for_config + computable_graph_v2 (semantic DAG + YAML computable_extra_edges/remove_edges) + POST /v1/meta/workflow-preview + optional computables_rich_v1 (include_computables_rich); PauliAveragingProtocol at run time",
-      "status": "analog_v2_semantic_graph_rich_optional"
-    },
-    {
-      "id": "evaluate_support_set",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — resource / Pauli support",
-      "inquanto_surface": "evaluate_expectation_value / measurement-plan support reuse (public docs)",
-      "qchem_stack": "protocol_counts hamiltonian_pauli_strings + protocols.pauli_support.assert_evaluate_compatible",
-      "status": "improved_v1"
-    },
-    {
-      "id": "compiler_pass_bundle",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §4 — TKET; gap id compiler_pass_bundle",
-      "inquanto_surface": "preoptimize_passes / compiler_passes / optimization_level (protocol compile stage)",
-      "qchem_stack": "CompilerSpec + compiler_bundle_signature_from_config + CircuitIR passes + integrations/tket_fullchain (pytket stats)",
-      "status": "improved_v1"
-    },
-    {
-      "id": "ucc_chem_ansatz",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — ADAPT / IQEB / UCC",
-      "inquanto_surface": "UCC / chemically aware pools",
-      "qchem_stack": "HEA + ADAPT + IQEB + ``quantum.variational_ansatz=uccsd`` dense cluster ansatz (UCCSDVQE / UCCSDTrotterVQE — **Jordan–Wigner** with JW particle-sector projector, or **Bravyi–Kitaev** BK-matched exponentials without JW projector; rejects **symmetry_conserving_bravyi_kitaev** qubit truncation); JW & BK operator pools ``fermionic_uccsd*`` slices in ``operator_pool_registry_export_v1``; `configs/example_h2_uccsd.yaml`, `configs/example_h2_uccsd_trotter.yaml`, BK example `configs/example_h2_uccsd_bk.yaml` + integrations/ucc_reference; HEA+VQE stays valid on BK/SCBK Hamiltonians alone",
-      "status": "partial_jw_sector_projector_bk_dense_packaged_scbk_truncation_na"
-    },
-    {
-      "id": "adapt_iqeb_operator_pool_surface",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §2 — quantum.adapt_pool_id / iqeb_pool_id export",
-      "inquanto_surface": "Chemically motivated excitation / pool selection (vendor documentation narrative)",
-      "qchem_stack": "quantum.operator_pool_registry (JW spin-UCCSD + singles/doubles slices; BK-mapped pools ``fermionic_uccsd_bravyi_kitaev`` + BK singles/doubles/concat; iqeb qubit-excitation pool; toy_pair_xx; aliases `qubit_excitation`→`iqeb_qubit_excitation`, `uccsd_jw`→`fermionic_uccsd`, `uccsd_bravyi_kitaev`/`uccsd_bk`→`fermionic_uccsd_bravyi_kitaev` via `operator_pool_registry_export_v1.pool_id_aliases`); YAML quantum.adapt_pool_id / quantum.iqeb_pool_id; run_summary echoes pool ids when adapt/iqeb runs; operator_pool_registry_export_v1 in algorithm_registry_alignment_v1 parity export block",
-      "status": "executable_pools_partial_vs_vendor_full_excitation_taxonomy"
-    },
-    {
-      "id": "dmet_scf_loop",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §3 — DMET / Schmidt",
-      "inquanto_surface": "Full DMET self-consistency",
-      "qchem_stack": "schmidt_dmet_density_feedback_v1 + schmidt_dmet_multifragment_density_feedback_v1 + DMETSelfConsistencyLoop generic hooks + optional dense fragment ED (QubitHamiltonianFragmentSolverExact; configs/example_h4_dmet_fragment_exact_small.yaml); optional schmidt_bath_sidecar_json_path → embedding_workflow.schmidt_bath_sidecar_v1; ONIOM toy layers → embedding_workflow.oniom_toy_v1 (configs/example_oniom_toy.yaml)",
-      "status": "schmidt_density_feedback_v1_plus_hooks_oniom_toy_yaml"
-    },
-    {
-      "id": "tensornet",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1 — CuTensorNet; parity_snapshot tensornet_engine_resolved",
-      "inquanto_surface": "CuTensorNetProtocol",
-      "qchem_stack": "cutensornet_protocol_stub + integrations/tensornet_closure (strategy map)",
-      "status": "n_a_no_shipped_l3_chemistry_contraction_reason_open_stack_stub_only_not_inquanto_cutensornet"
-    },
-    {
-      "id": "integrations_closure_layer",
-      "parity_matrix_anchor": "docs/工程记忆_Quantinuum对标与数据流技术文档.md §0; open_gap_closure_reference",
-      "inquanto_surface": "Product defaults (TKET boxes, UCC regrouping, DMET, Nexus, Qermit, TN)",
-      "qchem_stack": "Package qchem_stack.integrations — see docs/工程记忆_Quantinuum对标与数据流技术文档.md §0 (L1 not L0)",
-      "status": "reference_v1"
-    },
-    {
-      "id": "drivers_cosmo_pbc",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §3 — chem/inquanto_driver_surface.py",
-      "inquanto_surface": "COSMO / PBC / full driver surface",
-      "qchem_stack": "ddCOSMO; pbc RHF/KRHF + k-mesh + optional PBC ddCOSMO",
-      "status": "partial_kmesh"
-    },
-    {
-      "id": "qpu_shot_histogram",
-      "parity_matrix_anchor": "inquanto_public_parity_matrix.md §1–2 — Qiskit shots / device counts",
-      "inquanto_surface": "Device counts → expectation",
-      "qchem_stack": "Qiskit get_counts path + statevector sim",
-      "status": "yes_qiskit"
-    }
-  ],
   "vqd_after_variational": false,
   "vqd_n_states": 2,
   "vqd_penalty_weight": 5.0,

@@ -1,5 +1,5 @@
 """
-Field-level **reference** between InQuanto / Qermit narratives and this repo’s open analogs.
+Field-level **reference** between vendor mitigation narratives (MitRes/Qermit-style) and this repo’s open analogs.
 
 This is documentation-as-data for parity exports — **not** a CQCL binary.
 """
@@ -19,31 +19,31 @@ def qermit_capability_matrix() -> dict[str, Any]:
         "rows": [
             {
                 "capability": "Mitigation task graph (DAG)",
-                "inquanto_docs": "Qermit graphs for mitigation stages",
+                "reference_docs": "Qermit graphs for mitigation stages",
                 "implementation": "qchem_stack.mitigation.qermit_analog.build_qermit_style_mitigation_report",
                 "export_key": "mitigation_graph_report",
             },
             {
                 "capability": "Sequential graph execution",
-                "inquanto_docs": "Runtime consumes graph (MitRes-style)",
+                "reference_docs": "Runtime consumes graph (MitRes-style)",
                 "implementation": "qchem_stack.mitigation.qermit_runtime.execute_mitigation_dag[_runtime]",
                 "export_key": "mitigation_dag_execution",
             },
             {
                 "capability": "Execution class / batching intent",
-                "inquanto_docs": "Sync vs async barrier semantics on hardware",
+                "reference_docs": "Sync vs async barrier semantics on hardware",
                 "implementation": "MitigationSpec.execution_class (sync_graph | async_batch | …)",
                 "export_key": "repro.parity_snapshot.mitigation_execution_class",
             },
             {
                 "capability": "PMSV / symmetry post-selection",
-                "inquanto_docs": "Shot-level filtering",
+                "reference_docs": "Shot-level filtering",
                 "implementation": "Protocol counts + PMSV on PauliAveragingProtocol; toy stderr model in runtime",
                 "export_key": "protocol_counts, pmsv_report",
             },
             {
                 "capability": "ZNE stub",
-                "inquanto_docs": "Noise scaling / extrapolation",
+                "reference_docs": "Noise scaling / extrapolation",
                 "implementation": "qchem_stack.mitigation.zne.zne_scale_energy",
                 "export_key": "mitigation_dag_execution trace node ZNE_extrapolation_stub",
             },

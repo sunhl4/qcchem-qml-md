@@ -1,7 +1,7 @@
 """Unified ``driver_meta`` keys for active-space strategies after classical reference build.
 
 ``strategy=avas_stub`` is hook-only: orbital selection follows **CAS** ``ncas`` / ``nelecas`` sizing
-(same normalization as ``strategy=cas``). No PySCF/InQuanto-style AVAS threshold projection or
+(same normalization as ``strategy=cas``). No vendor/PySCF-style AVAS threshold projection or
 ``frozen=avas.frozenf`` list is computed—see ``avas_stub_semantics`` and
 ``avas_atomic_projection_executed`` on the payload.
 

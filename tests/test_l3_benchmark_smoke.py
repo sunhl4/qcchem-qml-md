@@ -21,7 +21,7 @@ def test_l3_representative_algorithm_yamls_sync_pipeline() -> None:
     """Energy + run_summary smoke; when enabled, emits ``algorithm_benchmark_bundle_v1`` metrics."""
     if os.environ.get("QCHEM_RUN_L3", "").strip() != "1":
         pytest.skip(
-            "Set QCHEM_RUN_L3=1 to run L3 numerical benchmarks (see docs/与InQuanto能力差距与实施计划.md 附录 B §7)"
+            "Set QCHEM_RUN_L3=1 to run L3 numerical benchmarks (see docs/public_parity_matrix.md 附录 B §7)"
         )
     pytest.importorskip("pyscf")
     root = Path(__file__).resolve().parents[1]

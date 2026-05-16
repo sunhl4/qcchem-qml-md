@@ -26,7 +26,7 @@ class AlgorithmReport:
 
 @runtime_checkable
 class AlgorithmLifecycle(Protocol):
-    """Unified algorithm lifecycle, analogous to InQuanto Algorithm classes."""
+    """Unified algorithm lifecycle, analogous to staged Algorithm classes in reference QC stacks."""
 
     def build(self, **kwargs: Any) -> AlgorithmLifecycle: ...
 

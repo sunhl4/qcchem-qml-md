@@ -7,4 +7,4 @@
 - Gate status:
   - `pytest -q`: pending
   - `python scripts/check_parity_export_sample.py`: pending
-  - `npm --prefix docs-site run docs:build`: pending
+  - `npm --prefix docusaurus-site run build`: pending

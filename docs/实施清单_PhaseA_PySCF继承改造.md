@@ -2,7 +2,7 @@
 
 ## 1. 目标（本阶段只做三件事）
 
-对应《`技术分析_InQuanto_PySCF_vs_原生PySCF_及工程借鉴.md`》的 Phase A，本阶段目标限定为：
+对应《`技术分析_Vendor platform_PySCF_vs_原生PySCF_及工程借鉴.md`》的 Phase A，本阶段目标限定为：
 
 1. 统一 driver benchmark 输出（HF/MP2/CCSD/CASCI）；
 2. 规范 `driver_meta` 字段（可用于 parity/回归）；
@@ -33,8 +33,8 @@
 
 - **改动文件**
   - `src/qchem_stack/chem/drivers/pyscf_driver.py`
-  - `src/qchem_stack/chem/inquanto_driver_surface.py`（补充可对照描述）
-  - `docs/inquanto_public_parity_matrix.md`（必要时更新说明）
+  - `src/qchem_stack/integrations/open_driver_surface.py`（coverage 矩阵；与 `chem/drivers/pyscf_driver.py` 协同）
+  - `docs/public_parity_matrix.md`（必要时更新说明）
 - **实现要求（最小字段集）**
   - `driver_family`: `"pyscf"`
   - `scf_method`: `"RHF" | "ROHF" | "UHF"`
@@ -49,7 +49,7 @@
 - **验收标准**
   - 分子 RHF 与 PBC RHF/KRHF 路径均生成完整 `driver_meta`。
   - ddCOSMO 打开/关闭时字段一致且可机读判别。
-  - `inquanto_driver_surface` 文档说明与实际字段不冲突。
+  - `integrations/open_driver_surface`（与 `driver_meta`、`pyscf_driver`）文档说明与实际字段不冲突。
 
 ## A3. 统一 active-space 策略入口（manual + CAS）
 
@@ -124,8 +124,7 @@
 ## 7. 可直接开工的 TODO（复制到 issue 即可）
 
 - [ ] 定义 `driver_meta` schema（字段、默认值、类型）并在 `PySCFDriver` 各分支填充  
-- [ ] 补齐 `inquanto_driver_surface` 对 `driver_meta` 的说明映射  
-- [ ] 引入统一 `active_space.strategy` 配置并保持向后兼容（若有旧字段）  
+- [ ] 补齐 **`open_driver_surface` / `pyscf_driver`** 对 `driver_meta` 的说明映射  - [ ] 引入统一 `active_space.strategy` 配置并保持向后兼容（若有旧字段）  
 - [ ] 新增 manual/cas 两份最小可运行配置样例  
 - [ ] 实现 `run_classical_benchmarks` 并处理不可用方法状态  
 - [ ] 新增 `meta_contract` / `active_space` / `benchmarks` 三类测试  

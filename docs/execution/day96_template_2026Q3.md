@@ -1,13 +1,13 @@
 # Day96 Execution Template (2026Q3)
 
-目标：完成 docs/docs-site 双站口径同步。
+目标：完成 docs/docusaurus-site 双站口径同步。
 
 ## 本日实现
 
 - 文件：
-  - `docs/与InQuanto能力差距与实施计划.md`
-  - `docs/inquanto_public_parity_matrix.md`
-  - `docs-site/docs/concept/p2-detailed-plan.md`
+  - `docs/public_parity_matrix.md`
+  - `docs/public_parity_matrix.md`
+  - `docusaurus-site/docs/parity/gap-implementation-plan.md`
 - 变更摘要：
   - （填写文档更新点）
   - （填写链接修正点）

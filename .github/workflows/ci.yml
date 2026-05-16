@@ -68,9 +68,9 @@ jobs:
         run: python scripts/smoke_pipeline.py --projection-trace
       - name: Parity criteria export (no PySCF run)
         run: python scripts/export_parity_criteria_table.py configs/example_h2.yaml | head -c 4000
-      - name: Parity export schema v2 keys
+      - name: Parity export schema v3 stable keys
         run: |
-          python scripts/export_parity_criteria_table.py configs/example_h2.yaml | python -c "import json,sys;d=json.load(sys.stdin);assert d.get('parity_export_schema_version')=='2';c=d['computable_abstract'];assert c.get('schema')=='qchem_computable_abstract_v2';assert isinstance(d.get('inquanto_gap_categories'),list);assert d.get('embedding',{}).get('mode')=='none'"
+          python scripts/export_parity_criteria_table.py configs/example_h2.yaml | python -c "import json,sys;d=json.load(sys.stdin);assert d.get('parity_export_schema_version')=='3';c=d['computable_abstract'];assert c.get('schema')=='qchem_computable_abstract_v2';assert isinstance(d.get('capability_gap_categories'),list);assert d.get('embedding',{}).get('mode')=='none'"
       - name: Parity export multi-config L1 gate (check_parity_export_sample)
         run: python scripts/check_parity_export_sample.py
       - name: Pytket bridge (optional extra)
@@ -82,7 +82,7 @@ jobs:
       - name: QPE dual-track demo (no PySCF)
         run: python scripts/run_qpe_track_demo.py
 
-  docs-site:
+  docusaurus:
     needs: lint
     runs-on: ubuntu-latest
     steps:
@@ -91,13 +91,10 @@ jobs:
         with:
           node-version: "20"
           cache: npm
-          cache-dependency-path: docs-site/package-lock.json
-      - name: Install docs-site
-        working-directory: docs-site
+          cache-dependency-path: docusaurus-site/package-lock.json
+      - name: Install site deps
+        working-directory: docusaurus-site
         run: npm ci
-      - name: Configs index matches repo YAML
-        working-directory: docs-site
-        run: npm run check:configs-table
-      - name: VitePress production build
-        working-directory: docs-site
-        run: npm run docs:build
+      - name: Docusaurus production build
+        working-directory: docusaurus-site
+        run: npm run build

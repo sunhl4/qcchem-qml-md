@@ -12,8 +12,7 @@ from typing import Any
 from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
-
-PRE_QUANTUM_INPUT_SCHEMA_V1 = "pre_quantum_input_v1"
+from qchem_stack.contracts.schema_ids import PRE_QUANTUM_INPUT_SCHEMA_V1
 
 
 def pre_quantum_meta_from_hamiltonian(

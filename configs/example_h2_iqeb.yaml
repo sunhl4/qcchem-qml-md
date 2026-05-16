@@ -1,5 +1,5 @@
 # IQEB outer loop + inner VQE on H2 active space (L1 parity; non-default algorithm).
-# See docs/InQuanto_B_J_逐项闭合计划.md 序 C3.
+# See docs/public_parity_matrix.md (closure plan narrative).
 schema_version: "1"
 experiment_id: "h2_iqeb_sto3g_001"
 random_seed: 42

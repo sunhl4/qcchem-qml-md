@@ -1,6 +1,6 @@
 # Day 1 Inventory (2026Q2)
 
-目标：把 `inquanto_gap_categories()` 的残余项映射到本季度可执行目标，作为 90 天实施的固定看板输入。
+目标：把 **`product_gap_categories()`**（HTTP `gaps` / export `capability_gap_categories`）的残余项映射到本季度可执行目标，作为 90 天实施的固定看板输入。
 
 ## 当前 gap 状态快照
 
@@ -14,7 +14,7 @@
 | `compiler_pass_bundle` | `improved_v1` | 维持可选 pytket 路径，不改为硬依赖。 |
 | `ucc_chem_ansatz` | `partial_jw_uccsd_and_trotter_packaged_bk_scbk_uccsd_na` | 本季度补 registry/文档/测试，不承诺 BK/SCBK UCCSD Trotter。 |
 | `dmet_scf_loop` | `schmidt_density_feedback_v1_plus_hooks_oniom_toy_yaml` | 推进 P2-W2 最小可跑分解路径（plugin/ONIOM）。 |
-| `tensornet` | `n_a_no_shipped_l3_chemistry_contraction_reason_open_stack_stub_only_not_inquanto_cutensornet` | 维持 `n/a` 诚实降级；不做商业二进制 parity。 |
+| `tensornet` | `n_a_no_shipped_l3_chemistry_contraction_reason_open_stack_stub_only_not_vendor_cutensornet` | 维持 `n/a` 诚实降级；不做商业二进制 parity。 |
 | `integrations_closure_layer` | `reference_v1` | 维持引用层，防止文档/代码漂移。 |
 | `drivers_cosmo_pbc` | `partial_kmesh` | 做边界文档与 driver surface 可检证扩展（P2-W3）。 |
 | `qpu_shot_histogram` | `yes_qiskit` | 维持稳定并覆盖更多样例回归。 |
@@ -28,5 +28,5 @@
 
 ## 冻结规则（执行期间）
 
-- 任一状态变化必须同步三处：`docs/inquanto_public_parity_matrix.md`、`docs/与InQuanto能力差距与实施计划.md`、`src/qchem_stack/protocols/inquanto_contract.py`（稳定 import：`qchem_stack.protocols.inquanto_contract`；字面量实现：`internal_reports/competitor/inquanto_contract.py`，见 [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）。
+- 任一状态变化必须同步三处：`docs/public_parity_matrix.md`、`docs/public_parity_matrix.md`、`src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：`product_gap_categories()` 等 — 见 [CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）。
 - 对云/硬件/闭源二进制相关项保持 `n/a` 或 `partial+caveat`，不允许营销式升格。

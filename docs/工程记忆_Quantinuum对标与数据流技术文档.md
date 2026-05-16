@@ -1,6 +1,6 @@
-# qchem_stack 工程记忆：与 Quantinuum / InQuanto 公开路线对标及优化路线图
+# qchem_stack 工程记忆：与 Quantinuum / Vendor platform 公开路线对标及优化路线图
 
-- 能力矩阵：`docs/inquanto_public_parity_matrix.md`
+- 能力矩阵：`docs/public_parity_matrix.md`
 - **开放栈「记忆 + 缺口清单」**：见本文 **[§13](#13-开放栈对标完成度与待闭合项原独立记忆合并)**。
 - **DMET / `parity_snapshot` 契约**：[技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)
 - **详细技术说明（本包）**：[技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md)（`CircuitIR`↔pytket、资源双轨、`JobHandle`/`protocol_hash`、与 Nexus **语义**类比）
@@ -12,21 +12,21 @@
 
 ---
 
-## 0. 闭源边界与可复现层级（合并收录；原 `架构_InQuanto闭源能力闭合与可复现边界.md`）
+## 0. 闭源边界与可复现层级（合并收录；原 `架构_Vendor platform闭源能力闭合与可复现边界.md`）
 
 ### 1. 必须先写清的「复现」含义
 
 
 | 层级                  | 含义                                                                 | 本项目是否追求                                   |
 | ----------------------- | ---------------------------------------------------------------------- | -------------------------------------------------- |
-| **L0 二进制等价**     | 与未公开的 InQuanto wheel / Nexus 私有 API 完全一致                  | **否**（无源码与合同则无意义）                   |
+| **L0 二进制等价**     | 与未公开的 Vendor platform wheel / Nexus 私有 API 完全一致                  | **否**（无源码与合同则无意义）                   |
 | **L1 公开契约等价**   | 与官方文档/API/教程描述的对象流、阶段、字段语义一致                  | **是**（当前主目标）                             |
 | **L2 数值比特级等价** | 同一输入下单次实验数值逐比特一致                                     | **通常**否（依赖随机性、闭源优化器、私有编译器） |
 | **L3 统计与资源等价** | 在相同测量计划、门集、shots 模型下，能量/方差/资源表在允许误差内一致 | **可作为**论文级对照目标                         |
 
 **结论**：所谓「闭合」闭源产品，在工程上应落实为：**用开放栈覆盖公开文档中可检证的全部工作流关节**，并对照公开仓库（`qnexus`、`pytket-quantinuum`、教程）做行为回归；**不**声称替代未公开的算法默认与商业后端实现。
 
-**对「完全复现功能与细节」的答复**：若理解为与 InQuanto **闭源 wheel / 内部默认 / 全部 driver 组合**在功能与数值上完全一致，则属于 **§1 表中的 L0/L2**，在无源码、无许可与无对照实验协议的前提下**不应立项为可交付 KPI**。可交付的是：**选定子能力**（例如某一类嵌入、某一算法族、某一缓解图语义）在 **L1/L3** 下的逐项加深，并对照公开资料或可逆合成基准验收。
+**对「完全复现功能与细节」的答复**：若理解为与 Vendor platform **闭源 wheel / 内部默认 / 全部 driver 组合**在功能与数值上完全一致，则属于 **§1 表中的 L0/L2**，在无源码、无许可与无对照实验协议的前提下**不应立项为可交付 KPI**。可交付的是：**选定子能力**（例如某一类嵌入、某一算法族、某一缓解图语义）在 **L1/L3** 下的逐项加深，并对照公开资料或可逆合成基准验收。
 
 ---
 
@@ -34,11 +34,11 @@
 
 ### 2.1 默认 TKET box 全链
 
-**闭源侧究竟难在哪**：教程强调 `build` 保留 `pytket` boxes，再在 `compile` 阶段统一 `rebase` 与优化（见 InQuanto Protocols 文档）。
+**闭源侧究竟难在哪**：教程强调 `build` 保留 `pytket` boxes，再在 `compile` 阶段统一 `rebase` 与优化（见 Vendor platform Protocols 文档）。
 
 **可闭合部分**：逻辑电路 → `pytket.Circuit` → `depth`/`depth_2q`/native 门统计 →（可选）`get_compiled_circuit`。
 
-**不可闭合部分**：与 InQuanto 私有 `preoptimize_passes` 实现细节完全一致；离子阱上最终 routing 与 Quantinuum 私有 pass 包。
+**不可闭合部分**：与 Vendor platform 私有 `preoptimize_passes` 实现细节完全一致；离子阱上最终 routing 与 Quantinuum 私有 pass 包。
 
 **开放实现策略**：见 `qchem_stack.integrations.tket_fullchain`：在已有 `pytket_bridge` 上增加「全链位」——统一入口、缺失门类清单、与 `CircuitIR` 对齐的扩展表。
 
@@ -48,7 +48,7 @@
 
 **可闭合部分**：同一活性空间下的 **UCCSD 费米子生成元集合**、JW 后的 Pauli/线路复杂度对照、与 HEA/ADAPT 的**门数对比表**（Methods 可写）。
 
-**不可闭合部分**：与 InQuanto 内部完全相同的 regrouping 与 Trotter 剖分；未公开常数与启发式。
+**不可闭合部分**：与 Vendor platform 内部完全相同的 regrouping 与 Trotter 剖分；未公开常数与启发式。
 
 **开放实现策略**：见 `qchem_stack.integrations.ucc_reference`：`IdentityRegrouping`（基线）+ 可插入的 `ChemicallyAwareUCCPolicy` 协议；未来可接论文 2210.14834 的可公开算法实现。
 
@@ -68,7 +68,7 @@
 
 **可闭合部分**：**状态机与数据契约**（bath → fragment 求解 → 全局更新）、自洽轮数进 `repro`、与 `EmbeddingSpec` 对齐的 falsifiability 字段。
 
-**不可闭合部分**：与某篇文献或 InQuanto 私有 DMET 默认参数完全一致而不设验证集。
+**不可闭合部分**：与某篇文献或 Vendor platform 私有 DMET 默认参数完全一致而不设验证集。
 
 **开放实现策略**：见 `qchem_stack.integrations.dmet_self_consistent`：`DMETSelfConsistencyLoop` 协议 + `OneShotEmbeddingDriver`（单轮、用于 CI）；真实循环由用户注入 `FragmentSolverProtocol` 与 bath 更新规则。
 
@@ -84,7 +84,7 @@
 
 ### 2.6 cuTensorNet 化学收缩「等价物」
 
-**闭源侧究竟难在哪**：`inquanto-cutensornet` 与 GPU 栈深度绑定；化学哈密顿量到 TN 的图构造多为产品内逻辑。
+**闭源侧究竟难在哪**：`vendor-cutensornet` 与 GPU 栈深度绑定；化学哈密顿量到 TN 的图构造多为产品内逻辑。
 
 **可闭合部分**：同一 Pauli/哈密顿量下的 **期望值在 SV/TN 双轨**上交叉检查（小体系）；`allow_partial` 语义在 stub 中已有对应思想。
 
@@ -130,10 +130,10 @@ flowchart TB
 
 ### 4. 验收：怎样算「闭合成功」
 
-1. **工作流**：`tutorial_inquanto_chain_h2.yaml` 级链 + 可选 extras（pytket / qnexus）探测通过。
+1. **工作流**：`tutorial_chain_h2.yaml` 级链 + 可选 extras（pytket / qnexus）探测通过。
 2. **元数据**：`compiler_bundle_signature`、`hamiltonian_fingerprint`、`protocol_counts` 支撑集、PMSV 三元组齐全。
 3. **扩展点**：DMET/UCC/Qermit/Nexus/TN 均有 **Protocol/探测函数**，可在无商业合同时 CI 绿灯。
-4. **文档**：本文 + `inquanto_contract.inquanto_gap_categories()` 同步更新口径；**维护用记忆与缺口清单**见 [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md) **§13**；**DMET/`parity_snapshot` 字段契约**见 [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)。
+4. **文档**：本文 + **`qchem_stack.protocols.product_contract`**（gap 导出等）口径同步；**维护用记忆与缺口清单**见本文 **§13**；**DMET/`parity_snapshot` 字段语义**见 [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)。
 
 ---
 
@@ -187,7 +187,7 @@ flowchart TB
 | 算法  | 竞品抽象                                  | 本工程                                                                                                                       | 差距                                               |
 | ------- | ------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------- |
 | VQD   | 三`Protocol`、重叠线路、粒子数守恒 ansatz | 优化仍单目标；`vqd_channels[*].three_protocol` 分 **objective / overlap / weight** 报告（可选 shots；重叠为 swap-test 模型） | 缺：优化内环三线路严格解耦、粒子数守恒 ansatz      |
-| QSE   | `QSEMatricesComputable` 式打包            | `qse_transition.py` + `run_from_vqe_hea_basis_pauli_transitions`（逐 $(i,j)$ Pauli 贡献 + `QSEPauliTransitionSchedule`）     | 缺：fermionic 激发池与 InQuanto composite 完全同构 |
+| QSE   | `QSEMatricesComputable` 式打包            | `qse_transition.py` + `run_from_vqe_hea_basis_pauli_transitions`（逐 $(i,j)$ Pauli 贡献 + `QSEPauliTransitionSchedule`）     | 缺：fermionic 激发池与 Vendor platform composite 完全同构 |
 | SCEOM | shot-\(M\)、分析 DataFrame                | `run_sceom_nested_commutator` / `from_hea`：嵌套对易子 \(M\) + 可选矩阵噪声；仍为 Pauli 玩具 \(S\)                           | 缺：文献费米激发算符、自洽迭代、全部分析 DataFrame |
 
 ### 3.1 激发态与 `repro.run_summary`（主线 pipeline）
@@ -216,7 +216,7 @@ flowchart TB
 
 ## 4. Protocol `run` 语义与竞品「evaluate」差异（重要）
 
-### 4.0 五阶段状态机（与 InQuanto 公开「阶段」叙事对齐）
+### 4.0 五阶段状态机（与 Vendor platform 公开「阶段」叙事对齐）
 
 `PauliAveragingProtocol` 使用 `ProtocolPhase` 枚举：`instantiate` → `build` → `compile` → `run` → `evaluate`（见 `protocols/protocol.py`）。**管线内**（`orchestration/pipeline.py::_protocol_for_job`）在单进程路径上依次调用：`proto.build(...)` → `proto.compile()` → `proto.run()` → `proto.evaluate()`；其中 **`run` 写入 `proto._counts`**（含 `expectation` / `expectation_source` / `energy_stderr_model` 等），`evaluate` 返回最终能量并与 `dataframe_circuit_shot_rows` 的资源表一致。**异步 Pauli pickle 作业**仍走同一协议对象序列化，由 worker 在 `dispatch_job` 中恢复执行。
 
@@ -227,7 +227,7 @@ flowchart TB
 - 能量均值来自 `executor.expectation_hea(...)`（statevector / 模拟器为**精确**或后端定义的单标量）。
 - `energy_stderr`、`total_shots_budget` 来自 `energy_estimate_with_uncertainty` 的**经典保守界**，不是从有限 shot 样本重估 \(\langle H\rangle\)。
 
-竞品 InQuanto：`run` 产生测量 DataFrame，`evaluate_expectation_value` 在**同一支撑集**上做线性重组。
+竞品 Vendor platform：`run` 产生测量 DataFrame，`evaluate_expectation_value` 在**同一支撑集**上做线性重组。
 
 **优化建议**：
 
@@ -260,9 +260,9 @@ flowchart TB
 
 ## 7. 缓解与编排
 
-**竞品**：Qermit 产品图与云上异步；本工程：**SQLite** job + `process_job_with_retry`；另有与 InQuanto **公开叙事可对表**的开放栈类比（**非** 二进制等价）：
+**竞品**：Qermit 产品图与云上异步；本工程：**SQLite** job + `process_job_with_retry`；另有与 Vendor platform **公开叙事可对表**的开放栈类比（**非** 二进制等价）：
 
-- **缓解图 + 线性执行**：`mitigation_graph_report`（`qermit_analog`）与管线输出的 `mitigation_dag_execution`（`qermit_runtime`）。详见 [与InQuanto能力差距与实施计划 — 附录 F](与InQuanto能力差距与实施计划.md)、[inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。
+- **缓解图 + 线性执行**：`mitigation_graph_report`（`qermit_analog`）与管线输出的 `mitigation_dag_execution`（`qermit_runtime`）。详见 [与Vendor platform能力差距与实施计划 — 附录 F](public_parity_matrix.md)、[public_parity_matrix.md](public_parity_matrix.md)。
 - **真云**：不设 Quantinuum SDK；`jobs/nexus_cloud.py` 为 **http/mock 侧车**（`ExperimentConfig.nexus_cloud`），仅 repro/探活，**非** Nexus 作业 API。
 - **计价类比**：`jobs/nexus_analog.py` + YAML `nexus_analog`；异步作业 pickle 上带 **`NexusAnalogSpec`**，`nexus_analog_billing` 与同步 `nexus_analog_ledger` 权重一致。
 
@@ -282,14 +282,14 @@ flowchart TB
 
 ## 8. DMET / MD / ML（差异化长板）
 
-- `md_bridge`、`QMEFDataset`、surrogate/active learning 是相对于「纯 InQuanto 化学核」的扩展长板。
+- `md_bridge`、`QMEFDataset`、surrogate/active learning 是相对于「纯 Vendor platform 化学核」的扩展长板。
 - 竞品文 §4：大体系论文应写清 fragment 自洽轮数与经典参考档。**二轮**：`DMETContext` 增加可选字段 `n_scf_cycles_embedding`、`classical_reference_method` 供流水线写入；全量 DMET 自洽循环仍为扩展项。
 
 ---
 
 ## 9. 优先实施顺序（已归档）
 
-原「按对标可证伪性排序」的逐项 checklist 已由 **[与InQuanto能力差距与实施计划 — 附录 E/C](与InQuanto能力差距与实施计划.md)** 与正文 **§3 摘要表**收束；**勿在本节追加新 checkbox**。物化链、判据与缺口仍以 **§1–§8**、**§13** 为准；路线图 **P2** 见 [与InQuanto能力差距与实施计划 — 附录 A](与InQuanto能力差距与实施计划.md)。
+原「按对标可证伪性排序」的逐项 checklist 已由 **[与Vendor platform能力差距与实施计划 — 附录 E/C](public_parity_matrix.md)** 与正文 **§3 摘要表**收束；**勿在本节追加新 checkbox**。物化链、判据与缺口仍以 **§1–§8**、**§13** 为准；路线图 **P2** 见 [与Vendor platform能力差距与实施计划 — 附录 A](public_parity_matrix.md)。
 
 ---
 
@@ -306,11 +306,11 @@ flowchart TB
 | VQD / QSE                         | `quantum/algorithms/excited.py`, `quantum/qse_transition.py`                                                                     |
 | SCEOM                             | `quantum/algorithms/sceom.py`                                                                                                    |
 | 流水线                            | `orchestration/pipeline.py`（含 `nexus_analog_ledger`、`mitigation_*`、`nexus_cloud_repro`、`tensornet_protocol_stub` 挂接）     |
-| 能力矩阵                          | `docs/inquanto_public_parity_matrix.md`                                                                                          |
+| 能力矩阵                          | `docs/public_parity_matrix.md`                                                                                          |
 | **缓解（Qermit 风格 + 存根）**    | `mitigation/qermit_analog.py`, `mitigation/qermit_runtime.py`, `mitigation/pmsv.py`, `mitigation/zne.py`                         |
 | **张量网（CuTensorNet 类比）**    | `tensornet/cutensornet_protocol_stub.py`（`quantum.tensornet_expectation_stub`、`tensornet_contraction_engine`）                 |
 | **计价 / 云侧车**                 | `jobs/nexus_analog.py`, `jobs/cost.py`, `jobs/nexus_cloud.py`                                                                    |
-| **周期 / 溶剂（PySCF）**          | `chem/drivers/pyscf_driver.py`, `config.ChemistryExtendedSpec`（PBC、k 网、ddCOSMO）；名称映射 `chem/inquanto_driver_surface.py` |
+| **周期 / 溶剂（PySCF）**          | `chem/drivers/pyscf_driver.py`, `config.ChemistryExtendedSpec`（PBC、k 网、ddCOSMO）；覆盖面见 `integrations/open_driver_surface.py` |
 | **资源行（自研）**                | `backends/spec.py`（`CircuitIR`, `circuit_resource_row`）                                                                        |
 | **TKET 桥（可选）**               | `backends/pytket_bridge.py`；`pip install qchem-stack[pytket]`                                                                   |
 | 作业与队列                        | `jobs/store.py`（`JobHandle`, `SqliteJobStore`，`full_pipeline` + `list_jobs`/`count_by_status`）                                |
@@ -342,7 +342,7 @@ flowchart TB
 
 - [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)
 - [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md)
-- 机读差距：`qchem_stack.protocols.inquanto_contract.inquanto_gap_categories`
+- 机读差距：`qchem_stack.protocols.product_contract.product_gap_categories`
 - **聚合开放参考单包**：`parity_snapshot.open_gap_closure_reference`（`integrations/gap_closure_bundle.py`）
 
 ### 13.1 我们「自己设计」的原则（闭源看不见时）
@@ -360,7 +360,7 @@ flowchart TB
 
 | 原「缺口」叙事项        | 开源侧落地                                                                                                                                    | 说明                                                 |
 | ------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------ |
-| Chemically aware UCC    | `SinglesBeforeDoublesLexicographic`、`GreedyCommutingFermionicLayers`（OpenFermion commutator 分层）、`ChemicallyAwareUCCPolicy` 仍保留       | 文献可解释重组，**非** InQuanto 内部启发式           |
+| Chemically aware UCC    | `SinglesBeforeDoublesLexicographic`、`GreedyCommutingFermionicLayers`（OpenFermion commutator 分层）、`ChemicallyAwareUCCPolicy` 仍保留       | 文献可解释重组，**非** Vendor platform 内部启发式           |
 | TKET 全链 / 编译        | `circuit_ir_tket_peephole_optimize_stats_or_none`（`FullPeepholeOptimise` before/after）、原 `circuit_ir_to_tket_stats_or_none`               | **无** 商业离子阱私有 pass                           |
 | Nexus / HQC 工作流      | `nexus_public_workflow_blueprint`、既有 `nexus_cloud` / `nexus_analog` / `qnexus_probe`；**本地**可选 HTTP + `SqliteJobStore`（`api/app.py`） | **无** 真计费/队列二进制                             |
 | Qermit                  | `qermit_mitigation_execution_overlays`、`mitigation_graph_report.execution_class_manifest`                                                    | **非** CQCL MitEx/MitRes                             |
@@ -382,7 +382,7 @@ flowchart TB
 
 ### 13.4 维护动作备忘
 
-- 能力变化时同步：`inquanto_gap_categories()`、[inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。
+- 能力变化时同步：**`qchem_stack.protocols.product_contract`**（gap 导出）、[public_parity_matrix.md](public_parity_matrix.md)。
 - 新增 `parity_snapshot` 顶层键时：更新本节 §13.2、[技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)（若 DMET 相关）。
 - 变更 **HTTP 路由** / **作业表 `meta`** / **`run_context` 头** / **`pipeline_profile`** 时：同步 [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md) **§9**，并跑 `tests/test_api_runs.py`、`tests/test_job_store_list.py` 等。
 
@@ -390,11 +390,11 @@ flowchart TB
 
 ---
 
-## 14. InQuanto How-to 与仓库映射（合并收录；原 `InQuanto_manual_howto_与_qchem_stack_映射.md`）
+## 14. Vendor platform How-to 与仓库映射（合并收录；原 `Vendor platform_manual_howto_与_qchem_stack_映射.md`）
 
-**钉扎文档（维护时对照）**：[How to use InQuanto](https://docs.quantinuum.com/inquanto/manual/howto.html)（站内手册；截图/版本以当时公开页为准）。
+**钉扎文档（维护时对照）**：[How to use Vendor platform](https://www.quantinuum.com/)（站内手册；截图/版本以当时公开页为准）。
 
-**用途**：把对方 **用户指南级** 叙事（算法 ↔ 可计算量 ↔ 协议 ↔ pytket 后端）映射到本仓库**可检证**的模块与 JSON 出口。**不**声称与 InQuanto 闭源包或默认工作流二进制一致；边界见 [竞争定位与路线图_对标Quantinuum产品与技术路线.md](竞争定位与路线图_对标Quantinuum产品与技术路线.md) §4。
+**用途**：把对方 **用户指南级** 叙事（算法 ↔ 可计算量 ↔ 协议 ↔ pytket 后端）映射到本仓库**可检证**的模块与 JSON 出口。**不**声称与 Vendor platform 闭源包或默认工作流二进制一致；边界见 [竞争定位与路线图_对标Quantinuum产品与技术路线.md](竞争定位与路线图_对标Quantinuum产品与技术路线.md) §4。
 
 ---
 
@@ -404,7 +404,7 @@ flowchart TB
 | 公开叙事要点                             | `qchem_stack` 落点                                                                                                                                                          | 机读 / 运维                                                                                                                |
 | ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
 | `Algorithm*` 求解化学量（基态/激发等）   | `qchem_stack/quantum/algorithms/`（VQE、ADAPT、IQEB、VQD/QSE/SCEOM 等）；激发态 `run_summary` 见 [工程记忆 §3.1](工程记忆_Quantinuum对标与数据流技术文档.md)               | `repro.parity_snapshot` 量子段；`export_parity_criteria_table.py`                                                          |
-| 符号层**Computable** + **Protocol** 评估 | `protocols/computable.py`、`protocols/protocol.py`（`PauliAveragingProtocol` 五阶段）；**图预览** `integrations/inquanto_workflow_preview.py`（`qchem_stack.integrations.inquanto_workflow_preview`；re-export，`internal_reports/competitor/` 见 [CONTRIBUTING](../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）                               | `POST /v1/meta/workflow-preview`、`POST /v1/meta/computables-preview`；[parity 矩阵 §1](inquanto_public_parity_matrix.md) |
+| 符号层**Computable** + **Protocol** 评估 | `protocols/computable.py`、`protocols/protocol.py`（`PauliAveragingProtocol` 五阶段）；**图预览** `integrations/workflow_preview.py`（`workflow_preview_payload`；维护约定见 [CONTRIBUTING](../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）                               | `POST /v1/meta/workflow-preview`、`POST /v1/meta/computables-preview`；[parity 矩阵 §1](public_parity_matrix.md) |
 | **pytket** 驱动编译与后端                | 可选：`backends/pytket_bridge.py`、`integrations/tket_fullchain.py`；资源/门集叙事见 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md) | `parity_snapshot.tket_first_compiled_circuit_probe`（若启用）                                                              |
 | 端到端编排                               | `orchestration/pipeline.py`、`config.ExperimentConfig` + YAML                                                                                                               | `run_pipeline_sync` / `run_pipeline_from_config`；`repro.run_summary`                                                      |
 
@@ -415,8 +415,8 @@ flowchart TB
 
 | 公开叙事要点                    | `qchem_stack` 落点                                                                                                    | 备注                                                                                   |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Geometry / drivers / mean-field | `chem/drivers/pyscf_driver.py`、`chem/hamiltonian.py`；扩展 `chemistry_extended`（ddCOSMO、PBC、k 点等）              | 名称别名：`src/qchem_stack/chem/inquanto_driver_surface.py`                            |
-| FCIDUMP 互操作                  | 以 PySCF 为主路径；FCIDUMP**未**作为一等入口时在 [parity 矩阵 §3](inquanto_public_parity_matrix.md) 标保守 `partial` |                                                                                        |
+| Geometry / drivers / mean-field | `chem/drivers/pyscf_driver.py`、`chem/hamiltonian.py`；扩展 `chemistry_extended`（ddCOSMO、PBC、k 点等）              | Driver 能力与矩阵汇总：`integrations/open_driver_surface.open_driver_coverage_matrix`                            |
+| FCIDUMP 互操作                  | 以 PySCF 为主路径；FCIDUMP**未**作为一等入口时在 [parity 矩阵 §3](public_parity_matrix.md) 标保守 `partial` |                                                                                        |
 | Embedding（DMET 等手册分支）    | `chem/embedding/`、`integrations/schmidt_dmet_self_consistent.py` 等                                                  | [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md) |
 
 ---
@@ -454,26 +454,26 @@ flowchart TB
 
 ### 6. 维护约定
 
-- 公开站结构改版时：对照 [howto](https://docs.quantinuum.com/inquanto/manual/howto.html) 侧边栏是否重排；更新本页 **章节标题对齐** 与 [与InQuanto — 附录 C](与InQuanto能力差距与实施计划.md) 钉扎说明。
-- 单一真相顺序不变：**代码键** → `export` / `repro` → [parity 矩阵](inquanto_public_parity_matrix.md) → `inquanto_gap_categories()`。
+- 公开站结构改版时：对照 [howto](https://www.quantinuum.com/) 侧边栏是否重排；更新本页 **章节标题对齐** 与 [与Vendor platform — 附录 C](public_parity_matrix.md) 钉扎说明。
+- 单一真相顺序不变：**代码键** → `export` / `repro` → [parity 矩阵](public_parity_matrix.md) → **`product_gap_categories()`**（HTTP `gaps` / export `capability_gap_categories`）。
 
 ---
 
-*版本：初版；与 Y1 台账 [与InQuanto — 附录 B](与InQuanto能力差距与实施计划.md) 的「公开文档周一对照」一致。*
+*版本：初版；与 Y1 台账 [与Vendor platform — 附录 B](public_parity_matrix.md) 的「公开文档周一对照」一致。*
 
 ---
 
-## 15. P1 化学与嵌入镜像对照（合并收录；原 `P1_化学与嵌入_InQuanto镜像与qchem_stack复现程度对照.md`）
+## 15. P1 化学与嵌入镜像对照（合并收录；原 `P1_化学与嵌入_Vendor platform镜像与qchem_stack复现程度对照.md`）
 
 **版本**：与仓库当前源码及公开 parity 叙述对齐；镜像页 `frontmatter` 可能与本文不一致时，**以本文 + 源码 + 下列权威引用为准**。
 
 **权威引用**
 
-- 能力差距与边界：[与InQuanto能力差距与实施计划.md](与InQuanto能力差距与实施计划.md)、本文 **§0**
-- 机读 driver 表面：`qchem_stack.chem.inquanto_driver_surface`、`qchem_stack.integrations.open_driver_surface.open_driver_coverage_matrix`
+- 能力差距与边界：[public_parity_matrix.md](public_parity_matrix.md)、本文 **§0**
+- 机读 driver 表面：`qchem_stack.integrations.open_driver_surface.open_driver_coverage_matrix`
 - 经典化学主实现：`qchem_stack.chem.drivers.pyscf_driver`、`qchem_stack.chem.embedding.*`
-- **P1 跨后端 / 映射 conformance（pytest）**：`tests/test_backend_conformance.py`（`statevector`、`qiskit`·statevector/estimator、`ionstack`·注入、`JW/BK/SCBK`、TKET probe 字典；无 PySCF 则 skip，无 Qiskit/pytket 则对应 case skip）。
-- 站点镜像树：`docs-site/docs/.vitepress/mirror-data.json`、`docs-site/scripts/mirror-doc-tree.yaml`（各 mirror 页 `index.md` 的 `status` / `qchem_module`）
+- **P1 capability / embedding gates（pytest）**：`tests/test_backend_capability_conformance.py`（后端能力矩阵等）；端到端编排与映射见 `tests/test_orchestration_pipeline.py`、`tests/test_fermion_qubit_mapping.py`；TKET/pytket 可选链见 `tests/test_pytket_bridge.py`、`tests/test_methods_resource_unified_export.py`。
+- 教程与 parity 叙事：`docusaurus-site/docs/`（用户站）、`docs/public_parity_matrix.md`（机读 gaps 以 `product_contract` 为准）
 
 ---
 
@@ -481,19 +481,19 @@ flowchart TB
 
 ### 1.1 目的
 
-将 **InQuanto 公开文档树中「化学 / 嵌入 / PySCF 扩展」镜像节点** 与 **本仓库 `qchem_stack` 实际实现** 做逐项对照，给出可维护的 **复现程度** 评级与 caveat，供：
+将 **Vendor platform 公开文档树中「化学 / 嵌入 / PySCF 扩展」镜像节点** 与 **本仓库 `qchem_stack` 实际实现** 做逐项对照，给出可维护的 **复现程度** 评级与 caveat，供：
 
-- Y1 台账与 [与InQuanto — 附录 B](与InQuanto能力差距与实施计划.md) 引用；
+- Y1 台账与 [与Vendor platform — 附录 B](public_parity_matrix.md) 引用；
 - 镜像页 `status`（shipped / partial / placeholder / not-applicable）的**二次校验**；
 - 论文 Methods 中「开放栈做了什么 / 未声称什么」的表述依据。
 
 ### 1.2 不声称的范围（L0 排除）
 
-本对照 **不** 声称与 **闭源 `inquanto-pyscf` wheel**、**InQuanto 内部默认启发式** 或 **类名级 API 一一对应**（L0）。对齐口径为公开资料可追溯 + 本仓可跑路径 + `repro` / parity 机读键（L1），见 [与InQuanto — 附录 D](与InQuanto能力差距与实施计划.md)。
+本对照 **不** 声称与 **闭源 `vendor-pyscf` wheel**、**Vendor platform 内部默认启发式** 或 **类名级 API 一一对应**（L0）。对齐口径为公开资料可追溯 + 本仓可跑路径 + `repro` / parity 机读键（L1），见 [与Vendor platform — 附录 D](public_parity_matrix.md)。
 
 ### 1.3 镜像 `status` 与源码的关系
 
-- 镜像节点 `status` 来自站点生成配置（如 `mirror-doc-tree.yaml` → `mirror-data.json`），本质是 **IA 审计与导航标签**。
+- 与对外教程树对应的 **IA / status 标签** 以 **`docusaurus-site/docs/`** 与 [public_parity_matrix.md](public_parity_matrix.md) 的维护口径为准（不再使用独立的镜像生成物文件）。
 - 个别页面存在 **标签与正文矛盾**（例如 `AVAS` 标 `shipped` 但 `qchem_module` 为空、正文仍写未实现）。**复现程度以源码与差距总表为准**；若需与附录 C / backlog 计数一致，应单独维护「镜像 status ↔ 源码证据」纠偏列。
 
 #### 1.3.1 纠偏清单（与 Phase0 对账同源）
@@ -501,18 +501,18 @@ flowchart TB
 
 | 纠偏项                 | 权威依据                                               | 维护动作                                                                                   |
 | ------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
-| 镜像`status` vs 正文   | 本文 §2–§4、`open_driver_coverage_matrix`           | 改版镜像 YAML 时对照[与InQuanto — 附录 D](与InQuanto能力差距与实施计划.md) **附录 A**     |
+| 镜像`status` vs 正文   | 本文 §2–§4、`open_driver_coverage_matrix`           | 改版镜像 YAML 时对照[与Vendor platform — 附录 D](public_parity_matrix.md) **附录 A**     |
 | AVAS / CASSCF 产品深度 | `integrations/open_driver_surface.py` 行 `not_claimed` | 矩阵 §3 与 gap`drivers_cosmo_pbc` 不升级为 `yes` 除非实现                                 |
-| UCCSD 变分 × 映射     | `quantum/algorithms/uccsd_vqe.py`（JW-only）           | 与`ucc_chem_ansatz` 机读条一致；BK/SCBK 用于 Hamiltonian+VQE 见 `test_backend_conformance` |
+| UCCSD 变分 × 映射     | `quantum/algorithms/uccsd_vqe.py`（JW-only）           | 与`ucc_chem_ansatz` 机读条一致；BK/SCBK UCCSD 电路边界见 `tests/test_uccsd_mapping_support_matrix.py` |
 
 ### 1.4 复现程度等级定义
 
 
 | 等级   | 含义                                                                                              |
 | -------- | --------------------------------------------------------------------------------------------------- |
-| **高** | 主路径可跑；有配置 / 管线 /`repro` 或 pytest；**不**宣称与 InQuanto 闭源数值或 API 等价           |
+| **高** | 主路径可跑；有配置 / 管线 /`repro` 或 pytest；**不**宣称与 Vendor platform 闭源数值或 API 等价           |
 | **中** | 子路径可跑或仅覆盖公开叙事的一部分（积分、嵌入子步骤等）；caveat 在 parity 矩阵或技术文档中已固定 |
-| **低** | 主要为文档镜像、机读 gap、或`open_driver_coverage_matrix` 一行声明；无 InQuanto 同名 Python API   |
+| **低** | 主要为文档镜像、机读 gap、或`open_driver_coverage_matrix` 一行声明；无 Vendor platform 同名 Python API   |
 | **无** | 当前无对应实现，或列为「刻意不做」                                                                |
 
 ---
@@ -524,25 +524,25 @@ flowchart TB
 | ----------------------------------- | -------------------------------- | ----------------------- | ---------------------------------------------------------------------------------------- | ------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | 几何                              | `manual`（几何）               | partial               | `MoleculeSpec`（`qchem_stack.config`）、`MolecularSystem`（`qchem_stack.chem.system`） | **高**     | 符号、Bohr 坐标、电荷、多重度、基组进入 PySCF`gto.M`                                                                                                                                                                |
 | 嵌入与 DMET（总述）               | `manual` / embedding           | partial               | `EmbeddingSpec`、`chem/embedding/*`、`orchestration.pipeline`                          | **中**     | `none` / `dmet` / `projection`；Schmidt 生产、whole_active 单碎片、stub 账本；**非**闭源 bath 全拟合                                                                                                                |
-| DMET 概览                         | `manual` / embedding           | partial               | `chem/embedding/dmet.py` + 管线 DMET 钩子                                              | **中**     | `DMETContext`、占位 solver；字段契约见 [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)；口径与 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) §3 一致 |
+| DMET 概览                         | `manual` / embedding           | partial               | `chem/embedding/dmet.py` + 管线 DMET 钩子                                              | **中**     | `DMETContext`、占位 solver；字段契约见 [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)；口径与 [public_parity_matrix.md](public_parity_matrix.md) §3 一致 |
 | 投影嵌入                          | `manual` / embedding           | partial               | `projection.py`、`projection_hamiltonian.py`                                           | **中**     | Mulliken 片段排序 + PySCF CASCI 活性积分 + JW；**非** full many-body projection embedding                                                                                                                           |
 | NEVPT2 / AC0                      | `manual` / embedding           | placeholder           | —                                                                                     | **无**     | 无独立量子化学实现；配置中`classical_reference_method` 等为文档 / parity 占位                                                                                                                                       |
 | Fe4N2 案例（AVAS+CASSCF 等）      | `tutorials/case_study_fe4n2/*` | placeholder           | 无单独「Fe4N2」化学包                                                                  | **低**     | 教程树为镜像占位；量子管线见`configs/`、`quantum.*`                                                                                                                                                                 |
 | Fe4N2：噪声硬件评估               | tutorials                      | 刻意不做              | —                                                                                     | **无**     | 与公开矩阵「非专有硬件专优」一致                                                                                                                                                                                    |
 | 碎片化教程 / 大体系 DMET 等       | `tutorials/fragmentation`      | partial / placeholder | 同嵌入与`PySCFDriver`                                                                  | **中～低** | 与 manual 同源能力，无第二套代码路径                                                                                                                                                                                |
-| InQuanto-PySCF（扩展叙事）        | `extensions`                   | partial               | `chem/drivers/pyscf_driver.py`                                                         | **中**     | 气相 RHF/ROHF/UHF、ddCOSMO、PBC（Γ / KRHF）；**非** inquanto-pyscf 二进制                                                                                                                                          |
-| InQuanto-NGLView                  | `extensions`                   | 刻意不做              | —                                                                                     | **无**     | 无 3D 可视化栈                                                                                                                                                                                                      |
-| `inquanto.embeddings`（厂商包名） | api / 文档                     | 刻意不做              | `EmbeddingSpec` 等 YAML 表达                                                           | **无**     | 不复制厂商包名级 API                                                                                                                                                                                                |
+| Vendor platform-PySCF（扩展叙事）        | `extensions`                   | partial               | `chem/drivers/pyscf_driver.py`                                                         | **中**     | 气相 RHF/ROHF/UHF、ddCOSMO、PBC（Γ / KRHF）；**非** vendor-pyscf 二进制                                                                                                                                          |
+| Vendor platform-NGLView                  | `extensions`                   | 刻意不做              | —                                                                                     | **无**     | 无 3D 可视化栈                                                                                                                                                                                                      |
+| `vendor.embeddings`（厂商包名） | api / 文档                     | 刻意不做              | `EmbeddingSpec` 等 YAML 表达                                                           | **无**     | 不复制厂商包名级 API                                                                                                                                                                                                |
 
 ---
 
 ### 3. `api` 层：公开 API 名与开源栈映射
 
 
-| 镜像 / InQuanto 相邻名                   | 镜像常见 status | 复现程度 | `qchem_stack` 锚点                     | 备注               |
+| 镜像 / Vendor platform 相邻名                   | 镜像常见 status | 复现程度 | `qchem_stack` 锚点                     | 备注               |
 | ------------------------------------------ | ----------------- | ---------- | ---------------------------------------- | -------------------- |
-| `inquanto.geometries`                    | partial         | **高**   | `MoleculeSpec`、`MolecularSystem`      | 与「几何」行一致   |
-| `inquanto.extensions.pyscf`              | partial         | **中**   | `PySCFDriver`、`ChemistryExtendedSpec` | 见 §4 driver 细表 |
+| `vendor.geometries`                    | partial         | **高**   | `MoleculeSpec`、`MolecularSystem`      | 与「几何」行一致   |
+| `vendor.extensions.pyscf`              | partial         | **中**   | `PySCFDriver`、`ChemistryExtendedSpec` | 见 §4 driver 细表 |
 | `qchem_stack.chem.embedding`（镜像指向） | partial         | **中**   | `chem/embedding`                       | 与 §2 嵌入行一致  |
 | `qchem_stack.chem.drivers.pyscf_driver`  | partial         | **中**   | `chem/drivers/pyscf_driver.py`         | 同上               |
 
@@ -550,41 +550,41 @@ flowchart TB
 
 ### 4. `api/extensions_pyscf/classes`：Driver 与碎片类名细表
 
-下列 InQuanto **类名片段** 在开源栈中**多数无同名 Python class**；对照的是 **「化学意图 → 本仓实际调用的 PySCF / 配置路径」**。
+下列 Vendor platform **类名片段** 在开源栈中**多数无同名 Python class**；对照的是 **「化学意图 → 本仓实际调用的 PySCF / 配置路径」**。
 
 ### 4.1 AVAS / CASSCF（高关注）
 
 
-| InQuanto 镜像类 | 镜像 status（常见）   | 复现程度                                          | 源码事实                                                                                                         | 纠偏说明                                                                                                                                                              |
+| Vendor platform 镜像类 | 镜像 status（常见）   | 复现程度                                          | 源码事实                                                                                                         | 纠偏说明                                                                                                                                                              |
 | ----------------- | ----------------------- | --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | **AVAS**        | shipped（部分镜像页） | **中（开放栈：`strategy=avas`）**                                              | **`active_space.strategy=avas`** → `chem.active_space.pyscf_active_space_hooks`；`qchem_canonical`/parity 链路；示例 `configs/example_h2_avas.yaml`                                                               | **非**闭源 **`ChemistryDriver*`** UX/L0；需与差距表 **`partial`** 含义一致：**产品预设 ≠ 已实现**                                                                   |
-| **CASSCF**      | partial               | **中**                                            | `active_space_integrals` 使用 `pyscf.mcscf.CASCI` 的 `get_h1eff` / `get_h2eff`；projection 路径亦用 CASCI 活性块 | InQuanto**CASSCF** 与开源栈 **CASCI 积分 + 固定活性空间** 语义**部分重叠**，**非**完整 CASSCF 产品行为                                                                |
+| **CASSCF**      | partial               | **中**                                            | `active_space_integrals` 使用 `pyscf.mcscf.CASCI` 的 `get_h1eff` / `get_h2eff`；projection 路径亦用 CASCI 活性块 | Vendor platform**CASSCF** 与开源栈 **CASCI 积分 + 固定活性空间** 语义**部分重叠**，**非**完整 CASSCF 产品行为                                                                |
 
 ### 4.2 ChemistryDriverPySCF*（分子气相 + 溶剂 + 周期）
 
 
-| InQuanto 镜像类                            | 镜像 status（常见）  | 复现程度 | `qchem_stack` 行为                                                                                          |
+| Vendor platform 镜像类                            | 镜像 status（常见）  | 复现程度 | `qchem_stack` 行为                                                                                          |
 | -------------------------------------------- | ---------------------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
 | ChemistryDriverPySCFMolecular**RHF**       | partial              | **高**   | `PySCFDriver.run_rhf()` → `scf.RHF`                                                                        |
 | ChemistryDriverPySCFMolecular**ROHF**      | partial              | **高**   | `run_rohf()` → `scf.ROHF`                                                                                  |
 | ChemistryDriverPySCFMolecular**UHF**       | 占位（若树中为占位） | **高**   | `run_uhf()` → `scf.UHF`；若镜像标占位，**应以源码为准改镜像**                                              |
 | …Molecular**RHF**QMMMCOSMO                | partial              | **中**   | `solvent_model=ddcosmo` 时 `solvent.ddCOSMO(mf)` 接在 **已构建的 mf** 上；当前主路径与 **RHF+ddCOSMO** 一致 |
-| …Molecular**ROHF**/…**UHF**QMMMCOSMO     | 占位                 | **低**   | **无**与 InQuanto 一一对应的独立 ROHF/UHF+QM/MM driver 类；是否可接 PySCF 视版本，**未**作产品级承诺        |
+| …Molecular**ROHF**/…**UHF**QMMMCOSMO     | 占位                 | **低**   | **无**与 Vendor platform 一一对应的独立 ROHF/UHF+QM/MM driver 类；是否可接 PySCF 视版本，**未**作产品级承诺        |
 | ChemistryDriverPySCF**GammaRHF**           | partial              | **中**   | `run_pbc_rhf` + `pbc_kpoint_mesh=[1,1,1]` → Γ 点 RHF                                                      |
 | ChemistryDriverPySCF**GammaROHF**          | 占位                 | **低**   | `run_pbc_rhf` **要求** `scf.method=RHF`；**无** Γ 点 ROHF 周期支路                                         |
 | ChemistryDriverPySCF**MomentumRHF**        | partial              | **中**   | `mesh` 非全 1 → `KRHF` + `make_kpts`                                                                       |
 | ChemistryDriverPySCF**MomentumROHF**       | 占位                 | **低**   | 同上，周期 ROHF**未**单独实现                                                                               |
 | ChemistryDriverPySCF**Embedding***（多类） | 占位                 | **低**   | 嵌入由**`EmbeddingSpec` + 管线** 表达，**非** PySCF `ChemistryDriverPySCFEmbedding*` 同名封装               |
-| ChemistryDriverPySCF**Integrals**          | 占位                 | **中**   | `active_space_integrals` 提供活性空间积分；**无** InQuanto 同名 Integrals driver 类                         |
+| ChemistryDriverPySCF**Integrals**          | 占位                 | **中**   | `active_space_integrals` 提供活性空间积分；**无** Vendor platform 同名 Integrals driver 类                         |
 
 ### 4.3 DMET / FMO / 活性空间辅助类
 
 
-| InQuanto 镜像类                                   | 镜像 status（常见） | 复现程度 | `qchem_stack` 行为                                                                                             |
+| Vendor platform 镜像类                                   | 镜像 status（常见） | 复现程度 | `qchem_stack` 行为                                                                                             |
 | --------------------------------------------------- | --------------------- | ---------- | ---------------------------------------------------------------------------------------------------------------- |
 | DMETRHFFragmentPySCF**Active**                    | partial             | **中**   | Schmidt 生产 / 活性哈密顿量 +`DMETContext` 等钩子；**非** PySCF fragment 类 API                                |
 | DMETRHFFragmentPySCF**RHF**                       | partial             | **中**   | RHF 参考与碎片叙事部分覆盖                                                                                     |
-| DMETRHFFragmentPySCF**{CCSD,FCI,MP2}**            | 占位                | **低**   | **未**以同名 fragment solver 矩阵暴露；部分相关能力出现在 Schmidt / FCI 审计子路径，**不等价**于 InQuanto 全表 |
+| DMETRHFFragmentPySCF**{CCSD,FCI,MP2}**            | 占位                | **低**   | **未**以同名 fragment solver 矩阵暴露；部分相关能力出现在 Schmidt / FCI 审计子路径，**不等价**于 Vendor platform 全表 |
 | ImpurityDMETROHF* 系列                            | 占位                | **低**   | 无 ROHF 杂质专用 driver 族                                                                                     |
 | FromActiveOrbitals / FromActiveSpace / FrozenCore | 占位                | **低**   | 概念由`ActiveSpaceSpec` 等承载，**无**同名类                                                                   |
 | FMO / FMOFragment*                                | 占位                | **无**   | 未实现                                                                                                         |
@@ -592,7 +592,7 @@ flowchart TB
 ### 4.4 积分算子类
 
 
-| InQuanto 镜像类                                | 镜像 status（常见） | 复现程度 | `qchem_stack` 行为                                                  |
+| Vendor platform 镜像类                                | 镜像 status（常见） | 复现程度 | `qchem_stack` 行为                                                  |
 | ------------------------------------------------ | --------------------- | ---------- | --------------------------------------------------------------------- |
 | PySCFChemistry**Restricted**IntegralOperator   | partial             | **中**   | `active_space_integrals` + OpenFermion 下游；**无**该类名文件级实现 |
 | PySCFChemistry**Unrestricted**IntegralOperator | 占位                | **低**   | 主路径以闭壳 / CASCI 常用分支为主；**未**对标 UHF 积分算子类        |
@@ -604,20 +604,20 @@ flowchart TB
 `qchem_stack.integrations.open_driver_surface.open_driver_coverage_matrix()` 返回的 `rows` 为 **四行** 声明式汇总，可与上表对照：
 
 
-| `inquanto_adjacent_name`                            | `status`          | 与 §2–§4 关系                                  |
+| `parity_matrix_row_label`                            | `status`          | 与 §2–§4 关系                                  |
 | ----------------------------------------------------- | ------------------- | --------------------------------------------------- |
 | gas-phase RHF/UHF/ROHF                              | `yes_pyscf`       | 对应 §4.2 分子气相**高**                         |
 | ddCOSMO / implicit solvent                          | `partial_ddCOSMO` | §4.2 COSMO 行**中**                              |
 | PBC / k-point mesh                                  | `partial_kmesh`   | §4.2 周期**中**                                  |
-| Full COSMO/PBC feature parity with InQuanto drivers | `not_claimed`     | 占位 / 刻意不做 / 未拆分 QM/MM 类名等**统一口径** |
+| Full COSMO/PBC feature parity with Vendor platform drivers | `not_claimed`     | 占位 / 刻意不做 / 未拆分 QM/MM 类名等**统一口径** |
 
-更细的 YAML 别名见 `qchem_stack.chem.inquanto_driver_surface.INQUANTO_DRIVER_ALIAS_TO_CONFIG`（当前为 **短表**，不覆盖全部 InQuanto 类名）。
+Vendor platform 文档中的 **scf.driver** 字面量请以 `pyscf_driver` 支持与 `scf.driver` **`Literal`**（`qchem_stack.config`）为准；更细的兼容性以代表 YAML/`open_driver_coverage_matrix` 陈述为准。
 
 ---
 
 ### 6. 节点计数（如 1 shipped / 20 partial / …）与本文关系
 
-附录 C / `inquanto-node-backlog.generated.*` 中的 **按节点 `status` 计数** 可与镜像站点一致，但 **「shipped」数量不自动等于源码已交付」**——至少 **AVAS** 需在台账中单独纠偏（见 §4.1）。
+附录 C / `vendor-node-backlog.generated.*` 中的 **按节点 `status` 计数** 可与镜像站点一致，但 **「shipped」数量不自动等于源码已交付」**——至少 **AVAS** 需在台账中单独纠偏（见 §4.1）。
 
 建议在 Y1 台账增加一列：
 
@@ -627,8 +627,8 @@ flowchart TB
 
 ### 7. 维护约定
 
-- 镜像页 `status` 或 `qchem_module` 变更时：同步检查本文 §4 对应行，并更新 [与InQuanto能力差距与实施计划.md](与InQuanto能力差距与实施计划.md) §1 经典化学行（若涉及公开承诺）。
-- 新增 PySCF 支路时：更新 `pyscf_driver.py`、`open_driver_coverage_matrix`、必要时 `inquanto_driver_surface.py` 与本文 §4。
+- 镜像页 `status` 或 `qchem_module` 变更时：同步检查本文 §4 对应行，并更新 [public_parity_matrix.md](public_parity_matrix.md) §1 经典化学行（若涉及公开承诺）。
+- 新增 PySCF 支路时：更新 `pyscf_driver.py`、`open_driver_coverage_matrix`、相关 YAML/`config` **`Literal`** 与本节 §4 叙述。
 
 ---
 
@@ -638,7 +638,7 @@ flowchart TB
 
 ## 16. MD/ML `repro` 字段冻结（合并收录；原 `md_bridge_repro_freeze_list.md`）
 
-**母稿**：[与InQuanto能力差距与实施计划 — 附录 A](与InQuanto能力差距与实施计划.md) §6 序 5、§8 第 1–2 周；SLA 行见 [附录 B §6 — `y1-residual-partial-sla-template`](与InQuanto能力差距与实施计划.md#y1-residual-partial-sla-template)。
+**母稿**：[与Vendor platform能力差距与实施计划 — 附录 A](public_parity_matrix.md) §6 序 5、§8 第 1–2 周；SLA 行见 [附录 B §6 — `y1-residual-partial-sla-template`](public_parity_matrix.md#y1-residual-partial-sla-template)。
 
 **范围**：`l1_md_ml` 契约与导出到扩展 XYZ / stub 训练器；与量子管线 `repro` 全量并集时，下列字段为 **稳定性承诺**（改名须 bump 导出 schema 或显式 major）。
 

@@ -1,4 +1,4 @@
-"""Computable-style abstract list (InQuanto-analog)."""
+"""Computable-style abstract list (workflow-parity analog)."""
 
 from __future__ import annotations
 

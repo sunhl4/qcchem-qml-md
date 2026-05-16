@@ -11,7 +11,7 @@
     - `decomposition_fragment_count`
   - 数据来源为 YAML 与 `embedding_workflow` 摘要字段（Day8 已接入）。
 
-- 更新 `src/qchem_stack/protocols/inquanto_contract.py`（`qchem_stack.protocols.inquanto_contract`；字面量 `internal_reports/competitor/inquanto_contract.py`，[CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）：
+- 更新 `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：[CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）：
   - 将上述三个字段加入 `RUN_SUMMARY_DOCUMENTED_KEYS`，保持键注册 CI 一致。
 
 - 更新 `tests/test_decomposition_plugin_pipeline.py`：

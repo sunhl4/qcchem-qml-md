@@ -12,7 +12,7 @@
 ## 缓冲周内允许的范围
 
 - 更新 [`P2_execution_alignment_notes.md`](P2_execution_alignment_notes.md) 滚动表一行（公开文档钉扎 / Tangelo registry）。
-- 对齐 [`inquanto_public_parity_matrix.md`](inquanto_public_parity_matrix.md) 与 `inquanto_gap_categories()`（已有 `tests/test_gap_parity_matrix_anchors.py` 守门）。
+- 对齐 [`public_parity_matrix.md`](public_parity_matrix.md) 与 **`product_gap_categories()`**（HTTP `gaps` / export `capability_gap_categories`；历史 `test_gap_parity_matrix_anchors.py` 已移除，闸改由 `tests/test_api_runs.py` 等与 CI 脚本承担）。
 - **不做**：版本号仪式化发布、CHANGELOG 条目堆砌（除非当月确有对外变更说明需求）。
 
 台账对应：[`P2_ninety_day_execution_checklist.md`](P2_ninety_day_execution_checklist.md) D83–D87。

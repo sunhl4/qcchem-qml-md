@@ -5,7 +5,7 @@
 ## 本日实现
 
 - 文件：
-  - `src/qchem_stack/protocols/inquanto_contract.py`（稳定 import：`qchem_stack.protocols.inquanto_contract`；字面量：`internal_reports/competitor/inquanto_contract.py` — [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
+  - `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：差距分类与 export 稳定键；详见 [CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）
   - `tests/test_run_summary_key_registry.py`
 - 变更摘要：
   - （填写新增键）

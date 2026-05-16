@@ -36,7 +36,7 @@ class DMETContext:
 @dataclass
 class VQEFragmentSolverStub:
     """
-    InQuanto-adjacent **fragment solver** placeholder: register intent to run VQE on an impurity.
+    Vendor-doc-adjacent **fragment solver** placeholder: register intent to run VQE on an impurity.
 
     Replace ``solve`` body with :func:`~qchem_stack.chem.hamiltonian.molecular_hamiltonian_from_classical_reference`
     on the fragment Hamiltonian + :class:`~qchem_stack.quantum.algorithms.vqe.VQE` for a real DMET loop.

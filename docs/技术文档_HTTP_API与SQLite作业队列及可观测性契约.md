@@ -2,7 +2,7 @@
 
 **文档性质**：描述可选 **`qchem-stack[api]`** 面与 **`jobs`** 存储的**可机读契约**；与 [ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md)（英文化分层）互补，本文偏**产品化 HTTP + 观测字段**与**竞品语义对照**。
 1
-**竞品对照（公开文档口径）**：[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md)、[inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。**不**声称实现 Quantinuum Nexus 真队列、真 HQC 或 OAuth。
+**竞品对照（公开文档口径）**：[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md)、[public_parity_matrix.md](public_parity_matrix.md)。**不**声称实现 Quantinuum Nexus 真队列、真 HQC 或 OAuth。
 
 **源码入口**：`src/qchem_stack/api/app.py`、`src/qchem_stack/jobs/`、`src/qchem_stack/orchestration/run_context.py`、`src/qchem_stack/orchestration/pipeline.py`（`_attach_run_summary`、`run_pipeline_sync`）。
 
@@ -98,7 +98,7 @@ HTTP 异步入队常见键：
 | GET | `/health` | 无 `schema`；体为 `{"status":"ok"}` |
 | GET | `/health/ready` | 无 `schema`；体为 `{"status":"ready","job_db_default":...}`；SQLite ping 失败 → **503** |
 | GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`qchem_stack_version`、`object_map`、`gaps`、`mitigation_execution_model`、`open_stack_differentiators`、`tangelo_public_mapping_alias_surface_v1`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`） |
-| GET | `/v1/meta/parity-gaps` | `inquanto_gap_export_v1`：`qchem_stack_version`、`gaps` |
+| GET | `/v1/meta/parity-gaps` | `capability_gap_export_v1`：`qchem_stack_version`、`gaps` |
 | GET | `/v1/meta/product-analog` | `product_analog_v1`（控制台用路由指针 + `emulation_notes`） |
 | POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`；可选 `computables_rich`） |
 | POST | `/v1/meta/computables-preview` | `computables_preview_v1`（`experiment_id`、`computables[]`、`computable_abstract` v2） |
@@ -172,7 +172,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 1. 增删 HTTP 路由或响应 `schema`：更新本文 **§5**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §9、[README.md](../../README.md) HTTP 段、[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) 表格（若行为类比变）。
 2. 增减 `meta` 键或 `full_pipeline_job_result_v1` 白名单：更新 **`pipeline_runner.py`**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §10。
 3. 观测字段变更：更新 **§2**、`tests/test_observability_pipeline.py`（PySCF）、`tests/test_api_runs.py`（FastAPI）。
-4. 机读差距分类：视需要更新 `inquanto_contract.inquanto_gap_categories()` 与 [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md)。
+4. 机读差距分类：视需要更新 **`qchem_stack.protocols.product_contract`**（`product_gap_categories()` 等）与 [public_parity_matrix.md](public_parity_matrix.md)。
 
 ---
 
@@ -182,7 +182,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 ### 9.1 为什么做这一层
 
-- **竞品叙事**：InQuanto/Nexus 公开资料强调「提交作业 → 轮询状态 → 取结果」与 **Methods/Computable** 可追溯性。本栈在**不引入真云**的前提下，用 **FastAPI + SQLite + 既有 `repro`** 提供**可审计的本地类比**。
+- **竞品叙事**：Vendor platform/Nexus 公开资料强调「提交作业 → 轮询状态 → 取结果」与 **Methods/Computable** 可追溯性。本栈在**不引入真云**的前提下，用 **FastAPI + SQLite + 既有 `repro`** 提供**可审计的本地类比**。
 - **与「只做库」的关系**：`run_pipeline_sync` 仍是稳定核心；HTTP 与 `full_pipeline` 作业是 **optional extra**（`pip install qchem-stack[api]`），避免把 Web 框架强加给嵌入用户。
 
 ### 9.2 已定决策（摘要）
@@ -195,7 +195,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | `GET …/repro` | 仅 `DONE`，否则 **409**，方便 Methods 流水线只拉 `repro` |
 | `GET …/events` | **不**承诺完整事件流；仅 `created`/`updated` 合成两点 |
 | `experiment_id` + workspace 过滤 | SQL `json_extract` + 老 SQLite **扫描回退**（有上限） |
-| 竞品差距机读 | `GET /v1/meta/parity-gaps` 与 `inquanto_gap_categories()` 同内容源 |
+| 竞品差距机读 | `GET /v1/meta/parity-gaps` 与 **`product_gap_categories()`**（响应体字段 **`gaps`**）同源 |
 
 ### 9.3 明确不做（避免范围漂移）
 
@@ -211,7 +211,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | [ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) | 英文化分层、稳定公共面、错误类型 |
 | **本文** | 中文 **schema/端点/存储** 契约 + 上表决策 |
 | [launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) | Nexus **语义**短表 |
-| [inquanto_public_parity_matrix.md](inquanto_public_parity_matrix.md) | 公开能力矩阵 |
+| [public_parity_matrix.md](public_parity_matrix.md) | 公开能力矩阵 |
 | [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md) | 化学/Protocol/数据流总记忆 |
 
 ### 9.5 变更 Checklist（逐项打勾）
@@ -220,7 +220,7 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 - [ ] 修改 `jobs/store.py` 行为：同步 **本文 §3**、**ENGINEERING §10**；单测 `test_job_store_list.py`、`test_api_runs.py`。
 - [ ] 修改 `run_context` / `pipeline_profile`：同步 **本文 §2**、**ENGINEERING §8**、`test_observability_pipeline.py`。
 - [ ] 修改 `pipeline_runner._RESULT_KEYS`：同步 **本文 §4 / §8**、README 若有「侧车」表述。
-- [ ] 产品矩阵行级变更：更新 **inquanto_public_parity_matrix.md**；机读条更新 **inquanto_gap_categories()**。
+- [ ] 产品矩阵行级变更：更新 **public_parity_matrix.md**；机读条更新 **`product_gap_categories()`** / 导出 **`capability_gap_categories`**。
 
 ### 9.6 测试与 CI
 

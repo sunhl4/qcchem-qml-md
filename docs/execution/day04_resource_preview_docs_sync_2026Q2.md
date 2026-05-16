@@ -4,7 +4,7 @@
 
 ## 本日实现
 
-- 更新 `docs/inquanto_public_parity_matrix.md` 的资源行（§1）：
+- 更新 `docs/public_parity_matrix.md` 的资源行（§1）：
   - 增补 `resource_estimation_preview_v1` 的可选导出入口：
     - 开关：`parity_integrations.resource_estimation_preview: true`
   - 明确 caveat：

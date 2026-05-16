@@ -1,6 +1,6 @@
 # 里程碑详细计划：化学后端深化 + 嵌入 SPI v2（与主干的「安全分界线」）
 
-本文档是把《实施总计划_InQuanto_PySCF_Tangelo.md》中 **工程量与接口面过大**、须单独收口的几条线，整理成 **可分 PR、可分阶段验收** 的里程碑说明。
+本文档是把《实施总计划_Vendor platform_PySCF_Tangelo.md》中 **工程量与接口面过大**、须单独收口的几条线，整理成 **可分 PR、可分阶段验收** 的里程碑说明。
 
 ---
 
@@ -34,7 +34,7 @@ flowchart LR
 |------|------|----------|----------|--------|
 | **M1** | `ChemIntegralSolver` 与 Tangelo **三方法同构命名** | 降低跨代码库心智负担；为 Psi4/未来后端统一入口 | 中 | 无新外部依赖 |
 | **M2** | **Psi4** 全流程 `mf`/积分进入 pipeline（可选） | 证明「多后端可迁移」不仅是能量 smoke | 大 | 可选 `psi4` 环境 |
-| **M3** | **真实 AVAS**（PySCF 内核） | 缩小与 InQuanto `AVAS` 能力差距 | 大 | `chem`（PySCF） |
+| **M3** | **真实 AVAS**（PySCF 内核） | 缩小与 Vendor platform `AVAS` 能力差距 | 大 | `chem`（PySCF） |
 | **M4** | **Fragment / 嵌入 SPI v2** | 统一碎片求解、能量账本、失败语义 | 大 | 无新外部依赖（首批） |
 
 **建议合并顺序**：**M1 →（M2 ∥ M3 ∥ M4）**；M2 与 M3 可并行由不同开发者推进，但 **M1 应先落地**，避免各分支各写一套 adapter 名称。
@@ -228,7 +228,7 @@ scf:
 
 1. `python -m pytest`（含新增 optional 用例的 skip 语义正确）。  
 2. `python scripts/check_parity_export_sample.py`。  
-3. 若动 `run_summary` / `parity_snapshot`：**同步** `inquanto_contract.py` 键集合。  
+3. 若动 `run_summary` / `parity_snapshot`：**同步** `product_contract.py`、`scripts/export_*` 与既有单测/CI 钩子（已无集中式 `PARITY_SNAPSHOT_DOCUMENTED_KEYS`）。
 4. 若动积分约定：**补一条** `integral_convention` 或 golden JSON 的回归（与 M2 强相关）。  
 
 ---
@@ -237,13 +237,13 @@ scf:
 
 - QMMM / 显式溶剂场 beyond ddCOSMO。  
 - 设备端 RDM → `RDMBundle` 的贝叶斯/AC0 产品级闭环。  
-- InQuanto 闭源 L0 数值同构声明。  
+- Vendor platform 闭源 L0 数值同构声明。  
 
 ---
 
 ## 8. 与主文档关系
 
-- 战略周历与任务组索引仍以 **[实施总计划_InQuanto_PySCF_Tangelo.md](./实施总计划_InQuanto_PySCF_Tangelo.md)** 为准。  
+- 战略周历与任务组索引仍以 **[实施总计划_Vendor platform_PySCF_Tangelo.md](./实施总计划_Vendor platform_PySCF_Tangelo.md)** 为准。  
 - **本文档**负责 **「深水区」里程碑级拆分与 DoD**；执行中若与主文档冲突，以 **主文档战略优先级** 为准，**本文档技术拆分** 可半年度修订一次。
 
 ---

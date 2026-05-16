@@ -1,7 +1,7 @@
 """
 Schmidt embedding **outer self-consistency** (engineering DMET-style): iterate AO density → bath → FCI impurity → mix density.
 
-This closes the loop implied by InQuanto’s DMET *workflow* at an **open, falsifiable** level: it is not identical to
+This closes an **open, falsifiable** loop analogous to documented DMET workflows; it is not identical to
 closed-source bath optimization, but provides multi-cycle ``repro`` fields and the same driver shape as
 :class:`~qchem_stack.integrations.dmet_self_consistent.DMETSelfConsistencyLoop`.
 

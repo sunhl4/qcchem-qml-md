@@ -73,7 +73,7 @@ SCBK 在**理想对称性 + 全栈一致**时往往更省，但不构成「永�
    开壳层、外场、对称性破缺参考、或活性空间与对称性假设不一致时，SCBK 的简化前提可能不成立或实现上更绕。
 
 2. **与 ansatz / 线路语义绑定**  
-   许多化学 UCC 类线路在文献与实现上**按 JW 约定书写**；本仓对 **UCCSD Trotter 等路径在 BK/SCBK 上标为 `n/a` 或需换 ansatz** 的说明，见公开 parity 矩阵与 `docs-site` 中 UCCSD/Trotter 相关页。即：**映射**与**变分线路**是两件独立决策，不能只看哈密顿量项数。
+   许多化学 UCC 类线路在文献与实现上**按 JW 约定书写**；本仓对 **UCCSD Trotter 等路径在 BK/SCBK 上标为 `n/a` 或需换 ansatz** 的说明，见公开 parity 矩阵与 `docusaurus-site` 中 UCCSD/Trotter 相关页。即：**映射**与**变分线路**是两件独立决策，不能只看哈密顿量项数。
 
 3. **「少比特」≠「实验总成本更低」**  
    信息压缩到更小子空间可能伴随**更强纠缠或更难制备的初态**；再加上硬件连通度、读出与校准，**2-qubit 方案未必**在真实芯片上优于 4-qubit 方案。
@@ -94,7 +94,7 @@ SCBK 在**理想对称性 + 全栈一致**时往往更省，但不构成「永�
 | YAML 键 | `active_space.fermion_qubit_mapping`（如 `jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`） |
 | 实跑导出脚本 | `docs/assets/export_mapping_comparison_data.py` |
 | 作图 | `docs/assets/generate_all_figures.py` → `fig_mapping_comparison()` |
-| 映射相关单测（接线） | `tests/test_fermion_qubit_mapping.py`、多后端与映射一致性见 `tests/test_backend_conformance.py` |
+| 映射相关单测（接线） | `tests/test_fermion_qubit_mapping.py`、端到端覆盖面见 `tests/test_orchestration_pipeline.py`、`tests/test_backend_capability_conformance.py` |
 
 ---
 

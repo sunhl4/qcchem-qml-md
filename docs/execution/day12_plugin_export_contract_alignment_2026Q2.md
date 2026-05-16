@@ -15,7 +15,7 @@
     - `mitigation_zne_mode_yaml`
     - `mitigation_zne_scales_yaml`
     - `protocol_zne_mode`
-- `src/qchem_stack/protocols/inquanto_contract.py`（`qchem_stack.protocols.inquanto_contract` — [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
+- `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`** — [CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）
   - 将上述 `run_summary` 新键注册到 `RUN_SUMMARY_DOCUMENTED_KEYS`。
 - `scripts/export_parity_criteria_table.py`
   - 新增 `algorithm_registry_alignment_v1` 与 `md_ml_repro_freeze_fields_v1`（W5/W6 证据块）。

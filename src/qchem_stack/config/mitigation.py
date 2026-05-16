@@ -8,7 +8,7 @@ from pydantic import BaseModel, Field
 
 
 class MitigationSpec(BaseModel):
-    """Aligned with InQuanto docs: classify mitigation by **orchestration** (sync graph vs async batch)."""
+    """Classify mitigation by orchestration topology (sync graph vs async batch)."""
 
     execution_class: Literal["unspecified", "sync_graph", "async_batch", "shot_postselect"] = (
         "unspecified"

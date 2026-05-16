@@ -20,7 +20,7 @@ active_space:
   n_active_electrons: 2
   # Optional: jordan_wigner | bravyi_kitaev | symmetry_conserving_bravyi_kitaev (OpenFermion SCBK)
   fermion_qubit_mapping: jordan_wigner
-  # Optional JW optimizations (see docs-site inquanto-pyscf-problem-analog):
+  # Optional JW optimizations (see docusaurus-site/docs/guide/chemistry-and-embedding.md):
   # prefer_restricted_spatial_fermion_for_jordan_wigner: true   # spatial MO FermionOperator + JW (no dense spin ERI for that step)
   # jordan_wigner_coeff_atol: 1.0e-12                           # InteractionOperator JW path only; omit if using line above
 

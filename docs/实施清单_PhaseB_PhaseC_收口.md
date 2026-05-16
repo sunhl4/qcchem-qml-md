@@ -2,7 +2,7 @@
 
 ## 1. 范围说明
 
-本收口基于 `技术分析_InQuanto_PySCF_vs_原生PySCF_及工程借鉴.md` 中的分阶段路线：
+本收口基于 `技术分析_Vendor platform_PySCF_vs_原生PySCF_及工程借鉴.md` 中的分阶段路线：
 
 - **Phase B**：强化嵌入上游输入形态（AO / Löwdin 表示）；
 - **Phase C**：RDM 驱动后处理的工程骨架（先走可机读、可回归的 stub 路线）。
@@ -49,7 +49,7 @@
 ## 4. Phase 3（Phase C 深化）
 
 - [x] **parity 维度**：`rdm_correction_readiness_v1`（`rdm_correction_readiness` + `run_summary` 镜像键）。
-- [x] **可选数值内核**：`pyscf_nevpt2_casci` → PySCF `mrpt.NEVPT(CASCI(...))` 相关能增量（**不**宣称与 InQuanto 闭源 `inquanto-pyscf` 行级等价）。
+- [x] **可选数值内核**：`pyscf_nevpt2_casci` → PySCF `mrpt.NEVPT(CASCI(...))` 相关能增量（**不**宣称与 Vendor platform 闭源 `vendor-pyscf` 行级等价）。
 - [x] stub / 数值共用报告字段：`reference_wavefunction`、`kernel_class`、`pyscf_nevpt2` 状态块。
 
 ---
@@ -60,7 +60,7 @@
 
 - AVAS 真实活性空间自动选择；
 - **AC0** 及量子测量 RDM 驱动的高阶混合后处理（产品级）；
-- 闭源 InQuanto `inquanto-pyscf` 行级行为一致性（开放栈仅提供 **PySCF mrpt.NEVPT** 可选钩子，见 §4）。
+- 闭源 Vendor platform `vendor-pyscf` 行级行为一致性（开放栈仅提供 **PySCF mrpt.NEVPT** 可选钩子，见 §4）。
 
 ---
 
@@ -90,7 +90,7 @@
   - `mock_external_solver_example.py`
 - [x] 架构不变量已写入：
   - `docs/ENGINEERING_ARCHITECTURE.md`
-  - docs-site 中英文架构页
+  - docusaurus-site 中英文架构页
 
 ### 7.2 统一接口完成态
 

@@ -1,7 +1,7 @@
 """
 TKET-oriented **compile closing** path: ``CircuitIR`` → pytket circuit → resource stats.
 
-InQuanto keeps logical boxes until compile; we expose a single hook that fails soft when pytket is absent.
+Logical compilation stays boxed until lowering; we expose a single hook that fails soft when pytket is absent.
 """
 
 from __future__ import annotations

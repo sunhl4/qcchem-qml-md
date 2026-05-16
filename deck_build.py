@@ -117,7 +117,7 @@ def chart_slide(title, chart_title, series1, series2, cats, right_text=""):
         "type": "chart",
         "props": {
             "chartType": "column",
-            "series1.name": "InQuanto",
+            "series1.name": "Vendor platform (closed)",
             "series1.values": series1,
             "series1.color": "1E2761",
             "series2.name": "Our Platform",
@@ -156,25 +156,25 @@ standard_slide("构建开源工作流平台的战略价值", ["不再受制于�
     {"title": "MD/ML", "val": "融合", "sub": "差异化竞争点"}
 ])
 standard_slide("为什么不能直接用已有的开源工具？", ["现有工具(如Tangelo)多为散装脚本，缺乏产品化体验", "无法实现复杂任务的标准化审计(Repro / Parity)", "在作业队列、容错调度、大体系下折叠等企业级特性上存在短板"], "card", {"title":"结论", "body":"我们需要一个带有工业级纪律的架构，而不仅是一个研究用的工具箱。"})
-standard_slide("我们的定位", ["不照搬闭源逻辑，不做散装工具箱", "定位：开源、可审计、可写进论文Methods的计算化学编排平台", "融合InQuanto的工作流纪律与Tangelo的算法广度", "打造我们特有的MD/ML延伸能力"], "card", {"title":"愿景", "body":"成为量子化学研究和工业应用的首选开放平台。"})
+standard_slide("我们的定位", ["不照搬闭源逻辑，不做散装工具箱", "定位：开源、可审计、可写进论文Methods的计算化学编排平台", "融合商业全栈产品的流程纪律与开源工具箱的算法广度", "打造我们特有的MD/ML延伸能力"], "card", {"title":"愿景", "body":"成为量子化学研究和工业应用的首选开放平台。"})
 
 # Part 2
-section_divider("02", "竞品分析：InQuanto 与 Tangelo")
-full_card_slide("InQuanto：商业平台标杆", [
+section_divider("02", "竞品分析：商业全栈 vs 开源工具箱")
+full_card_slide("商业闭源全栈：标杆特征", [
     {"title": "特点", "body": "深度绑定Quantinuum生态(TKET, Nexus, H-Series)", "bg": "1E2761"},
     {"title": "优势", "body": "产品叙事完整，拥有极强的Protocol和Job对象模型", "bg": "2C5F2D"},
     {"title": "劣势", "body": "闭源、厂商锁定严重，外界无法完全检证其底层启发式细节", "bg": "B85042"}
 ])
-standard_slide("InQuanto 工作流原理", ["从化学输入(PySCF)出发，定义Active Space", "Fermion to Qubit映射", "通过Computable和Protocol构建量子作业", "提交到云端(Nexus)执行并回收资源报告"], "card", {"title":"核心思想", "body":"一切皆对象。定义好分子、算法、协议后，形成稳定的计算流。"})
+standard_slide("商业全栈工作流（示意）", ["从化学输入(PySCF)出发，定义Active Space", "Fermion to Qubit映射", "通过对象化协议构建量子作业", "提交到云端执行并回收资源报告"], "card", {"title":"核心思想", "body":"一切皆对象。定义好分子、算法、协议后，形成稳定的计算流。"})
 full_card_slide("Tangelo：开源工具箱", [
     {"title": "特点", "body": "SandboxAQ开源的端到端工具包，重研究与教程", "bg": "1E2761"},
     {"title": "优势", "body": "算法极多，支持大量Ansatz、后端(Qiskit/Cirq等)，生态丰富", "bg": "2C5F2D"},
     {"title": "劣势", "body": "统一契约较弱，像散装脚本，缺乏企业级作业管控和严谨输出", "bg": "B85042"}
 ])
 standard_slide("Tangelo 工作流原理", ["定义SecondQuantizedMolecule", "选取Solver(如VQESolver, ADAPTSolver)", "指定Backend执行运算", "获取能量与态信息"], "card", {"title":"流程特点", "body":"流程直白，方便二次开发，但各个模块间的接口没有被严格的对象模型(如Protocol)保护，复现性较弱。"})
-chart_slide("工作流与复现性对比(分数)", "平台功能广度得分", "9,8,4,7", "8,9,8,8", "Workflow,Algorithms,MD/ML,Reproducibility", "InQuanto在工作流占优，但MD/ML缺乏；我们将在MD/ML及复现性上超越。")
-standard_slide("竞品分析总结", ["InQuanto强在工程与产品体验(对象化，报告化)", "Tangelo强在算法广度和自由度", "二者均在MD/ML延伸上留有空白"], "cards_3", [
-    {"title": "InQuanto", "val": "重产品", "sub": "闭源封闭"},
+chart_slide("工作流与复现性对比(分数)", "平台功能广度得分", "9,8,4,7", "8,9,8,8", "Workflow,Algorithms,MD/ML,Reproducibility", "竞品A在工作流占优，但MD/ML缺乏；我们将在MD/ML及复现性上超越。")
+standard_slide("竞品分析总结", ["商业闭源栈强在工程与产品体验(对象化，报告化)", "开源工具箱强在算法广度和自由度", "二者均在MD/ML延伸上留有空白"], "cards_3", [
+    {"title": "闭源全栈", "val": "重产品", "sub": "厂商锁定"},
     {"title": "Tangelo", "val": "重算法", "sub": "缺乏纪律"},
     {"title": "Our", "val": "全栈", "sub": "开源+纪律"}
 ])
@@ -191,7 +191,7 @@ full_card_slide("目前的劣势", [
     {"title": "算法深度", "body": "在高级大体系求解(如复杂碎片法)上仍需逐步追赶", "bg": "B85042"},
     {"title": "商业包装", "body": "尚未形成与云计算平台深度集成的商业化UI前端", "bg": "B85042"}
 ])
-standard_slide("策略：我们要做什么？", ["不做InQuanto的无脑克隆，不强求商业云UI的一比一", "构建开放、可审计(Audit)、可插入的编排层", "把Tangelo的算法装入InQuanto的纪律里", "在ML和自研MD接口上打出差异化长板"], "card", {"title":"总原则", "body":"用纪律管住广度，用开源打败封闭，用生态(MD/ML)拓展边界。"})
+standard_slide("策略：我们要做什么？", ["不做闭源产品的无脑克隆，不强求商业云UI的一比一", "构建开放、可审计(Audit)、可插入的编排层", "把开源算法生态装入我们自己的工程纪律里", "在ML和自研MD接口上打出差异化长板"], "card", {"title":"总原则", "body":"用纪律管住广度，用开源打败封闭，用生态(MD/ML)拓展边界。"})
 standard_slide("竞争定调：P0 到 P3", ["P0: 建立绝对可信的Methods引擎(Repro机制)", "P1: 超越现有开源库的杂乱，实现一等工作流对象", "P2: 深化大体系(Embedding)、QPE与MD/ML的差异化", "P3: 完善产品生态(教程、前端看板、社区)"], "cards_3", [
     {"title": "P0-P1", "val": "可信工作流", "sub": "对标基础能力"},
     {"title": "P2", "val": "MD/ML", "sub": "形成独特壁垒"},
@@ -206,7 +206,7 @@ full_card_slide("模块间交互流 (Data Flow)", [
     {"title": "量子层", "body": "映射/Ansatz -> 构建电路IR并编译", "bg": "CADCFC"},
     {"title": "执行层", "body": "多后端分发 -> 汇总态与能量 -> Repro日志", "bg": "2C5F2D"}
 ])
-standard_slide("第一步：快速复现竞品功能", ["先挑选 InQuanto 和 Tangelo 中最典型的功能(如VQE, DMET)", "使用我们自研的这套框架进行复现", "验证能否用同样的化学输入得到一致的输出(Parity一致性)", "在内部输出对比报告，确认架构灵活性"], "card", {"title":"复现", "body":"这是检验架构承载能力的试金石。"})
+standard_slide("第一步：快速复现竞品功能", ["先挑选闭源全栈与开源工具箱中最典型的功能(如VQE, DMET)", "使用我们自研的这套框架进行复现", "验证能否用同样的化学输入得到一致的输出(Parity一致性)", "在内部输出对比报告，确认架构灵活性"], "card", {"title":"复现", "body":"这是检验架构承载能力的试金石。"})
 standard_slide("第二步：文献复现与新算法支持", ["用我们的框架复现顶级期刊(Nature/Science子刊)中的量子化学实验", "确保生成的Repro JSON可以直接作为论文的Methods附件", "开发支持内部研究员测试新量子算法(如新VQE变种)的插件体系"], "card", {"title":"科研背书", "body":"通过复现文献建立学术界公信力，这比任何广告都有效。"})
 standard_slide("第三步：API接入ML与自研MD", ["量子侧输出的能量和力，不再只是终点，而是起点", "对接分子动力学(QMEFDataset, NequIP/MACE hooks)", "训练基于量子高精度的自研分子动力学力场", "利用ML Surrogate替代部分昂贵的量子模拟"], "cards_3", [
     {"title": "QC", "val": "高精度数据", "sub": "能量与力"},
@@ -214,7 +214,7 @@ standard_slide("第三步：API接入ML与自研MD", ["量子侧输出的能量�
     {"title": "MD", "val": "大分子演化", "sub": "产业级应用"}
 ])
 standard_slide("最终目标：端到端全连通", ["输入：分子结构与业务需求", "引擎：量子计算+计算化学框架智能拆解计算任务", "放大：通过ML力场扩展到大尺度模拟", "输出：材料性质或药物活性预测"], "card", {"title":"全链路闭环", "body":"不仅解决了如何算得准的问题，更解决了算准了有什么用的问题。"})
-standard_slide("近期执行路线 (Roadmap)", ["下个月：冻结Repro schema，打通VQE/ADAPT的基础骨架", "Q3：复现主流架构，推出完善的多后端支持与DMET", "Q4：上线MD/ML接口，跑通内部第一个势函数训练Demo", "长期：迭代算法，打磨开发者文档与VitePress知识库"], "card", {"title":"行动指南", "body":"架构先行，场景驱动，生态制胜。"})
+standard_slide("近期执行路线 (Roadmap)", ["下个月：冻结Repro schema，打通VQE/ADAPT的基础骨架", "Q3：复现主流架构，推出完善的多后端支持与DMET", "Q4：上线MD/ML接口，跑通内部第一个势函数训练Demo", "长期：迭代算法，打磨开发者文档与Docusaurus用户站"], "card", {"title":"行动指南", "body":"架构先行，场景驱动，生态制胜。"})
 standard_slide("补充架构细节：编译与作业投递", ["后端(BackendSpec)抽象：兼容Statevector与Qiskit", "TKET Bridge：统一接管电路优化和资源度量(Metrics)", "异步作业类比(Nexus Analog)：通过SQLite支持本地高并发", "未来云端入口：预留了HTTP与Job DB的对接点"], "card", {"title":"工程细节", "body":"所有编译和硬件相关的不稳定因素，全部隔离在Backend适配层。"})
 standard_slide("补充架构细节：Repro与Parity系统", ["每一条实验配置都生成唯一的Hash", "记录详尽的测算资源：线路数、射击数(shots)、编译开销", "导出标准JSON，作为可回溯、可审计的唯一真理", "这是超越散装脚本库的根本"], "card", {"title":"审计级日志", "body":"可审计性(Auditability)是B端客户采购平台的核心考量。"})
 standard_slide("团队协作与质量保证", ["自动化测试(CI)覆盖所有核心路径(Smoke tests)", "在PR阶段执行跨后端一致性校验(Conformance)", "坚持文档即代码，中文工程台账与英文公开文档同步维护"], "card", {"title":"质量控制", "body":"用现代软件工程的方法，做高精尖的量子平台。"})

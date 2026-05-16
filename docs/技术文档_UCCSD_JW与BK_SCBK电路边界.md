@@ -1,6 +1,6 @@
 # UCCSD、JW 映射与 BK / SCBK 电路边界（工程裁断）
 
-本文档裁断 [公开 parity 矩阵 §2](inquanto_public_parity_matrix.md) 中 **AlgorithmVQE + `variational_ansatz: uccsd`** 的 **L1 范围**，避免被误读为在 **Bravyi–Kitaev / SCBK** 参考态上已实现与 InQuanto 闭源堆栈 **L0 电路语义**对齐。
+本文档裁断 [公开 parity 矩阵 §2](public_parity_matrix.md) 中 **AlgorithmVQE + `variational_ansatz: uccsd`** 的 **L1 范围**，避免被误读为在 **Bravyi–Kitaev / SCBK** 参考态上已实现与 Vendor platform 闭源堆栈 **L0 电路语义**对齐。
 
 ## 已支持（明确）
 

@@ -2,18 +2,18 @@
 
 ## 1. 目的与边界
 
-本仓库是 **独立开源** 的编排与协议栈，**不声称** 与 Quantinuum 闭源 InQuanto 的二进制同构。本文档说明：在**公开、可复现的契约**下，如何实现与公开资料中「**run（采样）→ 测量直方图 → 能量（期望）**」同构的 **Qiskit 比特串路径**，与已有的 **状态向量蒙特卡洛**（`run_sampled_pauli_protocol` / `pauli_shot_sim`）和 **执行器精确期望** 路径的关系。
+本仓库是 **独立开源** 的编排与协议栈，**不声称** 与 Quantinuum 闭源 Vendor platform 的二进制同构。本文档说明：在**公开、可复现的契约**下，如何实现与公开资料中「**run（采样）→ 测量直方图 → 能量（期望）**」同构的 **Qiskit 比特串路径**，与已有的 **状态向量蒙特卡洛**（`run_sampled_pauli_protocol` / `pauli_shot_sim`）和 **执行器精确期望** 路径的关系。
 
 | 能力 | 说明 |
 |------|------|
 | **有** | 对每组对易 Pauli，构造 **HEA + 单比特基变更 + 全比特测量** 的 Qiskit 线路；`Aer` 或真实 `Backend.run(..., shots=...)`；`get_counts`；按与 `pauli_shot_sim` **同一套** 张量/计算基索引，把 `histogram` 重组成 \(\langle H\rangle\) 的估计及分组方差近似。 |
-| **无** | 不绑定 IBM Quantum 账号、Nexus 作业队列、InQuanto 内部对象名或未公开 API；不保证与闭源 InQuanto 的数值逐比特一致。 |
+| **无** | 不绑定 IBM Quantum 账号、Nexus 作业队列、Vendor platform 内部对象名或未公开 API；不保证与闭源 Vendor platform 的数值逐比特一致。 |
 
 **前置条件**：下列三条路径均在 **`quantum.use_pauli_protocol: true`** 且管线实际构造 `PauliAveragingProtocol` 时生效。若 `use_pauli_protocol: false`，管线在 `pre_pauli_protocol` 之后直接跳过 Pauli 阶段（无 `protocol_counts` 中的本节字段）；见 `orchestration/pipeline.py` 中 `pauli_protocol_skipped` 分支。
 
-**机读分类（CI / gap）**：`qchem_stack.protocols.inquanto_contract.protocol_expectation_semantics_public()` 将上述开关组合映射到 `protocol_counts_expectation_source` / `protocol_counts_energy_stderr_model`，与 parity 导出同源维护。
+**机读分类（CI / gap）**：`qchem_stack.protocols.product_contract.protocol_expectation_semantics_public()` 将上述开关组合映射到 `protocol_counts_expectation_source` / `protocol_counts_energy_stderr_model`，与 parity 导出同源维护。
 
-**对标叙事**：在「公开的产品故事」上，本路径与 InQuanto 文档中常见的 **Computable → Protocol / shot schedule → counts → expectation** 一致；实现落点在 `qchem_stack.backends.qiskit_pauli_shots` 与 `PauliAveragingProtocol.run` 的 `run_qiskit_shots` 分支。
+**对标叙事**：在「公开的产品故事」上，本路径与 Vendor platform 文档中常见的 **Computable → Protocol / shot schedule → counts → expectation** 一致；实现落点在 `qchem_stack.backends.qiskit_pauli_shots` 与 `PauliAveragingProtocol.run` 的 `run_qiskit_shots` 分支。
 
 ## 2. 三条 Pauli 协议能量路径对比
 
@@ -23,7 +23,7 @@
    由 `HamiltonianExpectationExecutor.expectation_hea` 提供 \(\langle H\rangle\)（`statevector` / `QiskitStatevector` 等 **精确或设备解析期望**，取决于 `BackendSpec`）。`protocol_counts` 写入：`expectation_source: executor_exact_or_device_mean`，`energy_stderr_model: conservative_sum_bound_equal_shots`（`backends/shot_budget.energy_estimate_with_uncertainty` 的保守上界，可按 `target_energy_stderr` 反推有效 `shots_per_circuit`）。
 
 2. **状态向量分组蒙特卡洛**（`run_sampled_pauli_protocol: true`）  
-   在 `hea_state` 上按组从计算基分布 **采样**，与 InQuanto 式「模拟 shot」一致。直方图来自**模拟**计数。实现：`backends/pauli_shot_sim.py`。`protocol_counts`：`expectation_source: grouped_shot_simulation_statevector`，`energy_stderr_model: sample_stderr_independent_groups_approx`。
+   在 `hea_state` 上按组从计算基分布 **采样**，与 Vendor platform 式「模拟 shot」一致。直方图来自**模拟**计数。实现：`backends/pauli_shot_sim.py`。`protocol_counts`：`expectation_source: grouped_shot_simulation_statevector`，`energy_stderr_model: sample_stderr_independent_groups_approx`。
 
 3. **Qiskit 比特串路径**（`run_qiskit_shots_pauli_protocol: true`）  
    每条（子）线路在 Qiskit 上 `run` 指定 `shots`，直方图来自 `result().get_counts()`。实现：`backends/qiskit_pauli_shots.py`。`protocol_counts`：`expectation_source: qiskit_shot_counts_get_counts`，`energy_stderr_model: empirical_shot_variance_independent_groups_approx`。
@@ -102,9 +102,9 @@ quantum:
 2. 将实例赋给 **`backend.meta["qiskit_shots_backend"]`**（在 Python 中加载配置后写回，或在自定义脚本中构建 `BackendSpec`）。  
 3. 为降低插入误差，可酌情提高 `qiskit_transpile_optimization` 并依设备校准配置 **layout / scheduling**（属 Qiskit 使用范畴，本栈仅透传 transpile）。  
 
-**诚实说明**：与 InQuanto 的「Nexus + H1」一站体验不同，本仓库不内置凭证与队列，仅保留 **Qiskit 标准接口** 以便对接任意 provider。
+**诚实说明**：与 Vendor platform 的「Nexus + H1」一站体验不同，本仓库不内置凭证与队列，仅保留 **Qiskit 标准接口** 以便对接任意 provider。
 
-## 8. 与 InQuanto **公开** 契约的对齐点（非闭源同构）
+## 8. 与 Vendor platform **公开** 契约的对齐点（非闭源同构）
 
 - **阶段模型**：`PauliAveragingProtocol` 仍为 instantiate → build → compile → run → evaluate；`run` 在 Qiskit 路径下改变 **能量来源** 为比特串直方图估计，**不改变** 资源行 `dataframe_circuit_shot_rows` 的生成逻辑。  
 - **可导出资源**：`resource_rows` / `pauli_measurement_ledger`、parity 导出处仍可与 `export_parity_criteria_table` 联动（能量字段以本次 `expectation_source` 为准）。  

@@ -518,7 +518,7 @@ class PySCFIntegralSolver:
                 "driver_meta": meta,
                 "epistemic_bound": (
                     "AO wrapper keeps SCF object for fragment builders; "
-                    "no full InQuanto AO driver parity claim."
+                    "no full vendor AO driver parity claim."
                 ),
             }
 

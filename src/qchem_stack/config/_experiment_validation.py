@@ -19,10 +19,17 @@ def preprocess_top_level_yaml_dict(
     data: Mapping[str, Any],
     *,
     known_fields: set[str],
+    strict_unknown_top_level: bool = False,
 ) -> dict[str, Any]:
     """Filter known top-level fields and merge unknown keys into ``extra``."""
     top_level = {key: value for key, value in data.items() if key in known_fields}
     unknown_top_level = {key: data[key] for key in sorted(set(data) - known_fields)}
+    if strict_unknown_top_level and unknown_top_level:
+        keys = ", ".join(sorted(str(k) for k in unknown_top_level))
+        raise ConfigurationError(
+            "Unknown top-level config keys are not allowed in strict mode: "
+            f"{keys}. Move extension fields under `extra`."
+        )
 
     explicit_extra = top_level.get("extra")
     if explicit_extra is None:

@@ -50,8 +50,8 @@ def test_merged_experiment_benchmark_groups_by_algorithm_yaml() -> None:
     ]
 
 
-def test_default_benchmark_yaml_set_covers_inquanto_and_tangelo_slices() -> None:
-    # InQuanto-aligned: VQD UCCSD deflation sample.
+def test_default_benchmark_yaml_set_covers_reference_and_tangelo_slices() -> None:
+    # Reference-demo aligned: VQD UCCSD deflation sample.
     assert "configs/example_h2_vqd_uccsd.yaml" in DEFAULT_BENCHMARK_YAMLS
     # Tangelo-aligned: fermion mapping / pool-alias vocabulary sample.
     assert "configs/example_h2_iqeb_qubit_excitation_alias.yaml" in DEFAULT_BENCHMARK_YAMLS

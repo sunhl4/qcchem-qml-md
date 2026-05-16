@@ -1,6 +1,6 @@
 # `launch` / `retrieve` 与 Nexus 异步模型的对照
 
-本仓库不实现 Quantinuum **Nexus** 或 HQC 计价；以下仅说明 **公开文档中的异步提交/拉结果** 与 `qchem_stack` 的**语义类比**，便于与 [InQuanto Protocols 概述](https://docs.quantinuum.com/inquanto/manual/protocols_overview.html) 对照。
+本仓库不实现 Quantinuum **Nexus** 或 HQC 计价；以下仅说明 **公开文档中的异步提交/拉结果** 与 `qchem_stack` 的**语义类比**，便于与 [Vendor platform Protocols 概述](https://www.quantinuum.com/) 对照。
 
 | Nexus / 文档侧（概念） | `qchem_stack` |
 |--------------------------|---------------|

@@ -119,4 +119,4 @@ set_entrypoint_conflict_policy("strict") # CI / 生产硬门禁：冲突时直�
 - 外部插件骨架示例：`examples/solver_plugin_entrypoint_demo/`
 - 适配器生成器（仓库内实现）：`scripts/create_solver_adapter_scaffold.py`
 - 合同检查器：`scripts/check_solver_adapter_contract.py`
-- 适配快速上手（VitePress）：`docs-site/docs/guide/chemistry-and-embedding/backend-adapter-quickstart.md`
+- 适配快速上手（Docusaurus）：`docusaurus-site/docs/guide/backend-adapter-quickstart.md`

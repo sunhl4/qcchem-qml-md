@@ -581,9 +581,9 @@ quantum:
     assert rsum.get("job_async_expectation") is not None
 
 
-def test_tutorial_inquanto_chain_yaml_runs() -> None:
+def test_tutorial_chain_h2_yaml_runs() -> None:
     root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "tutorial_inquanto_chain_h2.yaml"
+    p = root / "configs" / "tutorial_chain_h2.yaml"
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert out.get("embedding_workflow", {}).get("mode") == "dmet"
@@ -666,7 +666,7 @@ def test_run_pipeline_sync_packaged_h2_vqd_uccsd_yaml() -> None:
     assert meta.get("reused_pipeline_ground") is True
     assert meta.get("vqd_overlap_mode_yaml") == cfg.quantum.vqd_overlap_mode
     assert isinstance(meta.get("tangelo_deflation_analogy_v1"), dict)
-    assert isinstance(meta.get("inquanto_vqd_semantics_v1"), dict)
+    assert isinstance(meta.get("vqd_cross_stack_semantics_v1"), dict)
     assert vqd["energies"][0] == pytest.approx(float(out["energy_after_variational"]))
     rsum = out["repro"]["run_summary"]
     assert rsum.get("vqd_variety_yaml") == "uccsd"

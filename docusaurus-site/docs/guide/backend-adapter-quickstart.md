@@ -1,11 +1,11 @@
 ---
 title: 后端适配快速接入
-description: 模板、运行时注册、pip entry points、registry 排障与冲突策略（与 VitePress 母稿对齐）。
+description: 模板、运行时注册、pip entry points、registry 排障与冲突策略（与仓库插件指南互补）。
 ---
 
 # 后端适配快速接入
 
-本文与仓库内 VitePress 母稿 `docs-site/docs/guide/chemistry-and-embedding/backend-adapter-quickstart.md` 叙事一致（`docs-site` 下 `npm run docs:dev` 浏览）。插件安装与发布另见母仓库 [`docs/solver_entrypoint_plugin_安装与发布指南.md`](../../../docs/solver_entrypoint_plugin_安装与发布指南.md)。
+本文即 Docusaurus 站内 **后端适配快速接入** 母稿；本地浏览：`cd docusaurus-site && npm start`。插件安装与发布另见仓库 [solver 插件安装与发布指南](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/solver_entrypoint_plugin_%E5%AE%89%E8%A3%85%E4%B8%8E%E5%8F%91%E5%B8%83%E6%8C%87%E5%8D%97.md)。
 
 ## 可选：脚手架
 

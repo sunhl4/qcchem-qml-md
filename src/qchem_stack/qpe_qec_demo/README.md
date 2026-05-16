@@ -1,6 +1,6 @@
 # QPE / QEC demo track (L1 open analog)
 
-This package implements a **documentation-aligned**, **non–vendor-binary** analog of InQuanto’s QPE / Bayesian-QPE **naming and repro hooks** (see [与InQuanto能力差距与实施计划 — 附录 D](../../docs/与InQuanto能力差距与实施计划.md) **序 C7 / C14** and [inquanto_public_parity_matrix.md](../../docs/inquanto_public_parity_matrix.md) §2).
+This package implements a **documentation-aligned**, **non–vendor-binary** analog of common QPE / Bayesian-QPE **naming and repro hooks** (see [与Vendor platform能力差距与实施计划 — 附录 D](../../docs/public_parity_matrix.md) **序 C7 / C14** and [public_parity_matrix.md](../../docs/public_parity_matrix.md) §2).
 
 ## Public entry points
 
@@ -26,9 +26,9 @@ Packaged YAML: `configs/example_h2_qpe_track.yaml` (Pauli-on chain); **`configs/
 - `tests/test_l1_phase_c_iqeb_bayesian.py` — `BayesianQPEStub.estimate` smoke.
 - Orchestration / QPE track: `tests/test_orchestration_pipeline.py`, `scripts/run_qpe_track_demo.py`.
 
-**Status**: `partial` vs closed-source InQuanto — L1 naming + JSON only, not numerical parity with vendor stacks.
+**Status**: `partial` vs closed-source Vendor platform — L1 naming + JSON only, not numerical parity with vendor stacks.
 
 ## P1 演示轨 vs P2 深度（边界）
 
 - **P1（已验收）**：`qpe_demo_track` + `run_summary.qpe_demo_track_ran` + `export_parity_criteria_table` 的 `qpe_*_from_run` / `methods_resource_unified_v1`（见上 YAML 表）；可选 TKET 探针见 `example_h2_qpe_track_parity_integrations.yaml`。  
-- **P2（进行中）**：超出 demo 的 **resource estimation** 可选叙事见 export 顶键 **`resource_estimation_preview_v1`**（`parity_integrations.resource_estimation_preview: true` 时）；**不**宣称云计价或闭源资源估计 L0。双月周历见 [与InQuanto能力差距与实施计划 — 附录 A](../../docs/与InQuanto能力差距与实施计划.md) 内 `### 8.`。
+- **P2（进行中）**：超出 demo 的 **resource estimation** 可选叙事见 export 顶键 **`resource_estimation_preview_v1`**（`parity_integrations.resource_estimation_preview: true` 时）；**不**宣称云计价或闭源资源估计 L0。双月周历见 [与Vendor platform能力差距与实施计划 — 附录 A](../../docs/public_parity_matrix.md) 内 `### 8.`。

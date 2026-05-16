@@ -1,5 +1,5 @@
 # H₂ (sto-3g) closed-shell: UCCSD variational ground, then VQD deflation (same UCCSD parameterization).
-# See docusaurus-site/docs/tutorial/vqd-inquanto-tangelo.md
+# See docusaurus-site/docs/tutorial/workflow.md
 schema_version: "1"
 experiment_id: "h2_vqd_uccsd_smoke"
 random_seed: 7

@@ -1,5 +1,5 @@
 """
-Closed-gap **extension layer** toward InQuanto *public-contract* parity (not binary parity).
+Closed-gap **extension layer** toward documented public-contract parity (not binary parity).
 
 See ``docs/工程记忆_Quantinuum对标与数据流技术文档.md`` §0 for epistemic bounds (L0–L3).
 """

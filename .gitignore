@@ -33,10 +33,10 @@ htmlcov/
 .DS_Store
 Thumbs.db
 
-# docs-site (VitePress)
-docs-site/node_modules/
-docs-site/.vitepress/dist/
-docs-site/docs/.vitepress/cache/
+# docusaurus-site
+docusaurus-site/node_modules/
+docusaurus-site/build/
+docusaurus-site/.docusaurus/
 
 # local / secrets
 .env

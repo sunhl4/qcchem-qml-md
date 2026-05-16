@@ -6,7 +6,7 @@
 
 - [x] `docs/统一经典化学接口_ChemIntegralSolver与下游无关性.md` 与实现无矛盾
 - [x] `docs/execution/unified_chem_driver_audit_notes.md` 中 `open` 项已关闭或标 `wontfix`
-- [x] `pytest` 全量绿；`docs-site` `npm run docs:build` 绿（若当周改文档站）
+- [x] `pytest` 全量绿；`docusaurus-site` `npm run build` 绿（若当周改文档站）
 - [x] `scripts/check_parity_export_sample.py` 绿
 
 **签字**：Codex 执行批次　**日期**：2026-05-08

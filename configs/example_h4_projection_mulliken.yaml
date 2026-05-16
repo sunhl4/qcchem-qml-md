@@ -1,5 +1,5 @@
 # Linear H4 (6-31g): projection + fragment Mulliken active Hamiltonian for variational stage.
-# Requires PySCF (``pip install qchem-stack[chem]``). See docs/inquanto_public_parity_matrix.md §3.
+# Requires PySCF (``pip install qchem-stack[chem]``). See docs/public_parity_matrix.md §3.
 schema_version: "1"
 experiment_id: "h4_projection_mulliken_smoke_001"
 random_seed: 0

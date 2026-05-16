@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Generate visual comparison figures for three platforms: InQuanto, Tangelo, qchem-stack.
+Generate visual comparison figures for three platforms: commercial stack, Tangelo, qchem-stack.
 Style: Infographic-style comparison charts.
 """
 
@@ -22,7 +22,7 @@ def save_figure(fig, name, dpi=300):
 
 def plot_three_platform_comparison():
     """
-    Three-platform radar comparison: InQuanto vs Tangelo vs qchem-stack.
+    Three-platform radar comparison: commercial vs Tangelo vs qchem-stack.
     """
     fig, axes = plt.subplots(1, 3, figsize=(16, 6))
     fig.patch.set_facecolor('white')
@@ -33,13 +33,13 @@ def plot_three_platform_comparison():
     n_cats = len(categories)
     
     # Data (subjective scores 1-5)
-    inquanto_scores = [4, 5, 3, 2, 2, 5]
+    vendor_a_scores = [4, 5, 3, 2, 2, 5]
     tangelo_scores = [5, 2, 2, 4, 3, 2]
     qchem_scores = [3, 4, 5, 4, 4, 3]
     
     colors = ['#e74c3c', '#3498db', '#27ae60']  # Red, Blue, Green
-    platforms = ['InQuanto\n(Commercial)', 'Tangelo\n(Open Source)', 'qchem-stack\n(Our Platform)']
-    all_scores = [inquanto_scores, tangelo_scores, qchem_scores]
+    platforms = ['Commercial stack\n(reference)', 'Tangelo\n(Open Source)', 'qchem-stack\n(Our Platform)']
+    all_scores = [vendor_a_scores, tangelo_scores, qchem_scores]
     
     for idx, (ax, scores, platform, color) in enumerate(zip(axes, all_scores, platforms, colors)):
         # Create bar chart instead of radar for clarity
@@ -70,9 +70,9 @@ def plot_three_platform_comparison():
     plt.tight_layout(rect=[0, 0, 1, 0.95])
     save_figure(fig, 'three_platform_radar.png')
 
-def plot_inquanto_workflow():
+def plot_commercial_stack_workflow():
     """
-    Visualize InQuanto's three-pillar workflow.
+    Visualize a typical three-pillar commercial quantum-chemistry workflow (illustrative).
     """
     fig, ax = plt.subplots(figsize=(14, 8))
     fig.patch.set_facecolor('white')
@@ -81,17 +81,17 @@ def plot_inquanto_workflow():
     ax.axis('off')
     
     # Title
-    ax.text(7, 9.5, 'InQuanto: Commercial Platform Workflow', 
+    ax.text(7, 9.5, 'Commercial stack: illustrative three-pillar workflow', 
            fontsize=16, ha='center', fontweight='bold', color='#e74c3c')
     
     # Three pillars
     pillars = [
         (2, 6.5, 'Chemical\nSpecification', '#ffebee', '#e74c3c',
-         ['FermionSpace', 'Active Space', 'InQuanto-PySCF', 'Geometry']),
+         ['FermionSpace', 'Active Space', 'PySCF driver', 'Geometry']),
         (7, 6.5, 'Program\nConstruction', '#fff3e0', '#f39c12',
          ['Algorithm*', 'Computable', 'Protocol', 'TKET Passes']),
         (12, 6.5, 'Execution &\nAnalysis', '#e8f5e9', '#27ae60',
-         ['Nexus Cloud', 'H-Series HW', 'HQC Billing', 'Resource Table']),
+         ['Managed cloud', 'HW backends', 'Metering', 'Resource Table']),
     ]
     
     for x, y, title, facecolor, edgecolor, items in pillars:
@@ -114,7 +114,7 @@ def plot_inquanto_workflow():
     ax.annotate('', xy=(10.2, 6.5), xytext=(8.8, 6.5), arrowprops=arrow_style)
     
     plt.tight_layout()
-    save_figure(fig, 'inquanto_workflow.png')
+    save_figure(fig, 'commercial_stack_workflow.png')
 
 def plot_tangelo_workflow_detailed():
     """
@@ -194,7 +194,7 @@ def plot_workflow_philosophy_comparison():
 if __name__ == '__main__':
     print("Generating comparison figures...")
     plot_three_platform_comparison()
-    plot_inquanto_workflow()
+    plot_commercial_stack_workflow()
     plot_tangelo_workflow_detailed()
     plot_workflow_philosophy_comparison()
     print("\nAll comparison figures generated!")

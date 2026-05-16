@@ -8,7 +8,7 @@ from ._validation import strip_required_text
 
 
 class CompilerSpec(BaseModel):
-    """Pass bundles analogous to InQuanto ``preoptimize_passes`` / ``compiler_passes`` knobs."""
+    """Pass bundles analogous to vendor ``preoptimize_passes`` / ``compiler_passes`` knobs."""
 
     optimization_level: int = Field(default=1, ge=0, le=3)
     native_twoq: str = Field(default="CX", min_length=1)

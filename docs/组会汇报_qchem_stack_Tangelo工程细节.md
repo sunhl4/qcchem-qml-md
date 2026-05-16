@@ -63,28 +63,26 @@ $$
 
 ---
 
-## 三、竞品深度拆解：InQuanto vs Tangelo
+## 三、竞品深度拆解：Vendor platform vs Tangelo
 
 了解竞品是定位自身优势的前提。主要有两个标杆性竞品：
 
 ---
 
-### 3.1 InQuanto：商业完整平台（Quantinuum）
+### 3.1 Vendor platform：商业完整平台（Quantinuum）
 
-InQuanto 是 Quantinuum 的**商业量子化学平台**，与 H-Series 离子阱、TKET 编译器和 Nexus 云深度集成。
+Vendor platform 是 Quantinuum 的**商业量子化学平台**，与 H-Series 离子阱、TKET 编译器和 Nexus 云深度集成。
 
 #### 3.1.1 三支柱工作流
 
-![InQuanto Workflow](assets/inquanto_workflow.png)
+![Vendor platform Workflow](assets/commercial_stack_workflow.png)
 
-InQuanto 的核心是**「真机与运营一体」**：用强类型 API 串起 `Computable` / `Protocol`、TKET、Nexus 与 H-Series 后端，把哈密顿量推向可运营的真机测量：
+Vendor platform 的核心是**「真机与运营一体」**：用强类型 API 串起 `Computable` / `Protocol`、TKET、Nexus 与 H-Series 后端，把哈密顿量推向可运营的真机测量：
 
 ```python
-from inquanto import FermionSpace, AlgorithmVQE, Protocol
-
-fs = FermionSpace.from_pyscf(mol, active_space=(4, 4))
-algo = AlgorithmVQE(fermion_space=fs, ansatz="UCCSD",
-                    optimizer="L-BFGS-B")
+# 以下为示意伪代码 — 商业栈 API 以各厂商 SDK 为准，与本仓库无 L0 绑定。
+fs = build_fermion_space(mol, active_space=(4, 4))
+algo = AlgorithmVQE(fermion_space=fs, ansatz="UCCSD", optimizer="L-BFGS-B")
 computable = algo.expectation_value(fs.hamiltonian)
 result = Protocol(computable, backend="H1-1", shots=10000).run()
 ```
@@ -119,7 +117,7 @@ energy = vqe.simulate()
 
 ### 3.3 竞品启发与工程取舍
 
-| 对比维度 | InQuanto（优势/劣势） | Tangelo（优势/劣势） | `qchem-stack` 启发落地（取其长、避其短） |
+| 对比维度 | Vendor platform（优势/劣势） | Tangelo（优势/劣势） | `qchem-stack` 启发落地（取其长、避其短） |
 |----------|------------------------|----------------------|-------------------------------------------|
 | 平台形态 | **优**：闭环成熟；**劣**：闭源锁定 | **优**：开源灵活；**劣**：交付链路轻 | 开源 + 插拔式架构，补齐工程交付 |
 | 配置体验 | **优**：规范；**劣**：机制不透明 | **优**：字典上手快；**劣**：弱校验 | YAML + Pydantic，失败早且明确 |
@@ -130,7 +128,7 @@ energy = vqe.simulate()
 
 一句话总结三者的本质差异：
 
-- **InQuanto**：买一套完整的商业产品，省心但被锁死
+- **Vendor platform**：买一套完整的商业产品，省心但被锁死
 - **Tangelo**：在 Notebook 里快速验证想法，灵活但难以交付
 - **qchem-stack**：像搭工业流水线一样，严谨、可插拔、可审计
 

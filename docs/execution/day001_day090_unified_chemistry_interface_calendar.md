@@ -498,11 +498,11 @@ PLAN_START_DATE: 2026-05-08
 
 ### 第 45 天（第 7 周）
 
-**主题**：`inquanto-pyscf-problem-analog.md`：脚注「PySCF 为默认适配器示例」
+**主题**：`vendor-pyscf-problem-analog.md`：脚注「PySCF 为默认适配器示例」
 
 **当日完成定义（DoD）**：
 
-- `inquanto-pyscf-problem-analog.md`：脚注「PySCF 为默认适配器示例」
+- `vendor-pyscf-problem-analog.md`：脚注「PySCF 为默认适配器示例」
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。
@@ -531,11 +531,11 @@ PLAN_START_DATE: 2026-05-08
 
 ### 第 48 天（第 7 周）
 
-**主题**：VitePress：`check:configs-table` 若改 configs 则跑
+**主题**：Docusaurus：`docusaurus-site` 若改用户站则 `npm run build`
 
 **当日完成定义（DoD）**：
 
-- VitePress：`check:configs-table` 若改 configs 则跑
+- Docusaurus：`cd docusaurus-site && npm run build` 若当周修改了 `docusaurus-site/docs/` 或站点配置
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。
@@ -564,11 +564,11 @@ PLAN_START_DATE: 2026-05-08
 
 ### 第 51 天（第 8 周）
 
-**主题**：`inquanto_contract.open_stack_differentiators`：若有 driver 绑定措辞则改为 adapter-first
+**主题**：`qchem_stack.protocols.product_contract.open_stack_differentiators_public`：若有 driver 绑定措辞则改为 adapter-first
 
 **当日完成定义（DoD）**：
 
-- `inquanto_contract.open_stack_differentiators`：若有 driver 绑定措辞则改为 adapter-first
+- `qchem_stack.protocols.product_contract.open_stack_differentiators_public`：若有 driver 绑定措辞则改为 adapter-first
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。
@@ -949,44 +949,44 @@ PLAN_START_DATE: 2026-05-08
 
 ### 第 86 天（第 13 周）
 
-**主题**：更新 `inquanto_public_parity_matrix.md` §3 一句多适配器
+**主题**：更新 `public_parity_matrix.md` §3 一句多适配器
 
 **当日完成定义（DoD）**：
 
-- 更新 `inquanto_public_parity_matrix.md` §3 一句多适配器
+- 更新 `public_parity_matrix.md` §3 一句多适配器
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。
 
 ### 第 87 天（第 13 周）
 
-**主题**：更新 `与InQuanto能力差距与实施计划.md` §1「Psi4 等为 scaffold」若已过时则改
+**主题**：更新 `public_parity_matrix.md` §1「Psi4 等为 scaffold」若已过时则改
 
 **当日完成定义（DoD）**：
 
-- 更新 `与InQuanto能力差距与实施计划.md` §1「Psi4 等为 scaffold」若已过时则改
+- 更新 `public_parity_matrix.md` §1「Psi4 等为 scaffold」若已过时则改
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。
 
 ### 第 88 天（第 13 周）
 
-**主题**：Day88：`docs-site` parity 英中同步检查
+**主题**：Day88：`docusaurus-site` parity 英中同步检查
 
 **当日完成定义（DoD）**：
 
-- Day88：`docs-site` parity 英中同步检查
+- Day88：`docusaurus-site` parity 英中同步检查
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。
 
 ### 第 89 天（第 13 周）
 
-**主题**：Day89：全量 pytest + docs:build
+**主题**：Day89：全量 pytest + `docusaurus-site` `npm run build`
 
 **当日完成定义（DoD）**：
 
-- Day89：全量 pytest + docs:build
+- Day89：全量 pytest + `cd docusaurus-site && npm run build`（若当周改文档站）
 - 提交或更新可追溯产物（代码 / 测试 / `docs/execution/` 笔记 / 母稿其一）
 
 **日末检查**：相关 `pytest` 子集或全量（周五规则）；`ruff` 若改 Python。

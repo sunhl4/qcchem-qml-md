@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import pytest
 
+from qchem_stack.exceptions import ConfigurationError
 from qchem_stack.config._active_space_validation import (
     normalize_active_space_entry,
     validate_frozen_orbitals,
@@ -22,6 +23,16 @@ def test_preprocess_top_level_yaml_dict_merges_unknown_into_extra() -> None:
     raw = {"experiment_id": "e", "extra": {"x": 1}, "unknown_beta": 2}
     out = preprocess_top_level_yaml_dict(raw, known_fields={"experiment_id", "extra"})
     assert out == {"experiment_id": "e", "extra": {"x": 1, "unknown_beta": 2}}
+
+
+def test_preprocess_top_level_yaml_dict_strict_rejects_unknown() -> None:
+    raw = {"experiment_id": "e", "unknown_beta": 2}
+    with pytest.raises(ConfigurationError, match="Unknown top-level config keys"):
+        preprocess_top_level_yaml_dict(
+            raw,
+            known_fields={"experiment_id", "extra"},
+            strict_unknown_top_level=True,
+        )
 
 
 def test_validate_md_ml_extra_geometry_shape_requires_three_columns() -> None:

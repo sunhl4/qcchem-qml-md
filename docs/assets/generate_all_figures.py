@@ -9,7 +9,7 @@ Typography：正文四号 14 pt；**插图内**统一用更大磅值，补偿 
 |------|-----|------|
 | Markdown 正文（与 `<style>` 一致） | 14 | 文档说明中记为 **PT_DOC** |
 | **曲线 / SCI 等非流程图 PNG** | **16** | **FS_*** 取自 **PT_FIG** |
-| **流程图类** (`comparison_flow`、driver、InQuanto、Tangelo、philosophy) | **PT_FIG_FLOW** | 字号 **WF_FS**；画布 inch 乘 **_FLOW_FIG_K** |
+| **流程图类** (`comparison_flow`、driver、commercial stack、Tangelo、philosophy) | **PT_FIG_FLOW** | 字号 **WF_FS**；画布 inch 乘 **_FLOW_FIG_K** |
 
 说明：**PT_FIG** 与 **PT_DOC** 相差约「一格」；流程图再放大一档，与 `comparison_flow` 统一比例。
 
@@ -456,9 +456,9 @@ def fig_molecular_orbitals():
     save(fig, 'molecular_orbitals_sci.png')
 
 
-# ─── 4. InQuanto architecture ─────────────────────────────────────────────────
+# ─── 4. Commercial-stack architecture (illustrative) ─────────────────────────
 
-def fig_inquanto_workflow():
+def fig_commercial_stack_workflow():
     """Three pillars only (no bottom 'Key characteristics' panel)."""
     # Text block vertically centered in each pillar; uniform line spacing (transAxes units).
     fig, ax = plt.subplots(figsize=(12.5 * _FLOW_FIG_K, 5.45 * _FLOW_FIG_K))
@@ -466,7 +466,7 @@ def fig_inquanto_workflow():
     ax.set_ylim(0, 1)
     ax.axis('off')
     ax.set_title(
-        'InQuanto — Three-Pillar Commercial Workflow  (Quantinuum)',
+        'Commercial stack — Three-Pillar Workflow  (illustrative)',
         fontsize=WF_FS, fontweight='bold', color='#c0392b', pad=10,
     )
 
@@ -483,7 +483,7 @@ def fig_inquanto_workflow():
 
     pillar_cfg = [
         (0.168, 'Chemical Specification', '#fde8e8', '#c0392b',
-         ['FermionSpace', 'Active space selection', 'InQuanto-PySCF extensions',
+         ['FermionSpace', 'Active space selection', 'PySCF extensions',
           'Geometry · charge · spin']),
         (0.50, 'Program Construction', '#fef9e7', '#d4ac0d',
          ['AlgorithmVQE / ADAPT', 'Computable objects', 'TKET pass bundles', 'Noise models']),
@@ -555,7 +555,7 @@ def fig_inquanto_workflow():
         )
 
     plt.tight_layout()
-    save(fig, 'inquanto_workflow.png')
+    save(fig, 'commercial_stack_workflow.png')
 
 
 # ─── 5. Tangelo workflow ──────────────────────────────────────────────────────
@@ -728,7 +728,7 @@ def fig_three_platform():
     categories = ['Algorithm\nbreadth', 'Config\ndiscipline', 'Auditability\n& Repro',
                   'Hardware\nfreedom', 'MD / ML\nintegration', 'Cloud\nmaturity']
     scores = {
-        'InQuanto\n(Commercial)': [4, 5, 2, 2, 2, 5],
+        'Commercial stack\n(reference)': [4, 5, 2, 2, 2, 5],
         'Tangelo\n(Open Source)': [5, 2, 2, 4, 3, 2],
         'qchem-stack\n(Our Platform)': [3, 5, 5, 4, 4, 3],
     }
@@ -785,7 +785,7 @@ def fig_workflow_philosophy():
                  fontweight='bold', color=C['navy'], y=0.962)
 
     rows = [
-        (C['red'], 'InQuanto', 'Enterprise Cloud-Native',
+        (C['red'], 'Commercial stack', 'Enterprise Cloud-Native',
          ['YAML / Config', 'FermionSpace', 'Nexus Cloud', 'H-Series HW'],
          'Complete product ecosystem, deeply vendor-integrated.',
          'Closed ecosystem, HQC billing, hard to use outside Quantinuum infra.'),
@@ -1521,7 +1521,7 @@ if __name__ == '__main__':
     fig_active_space()
     fig_active_space_convergence()
     fig_molecular_orbitals()
-    fig_inquanto_workflow()
+    fig_commercial_stack_workflow()
     fig_tangelo_workflow()
     fig_three_platform()
     fig_workflow_philosophy()

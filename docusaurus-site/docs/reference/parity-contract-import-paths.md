@@ -1,44 +1,40 @@
 ---
-title: Parity 契约与 workflow-preview（稳定 import）
-description: protocols/inquanto_contract 与 integrations/inquanto_workflow_preview 的 Python import、re-export 与字面量实现路径；与仓库根 CONTRIBUTING.md 同源。
+title: Product contracts 与 workflow-preview（稳定 import）
+description: qchem_stack.protocols.product_contract 与 qchem_stack.integrations.workflow_preview — 能力与 gaps、导出常量、YAML-only 预览；与仓库根 CONTRIBUTING.md「Product contracts」节同源。
 ---
 
-# Parity 契约与 workflow-preview（稳定 import）
+# Product contracts 与 workflow-preview（稳定 import）
 
-面向**维护者与集成方**：新增 `parity_snapshot` / `run_summary` / `repro` 顶层键、修改 `inquanto_gap_categories()`、或改动 `workflow-preview` / `computable_graph_v2` 时，应知道**从哪里 import**、**改哪个文件的字面量**。
+面向**维护者与控制台集成方**：调整 capability gaps、parity 风格导出稳定键、或 workflow / computable 预览时，应知道从哪里 import、改哪个文件的字面量。
 
-本节与仓库根目录 **`CONTRIBUTING.md`**（章节 **Parity and workflow-preview (stable imports)**）**同源**；请以本地克隆内的文件为准。
+本节与仓库根目录 **[CONTRIBUTING.md](https://github.com/sunhl4/qcchem-qml-md/blob/main/CONTRIBUTING.md)**（章节 **Product contracts and workflow-preview**）**对齐**。
 
 ## 规则（一句话）
 
-**`protocols/`、`integrations/` 里是稳定 re-export；frozenset、gap 表、对象映射等字面量请在 `internal_reports/competitor/` 下编辑**（除非你刻意只做 façade  shim）。
+**产品机读常量**写在 **`qchem_stack.protocols.product_contract`**。**Workflow / DAG 预览**写在 **`qchem_stack.integrations.workflow_preview`**。
 
-## 映射表
+## Python 关注点
 
-| 稳定 Python import | `src/` re-export 文件 | 字面量实现（编辑注册表时改这里） |
-|--------------------|-----------------------|----------------------------------|
-| `qchem_stack.protocols.inquanto_contract` | `src/qchem_stack/protocols/inquanto_contract.py` | `src/qchem_stack/internal_reports/competitor/inquanto_contract.py` |
-| `qchem_stack.integrations.inquanto_workflow_preview` | `src/qchem_stack/integrations/inquanto_workflow_preview.py` | `src/qchem_stack/internal_reports/competitor/inquanto_workflow_preview.py` |
+| 话题 | Module / symbol | 备注 |
+|------|-----------------|------|
+| Gap 行 + anchors | `product_gap_categories()`, `product_gap_anchor_index_v1()`, `validate_product_gap_categories()` | `GET /v1/meta/parity-gaps`、`GET /v1/meta/capability-surface` |
+| Capability 名称 → 模块 | `PRODUCT_CAPABILITY_MAP` / `product_capability_map_for_docs()` | `capability_surface_v2.capability_map` |
+| Export 常量 | `PARITY_EXPORT_V3_STABLE_KEYS` | `scripts/check_parity_export_sample.py`、`tests/test_export_parity_golden.py` |
+| 预览载荷 | `workflow_preview_payload`, `computable_graph_v2`, `protocol_stages_preview_v1`, `slim_product_summary_from_pipeline_result` | FastAPI **`POST /v1/meta/workflow-preview`**、`GET /v1/runs/{id}/summary` |
 
-### 适配层（产品 HTTP / pipeline）
-
-`POST /v1/meta/workflow-preview` 等与预览相关的组装还可经 **`src/qchem_stack/integrations/workflow_preview.py`** 暴露（内部仍引用 competitor 模块）。
-
-## 快速自检（本地）
+## 自检（本地）
 
 在**仓库根**、已 `pip install -e ".[dev]"`（或等价环境）前提下：
 
 ```bash
-./scripts/venv-run python -c "from qchem_stack.protocols.inquanto_contract import PARITY_SNAPSHOT_DOCUMENTED_KEYS; print(len(PARITY_SNAPSHOT_DOCUMENTED_KEYS))"
-./scripts/venv-run python -c "from qchem_stack.integrations.inquanto_workflow_preview import computable_graph_v2; print('callable', callable(computable_graph_v2))"
+./scripts/venv-run python -c "from qchem_stack.protocols.product_contract import product_gap_categories, PARITY_EXPORT_V3_STABLE_KEYS; print(len(product_gap_categories()), len(PARITY_EXPORT_V3_STABLE_KEYS))"
+./scripts/venv-run python -c "from qchem_stack.integrations.workflow_preview import computable_graph_v2; print(callable(computable_graph_v2))"
 ```
-
-若没有 `./scripts/venv-run`，可将 `./scripts/venv-run` 换成你的解释器路径，保证能 `import qchem_stack`。
 
 ## 关联阅读
 
-- [DMET 与 parity_snapshot](/reference/dmet-parity-snapshot)：嵌入场景下快照键语义  
-- [命令行与脚本](/reference/cli-and-scripts)：`export_parity_criteria_table`、`check_parity_export_sample`  
-- [工程架构](/concept/engineering-architecture)：分层与契约边界  
+- [DMET 与 parity_snapshot](../reference/dmet-parity-snapshot)（语义表；快照键列表以源码与导出脚本为准）  
+- [命令行与脚本](../reference/cli-and-scripts)：export / check parity sample  
+- [工程架构](../concept/engineering-architecture)：分层与边界  
 
-母稿深度学习路线（仓库内 Markdown）：**`docs/学习路线图_框架理论到源码阅读顺序.md`**。
+母稿：**`docs/学习路线图_框架理论到源码阅读顺序.md`**（仓库）

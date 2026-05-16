@@ -14,7 +14,7 @@
 - `resource_estimation_preview_v1` 保持：
   - config-only：`mode=config_only`
   - results 合并：`mode=pipeline`
-- 稳定键集合 `PARITY_EXPORT_V2_STABLE_KEYS` 在抽样配置上无缺失。
+- 稳定键集合 `PARITY_EXPORT_V3_STABLE_KEYS` 在抽样配置上无缺失。
 
 ## 结论
 

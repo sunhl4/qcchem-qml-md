@@ -1,8 +1,8 @@
 # Examples index（仓库根 `examples/`）
 
-与 [CONTRIBUTING.md](../CONTRIBUTING.md) 中的 CI、`scripts/check_parity_export_sample.py` 及 **docs-site** 教程并列使用。
+与 [CONTRIBUTING.md](../CONTRIBUTING.md) 中的 CI、`scripts/check_parity_export_sample.py` 及 **Docusaurus**（`docusaurus-site/`）教程并列使用。
 
-这些路径也对应 **YAML → pipeline → `run_summary` / export → pytest** 的可复现 **open-stack** 入口（见 `docs/execution/day001_day090_tangelo_gap_calendar.md`）；不声称与 InQuanto / Tangelo 行级 parity。
+这些路径也对应 **YAML → pipeline → `run_summary` / export → pytest** 的可复现 **open-stack** 入口（见 `docs/execution/day001_day090_tangelo_gap_calendar.md`）；不声称与任何行级闭源/第三方教程 1:1 parity。
 
 ## 新用户三条路径（精简）
 
@@ -14,7 +14,7 @@
 | **UCCSD below SCF** | `tutorial_04_uccsd_below_scf.py` |
 | **张量网络 / DMRG toy（自旋链）** | `toy_dmrg_spin_chain.py`；配套讲义 [`docs/tensor_network_qchem_self_study.md`](../docs/tensor_network_qchem_self_study.md) |
 
-详细叙事见站点 [onboarding-three-paths](../docs-site/docs/guide/onboarding-three-paths.md)（`docs-site/` 下 `npm run docs:dev`）。
+详细叙事见站点 [onboarding-three-paths](../docusaurus-site/docs/guide/onboarding-three-paths.md)（`cd docusaurus-site && npm start`）。
 
 ## 外部插件（entry points）示例
 
@@ -50,11 +50,10 @@ CI 中 parity export 抽样见 `scripts/check_parity_export_sample.py`。
 - Schema 与 stub：`qchem_stack.md_bridge`（`QMEFDataset`、`QMFrame`、`StubTorchMLIPTrainer`）
 - 测试：`tests/test_md_bridge.py`、`tests/test_qmef_trainer_smoke.py`（marker `l1_md_ml`）
 
-## InQuanto-style quantum problem（PySCF → OpenFermion）
+## PySCF → OpenFermion 量子问题示例
 
-可运行脚本：`examples/example_inquanto_style_quantum_problem.py`。
+可运行脚本：`examples/example_open_stack_quantum_problem.py`。
 
-**Docs-site（VitePress）：**
+**Docs（Docusaurus，user site）：**
 
-- 中文：`docs-site/docs/guide/chemistry-and-embedding/inquanto-pyscf-problem-analog.md`
-- 英文：`docs-site/docs/en/guide/chemistry-and-embedding/inquanto-pyscf-problem-analog.md`
+- 指南：[化学与嵌入](../docusaurus-site/docs/guide/chemistry-and-embedding.md)（站内 `/guide/chemistry-and-embedding`）

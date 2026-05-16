@@ -28,7 +28,7 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
     """
     Single JSON blob listing **open-stack** counterparts to closed product areas.
 
-    Epistemic bound: **L1 / engineered reference**, never L0 binary equivalence to InQuanto or Nexus.
+    Epistemic bound: **L1 / engineered reference**, never L0 binary equivalence to closed vendor stacks or Nexus.
     """
     n_so = 2 * int(cfg.active_space.n_active_orbitals)
     ne = int(cfg.active_space.n_active_electrons)
@@ -51,7 +51,7 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
         "schema": "open_gap_closure_reference_v1",
         "epistemic_binding": (
             "Synthetic closure of publicly-documented *contract* gaps using peer-reviewable "
-            "or explicitly labeled toy methods. Not Quantinuum / InQuanto closed binaries."
+            "or explicitly labeled toy methods. Not Quantinuum closed binaries."
         ),
         "ucc": {
             "module": "qchem_stack.integrations.ucc_reference",
