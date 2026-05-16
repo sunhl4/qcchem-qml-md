@@ -8,7 +8,7 @@ from typing import Any
 import numpy as np
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+from qchem_stack.chem.pre_quantum_input import PreQuantumInput, pre_quantum_meta_from_hamiltonian
 from qchem_stack.chem.precomputed_bundle import (
     load_bundle_dict,
     parse_precomputed_manifest,
@@ -136,5 +136,9 @@ def precomputed_pre_quantum_input(
         classical_reference=rhf,
         qubit_hamiltonian=qh,
         canonical_active_space_integral_pack=None,
-        meta={"source": "precomputed_bundle"},
+        meta=pre_quantum_meta_from_hamiltonian(
+            source="precomputed_bundle",
+            qubit_hamiltonian=qh,
+            extra={"precomputed_bundle_path": str(path)},
+        ),
     )

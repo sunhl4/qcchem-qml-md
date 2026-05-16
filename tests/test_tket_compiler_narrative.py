@@ -11,7 +11,7 @@ from qchem_stack.config import (
     ExperimentConfig,
     compiler_bundle_signature_from_config,
 )
-from qchem_stack.internal_reports.competitor.inquanto_contract import inquanto_gap_categories
+from qchem_stack.protocols.inquanto_contract import inquanto_gap_categories
 
 
 def _minimal_h2_yaml() -> str:

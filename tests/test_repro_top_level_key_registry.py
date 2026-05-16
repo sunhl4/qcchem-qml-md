@@ -7,7 +7,7 @@ from pathlib import Path
 import pytest
 
 from qchem_stack.config import load_experiment_config
-from qchem_stack.internal_reports.competitor.inquanto_contract import REPRO_DOCUMENTED_KEYS
+from qchem_stack.protocols.inquanto_contract import REPRO_DOCUMENTED_KEYS
 from qchem_stack.orchestration.pipeline import collect_repro_metadata
 
 

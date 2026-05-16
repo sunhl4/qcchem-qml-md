@@ -23,6 +23,14 @@ def test_decomposition_plugin_toy_yaml_runs() -> None:
     assert cfg.embedding.mode == "plugin"
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert out["hamiltonian_meta"].get("integral_source") == "decomposition_plugin_toy_v1"
+    assert out["hamiltonian_meta"].get("integral_openfermion_bridge") == (
+        "decomposition_plugin_pauli_terms_v1"
+    )
+    assert len(out["hamiltonian_meta"].get("hamiltonian_fingerprint", "")) == 32
+    pre_q = out["pre_quantum_input"]
+    assert pre_q.get("source") == "embedding_plugin"
+    assert pre_q.get("integral_source") == "decomposition_plugin_toy_v1"
+    assert pre_q.get("hamiltonian_summary", {}).get("hamiltonian_fingerprint")
     wf = out["embedding_workflow"]
     assert wf.get("mode") == "plugin"
     assert wf.get("decomposition_plugin") == "uniform_fragment_guess"

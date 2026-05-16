@@ -128,7 +128,7 @@
 
 ## 6. 分阶段工程路线图
 
-下表将三方对比落为仓库内可执行目标。优先级从可信地基到开源超越，再到研究深度和产品生态。
+下表将三方对比落为仓库内可执行目标。优先级从可信地基到开源超越，再到研究深度和产品生态。**`inquanto_contract` / `inquanto_workflow_preview` 的稳定 import 与 re-export 约定**见仓库根 [CONTRIBUTING.md](../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)。
 
 
 | 阶段                    | 竞争目标                                                         | 工程动作                                                                                                                               | 主要模块/文档                                                                                                       | 验收口径                                                 |

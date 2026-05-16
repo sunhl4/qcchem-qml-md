@@ -59,7 +59,7 @@ active_space:
         _as_reference(r), n_active_orbitals=2, n_active_electrons=2
     )
     assert qh.meta.get("fermion_to_qubit_map") == "jordan_wigner"
-    assert qh.meta.get("integral_source") == "pyscf_active_space"
+    assert qh.meta.get("integral_source") == "pyscf_casci_h2eff_compact"
     assert qh.meta.get("integral_openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
     assert qh.meta.get("n_active_electrons") == 2
     v = VQE(qh, depth=1).run(maxiter=200, seed=0)

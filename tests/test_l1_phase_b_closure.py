@@ -17,7 +17,7 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
-from qchem_stack.internal_reports.competitor.inquanto_contract import (
+from qchem_stack.protocols.inquanto_contract import (
     PARITY_SNAPSHOT_DOCUMENTED_KEYS,
     PAULI_PATH_DISABLED,
     PAULI_PATH_EXACT,

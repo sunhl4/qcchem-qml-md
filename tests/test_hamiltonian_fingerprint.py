@@ -9,6 +9,7 @@ import pytest
 from openfermion import InteractionOperator
 from openfermion.ops import QubitOperator
 
+from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.fermion import FermionSpace
 from qchem_stack.chem.hamiltonian import hamiltonian_fingerprint_from_qubit_operator
@@ -142,3 +143,93 @@ def test_non_pyscf_reference_meta_stored_as_classical_driver() -> None:
     assert (
         qh.meta.get("classical_driver", {}).get("upstream_classical_software_tag") == "mock_solver"
     )
+    assert qh.meta.get("integral_source") == "mock_solver_active_space"
+    assert qh.meta.get("integral_openfermion_bridge") == "mock_solver_openfermion_interaction_operator_v1"
+
+
+def test_canonical_pack_provenance_controls_integral_metadata() -> None:
+    from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_active_space_fermionic_operator
+
+    mol_op = InteractionOperator(
+        0.0,
+        np.zeros((2, 2), dtype=float),
+        np.zeros((2, 2, 2, 2), dtype=float),
+    )
+    fs = FermionSpace(n_spin_orbitals=2, n_electrons=2)
+    pack = CanonicalActiveSpaceIntegralPack(
+        compact=object(),
+        provenance={
+            "upstream_integral_source": "stub_backend_active_space_pack_v1",
+            "integral_openfermion_bridge": "stub_openfermion_bridge_v1",
+            "classical_backend": "stub_backend",
+        },
+    )
+    qh = qubit_hamiltonian_from_active_space_fermionic_operator(
+        mol_op,
+        fs,
+        n_active_orbitals=1,
+        n_active_electrons=2,
+        canonical_pack=pack,
+    )
+    assert qh.meta.get("integral_source") == "stub_backend_active_space_pack_v1"
+    assert qh.meta.get("integral_openfermion_bridge") == "stub_openfermion_bridge_v1"
+
+
+def test_explicit_integral_metadata_overrides_pack_provenance() -> None:
+    from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_active_space_fermionic_operator
+
+    mol_op = InteractionOperator(
+        0.0,
+        np.zeros((2, 2), dtype=float),
+        np.zeros((2, 2, 2, 2), dtype=float),
+    )
+    fs = FermionSpace(n_spin_orbitals=2, n_electrons=2)
+    pack = CanonicalActiveSpaceIntegralPack(
+        compact=object(),
+        provenance={
+            "upstream_integral_source": "pack_source_v1",
+            "integral_openfermion_bridge": "pack_bridge_v1",
+        },
+    )
+
+    qh = qubit_hamiltonian_from_active_space_fermionic_operator(
+        mol_op,
+        fs,
+        n_active_orbitals=1,
+        n_active_electrons=2,
+        canonical_pack=pack,
+        integral_source="explicit_source_v1",
+        integral_openfermion_bridge="explicit_bridge_v1",
+    )
+
+    assert qh.meta["integral_source"] == "explicit_source_v1"
+    assert qh.meta["integral_openfermion_bridge"] == "explicit_bridge_v1"
+
+
+def test_compact_non_jw_path_forwards_explicit_integral_metadata() -> None:
+    from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_compact_restricted_active_space
+
+    class _Compact:
+        n_active_orbitals = 1
+        n_active_electrons = 2
+
+        def to_interaction_operator(self) -> InteractionOperator:
+            return InteractionOperator(
+                0.0,
+                np.zeros((2, 2), dtype=float),
+                np.zeros((2, 2, 2, 2), dtype=float),
+            )
+
+    fs = FermionSpace(n_spin_orbitals=2, n_electrons=2)
+    qh = qubit_hamiltonian_from_compact_restricted_active_space(
+        _Compact(),
+        fs,
+        n_active_orbitals=1,
+        n_active_electrons=2,
+        fermion_qubit_mapping="bravyi_kitaev",
+        integral_source="compact_explicit_source_v1",
+        integral_openfermion_bridge="compact_explicit_bridge_v1",
+    )
+
+    assert qh.meta["integral_source"] == "compact_explicit_source_v1"
+    assert qh.meta["integral_openfermion_bridge"] == "compact_explicit_bridge_v1"

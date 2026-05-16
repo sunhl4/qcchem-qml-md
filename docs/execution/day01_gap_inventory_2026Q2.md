@@ -28,5 +28,5 @@
 
 ## 冻结规则（执行期间）
 
-- 任一状态变化必须同步三处：`docs/inquanto_public_parity_matrix.md`、`docs/与InQuanto能力差距与实施计划.md`、`src/qchem_stack/protocols/inquanto_contract.py`。
+- 任一状态变化必须同步三处：`docs/inquanto_public_parity_matrix.md`、`docs/与InQuanto能力差距与实施计划.md`、`src/qchem_stack/protocols/inquanto_contract.py`（稳定 import：`qchem_stack.protocols.inquanto_contract`；字面量实现：`internal_reports/competitor/inquanto_contract.py`，见 [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）。
 - 对云/硬件/闭源二进制相关项保持 `n/a` 或 `partial+caveat`，不允许营销式升格。

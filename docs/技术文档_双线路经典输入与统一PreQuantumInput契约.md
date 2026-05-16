@@ -17,6 +17,35 @@
   - 在线：`pyscf` / `psi4` / 其它注册后端
   - 离线：`precomputed`
 
+## 2.1 `PreQuantumInput` 稳定摘要字段
+
+Pipeline 输出的 `out["pre_quantum_input"]` 仍保留完整 `hamiltonian_meta` 以兼容既有分析脚本；同时提供一组稳定顶层字段，作为 UI、API、Methods 表格优先消费的轻量契约：
+
+| 字段 | 说明 |
+|---|---|
+| `schema` | 固定为 `pre_quantum_input_v1` |
+| `source` | 进入量子前分支来源，例如 `canonical_active_space_integral_pack`、`precomputed_bundle`、`embedding_plugin` |
+| `backend_tag` | `ClassicalMeanFieldReference.backend_tag()`，如 `pyscf`、`precomputed`、外部 solver 标签 |
+| `n_qubits` | 当前 `QubitHamiltonian` 量子比特数 |
+| `integral_source` | 哈密顿量积分/Pauli 来源；优先来自 `CanonicalActiveSpaceIntegralPack.provenance` 或 bundle/plugin schema |
+| `fermion_to_qubit_map` | `jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`，若上游无法声明则可为空 |
+| `hamiltonian_fingerprint` | 排序 Pauli 项与系数的稳定 SHA-256 摘要前缀 |
+| `hamiltonian_summary` | 上述字段加 `integral_openfermion_bridge`、`jw_build`、active-space 尺寸等轻量补充 |
+| `hamiltonian_meta` | 完整历史元数据；可能较大，供调试和深度审计 |
+| `canonical_active_space_integral_pack` | canonical pack 存在时包含 schema、provenance、active-space 尺寸与 compact storage schema |
+
+分支 `source` 当前约定：
+
+| source | 路径 |
+|---|---|
+| `canonical_active_space_integral_pack` | 在线经典主路径：`ClassicalMeanFieldReference` → `CanonicalActiveSpaceIntegralPack` → `QubitHamiltonian` |
+| `precomputed_bundle` | 离线 bundle 直接提供 pre-quantum Hamiltonian |
+| `embedding_plugin` | `embedding.mode=plugin` 的 decomposition JSON / 外部 fragment payload |
+| `projection_fragment_mulliken_mo` | PySCF Mulliken MO projection 分支 |
+| `schmidt_atomic_production` | Schmidt impurity Hamiltonian 分支 |
+
+`integral_source` 与 `integral_openfermion_bridge` 不应硬编码假装来自 PySCF。优先级为：显式参数 > canonical pack provenance > 后端标签兜底；离线 bundle 与 decomposition plugin 使用自己的 Pauli-term 来源标签。
+
 ## 3. 离线线路数据格式
 
 离线模式读取 `classical_reference_bundle_v1` JSON（见 `src/qchem_stack/chem/precomputed_bundle.py`）。
@@ -105,3 +134,4 @@ python scripts/build_precomputed_bundle.py \
 - 配置约束：
   - `scf.driver='precomputed'` 时必须给 `scf.precomputed_bundle_path`
   - 其它 driver 不允许给 `scf.precomputed_bundle_path`
+- `scf.driver=psi4` 当前仍是能量/注册表浅接入，不参与默认 active-space qubit Hamiltonian 主路径。Psi4 真实积分导出与 `CanonicalActiveSpaceIntegralPack.from_classical_reference` 分发属于 Phase 2。

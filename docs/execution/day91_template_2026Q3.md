@@ -5,7 +5,7 @@
 ## 本日实现
 
 - 文件：
-  - `src/qchem_stack/protocols/inquanto_contract.py`
+  - `src/qchem_stack/protocols/inquanto_contract.py`（稳定 import：`qchem_stack.protocols.inquanto_contract`；frozenset/差距表字面量：`internal_reports/competitor/inquanto_contract.py` — 见 [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
   - `scripts/export_parity_criteria_table.py`
   - `tests/test_methods_resource_unified_export.py`
 - 变更摘要：

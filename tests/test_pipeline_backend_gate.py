@@ -12,8 +12,10 @@ from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.pipeline import (
     _hamiltonian_with_schmidt_context,
-    _schmidt_hamiltonian_and_context,
     run_pipeline_sync,
+)
+from qchem_stack.orchestration.pre_quantum_stage import (
+    schmidt_hamiltonian_and_context as _schmidt_hamiltonian_and_context,
 )
 
 
@@ -55,8 +57,12 @@ def test_plugin_mode_bypasses_backend_active_space_gate() -> None:
     cfg = load_experiment_config(p)
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     cfg.scf.driver = "psi4"
-    qh, _ctx = _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=p)
-    assert qh.meta.get("integral_source") == "decomposition_plugin_toy_v1"
+    pre_q, _ctx = _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=p)
+    hmeta = pre_q.qubit_hamiltonian.meta
+    assert hmeta.get("integral_source") == "decomposition_plugin_toy_v1"
+    assert hmeta.get("hamiltonian_fingerprint")
+    assert hmeta.get("integral_openfermion_bridge") == "decomposition_plugin_pauli_terms_v1"
+    assert pre_q.meta.get("source") == "embedding_plugin"
 
 
 def test_schmidt_path_rejects_backend_without_schmidt_capability() -> None:

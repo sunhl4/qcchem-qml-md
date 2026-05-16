@@ -110,6 +110,7 @@ def build_restricted_active_space_quantum_problem(
             n_active_electrons=n_active_electrons,
             fermion_qubit_mapping=fermion_qubit_mapping,
             rhf=rhf,
+            canonical_pack=pack,
         )
     else:
         qh = qubit_hamiltonian_from_active_space_fermionic_operator(
@@ -120,6 +121,7 @@ def build_restricted_active_space_quantum_problem(
             fermion_qubit_mapping=fermion_qubit_mapping,
             rhf=rhf,
             jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
+            canonical_pack=pack,
         )
     psi = np.asarray(
         jw_hartree_fock_state(int(fs.n_electrons), int(fs.n_spin_orbitals)),

@@ -1,8 +1,9 @@
 """
 Internal competitive-alignment helpers and legacy key registries.
 
-Release-facing code should import from ``qchem_stack.protocols.product_contract``.
-This module remains as an internal planning/reference surface.
+Integrators and docs should import the stable re-export
+``qchem_stack.protocols.inquanto_contract`` (same symbols as this module).
+Release-facing *product* defaults may also use ``qchem_stack.protocols.product_contract``.
 """
 
 from __future__ import annotations
@@ -65,7 +66,10 @@ INQUANTO_TO_QCHEM_OBJECT_MAP: dict[str, str] = {
         "PySCF get_integrals returns CASCI active-space MO blocks + OpenFermion reorder)"
     ),
     "dataframe_circuit / shot rows": "qchem_stack.backends.spec.circuit_resource_row, dataframe_circuit_shot_rows",
-    "Computable (expectation from circuits)": "qchem_stack.protocols.computable + integrations.inquanto_workflow_preview.computable_graph_v2 + POST /v1/meta/workflow-preview",
+    "Computable (expectation from circuits)": (
+        "qchem_stack.protocols.computable + "
+        "qchem_stack.integrations.inquanto_workflow_preview.computable_graph_v2 + POST /v1/meta/workflow-preview"
+    ),
     "TKET / pytket pass metrics": "optional: qchem_stack.integrations.tket_fullchain + backends.pytket_bridge (parity_integrations.tket_first_circuit_stats)",
     "qnexus / Nexus jobs": "qchem_stack.jobs: SqliteJobStore + nexus_analog_ledger + nexus_cloud (optional HTTP/mock), job nexus_analog_billing",
     "DMET fragment solver (stub)": "qchem_stack.chem.embedding.dmet.VQEFragmentSolverStub",

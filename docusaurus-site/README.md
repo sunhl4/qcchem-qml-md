@@ -8,9 +8,13 @@ This site is the **primary** user-facing documentation surface for `qchem_qml_md
 
 ## Local Development
 
-`npm start`
+```bash
+cd docusaurus-site
+npm install   # first time only
+npm start
+```
 
-This command starts a local development server and opens up a browser window. Most changes are reflected live without having to restart the server.
+默认开发服务器：**`http://localhost:3000/`**。parity / workflow-preview 稳定 import 说明页：**`/reference/parity-contract-import-paths`**。
 
 ## Build
 

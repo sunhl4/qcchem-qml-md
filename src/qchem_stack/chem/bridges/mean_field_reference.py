@@ -64,8 +64,9 @@ class ClassicalMeanFieldReference:
         """Convert to PySCF-specific container for PySCF-only branches."""
         from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
 
+        mf_handle = self.mf.raw_handle() if hasattr(self.mf, "raw_handle") else self.mf
         return PySCFRHFResult(
-            mf=self.mf.raw_handle(),
+            mf=mf_handle,
             e_tot=float(self.e_tot),
             mo_energy=np.asarray(self.mo_energy, dtype=float),
             molecular_system=self.molecular_system,

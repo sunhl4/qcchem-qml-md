@@ -116,7 +116,7 @@
 
 1. `pytest`（当周相关子集；月末倾向全量）。
 2. `python scripts/check_parity_export_sample.py`
-3. [`src/qchem_stack/protocols/inquanto_contract.py`](../../src/qchem_stack/protocols/inquanto_contract.py) / [`scripts/export_parity_criteria_table.py`](../../scripts/export_parity_criteria_table.py) / `RUN_SUMMARY_DOCUMENTED_KEYS` 同源。
+3. [`src/qchem_stack/protocols/inquanto_contract.py`](../../src/qchem_stack/protocols/inquanto_contract.py)（`from qchem_stack.protocols.inquanto_contract import …`；字面量在 `internal_reports/competitor/` — [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)） / [`scripts/export_parity_criteria_table.py`](../../scripts/export_parity_criteria_table.py) / `RUN_SUMMARY_DOCUMENTED_KEYS` 同源。
 4. `docs/` 与 `docs-site/` 入口互链抽检。
 5. 新增能力：**示例 YAML + 最小测试**。
 

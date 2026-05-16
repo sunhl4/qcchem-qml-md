@@ -18,7 +18,7 @@
 ## 2. 相对「竞品工具箱」的**长板**（开源可辩护）
 
 - **`GET /v1/meta/capability-surface`** 现含 **`tangelo_public_mapping_alias_surface_v1`**：JW/BK/SCBK ↔ 教程常用别名的 L1 对齐表，并**显式披露** JKMN/HCB 等在开放栈内不可执行（与 `DOCUMENTED_FERMION_QUBIT_MAPPINGS` 白名单一致）。
-- **全流程 JSON 契约 + 回归**：同一 YAML → 管线 → `repro.run_summary` / parity export → HTTP `workflow-preview`（见 `integrations/inquanto_workflow_preview.py`）。
+- **全流程 JSON 契约 + 回归**：同一 YAML → 管线 → `repro.run_summary` / parity export → HTTP `workflow-preview`（`integrations/inquanto_workflow_preview.py`，import **`qchem_stack.integrations.inquanto_workflow_preview`** — 字面量实现见 [CONTRIBUTING](../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）。
 - **算符池可版本化 id**：例如 `fermionic_uccsd`、`fermionic_uccsd_singles`、`fermionic_uccsd_doubles_only`、`iqeb_qubit_excitation`、`toy_pair_xx`；YAML 还可写 **`pool_id_aliases`** 中的别名 `qubit_excitation` → `iqeb_qubit_excitation`、`uccsd_jw` → `fermionic_uccsd`（详见 `operator_pool_registry_export_v1`）。
 - **多后端与 Pauli 路径分类**：statevector / Qiskit shots / sampled MC 等 — 需在技术文档写明每种路径的语义边界。
 

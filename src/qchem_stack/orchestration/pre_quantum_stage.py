@@ -12,7 +12,7 @@ from qchem_stack.chem.hamiltonian import (
     molecular_hamiltonian_from_canonical_active_space_pack,
     qubit_hamiltonian_from_spatial_chemist_integrals,
 )
-from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+from qchem_stack.chem.pre_quantum_input import PreQuantumInput, pre_quantum_meta_from_hamiltonian
 from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import PipelineError
@@ -249,10 +249,14 @@ def hamiltonian_with_schmidt_context(
                 classical_reference=rhf,
                 qubit_hamiltonian=qh,
                 canonical_active_space_integral_pack=None,
-                meta={
-                    "source": "embedding_plugin",
-                    "integral_source": qh_meta.get("integral_source"),
-                },
+                meta=pre_quantum_meta_from_hamiltonian(
+                    source="embedding_plugin",
+                    qubit_hamiltonian=qh,
+                    extra={
+                        "decomposition_plugin": qh_meta.get("decomposition_plugin"),
+                        "decomposition_plugin_schema": qh_meta.get("decomposition_plugin_schema"),
+                    },
+                ),
             ),
             None,
         )
@@ -264,7 +268,10 @@ def hamiltonian_with_schmidt_context(
                 classical_reference=rhf,
                 qubit_hamiltonian=qh,
                 canonical_active_space_integral_pack=None,
-                meta={"source": "schmidt_atomic_production"},
+                meta=pre_quantum_meta_from_hamiltonian(
+                    source="schmidt_atomic_production",
+                    qubit_hamiltonian=qh,
+                ),
             ),
             ctx,
         )
@@ -287,7 +294,10 @@ def hamiltonian_with_schmidt_context(
                 classical_reference=rhf,
                 qubit_hamiltonian=qh,
                 canonical_active_space_integral_pack=None,
-                meta={"source": "projection_fragment_mulliken_mo"},
+                meta=pre_quantum_meta_from_hamiltonian(
+                    source="projection_fragment_mulliken_mo",
+                    qubit_hamiltonian=qh,
+                ),
             ),
             None,
         )
@@ -316,7 +326,10 @@ def hamiltonian_with_schmidt_context(
             classical_reference=rhf,
             qubit_hamiltonian=qh,
             canonical_active_space_integral_pack=pack,
-            meta={"source": "canonical_active_space_integral_pack"},
+            meta=pre_quantum_meta_from_hamiltonian(
+                source="canonical_active_space_integral_pack",
+                qubit_hamiltonian=qh,
+            ),
         ),
         None,
     )

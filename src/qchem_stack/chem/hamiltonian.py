@@ -54,6 +54,52 @@ def _classical_driver_meta_payload(reference: Any) -> tuple[dict[str, Any], str]
     return driver_meta, backend_tag
 
 
+def _resolve_integral_metadata(
+    *,
+    canonical_pack: CanonicalActiveSpaceIntegralPack | None,
+    backend_tag: str,
+    integral_source: str | None = None,
+    integral_openfermion_bridge: str | None = None,
+) -> tuple[str, str]:
+    provenance = (
+        dict(getattr(canonical_pack, "provenance", {}) or {})
+        if canonical_pack is not None
+        else {}
+    )
+    resolved_backend_tag = (
+        str(backend_tag or provenance.get("classical_backend") or provenance.get("backend_id") or "")
+        .strip()
+        .lower()
+    )
+    explicit_source = str(integral_source or "").strip()
+    explicit_bridge = str(integral_openfermion_bridge or "").strip()
+    source = (
+        explicit_source
+        or str(provenance.get("upstream_integral_source") or "").strip()
+        or (
+            f"{resolved_backend_tag}_active_space"
+            if resolved_backend_tag
+            else "active_space_integrals"
+        )
+    )
+    bridge = (
+        explicit_bridge
+        or str(
+            provenance.get("integral_openfermion_bridge")
+            or provenance.get("openfermion_bridge")
+            or ""
+        ).strip()
+    )
+    if not bridge:
+        if resolved_backend_tag == "pyscf":
+            bridge = "pyscf_tangelo_openfermion_v1"
+        elif resolved_backend_tag:
+            bridge = f"{resolved_backend_tag}_openfermion_interaction_operator_v1"
+        else:
+            bridge = "openfermion_interaction_operator_v1"
+    return source, bridge
+
+
 def _interaction_operator_to_qubits(
     mol_op: InteractionOperator,
     mapping: FermionQubitMappingName,
@@ -261,6 +307,8 @@ def qubit_hamiltonian_from_active_space_fermionic_operator(
     rhf: ClassicalMeanFieldReference | None = None,
     jordan_wigner_coeff_atol: float | None = None,
     canonical_pack: CanonicalActiveSpaceIntegralPack | None = None,
+    integral_source: str | None = None,
+    integral_openfermion_bridge: str | None = None,
 ) -> QubitHamiltonian:
     """Map a pre-built fermionic active-space operator to qubits (shared by pipeline helpers)."""
     n_spin = int(fermion_space.n_spin_orbitals)
@@ -273,10 +321,17 @@ def qubit_hamiltonian_from_active_space_fermionic_operator(
     )
     n_phys = int(count_qubits(qop))
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
+    driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
+    source_tag, bridge_tag = _resolve_integral_metadata(
+        canonical_pack=canonical_pack,
+        backend_tag=backend_tag,
+        integral_source=integral_source,
+        integral_openfermion_bridge=integral_openfermion_bridge,
+    )
     meta: dict[str, Any] = {
         "fermion_to_qubit_map": fermion_qubit_mapping,
-        "integral_source": "pyscf_active_space",
-        "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+        "integral_source": source_tag,
+        "integral_openfermion_bridge": bridge_tag,
         "jw_build": "interaction_operator",
         "n_active_orbitals": n_active_orbitals,
         "n_active_electrons": n_active_electrons,
@@ -287,7 +342,6 @@ def qubit_hamiltonian_from_active_space_fermionic_operator(
         meta["hamiltonian_fingerprint_truncated"] = True
     if jordan_wigner_coeff_atol is not None:
         meta["jordan_wigner_coeff_atol"] = float(jordan_wigner_coeff_atol)
-    driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
     if driver_meta:
         if backend_tag == "pyscf":
             meta["pyscf_driver"] = driver_meta
@@ -316,6 +370,8 @@ def qubit_hamiltonian_from_compact_restricted_active_space(
     rhf: ClassicalMeanFieldReference | None = None,
     jordan_wigner_coeff_atol: float | None = None,
     canonical_pack: CanonicalActiveSpaceIntegralPack | None = None,
+    integral_source: str | None = None,
+    integral_openfermion_bridge: str | None = None,
 ) -> QubitHamiltonian:
     """Map compact MO integrals to qubits without instantiating a dense spin-orbital ERI tensor.
 
@@ -336,6 +392,8 @@ def qubit_hamiltonian_from_compact_restricted_active_space(
             rhf=rhf,
             jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
             canonical_pack=canonical_pack,
+            integral_source=integral_source,
+            integral_openfermion_bridge=integral_openfermion_bridge,
         )
 
     h2_of = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(compact.dense_h2_chemist_spatial())
@@ -344,10 +402,17 @@ def qubit_hamiltonian_from_compact_restricted_active_space(
     qop = jordan_wigner(fo)
     n_phys = int(count_qubits(qop))
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
+    driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
+    source_tag, bridge_tag = _resolve_integral_metadata(
+        canonical_pack=canonical_pack,
+        backend_tag=backend_tag,
+        integral_source=integral_source,
+        integral_openfermion_bridge=integral_openfermion_bridge,
+    )
     meta: dict[str, Any] = {
         "fermion_to_qubit_map": fermion_qubit_mapping,
-        "integral_source": "pyscf_active_space",
-        "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+        "integral_source": source_tag,
+        "integral_openfermion_bridge": bridge_tag,
         "jw_build": "restricted_spatial_fermion_operator",
         "n_active_orbitals": n_active_orbitals,
         "n_active_electrons": n_active_electrons,
@@ -356,7 +421,6 @@ def qubit_hamiltonian_from_compact_restricted_active_space(
     }
     if fp_trunc:
         meta["hamiltonian_fingerprint_truncated"] = True
-    driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
     if driver_meta:
         if backend_tag == "pyscf":
             meta["pyscf_driver"] = driver_meta

@@ -9,7 +9,7 @@
 - [ ] `pytest`（当周相关子集）通过并记录命令。
 - [ ] `python scripts/check_parity_export_sample.py` 通过。
 - [ ] 新增/改名键完成同源链：
-  - [ ] `src/qchem_stack/protocols/inquanto_contract.py`
+  - [ ] `src/qchem_stack/protocols/inquanto_contract.py`（`from qchem_stack.protocols.inquanto_contract import …`；编辑 frozenset/gap 字面量时打开 `internal_reports/competitor/inquanto_contract.py` — [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
   - [ ] `scripts/export_parity_criteria_table.py`
   - [ ] `tests/*`
   - [ ] `docs/*` 与 `docs-site/*`

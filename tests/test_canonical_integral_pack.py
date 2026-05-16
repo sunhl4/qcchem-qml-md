@@ -34,6 +34,8 @@ def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
     pack = CanonicalActiveSpaceIntegralPack.from_pyscf_reference(
         rhf, n_active_orbitals=na, n_active_electrons=ne
     )
+    assert pack.provenance.get("upstream_integral_source") == "pyscf_casci_h2eff_compact"
+    assert pack.provenance.get("integral_openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
     q_pack = molecular_hamiltonian_from_canonical_active_space_pack(
         pack,
         n_active_orbitals=na,
@@ -49,6 +51,10 @@ def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
     )
     assert q_ref.meta["hamiltonian_fingerprint"] == q_pack.meta["hamiltonian_fingerprint"]
     assert q_pack.meta.get("canonical_integral_pack", {}).get("schema")
+    assert q_pack.meta.get("integral_source") == pack.provenance.get("upstream_integral_source")
+    assert q_pack.meta.get("integral_openfermion_bridge") == pack.provenance.get(
+        "integral_openfermion_bridge"
+    )
 
 
 def test_psi4_solver_lacks_restricted_active_space_hamiltonian() -> None:

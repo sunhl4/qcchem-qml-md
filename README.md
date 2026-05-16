@@ -78,11 +78,7 @@ cd qchem_qml_md
 pip install -e ".[dev]"
 ```
 
-Local development commands in this repository are hard-pinned to:
-
-- `/home/sunhl/projects/qchem_qml_md/.venv/bin/python`
-
-via `./scripts/venv-run ...`.
+Local development commands use [`scripts/venv-run`](scripts/venv-run): it prepends the directory of the chosen interpreter to `PATH` and runs your command. **`QCHEM_STACK_PYTHON`** selects the interpreter when set; otherwise the default in `scripts/venv-run` applies (repo maintainers set this to their `conda base` or `.venv` Python).
 
 PySCF, Qiskit, and **pytket** (TKET bridge for resource stats) are optional extras: `pip install -e ".[all]"` includes all declared extras, or `pip install -e ".[pytket]"` alone.
 

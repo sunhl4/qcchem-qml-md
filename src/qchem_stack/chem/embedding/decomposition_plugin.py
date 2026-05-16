@@ -18,7 +18,10 @@ from typing import Any, Protocol
 
 from openfermion.ops import QubitOperator
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.chem.hamiltonian import (
+    QubitHamiltonian,
+    hamiltonian_fingerprint_from_qubit_operator,
+)
 from qchem_stack.config import ExperimentConfig
 
 _DECOMPOSITION_PLUGIN_SCHEMAS = frozenset(
@@ -152,9 +155,12 @@ def qubit_hamiltonian_from_decomposition_plugin(
         coeff = float(row["coeff"])
         label = str(row["label"])
         op += coeff * _pauli_label_to_operator(label, n_qubits)
+    fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(op)
     meta = {
         "integral_source": schema_tag,
+        "integral_openfermion_bridge": "decomposition_plugin_pauli_terms_v1",
         "fermion_to_qubit_map": mapping,
+        "hamiltonian_fingerprint": fp,
         "decomposition_plugin": name,
         "decomposition_plugin_json": str(path),
         "decomposition_plugin_schema": schema_tag,
@@ -163,6 +169,8 @@ def qubit_hamiltonian_from_decomposition_plugin(
         "decomposition_fragment_ids": sorted(str(k) for k in frags.keys()),
         "decomposition_fragment_pauli_term_counts": term_counts,
     }
+    if fp_trunc:
+        meta["hamiltonian_fingerprint_truncated"] = True
     if ledger_summary:
         meta["decomposition_fragment_energy_terms_v1"] = ledger_summary
     return QubitHamiltonian(operator=op, n_qubits=n_qubits, meta=meta, fermion_space=None)

@@ -6,7 +6,7 @@ import pytest
 from pydantic import ValidationError
 
 from qchem_stack.config import ActiveSpaceSpec, ExperimentConfig, MoleculeSpec, QuantumSpec
-from qchem_stack.internal_reports.competitor.inquanto_contract import (
+from qchem_stack.protocols.inquanto_contract import (
     PAULI_PATH_DISABLED,
     PAULI_PATH_EXACT,
     PAULI_PATH_QISKIT_COUNTS,
@@ -92,7 +92,7 @@ def test_gap_categories_contract_validator_has_no_errors() -> None:
 
 
 def test_parity_export_stable_keys_present() -> None:
-    from qchem_stack.internal_reports.competitor.inquanto_contract import (
+    from qchem_stack.protocols.inquanto_contract import (
         PARITY_EXPORT_V2_STABLE_KEYS,
     )
 
@@ -120,7 +120,7 @@ def test_parity_export_stable_keys_present() -> None:
 
 
 def test_open_stack_differentiators_schema() -> None:
-    from qchem_stack.internal_reports.competitor.inquanto_contract import (
+    from qchem_stack.protocols.inquanto_contract import (
         open_stack_differentiators_public,
     )
 

@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import pytest
 
-from qchem_stack.internal_reports.competitor.inquanto_contract import inquanto_gap_categories
+from qchem_stack.protocols.inquanto_contract import inquanto_gap_categories
 
 
 @pytest.mark.parametrize(

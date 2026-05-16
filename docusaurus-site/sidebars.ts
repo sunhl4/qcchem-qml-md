@@ -60,6 +60,7 @@ const sidebars: SidebarsConfig = {
         'reference/circuitir-tket-jobs',
         'reference/qiskit-shot-counts',
         'reference/dmet-parity-snapshot',
+        'reference/parity-contract-import-paths',
         'reference/cli-http',
       ],
     },

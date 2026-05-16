@@ -15,7 +15,10 @@ from typing import Any
 import numpy as np
 from openfermion.ops import QubitOperator
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.chem.hamiltonian import (
+    QubitHamiltonian,
+    hamiltonian_fingerprint_from_qubit_operator,
+)
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
 
 CLASSICAL_REFERENCE_BUNDLE_V1 = "classical_reference_bundle_v1"
@@ -143,6 +146,14 @@ def qubit_hamiltonian_from_bundle_payload(
         )
     qh_meta = dict(meta or {})
     qh_meta.setdefault("integral_source", CLASSICAL_REFERENCE_BUNDLE_V1)
+    qh_meta.setdefault("integral_openfermion_bridge", "precomputed_pauli_terms_v1")
+    manifest = parse_precomputed_manifest(data)
+    if manifest is not None and "fermion_qubit_mapping" in manifest:
+        qh_meta.setdefault("fermion_to_qubit_map", manifest["fermion_qubit_mapping"])
+    fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(op)
+    qh_meta.setdefault("hamiltonian_fingerprint", fp)
+    if fp_trunc:
+        qh_meta["hamiltonian_fingerprint_truncated"] = True
     qh_meta["precomputed_bundle_path"] = str(path)
     return QubitHamiltonian(
         operator=op,

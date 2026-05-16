@@ -5,7 +5,7 @@ from __future__ import annotations
 import re
 from pathlib import Path
 
-from qchem_stack.internal_reports.competitor.inquanto_contract import inquanto_gap_categories
+from qchem_stack.protocols.inquanto_contract import inquanto_gap_categories
 
 _ROOT = Path(__file__).resolve().parents[1]
 _MATRIX = _ROOT / "docs" / "inquanto_public_parity_matrix.md"

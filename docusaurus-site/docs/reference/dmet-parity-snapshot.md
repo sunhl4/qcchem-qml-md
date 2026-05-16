@@ -48,6 +48,7 @@
 
 ## 关联页面
 
+- [Parity 契约与 workflow-preview（稳定 import）](/reference/parity-contract-import-paths)
 - [Projection 嵌入深入](/tutorial/projection-embedding-deep-dive)
 - [P1 化学与嵌入](/guide/chemistry-and-embedding)
 - [工程架构](/concept/engineering-architecture)

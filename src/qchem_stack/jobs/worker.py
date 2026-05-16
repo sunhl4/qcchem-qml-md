@@ -17,11 +17,11 @@ def drain_one_queued(
     max_retries: int = 2,
 ) -> bool:
     """If a ``QUEUED`` job exists, run ``runner`` with retry bookkeeping; return whether one was processed."""
-    jid = store.fetch_next_queued()
+    jid = store.claim_next_queued()
     if jid is None:
         return False
     fn = runner if runner is not None else dispatch_job
-    process_job_with_retry(store, jid, fn, max_retries=max_retries)
+    process_job_with_retry(store, jid, fn, max_retries=max_retries, already_running=True)
     return True
 
 

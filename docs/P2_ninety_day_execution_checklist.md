@@ -16,7 +16,7 @@
 | D1 | InQuanto How-to ↔ [`InQuanto_manual_howto_与_qchem_stack_映射.md`](InQuanto_manual_howto_与_qchem_stack_映射.md) 不一致清单 | Done | [`P2_execution_alignment_notes.md`](P2_execution_alignment_notes.md) §1 drift 表（2026-05-12 基线行）；钉扎见 [`L1_InQuanto_alignment_signoff.md`](L1_InQuanto_alignment_signoff.md) |
 | D2 | 本地 pytest；对照 `.github/workflows/ci.yml` | Done | CI：`pytest`、markers；缺依赖时 skip：`CONTRIBUTING.md`、`pyproject.toml` `[tool.pytest.ini_options]` |
 | D3 | `check_parity_export_sample.py` | Done | [`scripts/check_parity_export_sample.py`](../scripts/check_parity_export_sample.py) `SAMPLE_CONFIGS_REL` |
-| D4 | 矩阵 ↔ `inquanto_gap_categories()` | Done | `protocols/inquanto_contract.py`；守门：`tests/test_gap_parity_matrix_anchors.py` |
+| D4 | 矩阵 ↔ `inquanto_gap_categories()` | Done | `protocols/inquanto_contract.py`（`qchem_stack.protocols.inquanto_contract`；字面量 `internal_reports/competitor/inquanto_contract.py`，[CONTRIBUTING](../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）；守门：`tests/test_gap_parity_matrix_anchors.py` |
 | D5 | export 抽样字段齐全 | Done | `tests/test_export_parity_golden.py`、`export_parity_criteria_table.py` |
 | D6 | Tangelo algorithms/linq 浏览笔记 | Done | [`P2_W5_algorithm_registry_alignment.md`](P2_W5_algorithm_registry_alignment.md) §4「浏览清单」；[`Tangelo_notebook_to_yaml_mapping.md`](Tangelo_notebook_to_yaml_mapping.md) |
 | D7 | Tangelo ↔ registry 表骨架 | Done | [`P2_W5_algorithm_registry_alignment.md`](P2_W5_algorithm_registry_alignment.md) §4 |

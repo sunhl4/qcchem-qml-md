@@ -5,7 +5,7 @@
 ## 范围边界
 
 - 继续执行 P2 深化，不跨越 L0 边界。
-- 新增键遵循同源链：`contract -> export -> tests -> docs`。
+- 新增键遵循同源链：`contract -> export -> tests -> docs`。（`contract` = `protocols/inquanto_contract.py` / import `qchem_stack.protocols.inquanto_contract`，见 [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)。）
 - `partial` / `n/a` 口径保持一致，不做闭源等价宣称。
 
 ## 日历拆分（Day91–Day120）
@@ -49,7 +49,7 @@
    - `pytest`（当周相关子集）
    - `python scripts/check_parity_export_sample.py`
 2. 一致性复核：
-   - `src/qchem_stack/protocols/inquanto_contract.py`
+   - `src/qchem_stack/protocols/inquanto_contract.py`（稳定 import `qchem_stack.protocols.inquanto_contract`；字面量在 `internal_reports/competitor/` — [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
    - `scripts/export_parity_criteria_table.py`
    - 文档口径（`docs/` + `docs-site/`）
 3. 执行页更新：

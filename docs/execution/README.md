@@ -2,6 +2,8 @@
 
 本目录记录 P2 连续执行证据链（按天与里程碑）。
 
+**parity / gap 机读契约与 `workflow-preview` 的稳定 import / 文件分层**（re-export vs `internal_reports/competitor/` 字面量）：见仓库根目录 [CONTRIBUTING.md — Parity and workflow-preview](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)。
+
 **工程深度总览（维度 × WBS × 闸门）**：[工程深度路线图_InQuanto_Tangelo_对标与交付.md](../工程深度路线图_InQuanto_Tangelo_对标与交付.md) — 与 InQuanto / Tangelo 公开叙事可对标的完整计划母页，承接差距文档附录与下列 Day 日志。
 
 ## Day logs

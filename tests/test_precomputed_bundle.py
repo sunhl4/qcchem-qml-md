@@ -74,6 +74,9 @@ def test_qubit_hamiltonian_from_bundle_indexed_labels(tmp_path: Path) -> None:
     qh = qubit_hamiltonian_from_bundle(str(p))
     assert qh.n_qubits == 2
     assert len(qh.operator.terms) == 2
+    assert qh.meta["integral_source"] == CLASSICAL_REFERENCE_BUNDLE_V1
+    assert qh.meta["integral_openfermion_bridge"] == "precomputed_pauli_terms_v1"
+    assert len(qh.meta["hamiltonian_fingerprint"]) == 32
 
 
 def test_parse_precomputed_manifest_validates_fields(tmp_path: Path) -> None:
@@ -107,3 +110,30 @@ def test_parse_precomputed_manifest_validates_fields(tmp_path: Path) -> None:
     assert manifest is not None
     assert manifest["n_active_orbitals"] == 2
     assert manifest["fermion_qubit_mapping"] == "jordan_wigner"
+
+
+def test_qubit_hamiltonian_from_bundle_copies_manifest_mapping(tmp_path: Path) -> None:
+    p = tmp_path / "bundle_with_mapping.json"
+    payload = {
+        "schema": CLASSICAL_REFERENCE_BUNDLE_V1,
+        "manifest": {
+            "schema": "precomputed_manifest_v1",
+            "fermion_qubit_mapping": "bravyi_kitaev",
+        },
+        "classical_reference": {
+            "e_tot": -1.0,
+            "mo_energy": [-0.5, 0.2],
+        },
+        "pre_quantum_input": {
+            "qubit_hamiltonian": {
+                "n_qubits": 2,
+                "terms": [{"label": "ZI", "coeff": 1.0}],
+            },
+        },
+    }
+    p.write_text(json.dumps(payload), encoding="utf-8")
+
+    qh = qubit_hamiltonian_from_bundle(str(p))
+
+    assert qh.meta["fermion_to_qubit_map"] == "bravyi_kitaev"
+    assert len(qh.meta["hamiltonian_fingerprint"]) == 32

@@ -12,7 +12,7 @@
 
 - 在 `resource_estimation_preview_v1` 上扩展深度字段（保持非云计价口径）。
 - 同步更新：
-  - `src/qchem_stack/protocols/inquanto_contract.py`
+  - `src/qchem_stack/protocols/inquanto_contract.py`（`qchem_stack.protocols.inquanto_contract`；字面量 `internal_reports/competitor/inquanto_contract.py`，[CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
   - `scripts/export_parity_criteria_table.py`
   - `tests/test_methods_resource_unified_export.py`
 - 交付：新增字段的 config-only 与 `--results` 双路径测试。

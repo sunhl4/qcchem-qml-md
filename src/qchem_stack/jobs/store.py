@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Any, Protocol
 
 _JSON_SCAN_CAP = 5000
+_SQLITE_BUSY_TIMEOUT_MS = 30_000
 
 
 def _meta_top_str(meta_raw: str | None, key: str) -> str | None:
@@ -66,13 +67,23 @@ def _migrate_jobs_schema(con: sqlite3.Connection) -> None:
         con.execute("ALTER TABLE jobs ADD COLUMN timeline_json TEXT")
 
 
+def _ensure_jobs_indexes(con: sqlite3.Connection) -> None:
+    con.execute(
+        "CREATE INDEX IF NOT EXISTS idx_jobs_status_created ON jobs(status, created ASC)"
+    )
+    con.execute(
+        "CREATE INDEX IF NOT EXISTS idx_jobs_job_kind_created ON jobs(job_kind, created DESC)"
+    )
+
+
 class SqliteJobStore:
     """Async job ledger with retries, failures, and JSON results."""
 
     def __init__(self, path: str | Path) -> None:
         self.path = Path(path)
         self.path.parent.mkdir(parents=True, exist_ok=True)
-        con = sqlite3.connect(self.path)
+        con = self._connect()
+        self._set_startup_pragmas(con)
         con.execute(
             """CREATE TABLE IF NOT EXISTS jobs (
                 job_id TEXT PRIMARY KEY,
@@ -90,8 +101,25 @@ class SqliteJobStore:
             )"""
         )
         _migrate_jobs_schema(con)
+        _ensure_jobs_indexes(con)
         con.commit()
         con.close()
+
+    def _connect(self) -> sqlite3.Connection:
+        con = sqlite3.connect(self.path, timeout=_SQLITE_BUSY_TIMEOUT_MS / 1000.0)
+        con.execute(f"PRAGMA busy_timeout={_SQLITE_BUSY_TIMEOUT_MS}")
+        return con
+
+    def _set_startup_pragmas(self, con: sqlite3.Connection) -> None:
+        # WAL/synchronous tuning is best-effort: older/readonly SQLite setups may reject it.
+        try:
+            con.execute("PRAGMA journal_mode=WAL")
+        except sqlite3.OperationalError:
+            pass
+        try:
+            con.execute("PRAGMA synchronous=NORMAL")
+        except sqlite3.OperationalError:
+            pass
 
     def enqueue(
         self,
@@ -102,7 +130,7 @@ class SqliteJobStore:
         job_kind: str = "pauli_protocol",
         meta: dict[str, Any] | None = None,
     ) -> JobHandle:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         now = time.time()
         meta_s = json.dumps(meta, sort_keys=True) if meta is not None else None
         initial_timeline = json.dumps(
@@ -132,7 +160,7 @@ class SqliteJobStore:
         return JobHandle(job_id=job_id, protocol_hash=protocol_hash)
 
     def get_job_row(self, job_id: str) -> dict[str, Any]:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         row = con.execute(
             "SELECT payload, job_kind, meta, protocol_hash, status FROM jobs WHERE job_id=?",
             (job_id,),
@@ -157,7 +185,7 @@ class SqliteJobStore:
 
     def append_timeline_event(self, job_id: str, event: dict[str, Any]) -> None:
         """Append one timeline entry (JSON object). Adds ``t`` if missing."""
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         row = con.execute("SELECT timeline_json FROM jobs WHERE job_id=?", (job_id,)).fetchone()
         if row is None:
             con.close()
@@ -188,7 +216,7 @@ class SqliteJobStore:
 
     def get_job_timeline_events(self, job_id: str) -> dict[str, Any]:
         """Timeline for ``GET .../events`` — persisted JSON or coarse fallback for legacy rows."""
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         row = con.execute(
             "SELECT timeline_json, created, updated, status FROM jobs WHERE job_id=?",
             (job_id,),
@@ -227,7 +255,7 @@ class SqliteJobStore:
         }
 
     def mark_running(self, job_id: str) -> None:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         con.execute(
             "UPDATE jobs SET status=?, updated=? WHERE job_id=?",
             (JobStatus.RUNNING.value, time.time(), job_id),
@@ -237,7 +265,7 @@ class SqliteJobStore:
         self.append_timeline(job_id, "running", JobStatus.RUNNING.value)
 
     def complete(self, job_id: str, result: dict[str, Any]) -> None:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         con.execute(
             "UPDATE jobs SET status=?, result=?, error_message=NULL, updated=? WHERE job_id=?",
             (JobStatus.DONE.value, json.dumps(result), time.time(), job_id),
@@ -247,7 +275,7 @@ class SqliteJobStore:
         self.append_timeline(job_id, "completed", JobStatus.DONE.value)
 
     def fail(self, job_id: str, message: str) -> None:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         con.execute(
             "UPDATE jobs SET status=?, error_message=?, updated=? WHERE job_id=?",
             (JobStatus.FAILED.value, message[:8000], time.time(), job_id),
@@ -257,7 +285,7 @@ class SqliteJobStore:
         self.append_timeline(job_id, "failed", JobStatus.FAILED.value)
 
     def fetch_next_queued(self) -> str | None:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         row = con.execute(
             "SELECT job_id FROM jobs WHERE status=? ORDER BY created ASC LIMIT 1",
             (JobStatus.QUEUED.value,),
@@ -265,8 +293,39 @@ class SqliteJobStore:
         con.close()
         return str(row[0]) if row else None
 
+    def claim_next_queued(self) -> str | None:
+        """
+        Atomically claim one queued job and transition it to RUNNING.
+
+        Uses ``BEGIN IMMEDIATE`` so concurrent workers cannot claim the same row.
+        """
+        con = self._connect()
+        now = time.time()
+        try:
+            con.execute("BEGIN IMMEDIATE")
+            row = con.execute(
+                "SELECT job_id FROM jobs WHERE status=? ORDER BY created ASC LIMIT 1",
+                (JobStatus.QUEUED.value,),
+            ).fetchone()
+            if row is None:
+                con.commit()
+                return None
+            job_id = str(row[0])
+            con.execute(
+                "UPDATE jobs SET status=?, updated=? WHERE job_id=?",
+                (JobStatus.RUNNING.value, now, job_id),
+            )
+            con.commit()
+        except Exception:
+            con.rollback()
+            raise
+        finally:
+            con.close()
+        self.append_timeline(job_id, "running", JobStatus.RUNNING.value)
+        return job_id
+
     def result(self, job_id: str) -> dict[str, Any]:
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         row = con.execute(
             """SELECT status, result, error_message, retry_count, job_kind, meta
                FROM jobs WHERE job_id=?""",
@@ -294,7 +353,7 @@ class SqliteJobStore:
 
     def get_job_public_summary(self, job_id: str) -> dict[str, Any]:
         """Small row for polling: timestamps, status, ``meta`` — no payload or full ``result`` blob."""
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         row = con.execute(
             """SELECT status, job_kind, created, updated, meta, retry_count, error_message
                FROM jobs WHERE job_id=?""",
@@ -326,7 +385,7 @@ class SqliteJobStore:
 
     def count_by_status(self) -> dict[str, int]:
         """Row counts per :class:`JobStatus` (missing statuses are omitted)."""
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         rows = con.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status").fetchall()
         con.close()
         return {str(st): int(n) for st, n in rows}
@@ -383,7 +442,7 @@ class SqliteJobStore:
             return out
 
         where_base = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-        con = sqlite3.connect(self.path)
+        con = self._connect()
         try:
             if not meta_eq:
                 sql = (
@@ -429,17 +488,19 @@ def process_job_with_retry(
     runner: Any,
     *,
     max_retries: int = 2,
+    already_running: bool = False,
 ) -> None:
     """
     Run ``runner(store, job_id)``; on failure increment ``retry_count`` and return to ``QUEUED``
     until ``max_retries`` attempts, then ``FAILED``.
     """
-    store.mark_running(job_id)
+    if not already_running:
+        store.mark_running(job_id)
     try:
         runner(store, job_id)
     except Exception as e:  # pragma: no cover - exercised via test
         msg = f"{type(e).__name__}: {e}\n{traceback.format_exc()}"
-        con = sqlite3.connect(store.path)
+        con = store._connect()
         row = con.execute("SELECT retry_count FROM jobs WHERE job_id=?", (job_id,)).fetchone()
         r = int(row[0] if row and row[0] is not None else 0)
         if r < max_retries:

@@ -13,7 +13,7 @@
 **机读真源（本栈）**
 
 - HTTP：`GET /v1/meta/capability-surface`（`capability_surface_v1` 顶层键集）。  
-- 导出：`scripts/export_parity_criteria_table.py`；稳定键：`protocols/inquanto_contract.py`（含 `RESOURCE_ESTIMATION_PREVIEW_V1_DOCUMENTED_KEYS`、`METHODS_RESOURCE_UNIFIED_V1_DOCUMENTED_KEYS` 等）。  
+- 导出：`scripts/export_parity_criteria_table.py`；稳定键：`protocols/inquanto_contract.py`（import **`qchem_stack.protocols.inquanto_contract`**；frozenset/gap 字面量 **`internal_reports/competitor/inquanto_contract.py`**，见 [CONTRIBUTING](../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）（含 `RESOURCE_ESTIMATION_PREVIEW_V1_DOCUMENTED_KEYS`、`METHODS_RESOURCE_UNIFIED_V1_DOCUMENTED_KEYS` 等）。  
 - 差距分类：`inquanto_gap_categories()`。
 
 ---
@@ -44,7 +44,7 @@
 | **算法与算符池** | Algorithms API、激发 taxonomy | D2+D3：registry export；L3 代表集；**不冒充**全套闭源 taxonomy | `quantum/algorithm_registry.py`、`operator_pool_registry.py`；算法面广度索引 §4–§5 |
 | **协议与资源语义** | Resource estimation、dataframe_circuit_shot | D2：`resource_estimation_preview_v1` 与 `methods_resource_unified_v1` **镜像一致**；Pauli 三路径 token | `integrations/resource_estimation_preview.py`、`methods_resource_unified.py`；设备比特串技术文档 |
 | **缓解** | Qermit MitRes/MitEx | D2：DAG + 线性迹不变量；进阶 ZNE/PMSV **可回归块** | `mitigation/`；`mitigation_PMSV_ZNE_Qermit_mapping.md`；P2-W4 |
-| **工作流与 Computable** | 五阶段、Computable | D2：`workflow-preview`、`computable_graph_v2`、可选 `computables_rich_v1` | `integrations/inquanto_workflow_preview.py` |
+| **工作流与 Computable** | 五阶段、Computable | D2：`workflow-preview`、`computable_graph_v2`、可选 `computables_rich_v1` | `integrations/inquanto_workflow_preview.py`（`qchem_stack.integrations.inquanto_workflow_preview`；[CONTRIBUTING](../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)） |
 | **作业与 HTTP** | Nexus 叙事（非真云） | D2：runs API、capability-surface 同源 | `api/app.py`、`jobs/` |
 | **MD/ML** | 非 InQuanto 主宣传 | D2+D4：长板钉扎 | `md_bridge/`；矩阵 MD/ML 行 |
 

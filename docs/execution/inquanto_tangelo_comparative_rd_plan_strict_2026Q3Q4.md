@@ -22,9 +22,9 @@
 
 ## 3. 当前仓库能力现状（与计划直接相关）
 
-- InQuanto 对齐主契约：`src/qchem_stack/protocols/inquanto_contract.py`
+- InQuanto 对齐主契约：`src/qchem_stack/protocols/inquanto_contract.py`（稳定 import：**`qchem_stack.protocols.inquanto_contract`**；字面量：**`internal_reports/competitor/inquanto_contract.py`** — 见 [CONTRIBUTING](../../CONTRIBUTING.md#parity-and-workflow-preview-stable-imports)）
 - HTTP 对齐面：`src/qchem_stack/api/app.py`（`/v1/meta/capability-surface`、`/v1/meta/parity-gaps`）
-- 工作流/Computable：`src/qchem_stack/integrations/inquanto_workflow_preview.py`
+- 工作流 / Computable：`src/qchem_stack/integrations/inquanto_workflow_preview.py`（**`qchem_stack.integrations.inquanto_workflow_preview`**；字面量 **`internal_reports/competitor/inquanto_workflow_preview.py`**）
 - Tangelo 对照点：`src/qchem_stack/chem/fermion_mapping_registry.py`、`src/qchem_stack/quantum/algorithms/excited.py`
 - 公开矩阵：`docs/inquanto_public_parity_matrix.md`
 - 已有执行链：`docs/execution/day121_day180_inquanto_tangelo_calendar_2026Q3.md`

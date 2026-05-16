@@ -1,12 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Project-local hard-pinned Python environment for this workspace.
-VENV_PYTHON="/home/sunhl/projects/qchem_qml_md/.venv/bin/python"
+# Default Python for this workspace. Override anytime, e.g.:
+#   export QCHEM_STACK_PYTHON=/path/to/python
+#   ./scripts/venv-run pytest tests -q
+default_python=/Users/shl/anaconda3/bin/python
+
+VENV_PYTHON="${QCHEM_STACK_PYTHON:-$default_python}"
 
 if [[ ! -x "$VENV_PYTHON" ]]; then
-  echo "error: pinned venv python not found: $VENV_PYTHON" >&2
-  echo "hint: create/repair the venv at /home/sunhl/projects/qchem_qml_md/.venv" >&2
+  echo "error: python interpreter not found or not executable: $VENV_PYTHON" >&2
+  echo "hint: conda activate base, or export QCHEM_STACK_PYTHON=/path/to/python" >&2
   exit 1
 fi
 

@@ -51,6 +51,7 @@ class CanonicalActiveSpaceIntegralPack:
         prov: dict[str, Any] = {
             "pack_schema": SCHEMA_V1,
             "upstream_integral_source": "pyscf_casci_h2eff_compact",
+            "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
             "classical_backend": "pyscf",
         }
         dm = getattr(rhf, "driver_meta", None) or {}

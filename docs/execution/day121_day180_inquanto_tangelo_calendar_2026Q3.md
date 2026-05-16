@@ -46,14 +46,14 @@
 | 146 | `check_parity_export_sample` 覆盖 | 抽样 configs | 脚本内列表 | 新增行需对应 gap/矩阵 | 脚本与文档互链 |
 | 147 | `variational_registry_export_v1` | 变分插件 | `variational_plugins/registry.py` | 对照 breadth 索引表 | 文档有模块指针 |
 | 148 | **Week4 闸门** | — | — | 周小结 | — |
-| 149 | `inquanto_gap_categories`  schema | 差距计划附录 | `inquanto_contract.py` | 字段级快照或测试锚点 | 重命名可发现 |
+| 149 | `inquanto_gap_categories`  schema | 差距计划附录 | `protocols/inquanto_contract.py`（import `qchem_stack.protocols.inquanto_contract`） | 字段级快照或测试锚点 | 重命名可发现 |
 | 150 | 矩阵 §3 化学行抽样 | PySCF / driver | `parity_matrix`、`drivers` | 3–5 行「证据路径」 | partial 有锚点 |
 | 151 | 矩阵 §4（若有）/ 嵌入 | DMET/Schmidt | `dmet.py`、`schmidt_production` | 对照执行记录 | 与 gap 一致 |
 | 152 | 孤儿 gap id 扫描 | 矩阵表格 | grep `gap`、JSON | 列表：文档有而代码无 | 清零或登记 |
-| 153 | `parity_snapshot` 注册键 | `PARITY_SNAPSHOT_DOCUMENTED_KEYS` | contract | 与矩阵「导出」行交叉 | 白名单完整 |
+| 153 | `parity_snapshot` 注册键 | `PARITY_SNAPSHOT_DOCUMENTED_KEYS` | `qchem_stack.protocols.inquanto_contract` | 与矩阵「导出」行交叉 | 白名单完整 |
 | 154 | docs-site / docs 双站 | 关键入口 | VitePress、docusaurus | 互链断链修复清单 | 用户路径不断 |
 | 155 | **Week5 闸门** | — | — | 周小结 | — |
-| 156 | `computable_graph_v2` | workflow-preview | `inquanto_workflow_preview.py` | 边编辑语义复核 | YAML 与图一致 |
+| 156 | `computable_graph_v2` | workflow-preview | `integrations/inquanto_workflow_preview.py`（`qchem_stack.integrations.inquanto_workflow_preview`） | 边编辑语义复核 | YAML 与图一致 |
 | 157 | `computables_rich` 可选 | §1 | repro 对齐测试 | 执行记录 | 与 gap 状态一致 |
 | 158 | `GET …/summary` slim | 产品类比 | `slim_product_summary` | UX 字段 vs 矩阵 | partial 标明 |
 | 159 | Mitigation 机读块 | §1 Qermit 行 | `mitigation_execution_model_public` | DAG/迹与文档一句 | 顺序不变量 |

@@ -2,19 +2,20 @@
 
 **对标与工程母稿（三份 + 契约矩阵）**：[竞争定位](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) · [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md) · [差距与实施计划](docs/与InQuanto能力差距与实施计划.md)（含 **附录 A–F**：P2 / Y1 / L1 / B→J / P1 审计 / 不排期项）· [parity 矩阵](docs/inquanto_public_parity_matrix.md)。**详细技术契约**：`docs/技术文档_*.md`、`mitigation_PMSV_ZNE_Qermit_mapping.md`、`launch_retrieve_nexus_analog.md`。
 
-## Local Python environment (hard-pinned)
+## Local Python environment (default)
 
-This repository pins local command execution to:
+[`scripts/venv-run`](scripts/venv-run) runs commands with the Python chosen by **`QCHEM_STACK_PYTHON`** (if set), otherwise the default interpreter path at the top of that script (repo default: maintainer `conda base` / workstation path). Example override:
 
-- `/home/sunhl/projects/qchem_qml_md/.venv/bin/python`
-
-Use `./scripts/venv-run ...` for local lint/test/script commands.
+```bash
+export QCHEM_STACK_PYTHON=/path/to/python
+./scripts/venv-run pytest tests -q --tb=short
+```
 
 ## 维护角色（原 `docs/MAINTAINERS.md`）
 
 | 角色 | 职责 |
 |------|------|
-| **Parity / 契约维护** | 矩阵与 `inquanto_contract` / `inquanto_gap_categories` 同源；公开站改版时执行差距登记（见 [与InQuanto能力差距与实施计划.md §5](docs/与InQuanto能力差距与实施计划.md)）。 |
+| **Parity / 契约维护** | 矩阵与 **`qchem_stack.protocols.inquanto_contract`**（`inquanto_gap_categories` 等）同源；源码布局见本节 [Parity and workflow-preview](#parity-and-workflow-preview-stable-imports)；公开站改版时执行差距登记（见 [与InQuanto能力差距与实施计划.md §5](docs/与InQuanto能力差距与实施计划.md)）。 |
 | **度量与台账** | 月度更新 [与InQuanto… — 附录 B](docs/与InQuanto能力差距与实施计划.md) §3；主表 yes/partial/n/a 可用 `python scripts/count_parity_matrix_main_tables.py` 对照手填。 |
 | **签字合并 gate** | 合并前：`ruff check src/qchem_stack tests scripts examples`、`ruff format --check`（同上路径）、`pytest`、`python scripts/check_parity_export_sample.py`；在 [附录 C](docs/与InQuanto能力差距与实施计划.md) 末行可写明 **实名 + 日期**。 |
 
@@ -78,6 +79,26 @@ For PySCF-related refactors, keep module boundaries stable:
 - Keep `src/qchem_stack/chem/drivers/pyscf_driver.py` focused on compatibility facade and workflow orchestration.
 
 If you add new helper logic, prefer the new modules first and keep legacy import paths compatible where practical.
+
+## Parity and workflow-preview (stable imports)
+
+Maintenance rule: **`protocols/` / `integrations/` host stable re-export modules**; **edit literals (frozensets, gap tables, object maps)** in **`internal_reports/competitor/`** unless you deliberately want a façade-only shim.
+
+| Stable Python import | `src/` file (re-export) | Where literals live |
+|---------------------|-------------------------|---------------------|
+| `qchem_stack.protocols.inquanto_contract` | `src/qchem_stack/protocols/inquanto_contract.py` | `src/qchem_stack/internal_reports/competitor/inquanto_contract.py` |
+| `qchem_stack.integrations.inquanto_workflow_preview` | `src/qchem_stack/integrations/inquanto_workflow_preview.py` | `src/qchem_stack/internal_reports/competitor/inquanto_workflow_preview.py` |
+
+HTTP/pipeline façade that bundles preview helpers for product code: `src/qchem_stack/integrations/workflow_preview.py`.
+
+Spot-check imports:
+
+```bash
+./scripts/venv-run python -c "from qchem_stack.protocols.inquanto_contract import PARITY_SNAPSHOT_DOCUMENTED_KEYS; print(len(PARITY_SNAPSHOT_DOCUMENTED_KEYS))"
+./scripts/venv-run python -c "from qchem_stack.integrations.inquanto_workflow_preview import computable_graph_v2; import inspect; print('computable_graph_v2', callable(computable_graph_v2))"
+```
+
+**Docusaurus 主站镜像（中文）**：源码 `docusaurus-site/docs/reference/parity-contract-import-paths.md` — 本地 `cd docusaurus-site && npm start` 后路径 **`/reference/parity-contract-import-paths`**。
 
 ## Parity export / golden fixture
 
