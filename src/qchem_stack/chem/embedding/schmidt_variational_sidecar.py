@@ -1,0 +1,76 @@
+"""Optional per-fragment VQE on Schmidt impurities (post pre-quantum handoff, uses quantum layer)."""
+
+from __future__ import annotations
+
+from typing import Any
+
+import numpy as np
+
+from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_spatial_chemist_integrals
+from qchem_stack.chem.pre_quantum_pyscf_gate import require_pyscf_reference
+from qchem_stack.config import ExperimentConfig
+from qchem_stack.quantum.algorithms.vqe import VQE
+
+
+def run_schmidt_per_fragment_vqe(
+    cfg: ExperimentConfig,
+    rhf: ClassicalMeanFieldReference,
+    schmidt_ctx: dict[str, Any],
+    exe: Any,
+) -> dict[str, Any] | None:
+    """Independent VQE on each fragment impurity (post embedding density)."""
+    groups = schmidt_ctx.get("fragment_groups")
+    if not groups or len(groups) < 2:
+        return None
+    labels = schmidt_ctx.get("fragment_labels") or []
+    if len(labels) != len(groups):
+        return None
+    if not cfg.embedding.schmidt_run_vqe_on_all_fragments:
+        return None
+    d = np.asarray(schmidt_ctx["D_embed"], dtype=float)
+    emb = cfg.embedding
+    from qchem_stack.chem.embedding.schmidt_production import build_schmidt_impurity_integrals
+
+    mx = emb.schmidt_per_fragment_vqe_maxiter
+    if mx is None:
+        mx = cfg.quantum.vqe_maxiter
+    rows: list[dict[str, Any]] = []
+    require_pyscf_reference(rhf, context="schmidt_run_vqe_on_all_fragments")
+    for i, atoms in enumerate(groups):
+        model = build_schmidt_impurity_integrals(
+            rhf,
+            fragment_atom_indices=list(atoms),
+            n_bath_orbitals=int(emb.schmidt_n_bath_spatial),
+            max_impurity_spatial_orbitals=int(emb.schmidt_max_impurity_spatial_orbitals),
+            density_ao=d,
+        )
+        ne = model.n_alpha_electrons + model.n_beta_electrons
+        qh_i = qubit_hamiltonian_from_spatial_chemist_integrals(
+            model.constant,
+            model.h1,
+            model.h2,
+            ne,
+            fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+            integral_source="schmidt_impurity_spatial_fragment",
+            meta_extra={"fragment_id": labels[i]},
+        )
+        vr = VQE(qh_i, depth=cfg.quantum.vqe_depth, executor=exe).run(
+            maxiter=int(mx),
+            seed=int(cfg.random_seed) + i * 31,
+        )
+        rows.append(
+            {
+                "fragment_id": labels[i],
+                "atom_indices": list(atoms),
+                "energy": float(vr.energy),
+                "nfev": int(vr.nfev),
+                "n_qubits": int(qh_i.n_qubits),
+            }
+        )
+    return {
+        "schema": "schmidt_per_fragment_vqe_v1",
+        "vqe_depth": cfg.quantum.vqe_depth,
+        "vqe_maxiter_per_fragment": int(mx),
+        "fragments": rows,
+    }

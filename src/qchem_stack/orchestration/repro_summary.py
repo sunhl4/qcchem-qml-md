@@ -174,6 +174,26 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
             sm["schmidt_per_fragment_vqe_max_energy_au"] = max(energies)
     if out.get("scf_energy") is not None:
         sm["scf_energy"] = out["scf_energy"]
+    pqi = out.get("pre_quantum_input")
+    if isinstance(pqi, dict):
+        if pqi.get("source") is not None:
+            sm["pre_quantum_source"] = pqi["source"]
+        if pqi.get("backend_tag") is not None:
+            sm["pre_quantum_backend_tag"] = pqi["backend_tag"]
+        if pqi.get("hamiltonian_branch") is not None:
+            sm["pre_quantum_hamiltonian_branch"] = pqi["hamiltonian_branch"]
+        if pqi.get("hamiltonian_fingerprint") is not None:
+            sm["hamiltonian_fingerprint"] = pqi["hamiltonian_fingerprint"]
+        if pqi.get("hamiltonian_fixed_before_variational") is not None:
+            sm["hamiltonian_fixed_before_variational"] = bool(
+                pqi["hamiltonian_fixed_before_variational"]
+            )
+    cache_stats = out.get("pre_quantum_build_cache")
+    if isinstance(cache_stats, dict):
+        if cache_stats.get("pack_builds") is not None:
+            sm["pre_quantum_pack_builds"] = int(cache_stats["pack_builds"])
+        if cache_stats.get("pack_hits") is not None:
+            sm["pre_quantum_pack_hits"] = int(cache_stats["pack_hits"])
     cb = out.get("classical_benchmarks")
     if isinstance(cb, dict):
         sm["classical_benchmarks_present"] = True

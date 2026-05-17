@@ -57,7 +57,7 @@ def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
     )
 
 
-def test_psi4_solver_lacks_restricted_active_space_hamiltonian() -> None:
+def test_psi4_solver_supports_restricted_active_space_hamiltonian() -> None:
     from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
     from qchem_stack.config import load_experiment_config
 
@@ -65,7 +65,7 @@ def test_psi4_solver_lacks_restricted_active_space_hamiltonian() -> None:
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     cfg.scf.driver = "psi4"  # type: ignore[misc]
     sol = Psi4IntegralSolver.from_experiment_config(cfg)
-    assert not sol.capabilities.supports_restricted_active_space_qubit_hamiltonian
+    assert sol.capabilities.supports_restricted_active_space_qubit_hamiltonian
 
 
 def test_classical_reference_fermionic_operator_matches_canonical_pack() -> None:

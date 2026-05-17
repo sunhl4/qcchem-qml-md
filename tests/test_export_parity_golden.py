@@ -161,7 +161,7 @@ active_space:
         caps = data.get("solver_capabilities_snapshot")
         assert isinstance(caps, dict)
         assert caps.get("backend_id") == "psi4"
-        assert caps.get("supports_restricted_active_space_qubit_hamiltonian") is False
+        assert caps.get("supports_restricted_active_space_qubit_hamiltonian") is True
     finally:
         cfg.unlink(missing_ok=True)
 
@@ -176,6 +176,14 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
     assert out.get("qse_shot_mode_from_run_meta") == "dense_reference_only"
     assert out.get("sceom_shot_noise_model_from_run") == "none"
     assert out.get("sceom_shots_per_matrix_element_from_run") == 0
+    pqi = out.get("pre_quantum_input_from_run") or {}
+    assert pqi.get("source") == "canonical_active_space_integral_pack"
+    assert pqi.get("backend_tag") == "pyscf"
+    assert out.get("pre_quantum_build_cache_from_run", {}).get("pack_builds") == 1
+    assert out.get("pre_quantum_source_mirror_run_summary") == "canonical_active_space_integral_pack"
+    ph = out.get("pre_quantum_handoff_v1_from_parity_snapshot") or {}
+    assert ph.get("hamiltonian_branch") == "canonical_active_space_integral_pack"
+    assert out.get("pre_quantum_build_cache_v1_from_parity_snapshot", {}).get("pack_builds") == 1
 
 
 @pytest.mark.parametrize(
@@ -204,6 +212,8 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
         "configs/example_h2_avas.yaml",
         "configs/example_h2_classical_shadows_stub.yaml",
         "configs/example_decomposition_plugin_contract.yaml",
+        "configs/example_h2_precomputed_bundle.yaml",
+        "configs/example_h4_schmidt_multifragment.yaml",
     ),
 )
 def test_m2_config_only_export_stable_keys(cfg_rel: str) -> None:

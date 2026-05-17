@@ -21,6 +21,24 @@ if TYPE_CHECKING:
 SCHEMA_V1 = "qchem_canonical_active_space_integral_pack_v1"
 
 
+def _pack_provenance(
+    *,
+    classical_backend: str,
+    upstream_integral_source: str,
+    integral_openfermion_bridge: str,
+    driver_meta: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    out: dict[str, Any] = {
+        "pack_schema": SCHEMA_V1,
+        "upstream_integral_source": upstream_integral_source,
+        "integral_openfermion_bridge": integral_openfermion_bridge,
+        "classical_backend": classical_backend,
+    }
+    if driver_meta:
+        out["classical_reference_meta"] = dict(driver_meta)
+    return out
+
+
 @dataclass(frozen=True)
 class CanonicalActiveSpaceIntegralPack:
     """Restricted active-space MO integrals + provenance for qubit Hamiltonian construction."""
@@ -48,15 +66,12 @@ class CanonicalActiveSpaceIntegralPack:
             n_active_orbitals=n_active_orbitals,
             n_active_electrons=n_active_electrons,
         )
-        prov: dict[str, Any] = {
-            "pack_schema": SCHEMA_V1,
-            "upstream_integral_source": "pyscf_casci_h2eff_compact",
-            "integral_openfermion_bridge": "pyscf_tangelo_openfermion_v1",
-            "classical_backend": "pyscf",
-        }
-        dm = getattr(rhf, "driver_meta", None) or {}
-        if dm:
-            prov["classical_reference_meta"] = dict(dm)
+        prov = _pack_provenance(
+            classical_backend="pyscf",
+            upstream_integral_source="pyscf_casci_h2eff_compact",
+            integral_openfermion_bridge="pyscf_tangelo_openfermion_v1",
+            driver_meta=getattr(rhf, "driver_meta", None) or {},
+        )
         return cls(compact=compact, provenance=prov)
 
     @classmethod
@@ -72,15 +87,12 @@ class CanonicalActiveSpaceIntegralPack:
         This is the preferred entry for downstream code. Backend-specific builders
         stay encapsulated here so pipeline/algorithms do not branch on driver names.
         """
+        from qchem_stack.chem.integrals.exporter_registry import get_active_space_integral_exporter
+
         tag = reference.backend_tag()
-        if tag == "pyscf":
-            return cls.from_pyscf_reference(
-                reference.as_pyscf_rhf_result(),
-                n_active_orbitals=n_active_orbitals,
-                n_active_electrons=n_active_electrons,
-            )
-        raise NotImplementedError(
-            "CanonicalActiveSpaceIntegralPack.from_classical_reference has no integral builder "
-            f"for backend {tag!r} yet. Implement backend-specific active-space integral export "
-            "and route it through this method."
+        exporter = get_active_space_integral_exporter(tag)
+        return exporter.build_canonical_pack(
+            reference,
+            n_active_orbitals=n_active_orbitals,
+            n_active_electrons=n_active_electrons,
         )

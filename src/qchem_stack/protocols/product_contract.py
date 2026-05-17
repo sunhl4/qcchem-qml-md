@@ -29,6 +29,7 @@ PARITY_EXPORT_V3_STABLE_KEYS: frozenset[str] = frozenset(
         "protocol_expectation_semantics_v1",
         "geometry_source",
         "embedding",
+        "pre_quantum_semantics_from_config",
     }
 )
 

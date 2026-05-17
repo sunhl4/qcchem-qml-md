@@ -39,14 +39,28 @@ def open_driver_coverage_matrix() -> dict[str, Any]:
                 "note": "Use PySCF ecosystem + explicit benchmarks; no vendor binary.",
             },
             {
-                "parity_matrix_row_label": "AVAS / full CASSCF product workflows (Fe4N2-style tutorials)",
-                "status": "not_claimed",
-                "note": "No AVAS driver; CASCI-sized active integrals only where documented (projection path).",
+                "parity_matrix_row_label": "AVAS active-space projection (PySCF mcscf.avas)",
+                "status": "partial_pyscf",
+                "implementation": (
+                    "active_space.strategy=avas + chemistry_extended.avas_ao_labels; "
+                    "SolverCapabilities.supports_avas_active_space_projection"
+                ),
             },
             {
-                "parity_matrix_row_label": "CASSCF orbital optimization loop (vendor PySCF extension class surface)",
-                "status": "not_claimed",
-                "note": "classical_reference_method and matrix rows are documentation hooks unless PySCF CASCI-only path applies.",
+                "parity_matrix_row_label": "CASSCF orbital optimization audit / feed (PySCF mcscf.CASSCF)",
+                "status": "partial_pyscf",
+                "implementation": (
+                    "chemistry_extended.casscf_orbital_optimization_audit / "
+                    "casscf_orbital_optimization_for_integrals on molecular RHF"
+                ),
+            },
+            {
+                "parity_matrix_row_label": "Psi4 restricted active-space CASCI integrals → qubit Hamiltonian",
+                "status": "yes_psi4",
+                "implementation": (
+                    "scf.driver=psi4 + CanonicalActiveSpaceIntegralPack via "
+                    "chem.integrals.psi4_active_space_exporter (RHF, small active spaces)"
+                ),
             },
         ],
     }

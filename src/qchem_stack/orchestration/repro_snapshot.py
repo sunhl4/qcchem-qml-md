@@ -215,5 +215,8 @@ def repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -
     snap["nexus_cloud"] = cfg.nexus_cloud.model_dump(mode="json")
     snap["tensornet_expectation_stub"] = bool(cfg.quantum.tensornet_expectation_stub)
     snap["tensornet_contraction_engine"] = cfg.quantum.tensornet_contraction_engine
+    from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
+
+    snap.update(pre_quantum_hamiltonian_semantics(cfg))
     append_open_stack_parity_fields(snap, cfg)
     return snap

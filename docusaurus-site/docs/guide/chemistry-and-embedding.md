@@ -25,6 +25,12 @@ P1 对应化学问题定义层：把“要算什么”描述清楚，再交给�
 - 保持问题定义与执行参数分层
 - 对关键字段保留可读注释，方便团队协作
 
+## 何时改算符 vs 何时仅审计
+
+- **变分之前**（`build_pre_quantum_stage`）：Schmidt、projection、`embedding.mode=plugin`、或默认 **canonical active-space integral pack** 会确定 `QubitHamiltonian`；`PreQuantumInput.meta` 与 `repro.parity_snapshot` 写入 `hamiltonian_branch`、`hamiltonian_fixed_before_variational`。
+- **变分之后**（`embedding_workflow`）：DMET fragment 演示、Schmidt per-fragment VQE、ONIOM 玩具元数据等 **不** 改写主路径上的 `qh`；`post_variational_embedding_audit_only=true` 表示审计/演示用途。
+- 允许/禁止的 YAML 组合见仓库 [`docs/pre_quantum_yaml_matrix.md`](https://github.com/NVIDIA/qcchem-qml-md/blob/main/docs/pre_quantum_yaml_matrix.md)（机读验收表）。
+
 ## 下一步
 
 - [后端适配快速接入](./backend-adapter-quickstart)（新经典后端、`scf.driver`、entry points）

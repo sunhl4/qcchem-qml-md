@@ -60,6 +60,10 @@ def test_pre_quantum_summary_exposes_stable_handoff_fields() -> None:
     assert summary["hamiltonian_fingerprint"] == "abc123"
     assert summary["hamiltonian_summary"]["integral_openfermion_bridge"].endswith("_v1")
     assert summary["hamiltonian_meta"]["n_active_orbitals"] == 1
+    assert summary["reference_energy_au"] == 0.0
+    assert summary["scf_energy_au"] == 0.0
+    assert summary["n_active_orbitals"] == 1
+    assert summary["n_active_electrons"] == 1
     assert not summary["has_canonical_active_space_integral_pack"]
 
 

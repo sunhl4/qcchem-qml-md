@@ -1,9 +1,16 @@
 from __future__ import annotations
 
 import importlib.util
+import os
 import subprocess
 import sys
 from pathlib import Path
+
+
+def _subprocess_env(root: Path) -> dict[str, str]:
+    env = dict(os.environ)
+    env["PYTHONPATH"] = f"{root / 'src'}{os.pathsep}{root}"
+    return env
 
 
 def _load_scaffold_module():
@@ -34,6 +41,7 @@ def test_create_solver_adapter_scaffold_writes_template(tmp_path: Path) -> None:
         capture_output=True,
         text=True,
         check=False,
+        env=_subprocess_env(root),
     )
     assert cp.returncode == 0, cp.stderr
     txt = out.read_text(encoding="utf-8")
@@ -53,6 +61,7 @@ def test_create_solver_adapter_scaffold_rejects_invalid_backend_id(tmp_path: Pat
         capture_output=True,
         text=True,
         check=False,
+        env=_subprocess_env(root),
     )
     assert cp.returncode != 0
 
@@ -78,6 +87,7 @@ def test_create_solver_adapter_scaffold_with_demo_register(tmp_path: Path) -> No
         capture_output=True,
         text=True,
         check=False,
+        env=_subprocess_env(root),
     )
     assert cp.returncode == 0, cp.stderr
     demo_txt = demo.read_text(encoding="utf-8")
@@ -86,5 +96,11 @@ def test_create_solver_adapter_scaffold_with_demo_register(tmp_path: Path) -> No
     assert "scaffold_xyz" in demo_txt
     assert str(solver.resolve()) in demo_txt
 
-    run = subprocess.run([sys.executable, str(demo)], cwd=str(root), capture_output=True, text=True)
+    run = subprocess.run(
+        [sys.executable, str(demo)],
+        cwd=str(root),
+        capture_output=True,
+        text=True,
+        env=_subprocess_env(root),
+    )
     assert run.returncode == 0, run.stdout + run.stderr

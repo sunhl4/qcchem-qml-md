@@ -30,19 +30,26 @@ Pipeline 输出的 `out["pre_quantum_input"]` 仍保留完整 `hamiltonian_meta`
 | `integral_source` | 哈密顿量积分/Pauli 来源；优先来自 `CanonicalActiveSpaceIntegralPack.provenance` 或 bundle/plugin schema |
 | `fermion_to_qubit_map` | `jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`，若上游无法声明则可为空 |
 | `hamiltonian_fingerprint` | 排序 Pauli 项与系数的稳定 SHA-256 摘要前缀 |
+| `reference_energy_au` / `scf_energy_au` | 经典参考态总能量（与 `out["scf_energy"]` 对账） |
+| `n_active_orbitals` / `n_active_electrons` | 活性空间尺寸（pack 或 qubit meta） |
+| `hamiltonian_branch` | `canonical_active_space_integral_pack` / `schmidt` / `projection` / `plugin` / `precomputed` |
+| `hamiltonian_fixed_before_variational` | 变分前算符是否已固定 |
+| `post_variational_embedding_audit_only` | 变分后 `embedding_workflow` 是否仅审计 |
 | `hamiltonian_summary` | 上述字段加 `integral_openfermion_bridge`、`jw_build`、active-space 尺寸等轻量补充 |
 | `hamiltonian_meta` | 完整历史元数据；可能较大，供调试和深度审计 |
 | `canonical_active_space_integral_pack` | canonical pack 存在时包含 schema、provenance、active-space 尺寸与 compact storage schema |
 
 分支 `source` 当前约定：
 
+<!-- BEGIN:PRE_QUANTUM_SOURCE_TABLE -->
 | source | 路径 |
 |---|---|
-| `canonical_active_space_integral_pack` | 在线经典主路径：`ClassicalMeanFieldReference` → `CanonicalActiveSpaceIntegralPack` → `QubitHamiltonian` |
 | `precomputed_bundle` | 离线 bundle 直接提供 pre-quantum Hamiltonian |
 | `embedding_plugin` | `embedding.mode=plugin` 的 decomposition JSON / 外部 fragment payload |
-| `projection_fragment_mulliken_mo` | PySCF Mulliken MO projection 分支 |
 | `schmidt_atomic_production` | Schmidt impurity Hamiltonian 分支 |
+| `projection_fragment_mulliken_mo` | PySCF Mulliken MO projection 分支 |
+| `canonical_active_space_integral_pack` | 在线经典主路径：`ClassicalMeanFieldReference` → `CanonicalActiveSpaceIntegralPack` → `QubitHamiltonian` |
+<!-- END:PRE_QUANTUM_SOURCE_TABLE -->
 
 `integral_source` 与 `integral_openfermion_bridge` 不应硬编码假装来自 PySCF。优先级为：显式参数 > canonical pack provenance > 后端标签兜底；离线 bundle 与 decomposition plugin 使用自己的 Pauli-term 来源标签。
 
@@ -127,11 +134,22 @@ python scripts/build_precomputed_bundle.py \
   --mo-energy "-0.580628,0.676341"
 ```
 
-## 7. 兼容性说明
+## 7. 推荐 import（建哈密顿量 / PreQuantumInput）
+
+| 场景 | 推荐入口 | 避免 |
+|---|---|---|
+| 端到端 YAML | `qchem_stack.orchestration.pipeline.run_pipeline_sync` / `run_pipeline_from_config` | 手写 SCF + 旧 `molecular_hamiltonian_from_classical_reference` |
+| 库内已有 `ExperimentConfig` + `ClassicalMeanFieldReference` | `qchem_stack.chem.pre_quantum_build.build_pre_quantum_input` | 直接调 `hamiltonian_with_schmidt_context`（编排层） |
+| 仅要 `QubitHamiltonian`（遗留脚本） | `build_pre_quantum_input(...).qubit_hamiltonian` | `molecular_hamiltonian_from_classical_reference`（已 `DeprecationWarning`） |
+| 允许/禁止 YAML 组合 | `docs/pre_quantum_yaml_matrix.md` | 在业务代码里硬编码 driver 字符串分支 |
+
+单次 pipeline run 内，`RunBuildCache` 会复用相同 `(cfg, mean_field)` 的 `CanonicalActiveSpaceIntegralPack`；统计见 `out["pre_quantum_build_cache"]`。
+
+## 8. 兼容性说明
 
 - 在线线路与离线线路最终都会产出 `PreQuantumInput`，量子侧入口统一。
 - `precomputed` 线路不提供在线后端相关的派生能力（如 AO/Lowdin embedding 输入、在线 RDM 修正）。
 - 配置约束：
   - `scf.driver='precomputed'` 时必须给 `scf.precomputed_bundle_path`
   - 其它 driver 不允许给 `scf.precomputed_bundle_path`
-- `scf.driver=psi4` 当前仍是能量/注册表浅接入，不参与默认 active-space qubit Hamiltonian 主路径。Psi4 真实积分导出与 `CanonicalActiveSpaceIntegralPack.from_classical_reference` 分发属于 Phase 2。
+- `scf.driver=psi4`：闭壳 RHF + 小活性空间可走 `CanonicalActiveSpaceIntegralPack`（`chem.integrals.psi4_active_space_exporter`）；**不**支持 Schmidt / AVAS / Mulliken projection（配置层拒绝，见 `pre_quantum_yaml_matrix.md`）。

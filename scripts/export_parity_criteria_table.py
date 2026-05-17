@@ -37,6 +37,7 @@ from qchem_stack.integrations.workflow_preview import (
     workflow_preview_vqs_track_slice_v1,
 )
 from qchem_stack.md_bridge import QMFrame
+from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
 from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
 from qchem_stack.protocols.computable import computables_export_dict
 from qchem_stack.protocols.product_contract import (
@@ -126,6 +127,7 @@ def _table_from_config(
         "mitigation_zne_mode": cfg.mitigation.zne_mode,
         "mitigation_zne_scales": list(cfg.mitigation.zne_scales),
         "embedding": cfg.embedding.model_dump(),
+        "pre_quantum_semantics_from_config": pre_quantum_hamiltonian_semantics(cfg),
         "embedding_mode": cfg.embedding.mode,
         "embedding_input_representation": cfg.embedding.embedding_input_representation,
         "parity_integrations_dmet_stub_one_shot_ledger": cfg.parity_integrations.dmet_stub_one_shot_ledger,
@@ -249,6 +251,30 @@ def main() -> None:
             hm = data.get("hamiltonian_meta")
             if isinstance(hm, dict) and hm.get("hamiltonian_fingerprint") is not None:
                 out["hamiltonian_fingerprint_from_run"] = hm.get("hamiltonian_fingerprint")
+            pqi = data.get("pre_quantum_input")
+            if isinstance(pqi, dict):
+                out["pre_quantum_input_from_run"] = {
+                    k: pqi[k]
+                    for k in (
+                        "schema",
+                        "source",
+                        "backend_tag",
+                        "integral_source",
+                        "fermion_to_qubit_map",
+                        "hamiltonian_fingerprint",
+                        "reference_energy_au",
+                        "scf_energy_au",
+                        "n_active_orbitals",
+                        "n_active_electrons",
+                        "hamiltonian_branch",
+                        "hamiltonian_fixed_before_variational",
+                        "post_variational_embedding_audit_only",
+                    )
+                    if k in pqi and pqi[k] is not None
+                }
+            pbc = data.get("pre_quantum_build_cache")
+            if isinstance(pbc, dict):
+                out["pre_quantum_build_cache_from_run"] = dict(pbc)
             cb = data.get("classical_benchmarks")
             if isinstance(cb, dict):
                 out["classical_benchmarks_from_run"] = cb
@@ -348,6 +374,13 @@ def main() -> None:
                     "rdm_correction_readiness_reference_wavefunction",
                     "rdm_correction_readiness_kernel_class",
                     "rdm_correction_readiness_nevpt2_pyscf_status",
+                    "pre_quantum_source",
+                    "pre_quantum_backend_tag",
+                    "pre_quantum_hamiltonian_branch",
+                    "hamiltonian_fingerprint",
+                    "hamiltonian_fixed_before_variational",
+                    "pre_quantum_pack_builds",
+                    "pre_quantum_pack_hits",
                 ):
                     if key in rsum and rsum[key] is not None:
                         out[f"{key}_mirror_run_summary"] = rsum[key]
@@ -409,6 +442,12 @@ def main() -> None:
                 ogr = psnap.get("open_gap_closure_reference")
                 if isinstance(ogr, dict) and ogr.get("schema") is not None:
                     out["open_gap_closure_reference_schema_from_run"] = ogr.get("schema")
+                ph = psnap.get("pre_quantum_handoff_v1")
+                if isinstance(ph, dict):
+                    out["pre_quantum_handoff_v1_from_parity_snapshot"] = dict(ph)
+                pbc = psnap.get("pre_quantum_build_cache_v1")
+                if isinstance(pbc, dict):
+                    out["pre_quantum_build_cache_v1_from_parity_snapshot"] = dict(pbc)
             vqd_block = data.get("vqd")
             if isinstance(vqd_block, dict):
                 vmeta = vqd_block.get("meta")

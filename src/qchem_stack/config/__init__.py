@@ -17,6 +17,10 @@ Layout: submodules by area (:mod:`molecule`, :mod:`geometry_files`, :mod:`scf`, 
 from __future__ import annotations
 
 from ._constants import ANGSTROM_TO_BOHR
+from ._experiment_validation import (
+    SCHMIDT_DMET_MAX_CYCLES_LIMIT,
+    validate_pre_quantum_contract,
+)
 from .active_space import ActiveSpaceSpec
 from .backend import BackendSpecConfig
 from .chemistry_extended import ChemistryExtendedSpec
@@ -62,6 +66,7 @@ __all__ = [
     "ParityIntegrationsSpec",
     "QuantumSpec",
     "SCFSpec",
+    "SCHMIDT_DMET_MAX_CYCLES_LIMIT",
     "backend_spec_from_config",
     "compiler_bundle_signature_from_config",
     "compiler_pass_bundle_from_config",
@@ -71,4 +76,5 @@ __all__ = [
     "merge_molecule_dict_from_geometry_file",
     "parse_xyz",
     "preprocess_experiment_dict_geometry_files",
+    "validate_pre_quantum_contract",
 ]

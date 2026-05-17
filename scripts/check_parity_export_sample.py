@@ -23,6 +23,7 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_h2.yaml",
     # Second backend (`scf.driver=psi4`): registry + capabilities snapshot in export (no PySCF required).
     "configs/example_h2_psi4_rhf_sto3g.yaml",
+    "configs/example_h2_precomputed_bundle.yaml",
     "configs/example_h2_excited_smoke.yaml",
     "configs/example_h2_iqeb.yaml",
     "configs/example_h2_adapt_singles_pool.yaml",
@@ -45,6 +46,7 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_h2_pbc_gamma.yaml",
     "configs/example_oniom_toy.yaml",
     "configs/example_h4_dmet_fragment_exact_small.yaml",
+    "configs/example_h4_schmidt_multifragment.yaml",
     "configs/example_h2_qpe_track.yaml",
     "configs/example_h2_vqs_track.yaml",
     "configs/example_h2_qpe_track_parity_integrations.yaml",

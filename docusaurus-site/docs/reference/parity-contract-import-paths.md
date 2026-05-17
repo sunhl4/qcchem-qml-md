@@ -31,6 +31,12 @@ description: qchem_stack.protocols.product_contract 与 qchem_stack.integrations
 ./scripts/venv-run python -c "from qchem_stack.integrations.workflow_preview import computable_graph_v2; print(callable(computable_graph_v2))"
 ```
 
+## Pre-quantum YAML 组合矩阵
+
+允许/禁止的 `scf.driver` × `embedding.mode` × 活性空间策略组合见仓库根目录 **`docs/pre_quantum_yaml_matrix.md`**（与 `config/_experiment_validation.py` 同源）。
+
+Config-only parity 导出稳定键包含 **`pre_quantum_semantics_from_config`**（`PARITY_EXPORT_V3_STABLE_KEYS`）：无需跑 pipeline 即可在 Methods/parity 表中声明 `hamiltonian_branch` 与 `post_variational_embedding_audit_only`。离线样例：`configs/example_h2_precomputed_bundle.yaml`。
+
 ## 关联阅读
 
 - [DMET 与 parity_snapshot](../reference/dmet-parity-snapshot)（语义表；快照键列表以源码与导出脚本为准）  

@@ -116,14 +116,40 @@ After intentional contract changes to **`product_gap_categories()`**, **`PARITY_
 
 [`.github/dependabot.yml`](.github/dependabot.yml) 会定期开 PR：**GitHub Actions**（仓库根，按周、同批合并）、**pip / `pyproject.toml`**（按月）、**`docusaurus-site` npm**（按周）。合并前仍按本页 **Lint / Tests / parity** 自检。
 
+## Pre-quantum stack（维护清单）
+
+经典 → `PreQuantumInput` → 量子变分的主路径。改下列区域时，请同步对应测试与文档。
+
+| 区域 | 模块 / 文档 | 合并前自检 |
+|------|-------------|------------|
+| **配置门禁** | `config/_experiment_validation.py`，`validate_pre_quantum_contract` | `pytest tests/test_config_pre_quantum_combos.py tests/test_validate_pre_quantum_contract.py -q` |
+| **公开构建 API** | `chem/pre_quantum_build.build_pre_quantum_input`；勿再教用户直接用 `molecular_hamiltonian_from_classical_reference` | `pytest tests/test_build_pre_quantum_input_api.py -q` |
+| **装配（chem）** | `chem/pre_quantum_build.py`（`build_pre_quantum_input` / `build_pre_quantum_input_with_context`），分支见 `chem/pre_quantum_path.py` | `pytest tests/test_build_pre_quantum_input_api.py -q` |
+| **管线阶段（编排）** | `stage_execution.build_pre_quantum_stage`（precomputed / live 分叉与计时） | `pytest tests/test_orchestration_pipeline.py tests/test_pre_quantum_input_contract.py -q` |
+| **单次 run 缓存** | `chem/bridges/run_build_cache.py` → `out["pre_quantum_build_cache"]` | `pytest tests/test_run_build_cache.py -q` |
+| **分支解析** | `chem/pre_quantum_path.py`（与 `hamiltonian_semantics` / 校验共用） | `pytest tests/test_pre_quantum_path.py -q` |
+| **嵌入语义** | `chem/embedding/hamiltonian_semantics.py`；`parity_snapshot.pre_quantum_handoff_v1` | `pytest tests/test_embedding_hamiltonian_semantics.py -q` |
+| **活性空间 exporter** | `chem/integrals/*_active_space_exporter.py`，`canonical_integral_pack` | `pytest tests/test_canonical_integral_pack.py -q` |
+| **Psi4（可选）** | `chem/integrals/psi4_active_space.py`；CI job `test-psi4` | `pytest -m psi4 -q`（本机需 `pip install psi4`） |
+| **YAML 组合表** | `docs/pre_quantum_yaml_matrix.md` | 新增/禁止组合时更新矩阵 + 负例测试 |
+| **Parity 导出** | `pre_quantum_semantics_from_config` ∈ `PARITY_EXPORT_V3_STABLE_KEYS` | `pytest tests/test_export_pre_quantum_semantics.py`；`python scripts/check_parity_export_sample.py` |
+
+推荐端到端样例：`configs/example_h2.yaml`（PySCF canonical）、`configs/example_h2_precomputed_bundle.yaml`（离线）、`configs/example_h2_psi4_rhf_sto3g.yaml`（Psi4）、`configs/example_h4_schmidt_multifragment.yaml`（Schmidt，`-m slow`）。
+
 ## Smoke orchestration
 
-Requires PySCF (`pip install qchem-stack[chem]`):
+PySCF paths (`pip install qchem-stack[chem]`):
 
 ```bash
 ./scripts/venv-run python scripts/smoke_pipeline.py
 ./scripts/venv-run python scripts/smoke_pipeline.py --iqeb
 ./scripts/venv-run python scripts/smoke_pipeline.py --projection-trace
+```
+
+**Pre-quantum 离线 lane**（无需 PySCF，读 `precomputed_classical_reference_h2.json`）：
+
+```bash
+./scripts/venv-run python scripts/smoke_pipeline.py --precomputed-only
 ```
 
 ## Examples / tutorials

@@ -79,6 +79,28 @@ def test_qubit_hamiltonian_from_bundle_indexed_labels(tmp_path: Path) -> None:
     assert len(qh.meta["hamiltonian_fingerprint"]) == 32
 
 
+def test_qubit_hamiltonian_from_bundle_rejects_conflicting_indexed_labels(tmp_path: Path) -> None:
+    p = tmp_path / "bundle_conflicting_indexed.json"
+    payload = {
+        "schema": CLASSICAL_REFERENCE_BUNDLE_V1,
+        "classical_reference": {
+            "e_tot": -1.0,
+            "mo_energy": [-0.5, 0.2],
+        },
+        "pre_quantum_input": {
+            "qubit_hamiltonian": {
+                "n_qubits": 2,
+                "terms": [
+                    {"label": "X0 Z0", "coeff": 0.5},
+                ],
+            },
+        },
+    }
+    p.write_text(json.dumps(payload), encoding="utf-8")
+    with pytest.raises(ValueError, match="conflicting indexed Pauli tokens"):
+        qubit_hamiltonian_from_bundle(str(p))
+
+
 def test_parse_precomputed_manifest_validates_fields(tmp_path: Path) -> None:
     p = tmp_path / "bundle_with_manifest.json"
     payload = {

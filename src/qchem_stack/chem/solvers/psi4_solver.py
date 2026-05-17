@@ -51,8 +51,8 @@ def _scf_energy_with_wavefunction(
     basis: str,
     method: str,
     max_cycle: int | None,
-) -> tuple[float | None, np.ndarray | None, str | None]:
-    """Run Psi4 SCF and return ``(e_tot, mo_energy, reason)``.
+) -> tuple[float | None, np.ndarray | None, Any | None, str | None]:
+    """Run Psi4 SCF and return ``(e_tot, mo_energy, wavefunction, reason)``.
 
     ``reason`` is ``None`` on success and a stable string token on failure.
     """
@@ -60,12 +60,12 @@ def _scf_energy_with_wavefunction(
         geom = _normalize_coords_bohr(coords_bohr)
         _validate_symbols_coords(symbols, geom)
     except ValueError as exc:
-        return None, None, str(exc)
+        return None, None, None, str(exc)
 
     try:
         import psi4
     except ImportError:
-        return None, None, "psi4_import_missing"
+        return None, None, None, "psi4_import_missing"
 
     try:
         psi4.core.clean()
@@ -86,9 +86,9 @@ def _scf_energy_with_wavefunction(
                 mo = np.asarray(eps_a.np, dtype=float)
         except Exception:
             pass
-        return float(e_au), mo, None
+        return float(e_au), mo, wfn, None
     except Exception as exc:  # noqa: BLE001
-        return None, None, f"{type(exc).__name__}: {exc}"
+        return None, None, None, f"{type(exc).__name__}: {exc}"
 
 
 def _psi4_geometry_block(
@@ -121,7 +121,7 @@ def psi4_hf_total_energy_au(
 
     Returns ``(energy_hartree, None)`` on success or ``(None, reason_string)``.
     """
-    e_au, _, reason = _scf_energy_with_wavefunction(
+    e_au, _, _, reason = _scf_energy_with_wavefunction(
         symbols=list(symbols),
         coords_bohr=np.asarray(coords_bohr, dtype=float),
         charge=int(charge),
@@ -170,7 +170,7 @@ class Psi4IntegralSolver:
             "driver_family": "psi4",
             "scf_method": str(self._method),
             "upstream_classical_software_tag": "psi4",
-            "integral_representation": "unknown_energy_only_stub",
+            "integral_representation": "psi4_wavefunction_rhf",
             "psi4_energy_reason": reason,
             "psi4_version": psi4_version_or_unknown(),
             "ecp": self._system.ecp,
@@ -207,7 +207,7 @@ class Psi4IntegralSolver:
             supports_uhf=False,
             supports_implicit_solvent_ddcosmo=False,
             supports_qmmm=False,
-            supports_restricted_active_space_qubit_hamiltonian=False,
+            supports_restricted_active_space_qubit_hamiltonian=True,
             supports_projection_fragment_mulliken_hamiltonian=False,
             supports_schmidt_atomic_hamiltonian=False,
             supports_embedding_input_ao_lowdin=False,
@@ -253,7 +253,7 @@ class Psi4IntegralSolver:
 
     def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
         """Run Psi4 RHF when bindings are available (optional environment)."""
-        e_au, mo_energies, reason = _scf_energy_with_wavefunction(
+        e_au, mo_energies, wfn, reason = _scf_energy_with_wavefunction(
             symbols=list(self._system.symbols),
             coords_bohr=np.asarray(self._system.coordinates_bohr, dtype=float),
             charge=int(self._system.charge),
@@ -262,17 +262,12 @@ class Psi4IntegralSolver:
             method=str(self._method),
             max_cycle=self._cfg.scf.max_cycle,
         )
-        if e_au is None:
+        if e_au is None or wfn is None:
             raise RuntimeError(f"Psi4 SCF unavailable: {reason}")
         if mo_energies is None:
             mo_energies = np.asarray([float(e_au)], dtype=float)
         return MolecularMeanFieldResult(
-            mf={
-                "backend": "psi4",
-                "method": str(self._method),
-                "basis": str(self._system.basis),
-                "status": "energy_only_stub",
-            },
+            mf=wfn,
             e_tot=float(e_au),
             mo_energy=np.asarray(mo_energies, dtype=float),
             driver_meta=self._base_driver_meta(reason=None),

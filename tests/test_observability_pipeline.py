@@ -56,6 +56,13 @@ def test_pipeline_profile_v1_and_run_summary_slowest() -> None:
     sm = out["repro"].get("run_summary", {})
     assert "pipeline_total_wall_ms" in sm
     assert "pipeline_slowest_stage" in sm
+    assert "canonical_pack_ms" in names
+    assert "fermion_to_qubit_ms" in names
+    cache = out.get("pre_quantum_build_cache") or {}
+    assert cache.get("schema") == "run_build_cache_v1"
+    assert int(cache.get("pack_builds", 0)) >= 1
+    assert sm.get("pre_quantum_source") == "canonical_active_space_integral_pack"
+    assert sm.get("pre_quantum_pack_builds") == int(cache.get("pack_builds", 0))
     repro_json_dumps(out["repro"])
 
 

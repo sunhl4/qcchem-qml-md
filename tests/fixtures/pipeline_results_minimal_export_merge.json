@@ -1,18 +1,50 @@
 {
   "scf_energy": -1.0,
   "energy_after_variational": -1.1,
+  "pre_quantum_input": {
+    "schema": "pre_quantum_input_v1",
+    "source": "canonical_active_space_integral_pack",
+    "backend_tag": "pyscf",
+    "hamiltonian_fingerprint": "deadbeefdeadbeefdeadbeefdeadbeef",
+    "hamiltonian_branch": "canonical_active_space_integral_pack",
+    "hamiltonian_fixed_before_variational": true
+  },
+  "pre_quantum_build_cache": {
+    "schema": "run_build_cache_v1",
+    "pack_builds": 1,
+    "pack_hits": 0,
+    "pack_count": 1
+  },
   "repro": {
     "experiment_id": "minimal_fixture",
     "run_summary": {
       "stages_completed": ["scf", "variational"],
       "qpe_demo_track_ran": true,
-      "quantum_algorithm": "vqe"
+      "quantum_algorithm": "vqe",
+      "pre_quantum_source": "canonical_active_space_integral_pack",
+      "pre_quantum_hamiltonian_branch": "canonical_active_space_integral_pack",
+      "hamiltonian_fingerprint": "deadbeefdeadbeefdeadbeefdeadbeef",
+      "pre_quantum_pack_builds": 1
     },
     "parity_snapshot": {
       "tensornet_engine_resolved": "stub",
       "tensornet_fallback_reason": "stub_no_contraction",
       "open_gap_closure_reference": {
         "schema": "open_gap_closure_reference_v1"
+      },
+      "pre_quantum_handoff_v1": {
+        "source": "canonical_active_space_integral_pack",
+        "backend_tag": "pyscf",
+        "hamiltonian_fingerprint": "deadbeefdeadbeefdeadbeefdeadbeef",
+        "hamiltonian_branch": "canonical_active_space_integral_pack",
+        "hamiltonian_fixed_before_variational": true,
+        "post_variational_embedding_audit_only": true
+      },
+      "pre_quantum_build_cache_v1": {
+        "schema": "run_build_cache_v1",
+        "pack_builds": 1,
+        "pack_hits": 0,
+        "pack_count": 1
       }
     }
   },

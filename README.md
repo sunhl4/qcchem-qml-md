@@ -90,29 +90,23 @@ Smoke scripts and marker subsets mirror [.github/workflows/ci.yml](.github/workf
 ## Quick start
 
 ```python
+from pathlib import Path
 from qchem_stack.config import load_experiment_config
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 cfg = load_experiment_config("configs/example_h2.yaml")
-drv = PySCFDriver.from_config(cfg)
-result = drv.run_rhf()
-ref = ClassicalMeanFieldReference(
-    mf=result.mf,
-    e_tot=float(result.e_tot),
-    mo_energy=result.mo_energy,
-    molecular_system=result.molecular_system,
-    driver_meta=dict(result.driver_meta),
-)
-h = molecular_hamiltonian_from_classical_reference(
-    ref,
-    n_active_orbitals=2,
-    n_active_electrons=2,
-)
-# Optional JW knobs from YAML ``active_space``: ``prefer_restricted_spatial_fermion_for_jordan_wigner``,
-# ``jordan_wigner_coeff_atol`` (pass-through kwargs on ``molecular_hamiltonian_from_classical_reference``).
+out = run_pipeline_sync(cfg, cfg_path=Path("configs/example_h2.yaml"))
+pqi = out["pre_quantum_input"]  # PreQuantumInput.as_summary_dict() fields
+print(pqi["hamiltonian_fingerprint"], pqi["n_qubits"])
 ```
+
+Programmatic Hamiltonian build (library callers): use
+`qchem_stack.chem.pre_quantum_build.build_pre_quantum_input(cfg, reference, cfg_path=...)`.
+The legacy `molecular_hamiltonian_from_classical_reference` remains but emits a
+`DeprecationWarning`; prefer the YAML pipeline or `build_pre_quantum_input`.
+
+Allowed YAML combinations for the pre-quantum path are listed in
+[docs/pre_quantum_yaml_matrix.md](docs/pre_quantum_yaml_matrix.md).
 
 **Unified classical mean field** (any `scf.driver` registered in `chem/solvers`): `classical_mean_field_via_solver_bridge(cfg)` in `qchem_stack.chem.bridges.facade` returns `MolecularMeanFieldResult` with canonical `driver_meta` headers — same interchange shape the pipeline uses after SCF.
 

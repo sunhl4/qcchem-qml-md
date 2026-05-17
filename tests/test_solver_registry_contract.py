@@ -163,9 +163,10 @@ active_space:
 """,
         encoding="utf-8",
     )
-    cfg = load_experiment_config(cfg_path)
-    with pytest.raises(UnknownSolverError, match="Registered:"):
-        create_solver(cfg)
+    from pydantic import ValidationError
+
+    with pytest.raises(ValidationError, match="unknown_backend"):
+        load_experiment_config(cfg_path)
 
 
 def test_create_solver_rejects_invalid_driver_id() -> None:

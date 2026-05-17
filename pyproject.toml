@@ -47,6 +47,10 @@ markers = [
     "l1_excited: VQD/QSE/SCEOM unit tests (selective CI: pytest -m l1_excited)",
     "l1_md_ml: MD/ML bridge smoke (pytest -m l1_md_ml)",
     "slow: optional heavier chemistry smoke (DMET multi-fragment exact, etc.)",
+    "pyscf: requires PySCF installed",
+    "psi4: requires Psi4 installed (optional CI job)",
+    "no_pyscf: subprocess isolates precomputed lane without PySCF import",
+    "perf: soft wall-time guards (local/nightly only)",
 ]
 
 # CI **lint** job: `ruff check` + `ruff format --check` on `src/qchem_stack`,

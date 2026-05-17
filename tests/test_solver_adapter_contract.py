@@ -9,7 +9,6 @@ from qchem_stack.chem.solvers.adapter_contract import validate_solver_adapter_co
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
 
 
-@dataclass
 class _GoodSolver:
     @property
     def capabilities(self) -> SolverCapabilities:
@@ -35,6 +34,10 @@ class _GoodSolver:
 
     def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         del args, kwargs
+        return {}
+
+    def build_embedding_input_system(self, reference: Any, *, representation: str) -> dict[str, Any]:
+        del reference, representation
         return {}
 
 

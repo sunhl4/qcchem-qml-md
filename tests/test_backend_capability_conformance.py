@@ -14,10 +14,18 @@ from qchem_stack.chem.embedding.schmidt_production import (
     SchmidtProductionError,
     build_schmidt_impurity_integrals,
 )
+from qchem_stack.chem.integrals.exporter_protocol import ActiveSpaceIntegralExporter
+from qchem_stack.chem.integrals.exporter_registry import (
+    get_active_space_integral_exporter,
+    list_active_space_integral_exporters,
+    register_active_space_integral_exporter,
+)
+from qchem_stack.chem.integrals.pyscf_active_space_exporter import PySCFActiveSpaceIntegralExporter
 from qchem_stack.chem.solvers import create_solver, register_mock_external_solver
 from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import EmbeddingError, PipelineError
+from qchem_stack.exceptions import PreQuantumCapabilityError
 from qchem_stack.integrations.rdm_corrections import run_pyscf_nevpt2_casci_correction
 from qchem_stack.integrations.schmidt_dmet_self_consistent import (
     run_schmidt_density_feedback_cycles,
@@ -30,7 +38,7 @@ def test_builtin_backend_capability_matrix_smoke() -> None:
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     cfg.scf.driver = "psi4"
     psi4 = create_solver(cfg).capabilities
-    assert not psi4.supports_restricted_active_space_qubit_hamiltonian
+    assert psi4.supports_restricted_active_space_qubit_hamiltonian
     assert not psi4.supports_projection_fragment_mulliken_hamiltonian
     assert not psi4.supports_schmidt_atomic_hamiltonian
     assert not psi4.supports_embedding_input_ao_lowdin
@@ -64,9 +72,9 @@ def test_canonical_pack_requires_backend_builder() -> None:
             coordinates_bohr=np.zeros((1, 3), dtype=float),
             basis="sto-3g",
         ),
-        driver_meta={"upstream_classical_software_tag": "psi4"},
+        driver_meta={"upstream_classical_software_tag": "unknown_backend"},
     )
-    with pytest.raises(NotImplementedError, match="from_classical_reference"):
+    with pytest.raises(PreQuantumCapabilityError, match="No ActiveSpaceIntegralExporter"):
         CanonicalActiveSpaceIntegralPack.from_classical_reference(
             ref,
             n_active_orbitals=1,
@@ -123,3 +131,58 @@ def test_projection_and_schmidt_builders_require_pyscf_backend_tag() -> None:
     rep = run_pyscf_nevpt2_casci_correction(ref, n_active_orbitals=1, n_active_electrons=0)
     assert rep.get("status") == "failed"
     assert "backend_not_supported" in str((rep.get("pyscf_nevpt2") or {}).get("reason"))
+
+
+def test_pyscf_active_space_exporter_requires_pyscf_backend_tag() -> None:
+    ref = ClassicalMeanFieldReference(
+        mf=object(),
+        e_tot=0.0,
+        mo_energy=np.zeros(1, dtype=float),
+        molecular_system=MolecularSystem(
+            symbols=["H"],
+            coordinates_bohr=np.zeros((1, 3), dtype=float),
+            basis="sto-3g",
+        ),
+        driver_meta={"upstream_classical_software_tag": "psi4"},
+    )
+    with pytest.raises(ValueError, match="expected backend_tag='pyscf'"):
+        PySCFActiveSpaceIntegralExporter().build_canonical_pack(
+            ref,
+            n_active_orbitals=1,
+            n_active_electrons=0,
+        )
+
+
+def test_exporter_registry_lists_and_accepts_custom_backend() -> None:
+    class _DummyExporter(ActiveSpaceIntegralExporter):
+        backend_tag = "dummy"
+
+        def build_canonical_pack(self, reference, *, n_active_orbitals, n_active_electrons):
+            raise NotImplementedError
+
+    known = list_active_space_integral_exporters()
+    assert "pyscf" in known
+    assert "psi4" in known
+    register_active_space_integral_exporter("dummy", _DummyExporter())
+    known2 = list_active_space_integral_exporters()
+    assert "dummy" in known2
+
+
+def test_exporter_registry_requires_explicit_override() -> None:
+    class _ExporterA(ActiveSpaceIntegralExporter):
+        backend_tag = "tmp_override"
+
+        def build_canonical_pack(self, reference, *, n_active_orbitals, n_active_electrons):
+            raise NotImplementedError
+
+    class _ExporterB(ActiveSpaceIntegralExporter):
+        backend_tag = "tmp_override"
+
+        def build_canonical_pack(self, reference, *, n_active_orbitals, n_active_electrons):
+            raise NotImplementedError
+
+    register_active_space_integral_exporter("tmp_override", _ExporterA(), allow_override=True)
+    with pytest.raises(ValueError, match="already registered"):
+        register_active_space_integral_exporter("tmp_override", _ExporterB())
+    register_active_space_integral_exporter("tmp_override", _ExporterB(), allow_override=True)
+    assert isinstance(get_active_space_integral_exporter("tmp_override"), _ExporterB)

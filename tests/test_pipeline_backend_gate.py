@@ -10,13 +10,11 @@ from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabi
 from qchem_stack.chem.solvers.registry import register_solver
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import PipelineError
-from qchem_stack.orchestration.pipeline import (
-    _hamiltonian_with_schmidt_context,
-    run_pipeline_sync,
+from qchem_stack.chem.pre_quantum_build import (
+    build_pre_quantum_input_with_context,
+    schmidt_hamiltonian_and_context,
 )
-from qchem_stack.orchestration.pre_quantum_stage import (
-    schmidt_hamiltonian_and_context as _schmidt_hamiltonian_and_context,
-)
+from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 
 class _MockChemSolver:
@@ -45,10 +43,13 @@ def test_pipeline_rejects_backend_without_canonical_active_space_pack() -> None:
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "example_h2.yaml"
     cfg = load_experiment_config(p)
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
-    cfg.scf.driver = "psi4"  # emulate a backend lacking canonical-pack capability
+    from qchem_stack.orchestration.scf_stage import run_scf_reference
+
+    register_solver("mockchem", _MockChemSolver)
+    cfg.scf.driver = "mockchem"
+    rhf = run_scf_reference(cfg)
     with pytest.raises(PipelineError, match="canonical active-space integral pack"):
-        _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=p)
+        build_pre_quantum_input_with_context(cfg, rhf, cfg_path=p)
 
 
 def test_plugin_mode_bypasses_backend_active_space_gate() -> None:
@@ -57,7 +58,7 @@ def test_plugin_mode_bypasses_backend_active_space_gate() -> None:
     cfg = load_experiment_config(p)
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     cfg.scf.driver = "psi4"
-    pre_q, _ctx = _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=p)
+    pre_q, _ctx = build_pre_quantum_input_with_context(cfg, rhf, cfg_path=p)
     hmeta = pre_q.qubit_hamiltonian.meta
     assert hmeta.get("integral_source") == "decomposition_plugin_toy_v1"
     assert hmeta.get("hamiltonian_fingerprint")
@@ -72,7 +73,7 @@ def test_schmidt_path_rejects_backend_without_schmidt_capability() -> None:
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     cfg.scf.driver = "psi4"
     with pytest.raises(PipelineError, match="schmidt_atomic_production"):
-        _schmidt_hamiltonian_and_context(cfg, rhf)
+        schmidt_hamiltonian_and_context(cfg, rhf)
 
 
 def test_projection_fragment_mulliken_rejects_backend_without_capability() -> None:
@@ -82,7 +83,7 @@ def test_projection_fragment_mulliken_rejects_backend_without_capability() -> No
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     cfg.scf.driver = "psi4"
     with pytest.raises(PipelineError, match="projection\\.fragment_mulliken_mo"):
-        _hamiltonian_with_schmidt_context(cfg, rhf, cfg_path=p)
+        build_pre_quantum_input_with_context(cfg, rhf, cfg_path=p)
 
 
 def test_mockchem_canonical_pack_capability_missing() -> None:

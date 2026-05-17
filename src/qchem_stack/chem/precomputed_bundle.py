@@ -22,9 +22,42 @@ from qchem_stack.chem.hamiltonian import (
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
 from qchem_stack.contracts.schema_ids import (
     CLASSICAL_REFERENCE_BUNDLE_V1,
-    PRECOMPUTED_MANIFEST_SCHEMA_V1,
     PRE_QUANTUM_INPUT_SCHEMA_V1,
+    PRECOMPUTED_MANIFEST_SCHEMA_V1,
 )
+
+
+def _expect_object(value: Any, message: str) -> dict[str, Any]:
+    if not isinstance(value, dict):
+        raise ValueError(message)
+    return value
+
+
+def _expect_non_empty_list(value: Any, message: str) -> list[Any]:
+    if not isinstance(value, list) or not value:
+        raise ValueError(message)
+    return value
+
+
+def _coerce_int(value: Any, message: str) -> int:
+    try:
+        return int(value)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(message) from exc
+
+
+def _coerce_float(value: Any, message: str) -> float:
+    try:
+        return float(value)
+    except Exception as exc:  # noqa: BLE001
+        raise ValueError(message) from exc
+
+
+def _coerce_positive_int(value: Any, *, field: str) -> int:
+    out = _coerce_int(value, f"{field} must be an integer.")
+    if out < 1:
+        raise ValueError(f"{field} must be >= 1.")
+    return out
 
 
 def resolve_bundle_path(raw_path: str, *, cfg_path: Path | None = None) -> Path:
@@ -57,16 +90,12 @@ def molecular_mean_field_result_from_bundle(
     cfg_path: Path | None = None,
 ) -> MolecularMeanFieldResult:
     path, data = load_bundle_dict(raw_path, cfg_path=cfg_path)
-    block = data.get("classical_reference")
-    if not isinstance(block, dict):
-        raise ValueError("bundle.classical_reference must be an object.")
-    try:
-        e_tot = float(block["e_tot"])
-    except Exception as exc:  # noqa: BLE001
-        raise ValueError("bundle.classical_reference.e_tot must be numeric.") from exc
-    mo_raw = block.get("mo_energy")
-    if not isinstance(mo_raw, list) or not mo_raw:
-        raise ValueError("bundle.classical_reference.mo_energy must be a non-empty list.")
+    block = _expect_object(data.get("classical_reference"), "bundle.classical_reference must be an object.")
+    e_tot = _coerce_float(block["e_tot"], "bundle.classical_reference.e_tot must be numeric.")
+    mo_raw = _expect_non_empty_list(
+        block.get("mo_energy"),
+        "bundle.classical_reference.mo_energy must be a non-empty list.",
+    )
     mo_energy = np.asarray(mo_raw, dtype=float)
     driver_meta_raw = block.get("driver_meta")
     if driver_meta_raw is not None and not isinstance(driver_meta_raw, dict):
@@ -102,31 +131,25 @@ def qubit_hamiltonian_from_bundle_payload(
     *,
     path: Path,
 ) -> QubitHamiltonian:
-    pqi = data.get("pre_quantum_input")
-    if not isinstance(pqi, dict):
-        raise ValueError("bundle.pre_quantum_input must be an object.")
+    pqi = _expect_object(data.get("pre_quantum_input"), "bundle.pre_quantum_input must be an object.")
     schema = str(pqi.get("schema") or "")
     if schema and schema != PRE_QUANTUM_INPUT_SCHEMA_V1:
         raise ValueError(
             "bundle.pre_quantum_input.schema must be "
             f"{PRE_QUANTUM_INPUT_SCHEMA_V1!r} when provided (got {schema!r})."
         )
-    qh = pqi.get("qubit_hamiltonian")
-    if not isinstance(qh, dict):
-        raise ValueError("bundle.pre_quantum_input.qubit_hamiltonian must be an object.")
-    try:
-        n_qubits = int(qh["n_qubits"])
-    except Exception as exc:  # noqa: BLE001
-        raise ValueError(
-            "bundle.pre_quantum_input.qubit_hamiltonian.n_qubits must be an integer."
-        ) from exc
-    if n_qubits < 1:
-        raise ValueError("bundle.pre_quantum_input.qubit_hamiltonian.n_qubits must be >= 1.")
-    rows = qh.get("terms")
-    if not isinstance(rows, list) or not rows:
-        raise ValueError(
-            "bundle.pre_quantum_input.qubit_hamiltonian.terms must be a non-empty list."
-        )
+    qh = _expect_object(
+        pqi.get("qubit_hamiltonian"),
+        "bundle.pre_quantum_input.qubit_hamiltonian must be an object.",
+    )
+    n_qubits = _coerce_positive_int(
+        qh["n_qubits"],
+        field="bundle.pre_quantum_input.qubit_hamiltonian.n_qubits",
+    )
+    rows = _expect_non_empty_list(
+        qh.get("terms"),
+        "bundle.pre_quantum_input.qubit_hamiltonian.terms must be a non-empty list.",
+    )
     op = QubitOperator()
     for idx, row in enumerate(rows):
         if not isinstance(row, dict):
@@ -134,10 +157,7 @@ def qubit_hamiltonian_from_bundle_payload(
         label = str(row.get("label") or "")
         if not label:
             raise ValueError(f"terms[{idx}].label must be non-empty.")
-        try:
-            coeff = float(row["coeff"])
-        except Exception as exc:  # noqa: BLE001
-            raise ValueError(f"terms[{idx}].coeff must be numeric.") from exc
+        coeff = _coerce_float(row["coeff"], f"terms[{idx}].coeff must be numeric.")
         term = _label_to_term(label, n_qubits=n_qubits)
         op += coeff * QubitOperator(term, 1.0)
     meta = qh.get("meta")
@@ -166,11 +186,10 @@ def qubit_hamiltonian_from_bundle_payload(
 
 def parse_precomputed_manifest(data: dict[str, Any]) -> dict[str, Any] | None:
     """Return validated optional precomputed manifest payload."""
-    raw = data.get("manifest")
-    if raw is None:
+    raw_obj = data.get("manifest")
+    if raw_obj is None:
         return None
-    if not isinstance(raw, dict):
-        raise ValueError("bundle.manifest must be an object when present.")
+    raw = _expect_object(raw_obj, "bundle.manifest must be an object when present.")
     schema = str(raw.get("schema") or "")
     if schema and schema != PRECOMPUTED_MANIFEST_SCHEMA_V1:
         raise ValueError(
@@ -181,14 +200,10 @@ def parse_precomputed_manifest(data: dict[str, Any]) -> dict[str, Any] | None:
     if "config_fingerprint" in raw and raw["config_fingerprint"] is not None:
         out["config_fingerprint"] = str(raw["config_fingerprint"])
     if "n_active_orbitals" in raw and raw["n_active_orbitals"] is not None:
-        n_orb = int(raw["n_active_orbitals"])
-        if n_orb < 1:
-            raise ValueError("bundle.manifest.n_active_orbitals must be >= 1.")
+        n_orb = _coerce_positive_int(raw["n_active_orbitals"], field="bundle.manifest.n_active_orbitals")
         out["n_active_orbitals"] = n_orb
     if "n_active_electrons" in raw and raw["n_active_electrons"] is not None:
-        n_ele = int(raw["n_active_electrons"])
-        if n_ele < 1:
-            raise ValueError("bundle.manifest.n_active_electrons must be >= 1.")
+        n_ele = _coerce_positive_int(raw["n_active_electrons"], field="bundle.manifest.n_active_electrons")
         out["n_active_electrons"] = n_ele
     if "fermion_qubit_mapping" in raw and raw["fermion_qubit_mapping"] is not None:
         map_name = str(raw["fermion_qubit_mapping"]).strip().lower()
@@ -198,9 +213,7 @@ def parse_precomputed_manifest(data: dict[str, Any]) -> dict[str, Any] | None:
             )
         out["fermion_qubit_mapping"] = map_name
     if "n_qubits" in raw and raw["n_qubits"] is not None:
-        nq = int(raw["n_qubits"])
-        if nq < 1:
-            raise ValueError("bundle.manifest.n_qubits must be >= 1.")
+        nq = _coerce_positive_int(raw["n_qubits"], field="bundle.manifest.n_qubits")
         out["n_qubits"] = nq
     if "molecule_symbols" in raw and raw["molecule_symbols"] is not None:
         symbols_raw = raw["molecule_symbols"]
@@ -223,7 +236,7 @@ def _label_to_term(label: str, *, n_qubits: int) -> tuple[tuple[int, str], ...]:
         return ()
     if " " in s:
         parts = [x for x in s.split(" ") if x]
-        pairs: list[tuple[int, str]] = []
+        indexed: dict[int, str] = {}
         for tok in parts:
             m = _INDEXED_LABEL_TOKEN.match(tok)
             if m is None:
@@ -232,8 +245,13 @@ def _label_to_term(label: str, *, n_qubits: int) -> tuple[tuple[int, str], ...]:
             idx = int(m.group(2))
             if idx < 0 or idx >= n_qubits:
                 raise ValueError(f"Pauli index out of bounds for n_qubits={n_qubits}: {idx}")
-            pairs.append((idx, pauli))
-        return tuple(sorted(set(pairs), key=lambda x: x[0]))
+            prev = indexed.get(idx)
+            if prev is not None and prev != pauli:
+                raise ValueError(
+                    f"conflicting indexed Pauli tokens at qubit {idx}: {prev!r} vs {pauli!r}."
+                )
+            indexed[idx] = pauli
+        return tuple((idx, indexed[idx]) for idx in sorted(indexed))
     if len(s) != n_qubits:
         raise ValueError(
             f"compact Pauli label length {len(s)} must equal n_qubits={n_qubits} (label={label!r})."

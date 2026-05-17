@@ -30,3 +30,11 @@ class PipelineError(QChemStackError):
 
 class EmbeddingError(QChemStackError):
     """Fragment / bath / Schmidt embedding construction or self-consistency failure."""
+
+
+class PreQuantumError(QChemStackError):
+    """Base class for pre-quantum contract/build failures."""
+
+
+class PreQuantumCapabilityError(PreQuantumError):
+    """Selected backend or registered adapters cannot satisfy a required pre-quantum capability."""

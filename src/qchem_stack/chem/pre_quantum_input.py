@@ -14,6 +14,28 @@ from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldRefe
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.contracts.schema_ids import PRE_QUANTUM_INPUT_SCHEMA_V1
 
+# Keys copied from ``QubitHamiltonian.meta`` into branch-stable handoff meta / summaries.
+HAMILTONIAN_META_BRANCH_KEYS: tuple[str, ...] = (
+    "integral_source",
+    "fermion_to_qubit_map",
+    "hamiltonian_fingerprint",
+    "integral_openfermion_bridge",
+    "hamiltonian_fingerprint_truncated",
+    "jordan_wigner_coeff_atol",
+)
+
+HAMILTONIAN_META_SUMMARY_EXTRA_KEYS: tuple[str, ...] = (
+    "jw_build",
+    "n_active_orbitals",
+    "n_active_electrons",
+)
+
+HAMILTONIAN_SEMANTICS_KEYS: tuple[str, ...] = (
+    "hamiltonian_branch",
+    "hamiltonian_fixed_before_variational",
+    "post_variational_embedding_audit_only",
+)
+
 
 def pre_quantum_meta_from_hamiltonian(
     *,
@@ -26,20 +48,32 @@ def pre_quantum_meta_from_hamiltonian(
     out: dict[str, Any] = {
         "source": str(source),
         "n_qubits": int(qubit_hamiltonian.n_qubits),
-        "integral_source": hmeta.get("integral_source"),
-        "fermion_to_qubit_map": hmeta.get("fermion_to_qubit_map"),
-        "hamiltonian_fingerprint": hmeta.get("hamiltonian_fingerprint"),
     }
-    for key in (
-        "integral_openfermion_bridge",
-        "hamiltonian_fingerprint_truncated",
-        "jordan_wigner_coeff_atol",
-    ):
+    for key in HAMILTONIAN_META_BRANCH_KEYS:
         if key in hmeta:
             out[key] = hmeta[key]
     if extra:
         out.update(extra)
     return out
+
+
+def build_pre_quantum_meta(
+    cfg: Any,
+    *,
+    source: str,
+    qubit_hamiltonian: QubitHamiltonian,
+    extra: dict[str, Any] | None = None,
+) -> dict[str, Any]:
+    """Hamiltonian branch meta plus parity semantics (all ingress paths)."""
+    from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
+
+    meta = pre_quantum_meta_from_hamiltonian(
+        source=source,
+        qubit_hamiltonian=qubit_hamiltonian,
+        extra=extra,
+    )
+    meta.update(pre_quantum_hamiltonian_semantics(cfg))
+    return meta
 
 
 @dataclass(frozen=True)
@@ -61,33 +95,34 @@ class PreQuantumInput:
         source = str(self.meta.get("source") or "")
         hamiltonian_summary: dict[str, Any] = {
             "n_qubits": int(self.qubit_hamiltonian.n_qubits),
-            "integral_source": hmeta.get("integral_source"),
-            "fermion_to_qubit_map": hmeta.get("fermion_to_qubit_map"),
-            "hamiltonian_fingerprint": hmeta.get("hamiltonian_fingerprint"),
         }
-        for key in (
-            "integral_openfermion_bridge",
-            "jw_build",
-            "n_active_orbitals",
-            "n_active_electrons",
-            "hamiltonian_fingerprint_truncated",
-            "jordan_wigner_coeff_atol",
-        ):
+        for key in HAMILTONIAN_META_BRANCH_KEYS + HAMILTONIAN_META_SUMMARY_EXTRA_KEYS:
             if key in hmeta:
                 hamiltonian_summary[key] = hmeta[key]
+        na = hmeta.get("n_active_orbitals")
+        ne = hmeta.get("n_active_electrons")
+        if pack is not None:
+            na = int(pack.compact.n_active_orbitals)
+            ne = int(pack.compact.n_active_electrons)
         summary: dict[str, Any] = {
             "schema": self.schema,
             "source": source,
             "backend_tag": self.classical_reference.backend_tag(),
             "n_qubits": int(self.qubit_hamiltonian.n_qubits),
-            "integral_source": hamiltonian_summary.get("integral_source"),
-            "fermion_to_qubit_map": hamiltonian_summary.get("fermion_to_qubit_map"),
-            "hamiltonian_fingerprint": hamiltonian_summary.get("hamiltonian_fingerprint"),
+            "reference_energy_au": float(self.classical_reference.e_tot),
+            "scf_energy_au": float(self.classical_reference.e_tot),
+            "n_active_orbitals": na,
+            "n_active_electrons": ne,
             "hamiltonian_summary": hamiltonian_summary,
             "hamiltonian_meta": hmeta,
             "meta": dict(self.meta),
             "has_canonical_active_space_integral_pack": pack is not None,
         }
+        for key in HAMILTONIAN_META_BRANCH_KEYS:
+            summary[key] = hamiltonian_summary.get(key)
+        for key in HAMILTONIAN_SEMANTICS_KEYS:
+            if key in self.meta:
+                summary[key] = self.meta[key]
         if pack is not None:
             summary["canonical_active_space_integral_pack"] = {
                 "schema": pack.schema,

@@ -84,6 +84,12 @@ python scripts/build_precomputed_bundle.py \
   --mo-energy=-0.580628,0.676341
 ```
 
+## Pre-quantum 组合矩阵
+
+`scf.driver` × `embedding.mode` × 活性空间策略的允许/禁止规则见仓库 [`docs/pre_quantum_yaml_matrix.md`](https://github.com/NVIDIA/qcchem-qml-md/blob/main/docs/pre_quantum_yaml_matrix.md)（与 `config/_experiment_validation.py` 一致）。配置加载时可调用 `from qchem_stack.config import validate_pre_quantum_contract`。
+
+Schmidt 多 fragment 端到端样例：`configs/example_h4_schmidt_multifragment.yaml`。
+
 ## 常见问题
 
 - **`scf.driver='precomputed'` 但没填路径**

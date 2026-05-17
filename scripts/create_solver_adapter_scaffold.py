@@ -175,6 +175,16 @@ class {class_name}:
     def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
         # TODO[3]: implement when exposing AO/MO integrals.
         raise NotImplementedError("{class_name}.get_integrals not implemented yet.")
+
+    def build_embedding_input_system(
+        self,
+        reference: Any,
+        *,
+        representation: str,
+    ) -> dict[str, Any]:
+        # TODO[4]: optional AO/Lowdin embedding input export.
+        del reference, representation
+        return {{}}
 '''
 
 

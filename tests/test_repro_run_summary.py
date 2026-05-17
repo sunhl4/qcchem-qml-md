@@ -78,6 +78,34 @@ def test_attach_run_summary_stages_and_protocol_semantics() -> None:
     assert sm["vqd_reused_pipeline_ground"] is True
     assert sm["sum_shots_total_with_excited_upper_bound"] == 250
     assert sm["scf_energy"] == -1.99
+
+
+def test_attach_run_summary_surfaces_pre_quantum_handoff() -> None:
+    cfg = _base_cfg(QuantumSpec())
+    out: dict = {
+        "repro": collect_repro_metadata(cfg),
+        "scf_energy": -1.116,
+        "pre_quantum_input": {
+            "source": "canonical_active_space_integral_pack",
+            "backend_tag": "pyscf",
+            "hamiltonian_branch": "canonical_active_space_integral_pack",
+            "hamiltonian_fingerprint": "abc" * 10 + "ab",
+            "hamiltonian_fixed_before_variational": True,
+        },
+        "pre_quantum_build_cache": {
+            "schema": "run_build_cache_v1",
+            "pack_builds": 1,
+            "pack_hits": 0,
+        },
+    }
+    _attach_run_summary(out, cfg)
+    sm = out["repro"]["run_summary"]
+    assert sm["pre_quantum_source"] == "canonical_active_space_integral_pack"
+    assert sm["pre_quantum_backend_tag"] == "pyscf"
+    assert sm["pre_quantum_hamiltonian_branch"] == "canonical_active_space_integral_pack"
+    assert sm["hamiltonian_fingerprint"] == "abc" * 10 + "ab"
+    assert sm["pre_quantum_pack_builds"] == 1
+    assert sm["pre_quantum_pack_hits"] == 0
     assert sm["energy_pauli_protocol"] == -1.1
     assert sm["n_pauli_terms"] == 7
     assert sm["n_pauli_groups"] == 3

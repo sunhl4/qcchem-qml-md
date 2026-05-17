@@ -263,6 +263,13 @@ def slim_product_summary_from_pipeline_result(row: dict[str, Any]) -> dict[str, 
     ps = repro.get("parity_snapshot")
     if isinstance(ps, dict):
         out["parity_snapshot_keys"] = sorted(ps.keys())
+    emb_wf = row.get("embedding_workflow")
+    if not isinstance(emb_wf, dict):
+        emb_wf = repro.get("embedding_workflow")
+    if isinstance(emb_wf, dict):
+        bound = emb_wf.get("epistemic_bound")
+        if bound is not None:
+            out["embedding_epistemic_bound"] = bound
     return out
 
 

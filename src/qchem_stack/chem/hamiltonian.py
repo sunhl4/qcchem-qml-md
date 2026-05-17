@@ -38,6 +38,13 @@ FermionQubitMappingName = Literal[
 ]
 
 
+def _attach_reference_energy_meta(meta: dict[str, Any], rhf: ClassicalMeanFieldReference | None) -> None:
+    if rhf is None:
+        return
+    meta["scf_energy_au"] = float(rhf.e_tot)
+    meta["reference_energy_au"] = float(rhf.e_tot)
+
+
 def _classical_driver_meta_payload(reference: Any) -> tuple[dict[str, Any], str]:
     if reference is None or not getattr(reference, "driver_meta", None):
         return {}, ""
@@ -246,7 +253,21 @@ def molecular_hamiltonian_from_classical_reference(
     prefer_restricted_spatial_fermion_for_jordan_wigner: bool = False,
     jordan_wigner_coeff_atol: float | None = None,
 ) -> QubitHamiltonian:
-    """Build active-space molecular Hamiltonian from backend-agnostic mean-field reference."""
+    """Build active-space molecular Hamiltonian from backend-agnostic mean-field reference.
+
+    .. deprecated::
+        Prefer :func:`qchem_stack.chem.pre_quantum_build.build_pre_quantum_input` or
+        :func:`qchem_stack.orchestration.pipeline.run_pipeline_from_config` for full
+        ``PreQuantumInput`` / repro metadata.
+    """
+    import warnings
+
+    warnings.warn(
+        "molecular_hamiltonian_from_classical_reference is deprecated; use "
+        "qchem_stack.chem.pre_quantum_build.build_pre_quantum_input or the YAML pipeline.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
 
     pack = CanonicalActiveSpaceIntegralPack.from_classical_reference(
@@ -352,6 +373,7 @@ def qubit_hamiltonian_from_active_space_fermionic_operator(
             "schema": canonical_pack.schema,
             "provenance": dict(canonical_pack.provenance),
         }
+    _attach_reference_energy_meta(meta, rhf)
     return QubitHamiltonian(
         operator=qop,
         n_qubits=n_phys,
@@ -431,6 +453,7 @@ def qubit_hamiltonian_from_compact_restricted_active_space(
             "schema": canonical_pack.schema,
             "provenance": dict(canonical_pack.provenance),
         }
+    _attach_reference_energy_meta(meta, rhf)
     return QubitHamiltonian(
         operator=qop,
         n_qubits=n_phys,

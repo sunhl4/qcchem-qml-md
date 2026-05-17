@@ -14,6 +14,150 @@ if TYPE_CHECKING:
 
 _UCCSD_ALLOWED_FERMION_QUBIT_MAPPINGS = frozenset({"jordan_wigner", "bravyi_kitaev"})
 
+SCHMIDT_DMET_MAX_CYCLES_LIMIT = 50
+
+
+def _driver_id(spec: ExperimentConfig) -> str:
+    return str(spec.scf.driver).strip().lower()
+
+
+def _raise_missing_backend_capability(
+    *,
+    enabled: bool,
+    message: str,
+) -> None:
+    if not enabled:
+        raise ConfigurationError(message)
+
+
+def validate_pre_quantum_contract(spec: ExperimentConfig) -> None:
+    """Run all pre-quantum YAML validators (same gates as :class:`ExperimentConfig` load)."""
+    validate_precomputed_driver_excludes_live_hooks(spec)
+    validate_schmidt_requires_rhf(spec)
+    validate_schmidt_cycle_bounds(spec)
+    validate_pbc_excludes_casscf_hooks(spec)
+    validate_backend_capabilities_for_pre_quantum_path(spec)
+
+
+def validate_precomputed_driver_excludes_live_hooks(spec: ExperimentConfig) -> None:
+    if _driver_id(spec) != "precomputed":
+        return
+    if spec.chemistry_extended.classical_benchmark_enabled:
+        raise ConfigurationError(
+            "chemistry_extended.classical_benchmark_enabled is unsupported with "
+            "scf.driver='precomputed' (no live post-HF backend)."
+        )
+    if str(spec.chemistry_extended.rdm_correction_method).strip().lower() != "none":
+        raise ConfigurationError(
+            "chemistry_extended.rdm_correction_method requires live backend hooks and is "
+            "unsupported with scf.driver='precomputed'."
+        )
+
+
+def validate_schmidt_requires_rhf(spec: ExperimentConfig) -> None:
+    emb = spec.embedding
+    if emb.dmet_hamiltonian_source != "schmidt_atomic_production":
+        return
+    if str(spec.scf.method).strip().upper() != "RHF":
+        raise ConfigurationError(
+            "embedding.dmet_hamiltonian_source='schmidt_atomic_production' requires "
+            "scf.method='RHF' (closed-shell single density matrix)."
+        )
+
+
+def validate_schmidt_cycle_bounds(spec: ExperimentConfig) -> None:
+    emb = spec.embedding
+    if emb.dmet_hamiltonian_source != "schmidt_atomic_production":
+        return
+    cycles = int(emb.schmidt_dmet_max_cycles)
+    if cycles < 1:
+        raise ConfigurationError("embedding.schmidt_dmet_max_cycles must be at least 1.")
+    if cycles > SCHMIDT_DMET_MAX_CYCLES_LIMIT:
+        raise ConfigurationError(
+            "embedding.schmidt_dmet_max_cycles exceeds limit "
+            f"{SCHMIDT_DMET_MAX_CYCLES_LIMIT} (got {cycles})."
+        )
+
+
+def validate_pbc_excludes_casscf_hooks(spec: ExperimentConfig) -> None:
+    ce = spec.chemistry_extended
+    mesh = list(ce.pbc_kpoint_mesh or [1, 1, 1])
+    pbc_on = bool(ce.pbc_cell_vectors_bohr) or mesh != [1, 1, 1]
+    if not pbc_on:
+        return
+    if spec.active_space.strategy == "avas":
+        raise ConfigurationError(
+            "active_space.strategy='avas' is unsupported with periodic boundary conditions."
+        )
+    if ce.casscf_orbital_optimization_audit:
+        raise ConfigurationError(
+            "chemistry_extended.casscf_orbital_optimization_audit is unsupported with PBC in this milestone."
+        )
+    if ce.casscf_orbital_optimization_for_integrals:
+        raise ConfigurationError(
+            "chemistry_extended.casscf_orbital_optimization_for_integrals is unsupported with PBC "
+            "in this milestone."
+        )
+
+
+def validate_backend_capabilities_for_pre_quantum_path(spec: ExperimentConfig) -> None:
+    """Reject YAML combos that the selected ``scf.driver`` cannot serve at load time."""
+    from qchem_stack.chem.pre_quantum_path import PreQuantumPath, resolve_pre_quantum_path
+    from qchem_stack.chem.solvers.registry import create_solver
+
+    driver = _driver_id(spec)
+    path = resolve_pre_quantum_path(spec)
+    if path == PreQuantumPath.PRECOMPUTED_BUNDLE:
+        return
+    caps = create_solver(spec).capabilities
+
+    if path == PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION:
+        _raise_missing_backend_capability(
+            enabled=caps.supports_schmidt_atomic_hamiltonian,
+            message=(
+                "embedding.dmet_hamiltonian_source='schmidt_atomic_production' requires "
+                f"backend Schmidt support (scf.driver={driver!r})."
+            ),
+        )
+    elif path == PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO:
+        _raise_missing_backend_capability(
+            enabled=caps.supports_projection_fragment_mulliken_hamiltonian,
+            message=(
+                "embedding.projection_quantum_hamiltonian='fragment_mulliken_mo' requires "
+                f"backend projection support (scf.driver={driver!r})."
+            ),
+        )
+
+    if spec.active_space.strategy == "avas":
+        _raise_missing_backend_capability(
+            enabled=caps.supports_avas_active_space_projection,
+            message=(
+                "active_space.strategy='avas' requires backend AVAS support "
+                f"(scf.driver={driver!r})."
+            ),
+        )
+    if path == PreQuantumPath.EMBEDDING_PLUGIN:
+        return
+
+    if driver in ("pyscf", "psi4"):
+        _raise_missing_backend_capability(
+            enabled=caps.supports_restricted_active_space_qubit_hamiltonian,
+            message=(
+                "Default pre-quantum path builds a restricted active-space qubit Hamiltonian; "
+                f"scf.driver={driver!r} does not advertise "
+                "supports_restricted_active_space_qubit_hamiltonian=True."
+            ),
+        )
+        return
+
+    _raise_missing_backend_capability(
+        enabled=caps.supports_restricted_active_space_qubit_hamiltonian,
+        message=(
+            "Default pre-quantum path requires supports_restricted_active_space_qubit_hamiltonian "
+            f"or embedding.mode='plugin' (scf.driver={driver!r})."
+        ),
+    )
+
 
 def preprocess_top_level_yaml_dict(
     data: Mapping[str, Any],

@@ -1,0 +1,50 @@
+# H4 linear chain: Schmidt multifragment DMET + per-fragment VQE demo (PySCF RHF).
+# Smoke: ``pytest tests/test_h4_schmidt_multifragment_yaml.py -q`` (PySCF required).
+schema_version: "1"
+experiment_id: "h4_schmidt_multifragment_demo"
+random_seed: 3
+
+molecule:
+  symbols: ["H", "H", "H", "H"]
+  coordinates_bohr:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+    - [0.0, 0.0, 2.8]
+    - [0.0, 0.0, 4.2]
+  charge: 0
+  multiplicity: 1
+  basis: "sto-3g"
+
+scf:
+  driver: "pyscf"
+  method: "RHF"
+
+active_space:
+  n_active_orbitals: 4
+  n_active_electrons: 4
+  fermion_qubit_mapping: jordan_wigner
+
+backend:
+  provider: "statevector"
+  shots_per_circuit: 256
+
+embedding:
+  mode: "dmet"
+  fragment_labels: ["left", "right"]
+  dmet_hamiltonian_source: "schmidt_atomic_production"
+  schmidt_multi_fragment_atom_groups:
+    - [0, 1]
+    - [2, 3]
+  schmidt_multi_primary_fragment_index: 0
+  schmidt_n_bath_spatial: 1
+  schmidt_max_impurity_spatial_orbitals: 8
+  schmidt_dmet_max_cycles: 1
+  schmidt_attach_fci_reference: false
+  schmidt_run_vqe_on_all_fragments: true
+  schmidt_per_fragment_vqe_maxiter: 12
+
+quantum:
+  algorithm: "vqe"
+  vqe_depth: 1
+  vqe_maxiter: 24
+  use_pauli_protocol: false

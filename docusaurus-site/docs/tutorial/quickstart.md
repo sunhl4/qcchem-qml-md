@@ -41,12 +41,16 @@ out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqli
 ```python
 print(out.get("status"))
 print(out.get("run_summary", {}).keys())
+pqi = out["pre_quantum_input"]
+print(pqi["hamiltonian_fingerprint"], pqi.get("reference_energy_au"))
 ```
 
 至少确认两点：
 
 - 任务已结束（通常是 `DONE` 语义）
-- `run_summary` 存在（用于后续对比和导出）
+- `pre_quantum_input` 含 `hamiltonian_fingerprint` 与能量/活性空间摘要字段
+
+库内单独构建哈密顿量请用 `qchem_stack.chem.pre_quantum_build.build_pre_quantum_input`（勿再依赖已弃用的 `molecular_hamiltonian_from_classical_reference`）。YAML 组合矩阵见仓库 `docs/pre_quantum_yaml_matrix.md`。
 
 ## 3. 可选 HTTP API
 

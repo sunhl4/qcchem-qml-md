@@ -17,9 +17,14 @@ from ._experiment_validation import (
     preprocess_precomputed_bundle_path,
     preprocess_top_level_yaml_dict,
     validate_avas_strategy_requires_pyscf_labels,
+    validate_backend_capabilities_for_pre_quantum_path,
     validate_embedding_atom_indices_within_molecule,
     validate_md_ml_extra_coordinates_shape,
     validate_md_ml_pauli_energy_requires_pauli_protocol,
+    validate_pbc_excludes_casscf_hooks,
+    validate_precomputed_driver_excludes_live_hooks,
+    validate_schmidt_cycle_bounds,
+    validate_schmidt_requires_rhf,
     validate_uccsd_variational_constraints,
 )
 from .active_space import ActiveSpaceSpec
@@ -101,4 +106,29 @@ class ExperimentConfig(BaseModel):
     @model_validator(mode="after")
     def _uccsd_variational_constraints(self) -> ExperimentConfig:
         validate_uccsd_variational_constraints(self)
+        return self
+
+    @model_validator(mode="after")
+    def _precomputed_driver_excludes_live_hooks(self) -> ExperimentConfig:
+        validate_precomputed_driver_excludes_live_hooks(self)
+        return self
+
+    @model_validator(mode="after")
+    def _schmidt_requires_rhf(self) -> ExperimentConfig:
+        validate_schmidt_requires_rhf(self)
+        return self
+
+    @model_validator(mode="after")
+    def _schmidt_cycle_bounds(self) -> ExperimentConfig:
+        validate_schmidt_cycle_bounds(self)
+        return self
+
+    @model_validator(mode="after")
+    def _pbc_excludes_casscf_hooks(self) -> ExperimentConfig:
+        validate_pbc_excludes_casscf_hooks(self)
+        return self
+
+    @model_validator(mode="after")
+    def _backend_capabilities_for_pre_quantum_path(self) -> ExperimentConfig:
+        validate_backend_capabilities_for_pre_quantum_path(self)
         return self

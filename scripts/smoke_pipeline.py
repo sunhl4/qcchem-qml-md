@@ -1,9 +1,12 @@
 #!/usr/bin/env python3
-"""CI smoke: load packaged H2 config and run orchestration sync (requires PySCF).
+"""CI smoke: load packaged config and run orchestration sync.
+
+Default H2 path requires PySCF. ``--precomputed-only`` uses the offline bundle lane (no PySCF).
 
 Usage::
 
     python scripts/smoke_pipeline.py
+    python scripts/smoke_pipeline.py --precomputed-only  # example_h2_precomputed_bundle.yaml (no PySCF)
     python scripts/smoke_pipeline.py --excited      # example_h2.yaml then excited smoke
     python scripts/smoke_pipeline.py --excited-only   # only configs/example_h2_excited_smoke.yaml
     python scripts/smoke_pipeline.py --sampled        # configs/example_h2_sampled.yaml
@@ -44,7 +47,41 @@ def _run_smoke_cfg(cfg_path: Path) -> int:
     return 0 if ok else 1
 
 
+def _run_precomputed_smoke(cfg_path: Path) -> int:
+    """Offline pre-quantum lane: bundle → PreQuantumInput → VQE (no PySCF import)."""
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.orchestration.pipeline import run_pipeline_from_config
+
+    cfg_obj = load_experiment_config(cfg_path)
+    if str(cfg_obj.scf.driver).strip().lower() != "precomputed":
+        print(f"smoke_pipeline: expected scf.driver=precomputed in {cfg_path}", file=sys.stderr)
+        return 2
+    out = run_pipeline_from_config(cfg_path)
+    pqi = out.get("pre_quantum_input") or {}
+    print(f"--- {cfg_path.name} (precomputed) ---")
+    print("pre_quantum_source", pqi.get("source"))
+    print("hamiltonian_fingerprint", (pqi.get("hamiltonian_fingerprint") or "")[:16], "...")
+    print("energy_after_variational", out.get("energy_after_variational"))
+    print("pre_quantum_build_cache", out.get("pre_quantum_build_cache"))
+    rs = (out.get("repro") or {}).get("run_summary") or {}
+    print("repro.run_summary.pre_quantum_source", rs.get("pre_quantum_source"))
+    ok = (
+        pqi.get("source") == "precomputed_bundle"
+        and out.get("energy_after_variational") is not None
+        and bool(pqi.get("hamiltonian_fingerprint"))
+    )
+    return 0 if ok else 1
+
+
 def main() -> int:
+    root = Path(__file__).resolve().parents[1]
+    argv = sys.argv[1:]
+    if "--precomputed-only" in argv:
+        cfg = root / "configs" / "example_h2_precomputed_bundle.yaml"
+        if not cfg.exists():
+            print("missing", cfg, file=sys.stderr)
+            return 2
+        return _run_precomputed_smoke(cfg)
     try:
         import pyscf  # noqa: F401
     except ImportError:
@@ -52,7 +89,7 @@ def main() -> int:
             "smoke_pipeline: skip (install PySCF: pip install qchem-stack[chem])", file=sys.stderr
         )
         return 0
-    if "--qiskit-shots" in sys.argv[1:]:
+    if "--qiskit-shots" in argv:
         try:
             import qiskit  # noqa: F401
             import qiskit_aer  # noqa: F401
@@ -62,8 +99,6 @@ def main() -> int:
                 file=sys.stderr,
             )
             return 0
-    root = Path(__file__).resolve().parents[1]
-    argv = sys.argv[1:]
     if "--excited-only" in argv:
         paths = [root / "configs" / "example_h2_excited_smoke.yaml"]
     elif "--qiskit-shots" in argv:
