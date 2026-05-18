@@ -17,6 +17,7 @@ from qchem_stack.chem.hamiltonian import (
 )
 from qchem_stack.chem.pre_quantum_input import PreQuantumInput, build_pre_quantum_meta
 from qchem_stack.chem.pre_quantum_builder_registry import (
+    PreQuantumBuildRequest,
     get_pre_quantum_branch_builder,
     register_pre_quantum_branch_builder,
 )
@@ -329,14 +330,15 @@ def build_pre_quantum_input_with_context(
     ):
         backend_caps = create_solver(cfg).capabilities
     builder = get_pre_quantum_branch_builder(path)
-    return builder(
-        cfg,
-        reference,
+    req = PreQuantumBuildRequest(
+        cfg=cfg,
+        reference=reference,
         cfg_path=cfg_path,
         cache=cache,
         profile=profile,
         backend_caps=backend_caps,
     )
+    return builder(req)
 
 
 def build_pre_quantum_input(
@@ -362,65 +364,51 @@ hamiltonian_with_schmidt_context = build_pre_quantum_input_with_context
 
 
 def _branch_precomputed_bundle(
-    cfg: ExperimentConfig,
-    reference: ClassicalMeanFieldReference,
-    *,
-    cfg_path: Path | None = None,
-    **_kwargs: Any,
+    req: PreQuantumBuildRequest,
 ) -> tuple[PreQuantumInput, None]:
-    return precomputed_pre_quantum_input(cfg, reference, cfg_path=cfg_path), None
+    return precomputed_pre_quantum_input(req.cfg, req.reference, cfg_path=req.cfg_path), None
 
 
 def _branch_embedding_plugin(
-    cfg: ExperimentConfig,
-    reference: ClassicalMeanFieldReference,
-    *,
-    cfg_path: Path | None = None,
-    **_kwargs: Any,
+    req: PreQuantumBuildRequest,
 ) -> tuple[PreQuantumInput, None]:
-    return _build_pre_quantum_from_embedding_plugin(cfg, reference, cfg_path=cfg_path)
+    return _build_pre_quantum_from_embedding_plugin(req.cfg, req.reference, cfg_path=req.cfg_path)
 
 
 def _branch_schmidt_atomic_production(
-    cfg: ExperimentConfig,
-    reference: ClassicalMeanFieldReference,
-    *,
-    backend_caps: Any | None = None,
-    **_kwargs: Any,
+    req: PreQuantumBuildRequest,
 ) -> tuple[PreQuantumInput, dict[str, Any] | None]:
-    qh, ctx = schmidt_hamiltonian_and_context(cfg, reference, backend_caps=backend_caps)
-    return _make_pre_quantum_input(cfg, reference, qh, path=PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION), ctx
+    qh, ctx = schmidt_hamiltonian_and_context(req.cfg, req.reference, backend_caps=req.backend_caps)
+    return (
+        _make_pre_quantum_input(
+            req.cfg,
+            req.reference,
+            qh,
+            path=PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION,
+        ),
+        ctx,
+    )
 
 
 def _branch_projection_fragment_mulliken(
-    cfg: ExperimentConfig,
-    reference: ClassicalMeanFieldReference,
-    *,
-    backend_caps: Any | None = None,
-    **_kwargs: Any,
+    req: PreQuantumBuildRequest,
 ) -> tuple[PreQuantumInput, None]:
     return _build_pre_quantum_from_projection_fragment_mulliken(
-        cfg,
-        reference,
-        backend_caps=backend_caps,
+        req.cfg,
+        req.reference,
+        backend_caps=req.backend_caps,
     )
 
 
 def _branch_canonical_active_space_pack(
-    cfg: ExperimentConfig,
-    reference: ClassicalMeanFieldReference,
-    *,
-    cache: RunBuildCache | None = None,
-    profile: Any | None = None,
-    backend_caps: Any | None = None,
-    **_kwargs: Any,
+    req: PreQuantumBuildRequest,
 ) -> tuple[PreQuantumInput, None]:
     return _build_pre_quantum_from_canonical_pack(
-        cfg,
-        reference,
-        cache=cache,
-        profile=profile,
-        backend_caps=backend_caps,
+        req.cfg,
+        req.reference,
+        cache=req.cache,
+        profile=req.profile,
+        backend_caps=req.backend_caps,
     )
 
 
