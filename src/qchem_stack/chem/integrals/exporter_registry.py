@@ -3,11 +3,14 @@
 from __future__ import annotations
 
 import logging
+from typing import TYPE_CHECKING
 
-from qchem_stack.chem.integrals.exporter_protocol import ActiveSpaceIntegralExporter
 from qchem_stack.chem.integrals.psi4_active_space_exporter import Psi4ActiveSpaceIntegralExporter
 from qchem_stack.chem.integrals.pyscf_active_space_exporter import PySCFActiveSpaceIntegralExporter
 from qchem_stack.exceptions import PreQuantumCapabilityError
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.integrals.exporter_protocol import ActiveSpaceIntegralExporter
 
 _LOG = logging.getLogger(__name__)
 

@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 import numpy as np
-from openfermion.ops import QubitOperator
 
 from qchem_stack.quantum.statevector import expectation_qubit_operator, hea_state
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
 
 # Hardware note: grouped Pauli readouts can populate
 # ``PauliAveragingProtocol._counts["measurement_histogram_rows"]`` directly from device

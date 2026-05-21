@@ -161,7 +161,7 @@ class {class_name}:
 
     def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
         # TODO[2]: replace with real backend SCF call + parsing.
-        n_orb = max(1, int(self._cfg.active_space.n_active_orbitals))
+        n_orb = max(1, int(self._cfg.active_space.cas.n_orbitals))
         return MolecularMeanFieldResult(
             mf={{"backend": "{backend_id}", "scaffold": True}},
             e_tot=0.0,

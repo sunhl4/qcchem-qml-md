@@ -8,9 +8,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.jobs.kinds import JOB_KIND_FULL_PIPELINE
-from qchem_stack.jobs.store import JobHandle, SqliteJobStore
 
 if TYPE_CHECKING:
+    from qchem_stack.jobs.store import JobHandle, SqliteJobStore
     from qchem_stack.orchestration.run_context import RunContext
 
 

@@ -45,9 +45,9 @@ Pipeline 输出的 `out["pre_quantum_input"]` 仍保留完整 `hamiltonian_meta`
 | source | 路径 |
 |---|---|
 | `precomputed_bundle` | 离线 bundle 直接提供 pre-quantum Hamiltonian |
-| `embedding_plugin` | `embedding.mode=plugin` 的 decomposition JSON / 外部 fragment payload |
-| `schmidt_atomic_production` | Schmidt impurity Hamiltonian 分支 |
-| `projection_fragment_mulliken_mo` | PySCF Mulliken MO projection 分支 |
+| `embedding_plugin` | `embedding.mode=plugin` + `embedding.plugin.{name,json_path}` decomposition payload |
+| `schmidt_atomic_production` | `embedding.mode=dmet` + `embedding.dmet.hamiltonian_source=schmidt_atomic_production` |
+| `projection_fragment_mulliken_mo` | `embedding.mode=projection` + `embedding.projection.quantum_hamiltonian=fragment_mulliken_mo` |
 | `canonical_active_space_integral_pack` | 在线经典主路径：`ClassicalMeanFieldReference` → `CanonicalActiveSpaceIntegralPack` → `QubitHamiltonian` |
 <!-- END:PRE_QUANTUM_SOURCE_TABLE -->
 

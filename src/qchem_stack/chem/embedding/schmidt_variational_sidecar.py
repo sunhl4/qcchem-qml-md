@@ -2,15 +2,22 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_spatial_chemist_integrals
 from qchem_stack.chem.pre_quantum_pyscf_gate import require_pyscf_reference
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.config.embedding_helpers import (
+    require_dmet,
+    resolve_schmidt_per_fragment_vqe_maxiter,
+)
+from qchem_stack.contracts.schema_ids import SCHMIDT_PER_FRAGMENT_VQE_V1
 from qchem_stack.quantum.algorithms.vqe import VQE
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
 
 
 def run_schmidt_per_fragment_vqe(
@@ -26,23 +33,22 @@ def run_schmidt_per_fragment_vqe(
     labels = schmidt_ctx.get("fragment_labels") or []
     if len(labels) != len(groups):
         return None
-    if not cfg.embedding.schmidt_run_vqe_on_all_fragments:
+    if not require_dmet(cfg.embedding).dmet.schmidt.run_vqe_on_all_fragments:
         return None
     d = np.asarray(schmidt_ctx["D_embed"], dtype=float)
-    emb = cfg.embedding
+    dmet = require_dmet(cfg.embedding).dmet
+    schmidt = dmet.schmidt
     from qchem_stack.chem.embedding.schmidt_production import build_schmidt_impurity_integrals
 
-    mx = emb.schmidt_per_fragment_vqe_maxiter
-    if mx is None:
-        mx = cfg.quantum.vqe_maxiter
+    mx = resolve_schmidt_per_fragment_vqe_maxiter(cfg)
     rows: list[dict[str, Any]] = []
     require_pyscf_reference(rhf, context="schmidt_run_vqe_on_all_fragments")
     for i, atoms in enumerate(groups):
         model = build_schmidt_impurity_integrals(
             rhf,
             fragment_atom_indices=list(atoms),
-            n_bath_orbitals=int(emb.schmidt_n_bath_spatial),
-            max_impurity_spatial_orbitals=int(emb.schmidt_max_impurity_spatial_orbitals),
+            n_bath_orbitals=int(schmidt.n_bath_spatial),
+            max_impurity_spatial_orbitals=int(schmidt.max_impurity_spatial_orbitals),
             density_ao=d,
         )
         ne = model.n_alpha_electrons + model.n_beta_electrons
@@ -51,11 +57,11 @@ def run_schmidt_per_fragment_vqe(
             model.h1,
             model.h2,
             ne,
-            fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+            fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
             integral_source="schmidt_impurity_spatial_fragment",
             meta_extra={"fragment_id": labels[i]},
         )
-        vr = VQE(qh_i, depth=cfg.quantum.vqe_depth, executor=exe).run(
+        vr = VQE(qh_i, depth=cfg.quantum.vqe.depth, executor=exe).run(
             maxiter=int(mx),
             seed=int(cfg.random_seed) + i * 31,
         )
@@ -69,8 +75,8 @@ def run_schmidt_per_fragment_vqe(
             }
         )
     return {
-        "schema": "schmidt_per_fragment_vqe_v1",
-        "vqe_depth": cfg.quantum.vqe_depth,
+        "schema": SCHMIDT_PER_FRAGMENT_VQE_V1,
+        "vqe_depth": cfg.quantum.vqe.depth,
         "vqe_maxiter_per_fragment": int(mx),
         "fragments": rows,
     }

@@ -4,30 +4,32 @@ from __future__ import annotations
 
 from typing import Any
 
+from qchem_stack.contracts.schema_ids import METHODS_RESOURCE_UNIFIED_V1
+
 
 def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str, Any]:
     """
     Merge ``resource_summary``, optional ``qpe_demo_track``, parity TKET probe, optional
-    classical benchmark summary (when ``chemistry_extended.classical_benchmark_enabled``), and a
+    classical benchmark summary (when ``chemistry_extended.benchmarks.enabled``), and a
     flat ``run_summary_protocol_*`` mirror (same names as ``resource_estimation_preview_v1`` under
     ``--results``) into one blob.
 
     Intended for ``export_parity_criteria_table.py --results`` parity with plain VQE YAML exports.
     """
-    rs = (
-        pipeline_row.get("resource_summary")
-        if isinstance(pipeline_row.get("resource_summary"), dict)
-        else {}
-    )
+    rs_raw = pipeline_row.get("resource_summary")
+    rs: dict[str, Any] = rs_raw if isinstance(rs_raw, dict) else {}
     qpe = (
         pipeline_row.get("qpe_demo_track")
         if isinstance(pipeline_row.get("qpe_demo_track"), dict)
         else None
     )
-    repro = pipeline_row.get("repro") if isinstance(pipeline_row.get("repro"), dict) else {}
-    ps = repro.get("parity_snapshot") if isinstance(repro.get("parity_snapshot"), dict) else {}
+    repro_raw = pipeline_row.get("repro")
+    repro: dict[str, Any] = repro_raw if isinstance(repro_raw, dict) else {}
+    ps_raw = repro.get("parity_snapshot")
+    ps: dict[str, Any] = ps_raw if isinstance(ps_raw, dict) else {}
     tket = ps.get("tket_first_compiled_circuit_probe")
-    rsum = repro.get("run_summary") if isinstance(repro.get("run_summary"), dict) else {}
+    rsum_raw = repro.get("run_summary")
+    rsum: dict[str, Any] = rsum_raw if isinstance(rsum_raw, dict) else {}
 
     rs_pick = {
         k: rs[k]
@@ -69,7 +71,7 @@ def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str,
     sum_schema = cbs_d.get("schema")
     best_m = cbs_d.get("best_method")
     best_e = cbs_d.get("best_energy_au")
-    if isinstance(rsum, dict):
+    if rsum:
         if sum_schema is None:
             sum_schema = rsum.get("classical_benchmark_summary_schema")
         if rec_method is None:
@@ -117,7 +119,7 @@ def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str,
             proto_mirror[f"run_summary_{k}"] = rsum[k]
 
     return {
-        "schema": "methods_resource_unified_v1",
+        "schema": METHODS_RESOURCE_UNIFIED_V1,
         "classical_backend_id": rsum.get("classical_backend_id"),
         "classical_benchmark_backend_yaml": rsum.get("classical_benchmark_backend_yaml"),
         "quantum_algorithm_yaml": rsum.get("quantum_algorithm_yaml"),

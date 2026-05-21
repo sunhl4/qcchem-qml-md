@@ -10,9 +10,12 @@ full symplectic linear-span analysis.
 
 from __future__ import annotations
 
-from openfermion.ops import QubitOperator
+from typing import TYPE_CHECKING
 
 from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
 
 __all__ = [
     "assert_evaluate_compatible",

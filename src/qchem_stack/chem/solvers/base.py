@@ -3,22 +3,32 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
 
-import numpy as np
-
-from qchem_stack.chem.bridges.mean_field_like import MeanFieldLike
-from qchem_stack.config import ExperimentConfig
-
 if TYPE_CHECKING:
+    import numpy as np
+
+    from qchem_stack.chem.bridges.mean_field_like import MeanFieldLike
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
 
 
 @dataclass(frozen=True)
 class SolverCapabilities:
-    """Static capability flags for classical chemistry backends."""
+    """Static capability flags for classical chemistry backends.
+
+    Each ``supports_*`` answers whether the **pipeline may attempt** a YAML path,
+    not whether the feature is implemented natively inside the driver executable.
+    Delegated implementations (e.g. Psi4 SCF + PySCF AVAS kernel) should still set
+    the flag when wired, and record ``driver_meta.kernel_bindings`` with
+    ``native=False``. See ``docs/execution/multi_backend_integration_philosophy.md``.
+    """
 
     backend_id: str
     supports_molecular_scf: bool = True
     supports_pbc_scf: bool = False
+    supports_pbc_k_mesh: bool = False
+    """True when Monkhorst–Pack meshes with any entry > 1 are supported for PBC SCF."""
+    capability_notes: dict[str, str] = field(default_factory=dict)
+    """Human-readable notes for ``supports_*`` flags (delegation, epistemic bounds)."""
     supports_rhf: bool = True
     supports_rohf: bool = True
     supports_uhf: bool = True
@@ -27,9 +37,9 @@ class SolverCapabilities:
     supports_restricted_active_space_qubit_hamiltonian: bool = False
     """True when the backend supplies MO active-space integrals for the restricted CASCI-style qubit Hamiltonian path."""
     supports_projection_fragment_mulliken_hamiltonian: bool = False
-    """True when ``embedding.projection_quantum_hamiltonian='fragment_mulliken_mo'`` is implemented."""
+    """True when ``embedding.projection.quantum_hamiltonian='fragment_mulliken_mo'`` is implemented."""
     supports_schmidt_atomic_hamiltonian: bool = False
-    """True when ``embedding.dmet_hamiltonian_source='schmidt_atomic_production'`` is implemented."""
+    """True when ``embedding.dmet.hamiltonian_source='schmidt_atomic_production'`` is implemented."""
     supports_embedding_input_ao_lowdin: bool = False
     """True when ``embedding_input_representation`` in ``{ao, lowdin_orth_ao}`` is implemented."""
     supports_casscf_orbital_audit: bool = False
@@ -48,7 +58,7 @@ class SolverCapabilities:
 class MolecularMeanFieldResult:
     """Converged (or prepared) mean-field container used by drivers and pipeline."""
 
-    mf: MeanFieldLike | Any
+    mf: MeanFieldLike
     e_tot: float
     mo_energy: np.ndarray
     driver_meta: dict[str, Any] = field(default_factory=dict)
@@ -71,29 +81,19 @@ class ChemIntegralSolver(Protocol):
     @property
     def capabilities(self) -> SolverCapabilities: ...
 
-    def set_physical_data(self, cfg: ExperimentConfig) -> None:
-        """Re-bind molecule, basis, charge, multiplicity, SCF knobs from YAML/runtime config."""
+    def set_physical_data(self, cfg: ExperimentConfig) -> None: ...
 
-    def compute_mean_field(self, *, periodic: bool = False) -> MolecularMeanFieldResult:
-        """Primary entry: molecule ( ``periodic=False`` ) or ``pbc`` ( ``periodic=True`` ) branch."""
+    def compute_mean_field(self, *, periodic: bool = False) -> MolecularMeanFieldResult: ...
 
-    def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
-        """Alias for ``compute_mean_field(periodic=False)``."""
+    def run_molecular_mean_field(self) -> MolecularMeanFieldResult: ...
 
-    def run_periodic_mean_field(self) -> MolecularMeanFieldResult:
-        """Alias for ``compute_mean_field(periodic=True)``."""
+    def run_periodic_mean_field(self) -> MolecularMeanFieldResult: ...
 
-    def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]:
-        """Optional hook for backends that expose full-orbital / MO integrals.
-
-        Backends that do not implement this are expected to raise ``NotImplementedError`` and
-        keep :attr:`SolverCapabilities.supports_get_integrals` as ``False``.
-        """
+    def get_integrals(self, *args: Any, **kwargs: Any) -> dict[str, Any]: ...
 
     def build_embedding_input_system(
         self,
         reference: ClassicalMeanFieldReference,
         *,
         representation: str,
-    ) -> dict[str, Any]:
-        """Optional embedding-input export hook for AO/Lowdin representations."""
+    ) -> dict[str, Any]: ...

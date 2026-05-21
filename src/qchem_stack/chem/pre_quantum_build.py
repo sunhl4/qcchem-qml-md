@@ -2,34 +2,28 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-from typing import Any
-
-import numpy as np
+from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.bridges.run_build_cache import RunBuildCache, pack_cache_key
 from qchem_stack.chem.hamiltonian import (
     QubitHamiltonian,
     molecular_hamiltonian_from_canonical_active_space_pack,
-    qubit_hamiltonian_from_spatial_chemist_integrals,
 )
-from qchem_stack.chem.pre_quantum_input import PreQuantumInput, build_pre_quantum_meta
 from qchem_stack.chem.pre_quantum_builder_registry import (
     PreQuantumBuildRequest,
     get_pre_quantum_branch_builder,
     register_pre_quantum_branch_builder,
 )
+from qchem_stack.chem.pre_quantum_input import PreQuantumInput, build_pre_quantum_meta
 from qchem_stack.chem.pre_quantum_path import (
     PreQuantumPath,
     pre_quantum_path_source,
     resolve_pre_quantum_path,
 )
-from qchem_stack.chem.precomputed_pre_quantum import precomputed_pre_quantum_input
 from qchem_stack.chem.pre_quantum_pyscf_gate import require_pyscf_reference  # re-exported API
+from qchem_stack.chem.precomputed_pre_quantum import precomputed_pre_quantum_input
 from qchem_stack.chem.solvers.registry import create_solver
-from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import PipelineError
 
 __all__ = [
@@ -41,139 +35,14 @@ __all__ = [
     "schmidt_hamiltonian_and_context",
 ]
 
+from qchem_stack.chem.pre_quantum_schmidt import schmidt_hamiltonian_and_context  # noqa: E402
 
-def schmidt_hamiltonian_and_context(
-    cfg: ExperimentConfig,
-    rhf: ClassicalMeanFieldReference,
-    *,
-    backend_caps: Any | None = None,
-) -> tuple[QubitHamiltonian, dict[str, Any]]:
-    """Build primary Schmidt impurity ``QubitHamiltonian`` and context."""
-    caps = backend_caps or create_solver(cfg).capabilities
-    if not caps.supports_schmidt_atomic_hamiltonian:
-        raise PipelineError(
-            "embedding.dmet_hamiltonian_source='schmidt_atomic_production' requires backend support "
-            f"(backend={caps.backend_id!r})."
-        )
-    require_pyscf_reference(rhf, context="schmidt_atomic_production")
-    if cfg.scf.method != "RHF":
-        raise PipelineError(
-            "embedding.dmet_hamiltonian_source='schmidt_atomic_production' requires scf.method='RHF' "
-            "(closed-shell single density matrix)."
-        )
-    from qchem_stack.chem.embedding.schmidt_production import (
-        apply_chemical_potential_fragment_block,
-        bisection_mu_for_fragment_electron_count,
-        fci_fragment_ground_state,
-        fragment_mulliken_electrons,
-    )
-    from qchem_stack.integrations.schmidt_dmet_self_consistent import (
-        run_schmidt_density_feedback_cycles,
-        run_schmidt_multifragment_density_cycles,
-    )
+if TYPE_CHECKING:
+    from pathlib import Path
 
-    emb = cfg.embedding
-    groups = emb.schmidt_multi_fragment_atom_groups
-    if groups:
-        labs = [x for x in emb.fragment_labels if str(x).strip()]
-        model, dmet_loop_report, d_embed = run_schmidt_multifragment_density_cycles(
-            rhf,
-            fragment_atom_groups=[list(g) for g in groups],
-            fragment_labels=labs if len(labs) == len(groups) else None,
-            primary_fragment_index=int(emb.schmidt_multi_primary_fragment_index),
-            n_bath_orbitals=int(emb.schmidt_n_bath_spatial),
-            max_impurity_spatial_orbitals=int(emb.schmidt_max_impurity_spatial_orbitals),
-            max_cycles=int(emb.schmidt_dmet_max_cycles),
-            mixing_alpha=float(emb.schmidt_dmet_mixing_alpha),
-            convergence_tol=float(emb.schmidt_dmet_convergence_tol),
-        )
-        multifrag_audit: dict[str, Any] = {
-            "schmidt_multifragment": True,
-            "n_embedding_fragments": len(groups),
-            "primary_fragment_index": int(emb.schmidt_multi_primary_fragment_index),
-        }
-        schmidt_ctx: dict[str, Any] = {
-            "D_embed": d_embed,
-            "fragment_groups": [list(g) for g in groups],
-            "fragment_labels": list(dmet_loop_report.get("fragment_labels_used", [])),
-        }
-    else:
-        model, dmet_loop_report, d_embed = run_schmidt_density_feedback_cycles(
-            rhf,
-            fragment_atom_indices=list(emb.schmidt_fragment_atom_indices),
-            n_bath_orbitals=int(emb.schmidt_n_bath_spatial),
-            max_impurity_spatial_orbitals=int(emb.schmidt_max_impurity_spatial_orbitals),
-            max_cycles=int(emb.schmidt_dmet_max_cycles),
-            mixing_alpha=float(emb.schmidt_dmet_mixing_alpha),
-            convergence_tol=float(emb.schmidt_dmet_convergence_tol),
-        )
-        multifrag_audit = {}
-        schmidt_ctx = {
-            "D_embed": d_embed,
-            "fragment_groups": None,
-            "fragment_labels": list(emb.fragment_labels) if emb.fragment_labels else ["fragment_0"],
-        }
-
-    mf = rhf.mf
-    s = np.asarray(mf.get_ovlp(), dtype=float)
-    frag_ao = list(model.meta.get("fragment_ao_indices", []))
-    mulliken_frag = fragment_mulliken_electrons(d_embed, s, frag_ao)
-
-    mu = 0.0
-    mu_report: dict[str, Any] | None = None
-    if emb.schmidt_run_mu_bisection and emb.dmet_target_fragment_electrons is not None:
-        mu, mu_report = bisection_mu_for_fragment_electron_count(
-            model,
-            target_fragment_electrons=float(emb.dmet_target_fragment_electrons),
-        )
-
-    h1_use = apply_chemical_potential_fragment_block(
-        model.h1, mu=mu, n_fragment_spatial_orbitals=model.n_fragment_spatial_orbitals
-    )
-    ne = model.n_alpha_electrons + model.n_beta_electrons
-
-    fci_ref: dict[str, Any] | None = None
-    if mu_report is not None:
-        if mu_report.get("status") == "converged" and isinstance(mu_report.get("fci_at_mu"), dict):
-            fci_ref = mu_report["fci_at_mu"]  # type: ignore[assignment]
-        elif mu_report.get("status") == "no_bracket" and isinstance(
-            mu_report.get("fci_mu_zero"), dict
-        ):
-            fci_ref = mu_report["fci_mu_zero"]  # type: ignore[assignment]
-    elif emb.schmidt_attach_fci_reference and model.n_spatial_orbitals <= int(
-        emb.schmidt_fci_reference_max_spatial_orbitals
-    ):
-        fci_ref = fci_fragment_ground_state(model, mu=mu)
-
-    audit: dict[str, Any] = {
-        "schema": "schmidt_production_pipeline_v1",
-        "impurity_model": dict(model.meta),
-        "schmidt_dmet_self_consistency": dmet_loop_report,
-        "mulliken_fragment_after_embedding_density": mulliken_frag,
-        "mu_on_fragment_diagonal_au": float(mu),
-        "mu_bisection_report": mu_report,
-        "fci_impurity_reference": fci_ref,
-        "impurity_n_spatial_orbitals": model.n_spatial_orbitals,
-        "impurity_n_electrons": int(ne),
-        "active_space_yaml_ignored_for_qh": True,
-        "note": (
-            "Main variational stage uses impurity qubit Hamiltonian "
-            f"({cfg.active_space.fermion_qubit_mapping}); cfg.active_space sizes apply to "
-            "ledger/stub fields only on this path."
-        ),
-        **multifrag_audit,
-    }
-    qh = qubit_hamiltonian_from_spatial_chemist_integrals(
-        model.constant,
-        h1_use,
-        model.h2,
-        ne,
-        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
-        integral_source="schmidt_impurity_spatial",
-        meta_extra={"schmidt_production_audit": audit},
-        pyscf_driver_meta=dict(rhf.driver_meta) if getattr(rhf, "driver_meta", None) else None,
-    )
-    return qh, schmidt_ctx
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.solvers.base import SolverCapabilities
+    from qchem_stack.config import ExperimentConfig
 
 
 def _make_pre_quantum_input(
@@ -230,7 +99,7 @@ def _build_pre_quantum_from_projection_fragment_mulliken(
     cfg: ExperimentConfig,
     reference: ClassicalMeanFieldReference,
     *,
-    backend_caps: Any | None = None,
+    backend_caps: SolverCapabilities | None = None,
 ) -> tuple[PreQuantumInput, None]:
     caps = backend_caps or create_solver(cfg).capabilities
     if not caps.supports_projection_fragment_mulliken_hamiltonian:
@@ -260,7 +129,7 @@ def _build_pre_quantum_from_canonical_pack(
     *,
     cache: RunBuildCache | None,
     profile: Any | None,
-    backend_caps: Any | None = None,
+    backend_caps: SolverCapabilities | None = None,
 ) -> tuple[PreQuantumInput, None]:
     caps = backend_caps or create_solver(cfg).capabilities
     if not caps.supports_restricted_active_space_qubit_hamiltonian:
@@ -269,9 +138,15 @@ def _build_pre_quantum_from_canonical_pack(
             f"the selected backend {caps.backend_id!r} does not provide "
             "a canonical active-space integral pack yet."
         )
+    from qchem_stack.config.active_space_helpers import (
+        resolve_fermion_qubit_mapping,
+        resolve_n_electrons,
+        resolve_n_orbitals,
+    )
+
     active = cfg.active_space
-    na = int(active.n_active_orbitals)
-    ne = int(active.n_active_electrons)
+    na = resolve_n_orbitals(active)
+    ne = resolve_n_electrons(active)
 
     def _build_pack() -> CanonicalActiveSpaceIntegralPack:
         return CanonicalActiveSpaceIntegralPack.from_classical_reference(
@@ -288,13 +163,18 @@ def _build_pre_quantum_from_canonical_pack(
 
     if profile is not None:
         profile.mark("canonical_pack_ms")
+    from qchem_stack.chem.integration.crosscheck import maybe_attach_integral_crosscheck
+    from qchem_stack.chem.integration.driver_meta import record_casci_active_integrals_binding
+
+    record_casci_active_integrals_binding(reference.driver_meta, pack)
+    maybe_attach_integral_crosscheck(cfg, reference, primary_pack=pack)
     qh = molecular_hamiltonian_from_canonical_active_space_pack(
         pack,
-        n_active_orbitals=active.n_active_orbitals,
-        n_active_electrons=active.n_active_electrons,
-        fermion_qubit_mapping=active.fermion_qubit_mapping,
-        prefer_restricted_spatial_fermion_for_jordan_wigner=active.prefer_restricted_spatial_fermion_for_jordan_wigner,
-        jordan_wigner_coeff_atol=active.jordan_wigner_coeff_atol,
+        n_active_orbitals=na,
+        n_active_electrons=ne,
+        fermion_qubit_mapping=resolve_fermion_qubit_mapping(active),
+        prefer_restricted_spatial_fermion_for_jordan_wigner=active.jw.prefer_restricted_spatial,
+        jordan_wigner_coeff_atol=active.jw.coeff_atol,
         classical_reference_for_meta=reference,
     )
     if profile is not None:

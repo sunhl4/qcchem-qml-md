@@ -213,7 +213,7 @@ def exact_heisenberg_obc_energy(chain_length: int, *, j: float = 1.0, jz: float 
                 terms.append(identity(2, format="csr", dtype=np.float64))
         terms.append(csr_matrix(Sz1))
         terms.append(csr_matrix(Sz1))
-        for s in range(site + 2, chain_length):
+        for _ in range(site + 2, chain_length):
             terms.append(identity(2, format="csr", dtype=np.float64))
         h_tot += jz * _kron_chain(terms)
 
@@ -223,7 +223,7 @@ def exact_heisenberg_obc_energy(chain_length: int, *, j: float = 1.0, jz: float 
                 terms_sp.append(identity(2, format="csr", dtype=np.float64))
         terms_sp.append(csr_matrix(Sp1))
         terms_sp.append(csr_matrix(Sp1.T))
-        for s in range(site + 2, chain_length):
+        for _ in range(site + 2, chain_length):
             terms_sp.append(identity(2, format="csr", dtype=np.float64))
         h_tot += (j / 2.0) * _kron_chain(terms_sp)
 
@@ -233,7 +233,7 @@ def exact_heisenberg_obc_energy(chain_length: int, *, j: float = 1.0, jz: float 
                 terms_sm.append(identity(2, format="csr", dtype=np.float64))
         terms_sm.append(csr_matrix(Sp1.T))
         terms_sm.append(csr_matrix(Sp1))
-        for s in range(site + 2, chain_length):
+        for _ in range(site + 2, chain_length):
             terms_sm.append(identity(2, format="csr", dtype=np.float64))
         h_tot += (j / 2.0) * _kron_chain(terms_sm)
 

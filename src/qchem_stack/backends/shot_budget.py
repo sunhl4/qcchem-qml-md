@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
+if TYPE_CHECKING:
+    from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
 
 
 @dataclass

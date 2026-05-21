@@ -20,12 +20,12 @@ from qchem_stack.quantum.variational_plugins.spec import (
 def run_micro_vqe(ctx: VariationalRunContext) -> VariationalStageOutcome:
     qh = ctx.resolved_hamiltonian()
     q = ctx.cfg.quantum
-    capped = max(1, min(int(q.vqe_maxiter), 8))
+    capped = max(1, min(int(q.vqe.maxiter), 8))
     vr = VQE(
         qh,
-        depth=int(q.vqe_depth),
+        depth=int(q.vqe.depth),
         executor=ctx.executor,
-        optimizer_method=q.vqe_optimizer_method,
+        optimizer_method=q.vqe.optimizer_method,
     ).run(maxiter=capped, seed=int(ctx.seed))
     return VariationalStageOutcome(
         energy=float(vr.energy),

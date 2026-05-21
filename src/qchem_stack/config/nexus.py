@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ._validation import strip_required_text
 
 
 class NexusAnalogSpec(BaseModel):
     """Local project + HQC **unit** ledger (no Nexus API, no real billing)."""
+
+    model_config = ConfigDict(extra="forbid")
 
     enabled: bool = False
     project_label: str = Field(default="default", min_length=1)
@@ -32,11 +34,20 @@ class NexusCloudSpec(BaseModel):
     only ships a typed client + health/submit shims, not a vendor contract.
     """
 
-    mode: Literal["off", "http", "mock"] = "off"
-    base_url: str = ""
-    """HTTPS API root (e.g. ``https://nexus.../v1``) — use only in ``http`` mode."""
+    model_config = ConfigDict(extra="forbid")
+
+    mode: Literal["off", "http", "mock"] = Field(
+        default="off",
+        description="Cloud adapter mode: off (default), http (real HTTPS client), or mock.",
+    )
+    base_url: str = Field(
+        default="",
+        description="HTTPS API root (e.g. ``https://nexus.../v1``) — use only in ``http`` mode.",
+    )
     api_key_env: str = Field(default="NEXUS_API_KEY", min_length=1)
-    project_slug: str = ""
+    project_slug: str = Field(
+        default="", description="Optional Nexus project slug for cloud submit."
+    )
     timeout_s: float = Field(default=30.0, gt=0.0)
 
     @field_validator("api_key_env")

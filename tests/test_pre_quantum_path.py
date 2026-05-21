@@ -13,18 +13,24 @@ from qchem_stack.chem.pre_quantum_path import (
     resolve_pre_quantum_path,
 )
 from qchem_stack.config import ExperimentConfig, load_experiment_config
+from tests.embedding_nested import embedding_dmet
 
 
 def _cfg(**embedding: object) -> ExperimentConfig:
     root = Path(__file__).resolve().parents[1]
     base = load_experiment_config(root / "configs" / "example_h2.yaml")
-    return base.model_copy(update={"embedding": base.embedding.model_copy(update=embedding)})
+    if not embedding:
+        return base
+    return base.model_copy(update={"embedding": embedding_dmet(**embedding)})
 
 
 def test_resolve_canonical_default_h2() -> None:
     cfg = _cfg()
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.CANONICAL_ACTIVE_SPACE_INTEGRAL_PACK
-    assert pre_quantum_path_source(resolve_pre_quantum_path(cfg)) == "canonical_active_space_integral_pack"
+    assert (
+        pre_quantum_path_source(resolve_pre_quantum_path(cfg))
+        == "canonical_active_space_integral_pack"
+    )
 
 
 def test_resolve_precomputed_driver() -> None:
@@ -40,7 +46,10 @@ def test_resolve_embedding_plugin() -> None:
 
 
 def test_resolve_schmidt_atomic_production() -> None:
-    cfg = _cfg(dmet_hamiltonian_source="schmidt_atomic_production", mode="dmet")
+    cfg = _cfg(
+        hamiltonian_source="schmidt_atomic_production",
+        schmidt={"fragment_atom_indices": [0]},
+    )
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION
 
 
@@ -51,17 +60,17 @@ def test_resolve_projection_fragment_mulliken_mo() -> None:
 
 
 def test_schmidt_takes_priority_over_projection_mode() -> None:
+    """DMET + schmidt_atomic_production resolves to Schmidt even when mode is not projection."""
     cfg = _cfg(
-        mode="projection",
-        projection_quantum_hamiltonian="fragment_mulliken_mo",
-        projection_fragment_atom_indices=[0],
-        dmet_hamiltonian_source="schmidt_atomic_production",
+        hamiltonian_source="schmidt_atomic_production",
+        schmidt={"fragment_atom_indices": [0]},
     )
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION
 
 
 def test_plugin_takes_priority_over_canonical() -> None:
-    cfg = _cfg(mode="plugin")
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_decomposition_plugin_toy.yaml")
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.EMBEDDING_PLUGIN
 
 

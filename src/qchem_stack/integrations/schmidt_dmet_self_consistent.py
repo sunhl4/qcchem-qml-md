@@ -20,16 +20,19 @@ Multi-fragment sweeps are implemented via :meth:`~qchem_stack.integrations.dmet_
 from __future__ import annotations
 
 from dataclasses import dataclass, replace
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.embedding.schmidt_production import (
     SchmidtImpurityModel,
     SchmidtProductionError,
     build_schmidt_impurity_integrals,
     fci_impurity_spatial_ground,
+)
+from qchem_stack.contracts.schema_ids import (
+    SCHMIDT_DMET_DENSITY_FEEDBACK_V1,
+    SCHMIDT_DMET_MULTIFRAGMENT_DENSITY_FEEDBACK_V1,
 )
 from qchem_stack.integrations.dmet_self_consistent import (
     DMETBathState,
@@ -37,6 +40,9 @@ from qchem_stack.integrations.dmet_self_consistent import (
     DMETFragmentResult,
     DMETSelfConsistencyLoop,
 )
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 def _as_pyscf_mean_field_reference(
@@ -178,7 +184,7 @@ def run_schmidt_density_feedback_cycles(
         raise SchmidtProductionError("no impurity model produced")
 
     report: dict[str, Any] = {
-        "schema": "schmidt_dmet_density_feedback_v1",
+        "schema": SCHMIDT_DMET_DENSITY_FEEDBACK_V1,
         "cycles_requested": int(max_cycles),
         "cycles_executed": len(history),
         "converged_early_on_gamma": converged_early,
@@ -228,7 +234,9 @@ def run_schmidt_multifragment_density_cycles(
         labs = [f"fragment_{i}" for i in range(len(fragment_atom_groups))]
     fid_atoms = {labs[i]: list(fragment_atom_groups[i]) for i in range(len(labs))}
 
-    mf = rhf_ref.mf
+    mf: Any = rhf_ref.mf
+    if hasattr(mf, "raw_handle"):
+        mf = mf.raw_handle()
     mol = mf.mol
     nel = int(mol.nelectron)
     S = np.asarray(mf.get_ovlp(), dtype=float)
@@ -287,7 +295,7 @@ def run_schmidt_multifragment_density_cycles(
     )
 
     report: dict[str, Any] = {
-        "schema": "schmidt_dmet_multifragment_density_feedback_v1",
+        "schema": SCHMIDT_DMET_MULTIFRAGMENT_DENSITY_FEEDBACK_V1,
         "n_fragments": len(fragment_atom_groups),
         "fragment_labels_used": list(labs),
         "primary_fragment_index": int(primary_fragment_index),

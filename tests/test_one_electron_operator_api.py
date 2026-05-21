@@ -16,7 +16,7 @@ def test_one_electron_operator_fermion_and_pauli_hcore() -> None:
     drv = PySCFDriver.from_config(cfg)
     fop = drv.compute_one_electron_operator_fermion("hcore")
     assert hasattr(fop, "terms")
-    assert len(getattr(fop, "terms")) > 0
+    assert len(fop.terms) > 0
     qop = drv.compute_one_electron_operator_pauli("hcore")
     assert hasattr(qop, "terms")
 

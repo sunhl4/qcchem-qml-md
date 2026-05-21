@@ -1,10 +1,14 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
 from scipy.linalg import eigvalsh
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 def kitaev_qpe_energy_estimate(h: QubitHamiltonian, bits: int = 4) -> float:

@@ -7,12 +7,15 @@ and applies toy PMSV (stderr inflation) + ZNE (``zne_scale_energy`` curve) to a 
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import QERMIT_RUNTIME_V1
 from qchem_stack.mitigation.zne import zne_scale_energy
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
 
 
 def execute_mitigation_dag_runtime(
@@ -21,10 +24,7 @@ def execute_mitigation_dag_runtime(
     """If mitigation is on and an energy is present in ``out``, return an execution trace."""
     m = cfg.mitigation
     if not (
-        m.pmsv_enabled
-        or m.zne_enabled
-        or m.spam_calibration_enabled
-        or m.classical_shadows_stub_enabled
+        m.pmsv.enabled or m.zne.enabled or m.stubs.spam_calibration or m.stubs.classical_shadows
     ):
         return None
     e_raw = out.get("energy_pauli_protocol")
@@ -53,7 +53,7 @@ def execute_mitigation_dag(
     e = float(energy)
     se = float(energy_stderr) if energy_stderr is not None else None
 
-    if m.spam_calibration_enabled:
+    if m.stubs.spam_calibration:
         trace.append(
             {
                 "node": "SPAM_readout_calibration_stub",
@@ -65,7 +65,7 @@ def execute_mitigation_dag(
             }
         )
 
-    if m.classical_shadows_stub_enabled:
+    if m.stubs.classical_shadows:
         trace.append(
             {
                 "node": "classical_shadows_expectation_stub",
@@ -73,13 +73,13 @@ def execute_mitigation_dag(
                 "energy_out": e,
                 "energy_stderr_in": se,
                 "energy_stderr_out": se,
-                "budget_pairs_hint": int(m.classical_shadows_budget_pairs),
+                "budget_pairs_hint": int(m.stubs.classical_shadows_budget_pairs),
                 "note": "Identity stub — open-stack analog to shadows narratives without sampling.",
             }
         )
 
-    if m.pmsv_enabled:
-        rr = float(m.pmsv_retention_rate)
+    if m.pmsv.enabled:
+        rr = float(m.pmsv.retention_rate)
         rr = max(min(rr, 1.0), 1e-9)
         # Toy: effective stderr widens when post-selection keeps fewer shots
         se2 = None if se is None else float(se / (rr**0.5))
@@ -94,16 +94,16 @@ def execute_mitigation_dag(
         )
         se = se2
 
-    if m.zne_enabled:
-        scales = [float(x) for x in m.zne_scales] if m.zne_scales else [1.0, 1.5, 2.0]
+    if m.zne.enabled:
+        scales = [float(x) for x in m.zne.scales] if m.zne.scales else [1.0, 1.5, 2.0]
         pc_ex = protocol_counts or {}
         zcurve = pc_ex.get("zne_curve")
         use_protocol_curve = (
-            m.zne_mode == "circuit_scale_fold"
+            m.zne.mode == "circuit_scale_fold"
             and isinstance(zcurve, list)
             and len(zcurve) == len(scales)
         )
-        if use_protocol_curve:
+        if use_protocol_curve and zcurve is not None:
             curve = [float(x) for x in zcurve]
             ex_opt = pc_ex.get("zne_extrapolated_energy")
             ex = (
@@ -128,7 +128,7 @@ def execute_mitigation_dag(
     gr = graph_report if isinstance(graph_report, dict) else None
     gid = gr.get("schema") if gr else None
     return {
-        "schema": "qermit_runtime_v1",
+        "schema": QERMIT_RUNTIME_V1,
         "graph_schema": gid,
         "final_energy": e,
         "final_energy_stderr": se,

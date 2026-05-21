@@ -16,11 +16,17 @@ baseline H2 VQE, default IQEB, and QPE dual-track for paper-style ``l3_algorithm
 from __future__ import annotations
 
 import time
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qchem_stack.config import load_experiment_config
+from qchem_stack.contracts.schema_ids import (
+    ALGORITHM_BENCHMARK_BUNDLE_V1,
+    MERGED_EXPERIMENT_BENCHMARK_V1,
+)
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
+if TYPE_CHECKING:
+    from pathlib import Path
 
 DEFAULT_BENCHMARK_YAMLS: tuple[str, ...] = (
     "configs/example_h2.yaml",
@@ -64,8 +70,8 @@ def algorithm_benchmark_bundle_v1(*, repo_root: Path, config_rels: list[str]) ->
             "experiment_id": exp_id,
             "config_rel": rel,
             "quantum_algorithm_yaml": cfg.quantum.algorithm,
-            "adapt_pool_id_yaml": cfg.quantum.adapt_pool_id,
-            "iqeb_pool_id_yaml": cfg.quantum.iqeb_pool_id,
+            "adapt_pool_id_yaml": cfg.quantum.adapt.pool_id,
+            "iqeb_pool_id_yaml": cfg.quantum.iqeb.pool_id,
             "scf_energy_au": out.get("scf_energy"),
             "energy_after_variational_au": out.get("energy_after_variational"),
             "nfev": nfev,
@@ -74,11 +80,14 @@ def algorithm_benchmark_bundle_v1(*, repo_root: Path, config_rels: list[str]) ->
             "stages_completed_tail": list((rs.get("stages_completed") or [])[-5:]),
         }
         rows.append(row)
-    return {"schema": "algorithm_benchmark_bundle_v1", "rows": rows}
+    return {"schema": ALGORITHM_BENCHMARK_BUNDLE_V1, "rows": rows}
 
 
 def merged_experiment_benchmark_v1(bundle: dict[str, Any]) -> dict[str, Any]:
-    rows = bundle.get("rows") if isinstance(bundle.get("rows"), list) else []
+    rows_raw = bundle.get("rows")
+    rows: list[dict[str, Any]] = (
+        [r for r in rows_raw if isinstance(r, dict)] if isinstance(rows_raw, list) else []
+    )
     walls = [float(r["wall_time_ms"]) for r in rows if r.get("wall_time_ms") is not None]
 
     algo_walls: dict[str, list[float]] = {}
@@ -103,7 +112,7 @@ def merged_experiment_benchmark_v1(bundle: dict[str, Any]) -> dict[str, Any]:
         )
 
     return {
-        "schema": "merged_experiment_benchmark_v1",
+        "schema": MERGED_EXPERIMENT_BENCHMARK_V1,
         "n_configs": len(rows),
         "total_wall_time_ms": float(sum(walls)) if walls else None,
         "mean_wall_time_ms": float(sum(walls) / len(walls)) if walls else None,

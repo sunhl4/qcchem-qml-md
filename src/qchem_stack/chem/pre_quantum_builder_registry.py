@@ -4,15 +4,18 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.bridges.run_build_cache import RunBuildCache
 from qchem_stack.chem.pre_quantum_input import PreQuantumInput
-from qchem_stack.chem.pre_quantum_path import PreQuantumPath
-from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import PreQuantumCapabilityError
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.bridges.run_build_cache import RunBuildCache
+    from qchem_stack.chem.pre_quantum_path import PreQuantumPath
+    from qchem_stack.config import ExperimentConfig
 
 
 @dataclass(frozen=True)
@@ -83,4 +86,3 @@ def get_pre_quantum_branch_builder(
             f"Known paths: {known}."
         )
     return fn
-

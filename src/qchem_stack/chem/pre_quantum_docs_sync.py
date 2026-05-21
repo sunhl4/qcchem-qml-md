@@ -12,10 +12,14 @@ _SOURCE_DESCRIPTIONS: dict[str, str] = {
     ),
     "precomputed_bundle": "离线 bundle 直接提供 pre-quantum Hamiltonian",
     "embedding_plugin": (
-        "`embedding.mode=plugin` 的 decomposition JSON / 外部 fragment payload"
+        "`embedding.mode=plugin` + `embedding.plugin.{name,json_path}` decomposition payload"
     ),
-    "projection_fragment_mulliken_mo": "PySCF Mulliken MO projection 分支",
-    "schmidt_atomic_production": "Schmidt impurity Hamiltonian 分支",
+    "projection_fragment_mulliken_mo": (
+        "`embedding.mode=projection` + `embedding.projection.quantum_hamiltonian=fragment_mulliken_mo`"
+    ),
+    "schmidt_atomic_production": (
+        "`embedding.mode=dmet` + `embedding.dmet.hamiltonian_source=schmidt_atomic_production`"
+    ),
 }
 
 
@@ -62,4 +66,3 @@ def generated_pre_quantum_path_registry_markdown() -> str:
     for source in _pre_quantum_path_source_values():
         lines.append(f"  - `{source}`")
     return "\n".join(lines)
-

@@ -1,0 +1,55 @@
+schema_version: '2'
+experiment_id: custom_driver_template_dev
+random_seed: 0
+molecule:
+  symbols:
+  - H
+  - H
+  coordinates:
+  - - 0.0
+    - 0.0
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 1.4
+  coordinate_unit: bohr
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf:
+  driver: custom_external_template
+  method: RHF
+active_space:
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+  mapping:
+    fermion_qubit: jordan_wigner
+backend:
+  name: statevector_sim
+  provider: statevector
+  shots_per_circuit: 1024
+  qiskit_mode: statevector
+  ionstack_endpoint: null
+  meta: {}
+mitigation:
+  zne:
+    enabled: false
+  pmsv:
+    enabled: false
+compiler:
+  optimization_level: 0
+quantum:
+  algorithm: vqe
+  variational:
+    ansatz: uccsd
+  vqe:
+    maxiter: 5
+  pauli:
+    use_protocol: false
+embedding:
+  mode: none
+chemistry_extended:
+  post_hf:
+    integral_crosscheck: none

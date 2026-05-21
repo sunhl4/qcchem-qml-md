@@ -17,13 +17,14 @@ def psi4_hf_config(tmp_path: Path) -> ExperimentConfig:
     p = tmp_path / "psi4.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: psi4_smoke
 random_seed: 0
 molecule:
   symbols: ["H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 2
   basis: sto-3g
@@ -31,8 +32,10 @@ scf:
   driver: psi4
   method: RHF
 active_space:
-  n_active_orbitals: 1
-  n_active_electrons: 1
+  strategy: cas
+  cas:
+    n_orbitals: 1
+    n_electrons: 1
 """,
         encoding="utf-8",
     )
@@ -55,11 +58,11 @@ def test_psi4_create_solver_runtime_behavior(psi4_hf_config: ExperimentConfig) -
         assert out.driver_meta.get("driver_family") == "psi4"
     except RuntimeError as exc:
         assert "Psi4 SCF unavailable" in str(exc)
-    with pytest.raises(NotImplementedError, match="PBC"):
+    with pytest.raises(ValueError, match="cell_vectors_bohr"):
         s.run_periodic_mean_field()
-    with pytest.raises(NotImplementedError, match="PBC"):
+    with pytest.raises(ValueError, match="cell_vectors_bohr"):
         s.compute_mean_field(periodic=True)
-    with pytest.raises(NotImplementedError, match="get_integrals"):
+    with pytest.raises(ValueError, match="n_active_orbitals"):
         s.get_integrals()
 
 

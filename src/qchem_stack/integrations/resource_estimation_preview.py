@@ -2,10 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import RESOURCE_ESTIMATION_PREVIEW_V1
 from qchem_stack.protocols.product_contract import pauli_protocol_expectation_path_for_config
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
 
 
 def _attach_classical_benchmark_preview_alignment(
@@ -68,54 +71,56 @@ def build_resource_estimation_preview_v1(
     be = cfg.backend
     ce = cfg.chemistry_extended
     base: dict[str, Any] = {
-        "schema": "resource_estimation_preview_v1",
+        "schema": RESOURCE_ESTIMATION_PREVIEW_V1,
         "mode": "pipeline" if pipeline_row else "config_only",
         "epistemic_bound": (
             "Open-stack preview only: no HQC/Nexus currency, no vendor L0 resource guarantee."
         ),
         "quantum_algorithm_yaml": qt.algorithm,
         "algorithm_factory_yaml": qt.algorithm_factory,
-        "adapt_pool_id_yaml": qt.adapt_pool_id,
-        "iqeb_pool_id_yaml": qt.iqeb_pool_id,
-        "variational_ansatz_yaml": qt.variational_ansatz,
-        "fermion_qubit_mapping_yaml": act.fermion_qubit_mapping,
+        "adapt_pool_id_yaml": qt.adapt.pool_id,
+        "iqeb_pool_id_yaml": qt.iqeb.pool_id,
+        "variational_ansatz_yaml": qt.variational.ansatz,
+        "fermion_qubit_mapping_yaml": act.mapping.fermion_qubit,
         "backend_provider_yaml": be.provider,
-        "zne_enabled_yaml": mit.zne_enabled,
-        "mitigation_zne_mode_yaml": mit.zne_mode,
-        "mitigation_zne_scales_yaml": [float(x) for x in mit.zne_scales],
-        "pmsv_enabled_yaml": mit.pmsv_enabled,
-        "run_sampled_pauli_protocol_yaml": qt.run_sampled_pauli_protocol,
-        "run_qiskit_shots_pauli_protocol_yaml": qt.run_qiskit_shots_pauli_protocol,
+        "zne_enabled_yaml": mit.zne.enabled,
+        "mitigation_zne_mode_yaml": mit.zne.mode,
+        "mitigation_zne_scales_yaml": [float(x) for x in mit.zne.scales],
+        "pmsv_enabled_yaml": mit.pmsv.enabled,
+        "run_sampled_pauli_protocol_yaml": qt.pauli.run_sampled,
+        "run_qiskit_shots_pauli_protocol_yaml": qt.pauli.run_qiskit_shots,
         "pauli_protocol_expectation_path_yaml": pauli_protocol_expectation_path_for_config(cfg),
-        "classical_benchmark_enabled_yaml": ce.classical_benchmark_enabled,
-        "qpe_demo_track_after_variational": qt.qpe_demo_track_after_variational,
-        "qpe_pipeline_integration": qt.qpe_pipeline_integration,
-        "qpe_demo_track_n_bits": int(qt.qpe_demo_track_n_bits),
-        "qpe_three_pack_after_variational": qt.qpe_three_pack_after_variational,
-        "qpe_three_pack_time_yaml": float(qt.qpe_three_pack_time),
-        "qpe_three_pack_deterministic_rounds_yaml": int(qt.qpe_three_pack_deterministic_rounds),
-        "qpe_three_pack_kitaev_bits_yaml": int(qt.qpe_three_pack_kitaev_bits),
-        "qpe_three_pack_info_samples_yaml": int(qt.qpe_three_pack_info_samples),
-        "vqs_track_after_variational": qt.vqs_track_after_variational,
-        "vqs_pipeline_integration": qt.vqs_pipeline_integration,
-        "vqs_mode_yaml": qt.vqs_mode,
-        "vqs_n_times_yaml": int(qt.vqs_n_times),
-        "vqs_dt_yaml": float(qt.vqs_dt),
-        "vqs_rhs_mode_yaml": qt.vqs_rhs_mode,
-        "vqs_tangent_fd_epsilon_yaml_preview": float(qt.vqs_tangent_fd_epsilon),
-        "vqd_overlap_exponent_yaml": float(qt.vqd_overlap_exponent),
-        "vqd_cobyla_maxiter_yaml": int(qt.vqd_cobyla_maxiter),
-        "vqd_overlap_mode_yaml": qt.vqd_overlap_mode,
-        "vqd_optimizer_method_yaml": qt.vqd_optimizer_method,
-        "vqd_init_strategy_yaml": qt.vqd_init_strategy,
-        "vqd_init_noise_scale_yaml": float(qt.vqd_init_noise_scale),
-        "vqd_max_overlap_warn_yaml": qt.vqd_max_overlap_warn,
-        "sceom_generator_strategy_yaml": qt.sceom_generator_strategy,
+        "classical_benchmark_enabled_yaml": ce.benchmarks.enabled,
+        "qpe_demo_track_after_variational": qt.demos.qpe.track_after_variational,
+        "qpe_pipeline_integration": qt.demos.qpe.pipeline_integration,
+        "qpe_demo_track_n_bits": int(qt.demos.qpe.demo_track_n_bits),
+        "qpe_three_pack_after_variational": qt.demos.qpe.three_pack.after_variational,
+        "qpe_three_pack_time_yaml": float(qt.demos.qpe.three_pack.time),
+        "qpe_three_pack_deterministic_rounds_yaml": int(
+            qt.demos.qpe.three_pack.deterministic_rounds
+        ),
+        "qpe_three_pack_kitaev_bits_yaml": int(qt.demos.qpe.three_pack.kitaev_bits),
+        "qpe_three_pack_info_samples_yaml": int(qt.demos.qpe.three_pack.info_samples),
+        "vqs_track_after_variational": qt.demos.vqs.track_after_variational,
+        "vqs_pipeline_integration": qt.demos.vqs.pipeline_integration,
+        "vqs_mode_yaml": qt.demos.vqs.mode,
+        "vqs_n_times_yaml": int(qt.demos.vqs.n_times),
+        "vqs_dt_yaml": float(qt.demos.vqs.dt),
+        "vqs_rhs_mode_yaml": qt.demos.vqs.rhs_mode,
+        "vqs_tangent_fd_epsilon_yaml_preview": float(qt.demos.vqs.tangent_fd_epsilon),
+        "vqd_overlap_exponent_yaml": float(qt.excited.vqd.overlap_exponent),
+        "vqd_cobyla_maxiter_yaml": int(qt.excited.vqd.cobyla_maxiter),
+        "vqd_overlap_mode_yaml": qt.excited.vqd.overlap_mode,
+        "vqd_optimizer_method_yaml": qt.excited.vqd.optimizer_method,
+        "vqd_init_strategy_yaml": qt.excited.vqd.init_strategy,
+        "vqd_init_noise_scale_yaml": float(qt.excited.vqd.init_noise_scale),
+        "vqd_max_overlap_warn_yaml": qt.excited.vqd.max_overlap_warn,
+        "sceom_generator_strategy_yaml": qt.excited.sceom.generator_strategy,
         "parity_integrations_tket_first_circuit_stats": pi.tket_first_circuit_stats,
-        "use_pauli_protocol": qt.use_pauli_protocol,
-        "spam_calibration_enabled_yaml": mit.spam_calibration_enabled,
-        "classical_shadows_stub_enabled_yaml": mit.classical_shadows_stub_enabled,
-        "classical_shadows_budget_pairs_yaml": int(mit.classical_shadows_budget_pairs),
+        "use_pauli_protocol": qt.pauli.use_protocol,
+        "spam_calibration_enabled_yaml": mit.stubs.spam_calibration,
+        "classical_shadows_stub_enabled_yaml": mit.stubs.classical_shadows,
+        "classical_shadows_budget_pairs_yaml": int(mit.stubs.classical_shadows_budget_pairs),
     }
     if not pipeline_row:
         return base

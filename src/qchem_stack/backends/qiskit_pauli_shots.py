@@ -9,16 +9,19 @@ probabilities come from empirical frequencies instead of a statevector.
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from openfermion.ops import QubitOperator
 
-from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
 from qchem_stack.backends.pauli_measure_expand import deserialize_basis_key
 from qchem_stack.backends.pauli_shot_sim import _pauli_eigenvalue_on_comp_bit
 from qchem_stack.backends.qiskit_executor import hea_circuit_qiskit
-from qchem_stack.backends.spec import BackendSpec
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
+
+    from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
+    from qchem_stack.backends.spec import BackendSpec
 
 
 def _basis_key_for_term(term: tuple[tuple[int, str], ...]) -> tuple[tuple[int, str], ...]:

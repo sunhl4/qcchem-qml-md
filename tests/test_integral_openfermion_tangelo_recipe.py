@@ -54,8 +54,8 @@ def test_h2_sector_ground_matches_pyscf_fci() -> None:
     rhf = drv.run_rhf()
     qh = molecular_hamiltonian_from_classical_reference(
         _as_reference(rhf),
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     H = get_sparse_operator(qh.operator, n_qubits=qh.n_qubits).toarray()
     ne = int(qh.fermion_space.n_electrons)
@@ -91,8 +91,8 @@ def test_transpose_matches_explicit_tangelo_recipe() -> None:
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     qh = molecular_hamiltonian_from_classical_reference(
         _as_reference(rhf),
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     m1 = get_sparse_operator(qh.operator, n_qubits=4).toarray()
     m2 = get_sparse_operator(qop_ref, n_qubits=4).toarray()
@@ -119,8 +119,8 @@ def test_optional_tangelo_package_matches_if_installed() -> None:
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     qh = molecular_hamiltonian_from_classical_reference(
         _as_reference(rhf),
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     m1 = get_sparse_operator(qh.operator, n_qubits=4).toarray()
     m2 = get_sparse_operator(q_t, n_qubits=4).toarray()

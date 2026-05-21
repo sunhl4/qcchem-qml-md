@@ -1,101 +1,87 @@
-"""Documented fermion→qubit transforms (config + OpenFermion wiring).
-
-See :attr:`qchem_stack.config.ActiveSpaceSpec.fermion_qubit_mapping` and :mod:`qchem_stack.chem.hamiltonian`.
-
-Research distributions such as **Tangelo** additionally advertise JKMN / generalized mappings in tutorials.
-Those identifiers remain **out-of-scope** for execution until each mapping gets explicit OpenFermion plumbing,
-parity fixtures, and documentation parity rows (:data:`DOCUMENTED_FERMION_QUBIT_MAPPINGS` is the whitelist).
-"""
+"""Documented fermion→qubit mappings and Tangelo tutorial alias surface (chem layer)."""
 
 from __future__ import annotations
 
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any
 
-DOCUMENTED_FERMION_QUBIT_MAPPINGS: Final[tuple[str, ...]] = (
+from qchem_stack.contracts.schema_ids import (
+    MAPPING_STATUS_ROWS_V1,
+    TANGELO_PUBLIC_MAPPING_ALIAS_SURFACE_V1,
+)
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian_meta import FermionQubitMappingName
+
+DOCUMENTED_FERMION_QUBIT_MAPPINGS: tuple[FermionQubitMappingName, ...] = (
     "jordan_wigner",
     "bravyi_kitaev",
     "symmetry_conserving_bravyi_kitaev",
 )
 
 
-def list_documented_fermion_qubit_mappings() -> tuple[str, ...]:
-    return DOCUMENTED_FERMION_QUBIT_MAPPINGS
+def list_documented_fermion_qubit_mappings() -> list[str]:
+    return list(DOCUMENTED_FERMION_QUBIT_MAPPINGS)
+
+
+def mapping_status_rows_v1() -> list[dict[str, Any]]:
+    """Execution status for YAML literals vs research-stack nicknames."""
+    rows: list[dict[str, Any]] = []
+    for lit in DOCUMENTED_FERMION_QUBIT_MAPPINGS:
+        rows.append(
+            {
+                "yaml_literal": lit,
+                "execution_status": "executable",
+                "notes": "Wired in chem.hamiltonian build paths.",
+            }
+        )
+    for nick, note in (
+        ("JKMN", "Jordan-Klein-Majorana-Navascués style; not wired in open stack."),
+        ("HCB", "Honeycomb Bravyi-style nickname; not wired in open stack."),
+    ):
+        rows.append(
+            {
+                "research_stack_nickname": nick,
+                "execution_status": "planned_not_wired",
+                "executable": False,
+                "notes": note,
+            }
+        )
+    return rows
 
 
 def tangelo_public_mapping_alias_surface_v1() -> dict[str, Any]:
-    """
-    L1 nickname alignment vs **Tangelo** / tutorial literature (JW, BK, SCBK, …).
-
-    Executability is pinned to :data:`DOCUMENTED_FERMION_QUBIT_MAPPINGS` only — JKMN / HCB and
-    other research mappings stay **explicitly undisclosed-as-executable** until OpenFermion plumbing
-    + parity fixtures land (same epistemic bound as this module docstring).
-
-    Surfaced from ``GET /v1/meta/capability-surface`` for dashboards / Methods appendix tables — **not**
-    a claim of full Tangelo toolbox parity.
-    """
-    executable_rows = [
+    """L1 parity table: tutorial nicknames vs executable YAML literals."""
+    tutorial_rows = [
         {
-            "public_aliases": [
-                "JW",
-                "Jordan-Wigner",
-                "jordan-wigner",
-                "Jordan-Wigner transformation",
-            ],
-            "qchem_stack": "jordan_wigner",
+            "tutorial_alias": "JW",
+            "yaml_literal": "jordan_wigner",
             "executable": True,
         },
         {
-            "public_aliases": ["BK", "Bravyi-Kitaev", "bravyi-kitaev"],
-            "qchem_stack": "bravyi_kitaev",
+            "tutorial_alias": "BK",
+            "yaml_literal": "bravyi_kitaev",
             "executable": True,
         },
         {
-            "public_aliases": ["SCBK", "BKSC", "symmetry-conserving-Bravyi-Kitaev"],
-            "qchem_stack": "symmetry_conserving_bravyi_kitaev",
+            "tutorial_alias": "SCBK",
+            "yaml_literal": "symmetry_conserving_bravyi_kitaev",
             "executable": True,
         },
     ]
-    non_exec_rows = [
+    not_executable = [
         {
-            "public_aliases": ["JKMN", "HCB"],
+            "research_stack_nickname": r["research_stack_nickname"],
+            "execution_status": r["execution_status"],
             "executable": False,
-            "qchem_stack_status": "planned_not_wired",
-            "note": (
-                "Not wired in qchem-stack; keep parity matrix partial + whitelist "
-                "DOCUMENTED_FERMION_QUBIT_MAPPINGS authoritative."
-            ),
-        },
+            "notes": r.get("notes"),
+        }
+        for r in mapping_status_rows_v1()
+        if r.get("execution_status") == "planned_not_wired"
     ]
     return {
-        "schema": "tangelo_public_mapping_alias_surface_v1",
-        "public_tool_references": [
-            {"label": "tangelo_docs", "url": "https://sandbox-quantum.github.io/Tangelo/"},
-            {"label": "tangelo_github", "url": "https://github.com/sandbox-quantum/Tangelo"},
-        ],
-        "epistemic_bound": (
-            "Alias vocabulary for reproducibility narratives — executable mappings are YAML "
-            "`active_space.fermion_qubit_mapping` literals in qchem-documented-whitelist form only."
-        ),
-        "yaml_config_field": "active_space.fermion_qubit_mapping",
+        "schema": TANGELO_PUBLIC_MAPPING_ALIAS_SURFACE_V1,
         "qchem_stack_documented_literals": list(DOCUMENTED_FERMION_QUBIT_MAPPINGS),
-        "tutorial_alias_rows": executable_rows,
-        "not_executable_named_in_research_stack": non_exec_rows,
-        "mapping_status_rows_v1": [
-            *[
-                {
-                    "canonical_mapping": r["qchem_stack"],
-                    "aliases": list(r["public_aliases"]),
-                    "execution_status": "executable",
-                }
-                for r in executable_rows
-            ],
-            *[
-                {
-                    "canonical_mapping": "unknown_or_future",
-                    "aliases": list(r["public_aliases"]),
-                    "execution_status": str(r["qchem_stack_status"]),
-                }
-                for r in non_exec_rows
-            ],
-        ],
+        "tutorial_alias_rows": tutorial_rows,
+        "not_executable_named_in_research_stack": not_executable,
+        MAPPING_STATUS_ROWS_V1: mapping_status_rows_v1(),
     }

@@ -59,8 +59,8 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
     )
     h1 = molecular_hamiltonian_from_classical_reference(
         ref1,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     r2 = drv.run_rhf()
     ref2 = ClassicalMeanFieldReference(
@@ -72,8 +72,8 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
     )
     h2 = molecular_hamiltonian_from_classical_reference(
         ref2,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     fp1 = h1.meta["hamiltonian_fingerprint"]
     fp2 = h2.meta["hamiltonian_fingerprint"]
@@ -101,14 +101,14 @@ def test_h2_fingerprint_sensitive_to_fermion_mapping() -> None:
     )
     h_jw = molecular_hamiltonian_from_classical_reference(
         ref,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
     )
     h_bk = molecular_hamiltonian_from_classical_reference(
         ref,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="bravyi_kitaev",
     )
     assert h_jw.meta["hamiltonian_fingerprint"] != h_bk.meta["hamiltonian_fingerprint"]
@@ -144,7 +144,10 @@ def test_non_pyscf_reference_meta_stored_as_classical_driver() -> None:
         qh.meta.get("classical_driver", {}).get("upstream_classical_software_tag") == "mock_solver"
     )
     assert qh.meta.get("integral_source") == "mock_solver_active_space"
-    assert qh.meta.get("integral_openfermion_bridge") == "mock_solver_openfermion_interaction_operator_v1"
+    assert (
+        qh.meta.get("integral_openfermion_bridge")
+        == "mock_solver_openfermion_interaction_operator_v1"
+    )
 
 
 def test_canonical_pack_provenance_controls_integral_metadata() -> None:
@@ -212,6 +215,11 @@ def test_compact_non_jw_path_forwards_explicit_integral_metadata() -> None:
     class _Compact:
         n_active_orbitals = 1
         n_active_electrons = 2
+        constant = 0.0
+        h1_active_mo = np.zeros((1, 1), dtype=float)
+
+        def dense_h2_chemist_spatial(self) -> np.ndarray:
+            return np.zeros((1, 1, 1, 1), dtype=float)
 
         def to_interaction_operator(self) -> InteractionOperator:
             return InteractionOperator(

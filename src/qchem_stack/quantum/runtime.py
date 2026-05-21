@@ -3,11 +3,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.backends.factory import executor_from_spec
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.vqe import VQE, VQEResult
 
 if TYPE_CHECKING:
     from qchem_stack.backends.spec import BackendSpec
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.config import ExperimentConfig
 
 

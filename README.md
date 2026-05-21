@@ -13,6 +13,7 @@ Open orchestration for quantum-chemistry workloads: **chemistry definition → e
 - **Documentation site (Docusaurus; product guides, tutorials, parity, reference)**: [`docusaurus-site/`](docusaurus-site/) — `cd docusaurus-site && npm install && npm start` (local dev, default `http://localhost:3000/`). Production build: `npm run build`. CI runs this build on every PR. See [`docusaurus-site/README.md`](docusaurus-site/README.md).
 
 - **Engineering architecture & long-form contracts** (repo `docs/*.md`, not fully copied into Docusaurus): [`docs/ENGINEERING_ARCHITECTURE.md`](docs/ENGINEERING_ARCHITECTURE.md). Use this for layering, HTTP touchpoints, and strict `repro` posture.
+- **Contributor quick start (English, YAML → pipeline → repro)**: [`docs/QUICKSTART_CONTRIBUTORS.md`](docs/QUICKSTART_CONTRIBUTORS.md).
 
 - **Competitive positioning vs Vendor platform and Tangelo (product + technical routes, P0–P3 roadmap)**: [docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) — what we **do** compete on (open orchestration, reproducibility, multi-backend, MD/ML, workflow discipline) and what we **do not** (Nexus, H-series lock-in, Vendor platform binary parity).
 - **Vendor platform public “How to use” → this repo (topic map)**：[工程记忆 §14](docs/工程记忆_Quantinuum对标与数据流技术文档.md) — aligns [Quantinuum howto](https://www.quantinuum.com/) sections to **open, auditable** paths; **not** closed-wheel parity.

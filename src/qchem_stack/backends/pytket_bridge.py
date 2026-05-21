@@ -5,9 +5,10 @@ Install: ``pip install qchem-stack[pytket]`` (or ``pip install pytket``).
 
 from __future__ import annotations
 
-from typing import Any, cast
+from typing import TYPE_CHECKING, Any, cast
 
-from qchem_stack.backends.spec import CircuitIR
+if TYPE_CHECKING:
+    from qchem_stack.backends.spec import CircuitIR
 
 
 def _require_pytket() -> type:
@@ -19,7 +20,7 @@ def _require_pytket() -> type:
         ) from e
     from pytket.circuit import Circuit  # type: ignore[import-untyped]
 
-    return cast(type, Circuit)
+    return cast("type", Circuit)
 
 
 def circuit_ir_to_pytket(ir: CircuitIR) -> tuple[Any, list[str]]:
@@ -69,7 +70,8 @@ def pytket_circuit_stats(circuit: Any) -> dict[str, Any]:
     """Depth, 2Q depth, and two-qubit gate count from a pytket :class:`~pytket.circuit.Circuit`."""
     _require_pytket()
     ng = circuit.n_gates
-    n_gates = int(ng() if callable(ng) else ng)
+    n_gates_raw = ng() if callable(ng) else ng
+    n_gates = int(n_gates_raw)  # type: ignore[arg-type]
     return {
         "depth": int(circuit.depth()),
         "depth_2q": int(circuit.depth_2q()),

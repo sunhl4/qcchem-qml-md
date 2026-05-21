@@ -7,11 +7,15 @@ so the same orchestration matches `EmbeddingSpec` / `repro` contracts without Py
 
 from __future__ import annotations
 
-from collections.abc import Callable
 from dataclasses import dataclass, field, replace
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.embedding.dmet import DMETContext
+from qchem_stack.contracts.schema_ids import DMET_ONE_SHOT_V1, DMET_SELF_CONSISTENCY_V1
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from qchem_stack.chem.embedding.dmet import DMETContext
 
 
 @dataclass
@@ -78,14 +82,14 @@ class DMETSelfConsistencyLoop:
             )
             if prev_bath is not None and is_converged(prev_bath, bath, k):
                 return {
-                    "schema": "dmet_self_consistency_v1",
+                    "schema": DMET_SELF_CONSISTENCY_V1,
                     "converged": True,
                     "cycles": k + 1,
                     "history": history,
                     "final_bath": _bath_to_json(bath),
                 }
         return {
-            "schema": "dmet_self_consistency_v1",
+            "schema": DMET_SELF_CONSISTENCY_V1,
             "converged": False,
             "cycles": self.max_cycles,
             "history": history,
@@ -149,7 +153,7 @@ class DMETSelfConsistencyLoop:
                 }
             )
             rep_out: dict[str, Any] = {
-                "schema": "dmet_self_consistency_v1",
+                "schema": DMET_SELF_CONSISTENCY_V1,
                 "sequential_fragment_updates": True,
                 "cycles": k + 1,
                 "history": history,
@@ -160,7 +164,7 @@ class DMETSelfConsistencyLoop:
                 rep_out["converged"] = True
                 return rep_out
         rep_fail: dict[str, Any] = {
-            "schema": "dmet_self_consistency_v1",
+            "schema": DMET_SELF_CONSISTENCY_V1,
             "sequential_fragment_updates": True,
             "converged": False,
             "cycles": self.max_cycles,
@@ -197,7 +201,7 @@ class OneShotEmbeddingDriver:
             row: dict[str, Any] = {"fragment_id": r.fragment_id, "energy": r.energy}
             row.update(r.meta)
             rows.append(row)
-        return {"schema": "dmet_one_shot_v1", "fragments": rows}
+        return {"schema": DMET_ONE_SHOT_V1, "fragments": rows}
 
 
 def _coerce_float(x: Any) -> float | None:

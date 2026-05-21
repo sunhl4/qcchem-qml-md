@@ -1,4 +1,7 @@
-"""YAML I/O and runtime adapter conversion helpers for experiment configs."""
+"""YAML I/O and runtime adapter conversion helpers for experiment configs.
+
+User-facing overview (plain language): ``docs/说明_实验配置加载_io.md``.
+"""
 
 from __future__ import annotations
 
@@ -51,7 +54,7 @@ def _strip_callables(obj: object) -> object:
 
 
 def dump_experiment_config(cfg: ExperimentConfig) -> str:
-    raw = _strip_callables(cfg.model_dump(mode="python"))
+    raw = _strip_callables(cfg.model_dump(mode="json"))
     return yaml.safe_dump(raw, sort_keys=False, allow_unicode=True)
 
 

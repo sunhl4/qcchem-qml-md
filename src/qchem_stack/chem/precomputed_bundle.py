@@ -15,6 +15,7 @@ from typing import Any
 import numpy as np
 from openfermion.ops import QubitOperator
 
+from qchem_stack.chem.bridges.mean_field_like import wrap_mean_field_like
 from qchem_stack.chem.hamiltonian import (
     QubitHamiltonian,
     hamiltonian_fingerprint_from_qubit_operator,
@@ -90,7 +91,9 @@ def molecular_mean_field_result_from_bundle(
     cfg_path: Path | None = None,
 ) -> MolecularMeanFieldResult:
     path, data = load_bundle_dict(raw_path, cfg_path=cfg_path)
-    block = _expect_object(data.get("classical_reference"), "bundle.classical_reference must be an object.")
+    block = _expect_object(
+        data.get("classical_reference"), "bundle.classical_reference must be an object."
+    )
     e_tot = _coerce_float(block["e_tot"], "bundle.classical_reference.e_tot must be numeric.")
     mo_raw = _expect_non_empty_list(
         block.get("mo_energy"),
@@ -105,12 +108,18 @@ def molecular_mean_field_result_from_bundle(
     driver_meta.setdefault("driver_family", "precomputed")
     driver_meta["precomputed_bundle_schema"] = CLASSICAL_REFERENCE_BUNDLE_V1
     driver_meta["precomputed_bundle_path"] = str(path)
+    raw_mf = {
+        "backend": "precomputed",
+        "bundle_path": str(path),
+        "bundle_schema": CLASSICAL_REFERENCE_BUNDLE_V1,
+    }
     return MolecularMeanFieldResult(
-        mf={
-            "backend": "precomputed",
-            "bundle_path": str(path),
-            "bundle_schema": CLASSICAL_REFERENCE_BUNDLE_V1,
-        },
+        mf=wrap_mean_field_like(
+            backend_tag="precomputed",
+            raw_mf=raw_mf,
+            e_tot=e_tot,
+            mo_energy=mo_energy,
+        ),
         e_tot=e_tot,
         mo_energy=mo_energy,
         driver_meta=driver_meta,
@@ -131,7 +140,9 @@ def qubit_hamiltonian_from_bundle_payload(
     *,
     path: Path,
 ) -> QubitHamiltonian:
-    pqi = _expect_object(data.get("pre_quantum_input"), "bundle.pre_quantum_input must be an object.")
+    pqi = _expect_object(
+        data.get("pre_quantum_input"), "bundle.pre_quantum_input must be an object."
+    )
     schema = str(pqi.get("schema") or "")
     if schema and schema != PRE_QUANTUM_INPUT_SCHEMA_V1:
         raise ValueError(
@@ -200,10 +211,14 @@ def parse_precomputed_manifest(data: dict[str, Any]) -> dict[str, Any] | None:
     if "config_fingerprint" in raw and raw["config_fingerprint"] is not None:
         out["config_fingerprint"] = str(raw["config_fingerprint"])
     if "n_active_orbitals" in raw and raw["n_active_orbitals"] is not None:
-        n_orb = _coerce_positive_int(raw["n_active_orbitals"], field="bundle.manifest.n_active_orbitals")
+        n_orb = _coerce_positive_int(
+            raw["n_active_orbitals"], field="bundle.manifest.n_active_orbitals"
+        )
         out["n_active_orbitals"] = n_orb
     if "n_active_electrons" in raw and raw["n_active_electrons"] is not None:
-        n_ele = _coerce_positive_int(raw["n_active_electrons"], field="bundle.manifest.n_active_electrons")
+        n_ele = _coerce_positive_int(
+            raw["n_active_electrons"], field="bundle.manifest.n_active_electrons"
+        )
         out["n_active_electrons"] = n_ele
     if "fermion_qubit_mapping" in raw and raw["fermion_qubit_mapping"] is not None:
         map_name = str(raw["fermion_qubit_mapping"]).strip().lower()

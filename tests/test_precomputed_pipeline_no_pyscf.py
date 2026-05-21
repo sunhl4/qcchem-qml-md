@@ -12,7 +12,6 @@ import pytest
 @pytest.mark.no_pyscf
 def test_precomputed_lane_without_pyscf_import() -> None:
     root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_precomputed_bundle.yaml"
     script = f"""
 import importlib.abc
 import sys

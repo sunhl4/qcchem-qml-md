@@ -17,13 +17,17 @@ Layout: submodules by area (:mod:`molecule`, :mod:`geometry_files`, :mod:`scf`, 
 from __future__ import annotations
 
 from ._constants import ANGSTROM_TO_BOHR
-from ._experiment_validation import (
-    SCHMIDT_DMET_MAX_CYCLES_LIMIT,
-    validate_pre_quantum_contract,
-)
+from ._embedding_validation import SCHMIDT_DMET_MAX_CYCLES_LIMIT
+from ._experiment_validation import validate_pre_quantum_contract
 from .active_space import ActiveSpaceSpec
+from .active_space_helpers import (
+    resolve_fermion_qubit_mapping,
+    resolve_n_electrons,
+    resolve_n_orbitals,
+)
 from .backend import BackendSpecConfig
 from .chemistry_extended import ChemistryExtendedSpec
+from .chemistry_extended_helpers import avas_ao_labels, pbc_cell_vectors_bohr
 from .compiler import CompilerSpec
 from .embedding import EmbeddingSpec
 from .experiment import ExperimentConfig
@@ -41,12 +45,18 @@ from .io import (
     load_experiment_config,
 )
 from .md_ml_export import MdMlExportSpec
+from .md_ml_export_helpers import extra_coordinates_bohr, trajectory_theory_level
 from .mitigation import MitigationSpec
+from .mitigation_helpers import mitigation_repro_core_fields, pmsv_enabled, zne_enabled
 from .molecule import MoleculeSpec
 from .nexus import NexusAnalogSpec, NexusCloudSpec
 from .parity_integrations import ParityIntegrationsSpec
-from .quantum import ComputableGraphEdgeDecl, ComputableGraphEdgeRemove, QuantumSpec
+from .quantum import QuantumSpec
+from .quantum_enums import OperatorPoolId
+from .quantum_graph import ComputableGraphEdgeDecl, ComputableGraphEdgeRemove
+from .quantum_helpers import quantum_repro_core_fields
 from .scf import SCFSpec
+from .scf_helpers import resolve_scf_density_fit, resolve_scf_max_cycle
 
 __all__ = [
     "ANGSTROM_TO_BOHR",
@@ -56,6 +66,7 @@ __all__ = [
     "CompilerSpec",
     "ComputableGraphEdgeDecl",
     "ComputableGraphEdgeRemove",
+    "OperatorPoolId",
     "EmbeddingSpec",
     "ExperimentConfig",
     "MdMlExportSpec",
@@ -76,5 +87,18 @@ __all__ = [
     "merge_molecule_dict_from_geometry_file",
     "parse_xyz",
     "preprocess_experiment_dict_geometry_files",
+    "avas_ao_labels",
+    "extra_coordinates_bohr",
+    "mitigation_repro_core_fields",
+    "pbc_cell_vectors_bohr",
+    "pmsv_enabled",
+    "quantum_repro_core_fields",
+    "resolve_fermion_qubit_mapping",
+    "resolve_n_electrons",
+    "resolve_n_orbitals",
+    "resolve_scf_density_fit",
+    "resolve_scf_max_cycle",
+    "trajectory_theory_level",
     "validate_pre_quantum_contract",
+    "zne_enabled",
 ]

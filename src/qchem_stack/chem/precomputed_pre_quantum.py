@@ -4,12 +4,10 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.pre_quantum_input import PreQuantumInput, build_pre_quantum_meta
 from qchem_stack.chem.pre_quantum_path import PreQuantumPath, pre_quantum_path_source
 from qchem_stack.chem.precomputed_bundle import (
@@ -17,8 +15,14 @@ from qchem_stack.chem.precomputed_bundle import (
     parse_precomputed_manifest,
     qubit_hamiltonian_from_bundle_payload,
 )
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import PRECOMPUTED_CONFIG_FINGERPRINT_V1
 from qchem_stack.exceptions import PipelineError
+
+if TYPE_CHECKING:
+    from pathlib import Path
+
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
 
 
 def _manifest_mismatch(field: str, detail: str) -> PipelineError:
@@ -46,16 +50,16 @@ def precomputed_config_fingerprint_payload(cfg: ExperimentConfig) -> dict[str, A
     coords_bohr = np.asarray(cfg.molecule.coordinates_in_bohr(), dtype=float)
     rounded = [[round(float(x), 12) for x in row] for row in coords_bohr.tolist()]
     return {
-        "schema": "precomputed_config_fingerprint_v1",
+        "schema": PRECOMPUTED_CONFIG_FINGERPRINT_V1,
         "molecule_symbols": [str(x) for x in cfg.molecule.symbols],
         "molecule_coordinates_bohr": rounded,
         "charge": int(cfg.molecule.charge),
         "multiplicity": int(cfg.molecule.multiplicity),
         "basis": str(cfg.molecule.basis),
         "active_space": {
-            "n_active_orbitals": int(cfg.active_space.n_active_orbitals),
-            "n_active_electrons": int(cfg.active_space.n_active_electrons),
-            "fermion_qubit_mapping": str(cfg.active_space.fermion_qubit_mapping),
+            "n_active_orbitals": int(cfg.active_space.cas.n_orbitals),
+            "n_active_electrons": int(cfg.active_space.cas.n_electrons),
+            "fermion_qubit_mapping": str(cfg.active_space.mapping.fermion_qubit),
         },
     }
 
@@ -93,21 +97,21 @@ def validate_precomputed_manifest_against_config(
     scalar_checks: tuple[tuple[str, Any, Any, str], ...] = (
         (
             "n_active_orbitals",
-            cfg.active_space.n_active_orbitals,
+            cfg.active_space.cas.n_orbitals,
             int,
-            f"!= cfg.active_space.n_active_orbitals {cfg.active_space.n_active_orbitals}.",
+            f"!= cfg.active_space.cas.n_orbitals {cfg.active_space.cas.n_orbitals}.",
         ),
         (
             "n_active_electrons",
-            cfg.active_space.n_active_electrons,
+            cfg.active_space.cas.n_electrons,
             int,
-            f"!= cfg.active_space.n_active_electrons {cfg.active_space.n_active_electrons}.",
+            f"!= cfg.active_space.cas.n_electrons {cfg.active_space.cas.n_electrons}.",
         ),
         (
             "fermion_qubit_mapping",
-            cfg.active_space.fermion_qubit_mapping,
+            cfg.active_space.mapping.fermion_qubit,
             str,
-            f"!= {cfg.active_space.fermion_qubit_mapping!r}.",
+            f"!= {cfg.active_space.mapping.fermion_qubit!r}.",
         ),
     )
     for field, expected, normalize, rhs in scalar_checks:
@@ -142,7 +146,9 @@ def validate_precomputed_manifest_against_config(
         observed = str(manifest["config_fingerprint"])
         expected = precomputed_config_fingerprint(cfg)
         if observed != expected:
-            raise _manifest_mismatch("config_fingerprint", f"{observed!r} != expected {expected!r}.")
+            raise _manifest_mismatch(
+                "config_fingerprint", f"{observed!r} != expected {expected!r}."
+            )
 
 
 def precomputed_pre_quantum_input(
@@ -151,7 +157,7 @@ def precomputed_pre_quantum_input(
     *,
     cfg_path: Path | None,
 ) -> PreQuantumInput:
-    raw = str(cfg.scf.precomputed_bundle_path or "").strip()
+    raw = str(cfg.scf.precomputed.bundle_path or "").strip()
     if not raw:
         raise PipelineError(
             "scf.driver='precomputed' requires scf.precomputed_bundle_path to load pre-quantum input."

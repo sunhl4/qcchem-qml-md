@@ -19,6 +19,7 @@ class ChemicallyAwareUCCPolicy(Protocol):
 
     def regroup_generators(self, ops: list[FermionOperator]) -> list[FermionOperator]:
         """Return reordered or merged fermionic generators (same algebra up to Trotter error)."""
+        ...
 
 
 class IdentityRegrouping:

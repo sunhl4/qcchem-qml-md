@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import TYPE_CHECKING
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.qpe_qec_demo.kitaev import kitaev_qpe_energy_estimate
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 @dataclass

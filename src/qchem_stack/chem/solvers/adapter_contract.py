@@ -11,6 +11,7 @@ from qchem_stack.chem.solvers.base import (
     MolecularMeanFieldResult,
     SolverCapabilities,
 )
+from qchem_stack.contracts.schema_ids import SOLVER_ADAPTER_CONTRACT_REPORT_V1
 
 
 @dataclass(frozen=True)
@@ -27,7 +28,7 @@ class SolverAdapterContractReport:
 
     def as_dict(self) -> dict[str, Any]:
         return {
-            "schema": "solver_adapter_contract_report_v1",
+            "schema": SOLVER_ADAPTER_CONTRACT_REPORT_V1,
             "backend_id": self.backend_id,
             "ok": self.ok,
             "protocol_conformant": self.protocol_conformant,

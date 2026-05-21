@@ -1,14 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
-from openfermion.ops import QubitOperator
 from scipy.linalg import expm
 from scipy.optimize import minimize
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
 from qchem_stack.quantum.operator_pool_registry import build_registered_operator_pool
 from qchem_stack.quantum.statevector import (
@@ -18,7 +16,10 @@ from qchem_stack.quantum.statevector import (
 )
 
 if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
+
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 @dataclass
@@ -58,7 +59,10 @@ class FermionicAdaptVQE(AlgorithmBase):
         self.pool = pool or build_registered_operator_pool(pool_id, hamiltonian)
 
     def build(self, **kwargs: Any) -> FermionicAdaptVQE:
-        return super().build(pool_id=self.pool_id, tetris_style=self.tetris_style, **kwargs)
+        return cast(
+            "FermionicAdaptVQE",
+            super().build(pool_id=self.pool_id, tetris_style=self.tetris_style, **kwargs),
+        )
 
     def run(
         self,
@@ -131,11 +135,13 @@ class FermionicAdaptVQE(AlgorithmBase):
                     if len(selected_this_round) >= 4:
                         break
 
-            def full_obj(x: np.ndarray) -> float:
+            round_sel = tuple(selected_this_round)
+
+            def full_obj(x: np.ndarray, sel: tuple[int, ...] = round_sel) -> float:
                 hea_x = x[:n_hea]
                 tail = x[n_hea:]
                 trial = list(layers)
-                for k, idx in enumerate(selected_this_round):
+                for k, idx in enumerate(sel):
                     trial.append((idx, float(tail[k])))
                 return energy_fn(hea_x, trial)
 

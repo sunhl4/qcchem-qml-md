@@ -8,17 +8,19 @@ import pytest
 from pydantic import ValidationError
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
+from qchem_stack.exceptions import ConfigurationError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 
 def test_experiment_validation_rejects_avas_without_labels() -> None:
     raw = {
-        "schema_version": "1",
+        "schema_version": "2",
         "experiment_id": "bad_avas",
         "random_seed": 0,
         "molecule": {
             "symbols": ["H", "H"],
-            "coordinates_bohr": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+            "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+            "coordinate_unit": "bohr",
             "charge": 0,
             "multiplicity": 1,
             "basis": "sto-3g",
@@ -28,18 +30,21 @@ def test_experiment_validation_rejects_avas_without_labels() -> None:
         "chemistry_extended": {"avas_ao_labels": []},
         "quantum": {"use_pauli_protocol": False},
     }
-    with pytest.raises(ValidationError, match="avas_ao_labels"):
+    from qchem_stack.exceptions import ConfigurationError
+
+    with pytest.raises((ValidationError, ConfigurationError), match="avas.ao_labels"):
         ExperimentConfig.from_yaml_dict(raw)
 
 
 def test_experiment_validation_rejects_avas_on_psi4_driver() -> None:
     raw = {
-        "schema_version": "1",
+        "schema_version": "2",
         "experiment_id": "bad_avas_driver",
         "random_seed": 0,
         "molecule": {
             "symbols": ["H", "H"],
-            "coordinates_bohr": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+            "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+            "coordinate_unit": "bohr",
             "charge": 0,
             "multiplicity": 1,
             "basis": "sto-3g",
@@ -49,7 +54,7 @@ def test_experiment_validation_rejects_avas_on_psi4_driver() -> None:
         "chemistry_extended": {"avas_ao_labels": ["H 1s"]},
         "quantum": {"use_pauli_protocol": False},
     }
-    with pytest.raises(ValidationError, match="scf.driver"):
+    with pytest.raises(ConfigurationError, match="supports_avas_active_space_projection"):
         ExperimentConfig.from_yaml_dict(raw)
 
 

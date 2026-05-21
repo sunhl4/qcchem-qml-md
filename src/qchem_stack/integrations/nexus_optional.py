@@ -9,6 +9,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from qchem_stack.contracts.schema_ids import NEXUS_PUBLIC_WORKFLOW_BLUEPRINT_V1, QNEXUS_PROBE_V1
+
 
 def probe_qnexus_installation() -> dict[str, Any]:
     """
@@ -20,14 +22,14 @@ def probe_qnexus_installation() -> dict[str, Any]:
         import qnexus as qnx  # type: ignore[import-not-found]
     except ImportError as e:
         return {
-            "schema": "qnexus_probe_v1",
+            "schema": QNEXUS_PROBE_V1,
             "available": False,
             "package": "qnexus",
             "error": str(e)[:400],
         }
     ver = getattr(qnx, "__version__", None)
     out: dict[str, Any] = {
-        "schema": "qnexus_probe_v1",
+        "schema": QNEXUS_PROBE_V1,
         "available": True,
         "package": "qnexus",
         "version": str(ver) if ver is not None else "unknown",
@@ -45,7 +47,7 @@ def nexus_public_workflow_blueprint() -> dict[str, Any]:
     Use for Methods diagrams; actual calls live in user code with credentials.
     """
     return {
-        "schema": "nexus_public_workflow_blueprint_v1",
+        "schema": NEXUS_PUBLIC_WORKFLOW_BLUEPRINT_V1,
         "stages": [
             {"id": "auth", "description": "API key / workspace session (qnexus / portal)"},
             {"id": "project_context", "description": "Select project + versioning context"},

@@ -137,21 +137,24 @@ def test_export_parity_psi4_config_only_row_present() -> None:
     cfg = _ROOT / "tests" / "fixtures" / "_tmp_psi4_export.yaml"
     cfg.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: psi4_export
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   basis: sto-3g
 scf:
   driver: psi4
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -180,7 +183,9 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
     assert pqi.get("source") == "canonical_active_space_integral_pack"
     assert pqi.get("backend_tag") == "pyscf"
     assert out.get("pre_quantum_build_cache_from_run", {}).get("pack_builds") == 1
-    assert out.get("pre_quantum_source_mirror_run_summary") == "canonical_active_space_integral_pack"
+    assert (
+        out.get("pre_quantum_source_mirror_run_summary") == "canonical_active_space_integral_pack"
+    )
     ph = out.get("pre_quantum_handoff_v1_from_parity_snapshot") or {}
     assert ph.get("hamiltonian_branch") == "canonical_active_space_integral_pack"
     assert out.get("pre_quantum_build_cache_v1_from_parity_snapshot", {}).get("pack_builds") == 1

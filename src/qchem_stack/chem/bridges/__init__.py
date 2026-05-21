@@ -1,3 +1,4 @@
+# pyright: reportUnsupportedDunderAll=false
 """Classical QC software → qchem_stack interchange public exports.
 
 This package uses lazy attribute loading so importing submodules like

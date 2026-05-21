@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.chem.systems.pyscf_views import PySCFLowdinSystem
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.system import MolecularSystem
 
 
 def build_lowdin_system_from_rhf(

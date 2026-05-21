@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext
 from qchem_stack.chem.classical_benchmarks.schema import CLASSICAL_POST_HF_BENCHMARKS_SCHEMA_V1
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext
 
 
 def _na(reason: str) -> dict[str, Any]:

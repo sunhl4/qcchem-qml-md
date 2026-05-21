@@ -6,10 +6,10 @@ Merged into ``repro.parity_snapshot`` when :attr:`~qchem_stack.config.ParityInte
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qchem_stack.backends.spec import CircuitIR
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import OPEN_GAP_CLOSURE_REFERENCE_V1
 from qchem_stack.integrations.l3_statistics_reference import energy_bootstrap_ci_stub
 from qchem_stack.integrations.nexus_optional import nexus_public_workflow_blueprint
 from qchem_stack.integrations.open_driver_surface import open_driver_coverage_matrix
@@ -23,6 +23,9 @@ from qchem_stack.integrations.ucc_reference import (
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.tensornet.dense_expectation_reference import dense_expectation_api_descriptor
 
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
+
 
 def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
     """
@@ -30,8 +33,8 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
 
     Epistemic bound: **L1 / engineered reference**, never L0 binary equivalence to closed vendor stacks or Nexus.
     """
-    n_so = 2 * int(cfg.active_space.n_active_orbitals)
-    ne = int(cfg.active_space.n_active_electrons)
+    n_so = 2 * int(cfg.active_space.cas.n_orbitals)
+    ne = int(cfg.active_space.cas.n_electrons)
     base_gens = build_spin_uccsd_fermion_generators(n_so, ne)
     layers_greedy = GreedyCommutingFermionicLayers().regroup_into_layers(base_gens)
     gens_sbd = SinglesBeforeDoublesLexicographic().regroup_generators(base_gens)
@@ -48,7 +51,7 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
     mit = build_qermit_style_mitigation_report(cfg)
 
     return {
-        "schema": "open_gap_closure_reference_v1",
+        "schema": OPEN_GAP_CLOSURE_REFERENCE_V1,
         "epistemic_binding": (
             "Synthetic closure of publicly-documented *contract* gaps using peer-reviewable "
             "or explicitly labeled toy methods. Not Quantinuum closed binaries."

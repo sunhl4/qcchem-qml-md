@@ -249,14 +249,15 @@ def test_methods_resource_unified_v1_includes_classical_benchmark_fields_when_en
     cfg_path = tmp_path / "h2_methods_uni_bench.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: methods_uni_bench
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -264,18 +265,23 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 10
-  use_pauli_protocol: false
+  vqe:
+    depth: 1
+    maxiter: 10
+  pauli:
+    use_protocol: false
 chemistry_extended:
-  classical_benchmark_enabled: true
+  benchmarks:
+    enabled: true
 """,
         encoding="utf-8",
     )

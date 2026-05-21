@@ -7,31 +7,30 @@ before :class:`MoleculeSpec` is built; see :mod:`qchem_stack.config.geometry_fil
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Literal
 
-from pydantic import AliasChoices, BaseModel, ConfigDict, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, model_validator
 
 from qchem_stack.exceptions import ConfigurationError
 
 from ._constants import ANGSTROM_TO_BOHR
 
+if TYPE_CHECKING:
+    import numpy as np
+
+_FORBID = ConfigDict(extra="forbid")
+
 
 class MoleculeSpec(BaseModel):
-    model_config = ConfigDict(populate_by_name=True)
+    model_config = _FORBID
 
     symbols: list[str]
     coordinates: list[list[float]] | None = Field(
         default=None,
-        validation_alias=AliasChoices("coordinates", "coordinates_bohr"),
-        description=(
-            "Atomic Cartesian coordinates in ``coordinate_unit``. "
-            "YAML may use legacy key ``coordinates_bohr`` (values interpreted as Bohr unless "
-            "``coordinate_unit`` is set explicitly)."
-        ),
+        description="Atomic Cartesian coordinates in ``coordinate_unit``.",
     )
     zmatrix: str | None = Field(
         default=None,
-        validation_alias=AliasChoices("zmatrix", "z_matrix"),
         description=(
             "Optional Z-matrix molecular geometry text. When provided (and ``coordinates`` is omitted), "
             "it is converted to Cartesian Bohr coordinates internally."
@@ -39,37 +38,45 @@ class MoleculeSpec(BaseModel):
     )
     coordinate_unit: Literal["angstrom", "bohr"] = Field(
         default="angstrom",
+        description="Length unit for ``coordinates`` (default ångström).",
+    )
+    charge: int = Field(
+        default=0,
+        description="Total molecular charge (0 neutral; +1 cation; -1 anion). Forwarded to PySCF/Psi4.",
+    )
+    multiplicity: int = Field(
+        default=1,
+        ge=1,
         description=(
-            "Length unit for ``coordinates``. Defaults to **ångström** for the canonical ``coordinates`` key; "
-            "if the legacy alias ``coordinates_bohr`` is used and this field is omitted, it defaults to **bohr**."
+            "Spin multiplicity 2S+1 (singlet=1, doublet=2, triplet=3). "
+            "PySCF ``gto.M(..., spin=multiplicity - 1)``."
         ),
     )
-    charge: int = 0
-    multiplicity: int = 1
-    basis: str = "sto-3g"
-    ecp: str | dict[str, str] | None = None
-
-    @model_validator(mode="before")
-    @classmethod
-    def _legacy_coordinates_bohr_unit(cls, data: Any) -> Any:
-        if not isinstance(data, dict):
-            return data
-        out = dict(data)
-        if "coordinates_bohr" in out and "coordinate_unit" not in out:
-            out["coordinate_unit"] = "bohr"
-        return out
+    basis: str = Field(
+        default="sto-3g",
+        min_length=1,
+        description=(
+            "Basis set name understood by the classical backend (e.g. sto-3g, 6-31g, lanl2dz). "
+            "Use the same family label as ``ecp`` when an ECP is specified."
+        ),
+    )
+    ecp: str | dict[str, str] | None = Field(
+        default=None,
+        description=(
+            "Effective core potential: ``None`` for all-electron; a ``str`` applies one ECP label to "
+            "every atom; a ``dict`` maps element symbols to per-element ECP names (PySCF ``ecp=``)."
+        ),
+    )
 
     @model_validator(mode="after")
     def _validate_geometry_source(self) -> MoleculeSpec:
         if self.coordinates is None and not (self.zmatrix and self.zmatrix.strip()):
-            raise ValueError(
-                "molecule requires either coordinates/coordinates_bohr or a non-empty zmatrix."
-            )
+            raise ValueError("molecule requires either coordinates or a non-empty zmatrix.")
         if self.coordinates is not None and self.zmatrix:
             raise ValueError("molecule.coordinates and molecule.zmatrix are mutually exclusive.")
         return self
 
-    def coordinates_in_bohr(self):
+    def coordinates_in_bohr(self) -> np.ndarray:
         """Positions as a float ndarray in Bohr (PySCF ``gto.M`` internal convention)."""
         import numpy as np
 

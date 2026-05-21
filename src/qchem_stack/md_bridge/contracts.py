@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
-from qchem_stack.md_bridge.schema import QMEFDataset
+if TYPE_CHECKING:
+    from qchem_stack.md_bridge.schema import QMEFDataset
 
 
 @dataclass

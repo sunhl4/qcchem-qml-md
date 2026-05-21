@@ -61,13 +61,59 @@ class PySCFMeanFieldLike(GenericMeanFieldLike):
             return np.asarray(dm[0], dtype=float) + np.asarray(dm[1], dtype=float)
         return np.asarray(dm, dtype=float)
 
+    def make_rdm1(self) -> np.ndarray:
+        return self.rdm1_ao()
+
+
+class Psi4MeanFieldLike(GenericMeanFieldLike):
+    def __init__(self, *, _raw: Any, _e_tot: float, _mo_energy: np.ndarray) -> None:
+        super().__init__(backend_tag="psi4", _raw=_raw, _e_tot=float(_e_tot), _mo_energy=_mo_energy)
+
+    def _ao_view(self) -> Any:
+        from qchem_stack.chem.bridges.ao_basis_view import Psi4AOBasisView
+
+        return Psi4AOBasisView(_wfn=self._raw)
+
+    def overlap_ao(self) -> np.ndarray:
+        return self._ao_view().overlap_ao()
+
+    def get_ovlp(self) -> np.ndarray:
+        return self.overlap_ao()
+
+    def make_rdm1(self) -> np.ndarray:
+        return self._ao_view().make_rdm1_ao()
+
+
+def unwrap_mean_field_raw(mf: Any) -> Any:
+    """Return the backend-native mean-field handle (strip MeanFieldLike wrappers)."""
+    cur = mf
+    seen: set[int] = set()
+    while True:
+        oid = id(cur)
+        if oid in seen:
+            break
+        seen.add(oid)
+        raw_handle = getattr(cur, "raw_handle", None)
+        if not callable(raw_handle):
+            break
+        nxt = raw_handle()
+        if nxt is None or nxt is cur:
+            break
+        cur = nxt
+    return cur
+
 
 def wrap_mean_field_like(
     *, backend_tag: str, raw_mf: Any, e_tot: float, mo_energy: np.ndarray
 ) -> MeanFieldLike:
     tag = str(backend_tag).strip().lower()
+    raw_mf = unwrap_mean_field_raw(raw_mf)
     if tag == "pyscf":
         return PySCFMeanFieldLike(
+            _raw=raw_mf, _e_tot=float(e_tot), _mo_energy=np.asarray(mo_energy, dtype=float)
+        )
+    if tag == "psi4":
+        return Psi4MeanFieldLike(
             _raw=raw_mf, _e_tot=float(e_tot), _mo_energy=np.asarray(mo_energy, dtype=float)
         )
     return GenericMeanFieldLike(

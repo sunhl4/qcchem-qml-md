@@ -1,14 +1,16 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from scipy.linalg import eigvalsh
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 @dataclass

@@ -5,6 +5,10 @@ venv/
 .venv-wsl/
 env/
 
+# optional Psi4 micromamba prefix (see scripts/setup_psi4_micromamba.sh)
+.micromamba/
+bin/micromamba
+
 # Python
 __pycache__/
 *.py[cod]

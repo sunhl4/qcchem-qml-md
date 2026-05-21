@@ -25,9 +25,9 @@ def transition_pauli_amplitude(
 ) -> complex:
     """``\\langle \\phi_{\\mathrm{left}} | P | \\phi_{\\mathrm{right}} \\rangle`` for a single Pauli word."""
     if len(pauli_term) == 0:
-        return np.vdot(phi_left, phi_right)
+        return complex(np.vdot(phi_left, phi_right))
     op = qubit_operator_to_sparse(QubitOperator(pauli_term, 1.0), n_qubits)
-    return np.vdot(phi_left, op @ phi_right)
+    return complex(np.vdot(phi_left, op @ phi_right))
 
 
 def hamiltonian_transition_amplitude(

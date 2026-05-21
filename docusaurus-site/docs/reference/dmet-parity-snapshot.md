@@ -2,19 +2,25 @@
 
 本文说明嵌入相关配置在 pipeline 与 `parity_snapshot` 中的可观测语义。
 
+Nested 配置字段见仓库 [`docs/说明_embedding配置.md`](https://github.com/NVIDIA/qcchem-qml-md/blob/main/docs/说明_embedding配置.md)。
+
 ## 适用场景
 
 - 你要确认 embedding 配置是否被正确记录
 - 你要在验收中区分“结构对齐”和“数值求解深度”
 - 你要把嵌入相关字段纳入 `repro` 检查
 
-## 核心配置
+## 核心配置（nested YAML）
 
-| 字段 | 说明 |
+| 路径 | 说明 |
 |------|------|
-| `embedding.mode` | `none` / `dmet` / `projection` |
-| `fragment_labels` | 片段标识 |
-| `dmet_hamiltonian_source` | 杂质哈密顿量来源策略 |
+| `embedding.mode` | `none` / `dmet` / `projection` / `plugin` |
+| `embedding.dmet.fragment_labels` | DMET 片段标识 |
+| `embedding.dmet.hamiltonian_source` | 杂质哈密顿量来源策略 |
+| `embedding.projection.quantum_hamiltonian` | projection 变分 Hamiltonian 策略 |
+| `embedding.plugin.name` / `json_path` | 分解插件模式 |
+
+`repro` / `embedding_workflow` 输出仍使用历史键名（如 `dmet_hamiltonian_source`），与 YAML nested 路径对应。
 
 ## pipeline 行为摘要
 
@@ -39,12 +45,6 @@
 
 - 教程和烟测可先用最小 dmet stub 路径
 - 对外报告时明确“结构对齐”与“数值求解”边界
-
-## 常见问题
-
-- **字段缺失**：优先检查 `embedding.mode` 是否真的启用
-- **语义不一致**：确认运行用的是目标配置而非旧缓存/旧文件
-- **难以复盘**：在报告中同时保留配置快照与 `repro` 片段
 
 ## 关联页面
 

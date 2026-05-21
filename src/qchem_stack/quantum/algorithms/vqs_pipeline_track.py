@@ -2,24 +2,27 @@
 
 Supports either the historical **linear damping** toy flow (:class:`~AlgorithmVQS`) or a
 finite-difference **HEA tangent-space McLachlan/TDVP Euler stepper** configured via
-``quantum.vqs_rhs_mode`` *(ignored for bare ``quantum.vqs_mode: vqs`` — always damping)*.
+``quantum.demos.vqs.rhs_mode`` *(ignored for bare ``quantum.demos.vqs.mode: vqs`` — always damping)*.
 
 This remains an open-stack analogue of vendor time-evolved variational workflows, not ion-trap parity.
 """
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import VQS_INTEGRATION_CONTRACT_V1, VQS_TRACK_V1
 from qchem_stack.quantum.algorithms.vqs import (
     AlgorithmMcLachlanImagTime,
     AlgorithmMcLachlanRealTime,
     AlgorithmVQS,
     RhsMode,
 )
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 def _normalized_mode(mode: str) -> str:
@@ -32,7 +35,7 @@ def _effective_rhs_mode(yaml_track_mode: str, yaml_rhs: str) -> RhsMode:
         return "linear_damping"
     rhs = str(yaml_rhs).strip().lower().replace("-", "_")
     if rhs not in {"linear_damping", "hea_mclachlan_tdvp"}:
-        raise ValueError(f"Unknown quantum.vqs_rhs_mode={yaml_rhs!r}")
+        raise ValueError(f"Unknown quantum.demos.vqs.rhs_mode={yaml_rhs!r}")
     return rhs  # type: ignore[return-value]
 
 
@@ -58,7 +61,7 @@ def _select_runner(
         )
     raise ValueError(
         f"Unknown vqs_mode={mode!r}. "
-        "Use 'vqs', 'mclachlan_real_time', or 'mclachlan_imag_time' (quantum.vqs_mode)."
+        "Use 'vqs', 'mclachlan_real_time', or 'mclachlan_imag_time' (quantum.demos.vqs.mode)."
     )
 
 
@@ -91,7 +94,7 @@ def vqs_track_payload(
     if eff_rhs == "linear_damping":
         contract_rhs = (
             "linear_damping_lambda_theta (λ=0.1) forward Euler "
-            "(default when quantum.vqs_mode=='vqs' or rhs_mode_yaml requests damping)."
+            "(default when quantum.demos.vqs.mode=='vqs' or rhs_mode_yaml requests damping)."
         )
         integrator = "forward_euler_linear_damping"
     else:
@@ -102,13 +105,13 @@ def vqs_track_payload(
         integrator = "forward_euler_tdvp_fd"
 
     return {
-        "schema": "vqs_track_v1",
+        "schema": VQS_TRACK_V1,
         "epistemic_bound": (
             "Open-stack variational-parameter dynamics analogue: damping toy or tangent-space Euler; "
             "not calibrated closed-source chemistry time-evolution parity."
         ),
         "vqs_integration_contract_v1": {
-            "schema": "vqs_integration_contract_v1",
+            "schema": VQS_INTEGRATION_CONTRACT_V1,
             "rhs_model_effective": eff_rhs,
             "rhs_yaml_requested": rhs_mode_yaml,
             "rhs_descriptor": contract_rhs,

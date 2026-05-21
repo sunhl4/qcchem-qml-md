@@ -3,6 +3,7 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+
 def _extract_block(text: str, start_marker: str, end_marker: str) -> str:
     start = text.find(start_marker)
     end = text.find(end_marker)
@@ -47,4 +48,3 @@ def test_generated_path_registry_synced_in_yaml_matrix_doc() -> None:
         "<!-- END:PRE_QUANTUM_PATH_REGISTRY -->",
     )
     assert actual == module.generated_pre_quantum_path_registry_markdown()
-

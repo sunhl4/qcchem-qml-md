@@ -4,15 +4,17 @@ from __future__ import annotations
 
 import hashlib
 import json
-from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import yaml
 
+from qchem_stack.contracts.schema_ids import QMEF_ML_ATTACHMENT_V1
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
     from qchem_stack.config import ExperimentConfig
@@ -96,7 +98,12 @@ def _normalize_coords(coords: list[list[float]]) -> list[list[float]]:
 def _energy_hartree_from_pipeline_out(cfg: ExperimentConfig, out: dict[str, Any]) -> float:
     ref = cfg.md_ml_export.energy_reference
     if ref == "scf":
-        return float(out.get("scf_energy"))
+        scf = out.get("scf_energy")
+        if scf is None:
+            raise PipelineError(
+                "md_ml_export.energy_reference='scf' requires scf_energy on pipeline output."
+            )
+        return float(scf)
     if ref == "pauli_protocol":
         if "energy_pauli_protocol" not in out:
             raise PipelineError(
@@ -122,7 +129,7 @@ def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PyS
         },
     )
     drv = PySCFDriver.from_config(child)
-    if child.chemistry_extended.pbc_cell_vectors_bohr is not None:
+    if child.chemistry_extended.pbc.cell_vectors_bohr is not None:
         return drv.run_pbc_rhf()
     if child.scf.method == "RHF":
         return drv.run_rhf()
@@ -174,7 +181,7 @@ def _qmframe_from_rhf(
 def _primary_qmframe(cfg: ExperimentConfig, out: dict[str, Any], rhf: PySCFRHFResult) -> QMFrame:
     energy = _energy_hartree_from_pipeline_out(cfg, out)
     positions = _normalize_coords(cfg.molecule.coordinates_in_bohr().tolist())
-    tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.fermion_qubit_mapping}"
+    tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.mapping.fermion_qubit}"
     return _qmframe_from_rhf(cfg, out, rhf, positions, energy_hartree=energy, method_tag=tag)
 
 
@@ -226,7 +233,7 @@ def _extra_frame_full_pipeline(
         if frc is not None:
             forces = frc
     zs = _atomic_numbers_from_pyscf_mol(rhf_g)
-    tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.fermion_qubit_mapping}/trajectory-FP[{index}]"
+    tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.mapping.fermion_qubit}/trajectory-FP[{index}]"
     return QMFrame(
         atomic_numbers=zs,
         positions_bohr=_normalize_coords(coords),
@@ -269,10 +276,10 @@ def build_qmef_ml_attachment_repro_block(
         }
     ]
 
-    for i, raw_coords in enumerate(spec.extra_coordinates_bohr):
+    for i, raw_coords in enumerate(spec.trajectory.extra_coordinates_bohr):
         coords = _normalize_coords(raw_coords)
         idx = i + 1
-        if spec.trajectory_theory_level == "full_pipeline":
+        if spec.trajectory.theory_level == "full_pipeline":
             frames.append(_extra_frame_full_pipeline(cfg, out, coords, index=i, cfg_path=cfg_path))
             fm_energy = "nested_full_pipeline"
         else:
@@ -307,7 +314,7 @@ def build_qmef_ml_attachment_repro_block(
     epistemic = (
         "QMEF attachment: frame 0 uses the primary pipeline geometry; "
         f"energy for frame 0 follows md_ml_export.energy_reference ({spec.energy_reference}: variational | scf | pauli_protocol). "
-        "Pauli energy requires quantum.use_pauli_protocol and a completed Pauli stage. "
+        "Pauli energy requires quantum.pauli.use_protocol and a completed Pauli stage. "
         "Extra frames use md_ml_export.extra_coordinates_bohr; trajectory_theory_level hf_scf runs PySCF mean-field only "
         "per geometry; full_pipeline re-invokes run_pipeline_sync per geometry (cost scales linearly; nested jobs do not attach QMEF). "
         "When include_hf_nuclear_gradient is true, forces are analytic HF −∂E/∂R (Hartree/Bohr) at that geometry's RHF reference "
@@ -315,7 +322,7 @@ def build_qmef_ml_attachment_repro_block(
     )
 
     return {
-        "schema": "qmef_ml_attachment_v1",
+        "schema": QMEF_ML_ATTACHMENT_V1,
         "epistemic_bound": epistemic,
         "frame_meta": frame_meta,
         "dataset": ds.model_dump(mode="json"),

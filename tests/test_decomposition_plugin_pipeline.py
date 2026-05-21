@@ -98,7 +98,17 @@ def test_decomposition_plugin_rejects_missing_primary_fragment(tmp_path: Path) -
     }
     bad_json = tmp_path / "bad_primary.json"
     bad_json.write_text(json.dumps(bad_payload), encoding="utf-8")
-    cfg.embedding.decomposition_plugin_json_path = str(bad_json)
+    from qchem_stack.config.embedding_specs import EmbeddingPlugin
+
+    emb = cfg.embedding
+    assert isinstance(emb, EmbeddingPlugin)
+    cfg = cfg.model_copy(
+        update={
+            "embedding": emb.model_copy(
+                update={"plugin": emb.plugin.model_copy(update={"json_path": str(bad_json)})}
+            )
+        }
+    )
     with pytest.raises(ValueError, match="primary_fragment_id missing from fragments map"):
         _ = qubit_hamiltonian_from_decomposition_plugin(cfg, cfg_path=cfg_path)
 
@@ -127,6 +137,16 @@ def test_decomposition_plugin_rejects_invalid_secondary_fragment_pauli_shape(
     }
     bad_json = tmp_path / "bad_secondary_shape.json"
     bad_json.write_text(json.dumps(bad_payload), encoding="utf-8")
-    cfg.embedding.decomposition_plugin_json_path = str(bad_json)
+    from qchem_stack.config.embedding_specs import EmbeddingPlugin
+
+    emb = cfg.embedding
+    assert isinstance(emb, EmbeddingPlugin)
+    cfg = cfg.model_copy(
+        update={
+            "embedding": emb.model_copy(
+                update={"plugin": emb.plugin.model_copy(update={"json_path": str(bad_json)})}
+            )
+        }
+    )
     with pytest.raises(ValueError, match="pauli label length 2 != n_qubits 3"):
         _ = qubit_hamiltonian_from_decomposition_plugin(cfg, cfg_path=cfg_path)

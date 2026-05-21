@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.integrals.exporter_protocol import ActiveSpaceIntegralExporter
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 class PySCFActiveSpaceIntegralExporter(ActiveSpaceIntegralExporter):

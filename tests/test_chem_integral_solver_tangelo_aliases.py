@@ -29,14 +29,15 @@ def test_pyscf_set_physical_data_rejects_non_pyscf_driver(tmp_path: Path) -> Non
     p = tmp_path / "c.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: m1_gate
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -44,8 +45,10 @@ scf:
   driver: psi4
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -82,13 +85,14 @@ def test_psi4_solver_set_physical_data_and_compute_aliases(tmp_path: Path) -> No
     cfg_path = tmp_path / "psi4mini.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: m1_psi4
 random_seed: 0
 molecule:
   symbols: ["H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 2
   basis: sto-3g
@@ -96,8 +100,10 @@ scf:
   driver: psi4
   method: RHF
 active_space:
-  n_active_orbitals: 1
-  n_active_electrons: 1
+  strategy: cas
+  cas:
+    n_orbitals: 1
+    n_electrons: 1
 """,
         encoding="utf-8",
     )
@@ -117,5 +123,5 @@ active_space:
         assert out.driver_meta.get("driver_family") == "psi4"
     except RuntimeError as exc:
         assert "Psi4 SCF unavailable" in str(exc)
-    with pytest.raises(NotImplementedError, match="PBC"):
+    with pytest.raises(ValueError, match="cell_vectors_bohr"):
         s.compute_mean_field(periodic=True)

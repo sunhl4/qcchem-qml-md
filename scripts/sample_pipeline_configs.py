@@ -78,9 +78,9 @@ def _probe_precomputed_bundle(cfg_rel: str) -> int:
     if driver != "precomputed":
         return 0
 
-    bundle_raw = str(cfg.scf.precomputed_bundle_path or "").strip()
+    bundle_raw = str(cfg.scf.precomputed.bundle_path or "").strip()
     if not bundle_raw:
-        sys.stderr.write(f"{cfg_rel}: missing scf.precomputed_bundle_path\n")
+        sys.stderr.write(f"{cfg_rel}: missing scf.precomputed.bundle_path\n")
         return 1
     bundle_path = Path(bundle_raw)
     if not bundle_path.is_file():
@@ -135,7 +135,7 @@ def _run_pipeline(cfg_rel: str) -> int:
     p = _ROOT / cfg_rel
     cfg = load_experiment_config(p)
     out = run_pipeline_from_config(p)
-    if cfg.quantum.use_pauli_protocol:
+    if cfg.quantum.pauli.use_protocol:
         ok = out.get("energy_pauli_protocol") is not None
     else:
         ok = out.get("energy_after_variational") is not None

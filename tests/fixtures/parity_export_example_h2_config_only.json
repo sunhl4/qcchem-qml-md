@@ -30,6 +30,7 @@
   "scf_method": "RHF",
   "scf_driver": "pyscf",
   "registered_solvers": [
+    "precomputed",
     "psi4",
     "pyscf"
   ],
@@ -37,6 +38,8 @@
     "backend_id": "pyscf",
     "supports_molecular_scf": true,
     "supports_pbc_scf": true,
+    "supports_pbc_k_mesh": true,
+    "capability_notes": {},
     "supports_rhf": true,
     "supports_rohf": true,
     "supports_uhf": true,
@@ -54,14 +57,24 @@
   },
   "active_space": {
     "strategy": "cas",
-    "n_active_orbitals": 2,
-    "n_active_electrons": 2,
-    "ncas": 2,
-    "nelecas": 2,
-    "frozen_orbitals": [],
     "fermion_qubit_mapping": "jordan_wigner",
-    "prefer_restricted_spatial_fermion_for_jordan_wigner": false,
-    "jordan_wigner_coeff_atol": null
+    "cas": {
+      "ncas": 2,
+      "nelecas": 2,
+      "n_active_orbitals": 2,
+      "n_active_electrons": 2
+    },
+    "manual": {
+      "n_active_orbitals": null,
+      "n_active_electrons": null,
+      "frozen_orbitals": [],
+      "ncas": null,
+      "nelecas": null
+    },
+    "jw": {
+      "prefer_restricted_spatial": false,
+      "coeff_atol": null
+    }
   },
   "fermion_to_qubit_map": "jordan_wigner",
   "pauli_grouping": "tensor_product",
@@ -84,7 +97,7 @@
   "protocol_expectation_semantics_v1": {
     "schema": "protocol_expectation_semantics_v1",
     "doc_anchor": "docs/技术文档_设备比特串与Qiskit采样路径.md (section 2)",
-    "yaml_mutual_exclusion": "QuantumSpec.run_sampled_pauli_protocol XOR run_qiskit_shots_pauli_protocol (validated in QuantumSpec model_validator)",
+    "yaml_mutual_exclusion": "QuantumSpec.pauli.run_sampled XOR run_qiskit_shots_pauli_protocol (validated in QuantumSpec model_validator)",
     "paths": [
       {
         "order": 1,
@@ -156,6 +169,86 @@
     ]
   },
   "excited_resource_from_config": null,
+  "capability_gap_categories": [
+    {
+      "id": "managed_cloud_runtime",
+      "release_anchor": "product_capability_matrix.md#managed-cloud-runtime",
+      "open_stack_surface": "Local SQLite queue, optional HTTP sidecar adapters, and analog billing only.",
+      "status": "local_runtime_only"
+    },
+    {
+      "id": "http_submission_workspace_ops",
+      "release_anchor": "product_capability_matrix.md#http-submission-and-ops",
+      "open_stack_surface": "FastAPI submit/list/poll endpoints with project/workspace fields.",
+      "status": "available"
+    },
+    {
+      "id": "mitigation_batch_scheduler",
+      "release_anchor": "product_capability_matrix.md#mitigation-runtime",
+      "open_stack_surface": "DAG + linear trace are implemented; distributed async mitigation scheduler is not.",
+      "status": "partial_runtime"
+    },
+    {
+      "id": "computable_composition_surface",
+      "release_anchor": "product_capability_matrix.md#computable-and-workflow-preview",
+      "open_stack_surface": "Computable graph preview and rich slices are implemented for YAML-driven flows.",
+      "status": "available"
+    },
+    {
+      "id": "evaluate_support_set_reasoning",
+      "release_anchor": "product_capability_matrix.md#evaluate-support-set",
+      "open_stack_surface": "Conservative Pauli set-containment checks are implemented.",
+      "status": "available"
+    },
+    {
+      "id": "compiler_pass_depth",
+      "release_anchor": "product_capability_matrix.md#compiler-and-pass-bundle",
+      "open_stack_surface": "CompilerSpec + CircuitIR pass bundle are implemented; managed pass presets remain limited.",
+      "status": "partial"
+    },
+    {
+      "id": "chemically_aware_ansatz_pack",
+      "release_anchor": "product_capability_matrix.md#ansatz-and-operator-pools",
+      "open_stack_surface": "HEA + UCCSD/JW/BK options implemented with explicit boundaries.",
+      "status": "partial"
+    },
+    {
+      "id": "operator_pool_taxonomy_depth",
+      "release_anchor": "product_capability_matrix.md#operator-pool-registry",
+      "open_stack_surface": "Executable ADAPT/IQEB pools and aliases are implemented; broader taxonomy is still growing.",
+      "status": "partial"
+    },
+    {
+      "id": "dmet_self_consistency_depth",
+      "release_anchor": "product_capability_matrix.md#embedding-and-dmet",
+      "open_stack_surface": "Density-feedback and hook-based loops are available with explicit caveats.",
+      "status": "partial"
+    },
+    {
+      "id": "tensor_network_engine",
+      "release_anchor": "product_capability_matrix.md#tensor-network",
+      "open_stack_surface": "Stub workflow and strategy resolution are available; full production contraction stack is out of scope.",
+      "status": "stub_only"
+    },
+    {
+      "id": "integration_closure",
+      "release_anchor": "product_capability_matrix.md#integration-closure-layer",
+      "open_stack_surface": "Integration closure helpers are available as open reference implementations.",
+      "status": "reference"
+    },
+    {
+      "id": "driver_surface_breadth",
+      "release_anchor": "product_capability_matrix.md#driver-surface",
+      "open_stack_surface": "PySCF-focused surface with ddCOSMO and PBC variants; broader driver matrix is partial.",
+      "status": "partial"
+    },
+    {
+      "id": "device_shot_histogram_flow",
+      "release_anchor": "product_capability_matrix.md#shot-histogram-paths",
+      "open_stack_surface": "Statevector grouped shots and Qiskit counts pipelines are implemented.",
+      "status": "available"
+    }
+  ],
   "vqd_after_variational": false,
   "vqd_n_states": 2,
   "vqd_penalty_weight": 5.0,
@@ -185,75 +278,64 @@
     2.0
   ],
   "embedding": {
-    "mode": "none",
     "embedding_input_representation": "mo",
     "n_scf_cycles_embedding": null,
     "classical_reference_method": null,
-    "projection_low_level": "HF",
-    "projection_high_level": "CAS",
-    "projection_threshold": 1e-08,
-    "projection_quantum_hamiltonian": "global_active_space",
-    "projection_fragment_atom_indices": [],
-    "fragment_labels": [],
-    "dmet_hamiltonian_source": "parity_stub",
-    "dmet_target_fragment_electrons": null,
-    "schmidt_fragment_atom_indices": [],
-    "schmidt_n_bath_spatial": 2,
-    "schmidt_max_impurity_spatial_orbitals": 14,
-    "schmidt_run_mu_bisection": false,
-    "schmidt_attach_fci_reference": true,
-    "schmidt_fci_reference_max_spatial_orbitals": 8,
-    "schmidt_dmet_max_cycles": 1,
-    "schmidt_dmet_mixing_alpha": 0.35,
-    "schmidt_dmet_convergence_tol": 0.001,
-    "schmidt_multi_fragment_atom_groups": [],
-    "schmidt_multi_primary_fragment_index": 0,
-    "schmidt_run_vqe_on_all_fragments": false,
-    "schmidt_per_fragment_vqe_maxiter": null,
-    "dmet_uniform_multifragment_toy": false,
-    "dmet_multifragment_one_shot_shared_hamiltonian": false,
-    "dmet_fragment_use_exact_solver": false,
-    "dmet_fragment_exact_max_qubits": 14,
-    "decomposition_plugin": "",
-    "decomposition_plugin_json_path": null,
-    "schmidt_bath_sidecar_json_path": null,
-    "oniom_layers_v1": []
+    "oniom_layers_v1": [],
+    "mode": "none"
   },
   "pre_quantum_semantics_from_config": {
     "hamiltonian_branch": "canonical_active_space_integral_pack",
     "hamiltonian_fixed_before_variational": true,
     "post_variational_embedding_audit_only": true,
     "embedding_mode": "none",
-    "dmet_hamiltonian_source": "parity_stub"
+    "dmet_hamiltonian_source": ""
   },
   "embedding_mode": "none",
   "embedding_input_representation": "mo",
   "parity_integrations_dmet_stub_one_shot_ledger": true,
   "chemistry_extended": {
-    "solvent_model": "none",
-    "ddcosmo_epsilon": 78.3553,
-    "pbc_cell_vectors_bohr": null,
-    "pbc_kpoint_mesh": [
-      1,
-      1,
-      1
-    ],
-    "pbc_active_space_kpoint_index": 0,
-    "casscf_orbital_optimization_audit": false,
-    "casscf_orbital_optimization_for_integrals": false,
-    "classical_benchmark_enabled": false,
-    "classical_benchmark_backend": "auto",
-    "rdm_correction_method": "none",
-    "avas_ao_labels": [],
-    "avas_threshold": 0.2,
-    "avas_minao": "minao",
-    "avas_with_iao": false,
-    "avas_openshell_option": 2,
-    "avas_canonicalize": true,
-    "avas_ncore": 0,
-    "pyscf_symmetry": false,
-    "mo_coeff_transform_hook": "",
-    "mo_coeff_transform_kwargs": {}
+    "solvent": {
+      "model": "none",
+      "epsilon": 78.3553
+    },
+    "pbc": {
+      "cell_vectors_bohr": null,
+      "kpoint_mesh": [
+        1,
+        1,
+        1
+      ],
+      "active_space_kpoint_index": 0
+    },
+    "avas": {
+      "ao_labels": [],
+      "threshold": 0.2,
+      "minao": "minao",
+      "with_iao": false,
+      "openshell_option": 2,
+      "canonicalize": true,
+      "ncore": 0
+    },
+    "casscf": {
+      "orbital_optimization_audit": false,
+      "orbital_optimization_for_integrals": false
+    },
+    "benchmarks": {
+      "enabled": false,
+      "backend": "auto"
+    },
+    "post_hf": {
+      "integral_crosscheck": "none",
+      "rdm_correction_method": "none"
+    },
+    "mo_transform": {
+      "hook": "",
+      "kwargs": {}
+    },
+    "symmetry": {
+      "pyscf_symmetry": false
+    }
   },
   "classical_benchmark_enabled": false,
   "rdm_correction_method": "none",

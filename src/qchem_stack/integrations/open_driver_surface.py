@@ -8,11 +8,13 @@ from __future__ import annotations
 
 from typing import Any
 
+from qchem_stack.contracts.schema_ids import OPEN_DRIVER_SURFACE_V1
+
 
 def open_driver_coverage_matrix() -> dict[str, Any]:
     """Machine-readable coverage for parity matrices / gap dashboards."""
     return {
-        "schema": "open_driver_surface_v1",
+        "schema": OPEN_DRIVER_SURFACE_V1,
         "stack": "qchem_stack.chem.drivers.pyscf_driver",
         "rows": [
             {

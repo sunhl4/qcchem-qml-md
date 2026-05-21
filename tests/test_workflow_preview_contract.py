@@ -31,9 +31,13 @@ def _cfg() -> ExperimentConfig:
     return ExperimentConfig(
         experiment_id="h2_test",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-        quantum=QuantumSpec(algorithm="vqe", use_pauli_protocol=True),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
+        quantum=QuantumSpec(algorithm="vqe", pauli={"use_protocol": True}),
     )
 
 
@@ -99,12 +103,20 @@ def test_computable_graph_v2_ground_to_pauli() -> None:
 
 
 def test_computable_graph_v2_vqd_after_pauli() -> None:
-    q = QuantumSpec(algorithm="vqe", use_pauli_protocol=True, vqd_after_variational=True)
+    q = QuantumSpec(
+        algorithm="vqe",
+        pauli={"use_protocol": True},
+        excited={"vqd": {"after_variational": True}},
+    )
     cfg = ExperimentConfig(
         experiment_id="x",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         quantum=q,
     )
     refs = list_computables_for_config(cfg)
@@ -119,12 +131,20 @@ def test_computable_graph_v2_vqd_after_pauli() -> None:
 
 
 def test_computable_graph_v2_vqd_without_pauli() -> None:
-    q = QuantumSpec(algorithm="vqe", use_pauli_protocol=False, vqd_after_variational=True)
+    q = QuantumSpec(
+        algorithm="vqe",
+        pauli={"use_protocol": False},
+        excited={"vqd": {"after_variational": True}},
+    )
     cfg = ExperimentConfig(
         experiment_id="x",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         quantum=q,
     )
     refs = list_computables_for_config(cfg)
@@ -180,27 +200,33 @@ def test_computable_graph_v2_roundtrip_refs_re_emit_identical() -> None:
 def test_computable_declarative_extra_and_remove() -> None:
     q = QuantumSpec(
         algorithm="vqe",
-        use_pauli_protocol=True,
-        vqd_after_variational=True,
-        computable_remove_edges=[
-            ComputableGraphEdgeRemove(
-                from_ref="hamiltonian_expectation_pauli_protocol",
-                to_ref="excited_energies_vqd",
-            )
-        ],
-        computable_extra_edges=[
-            ComputableGraphEdgeDecl(
-                from_ref="ground_state_energy",
-                to_ref="excited_energies_vqd",
-                kind="custom_fork",
-            )
-        ],
+        pauli={"use_protocol": True},
+        excited={"vqd": {"after_variational": True}},
+        graph={
+            "remove_edges": [
+                ComputableGraphEdgeRemove(
+                    from_ref="hamiltonian_expectation_pauli_protocol",
+                    to_ref="excited_energies_vqd",
+                )
+            ],
+            "extra_edges": [
+                ComputableGraphEdgeDecl(
+                    from_ref="ground_state_energy",
+                    to_ref="excited_energies_vqd",
+                    kind="custom_fork",
+                )
+            ],
+        },
     )
     cfg = ExperimentConfig(
         experiment_id="decl",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         quantum=q,
     )
     refs = list_computables_for_config(cfg)
@@ -276,13 +302,17 @@ def test_workflow_preview_and_graph_mark_yaml_plugin_factory() -> None:
     cfg = ExperimentConfig(
         experiment_id="plugin_wf",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         quantum=QuantumSpec(
             algorithm="echo_label",
             algorithm_factory=fac,
-            use_pauli_protocol=False,
-            vqe_depth=1,
+            pauli={"use_protocol": False},
+            vqe={"depth": 1},
         ),
     )
     refs = list_computables_for_config(cfg)

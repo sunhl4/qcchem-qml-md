@@ -11,8 +11,10 @@
 
 from __future__ import annotations
 
-from collections.abc import MutableMapping, Sequence
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
+
+if TYPE_CHECKING:
+    from collections.abc import MutableMapping, Sequence
 
 ActiveSpaceStrategy = Literal["manual", "cas", "avas_stub", "avas"]
 

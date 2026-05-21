@@ -71,11 +71,19 @@ select = [
   "UP",
 ]
 ignore = []
+extend-select = ["TCH", "B", "SIM"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["qchem_stack"]
 
 # Tests use ``pytest.importorskip`` before importing qchem_stack / PySCF — imports are intentionally not at file top.
 [tool.ruff.lint.per-file-ignores]
-"tests/**" = ["E402"]
+"tests/**" = ["E402", "TCH001", "TCH002", "TCH003"]
+"scripts/**" = ["TCH001", "TCH002", "TCH003"]
+"examples/**" = ["TCH001", "TCH002", "TCH003"]
+
+[tool.pyright]
+include = ["src/qchem_stack"]
+typeCheckingMode = "basic"
+reportMissingImports = false
 

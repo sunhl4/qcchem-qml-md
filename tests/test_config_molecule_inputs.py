@@ -12,24 +12,28 @@ def test_density_fit_auxbasis_requires_density_fit(tmp_path) -> None:
     p = tmp_path / "bad_density_fit.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: cfg_inputs_density_fit
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
 scf:
   driver: pyscf
   method: RHF
-  density_fit_auxbasis: weigend
+  pyscf:
+    density_fit_auxbasis: weigend
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -41,14 +45,15 @@ def test_molecule_coordinates_and_zmatrix_mutually_exclusive(tmp_path) -> None:
     p = tmp_path / "bad_geom.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: cfg_inputs_bad_geom
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   zmatrix: |
     H
     H 1 0.74
@@ -59,8 +64,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -72,14 +79,15 @@ def test_precomputed_driver_requires_bundle_path(tmp_path) -> None:
     p = tmp_path / "bad_precomputed_missing_path.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: cfg_inputs_precomputed_missing_path
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -87,12 +95,46 @@ scf:
   driver: precomputed
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
-    with pytest.raises(ValueError, match="requires scf.precomputed_bundle_path"):
+    with pytest.raises(ValueError, match="requires scf.precomputed.bundle_path"):
+        load_experiment_config(p)
+
+
+def test_flat_precomputed_bundle_path_key_rejected(tmp_path) -> None:
+    p = tmp_path / "flat_precomputed_key.yaml"
+    p.write_text(
+        """
+schema_version: "2"
+experiment_id: cfg_inputs_flat_precomputed
+random_seed: 0
+molecule:
+  symbols: ["H", "H"]
+  coordinates:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf:
+  driver: precomputed
+  method: RHF
+  precomputed_bundle_path: bundle.json
+active_space:
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+""",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="precomputed_bundle_path|extra"):
         load_experiment_config(p)
 
 
@@ -100,24 +142,28 @@ def test_precomputed_bundle_path_forbidden_for_non_precomputed_driver(tmp_path) 
     p = tmp_path / "bad_precomputed_path_on_live_driver.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: cfg_inputs_precomputed_forbidden
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
 scf:
   driver: pyscf
   method: RHF
-  precomputed_bundle_path: configs/precomputed_classical_reference_h2.json
+  precomputed:
+    bundle_path: configs/precomputed_classical_reference_h2.json
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -145,50 +191,57 @@ def test_precomputed_bundle_path_resolves_relative_to_yaml_dir(tmp_path) -> None
     p = tmp_path / "ok_precomputed_relative.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: cfg_inputs_precomputed_relative
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
 scf:
   driver: precomputed
   method: RHF
-  precomputed_bundle_path: bundle.json
+  precomputed:
+    bundle_path: bundle.json
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
     cfg = load_experiment_config(p)
-    assert cfg.scf.precomputed_bundle_path == str(bundle.resolve())
+    assert cfg.scf.precomputed.bundle_path == str(bundle.resolve())
 
 
 def test_strict_top_level_keys_rejects_unknown_yaml_keys(tmp_path) -> None:
     p = tmp_path / "bad_unknown_top_level.yaml"
     p.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: cfg_inputs_strict_unknown
 random_seed: 0
 unknown_feature_flag: true
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )

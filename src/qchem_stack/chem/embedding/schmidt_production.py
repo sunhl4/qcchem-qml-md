@@ -8,19 +8,26 @@ and a path to :class:`~qchem_stack.chem.hamiltonian.QubitHamiltonian` via
 **Scope**: closed-shell **RHF / RKS** reference (validated). ROHF/UHF: explicit error.
 
 This is **not** full analytic bath-fitting DMET from the literature unless you enable
-``schmidt_dmet_max_cycles > 1`` (:mod:`qchem_stack.integrations.schmidt_dmet_self_consistent` —
+``embedding.dmet.schmidt.dmet_max_cycles > 1`` (:mod:`qchem_stack.integrations.schmidt_dmet_self_consistent` —
 density-fed spectral bath + FCI-driven mixing).
 """
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from scipy.linalg import eigh
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+from qchem_stack.chem.bridges.ao_basis_view import AOBasisView, ao_basis_view_from_reference
+from qchem_stack.chem.embedding.ao_fragment import fragment_ao_indices
+from qchem_stack.chem.embedding.impurity_eri import impurity_eri_chemist
+from qchem_stack.contracts.schema_ids import (
+    DMET_MU_BISECTION_V1,
+    SCHMIDT_FCI_FRAGMENT_V1,
+    SCHMIDT_IMPURITY_INTEGRALS_V1,
+)
 from qchem_stack.exceptions import EmbeddingError
 
 
@@ -28,7 +35,12 @@ class SchmidtProductionError(EmbeddingError):
     """Raised when embedding inputs are invalid or unsafe for the configured caps."""
 
 
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+
+
 def _atom_ao_ranges(mol: Any) -> list[tuple[int, int]]:
+    """PySCF ``mol`` helper retained for tests importing this symbol."""
     sl = mol.aoslice_by_atom()
     ranges: list[tuple[int, int]] = []
     for ia in range(mol.natm):
@@ -107,44 +119,33 @@ def build_schmidt_impurity_integrals(
         default is converged SCF ``mf.make_rdm1()``.
     """
     tag = rhf.backend_tag()
-    if tag != "pyscf":
+    if tag not in ("pyscf", "psi4"):
         raise SchmidtProductionError(
-            "Schmidt impurity integral builder is currently implemented for backend='pyscf' "
+            "Schmidt impurity integral builder supports backend pyscf or psi4 "
             f"(got backend={tag!r})."
         )
-    rhf_pyscf = rhf.as_pyscf_rhf_result()
-    mf = rhf_pyscf.mf
-    if hasattr(mf, "raw_handle") and callable(getattr(mf, "raw_handle")):
-        mf = mf.raw_handle()
-    mol = mf.mol
-    ref_name = mf.__class__.__name__
+    basis: AOBasisView = ao_basis_view_from_reference(rhf)
+    ref_name = basis.reference_class_name()
     if ref_name not in ("RHF", "RKS"):
         raise SchmidtProductionError(
             f"Schmidt production requires RHF/RKS reference; got {ref_name}. "
             "ROHF/UHF require a follow-on implementation."
         )
-    if getattr(mol, "nelectron", 0) % 2 != 0:
-        raise SchmidtProductionError(
-            "Schmidt production path requires an even electron count (closed shell)."
-        )
 
-    nao = int(mol.nao_nr())
-    S = np.asarray(mf.get_ovlp(), dtype=float)
-    if density_ao is not None:
-        D = np.asarray(density_ao, dtype=float)
-    else:
-        D = np.asarray(mf.make_rdm1(), dtype=float)
+    nao = int(basis.nao)
+    S = basis.overlap_ao()
+    D = np.asarray(density_ao, dtype=float) if density_ao is not None else basis.make_rdm1_ao()
     if D.shape != (nao, nao):
         raise SchmidtProductionError("unexpected AO density matrix shape")
 
-    frag_ao = _fragment_ao_indices(mol, fragment_atom_indices)
+    frag_ao = fragment_ao_indices(basis, fragment_atom_indices)
     env_ao = [i for i in range(nao) if i not in set(frag_ao)]
     if not env_ao or not frag_ao:
         raise SchmidtProductionError("fragment and environment AO sets must both be non-empty")
 
     raw_frag = np.zeros((nao, len(frag_ao)))
-    for col, ao in enumerate(frag_ao):
-        raw_frag[ao, col] = 1.0
+    for col, ao_idx in enumerate(frag_ao):
+        raw_frag[ao_idx, col] = 1.0
     C_frag = _orthonormalize_columns(raw_frag, S)
 
     D_e = D[np.ix_(env_ao, env_ao)]
@@ -158,8 +159,8 @@ def build_schmidt_impurity_integrals(
         raise SchmidtProductionError("not enough environment AOs to build requested bath dimension")
     Cb = evecs[:, take]
     raw_bath = np.zeros((nao, len(take)))
-    for r, ao in enumerate(env_ao):
-        raw_bath[ao, :] = Cb[r, :]
+    for r, ao_idx in enumerate(env_ao):
+        raw_bath[ao_idx, :] = Cb[r, :]
 
     P_frag = _s_projector(C_frag, S)
     bath_pre = raw_bath - P_frag @ raw_bath
@@ -186,19 +187,17 @@ def build_schmidt_impurity_integrals(
     nelec_mo -= nelec_mo % 2
     nelec_mo = max(2, min(nelec_mo, 2 * n_imp))
 
-    h1_ao = np.asarray(mf.get_fock(dm=D), dtype=float)
+    h1_ao = basis.fock_ao(density_ao=D)
     h1e = C_imp.T @ h1_ao @ C_imp
 
-    from pyscf import ao2mo
+    eri = impurity_eri_chemist(basis, C_imp, molecular_system=rhf.molecular_system)
 
-    eri = ao2mo.restore(1, ao2mo.full(mol, C_imp, compact=False), n_imp)
-
-    enuc = float(mol.energy_nuc())
+    enuc = float(basis.energy_nuc_au())
     n_frag_sp = int(C_frag.shape[1])
     n_bath_sp = int(C_bath.shape[1])
 
     meta: dict[str, Any] = {
-        "schema": "schmidt_impurity_integrals_v1",
+        "schema": SCHMIDT_IMPURITY_INTEGRALS_V1,
         "reference": ref_name,
         "nao": nao,
         "n_impurity_spatial": n_imp,
@@ -289,7 +288,7 @@ def fci_fragment_ground_state(model: SchmidtImpurityModel, *, mu: float = 0.0) -
     e0, _dm1, compact = fci_impurity_spatial_ground(model, mu=mu)
     n_frag_trace = float(compact["fci_fragment_spatial_trace_1rdm"])
     return {
-        "schema": "schmidt_fci_fragment_v1",
+        "schema": SCHMIDT_FCI_FRAGMENT_V1,
         "energy_total_au": float(e0) + float(model.constant),
         "energy_electronic_au": float(e0),
         "nuc_repulsion_included_in_total": True,
@@ -347,7 +346,7 @@ def bisection_mu_for_fragment_electron_count(
     if fa * fb > 0:
         f0 = fci_fragment_ground_state(model, mu=0.0)
         return 0.0, {
-            "schema": "dmet_mu_bisection_v1",
+            "schema": DMET_MU_BISECTION_V1,
             "status": "no_bracket",
             "note": "Mu root not bracketed in configured window; using mu=0.",
             "fci_mu_zero": f0,
@@ -368,7 +367,7 @@ def bisection_mu_for_fragment_electron_count(
 
     fci_fin = fci_fragment_ground_state(model, mu=mu_mid)
     return float(mu_mid), {
-        "schema": "dmet_mu_bisection_v1",
+        "schema": DMET_MU_BISECTION_V1,
         "status": "converged",
         "mu_au": float(mu_mid),
         "target_fragment_electrons": target,

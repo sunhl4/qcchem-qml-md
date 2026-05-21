@@ -3,8 +3,13 @@
 from __future__ import annotations
 
 from enum import Enum
+from typing import TYPE_CHECKING
 
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.config.embedding_enums import EmbeddingMode
+from qchem_stack.config.embedding_helpers import is_projection_mulliken, is_schmidt_production
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
 
 
 class PreQuantumPath(str, Enum):
@@ -33,14 +38,11 @@ def resolve_pre_quantum_path(cfg: ExperimentConfig) -> PreQuantumPath:
     if driver == "precomputed":
         return PreQuantumPath.PRECOMPUTED_BUNDLE
     emb = cfg.embedding
-    if emb.mode == "plugin":
+    if emb.mode == EmbeddingMode.PLUGIN:
         return PreQuantumPath.EMBEDDING_PLUGIN
-    if emb.dmet_hamiltonian_source == "schmidt_atomic_production":
+    if is_schmidt_production(emb):
         return PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION
-    if (
-        emb.mode == "projection"
-        and emb.projection_quantum_hamiltonian == "fragment_mulliken_mo"
-    ):
+    if is_projection_mulliken(emb):
         return PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO
     return PreQuantumPath.CANONICAL_ACTIVE_SPACE_INTEGRAL_PACK
 

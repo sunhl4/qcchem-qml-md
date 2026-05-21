@@ -10,6 +10,7 @@ from openfermion import bravyi_kitaev, jordan_wigner
 from openfermion.ops import QubitOperator
 
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import OPERATOR_POOL_REGISTRY_EXPORT_V1
 from qchem_stack.integrations.ucc_reference import (
     build_spin_ucc_doubles_only_fermion_generators,
     build_spin_ucc_singles_only_fermion_generators,
@@ -166,7 +167,6 @@ OPERATOR_POOL_ID_ALIASES: Final[dict[str, str]] = {
 
 def resolve_operator_pool_id(pool_id: str) -> str:
     """Map alias ids (e.g. literature ``qubit_excitation``) to canonical registry keys."""
-
     return OPERATOR_POOL_ID_ALIASES.get(pool_id, pool_id)
 
 
@@ -249,13 +249,13 @@ def operator_pool_registry_export_v1() -> dict[str, Any]:
     for pid, entry in sorted(OPERATOR_POOL_REGISTRY.items()):
         pools[pid] = {"summary": entry.summary, "capabilities": dict(entry.capabilities)}
     return {
-        "schema": "operator_pool_registry_export_v1",
+        "schema": OPERATOR_POOL_REGISTRY_EXPORT_V1,
         "registered_ids": sorted(set(OPERATOR_POOL_REGISTRY) | set(OPERATOR_POOL_ID_ALIASES)),
         "canonical_operator_pool_ids": sorted(OPERATOR_POOL_REGISTRY.keys()),
         "pool_id_aliases": dict(sorted(OPERATOR_POOL_ID_ALIASES.items())),
         "pools": pools,
-        "adapt_pool_yaml_field": "quantum.adapt_pool_id",
-        "iqeb_pool_yaml_field": "quantum.iqeb_pool_id",
+        "adapt_pool_yaml_field": "quantum.adapt.pool_id",
+        "iqeb_pool_yaml_field": "quantum.iqeb.pool_id",
         "export_alignment_note": (
             "Open pools are JW (default slices) plus explicit **BK** spin-UCCSD pools "
             "(`fermionic_uccsd_bravyi_kitaev`, singles/doubles slices, concatenated id). "

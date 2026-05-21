@@ -7,10 +7,13 @@ floats from :class:`qchem_stack.jobs.cost.CostEstimate` and YAML ``nexus_analog`
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.config import ExperimentConfig, NexusAnalogSpec
+from qchem_stack.contracts.schema_ids import NEXUS_ANALOG_V1
 from qchem_stack.jobs.cost import CostEstimate
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig, NexusAnalogSpec
 
 
 def nexus_analog_ledger_from_spec(
@@ -21,7 +24,7 @@ def nexus_analog_ledger_from_spec(
         return None
     if not rows:
         return {
-            "schema": "nexus_analog_v1",
+            "schema": NEXUS_ANALOG_V1,
             "project_label": na.project_label,
             "hqc_units": 0.0,
             "note": "empty_resource_rows",
@@ -33,7 +36,7 @@ def nexus_analog_ledger_from_spec(
         unit_per_depth=float(na.unit_per_depth),
     )
     return {
-        "schema": "nexus_analog_v1",
+        "schema": NEXUS_ANALOG_V1,
         "project_label": na.project_label,
         "hqc_units": float(ce.hqc_units),
         "estimated_circuits": ce.estimated_circuits,
@@ -65,14 +68,14 @@ def default_nexus_analog_for_job_result(rows: list[dict[str, Any]]) -> dict[str,
     """When pickled protocol is processed without :class:`ExperimentConfig`, use unit defaults."""
     if not rows:
         return {
-            "schema": "nexus_analog_v1",
+            "schema": NEXUS_ANALOG_V1,
             "project_label": "default",
             "hqc_units": 0.0,
             "note": "config_defaults",
         }
     ce = CostEstimate.from_resource_rows(rows)
     return {
-        "schema": "nexus_analog_v1",
+        "schema": NEXUS_ANALOG_V1,
         "project_label": "default",
         "hqc_units": float(ce.hqc_units),
         "estimated_circuits": ce.estimated_circuits,

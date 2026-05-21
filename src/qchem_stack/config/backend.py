@@ -4,13 +4,15 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ._validation import strip_optional_text
 
 
 class BackendSpecConfig(BaseModel):
     """Execution backend selection and shot/noise controls."""
+
+    model_config = ConfigDict(extra="forbid")
 
     name: str = Field(default="statevector_sim", min_length=1)
     provider: Literal["statevector", "qiskit", "ionstack"] = "statevector"

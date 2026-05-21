@@ -1,0 +1,110 @@
+{
+  "src_root": "src/qchem_stack",
+  "line_threshold": 400,
+  "python_file_count": 321,
+  "files_over_line_threshold": 0,
+  "files_over_500_lines": 0,
+  "large_files": [],
+  "dict_str_any_top": [
+    {
+      "count": 15,
+      "path": "src/qchem_stack/integrations/dmet_self_consistent.py"
+    },
+    {
+      "count": 12,
+      "path": "src/qchem_stack/md_bridge/from_pipeline.py"
+    },
+    {
+      "count": 11,
+      "path": "src/qchem_stack/integrations/methods_resource_unified.py"
+    },
+    {
+      "count": 11,
+      "path": "src/qchem_stack/quantum/algorithms/base.py"
+    },
+    {
+      "count": 10,
+      "path": "src/qchem_stack/backends/spec.py"
+    },
+    {
+      "count": 10,
+      "path": "src/qchem_stack/quantum/algorithms/uccsd_vqe.py"
+    },
+    {
+      "count": 9,
+      "path": "src/qchem_stack/chem/pre_quantum_input.py"
+    },
+    {
+      "count": 9,
+      "path": "src/qchem_stack/integrations/workflow_preview.py"
+    },
+    {
+      "count": 9,
+      "path": "src/qchem_stack/orchestration/stage_execution.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/chem/integration/driver_meta.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/integrations/resource_estimation_preview.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/jobs/nexus_analog.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/chem/classical_benchmarks/stub_backend.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/integrations/l3_algorithm_benchmark.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/mitigation/qermit_runtime.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/orchestration/stages.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/protocols/product_contract.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/backends/pauli_measure_expand.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/chem/pre_quantum_schmidt.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/chem/precomputed_bundle.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/chem/solvers/pyscf_solver_setup.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/integrations/schmidt_dmet_self_consistent.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/orchestration/embedding_workflow_stage.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/orchestration/protocol_finalize_sidecars.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/protocols/computable.py"
+    }
+  ]
+}

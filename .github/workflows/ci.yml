@@ -26,6 +26,42 @@ jobs:
       - name: Ruff format (check only)
         run: ruff format --check src/qchem_stack tests scripts examples
 
+  typecheck-config:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install package + pyright
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]" pyright
+      - name: Pyright (config, exceptions, repro)
+        run: pyright src/qchem_stack/config src/qchem_stack/repro src/qchem_stack/exceptions.py
+
+  typecheck-stack:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install package + pyright
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]" pyright
+      - name: Pyright (full src/qchem_stack)
+        run: pyright src/qchem_stack
+
   test:
     needs: lint
     runs-on: ubuntu-latest
@@ -100,13 +136,19 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install stack and Psi4 (optional)
+      - name: Install micromamba and Psi4 env
         run: |
-          python -m pip install -U pip
-          pip install -e ".[dev]"
-          pip install psi4 || true
-      - name: Psi4 pre-quantum tests
-        run: pytest tests/test_psi4_pre_quantum_pipeline.py -m psi4 -q --tb=short
+          curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xj bin/micromamba
+          export MAMBA_ROOT_PREFIX="$GITHUB_WORKSPACE/.micromamba"
+          ./bin/micromamba create -y -p "$MAMBA_ROOT_PREFIX/envs/.conda-psi4" \
+            -c conda-forge python=3.12 psi4 pyscf pytest pydantic pyyaml openfermion scipy pandas opt_einsum
+          "$MAMBA_ROOT_PREFIX/envs/.conda-psi4/bin/python" -m pip install -U pip
+          "$MAMBA_ROOT_PREFIX/envs/.conda-psi4/bin/python" -m pip install -e ".[dev]"
+      - name: Psi4 cross-backend tests
+        run: |
+          export PY="$GITHUB_WORKSPACE/.micromamba/envs/.conda-psi4/bin/python"
+          "$PY" -c "import psi4, pyscf; print(psi4.__version__, pyscf.__version__)"
+          "$PY" -m pytest -m psi4 -q --tb=short
 
   docusaurus:
     needs: lint

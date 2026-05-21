@@ -38,7 +38,9 @@ def test_pipeline_precomputed_manifest_mismatch_fails_fast() -> None:
     cfg = load_experiment_config(cfg_path)
     cfg_bad = cfg.model_copy(
         update={
-            "active_space": cfg.active_space.model_copy(update={"n_active_orbitals": 3}),
+            "active_space": cfg.active_space.model_copy(
+                update={"cas": cfg.active_space.cas.model_copy(update={"n_orbitals": 3})}
+            ),
         }
     )
     with pytest.raises(PipelineError, match="precomputed manifest mismatch: n_active_orbitals"):
@@ -58,7 +60,13 @@ def test_pipeline_precomputed_manifest_fingerprint_mismatch_fails_fast(tmp_path:
     cfg = load_experiment_config(cfg_path)
     cfg_bad = cfg.model_copy(
         update={
-            "scf": cfg.scf.model_copy(update={"precomputed_bundle_path": str(bad_bundle)}),
+            "scf": cfg.scf.model_copy(
+                update={
+                    "precomputed": cfg.scf.precomputed.model_copy(
+                        update={"bundle_path": str(bad_bundle)}
+                    )
+                }
+            ),
         }
     )
     with pytest.raises(PipelineError, match="precomputed manifest mismatch: config_fingerprint"):
@@ -78,7 +86,13 @@ def test_pipeline_precomputed_manifest_missing_required_fields_fails_fast(tmp_pa
     cfg = load_experiment_config(cfg_path)
     cfg_bad = cfg.model_copy(
         update={
-            "scf": cfg.scf.model_copy(update={"precomputed_bundle_path": str(bad_bundle)}),
+            "scf": cfg.scf.model_copy(
+                update={
+                    "precomputed": cfg.scf.precomputed.model_copy(
+                        update={"bundle_path": str(bad_bundle)}
+                    )
+                }
+            ),
         }
     )
     with pytest.raises(PipelineError, match="precomputed manifest mismatch: required_fields"):

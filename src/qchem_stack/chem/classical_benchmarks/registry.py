@@ -5,9 +5,9 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.classical_benchmarks import pyscf_backend, stub_backend
-from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext
     from qchem_stack.config import ExperimentConfig
 
 
@@ -20,7 +20,7 @@ def resolve_backend_id(
         return force_backend_id
     chosen = "auto"
     if cfg is not None:
-        chosen = cfg.chemistry_extended.classical_benchmark_backend
+        chosen = cfg.chemistry_extended.benchmarks.backend
     if chosen != "auto":
         return chosen
     ref = ctx.mean_field_reference

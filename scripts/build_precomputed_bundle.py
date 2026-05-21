@@ -105,9 +105,9 @@ def main() -> int:
         cfg = load_experiment_config(Path(str(args.config_yaml)))
         manifest = {
             "schema": "precomputed_manifest_v1",
-            "n_active_orbitals": int(cfg.active_space.n_active_orbitals),
-            "n_active_electrons": int(cfg.active_space.n_active_electrons),
-            "fermion_qubit_mapping": str(cfg.active_space.fermion_qubit_mapping),
+            "n_active_orbitals": int(cfg.active_space.cas.n_orbitals),
+            "n_active_electrons": int(cfg.active_space.cas.n_electrons),
+            "fermion_qubit_mapping": str(cfg.active_space.mapping.fermion_qubit),
             "n_qubits": int(n_qubits),
             "molecule_symbols": [str(x) for x in cfg.molecule.symbols],
             "config_fingerprint": precomputed_config_fingerprint(cfg),

@@ -1,22 +1,26 @@
 from __future__ import annotations
 
-import logging
-from collections.abc import Callable
 from dataclasses import dataclass
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.energy_components import build_energy_components_v1
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
-from qchem_stack.chem.pre_quantum_input import PreQuantumInput
-from qchem_stack.config import ExperimentConfig
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.stages import (
     PreQuantumStageArtifacts,
     ScfStageArtifacts,
     mark_stage_done,
 )
+
+if TYPE_CHECKING:
+    import logging
+    from collections.abc import Callable
+    from pathlib import Path
+
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+    from qchem_stack.config import ExperimentConfig
+    from qchem_stack.orchestration.run_context import PipelineStageTimer
 
 
 @dataclass(frozen=True)
@@ -47,7 +51,7 @@ class PreQuantumStageContext:
 def run_scf_stage(
     cfg: ExperimentConfig,
     *,
-    profile: Any,
+    profile: PipelineStageTimer,
     emit: Callable[[str], None],
     logger: logging.Logger,
     context: ScfStageContext,
@@ -59,14 +63,14 @@ def run_scf_stage(
         cfg = context.refine_active_space_fn(cfg, rhf)
     nuclear_au = rhf.nuclear_repulsion_au()
     solvent_eps = (
-        float(cfg.chemistry_extended.ddcosmo_epsilon)
-        if cfg.chemistry_extended.solvent_model == "ddcosmo"
+        float(cfg.chemistry_extended.solvent.epsilon)
+        if cfg.chemistry_extended.solvent.model == "ddcosmo"
         else None
     )
     energy_components = build_energy_components_v1(
         nuclear_repulsion_au=nuclear_au,
         mean_field_total_au=float(rhf.e_tot),
-        solvent_model=str(cfg.chemistry_extended.solvent_model),
+        solvent_model=str(cfg.chemistry_extended.solvent.model),
         solvent_dielectric=solvent_eps,
         energy_accounting_model=str(
             rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")
@@ -77,12 +81,12 @@ def run_scf_stage(
     rdm_correction_report: dict[str, Any] | None = None
     rdm_correction_readiness: dict[str, Any] | None = None
     embedding_input_payload = context.embedding_input_payload_fn(cfg, rhf)
-    if precomputed_mode and cfg.chemistry_extended.classical_benchmark_enabled:
+    if precomputed_mode and cfg.chemistry_extended.benchmarks.enabled:
         raise PipelineError(
             "classical_benchmark_enabled is unsupported with scf.driver='precomputed' "
             "(no runtime post-HF backend attached)."
         )
-    if cfg.chemistry_extended.classical_benchmark_enabled:
+    if cfg.chemistry_extended.benchmarks.enabled:
         from qchem_stack.chem.classical_benchmarks import (
             ClassicalBenchmarkContext,
             run_classical_post_hf_benchmarks,
@@ -93,20 +97,20 @@ def run_scf_stage(
             ClassicalBenchmarkContext(
                 mean_field_reference=rhf,
                 reference_scf_method=str(cfg.scf.method),
-                n_active_orbitals=int(cfg.active_space.n_active_orbitals),
-                n_active_electrons=int(cfg.active_space.n_active_electrons),
+                n_active_orbitals=int(cfg.active_space.cas.n_orbitals),
+                n_active_electrons=int(cfg.active_space.cas.n_electrons),
             ),
         )
-    if precomputed_mode and cfg.chemistry_extended.rdm_correction_method != "none":
+    if precomputed_mode and cfg.chemistry_extended.post_hf.rdm_correction_method != "none":
         raise PipelineError(
             "rdm_correction_method requires live backend hooks and is unsupported with "
             "scf.driver='precomputed'."
         )
-    if cfg.chemistry_extended.rdm_correction_method != "none":
+    if cfg.chemistry_extended.post_hf.rdm_correction_method != "none":
+        from qchem_stack.chem.kernels.dispatch import run_nevpt2_casci
         from qchem_stack.integrations.rdm_corrections import (
             build_rdm_correction_readiness,
             rdm_bundle_from_mean_field,
-            run_pyscf_nevpt2_casci_correction,
             run_rdm_correction,
         )
 
@@ -117,26 +121,38 @@ def run_scf_stage(
             )
         rdmb = rdm_bundle_from_mean_field(rhf)
         rdm_bundle_meta = dict(rdmb.metadata)
-        rdm_m = cfg.chemistry_extended.rdm_correction_method
+        rdm_m = cfg.chemistry_extended.post_hf.rdm_correction_method
         if rdm_m in ("stub_nevpt2", "stub_ac0"):
-            rdm_correction_report = run_rdm_correction(rdm_m, rdmb)
-        elif rdm_m == "pyscf_nevpt2_casci":
+            rdm_correction_report = cast("dict[str, Any]", run_rdm_correction(rdm_m, rdmb))
+        elif rdm_m in ("pyscf_nevpt2_casci", "psi4_nevpt2_casci"):
             if not solver_caps.supports_rdm_nevpt2_casci:
                 raise PipelineError(
-                    "rdm_correction_method='pyscf_nevpt2_casci' requires backend support "
+                    f"rdm_correction_method={rdm_m!r} requires backend NEVPT2/CASCI support "
                     f"(backend={solver_caps.backend_id!r})."
                 )
-            rdm_correction_report = run_pyscf_nevpt2_casci_correction(
-                rhf,
-                int(cfg.active_space.n_active_orbitals),
-                int(cfg.active_space.n_active_electrons),
+            rdm_correction_report = cast(
+                "dict[str, Any]",
+                run_nevpt2_casci(
+                    cfg,
+                    rhf,
+                    int(cfg.active_space.cas.n_orbitals),
+                    int(cfg.active_space.cas.n_electrons),
+                ),
             )
+            from qchem_stack.chem.integration.driver_meta import (
+                merge_rdm_correction_bindings_into_reference,
+            )
+
+            merge_rdm_correction_bindings_into_reference(rhf.driver_meta, rdm_correction_report)
         else:
             raise ValueError(f"Unsupported rdm_correction_method: {rdm_m!r}")
-        rdm_correction_readiness = build_rdm_correction_readiness(
-            requested_method=rdm_m,
-            correction_report=rdm_correction_report,
-            bundle_meta=rdm_bundle_meta,
+        rdm_correction_readiness = cast(
+            "dict[str, Any]",
+            build_rdm_correction_readiness(
+                requested_method=rdm_m,
+                correction_report=rdm_correction_report,
+                bundle_meta=rdm_bundle_meta or {},
+            ),
         )
     mark_stage_done(
         profile=profile,
@@ -165,7 +181,7 @@ def build_pre_quantum_stage(
     rhf: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None,
-    profile: Any,
+    profile: PipelineStageTimer,
     emit: Callable[[str], None],
     logger: logging.Logger,
     context: PreQuantumStageContext,

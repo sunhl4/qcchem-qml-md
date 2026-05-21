@@ -9,9 +9,10 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 AlgorithmFactory = Callable[..., Any]
 

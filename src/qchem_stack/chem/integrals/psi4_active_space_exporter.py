@@ -2,18 +2,22 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
 
 from qchem_stack.chem.bridges.canonical_integral_pack import (
     SCHEMA_V1,
     CanonicalActiveSpaceIntegralPack,
 )
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.integrals.exporter_protocol import ActiveSpaceIntegralExporter
 from qchem_stack.chem.integrals.psi4_active_space import active_space_casci_raw_blocks_psi4
 from qchem_stack.chem.restricted_integral_operator import (
     RestrictedActiveSpaceIntegralOperatorCompact,
 )
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 class Psi4ActiveSpaceIntegralExporter(ActiveSpaceIntegralExporter):
@@ -31,7 +35,7 @@ class Psi4ActiveSpaceIntegralExporter(ActiveSpaceIntegralExporter):
                 f"Psi4ActiveSpaceIntegralExporter expected backend_tag='psi4', "
                 f"got {reference.backend_tag()!r}."
             )
-        constant, h1, h2 = active_space_casci_raw_blocks_psi4(
+        constant, h1, h2, casci_impl = active_space_casci_raw_blocks_psi4(
             reference,
             n_active_orbitals,
             n_active_electrons,
@@ -45,11 +49,12 @@ class Psi4ActiveSpaceIntegralExporter(ActiveSpaceIntegralExporter):
             symmetry_meta={"psi4_symmetry": "c1_assumed"},
             storage_schema="psi4_casci_mo_dense_v1",
         )
-        prov = {
+        prov: dict[str, Any] = {
             "pack_schema": SCHEMA_V1,
             "upstream_integral_source": "psi4_casci_mo_compact",
             "integral_openfermion_bridge": "psi4_mo_to_openfermion_v1",
             "classical_backend": "psi4",
+            "casci_implementation_id": str(casci_impl),
         }
         dm = dict(reference.driver_meta or {})
         if dm:

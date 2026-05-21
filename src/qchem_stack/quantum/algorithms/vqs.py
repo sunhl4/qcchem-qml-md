@@ -1,14 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
-from scipy.linalg import lstsq
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 @dataclass
@@ -105,16 +106,16 @@ class AlgorithmVQS(AlgorithmBase):
                 else:
                     M[i, j] = np.imag(gij)
             if imag_flow:
-                rhs[i] = -np.real(np.vdot(d_vecs[i], hpsi - e0 * psi0))
+                rhs[i] = -float(np.real(np.vdot(d_vecs[i], hpsi - e0 * psi0)))
             else:
-                rhs[i] = -np.real(np.vdot(d_vecs[i], hpsi))
+                rhs[i] = -float(np.real(np.vdot(d_vecs[i], hpsi)))
 
         Ms = M + ridge * np.eye(n)
         Ms = (Ms + Ms.T) / 2.0
         try:
             sol = np.linalg.solve(Ms, rhs)
         except np.linalg.LinAlgError:
-            sol, *_ = lstsq(Ms, rhs, rcond=None)
+            sol, *_ = np.linalg.lstsq(Ms, rhs, rcond=None)
         sol = np.asarray(sol, dtype=float)
         if not np.all(np.isfinite(sol)):
             sol = np.zeros_like(rhs)

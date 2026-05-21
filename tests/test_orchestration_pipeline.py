@@ -17,14 +17,15 @@ def test_run_pipeline_sync_h2(tmp_path) -> None:
     cfg_path = tmp_path / "h2.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_test
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -32,16 +33,20 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 512
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 120
-  use_pauli_protocol: true
+  vqe:
+    depth: 1
+    maxiter: 120
+  pauli:
+    use_protocol: true
 """,
         encoding="utf-8",
     )
@@ -73,14 +78,15 @@ def test_run_pipeline_sync_h2_with_classical_benchmarks(tmp_path) -> None:
     cfg_path = tmp_path / "h2_bench.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_test_bench
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -89,18 +95,22 @@ scf:
   method: RHF
 active_space:
   strategy: cas
-  ncas: 2
-  nelecas: 2
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 20
-  use_pauli_protocol: false
+  vqe:
+    depth: 1
+    maxiter: 20
+  pauli:
+    use_protocol: false
 chemistry_extended:
-  classical_benchmark_enabled: true
+  benchmarks:
+    enabled: true
 """,
         encoding="utf-8",
     )
@@ -134,7 +144,7 @@ def test_qpe_dual_track_yaml_runs_via_pipeline() -> None:
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "qpe_dual_track_demo.yaml"
     cfg = load_experiment_config(p)
-    assert cfg.quantum.qpe_pipeline_integration is True
+    assert cfg.quantum.demos.qpe.pipeline_integration is True
     out = run_pipeline_sync(cfg, cfg_path=p)
     qdt = out["qpe_demo_track"]
     assert qdt["schema"] == "qpe_qec_demo_track_v1"
@@ -157,7 +167,7 @@ def test_adapt_singles_pool_yaml_runs_via_pipeline() -> None:
     if not p.is_file():
         pytest.skip("configs/example_h2_adapt_singles_pool.yaml missing")
     cfg = load_experiment_config(p)
-    assert cfg.quantum.adapt_pool_id == "fermionic_uccsd_singles"
+    assert cfg.quantum.adapt.pool_id == "fermionic_uccsd_singles"
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert isinstance(out["repro"]["run_summary"].get("adapt_pool_id_yaml"), str)
     assert math.isfinite(float(out["energy_after_variational"]))
@@ -169,7 +179,7 @@ def test_adapt_doubles_pool_yaml_runs_via_pipeline() -> None:
     if not p.is_file():
         pytest.skip("configs/example_h2_adapt_doubles_pool.yaml missing")
     cfg = load_experiment_config(p)
-    assert cfg.quantum.adapt_pool_id == "fermionic_uccsd_doubles_only"
+    assert cfg.quantum.adapt.pool_id == "fermionic_uccsd_doubles_only"
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert math.isfinite(float(out["energy_after_variational"]))
 
@@ -180,7 +190,7 @@ def test_adapt_uccsd_jw_alias_pool_yaml_runs_via_pipeline() -> None:
     if not p.is_file():
         pytest.skip("configs/example_h2_adapt_uccsd_jw_alias.yaml missing")
     cfg = load_experiment_config(p)
-    assert cfg.quantum.adapt_pool_id == "uccsd_jw"
+    assert cfg.quantum.adapt.pool_id == "uccsd_jw"
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert out["repro"]["run_summary"].get("adapt_pool_id_yaml") == "uccsd_jw"
     assert math.isfinite(float(out["energy_after_variational"]))
@@ -192,7 +202,7 @@ def test_iqeb_fermionic_doubles_pool_yaml_runs_via_pipeline() -> None:
     if not p.is_file():
         pytest.skip("configs/example_h2_iqeb_fermionic_doubles_pool.yaml missing")
     cfg = load_experiment_config(p)
-    assert cfg.quantum.iqeb_pool_id == "fermionic_uccsd_doubles_only"
+    assert cfg.quantum.iqeb.pool_id == "fermionic_uccsd_doubles_only"
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert math.isfinite(float(out["energy_after_variational"]))
 
@@ -203,7 +213,7 @@ def test_iqeb_qubit_excitation_alias_pool_yaml_runs_via_pipeline() -> None:
     if not p.is_file():
         pytest.skip("configs/example_h2_iqeb_qubit_excitation_alias.yaml missing")
     cfg = load_experiment_config(p)
-    assert cfg.quantum.iqeb_pool_id == "qubit_excitation"
+    assert cfg.quantum.iqeb.pool_id == "qubit_excitation"
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert out["repro"]["run_summary"].get("iqeb_pool_id_yaml") == "qubit_excitation"
     assert math.isfinite(float(out["energy_after_variational"]))
@@ -215,7 +225,7 @@ def test_vqs_track_yaml_runs_via_pipeline() -> None:
     if not p.is_file():
         pytest.skip("configs/example_h2_vqs_track.yaml missing")
     cfg = load_experiment_config(p)
-    assert cfg.quantum.vqs_pipeline_integration is True
+    assert cfg.quantum.demos.vqs.pipeline_integration is True
     out = run_pipeline_sync(cfg, cfg_path=p)
     vt = out["vqs_track"]
     assert vt["schema"] == "vqs_track_v1"
@@ -238,14 +248,15 @@ def test_run_pipeline_sync_h2_qpe_demo_track(tmp_path) -> None:
     cfg_path = tmp_path / "h2qpe.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_qpe
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -253,17 +264,23 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 512
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 40
-  use_pauli_protocol: true
-  qpe_demo_track_after_variational: true
+  vqe:
+    depth: 1
+    maxiter: 40
+  pauli:
+    use_protocol: true
+  demos:
+    qpe:
+      track_after_variational: true
 """,
         encoding="utf-8",
     )
@@ -279,14 +296,15 @@ def test_run_pipeline_sync_h2_vqd_yaml_shots(tmp_path) -> None:
     cfg_path = tmp_path / "h2_vqd.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_vqd
 random_seed: 3
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -294,21 +312,27 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 80
-  use_pauli_protocol: false
-  vqd_after_variational: true
-  vqd_n_states: 2
-  vqd_shots_objective: 100
-  vqd_shots_overlap: 80
-  vqd_shots_weight: 80
+  vqe:
+    depth: 1
+    maxiter: 80
+  pauli:
+    use_protocol: false
+  excited:
+    vqd:
+      after_variational: true
+      n_states: 2
+      shots_objective: 100
+      shots_overlap: 80
+      shots_weight: 80
 """,
         encoding="utf-8",
     )
@@ -344,14 +368,15 @@ def test_run_pipeline_sync_h2_qse_sceom_yaml(tmp_path) -> None:
     cfg_path = tmp_path / "h2_excited.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_qse_sceom
 random_seed: 7
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -359,22 +384,29 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 60
-  use_pauli_protocol: false
-  qse_after_variational: true
-  qse_subspace_dim: 4
-  qse_shot_mode: exact
-  sceom_after_variational: true
-  sceom_subspace_dim: 2
-  sceom_shots_per_matrix_element: 0
+  vqe:
+    depth: 1
+    maxiter: 60
+  pauli:
+    use_protocol: false
+  excited:
+    qse:
+      after_variational: true
+      subspace_dim: 4
+      shot_mode: exact
+    sceom:
+      after_variational: true
+      subspace_dim: 2
+      shots_per_matrix_element: 0
 """,
         encoding="utf-8",
     )
@@ -412,14 +444,15 @@ def test_run_pipeline_sync_h2_qse_pauli_transitions_run_summary(tmp_path) -> Non
     cfg_path = tmp_path / "h2_qse_pauli.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_qse_pauli
 random_seed: 7
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -427,20 +460,26 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 60
-  use_pauli_protocol: false
-  qse_after_variational: true
-  qse_subspace_dim: 4
-  qse_shot_mode: pauli_transitions
-  qse_shots_per_ij_term: 32
+  vqe:
+    depth: 1
+    maxiter: 60
+  pauli:
+    use_protocol: false
+  excited:
+    qse:
+      after_variational: true
+      subspace_dim: 4
+      shot_mode: pauli_transitions
+      shots_per_ij_term: 32
 """,
         encoding="utf-8",
     )
@@ -457,14 +496,15 @@ def test_run_pipeline_sync_h2_adapt_then_vqd(tmp_path) -> None:
     cfg_path = tmp_path / "h2_adapt_vqd.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_adapt_vqd
 random_seed: 11
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -472,18 +512,25 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
   algorithm: adapt
-  adapt_max_iter: 2
-  vqe_depth: 1
-  use_pauli_protocol: false
-  vqd_after_variational: true
-  vqd_n_states: 2
+  adapt:
+    max_iter: 2
+  vqe:
+    depth: 1
+  pauli:
+    use_protocol: false
+  excited:
+    vqd:
+      after_variational: true
+      n_states: 2
 """,
         encoding="utf-8",
     )
@@ -499,14 +546,15 @@ def test_run_pipeline_sync_h2_vqd_and_pauli_protocol(tmp_path) -> None:
     cfg_path = tmp_path / "h2_vqd_pauli.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: orch_vqd_pauli
 random_seed: 5
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -514,20 +562,26 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 400
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 100
-  use_pauli_protocol: true
-  vqd_after_variational: true
-  vqd_n_states: 2
-  vqd_shots_objective: 50
-  vqd_shots_overlap: 40
+  vqe:
+    depth: 1
+    maxiter: 100
+  pauli:
+    use_protocol: true
+  excited:
+    vqd:
+      after_variational: true
+      n_states: 2
+      shots_objective: 50
+      shots_overlap: 40
 """,
         encoding="utf-8",
     )
@@ -545,14 +599,15 @@ def test_run_pipeline_with_job_db(tmp_path) -> None:
     cfg_path = tmp_path / "h2b.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: job_orch
 random_seed: 2
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -560,13 +615,17 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
   shots_per_circuit: 256
 quantum:
-  use_pauli_protocol: true
+  algorithm: vqe
+  pauli:
+    use_protocol: true
 """,
         encoding="utf-8",
     )
@@ -609,29 +668,33 @@ def test_dmet_whole_active_system_impurity_vqe_matches_global_vqe() -> None:
     from qchem_stack.config import (
         ActiveSpaceSpec,
         BackendSpecConfig,
-        EmbeddingSpec,
         ExperimentConfig,
         MoleculeSpec,
         QuantumSpec,
         SCFSpec,
     )
+    from tests.embedding_nested import embedding_dmet
 
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="dmet_whole_h2",
         random_seed=7,
         molecule=MoleculeSpec(
-            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
         ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
         quantum=QuantumSpec(
-            algorithm="vqe", vqe_depth=1, vqe_maxiter=120, use_pauli_protocol=False
+            algorithm="vqe",
+            vqe={"depth": 1, "maxiter": 120},
+            pauli={"use_protocol": False},
         ),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        embedding=embedding_dmet(
             fragment_labels=["impurity"],
-            dmet_hamiltonian_source="whole_active_system",
+            hamiltonian_source="whole_active_system",
             n_scf_cycles_embedding=1,
         ),
     )
@@ -664,13 +727,13 @@ def test_run_pipeline_sync_packaged_h2_vqd_uccsd_yaml() -> None:
     meta = vqd["meta"]
     assert meta.get("vqd_variety_yaml") == "uccsd"
     assert meta.get("reused_pipeline_ground") is True
-    assert meta.get("vqd_overlap_mode_yaml") == cfg.quantum.vqd_overlap_mode
+    assert meta.get("vqd_overlap_mode_yaml") == cfg.quantum.excited.vqd.overlap_mode
     assert isinstance(meta.get("tangelo_deflation_analogy_v1"), dict)
     assert isinstance(meta.get("vqd_cross_stack_semantics_v1"), dict)
     assert vqd["energies"][0] == pytest.approx(float(out["energy_after_variational"]))
     rsum = out["repro"]["run_summary"]
     assert rsum.get("vqd_variety_yaml") == "uccsd"
-    assert rsum.get("vqd_overlap_mode_yaml") == cfg.quantum.vqd_overlap_mode
+    assert rsum.get("vqd_overlap_mode_yaml") == cfg.quantum.excited.vqd.overlap_mode
 
 
 def test_run_pipeline_sync_packaged_h2_uccsd_yaml() -> None:

@@ -2,8 +2,7 @@
 
 from __future__ import annotations
 
-from collections.abc import Iterable
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
@@ -11,6 +10,10 @@ from qchem_stack.chem.solvers.psi4_solver import psi4_hf_total_energy_au
 from qchem_stack.chem.solvers.pyscf_solver import PySCFIntegralSolver
 from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import ChemistryExtendedSpec
+from qchem_stack.contracts.schema_ids import CROSS_SOLVER_HF_PARITY_V1
+
+if TYPE_CHECKING:
+    from collections.abc import Iterable
 
 
 def _closed_shell_cases() -> list[tuple[str, int, int, list[str], list[list[float]], str]]:
@@ -78,4 +81,4 @@ def build_cross_solver_parity_report(*, atol: float = 5e-4) -> dict[str, Any]:
     else:
         summary["all_within_atol"] = None
 
-    return {"schema": "cross_solver_hf_parity_v1", "summary": summary, "cases": cases_out}
+    return {"schema": CROSS_SOLVER_HF_PARITY_V1, "summary": summary, "cases": cases_out}

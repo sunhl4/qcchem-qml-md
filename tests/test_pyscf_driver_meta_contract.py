@@ -38,14 +38,15 @@ def test_driver_meta_contract_molecular_rhf(tmp_path) -> None:
     cfg_path = tmp_path / "h2_mol.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: h2_mol_meta
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -53,8 +54,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -80,14 +83,15 @@ def test_driver_meta_contract_pbc_rhf(tmp_path) -> None:
     cfg_path = tmp_path / "h2_pbc.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: h2_pbc_meta
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -95,8 +99,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 chemistry_extended:
   pbc_cell_vectors_bohr:
     - [5.0, 0.0, 0.0]

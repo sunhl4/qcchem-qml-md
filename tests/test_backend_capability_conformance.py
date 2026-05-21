@@ -24,8 +24,7 @@ from qchem_stack.chem.integrals.pyscf_active_space_exporter import PySCFActiveSp
 from qchem_stack.chem.solvers import create_solver, register_mock_external_solver
 from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import load_experiment_config
-from qchem_stack.exceptions import EmbeddingError, PipelineError
-from qchem_stack.exceptions import PreQuantumCapabilityError
+from qchem_stack.exceptions import EmbeddingError, PipelineError, PreQuantumCapabilityError
 from qchem_stack.integrations.rdm_corrections import run_pyscf_nevpt2_casci_correction
 from qchem_stack.integrations.schmidt_dmet_self_consistent import (
     run_schmidt_density_feedback_cycles,
@@ -88,7 +87,7 @@ def test_rdm_correction_gate_requires_backend_capability() -> None:
     cfg = load_experiment_config(p)
     register_mock_external_solver()
     cfg.scf.driver = "mock_external"
-    cfg.chemistry_extended.rdm_correction_method = "stub_nevpt2"
+    cfg.chemistry_extended.post_hf.rdm_correction_method = "stub_nevpt2"
     with pytest.raises(
         PipelineError, match="rdm_correction_method requires backend RDM extraction support"
     ):
@@ -105,20 +104,20 @@ def test_projection_and_schmidt_builders_require_pyscf_backend_tag() -> None:
             coordinates_bohr=np.zeros((1, 3), dtype=float),
             basis="sto-3g",
         ),
-        driver_meta={"upstream_classical_software_tag": "psi4"},
+        driver_meta={"upstream_classical_software_tag": "mock_external"},
     )
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h4_projection_mulliken.yaml")
-    with pytest.raises(EmbeddingError, match="currently implemented on the PySCF backend"):
+    with pytest.raises(EmbeddingError, match="requires backend pyscf or psi4"):
         molecular_hamiltonian_fragment_mulliken_projection(ref, cfg)
-    with pytest.raises(SchmidtProductionError, match="currently implemented for backend='pyscf'"):
+    with pytest.raises(SchmidtProductionError, match="supports backend pyscf or psi4"):
         build_schmidt_impurity_integrals(
             ref,
             fragment_atom_indices=[0],
             n_bath_orbitals=1,
             max_impurity_spatial_orbitals=2,
         )
-    with pytest.raises(SchmidtProductionError, match="requires backend='pyscf'"):
+    with pytest.raises(SchmidtProductionError, match="currently requires backend='pyscf'"):
         run_schmidt_density_feedback_cycles(
             ref,
             fragment_atom_indices=[0],

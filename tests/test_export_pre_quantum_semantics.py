@@ -11,9 +11,16 @@ from pathlib import Path
 
 def _export(cfg_rel: str) -> dict:
     root = Path(__file__).resolve().parents[1]
-    env = {**os.environ, "PYTHONPATH": str(root / "src") + os.pathsep + os.environ.get("PYTHONPATH", "")}
+    env = {
+        **os.environ,
+        "PYTHONPATH": str(root / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
+    }
     proc = subprocess.run(
-        [sys.executable, str(root / "scripts" / "export_parity_criteria_table.py"), str(root / cfg_rel)],
+        [
+            sys.executable,
+            str(root / "scripts" / "export_parity_criteria_table.py"),
+            str(root / cfg_rel),
+        ],
         cwd=str(root),
         capture_output=True,
         text=True,

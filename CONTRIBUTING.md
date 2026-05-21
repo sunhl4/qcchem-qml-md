@@ -1,5 +1,7 @@
 # Contributing to qchem-stack
 
+**New contributors:** start with the English quick start — [`docs/QUICKSTART_CONTRIBUTORS.md`](docs/QUICKSTART_CONTRIBUTORS.md) (YAML → pipeline → `repro` keys).
+
 **对标与工程母稿（三份 + 契约矩阵）**：[竞争定位](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) · [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md) · [差距与实施计划](docs/public_parity_matrix.md)（含 **附录 A–F**：P2 / Y1 / L1 / B→J / P1 审计 / 不排期项）· [parity 矩阵](docs/public_parity_matrix.md)。**详细技术契约**：`docs/技术文档_*.md`、`mitigation_PMSV_ZNE_Qermit_mapping.md`、`launch_retrieve_nexus_analog.md`。
 
 ## Local Python environment (default)
@@ -69,6 +71,29 @@ Targeted markers (see `pyproject.toml`): `-m l1_excited`, `-m l1_md_ml`, `-m l3`
 `.github/workflows/ci.yml` 在完整 `pytest tests` 之后还会跑 **`pytest -m l1_excited`** 与 **`pytest -m l1_md_ml`**（非「仅本地可选」）。激发态/VQD/QSE/SCEOM 等回归以 `l1_excited` 为准；`md_bridge` 与 MD/ML 契约以 `l1_md_ml` 为准（长板字段与 `repro` 对齐清单见 [与Vendor platform能力差距与实施计划 — 附录 B §6](docs/public_parity_matrix.md#y1-residual-partial-sla-template) 表末行）。
 
 **Parity / `computables_rich`（可选 repro）**：`parity_integrations.include_computables_rich_in_repro: true` 时的 workflow-preview 对齐见 `tests/test_workflow_preview_repro_alignment.py`；FastAPI 侧 `POST /v1/meta/workflow-preview` 烟测见 `tests/test_api_runs.py`（需 `pip install -e ".[api]"`，CI 已装）。
+
+## Config module style (nested schema)
+
+All new or refactored YAML fields in `src/qchem_stack/config/` must follow [`docs/config_校验分层约定.md`](docs/config_校验分层约定.md): nested sub-blocks, `extra="forbid"`, YAML path = Python path, validation split across `_{section}_validation.py` and `_experiment_validation.py`. Reference implementations: `embedding*.py`, `quantum*.py`. PRs that change public YAML shape must update the matching `docs/说明_*.md` and config tests.
+
+## Code style optimization (P0–P4)
+
+Milestone tracker: [`docs/internal/STYLE_OPTIMIZATION_ROADMAP.md`](docs/internal/STYLE_OPTIMIZATION_ROADMAP.md). Before large refactors, capture baseline:
+
+```bash
+./scripts/venv-run python scripts/code_health_baseline.py
+# optional JSON artifact:
+./scripts/venv-run python scripts/code_health_baseline.py --write docs/internal/code_health_baseline.json
+```
+
+Style PRs should attach baseline diff (files >400 lines, `dict[str, Any]` hotspots). Optional local checks after P3/P4 land:
+
+```bash
+./scripts/venv-run pyright src/qchem_stack
+./scripts/venv-run ruff check src/qchem_stack --select TCH
+```
+
+CI runs hard gates: `typecheck-config` (config, repro, exceptions) and `typecheck-stack` (full `src/qchem_stack`).
 
 ## PySCF boundary coding rule
 

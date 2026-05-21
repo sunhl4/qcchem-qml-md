@@ -96,7 +96,7 @@ class QubitHamiltonianFragmentSolverVQE:
     """
     Impurity **VQE** on a supplied :class:`~qchem_stack.chem.hamiltonian.QubitHamiltonian`.
 
-    Intended for ``EmbeddingSpec.dmet_hamiltonian_source == "whole_active_system"`` (single fragment
+    Intended for ``embedding.dmet.hamiltonian_source == "whole_active_system"`` (single fragment
     covering the active space). Multi-fragment DMET requires a user-implemented
     ``build_fragment_hamiltonian`` that includes bath / embedding potentials.
     """

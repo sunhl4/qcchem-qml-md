@@ -5,9 +5,9 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
-import numpy as np
-
 if TYPE_CHECKING:
+    import numpy as np
+
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.chem.pre_quantum_input import PreQuantumInput
@@ -41,7 +41,7 @@ class VariationalStageOutcome:
 
     energy: float
     angles: np.ndarray
-    """1-D float parameters for HEA with ``quantum.vqe_depth``."""
+    """1-D float parameters for HEA with ``quantum.vqe.depth``."""
 
     algo_meta: dict[str, Any] = field(default_factory=dict)
     """Flattened metadata merged into pipeline dict (historical keys: ``algorithm``, ``nfev``, …)."""

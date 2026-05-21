@@ -30,11 +30,14 @@ from qchem_stack.quantum.variational_plugins.spec import VariationalRunContext
 
 def _minimal_cfg(**q_kw: object) -> ExperimentConfig:
     return ExperimentConfig(
+        schema_version="2",
         experiment_id="t",
         molecule=MoleculeSpec(symbols=["H", "H"], coordinates=[[0.0, 0.0, 0.0], [0.0, 0.0, 0.74]]),
         scf=SCFSpec(),
-        active_space=ActiveSpaceSpec(ncas=2, nelecas=2),
-        quantum=QuantumSpec(**q_kw),  # type: ignore[arg-type]
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
+        quantum=QuantumSpec.model_validate(dict(q_kw)),  # type: ignore[arg-type]
     )
 
 
@@ -167,7 +170,7 @@ def test_echo_runner_factory_protocol() -> None:
             algorithm_factory=(
                 "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
             ),
-            vqe_depth=1,
+            vqe={"depth": 1},
         ),
         hamiltonian=qh,
         executor=StatevectorHeaExecutor(),
@@ -182,10 +185,8 @@ def test_run_variational_stage_builtin_vqe_zero_init() -> None:
     ctx = VariationalRunContext(
         cfg=_minimal_cfg(
             algorithm="vqe",
-            vqe_depth=1,
-            vqe_maxiter=1,
-            vqe_initial_parameters_strategy="zeros",
-            use_pauli_protocol=False,
+            vqe={"depth": 1, "maxiter": 1, "initial_parameters_strategy": "zeros"},
+            pauli={"use_protocol": False},
         ),
         hamiltonian=qh,
         executor=StatevectorHeaExecutor(),
@@ -215,7 +216,7 @@ def test_variational_context_prefers_pre_quantum_input_hamiltonian() -> None:
             algorithm_factory=(
                 "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
             ),
-            vqe_depth=1,
+            vqe={"depth": 1},
         ),
         hamiltonian=qh_fallback,
         executor=StatevectorHeaExecutor(),
@@ -234,7 +235,7 @@ def test_variational_context_falls_back_without_pre_quantum_input() -> None:
             algorithm_factory=(
                 "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
             ),
-            vqe_depth=1,
+            vqe={"depth": 1},
         ),
         hamiltonian=qh,
         executor=StatevectorHeaExecutor(),

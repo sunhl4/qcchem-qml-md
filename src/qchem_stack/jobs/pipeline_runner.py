@@ -4,15 +4,18 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import yaml
 
 from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import FULL_PIPELINE_JOB_RESULT_V1
 from qchem_stack.jobs.kinds import JOB_KIND_FULL_PIPELINE
-from qchem_stack.jobs.store import SqliteJobStore
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from qchem_stack.orchestration.run_context import RunContext
+
+if TYPE_CHECKING:
+    from qchem_stack.jobs.store import SqliteJobStore
 
 _RESULT_KEYS = (
     "repro",
@@ -52,7 +55,7 @@ _RESULT_KEYS = (
 def pipeline_result_for_job_store(out: dict[str, Any]) -> dict[str, Any]:
     """Drop large redundant fields (e.g. shot rows) while keeping reproducibility core."""
     slim: dict[str, Any] = {k: out[k] for k in _RESULT_KEYS if k in out}
-    slim["schema"] = "full_pipeline_job_result_v1"
+    slim["schema"] = FULL_PIPELINE_JOB_RESULT_V1
     return slim
 
 

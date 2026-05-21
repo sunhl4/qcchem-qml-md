@@ -1,57 +1,241 @@
-# Grouped Pauli energy from **Qiskit Aer (or any Qiskit Backend) shot histograms** — true bitstring path.
-# Requires: pip install "qchem-stack[quantum,chem]"  (Qiskit + qiskit-aer + PySCF).
-# Run: `run_pipeline_from_config` on this file; see docs/技术文档_设备比特串与Qiskit采样路径.md
-schema_version: "1"
-experiment_id: "h2_sto3g_qiskit_pauli_shots"
+schema_version: '2'
+experiment_id: h2_sto3g_qiskit_pauli_shots
 random_seed: 42
-
 molecule:
-  symbols: ["H", "H"]
-  coordinates_bohr:
-    - [0.0, 0.0, 0.0]
-    - [0.0, 0.0, 1.4]
+  symbols:
+  - H
+  - H
+  coordinates:
+  - - 0.0
+    - 0.0
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 1.4
+  zmatrix: null
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
-  basis: "sto-3g"
-
+  basis: sto-3g
+  ecp: null
 scf:
-  driver: "pyscf"
-  method: "RHF"
-
+  driver: pyscf
+  method: RHF
+  pyscf:
+    max_cycle: null
+    chkfile: null
+    init_guess: null
+    level_shift: null
+    use_newton: false
+    diis_space_dimension: null
+    density_fit: false
+    density_fit_auxbasis: null
+  psi4:
+    max_cycle: null
+    chkfile: null
+    init_guess: null
+    level_shift: null
+    use_newton: false
+    diis_space_dimension: null
+    density_fit: false
+    density_fit_auxbasis: null
+  precomputed:
+    bundle_path: null
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
-
+  strategy: cas
+  mapping:
+    fermion_qubit: jordan_wigner
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+  manual:
+    n_orbitals: null
+    n_electrons: null
+    frozen_orbitals: []
+  jw:
+    prefer_restricted_spatial: false
+    coeff_atol: null
 backend:
-  name: "qiskit_aer_pauli"
-  provider: "qiskit"
-  qiskit_mode: "statevector"
-  # Per commuting-group / per-term circuit; used for stderr bookkeeping and Qiskit run(..., shots=...)
+  name: qiskit_aer_pauli
+  provider: qiskit
   shots_per_circuit: 2048
-  # Optional Aer knobs (defaults to automatic method); optional: backend.meta["aer_method"]
-  # Optional: pass a pre-built `Backend` object in `qiskit_shots_backend` (see technical doc)
+  target_energy_stderr: null
+  qiskit_mode: statevector
+  ionstack_endpoint: null
   meta:
-    qiskit_shots_backend: "aer"
+    qiskit_shots_backend: aer
     qiskit_transpile_optimization: 0
-
 mitigation:
-  pmsv_enabled: false
-  zne_enabled: false
-
+  execution_class: unspecified
+  zne:
+    enabled: false
+    mode: scalar_stub
+    scales:
+    - 1.0
+    - 1.5
+    - 2.0
+  pmsv:
+    enabled: false
+    stabilizers: []
+    retention_rate: 1.0
+    report_extension: default
+    extra: {}
+  stubs:
+    spam_calibration: false
+    pec_literature: false
+    classical_shadows: false
+    classical_shadows_budget_pairs: 256
 compiler:
   optimization_level: 1
-  native_twoq: "CX"
-
-embedding:
-  mode: "none"
-
+  native_twoq: CX
+  preoptimize_passes: []
+  compiler_passes: []
 quantum:
-  algorithm: "vqe"
-  vqe_depth: 1
-  vqe_maxiter: 50
-  adapt_max_iter: 4
-  use_pauli_protocol: true
-  pauli_grouping: "tensor_product"
-  # Mutually exclusive with run_sampled_pauli_protocol
-  run_qiskit_shots_pauli_protocol: true
-  record_pauli_measurement_histograms: true
+  algorithm: vqe
+  algorithm_factory: null
+  variational:
+    ansatz: hea
+    uccsd_trotter_steps: null
+  vqe:
+    depth: 1
+    maxiter: 50
+    optimizer_method: COBYLA
+    initial_parameters_strategy: random_uniform
+  adapt:
+    max_iter: 4
+    pool_id: fermionic_uccsd
+  iqeb:
+    pool_id: iqeb_qubit_excitation
+    n_grads: 3
+    energy_tolerance: 1.0e-08
+    max_rounds: 2
+  pauli:
+    use_protocol: true
+    grouping: tensor_product
+    run_sampled: false
+    run_qiskit_shots: true
+    record_histograms: true
+    support_max_terms: null
+  excited:
+    vqd:
+      after_variational: false
+      n_states: 2
+      penalty_weight: 5.0
+      penalty_weights: null
+      overlap_exponent: 1.0
+      cobyla_maxiter: 150
+      optimizer_method: COBYLA
+      init_strategy: legacy
+      init_noise_scale: 0.15
+      max_overlap_warn: 0.05
+      overlap_mode: statevector_overlap
+      shots_objective: 0
+      shots_overlap: 0
+      shots_weight: 0
+    qse:
+      after_variational: false
+      subspace_dim: 4
+      max_basis: null
+      shot_mode: exact
+      shots_per_matrix_element: 4096
+      shots_per_ij_term: 512
+    sceom:
+      after_variational: false
+      subspace_dim: 4
+      shots_per_matrix_element: 0
+      generator_strategy: legacy
+  demos:
+    qpe:
+      track_after_variational: false
+      pipeline_integration: false
+      demo_track_n_bits: 4
+      three_pack:
+        after_variational: false
+        time: 1.0
+        deterministic_rounds: 4
+        kitaev_bits: 6
+        info_samples: 32
+    vqs:
+      track_after_variational: false
+      pipeline_integration: false
+      mode: mclachlan_real_time
+      n_times: 6
+      dt: 0.05
+      rhs_mode: linear_damping
+      tangent_fd_epsilon: 5.0e-05
+  tensornet:
+    expectation_stub: false
+    contraction_engine: stub
+  graph:
+    extra_edges: []
+    remove_edges: []
+embedding:
+  embedding_input_representation: mo
+  n_scf_cycles_embedding: null
+  classical_reference_method: null
+  oniom_layers_v1: []
+  mode: none
+chemistry_extended:
+  solvent:
+    model: none
+    epsilon: 78.3553
+  pbc:
+    cell_vectors_bohr: null
+    kpoint_mesh:
+    - 1
+    - 1
+    - 1
+    active_space_kpoint_index: 0
+  avas:
+    ao_labels: []
+    threshold: 0.2
+    minao: minao
+    with_iao: false
+    openshell_option: 2
+    canonicalize: true
+    ncore: 0
+  casscf:
+    orbital_optimization_audit: false
+    orbital_optimization_for_integrals: false
+  benchmarks:
+    enabled: false
+    backend: auto
+  post_hf:
+    integral_crosscheck: none
+    rdm_correction_method: none
+  mo_transform:
+    hook: ''
+    kwargs: {}
+  symmetry:
+    pyscf_symmetry: false
+nexus_analog:
+  enabled: false
+  project_label: default
+  unit_per_circuit: 1.0
+  unit_per_shot: 0.0001
+  unit_per_depth: 0.001
+nexus_cloud:
+  mode: 'off'
+  base_url: ''
+  api_key_env: NEXUS_API_KEY
+  project_slug: ''
+  timeout_s: 30.0
+parity_integrations:
+  enabled: true
+  qnexus_probe: true
+  open_qermit_reference: true
+  tensornet_closure_reference: true
+  uccsd_excitation_reference: true
+  tket_first_circuit_stats: true
+  dmet_stub_one_shot_ledger: true
+  gap_closure_reference_bundle: true
+  include_computables_rich_in_repro: false
+  resource_estimation_preview: false
+md_ml_export:
+  attach_single_frame_to_repro: false
+  energy_reference: variational
+  include_hf_nuclear_gradient: false
+  trajectory:
+    extra_coordinates_bohr: []
+    theory_level: hf_scf
+extra: {}

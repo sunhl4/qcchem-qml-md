@@ -13,44 +13,42 @@ from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_spatial_chemist_
 from qchem_stack.config import (
     ActiveSpaceSpec,
     BackendSpecConfig,
-    EmbeddingSpec,
     ExperimentConfig,
     MoleculeSpec,
     QuantumSpec,
     SCFSpec,
 )
+from tests.embedding_nested import embedding_dmet, schmidt_embedding_dmet
 
 
 def test_embedding_spec_rejects_schmidt_with_uniform_toy() -> None:
     with pytest.raises(ValueError, match="schmidt_atomic_production"):
-        EmbeddingSpec(
-            mode="dmet",
+        embedding_dmet(
             fragment_labels=["a", "b"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            dmet_uniform_multifragment_toy=True,
+            hamiltonian_source="schmidt_atomic_production",
+            schmidt={"fragment_atom_indices": [0]},
+            uniform_multifragment_toy=True,
         )
 
 
 def test_embedding_spec_rejects_schmidt_indices_and_groups_together() -> None:
     with pytest.raises(ValueError, match="not both"):
-        EmbeddingSpec(
-            mode="dmet",
+        embedding_dmet(
             fragment_labels=["a", "b"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_multi_fragment_atom_groups=[[0, 1], [2, 3]],
+            hamiltonian_source="schmidt_atomic_production",
+            schmidt={
+                "fragment_atom_indices": [0],
+                "multi_fragment_atom_groups": [[0, 1], [2, 3]],
+            },
         )
 
 
 def test_embedding_spec_schmidt_pf_vqe_maxiter_bounds() -> None:
-    with pytest.raises(ValueError, match="schmidt_per_fragment_vqe_maxiter"):
-        EmbeddingSpec(
-            mode="dmet",
+    with pytest.raises(ValueError, match="per_fragment_vqe_maxiter"):
+        schmidt_embedding_dmet(
             fragment_labels=["a"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_per_fragment_vqe_maxiter=0,
+            fragment_atom_indices=[0],
+            per_fragment_vqe_maxiter=0,
         )
 
 
@@ -83,14 +81,29 @@ def _as_reference(rhf) -> ClassicalMeanFieldReference:
     )
 
 
+def _quantum_vqe(*, depth: int = 1, maxiter: int = 40) -> QuantumSpec:
+    return QuantumSpec.model_validate(
+        {
+            "algorithm": "vqe",
+            "vqe": {"depth": depth, "maxiter": maxiter},
+            "pauli": {"use_protocol": False},
+        }
+    )
+
+
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_build_schmidt_h2_single_atom_fragment() -> None:
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_build",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
     )
     drv = PySCFDriver.from_config(cfg)
     rhf = drv.run_rhf()
@@ -111,22 +124,25 @@ def test_pipeline_schmidt_production_with_bath_sidecar_json() -> None:
     root = Path(__file__).resolve().parents[1]
     sidecar = root / "configs" / "schmidt_bath_sidecar_toy.json"
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_sidecar",
         random_seed=2,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=40, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=_quantum_vqe(maxiter=40),
+        embedding=schmidt_embedding_dmet(
             fragment_labels=["frag0"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_n_bath_spatial=1,
-            schmidt_max_impurity_spatial_orbitals=8,
-            schmidt_attach_fci_reference=False,
-            schmidt_bath_sidecar_json_path=str(sidecar),
+            fragment_atom_indices=[0],
+            n_bath_spatial=1,
+            max_impurity_spatial_orbitals=8,
+            attach_fci_reference=False,
+            bath_sidecar_json_path=str(sidecar),
         ),
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
@@ -141,22 +157,25 @@ def test_pipeline_schmidt_production_with_bath_sidecar_json() -> None:
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_pipeline_schmidt_production_smoke() -> None:
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_pipe",
         random_seed=2,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=40, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=_quantum_vqe(maxiter=40),
+        embedding=schmidt_embedding_dmet(
             fragment_labels=["frag0"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_n_bath_spatial=1,
-            schmidt_max_impurity_spatial_orbitals=8,
-            schmidt_attach_fci_reference=True,
-            schmidt_fci_reference_max_spatial_orbitals=8,
+            fragment_atom_indices=[0],
+            n_bath_spatial=1,
+            max_impurity_spatial_orbitals=8,
+            attach_fci_reference=True,
+            fci_reference_max_spatial_orbitals=8,
         ),
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
@@ -179,24 +198,27 @@ def test_pipeline_schmidt_production_smoke() -> None:
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_schmidt_density_feedback_two_cycles_audit() -> None:
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_fb",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=20, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=_quantum_vqe(maxiter=20),
+        embedding=schmidt_embedding_dmet(
             fragment_labels=["frag0"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_n_bath_spatial=1,
-            schmidt_max_impurity_spatial_orbitals=8,
-            schmidt_dmet_max_cycles=2,
-            schmidt_dmet_mixing_alpha=0.4,
-            schmidt_dmet_convergence_tol=1e-9,
-            schmidt_attach_fci_reference=False,
+            fragment_atom_indices=[0],
+            n_bath_spatial=1,
+            max_impurity_spatial_orbitals=8,
+            dmet_max_cycles=2,
+            dmet_mixing_alpha=0.4,
+            dmet_convergence_tol=1e-9,
+            attach_fci_reference=False,
         ),
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
@@ -216,11 +238,12 @@ def test_schmidt_density_feedback_two_cycles_audit() -> None:
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_pipeline_schmidt_multifragment_h4_smoke() -> None:
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_mf",
         random_seed=3,
         molecule=MoleculeSpec(
             symbols=["H", "H", "H", "H"],
-            coordinates_bohr=[
+            coordinates=[
                 [0, 0, 0.0],
                 [0, 0, 1.4],
                 [0, 0, 2.8],
@@ -228,21 +251,21 @@ def test_pipeline_schmidt_multifragment_h4_smoke() -> None:
             ],
         ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=4, n_active_electrons=4),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 4, "n_electrons": 4}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=24, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=_quantum_vqe(maxiter=24),
+        embedding=schmidt_embedding_dmet(
             fragment_labels=["left", "right"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_multi_fragment_atom_groups=[[0, 1], [2, 3]],
-            schmidt_multi_primary_fragment_index=0,
-            schmidt_n_bath_spatial=1,
-            schmidt_max_impurity_spatial_orbitals=8,
-            schmidt_dmet_max_cycles=1,
-            schmidt_attach_fci_reference=False,
-            schmidt_run_vqe_on_all_fragments=True,
-            schmidt_per_fragment_vqe_maxiter=12,
+            multi_fragment_atom_groups=[[0, 1], [2, 3]],
+            multi_primary_fragment_index=0,
+            n_bath_spatial=1,
+            max_impurity_spatial_orbitals=8,
+            dmet_max_cycles=1,
+            attach_fci_reference=False,
+            run_vqe_on_all_fragments=True,
+            per_fragment_vqe_maxiter=12,
         ),
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
@@ -285,21 +308,24 @@ def test_pipeline_schmidt_multifragment_h4_smoke() -> None:
 def test_pipeline_schmidt_repro_json_serializable() -> None:
     """``repro_json_dumps`` must accept pipeline repro (strict RFC JSON, no ``default=str``)."""
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_json",
         random_seed=7,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=8, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=_quantum_vqe(maxiter=8),
+        embedding=schmidt_embedding_dmet(
             fragment_labels=["frag0"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_n_bath_spatial=1,
-            schmidt_max_impurity_spatial_orbitals=8,
-            schmidt_attach_fci_reference=False,
+            fragment_atom_indices=[0],
+            n_bath_spatial=1,
+            max_impurity_spatial_orbitals=8,
+            attach_fci_reference=False,
         ),
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync

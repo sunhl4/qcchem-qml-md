@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
-from qchem_stack.config import ExperimentConfig
+if TYPE_CHECKING:
+    from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
+    from qchem_stack.config import ExperimentConfig
 
 
 @runtime_checkable

@@ -12,13 +12,12 @@ AO mean-field handles mirror ``get_system_ao`` via :meth:`qchem_stack.chem.drive
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from openfermion import InteractionOperator, jw_hartree_fock_state
 
 from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.fermion import FermionSpace
 from qchem_stack.chem.hamiltonian import (
     FermionQubitMappingName,
@@ -26,9 +25,13 @@ from qchem_stack.chem.hamiltonian import (
     qubit_hamiltonian_from_active_space_fermionic_operator,
     qubit_hamiltonian_from_compact_restricted_active_space,
 )
-from qchem_stack.chem.restricted_integral_operator import (
-    RestrictedActiveSpaceIntegralOperatorCompact,
-)
+from qchem_stack.contracts.schema_ids import RESTRICTED_ACTIVE_SPACE_QUANTUM_PROBLEM_V1
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.restricted_integral_operator import (
+        RestrictedActiveSpaceIntegralOperatorCompact,
+    )
 
 
 def _pyscf_symmetry_snapshot(mf: Any) -> dict[str, Any]:
@@ -74,11 +77,23 @@ def build_restricted_active_space_quantum_problem(
     ``jordan_wigner_coeff_atol`` applies only to the default InteractionOperator mapping and must be
     ``None`` when that flag is enabled with Jordan–Wigner.
     """
+    if (
+        prefer_restricted_spatial_fermion_for_jordan_wigner
+        and jordan_wigner_coeff_atol is not None
+        and fermion_qubit_mapping == "jordan_wigner"
+    ):
+        raise ValueError(
+            "jordan_wigner_coeff_atol is incompatible with "
+            "prefer_restricted_spatial_fermion_for_jordan_wigner on the spatial-fermion JW path."
+        )
     if rhf.backend_tag() == "pyscf":
         try:
             from pyscf import scf as scf_mod
 
-            if isinstance(rhf.mf, (scf_mod.rohf.ROHF, scf_mod.uhf.UHF)):
+            from qchem_stack.chem.pyscf_typing import as_pyscf_mf
+
+            mf_pyscf = as_pyscf_mf(rhf.mf)
+            if isinstance(mf_pyscf, (scf_mod.rohf.ROHF, scf_mod.uhf.UHF)):
                 raise ValueError(
                     "Restricted active-space quantum problem currently supports RHF references only. "
                     "Use scf.method=RHF or extend with spin-resolved open-shell integrals."
@@ -94,14 +109,21 @@ def build_restricted_active_space_quantum_problem(
     mol_op = compact.to_interaction_operator()
     n_so = int(mol_op.one_body_tensor.shape[0])
     fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=n_active_electrons)
-    if (
-        prefer_restricted_spatial_fermion_for_jordan_wigner
-        and fermion_qubit_mapping == "jordan_wigner"
+    from qchem_stack.chem.hamiltonian import _use_restricted_spatial_fermion_build
+
+    if _use_restricted_spatial_fermion_build(
+        fermion_qubit_mapping=fermion_qubit_mapping,
+        prefer_restricted_spatial_fermion_for_jordan_wigner=prefer_restricted_spatial_fermion_for_jordan_wigner,
+        jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
     ):
-        if jordan_wigner_coeff_atol is not None:
+        if (
+            prefer_restricted_spatial_fermion_for_jordan_wigner
+            and fermion_qubit_mapping != "jordan_wigner"
+        ):
             raise ValueError(
-                "jordan_wigner_coeff_atol applies only to the InteractionOperator JW path; "
-                "use prefer_restricted_spatial_fermion_for_jordan_wigner=False, or pass atol=None."
+                "prefer_restricted_spatial_fermion_for_jordan_wigner applies to "
+                "fermion_qubit_mapping='jordan_wigner' only; BK/SCBK use the spatial "
+                "fermion path automatically without this flag."
             )
         qh = qubit_hamiltonian_from_compact_restricted_active_space(
             compact,
@@ -131,8 +153,8 @@ def build_restricted_active_space_quantum_problem(
     if nrm < 1e-14:
         raise ValueError("JW Hartree–Fock state has zero norm.")
     psi = psi / nrm
-    meta = {
-        "schema": "restricted_active_space_quantum_problem_v1",
+    meta: dict[str, Any] = {
+        "schema": RESTRICTED_ACTIVE_SPACE_QUANTUM_PROBLEM_V1,
         "hartree_fock_reference_basis": "openfermion_jordan_wigner_spin_orbital_order",
         "fermion_qubit_mapping_used_for_qubit_hamiltonian": fermion_qubit_mapping,
         "compact_integral_storage_schema": compact.storage_schema,

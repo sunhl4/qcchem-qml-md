@@ -4,14 +4,17 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from openfermion.ops import QubitOperator
 
-from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
 from qchem_stack.backends.pauli_measure_expand import deserialize_basis_key
 from qchem_stack.quantum.statevector import _apply_one_qubit_unitary, _pauli_char_to_mat
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
+
+    from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
 
 
 def _single_qubit_rot_to_z_matrix(axis: str) -> np.ndarray:

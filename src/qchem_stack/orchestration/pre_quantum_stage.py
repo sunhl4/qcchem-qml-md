@@ -5,7 +5,6 @@ from __future__ import annotations
 from qchem_stack.chem.embedding.schmidt_variational_sidecar import run_schmidt_per_fragment_vqe
 from qchem_stack.chem.pre_quantum_build import (
     build_pre_quantum_input,
-    build_pre_quantum_input_with_context,
     hamiltonian,
     hamiltonian_with_schmidt_context,
     schmidt_hamiltonian_and_context,

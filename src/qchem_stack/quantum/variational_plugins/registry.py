@@ -47,7 +47,7 @@ class VariationalPluginRecord:
 
 _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
     "vqe": {
-        "summary": "Standard HEA / UCC-style VQE loop (see ``quantum.vqe_depth`` / ``vqe_maxiter``).",
+        "summary": "Standard HEA / UCC-style VQE loop (see ``quantum.vqe.depth`` / ``quantum.vqe.maxiter``).",
         "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_vqe_branch",
         "materialization_implementation": "qchem_stack.quantum.algorithms.vqe.VQE",
         "materialization_result_schema": "algorithm_vqe_report_v1",

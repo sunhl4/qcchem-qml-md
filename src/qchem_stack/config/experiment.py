@@ -3,49 +3,56 @@
 `ExperimentConfig` is the single schema source for YAML-backed experiments.
 Unknown top-level YAML keys are preserved under `extra` to keep integrations
 forward-compatible without relaxing strict typed fields.
+
+**YAML load chain** (see also ``docs/config_校验分层约定.md``):
+
+1. ``preprocess_top_level_yaml_dict`` — merge unknown top-level keys into ``extra``.
+2. Geometry / precomputed path preprocess when ``from_yaml_dict(..., geometry_files_base_dir=...)``.
+3. Pydantic section models (nested blocks use ``extra='forbid'``).
+4. ``ExperimentConfig`` cross-section ``@model_validator`` registry.
+5. Optional ``validate_pre_quantum_contract()`` at pipeline entry (subset of step 4;
+   does **not** include ``validate_pbc_k_mesh_solver_capability``).
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from ._experiment_validation import (
+    EXPERIMENT_CROSS_VALIDATORS,
     preprocess_precomputed_bundle_path,
     preprocess_top_level_yaml_dict,
-    validate_avas_strategy_requires_pyscf_labels,
-    validate_backend_capabilities_for_pre_quantum_path,
-    validate_embedding_atom_indices_within_molecule,
-    validate_md_ml_extra_coordinates_shape,
-    validate_md_ml_pauli_energy_requires_pauli_protocol,
-    validate_pbc_excludes_casscf_hooks,
-    validate_precomputed_driver_excludes_live_hooks,
-    validate_schmidt_cycle_bounds,
-    validate_schmidt_requires_rhf,
-    validate_uccsd_variational_constraints,
 )
-from .active_space import ActiveSpaceSpec
 from .backend import BackendSpecConfig
 from .chemistry_extended import ChemistryExtendedSpec
 from .compiler import CompilerSpec
-from .embedding import EmbeddingSpec
+from .embedding_specs import EmbeddingNone
 from .geometry_files import preprocess_experiment_dict_geometry_files
 from .md_ml_export import MdMlExportSpec
 from .mitigation import MitigationSpec
-from .molecule import MoleculeSpec
 from .nexus import NexusAnalogSpec, NexusCloudSpec
 from .parity_integrations import ParityIntegrationsSpec
 from .quantum import QuantumSpec
 from .scf import SCFSpec
 
+if TYPE_CHECKING:
+    from collections.abc import Mapping
+
+    from .active_space import ActiveSpaceSpec
+    from .embedding import EmbeddingSpec
+    from .molecule import MoleculeSpec
+
 
 class ExperimentConfig(BaseModel):
     """Validated experiment contract spanning chemistry, backend, and algorithm specs."""
 
-    schema_version: str = "1"
+    schema_version: str = Field(
+        default="2",
+        description='Experiment schema generation; nested YAML requires "2".',
+    )
     experiment_id: str
     random_seed: int = 0
     molecule: MoleculeSpec
@@ -55,13 +62,23 @@ class ExperimentConfig(BaseModel):
     mitigation: MitigationSpec = Field(default_factory=MitigationSpec)
     compiler: CompilerSpec = Field(default_factory=CompilerSpec)
     quantum: QuantumSpec = Field(default_factory=QuantumSpec)
-    embedding: EmbeddingSpec = Field(default_factory=EmbeddingSpec)
+    embedding: EmbeddingSpec = Field(default_factory=EmbeddingNone)
     chemistry_extended: ChemistryExtendedSpec = Field(default_factory=ChemistryExtendedSpec)
     nexus_analog: NexusAnalogSpec = Field(default_factory=NexusAnalogSpec)
     nexus_cloud: NexusCloudSpec = Field(default_factory=NexusCloudSpec)
     parity_integrations: ParityIntegrationsSpec = Field(default_factory=ParityIntegrationsSpec)
     md_ml_export: MdMlExportSpec = Field(default_factory=MdMlExportSpec)
     extra: dict[str, Any] = Field(default_factory=dict)
+
+    @field_validator("schema_version")
+    @classmethod
+    def _require_nested_schema_version(cls, v: str) -> str:
+        if str(v).strip() != "2":
+            raise ValueError(
+                f'schema_version must be "2" (nested YAML); got {v!r}. '
+                "Rewrite the config to nested blocks (see docs/config_校验分层约定.md)."
+            )
+        return "2"
 
     @classmethod
     def from_yaml_dict(
@@ -84,51 +101,7 @@ class ExperimentConfig(BaseModel):
         return cls.model_validate(top_level)
 
     @model_validator(mode="after")
-    def _embedding_atom_indices_within_molecule(self) -> ExperimentConfig:
-        validate_embedding_atom_indices_within_molecule(self)
-        return self
-
-    @model_validator(mode="after")
-    def _md_ml_extra_coordinates_shape(self) -> ExperimentConfig:
-        validate_md_ml_extra_coordinates_shape(self)
-        return self
-
-    @model_validator(mode="after")
-    def _md_ml_pauli_energy_requires_pauli_protocol(self) -> ExperimentConfig:
-        validate_md_ml_pauli_energy_requires_pauli_protocol(self)
-        return self
-
-    @model_validator(mode="after")
-    def _avas_strategy_requires_pyscf_labels(self) -> ExperimentConfig:
-        validate_avas_strategy_requires_pyscf_labels(self)
-        return self
-
-    @model_validator(mode="after")
-    def _uccsd_variational_constraints(self) -> ExperimentConfig:
-        validate_uccsd_variational_constraints(self)
-        return self
-
-    @model_validator(mode="after")
-    def _precomputed_driver_excludes_live_hooks(self) -> ExperimentConfig:
-        validate_precomputed_driver_excludes_live_hooks(self)
-        return self
-
-    @model_validator(mode="after")
-    def _schmidt_requires_rhf(self) -> ExperimentConfig:
-        validate_schmidt_requires_rhf(self)
-        return self
-
-    @model_validator(mode="after")
-    def _schmidt_cycle_bounds(self) -> ExperimentConfig:
-        validate_schmidt_cycle_bounds(self)
-        return self
-
-    @model_validator(mode="after")
-    def _pbc_excludes_casscf_hooks(self) -> ExperimentConfig:
-        validate_pbc_excludes_casscf_hooks(self)
-        return self
-
-    @model_validator(mode="after")
-    def _backend_capabilities_for_pre_quantum_path(self) -> ExperimentConfig:
-        validate_backend_capabilities_for_pre_quantum_path(self)
+    def _cross_section_contract(self) -> ExperimentConfig:
+        for validator in EXPERIMENT_CROSS_VALIDATORS:
+            validator(self)
         return self

@@ -5,6 +5,8 @@ from typing import Any
 
 import numpy as np
 
+from qchem_stack.contracts.schema_ids import BAYESIAN_QPE_STUB_MAP_V1
+
 
 @dataclass
 class BayesianQPEStub:
@@ -21,7 +23,7 @@ class BayesianQPEStub:
             logp += np.log(np.maximum(p, 1e-12))
         idx = int(np.argmax(logp))
         return {
-            "schema": "bayesian_qpe_stub_map_v1",
+            "schema": BAYESIAN_QPE_STUB_MAP_V1,
             "map_phase": float(phis[idx]),
             "grid_points": int(self.grid_points),
             "argmax_index": idx,

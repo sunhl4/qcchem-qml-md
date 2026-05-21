@@ -10,6 +10,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from qchem_stack.contracts.schema_ids import ENERGY_COMPONENTS_V1
+
 
 def build_energy_components_v1(
     *,
@@ -21,7 +23,7 @@ def build_energy_components_v1(
 ) -> dict[str, Any]:
     """Return ``energy_components_v1`` blob for ``run_summary`` / export mirrors."""
     return {
-        "schema": "energy_components_v1",
+        "schema": ENERGY_COMPONENTS_V1,
         "nuclear_repulsion_au": float(nuclear_repulsion_au)
         if nuclear_repulsion_au is not None
         else None,

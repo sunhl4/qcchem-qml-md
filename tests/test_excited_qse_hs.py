@@ -34,9 +34,12 @@ def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
         random_seed=0,
         molecule=MoleculeSpec(
             symbols=["H", "H"],
-            coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]],
+            coordinates=[[0, 0, 0], [0, 0, 1.4]],
+            coordinate_unit="bohr",
         ),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         scf=SCFSpec(),
     )
     drv = PySCFDriver.from_config(cfg)

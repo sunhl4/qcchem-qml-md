@@ -1,83 +1,71 @@
+"""In-process pipeline: SCF → pre-quantum → variational → excited → protocol finalize.
+
+Orchestration wires chem, quantum, and backends; it must not be imported from those layers.
+
+Stage map (``run_pipeline_sync``)
+------------------------------------
+1. **scf** — ``run_scf_stage``: reference MF, active-space refinement, embedding payload,
+   classical benchmarks, optional RDM bundle metadata.
+2. **pre_quantum** — ``build_pre_quantum_stage``: Schmidt / integral handoff → ``QubitHamiltonian``.
+3. **repro** — ``collect_repro_metadata`` after Hamiltonian is fixed for variational use.
+4. **variational** — ``run_variational_stage`` (VQE / ADAPT / registry plugins).
+5. **embedding_workflow** — ``apply_embedding_workflow_stage`` (DMET / fragment VQE when configured).
+6. **excited** — ``run_excited_stages`` (VQD / QSE / SCEOM per config).
+7. **protocol_finalize** — ``run_protocol_and_finalize_stage``: optional Pauli averaging,
+   mitigation DAG, resource summaries, ``attach_run_summary``.
+
+``run_pipeline_from_config`` adds an optional **job_enqueue** step when
+``cfg.quantum.pauli.use_protocol`` and ``job_db`` are set (build → compile → SQLite store).
+"""
+
 from __future__ import annotations
 
 import hashlib
-import json
 import logging
-from collections.abc import Callable
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from qchem_stack.backends.factory import executor_from_spec
-from qchem_stack.backends.spec import summarize_circuit_shot_rows
 from qchem_stack.chem.bridges.run_build_cache import RunBuildCache
-from qchem_stack.chem.embedding.dmet import (
-    DMETContext,
-    QubitHamiltonianFragmentSolverExact,
-    QubitHamiltonianFragmentSolverVQE,
-)
-from qchem_stack.chem.hamiltonian import (
-    QubitHamiltonian,
-)
+from qchem_stack.chem.integrals.exporter_registry import list_active_space_integral_exporters
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input_with_context
 from qchem_stack.chem.pre_quantum_builder_registry import list_pre_quantum_branch_builders
-from qchem_stack.chem.integrals.exporter_registry import list_active_space_integral_exporters
 from qchem_stack.config import (
     ExperimentConfig,
     backend_spec_from_config,
     compiler_pass_bundle_from_config,
     load_experiment_config,
 )
-from qchem_stack.integrations.dmet_self_consistent import OneShotEmbeddingDriver
-from qchem_stack.jobs.nexus_analog import nexus_analog_ledger_from_rows
-from qchem_stack.jobs.nexus_cloud import nexus_cloud_repro_sidecar
+from qchem_stack.contracts.schema_ids import (
+    ACTIVE_SPACE_EXPORTERS_REGISTRY_V1,
+    PRE_QUANTUM_BRANCH_REGISTRY_V1,
+)
 from qchem_stack.jobs.store import SqliteJobStore
-from qchem_stack.mitigation.pmsv import PMSVConfig
-from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
-from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
-from qchem_stack.orchestration.parity_finalize import (
-    finalize_open_stack_parity_snapshot as _finalize_open_stack_parity_snapshot_impl,
-)
-from qchem_stack.orchestration.parity_finalize import (
-    schmidt_per_fragment_vqe_parity_summary as _schmidt_per_fragment_vqe_parity_summary_impl,
-)
+from qchem_stack.orchestration import repro_snapshot
 from qchem_stack.orchestration.embedding_workflow_stage import (
     apply_embedding_workflow_stage,
 )
 from qchem_stack.orchestration.excited_stages import (
-    build_excited_resource_summary_for_export,
-    excited_shot_channel_upper_bounds as _excited_shot_channel_upper_bounds,
-    excited_shots_upper_bound as _excited_shots_upper_bound,
     run_excited_stages,
 )
-from qchem_stack.orchestration.protocol_finalize_stage import (
-    resource_summary_excited_only as _resource_summary_excited_only,
-)
-from qchem_stack.orchestration.protocol_finalize_stage import (
-    run_protocol_and_finalize_stage,
-)
-from qchem_stack.orchestration.protocol_finalize_stage import protocol_for_job
-
+from qchem_stack.orchestration.pipeline_result import PipelineResultV1, tag_pipeline_result
 from qchem_stack.orchestration.precomputed_stage import (
     is_precomputed_driver,
     normalize_precomputed_bundle_path,
     precomputed_pre_quantum_input,
 )
+from qchem_stack.orchestration.protocol_finalize_stage import (
+    protocol_for_job,
+    run_protocol_and_finalize_stage,
+)
 from qchem_stack.orchestration.repro_metadata import (
     collect_repro_metadata_impl as _collect_repro_metadata_impl,
 )
-from qchem_stack.orchestration.repro_snapshot import (
-    append_open_stack_parity_fields as _append_open_stack_parity_fields_impl,
-)
-from qchem_stack.orchestration.repro_snapshot import (
-    repro_quantum_snapshot as _repro_quantum_snapshot_impl,
-)
 from qchem_stack.orchestration.repro_summary import (
-    attach_run_summary as _attach_run_summary_impl,
-)
-from qchem_stack.orchestration.repro_summary import (
-    classical_benchmark_summary as _classical_benchmark_summary_impl,
+    attach_run_summary,
+    classical_benchmark_summary,
 )
 from qchem_stack.orchestration.run_context import PipelineStageTimer, RunContext
 from qchem_stack.orchestration.scf_stage import (
@@ -93,31 +81,17 @@ from qchem_stack.orchestration.stage_execution import (
     run_scf_stage,
 )
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
-from qchem_stack.quantum.algorithms.excited import QSE, VQD
 from qchem_stack.quantum.variational_plugins.registry import run_variational_stage
 from qchem_stack.quantum.variational_plugins.spec import VariationalRunContext
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from qchem_stack.chem.hamiltonian import (
+        QubitHamiltonian,
+    )
+
 _pipeline_log = logging.getLogger(__name__)
-
-
-def _repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -> dict[str, Any]:
-    return _repro_quantum_snapshot_impl(cfg, qh)
-
-
-def _append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig) -> None:
-    _append_open_stack_parity_fields_impl(snap, cfg)
-
-
-def _schmidt_per_fragment_vqe_parity_summary(spfv: dict[str, Any]) -> dict[str, Any]:
-    return _schmidt_per_fragment_vqe_parity_summary_impl(spfv)
-
-
-def _finalize_open_stack_parity_snapshot(
-    out: dict[str, Any],
-    cfg: ExperimentConfig,
-    proto: PauliAveragingProtocol | None,
-) -> None:
-    _finalize_open_stack_parity_snapshot_impl(out, cfg, proto)
 
 
 def collect_repro_metadata(
@@ -127,22 +101,15 @@ def collect_repro_metadata(
 ) -> dict[str, Any]:
     return _collect_repro_metadata_impl(
         cfg,
-        parity_snapshot_fn=_repro_quantum_snapshot,
+        parity_snapshot_fn=repro_snapshot.repro_quantum_snapshot,
         cfg_path=cfg_path,
         qh=qh,
     )
 
 
-def _classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:
-    return _classical_benchmark_summary_impl(cb)
-
-
-def _attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
-    _attach_run_summary_impl(out, cfg)
-
-
 # Backward-compatible aliases for tests and scripts.
 _run_scf = run_scf_reference
+_attach_run_summary = attach_run_summary
 
 
 def run_pipeline_sync(
@@ -152,7 +119,7 @@ def run_pipeline_sync(
     hamiltonian_out: list[QubitHamiltonian] | None = None,
     run_context: RunContext | None = None,
     job_timeline_emit: Callable[[dict[str, Any]], None] | None = None,
-) -> dict[str, Any]:
+) -> PipelineResultV1:
     """Run chemistry + VQE/ADAPT + optional VQD/QSE/SCEOM + optional Pauli protocol in-process."""
     cfg = normalize_precomputed_bundle_path(cfg, cfg_path=cfg_path)
     q = cfg.quantum
@@ -248,7 +215,7 @@ def run_pipeline_sync(
     out["pre_quantum_input"] = pre_q_input.as_summary_dict()
     if classical_benchmarks is not None:
         out["classical_benchmarks"] = classical_benchmarks
-        out["classical_benchmark_summary"] = _classical_benchmark_summary(classical_benchmarks)
+        out["classical_benchmark_summary"] = classical_benchmark_summary(classical_benchmarks)
     if embedding_input_payload is not None:
         out["embedding_input_system"] = embedding_input_payload
     out["energy_components"] = energy_components
@@ -264,11 +231,11 @@ def run_pipeline_sync(
     if isinstance(repro_ps, dict):
         repro_ps["pre_quantum_build_cache_v1"] = dict(out["pre_quantum_build_cache"])
         repro_ps["active_space_exporters_registry_v1"] = {
-            "schema": "active_space_exporters_registry_v1",
+            "schema": ACTIVE_SPACE_EXPORTERS_REGISTRY_V1,
             "backend_tags": list(list_active_space_integral_exporters()),
         }
         repro_ps["pre_quantum_branch_registry_v1"] = {
-            "schema": "pre_quantum_branch_registry_v1",
+            "schema": PRE_QUANTUM_BRANCH_REGISTRY_V1,
             "path_ids": list(list_pre_quantum_branch_builders()),
         }
         pqi_sum = out.get("pre_quantum_input")
@@ -312,19 +279,21 @@ def run_pipeline_sync(
         emit=_emit,
     )
 
-    return run_protocol_and_finalize_stage(
-        cfg,
-        out=out,
-        qh=qh,
-        angles=angles,
-        excited_rs=excited_rs,
-        bspec=bspec,
-        exe=exe,
-        bundle=bundle,
-        rhf=rhf,
-        cfg_path=cfg_path,
-        profile=profile,
-        emit=_emit,
+    return tag_pipeline_result(
+        run_protocol_and_finalize_stage(
+            cfg,
+            out=out,
+            qh=qh,
+            angles=angles,
+            excited_rs=excited_rs,
+            bspec=bspec,
+            exe=exe,
+            bundle=bundle,
+            rhf=rhf,
+            cfg_path=cfg_path,
+            profile=profile,
+            emit=_emit,
+        )
     )
 
 
@@ -334,15 +303,15 @@ def run_pipeline_from_config(
     job_db: Path | None = None,
     enqueue_only: bool = False,
     run_context: RunContext | None = None,
-) -> dict[str, Any]:
+) -> PipelineResultV1:
     """Sync pipeline plus optional job enqueue (pickled :class:`PauliAveragingProtocol`)."""
     p = Path(cfg_path)
     cfg = load_experiment_config(p)
     qh_lane: list[QubitHamiltonian] = []
     sync = run_pipeline_sync(cfg, cfg_path=p, hamiltonian_out=qh_lane, run_context=run_context)
 
-    if job_db is None or not cfg.quantum.use_pauli_protocol:
-        return sync
+    if job_db is None or not cfg.quantum.pauli.use_protocol:
+        return tag_pipeline_result(sync)
 
     qh = qh_lane[0]
     angles = np.asarray(sync["angles"], dtype=float)
@@ -350,7 +319,7 @@ def run_pipeline_from_config(
     exe2 = executor_from_spec(bspec2)
     bundle2 = compiler_pass_bundle_from_config(cfg)
     proto = protocol_for_job(cfg, qh, bspec=bspec2, exe=exe2, bundle=bundle2)
-    proto.build(angles, hea_depth=cfg.quantum.vqe_depth)
+    proto.build(angles, hea_depth=cfg.quantum.vqe.depth)
     proto.compile()
     blob = proto.dumps()
     ph = hashlib.sha256(blob).hexdigest()[:24]
@@ -360,7 +329,5 @@ def run_pipeline_from_config(
     if not enqueue_only:
         PauliAveragingProtocol.process_job(store, handle.job_id)
         sync["job_result"] = store.result(handle.job_id)
-    _attach_run_summary(sync, cfg)
-    return sync
-
-
+    attach_run_summary(sync, cfg)
+    return tag_pipeline_result(sync)

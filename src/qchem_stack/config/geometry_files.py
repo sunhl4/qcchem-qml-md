@@ -7,15 +7,24 @@ Supported today:
 
 Paths in ``molecule.geometry_file`` are resolved relative to the experiment YAML
 directory when using :func:`~qchem_stack.config.io.load_experiment_config`.
+
+**Coordinate units (user-facing):** XYZ rows are copied verbatim into
+``molecule.coordinates``; they are **not** converted to Bohr in this module.
+``molecule.coordinate_unit`` (default ``angstrom`` on :class:`~qchem_stack.config.molecule.MoleculeSpec`)
+defines how those numbers are interpreted; :meth:`~qchem_stack.config.molecule.MoleculeSpec.coordinates_in_bohr`
+performs Å→Bohr when needed. Standard ``.xyz`` files are usually in ångströms—do not set
+``coordinate_unit: bohr`` unless the file values are already in Bohr.
 """
 
 from __future__ import annotations
 
-from collections.abc import Mapping
 from pathlib import Path
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 from qchem_stack.exceptions import ConfigurationError
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 GeometryFileFormat = Literal["xyz"]
 
@@ -106,9 +115,10 @@ def merge_molecule_dict_from_geometry_file(
 ) -> dict[str, Any]:
     """Expand ``geometry_file`` into ``symbols`` and ``coordinates``; drop loader-only keys.
 
-    ``coordinate_unit`` is unchanged (defaults on :class:`~qchem_stack.config.molecule.MoleculeSpec`
-    still apply); XYZ coordinates are interpreted in ångströms unless the YAML sets
-    ``coordinate_unit`` explicitly.
+    ``coordinate_unit`` is passed through unchanged. This function does **not** convert
+    units; :meth:`~qchem_stack.config.molecule.MoleculeSpec.coordinates_in_bohr` applies
+    ``coordinate_unit`` later. For typical ``.xyz`` files use ``coordinate_unit: angstrom``
+    in YAML (see ``docs/说明_molecule配置与自旋多重度.md`` §1.1).
     """
     if "geometry_file" not in molecule or molecule["geometry_file"] is None:
         return dict(molecule)
@@ -116,7 +126,7 @@ def merge_molecule_dict_from_geometry_file(
     if not isinstance(path_raw, str) or not path_raw.strip():
         raise ConfigurationError("molecule.geometry_file must be a non-empty string path.")
 
-    conflicts = [k for k in ("coordinates", "coordinates_bohr", "zmatrix") if molecule.get(k)]
+    conflicts = [k for k in ("coordinates", "zmatrix") if molecule.get(k)]
     if conflicts:
         raise ConfigurationError(
             "molecule.geometry_file cannot be used together with inline geometry fields "

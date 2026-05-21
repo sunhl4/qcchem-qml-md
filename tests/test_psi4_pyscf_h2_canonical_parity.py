@@ -32,8 +32,8 @@ def test_psi4_pyscf_h2_canonical_pack_constant_near_parity() -> None:
     cfg_psi = cfg_py.model_copy(update={"scf": cfg_py.scf.model_copy(update={"driver": "psi4"})})
     ref_py = run_scf_reference(cfg_py)
     ref_psi = run_scf_reference(cfg_psi)
-    na = int(cfg_py.active_space.n_active_orbitals)
-    ne = int(cfg_py.active_space.n_active_electrons)
+    na = int(cfg_py.active_space.cas.n_orbitals)
+    ne = int(cfg_py.active_space.cas.n_electrons)
     pack_py = CanonicalActiveSpaceIntegralPack.from_classical_reference(
         ref_py, n_active_orbitals=na, n_active_electrons=ne
     )
@@ -61,7 +61,9 @@ def test_psi4_pyscf_pre_quantum_build_finite_energies() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg_py = _h2_cfg_pyscf(root)
     cfg_psi = cfg_py.model_copy(update={"scf": cfg_py.scf.model_copy(update={"driver": "psi4"})})
-    p_py = build_pre_quantum_input(cfg_py, run_scf_reference(cfg_py), cfg_path=root / "configs" / "example_h2.yaml")
+    p_py = build_pre_quantum_input(
+        cfg_py, run_scf_reference(cfg_py), cfg_path=root / "configs" / "example_h2.yaml"
+    )
     p_psi = build_pre_quantum_input(cfg_psi, run_scf_reference(cfg_psi))
     assert p_py.qubit_hamiltonian.n_qubits == p_psi.qubit_hamiltonian.n_qubits
     assert float((p_py.qubit_hamiltonian.meta or {})["scf_energy_au"]) < 0.0

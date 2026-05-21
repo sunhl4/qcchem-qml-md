@@ -10,6 +10,8 @@ from typing import Any
 
 import numpy as np
 
+from qchem_stack.contracts.schema_ids import L3_ENERGY_BOOTSTRAP_STUB_V1
+
 
 def energy_bootstrap_ci_stub(
     energy_samples: list[float],
@@ -25,7 +27,7 @@ def energy_bootstrap_ci_stub(
     """
     if len(energy_samples) < 2:
         return {
-            "schema": "l3_energy_bootstrap_stub_v1",
+            "schema": L3_ENERGY_BOOTSTRAP_STUB_V1,
             "status": "insufficient_samples",
             "n_samples": len(energy_samples),
         }
@@ -37,7 +39,7 @@ def energy_bootstrap_ci_stub(
         means[i] = float(rng.choice(arr, size=n, replace=True).mean())
     lo, hi = np.percentile(means, [100 * alpha / 2, 100 * (1 - alpha / 2)])
     return {
-        "schema": "l3_energy_bootstrap_stub_v1",
+        "schema": L3_ENERGY_BOOTSTRAP_STUB_V1,
         "status": "ok",
         "n_samples": int(n),
         "n_bootstrap": int(n_bootstrap),

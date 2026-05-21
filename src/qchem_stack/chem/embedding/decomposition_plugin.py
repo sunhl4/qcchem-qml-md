@@ -14,7 +14,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 from openfermion.ops import QubitOperator
 
@@ -22,7 +22,10 @@ from qchem_stack.chem.hamiltonian import (
     QubitHamiltonian,
     hamiltonian_fingerprint_from_qubit_operator,
 )
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.config.embedding_helpers import require_plugin
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
 
 _DECOMPOSITION_PLUGIN_SCHEMAS = frozenset(
     {"decomposition_plugin_toy_v1", "decomposition_plugin_contract_v1"}
@@ -38,7 +41,7 @@ class DecompositionPlugin(Protocol):
 
 
 class UniformFragmentGuessPlugin:
-    """Reads ``decomposition_plugin_*`` JSON and builds the primary fragment Hamiltonian."""
+    """Reads ``embedding.plugin.json_path`` JSON and builds the primary fragment Hamiltonian."""
 
     def load_fragments(
         self, cfg: ExperimentConfig, *, cfg_path: Path | None = None
@@ -50,9 +53,9 @@ class UniformFragmentGuessPlugin:
 def _resolve_decomposition_plugin_payload(
     cfg: ExperimentConfig, *, cfg_path: Path | None = None
 ) -> tuple[Path, dict[str, Any]]:
-    raw_path = cfg.embedding.decomposition_plugin_json_path
+    raw_path = require_plugin(cfg.embedding).plugin.json_path
     if not raw_path:
-        raise ValueError("embedding.decomposition_plugin_json_path required")
+        raise ValueError("embedding.plugin.json_path required")
     path = Path(raw_path)
     if not path.is_file() and cfg_path is not None:
         alt = cfg_path.parent / raw_path
@@ -132,10 +135,10 @@ def _pauli_label_to_operator(label: str, n_qubits: int) -> QubitOperator:
 def qubit_hamiltonian_from_decomposition_plugin(
     cfg: ExperimentConfig, *, cfg_path: Path | None = None
 ) -> QubitHamiltonian:
-    emb = cfg.embedding
-    name = (emb.decomposition_plugin or "").strip()
+    plugin = require_plugin(cfg.embedding).plugin
+    name = (plugin.name or "").strip()
     if name != "uniform_fragment_guess":
-        raise ValueError(f"unknown embedding.decomposition_plugin: {name!r}")
+        raise ValueError(f"unknown embedding.plugin.name: {name!r}")
     path, data = _resolve_decomposition_plugin_payload(cfg, cfg_path=cfg_path)
     schema_tag = str(data.get("schema") or "")
     primary = str(data.get("primary_fragment_id") or "")
@@ -166,7 +169,7 @@ def qubit_hamiltonian_from_decomposition_plugin(
         "decomposition_plugin_schema": schema_tag,
         "decomposition_primary_fragment_id": primary,
         "decomposition_fragment_count": len(frags),
-        "decomposition_fragment_ids": sorted(str(k) for k in frags.keys()),
+        "decomposition_fragment_ids": sorted(str(k) for k in frags),
         "decomposition_fragment_pauli_term_counts": term_counts,
     }
     if fp_trunc:

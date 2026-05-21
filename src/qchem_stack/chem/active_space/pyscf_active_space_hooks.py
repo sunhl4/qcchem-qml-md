@@ -10,6 +10,8 @@ from typing import Any
 
 import numpy as np
 
+from qchem_stack.contracts.schema_ids import CASSCF_ORBITAL_AUDIT_V1
+
 RESOLVED_ACTIVE_SPACE_META_KEY = "qchem_active_space_resolution_v1"
 
 
@@ -37,7 +39,7 @@ def apply_pyscf_avas_to_reference(cfg: Any, reference: Any) -> None:
         raise PipelineError(
             f"active_space.strategy='avas' requires upstream PySCF mean field (got upstream tag {tag!r})."
         )
-    if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
+    if cfg.chemistry_extended.pbc.cell_vectors_bohr is not None:
         from qchem_stack.exceptions import PipelineError
 
         raise PipelineError("AVAS is implemented on the molecular PySCF branch only (disable PBC).")
@@ -65,13 +67,13 @@ def apply_pyscf_avas_to_reference(cfg: Any, reference: Any) -> None:
     ce = cfg.chemistry_extended
     solver = pyscf_avas.AVAS(
         mf,
-        list(ce.avas_ao_labels),
-        threshold=float(ce.avas_threshold),
-        minao=str(ce.avas_minao),
-        with_iao=bool(ce.avas_with_iao),
-        openshell_option=int(ce.avas_openshell_option),
-        canonicalize=bool(ce.avas_canonicalize),
-        ncore=int(ce.avas_ncore),
+        list(ce.avas.ao_labels),
+        threshold=float(ce.avas.threshold),
+        minao=str(ce.avas.minao),
+        with_iao=bool(ce.avas.with_iao),
+        openshell_option=int(ce.avas.openshell_option),
+        canonicalize=bool(ce.avas.canonicalize),
+        ncore=int(ce.avas.ncore),
     )
     ncas, nelecas, mo_coeff = solver.kernel()
     mf.mo_coeff = mo_coeff
@@ -81,12 +83,12 @@ def apply_pyscf_avas_to_reference(cfg: Any, reference: Any) -> None:
         "source": "pyscf_mcscf_avas_kernel_v1",
         "n_active_orbitals": int(ncas),
         "n_active_electrons": int(nelecas),
-        "threshold": float(ce.avas_threshold),
-        "minao": str(ce.avas_minao),
-        "with_iao": bool(ce.avas_with_iao),
-        "openshell_option": int(ce.avas_openshell_option),
-        "canonicalize": bool(ce.avas_canonicalize),
-        "ncore": int(ce.avas_ncore),
+        "threshold": float(ce.avas.threshold),
+        "minao": str(ce.avas.minao),
+        "with_iao": bool(ce.avas.with_iao),
+        "openshell_option": int(ce.avas.openshell_option),
+        "canonicalize": bool(ce.avas.canonicalize),
+        "ncore": int(ce.avas.ncore),
     }
     reference.driver_meta["avas_atomic_projection_executed"] = True
 
@@ -132,7 +134,7 @@ def casscf_energy_and_maybe_orbitals(
         from qchem_stack.exceptions import PipelineError
 
         raise PipelineError(f"CASSCF orbital hooks require PySCF upstream (got tag {tag!r}).")
-    if cfg.chemistry_extended.pbc_cell_vectors_bohr is not None:
+    if cfg.chemistry_extended.pbc.cell_vectors_bohr is not None:
         from qchem_stack.exceptions import PipelineError
 
         raise PipelineError("CASSCF hooks are unsupported on the PBC branch.")
@@ -148,25 +150,26 @@ def casscf_energy_and_maybe_orbitals(
         PySCFRHFResult,
         unwrap_pyscf_rhf_for_backend_operations,
     )
+    from qchem_stack.chem.pyscf_typing import as_pyscf_cas, as_pyscf_mf
 
     pr: PySCFRHFResult = reference.as_pyscf_rhf_result()
     pr = unwrap_pyscf_rhf_for_backend_operations(pr)
-    mf = pr.mf
+    mf_p = as_pyscf_mf(pr.mf)
 
     meta_resolution = reference.driver_meta.get(RESOLVED_ACTIVE_SPACE_META_KEY)
     if isinstance(meta_resolution, dict):
         ncas = int(meta_resolution["n_active_orbitals"])
         nelec = int(meta_resolution["n_active_electrons"])
     else:
-        ncas = int(cfg.active_space.n_active_orbitals)
-        nelec = int(cfg.active_space.n_active_electrons)
+        ncas = int(cfg.active_space.cas.n_orbitals)
+        nelec = int(cfg.active_space.cas.n_electrons)
 
-    mc = mcscf.CASSCF(mf, ncas, nelec)
+    mc = as_pyscf_cas(mcscf.CASSCF(mf_p, ncas, nelec))
     ret = mc.kernel()
     e_casscf = float(ret[0] if isinstance(ret, tuple) else ret)
 
     merged_audit = {
-        "schema": "casscf_orbital_audit_v1",
+        "schema": CASSCF_ORBITAL_AUDIT_V1,
         "active_spatial_orbitals": ncas,
         "active_electrons": nelec,
         "casscf_energy_au": e_casscf,
@@ -180,8 +183,8 @@ def casscf_energy_and_maybe_orbitals(
     }
 
     if update_integrals_orbitals:
-        mf.mo_coeff = mc.mo_coeff
-        reference.mo_energy = _mo_energy_from_fock(mf)  # type: ignore[attr-defined]
+        mf_p.mo_coeff = mc.mo_coeff
+        reference.mo_energy = _mo_energy_from_fock(mf_p)  # type: ignore[attr-defined]
 
     if record_audit:
         reference.driver_meta["casscf_orbital_audit_v1"] = merged_audit

@@ -138,6 +138,12 @@ def registered_solvers_detail() -> Mapping[str, SolverRegistrationInfo]:
     return MappingProxyType(details)
 
 
+def solver_capability_notes_for_config(cfg: ExperimentConfig) -> dict[str, str]:
+    """Return ``capability_notes`` for the solver selected by ``cfg.scf.driver``."""
+    caps = create_solver(cfg).capabilities
+    return dict(caps.capability_notes)
+
+
 def set_entrypoint_conflict_policy(policy: EntrypointConflictPolicy) -> None:
     """Configure how entry-point id collisions are handled."""
     global _ENTRYPOINT_CONFLICT_POLICY

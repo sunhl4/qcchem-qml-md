@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Literal
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 from openfermion.measurements import group_into_tensor_product_basis_sets
-from openfermion.ops import QubitOperator
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
 
 
 def _term_to_xz(term: tuple[tuple[int, str], ...], n_qubits: int) -> tuple[np.ndarray, np.ndarray]:

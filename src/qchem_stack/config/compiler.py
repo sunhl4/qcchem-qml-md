@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from ._validation import strip_required_text
 
@@ -10,12 +10,27 @@ from ._validation import strip_required_text
 class CompilerSpec(BaseModel):
     """Pass bundles analogous to vendor ``preoptimize_passes`` / ``compiler_passes`` knobs."""
 
-    optimization_level: int = Field(default=1, ge=0, le=3)
-    native_twoq: str = Field(default="CX", min_length=1)
-    preoptimize_passes: list[str] = Field(default_factory=list)
-    """Ansatz- or chemistry-adjacent logical passes (see :mod:`qchem_stack.backends.compile_passes`)."""
-    compiler_passes: list[str] = Field(default_factory=list)
-    """Target-backend passes applied after ``preoptimize_passes``."""
+    model_config = ConfigDict(extra="forbid")
+
+    optimization_level: int = Field(
+        default=1,
+        ge=0,
+        le=3,
+        description="Logical optimization tier (0=minimal, 3=aggressive).",
+    )
+    native_twoq: str = Field(
+        default="CX",
+        min_length=1,
+        description="Native two-qubit gate name for backend lowering (e.g. CX, CZ).",
+    )
+    preoptimize_passes: list[str] = Field(
+        default_factory=list,
+        description="Ansatz- or chemistry-adjacent logical passes (see :mod:`qchem_stack.backends.compile_passes`).",
+    )
+    compiler_passes: list[str] = Field(
+        default_factory=list,
+        description="Target-backend passes applied after ``preoptimize_passes``.",
+    )
 
     @field_validator("native_twoq")
     @classmethod

@@ -8,18 +8,21 @@ without a second object graph.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
-from openfermion.ops import QubitOperator
 
-from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
-from qchem_stack.config import ExperimentConfig
 from qchem_stack.protocols.product_contract import (
     classify_pauli_expectation_path,
     pauli_protocol_expectation_path_for_config,
 )
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
+
+    from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
+    from qchem_stack.config import ExperimentConfig
 
 
 @dataclass(frozen=True)
@@ -137,7 +140,7 @@ class ProtocolRunner:
     gradient: Computable | None = None
 
     def evaluate_objective(self, parameters: np.ndarray) -> float:
-        return float(self.objective.evaluate(parameters))
+        return float(np.real(self.objective.evaluate(parameters)))
 
     def evaluate_auxiliary(self, parameters: np.ndarray) -> dict[str, float]:
         out: dict[str, float] = {}
@@ -158,9 +161,11 @@ def refs_from_computable_graph_v2(graph: dict[str, Any]) -> list[ComputableRef]:
     overrides in the graph are not represented here — re-emit with the same
     :class:`~qchem_stack.config.ExperimentConfig` to restore them.
     """
+    from qchem_stack.contracts.schema_ids import COMPUTABLE_GRAPH_V2
+
     sch = graph.get("schema")
-    if sch != "computable_graph_v2":
-        raise ValueError(f"expected schema computable_graph_v2, got {sch!r}")
+    if sch != COMPUTABLE_GRAPH_V2:
+        raise ValueError(f"expected schema {COMPUTABLE_GRAPH_V2!r}, got {sch!r}")
     nodes = graph.get("nodes")
     if not isinstance(nodes, list):
         raise ValueError("computable_graph_v2.nodes must be a list")
@@ -194,14 +199,14 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
                     "algorithm_label": q.algorithm,
                     "variational_dispatch": "yaml_algorithm_factory_v1",
                     "algorithm_factory": q.algorithm_factory,
-                    "vqe_depth": q.vqe_depth,
+                    "vqe_depth": q.vqe.depth,
                 },
             )
         )
     elif q.algorithm == "vqe":
         out.append(
             ComputableRef(
-                "ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe_depth}
+                "ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe.depth}
             )
         )
     elif q.algorithm in ("adapt", "tetris_adapt"):
@@ -209,7 +214,7 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
             ComputableRef(
                 "ground_state_energy",
                 "energy",
-                {"algorithm": q.algorithm, "adapt_max_iter": q.adapt_max_iter},
+                {"algorithm": q.algorithm, "adapt_max_iter": q.adapt.max_iter},
             )
         )
     elif q.algorithm == "iqeb":
@@ -219,8 +224,8 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
                 "energy",
                 {
                     "algorithm": "iqeb",
-                    "iqeb_max_rounds": q.iqeb_max_rounds,
-                    "vqe_depth": q.vqe_depth,
+                    "iqeb_max_rounds": q.iqeb.max_rounds,
+                    "vqe_depth": q.vqe.depth,
                 },
             )
         )
@@ -232,32 +237,36 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
                 {
                     "algorithm": q.algorithm,
                     "variational_plugin_registry_id": q.algorithm,
-                    "vqe_depth": q.vqe_depth,
+                    "vqe_depth": q.vqe.depth,
                 },
             )
         )
-    if q.use_pauli_protocol:
+    if q.pauli.use_protocol:
         out.append(
             ComputableRef(
                 "hamiltonian_expectation_pauli_protocol",
                 "energy",
                 {
-                    "pauli_grouping": q.pauli_grouping,
+                    "pauli_grouping": q.pauli.grouping,
                     "pauli_protocol_expectation_path": classify_pauli_expectation_path(q),
                 },
             )
         )
-    if q.vqd_after_variational:
-        out.append(ComputableRef("excited_energies_vqd", "spectrum", {"n_states": q.vqd_n_states}))
-    if q.qse_after_variational:
+    if q.excited.vqd.after_variational:
+        out.append(
+            ComputableRef("excited_energies_vqd", "spectrum", {"n_states": q.excited.vqd.n_states})
+        )
+    if q.excited.qse.after_variational:
         out.append(
             ComputableRef(
-                "excitation_energies_qse", "spectrum", {"subspace_dim": q.qse_subspace_dim}
+                "excitation_energies_qse", "spectrum", {"subspace_dim": q.excited.qse.subspace_dim}
             )
         )
-    if q.sceom_after_variational:
+    if q.excited.sceom.after_variational:
         out.append(
-            ComputableRef("sceom_energies", "spectrum", {"subspace_dim": q.sceom_subspace_dim})
+            ComputableRef(
+                "sceom_energies", "spectrum", {"subspace_dim": q.excited.sceom.subspace_dim}
+            )
         )
     if q.qpe_demo_track_requested():
         out.append(
@@ -272,8 +281,8 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
                 "dynamics",
                 {
                     "hook": "quantum.algorithms.vqs + vqs_pipeline_track",
-                    "vqs_mode": q.vqs_mode,
-                    "vqs_n_times": q.vqs_n_times,
+                    "vqs_mode": q.demos.vqs.mode,
+                    "vqs_n_times": q.demos.vqs.n_times,
                 },
             )
         )

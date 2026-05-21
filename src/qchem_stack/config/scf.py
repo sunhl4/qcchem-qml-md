@@ -1,96 +1,56 @@
-"""SCF driver selection and mean-field convergence controls."""
+"""SCF driver selection and mean-field convergence controls.
+
+Field reference: ``docs/说明_scf配置.md``.
+"""
 
 from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+
+from ._scf_validation import (
+    validate_density_fit_auxbasis_consistency,
+    validate_precomputed_bundle_requirements,
+)
+from .scf_enums import ScfDriverId
+from .scf_specs import ScfPrecomputedSpec, ScfPsi4Spec, ScfPyscfSpec
+
+_FORBID = ConfigDict(extra="forbid")
 
 
 class SCFSpec(BaseModel):
     """Classical Hartree–Fock driver selection (Hamiltonian build path is PySCF-first today)."""
 
+    model_config = _FORBID
+
     driver: str = Field(
-        default="pyscf",
-        description=(
-            "Classical backend id for solver registry lookup. "
-            "Built-ins include `pyscf`, `psi4`, and `precomputed`; plugin ids are supported."
-        ),
+        default=ScfDriverId.PYSCF.value,
+        description="Classical backend id (pyscf, psi4, precomputed, or registered plugin).",
     )
-    method: Literal["RHF", "ROHF", "UHF"] = "RHF"
-    max_cycle: int | None = Field(
-        default=None,
-        ge=1,
-        le=512,
-        description="Optional PySCF ``mf.max_cycle`` override (open-shell / transition-metal SCF).",
-    )
-    chkfile: str | None = Field(
-        default=None,
-        description="Optional PySCF checkpoint path (``mf.chkfile``).",
-    )
-    init_guess: str | None = Field(
-        default=None,
-        description=(
-            "Optional PySCF ``mf.init_guess`` token (e.g. ``minao``, ``atom``, ``huckel``, ``chkfile``)."
-        ),
-    )
-    level_shift: float | None = Field(
-        default=None,
-        description="Optional mean-field ``level_shift`` when supported by PySCF SCF objects.",
-    )
-    use_newton: bool = Field(
-        default=False,
-        description="If True and method is RHF/ROHF, use ``scf.RHF(...).newton()`` pipeline when available.",
-    )
-    diis_space_dimension: int | None = Field(
-        default=None,
-        ge=2,
-        description="Optional ``mf.diis_space`` dimension override (PySCF-dependent).",
-    )
-    density_fit: bool = Field(
-        default=False,
-        description="Enable density-fitting / RI SCF when supported by the selected backend.",
-    )
-    density_fit_auxbasis: str | None = Field(
-        default=None,
-        description="Optional auxiliary basis for density-fitting (PySCF ``mf.density_fit(auxbasis=...)``).",
-    )
-    precomputed_bundle_path: str | None = Field(
-        default=None,
-        description=(
-            "Path to ``classical_reference_bundle_v1`` JSON when ``scf.driver='precomputed'``. "
-            "Supports absolute paths and current-working-directory-relative paths."
-        ),
-    )
+    method: Literal["RHF", "ROHF", "UHF"] = Field(default="RHF", description="SCF spin treatment.")
+    pyscf: ScfPyscfSpec = Field(default_factory=ScfPyscfSpec)
+    psi4: ScfPsi4Spec = Field(default_factory=ScfPsi4Spec)
+    precomputed: ScfPrecomputedSpec = Field(default_factory=ScfPrecomputedSpec)
 
-    @model_validator(mode="after")
-    def _density_fit_auxbasis_consistency(self) -> SCFSpec:
-        if self.density_fit_auxbasis and not self.density_fit:
-            raise ValueError("scf.density_fit_auxbasis requires scf.density_fit=true.")
-        return self
-
-    @model_validator(mode="after")
-    def _normalize_driver_id(self) -> SCFSpec:
-        key = str(self.driver).strip().lower()
+    @field_validator("driver", mode="before")
+    @classmethod
+    def _coerce_driver(cls, v: object) -> str:
+        if isinstance(v, ScfDriverId):
+            return v.value
+        key = str(v).strip().lower()
         if not key:
             raise ValueError("scf.driver must be a non-empty solver id.")
         if any(ch.isspace() for ch in key):
-            raise ValueError(f"scf.driver must not contain whitespace: {self.driver!r}.")
-        self.driver = key
+            raise ValueError(f"scf.driver must not contain whitespace: {v!r}.")
+        return key
+
+    @model_validator(mode="after")
+    def _density_fit_auxbasis_consistency(self) -> SCFSpec:
+        validate_density_fit_auxbasis_consistency(self)
         return self
 
     @model_validator(mode="after")
     def _precomputed_bundle_requirements(self) -> SCFSpec:
-        raw = self.precomputed_bundle_path
-        if raw is not None:
-            raw = str(raw).strip()
-        self.precomputed_bundle_path = raw or None
-        if self.driver == "precomputed" and not self.precomputed_bundle_path:
-            raise ValueError(
-                "scf.driver='precomputed' requires scf.precomputed_bundle_path to be non-empty."
-            )
-        if self.driver != "precomputed" and self.precomputed_bundle_path:
-            raise ValueError(
-                "scf.precomputed_bundle_path is only valid when scf.driver='precomputed'."
-            )
+        validate_precomputed_bundle_requirements(self)
         return self

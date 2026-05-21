@@ -34,14 +34,14 @@ def _run_smoke_cfg(cfg_path: Path) -> int:
     if out.get("pauli_measurement_ledger") is not None:
         print("pauli_measurement_ledger_n", len(out["pauli_measurement_ledger"]))
     print("repro.run_summary", (out.get("repro") or {}).get("run_summary"))
-    if cfg_obj.quantum.use_pauli_protocol:
+    if cfg_obj.quantum.pauli.use_protocol:
         ok = e is not None and out.get("resource_summary") is not None
     else:
         ok = out.get("energy_after_variational") is not None
         if ok and (
-            cfg_obj.quantum.vqd_after_variational
-            or cfg_obj.quantum.qse_after_variational
-            or cfg_obj.quantum.sceom_after_variational
+            cfg_obj.quantum.excited.vqd.after_variational
+            or cfg_obj.quantum.excited.qse.after_variational
+            or cfg_obj.quantum.excited.sceom.after_variational
         ):
             ok = out.get("resource_summary") is not None
     return 0 if ok else 1

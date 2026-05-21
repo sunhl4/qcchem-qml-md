@@ -9,7 +9,6 @@ from openfermion.ops import QubitOperator
 from qchem_stack.config import (
     ActiveSpaceSpec,
     BackendSpecConfig,
-    EmbeddingSpec,
     ExperimentConfig,
     MoleculeSpec,
     QuantumSpec,
@@ -22,14 +21,19 @@ from qchem_stack.integrations.ucc_reference import (
 )
 from qchem_stack.orchestration.pipeline import collect_repro_metadata
 from qchem_stack.tensornet.dense_expectation_reference import expectation_qubit_operator_dense
+from tests.embedding_nested import embedding_dmet
 
 
 def test_open_gap_closure_reference_has_schemas() -> None:
     cfg = ExperimentConfig(
         experiment_id="gap",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
     )
     g = build_open_gap_closure_reference(cfg)
     assert g["schema"] == "open_gap_closure_reference_v1"
@@ -45,8 +49,12 @@ def test_parity_snapshot_includes_gap_bundle_by_default() -> None:
     cfg = ExperimentConfig(
         experiment_id="x",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
     )
     snap = collect_repro_metadata(cfg)["parity_snapshot"]
     assert "open_gap_closure_reference" in snap
@@ -85,8 +93,8 @@ def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
     )
     qh = molecular_hamiltonian_from_classical_reference(
         ref,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     ur = UCCSDVQE(qh, executor=StatevectorHeaExecutor()).run(maxiter=400, seed=42)
     assert ur.meta.get("jw_fixed_electron_sector_projection") is True
@@ -121,8 +129,8 @@ def test_uccsd_vqe_h2_bravyi_kitaev_energy_window() -> None:
     )
     qh = molecular_hamiltonian_from_classical_reference(
         ref,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="bravyi_kitaev",
     )
     ur = UCCSDVQE(qh, executor=StatevectorHeaExecutor()).run(maxiter=400, seed=7)
@@ -143,17 +151,25 @@ def test_expectation_qubit_operator_dense_Z0() -> None:
 def test_dmet_uniform_multifragment_toy_pipeline_smoke() -> None:
     pytest.importorskip("pyscf")
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="multi_toy",
         random_seed=1,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=30, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=QuantumSpec(
+            algorithm="vqe",
+            vqe={"depth": 1, "maxiter": 30},
+            pauli={"use_protocol": False},
+        ),
+        embedding=embedding_dmet(
             fragment_labels=["A", "B"],
-            dmet_uniform_multifragment_toy=True,
+            uniform_multifragment_toy=True,
         ),
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync

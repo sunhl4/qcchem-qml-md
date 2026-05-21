@@ -43,28 +43,35 @@ def test_schmidt_semantics_post_variational_audit_only() -> None:
     from qchem_stack.config import (
         ActiveSpaceSpec,
         BackendSpecConfig,
-        EmbeddingSpec,
         ExperimentConfig,
         MoleculeSpec,
         QuantumSpec,
         SCFSpec,
     )
+    from tests.embedding_nested import schmidt_embedding_dmet
 
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="schmidt_sem",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
-        quantum=QuantumSpec(algorithm="vqe", vqe_depth=1, vqe_maxiter=10, use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        quantum=QuantumSpec(
+            algorithm="vqe",
+            vqe={"depth": 1, "maxiter": 10},
+            pauli={"use_protocol": False},
+        ),
+        embedding=schmidt_embedding_dmet(
             fragment_labels=["frag0"],
-            dmet_hamiltonian_source="schmidt_atomic_production",
-            schmidt_fragment_atom_indices=[0],
-            schmidt_n_bath_spatial=1,
-            schmidt_max_impurity_spatial_orbitals=8,
+            fragment_atom_indices=[0],
+            n_bath_spatial=1,
+            max_impurity_spatial_orbitals=8,
         ),
     )
     sem = pre_quantum_hamiltonian_semantics(cfg)

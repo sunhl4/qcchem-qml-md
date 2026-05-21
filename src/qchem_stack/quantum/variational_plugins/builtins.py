@@ -18,15 +18,15 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
     q = ctx.cfg.quantum
     qh = ctx.resolved_hamiltonian()
     exe = ctx.executor
-    if q.variational_ansatz == "uccsd":
-        if q.uccsd_trotter_steps is not None:
+    if q.variational.ansatz == "uccsd":
+        if q.variational.uccsd_trotter_steps is not None:
             ur = UCCSDTrotterVQE(
                 qh,
                 executor=exe,
-                n_trotter_steps=int(q.uccsd_trotter_steps),
-            ).run(maxiter=q.vqe_maxiter, seed=ctx.seed)
+                n_trotter_steps=int(q.variational.uccsd_trotter_steps),
+            ).run(maxiter=q.vqe.maxiter, seed=ctx.seed)
         else:
-            ur = UCCSDVQE(qh, executor=exe).run(maxiter=q.vqe_maxiter, seed=ctx.seed)
+            ur = UCCSDVQE(qh, executor=exe).run(maxiter=q.vqe.maxiter, seed=ctx.seed)
         return VariationalStageOutcome(
             energy=float(ur.energy),
             angles=np.asarray(ur.angles, dtype=float),
@@ -34,17 +34,17 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
         )
 
     init = (
-        np.zeros(2 * qh.n_qubits * q.vqe_depth, dtype=float)
-        if q.vqe_initial_parameters_strategy == "zeros"
+        np.zeros(2 * qh.n_qubits * q.vqe.depth, dtype=float)
+        if q.vqe.initial_parameters_strategy == "zeros"
         else None
     )
     vr = VQE(
         qh,
-        depth=q.vqe_depth,
+        depth=q.vqe.depth,
         executor=exe,
-        optimizer_method=q.vqe_optimizer_method,
+        optimizer_method=q.vqe.optimizer_method,
     ).run(
-        maxiter=q.vqe_maxiter,
+        maxiter=q.vqe.maxiter,
         initial_parameters=init,
         seed=ctx.seed,
     )
@@ -60,9 +60,9 @@ def run_adapt_family(ctx: VariationalRunContext) -> VariationalStageOutcome:
     qh = ctx.resolved_hamiltonian()
     av = FermionicAdaptVQE(
         qh,
-        max_ops=q.adapt_max_iter,
-        hea_depth=q.vqe_depth,
-        pool_id=q.adapt_pool_id,
+        max_ops=q.adapt.max_iter,
+        hea_depth=q.vqe.depth,
+        pool_id=q.adapt.pool_id,
         tetris_style=(q.algorithm == "tetris_adapt"),
         executor=ctx.executor,
     )
@@ -84,13 +84,13 @@ def run_iqeb(ctx: VariationalRunContext) -> VariationalStageOutcome:
     qh = ctx.resolved_hamiltonian()
     iq = IQEBVQE(
         qh,
-        max_rounds=q.iqeb_max_rounds,
-        n_grads=q.iqeb_n_grads,
-        energy_tolerance=q.iqeb_energy_tolerance,
-        pool_id=q.iqeb_pool_id,
+        max_rounds=q.iqeb.max_rounds,
+        n_grads=q.iqeb.n_grads,
+        energy_tolerance=q.iqeb.energy_tolerance,
+        pool_id=q.iqeb.pool_id,
         executor=ctx.executor,
     )
-    ir = iq.run(depth=q.vqe_depth, seed=ctx.seed)
+    ir = iq.run(depth=q.vqe.depth, seed=ctx.seed)
     return VariationalStageOutcome(
         energy=float(ir.energy),
         angles=np.asarray(ir.vqe.angles, dtype=float),

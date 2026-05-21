@@ -11,11 +11,13 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
-from typing import Any, Final
+from typing import TYPE_CHECKING, Any, Final
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
 from qchem_stack.quantum.algorithms.vqe import VQE
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 AnsatzFactory = Callable[..., Any]
 
@@ -42,7 +44,7 @@ def _uccsd_trotter_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> UCCS
 
 ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
     "hea": AnsatzRegistryEntry(
-        summary="Hardware-efficient layered rotations; depth from ``quantum.vqe_depth``.",
+        summary="Hardware-efficient layered rotations; depth from ``quantum.vqe.depth``.",
         implementation="qchem_stack.quantum.algorithms.vqe.VQE",
         factory=_hea_factory,
         capabilities={"supports_gradient": True, "supports_auxiliary": True},
@@ -50,7 +52,7 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
     "uccsd": AnsatzRegistryEntry(
         summary=(
             "Closed-shell spin-orbital UCCSD as sequential matrix exponentials on the JW Hartree–Fock "
-            "reference (``quantum.variational_ansatz: uccsd`` with ``algorithm: vqe``; JW-only)."
+            "reference (``quantum.variational.ansatz: uccsd`` with ``algorithm: vqe``; JW-only)."
         ),
         implementation="qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDVQE",
         factory=_uccsd_factory,
@@ -82,8 +84,8 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
     ),
     "trotter_ucc_placeholder": AnsatzRegistryEntry(
         summary=(
-            "Alias for **first-order Trotter-layer UCCSD** wiring: set ``quantum.variational_ansatz: uccsd`` "
-            "and ``quantum.uccsd_trotter_steps`` (JW-only). Example: ``configs/example_h2_uccsd_trotter.yaml``."
+            "Alias for **first-order Trotter-layer UCCSD** wiring: set ``quantum.variational.ansatz: uccsd`` "
+            "and ``quantum.variational.uccsd_trotter_steps`` (JW-only). Example: ``configs/example_h2_uccsd_trotter.yaml``."
         ),
         implementation="qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDTrotterVQE",
         factory=_uccsd_trotter_factory,

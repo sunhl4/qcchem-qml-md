@@ -8,8 +8,19 @@ sidebar_position: 48
 
 ## 配置
 
-- **`configs/example_decomposition_plugin_toy.yaml`**：`embedding.mode: plugin`、`decomposition_plugin: uniform_fragment_guess`
+- **`configs/example_decomposition_plugin_toy.yaml`**：
+
+```yaml
+embedding:
+  mode: plugin
+  plugin:
+    name: uniform_fragment_guess
+    json_path: configs/decomposition_plugin_toy_integrals.json
+```
+
 - **积分 JSON**：`configs/decomposition_plugin_toy_integrals.json`（`schema: decomposition_plugin_toy_v1`）
+
+完整 nested 键说明见仓库 [`docs/说明_embedding配置.md`](https://github.com/NVIDIA/qcchem-qml-md/blob/main/docs/说明_embedding配置.md)。
 
 ## 验收
 

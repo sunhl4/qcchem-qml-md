@@ -1,11 +1,13 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
-from openfermion.ops import QubitOperator
 
-from qchem_stack.backends.spec import BackendSpec
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
+
+    from qchem_stack.backends.spec import BackendSpec
 
 
 def openfermion_to_sparse_pauli_op(qop: QubitOperator, n_qubits: int) -> Any:
@@ -107,11 +109,11 @@ class QiskitPrimitivesHeaExecutor:
             ev = getattr(pub.data, "evs", None)
             if ev is not None:
                 return float(np.real(ev))
-            return float(np.real(pub.data.values))
+            return float(np.real(np.asarray(pub.data.evs)))  # type: ignore[attr-defined]
         except Exception:
             pass
 
-        from qiskit.primitives import Estimator
+        from qiskit.primitives import Estimator  # type: ignore[attr-defined]
 
         est = Estimator(options={"default_shots": int(self.spec.shots_per_circuit)})
         job = est.run([qc], [op])

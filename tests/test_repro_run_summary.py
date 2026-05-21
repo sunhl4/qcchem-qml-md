@@ -4,12 +4,12 @@ from __future__ import annotations
 
 from qchem_stack.config import (
     ActiveSpaceSpec,
-    EmbeddingSpec,
     ExperimentConfig,
     MoleculeSpec,
     QuantumSpec,
 )
 from qchem_stack.orchestration.pipeline import _attach_run_summary, collect_repro_metadata
+from tests.embedding_nested import embedding_dmet
 
 
 def _base_cfg(quantum: QuantumSpec) -> ExperimentConfig:
@@ -18,9 +18,12 @@ def _base_cfg(quantum: QuantumSpec) -> ExperimentConfig:
         random_seed=0,
         molecule=MoleculeSpec(
             symbols=["H", "H"],
-            coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+            coordinates=[[0, 0, 0], [0, 0, 1.4]],
+            coordinate_unit="bohr",
         ),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         quantum=quantum,
     )
 
@@ -28,9 +31,11 @@ def _base_cfg(quantum: QuantumSpec) -> ExperimentConfig:
 def test_attach_run_summary_stages_and_protocol_semantics() -> None:
     cfg = _base_cfg(
         QuantumSpec(
-            use_pauli_protocol=True,
-            vqd_after_variational=True,
-            qse_after_variational=True,
+            pauli={"use_protocol": True},
+            excited={
+                "vqd": {"after_variational": True},
+                "qse": {"after_variational": True},
+            },
         )
     )
     out: dict = {
@@ -81,9 +86,26 @@ def test_attach_run_summary_stages_and_protocol_semantics() -> None:
 
 
 def test_attach_run_summary_surfaces_pre_quantum_handoff() -> None:
-    cfg = _base_cfg(QuantumSpec())
+    cfg = _base_cfg(
+        QuantumSpec(
+            pauli={"use_protocol": True},
+            excited={
+                "vqd": {"after_variational": True, "n_states": 2},
+                "qse": {"after_variational": True, "subspace_dim": 4},
+            },
+        )
+    )
     out: dict = {
         "repro": collect_repro_metadata(cfg),
+        "energy_pauli_protocol": -1.1,
+        "vqd": {"meta": {"reused_pipeline_ground": True}},
+        "qse": {"excitation_energies": [0.2]},
+        "resource_summary": {
+            "n_pauli_terms": 7,
+            "n_pauli_groups": 3,
+            "n_circuits": 4,
+            "n_qubits": 2,
+        },
         "scf_energy": -1.116,
         "pre_quantum_input": {
             "source": "canonical_active_space_integral_pack",
@@ -121,7 +143,9 @@ def test_attach_run_summary_surfaces_pre_quantum_handoff() -> None:
 
 
 def test_attach_run_summary_includes_scf_and_vqe_counters() -> None:
-    cfg = _base_cfg(QuantumSpec(algorithm="vqe", vqe_maxiter=300, use_pauli_protocol=False))
+    cfg = _base_cfg(
+        QuantumSpec(algorithm="vqe", vqe={"maxiter": 300}, pauli={"use_protocol": False})
+    )
     out: dict = {
         "repro": collect_repro_metadata(cfg),
         "scf_energy": -1.88,
@@ -136,7 +160,9 @@ def test_attach_run_summary_includes_scf_and_vqe_counters() -> None:
 
 
 def test_attach_run_summary_adapt_meta() -> None:
-    cfg = _base_cfg(QuantumSpec(algorithm="adapt", adapt_max_iter=4, use_pauli_protocol=False))
+    cfg = _base_cfg(
+        QuantumSpec(algorithm="adapt", adapt={"max_iter": 4}, pauli={"use_protocol": False})
+    )
     out: dict = {
         "repro": collect_repro_metadata(cfg),
         "scf_energy": -1.0,
@@ -157,7 +183,9 @@ def test_attach_run_summary_adapt_meta() -> None:
 
 
 def test_attach_run_summary_iqeb() -> None:
-    cfg = _base_cfg(QuantumSpec(algorithm="iqeb", iqeb_max_rounds=3, use_pauli_protocol=False))
+    cfg = _base_cfg(
+        QuantumSpec(algorithm="iqeb", iqeb={"max_rounds": 3}, pauli={"use_protocol": False})
+    )
     out: dict = {
         "repro": collect_repro_metadata(cfg),
         "scf_energy": -1.0,
@@ -177,7 +205,7 @@ def test_attach_run_summary_iqeb() -> None:
 
 
 def test_attach_run_summary_includes_job_worker_expectation() -> None:
-    cfg = _base_cfg(QuantumSpec(use_pauli_protocol=True))
+    cfg = _base_cfg(QuantumSpec(pauli={"use_protocol": True}))
     out: dict = {
         "repro": collect_repro_metadata(cfg),
         "job_result": {
@@ -194,7 +222,7 @@ def test_attach_run_summary_includes_job_worker_expectation() -> None:
 
 
 def test_attach_run_summary_includes_async_job_metadata() -> None:
-    cfg = _base_cfg(QuantumSpec(use_pauli_protocol=True))
+    cfg = _base_cfg(QuantumSpec(pauli={"use_protocol": True}))
     out: dict = {
         "repro": collect_repro_metadata(cfg),
         "job": {"job_id": "jid-1", "protocol_hash": "phash9"},
@@ -206,7 +234,11 @@ def test_attach_run_summary_includes_async_job_metadata() -> None:
 
 
 def test_parity_snapshot_includes_vqd_penalty_weight() -> None:
-    cfg = _base_cfg(QuantumSpec(vqd_penalty_weight=2.5, vqd_after_variational=True))
+    cfg = _base_cfg(
+        QuantumSpec(
+            excited={"vqd": {"after_variational": True, "penalty_weight": 2.5}},
+        )
+    )
     r = collect_repro_metadata(cfg)
     assert r["parity_snapshot"]["vqd_penalty_weight"] == 2.5
 
@@ -214,12 +246,16 @@ def test_parity_snapshot_includes_vqd_penalty_weight() -> None:
 def test_attach_run_summary_vqd_energy_and_shot_yaml() -> None:
     cfg = _base_cfg(
         QuantumSpec(
-            vqd_after_variational=True,
-            vqd_n_states=2,
-            vqd_shots_objective=10,
-            vqd_shots_overlap=20,
-            vqd_shots_weight=30,
-            use_pauli_protocol=False,
+            excited={
+                "vqd": {
+                    "after_variational": True,
+                    "n_states": 2,
+                    "shots_objective": 10,
+                    "shots_overlap": 20,
+                    "shots_weight": 30,
+                },
+            },
+            pauli={"use_protocol": False},
         )
     )
     out: dict = {
@@ -255,11 +291,15 @@ def test_attach_run_summary_vqd_energy_and_shot_yaml() -> None:
 def test_attach_run_summary_qse_schedule_fields() -> None:
     cfg = _base_cfg(
         QuantumSpec(
-            qse_after_variational=True,
-            qse_subspace_dim=4,
-            qse_max_basis=5,
-            qse_shot_mode="pauli_transitions",
-            use_pauli_protocol=False,
+            excited={
+                "qse": {
+                    "after_variational": True,
+                    "subspace_dim": 4,
+                    "max_basis": 5,
+                    "shot_mode": "pauli_transitions",
+                },
+            },
+            pauli={"use_protocol": False},
         )
     )
     out: dict = {
@@ -290,10 +330,14 @@ def test_attach_run_summary_qse_schedule_fields() -> None:
 def test_attach_run_summary_sceom_nested_meta() -> None:
     cfg = _base_cfg(
         QuantumSpec(
-            sceom_after_variational=True,
-            sceom_subspace_dim=2,
-            sceom_shots_per_matrix_element=128,
-            use_pauli_protocol=False,
+            excited={
+                "sceom": {
+                    "after_variational": True,
+                    "subspace_dim": 2,
+                    "shots_per_matrix_element": 128,
+                },
+            },
+            pauli={"use_protocol": False},
         )
     )
     out: dict = {
@@ -318,18 +362,20 @@ def test_attach_run_summary_sceom_nested_meta() -> None:
 
 def test_attach_run_summary_dmet_embedding_flags() -> None:
     cfg = ExperimentConfig(
+        schema_version="2",
         experiment_id="dmet_rsum",
         random_seed=0,
         molecule=MoleculeSpec(
-            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
         ),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-        quantum=QuantumSpec(use_pauli_protocol=False),
-        embedding=EmbeddingSpec(
-            mode="dmet",
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
+        quantum=QuantumSpec(pauli={"use_protocol": False}),
+        embedding=embedding_dmet(
             fragment_labels=["A", "B"],
-            dmet_hamiltonian_source="parity_stub",
-            dmet_uniform_multifragment_toy=True,
+            hamiltonian_source="parity_stub",
+            uniform_multifragment_toy=True,
         ),
     )
     out: dict = {

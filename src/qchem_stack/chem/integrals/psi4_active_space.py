@@ -12,12 +12,13 @@ from typing import Any
 
 import numpy as np
 
-
-def _unwrap_psi4_wfn(ref: Any) -> Any:
-    mf = getattr(ref, "mf", ref)
-    if hasattr(mf, "raw_handle"):
-        return mf.raw_handle()
-    return mf
+from qchem_stack.chem.integrals.psi4_reference_api import (
+    psi4_ao_eri_chemist,
+    psi4_hcore_ao,
+    psi4_nirrep,
+    psi4_nmo,
+    unwrap_psi4_reference,
+)
 
 
 def _casci_effective_blocks_from_mo_integrals(
@@ -28,7 +29,7 @@ def _casci_effective_blocks_from_mo_integrals(
     n_core_pairs: int,
     active_start: int,
     n_active_orbitals: int,
-) -> tuple[float, np.ndarray, np.ndarray]:
+) -> tuple[float, np.ndarray, np.ndarray, str]:
     """Build CASCI-style ``(constant, h1_eff, h2_active)`` from MO chemist integrals."""
     hmo = np.asarray(h_core_mo, dtype=float)
     eri = np.asarray(eri_mo_chemist, dtype=float)
@@ -49,8 +50,9 @@ def _casci_effective_blocks_from_mo_integrals(
     h2 = np.asarray(eri[start:stop, start:stop, start:stop, start:stop], dtype=float)
 
     n_core = int(n_core_pairs)
+    impl = "psi4_mints_casci_effective_v1"
     if n_core == 0:
-        return float(enuc), h1, h2
+        return float(enuc), h1, h2, impl
 
     c = slice(0, n_core)
     J_core = float(np.einsum("iijj->", eri[c, c, c, c], optimize=True))
@@ -62,34 +64,32 @@ def _casci_effective_blocks_from_mo_integrals(
     j_act = np.asarray(np.einsum("uvii->uv", eri[a, a, c, c], optimize=True), dtype=float)
     k_act = np.asarray(np.einsum("uiiv->uv", eri[a, c, c, a], optimize=True), dtype=float)
     h1_eff = h1 + 2.0 * j_act - k_act
-    return float(constant), h1_eff, h2
+    return float(constant), h1_eff, h2, impl
 
 
 def active_space_casci_raw_blocks_psi4(
     ref_wfn: Any,
     n_active_orbitals: int,
     n_active_electrons: int,
-) -> tuple[float, np.ndarray, np.ndarray]:
+) -> tuple[float, np.ndarray, np.ndarray, str]:
     """Return ``(constant, h1_active, h2_active)`` in chemists' MO layout.
 
-    Uses Psi4 ``energy('casci')`` at fixed RHF orbitals, then reads the CASCI
-    Hamiltonian from the returned wavefunction when available; otherwise builds
-  MO integrals via :class:`psi4.core.MintsHelper` on the active subspace.
+      Uses Psi4 ``energy('casci')`` at fixed RHF orbitals, then reads the CASCI
+      Hamiltonian from the returned wavefunction when available; otherwise builds
+    MO integrals via :class:`psi4.core.MintsHelper` on the active subspace.
     """
-    wfn = _unwrap_psi4_wfn(ref_wfn)
+    wfn = unwrap_psi4_reference(ref_wfn)
     import psi4
-    from psi4 import core
 
-    if int(wfn.nirrep()) != 1:
+    if psi4_nirrep(wfn) != 1:
         raise ValueError("psi4 active-space pack v1 requires single-irrep RHF reference")
-    nmo = int(wfn.nmo())
+    nmo = psi4_nmo(wfn)
     if n_active_orbitals > nmo:
         raise ValueError("active orbitals exceed nmo on Psi4 reference")
     if n_active_electrons % 2 != 0:
         raise ValueError("psi4 active-space pack v1 requires even electron count (RHF)")
     nfrozen = nmo - int(n_active_orbitals)
-    nalpha = int(n_active_electrons) // 2
-    nbeta = nalpha
+    int(n_active_electrons) // 2
 
     psi4.set_options(
         {
@@ -98,7 +98,13 @@ def active_space_casci_raw_blocks_psi4(
             "active": [int(n_active_orbitals)],
         }
     )
-    _e, cas_wfn = psi4.energy("casci", ref_wfn=wfn, return_wfn=True)
+    try:
+        _e, cas_wfn = psi4.energy("casci", ref_wfn=wfn, return_wfn=True)
+    except Exception as exc:  # noqa: BLE001 — Psi4 1.10+ may lack ``casci`` (use Mints fallback)
+        msg = str(exc).lower()
+        if "casci" in msg or "missingmethod" in type(exc).__name__.lower():
+            return _active_space_from_mints_helper(wfn, n_active_orbitals, n_active_electrons)
+        raise
 
     h_op = getattr(cas_wfn, "H", None)
     if h_op is not None and hasattr(h_op, "core_energy"):
@@ -106,7 +112,7 @@ def active_space_casci_raw_blocks_psi4(
         h1 = np.asarray(h_op.op(1), dtype=float)
         h2 = np.asarray(h_op.op(2), dtype=float)
         if h1.ndim == 2 and h2.ndim == 4:
-            return constant, h1, h2
+            return constant, h1, h2, "psi4_casci_hamiltonian_v1"
 
     return _active_space_from_mints_helper(wfn, n_active_orbitals, n_active_electrons)
 
@@ -115,11 +121,8 @@ def _active_space_from_mints_helper(
     wfn: Any,
     n_active_orbitals: int,
     n_active_electrons: int,
-) -> tuple[float, np.ndarray, np.ndarray]:
+) -> tuple[float, np.ndarray, np.ndarray, str]:
     """Fallback: AO integrals + CASCI-style MO effective Hamiltonian."""
-    from psi4 import core
-
-    mints = core.MintsHelper(wfn)
     Ca = np.asarray(wfn.Ca(), dtype=float)
     nmo = int(Ca.shape[1])
     n_alpha = int(wfn.nalpha())
@@ -134,12 +137,10 @@ def _active_space_from_mints_helper(
     if active_start + int(n_active_orbitals) > nmo:
         raise ValueError("active orbitals exceed available RHF orbital window")
 
-    T = np.asarray(mints.T(), dtype=float)
-    V = np.asarray(mints.V(), dtype=float)
-    h_core_ao = T + V
+    h_core_ao = psi4_hcore_ao(wfn)
     h_core_mo = np.asarray(Ca.T @ h_core_ao @ Ca, dtype=float)
 
-    eri_ao = np.asarray(mints.ao_eri(), dtype=float)
+    eri_ao = psi4_ao_eri_chemist(wfn)
     # Fallback path is rare and prioritizes correctness over minimal tensor work.
     eri_mo = np.asarray(
         np.einsum("pi,qj,rk,sl,pqrs->ijkl", Ca, Ca, Ca, Ca, eri_ao, optimize=True),

@@ -3,16 +3,18 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 import pandas as pd
 from openfermion import InteractionOperator
 from openfermion.chem.molecular_data import spinorb_from_spatial
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
 from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
 from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
 
 
 def interaction_operator_to_dataframe(

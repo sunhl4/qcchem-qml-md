@@ -7,9 +7,10 @@ walk order for auditability (no closed-source Qermit execution).
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.config import ExperimentConfig
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
 
 
 def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any] | None:
@@ -20,10 +21,7 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
     """
     m = cfg.mitigation
     if not (
-        m.pmsv_enabled
-        or m.zne_enabled
-        or m.spam_calibration_enabled
-        or m.classical_shadows_stub_enabled
+        m.pmsv.enabled or m.zne.enabled or m.stubs.spam_calibration or m.stubs.classical_shadows
     ):
         return None
 
@@ -33,7 +31,7 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
     edges: list[dict[str, str]] = []
     order = 0
     prev = "in0"
-    if m.spam_calibration_enabled:
+    if m.stubs.spam_calibration:
         order += 1
         nid = f"n{order}"
         nodes.append(
@@ -46,7 +44,7 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
         )
         edges.append({"source": prev, "target": nid, "dep": "sequential"})
         prev = nid
-    if m.classical_shadows_stub_enabled:
+    if m.stubs.classical_shadows:
         order += 1
         nid = f"n{order}"
         nodes.append(
@@ -54,13 +52,13 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
                 "id": nid,
                 "kind": "classical_shadows_expectation_stub",
                 "order": order,
-                "budget_pairs_hint": int(m.classical_shadows_budget_pairs),
+                "budget_pairs_hint": int(m.stubs.classical_shadows_budget_pairs),
                 "note": "Scalar-energy identity stub (no randomized measurement sampling).",
             }
         )
         edges.append({"source": prev, "target": nid, "dep": "sequential"})
         prev = nid
-    if m.pmsv_enabled:
+    if m.pmsv.enabled:
         order += 1
         nid = f"n{order}"
         nodes.append(
@@ -68,13 +66,13 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
                 "id": nid,
                 "kind": "PMSV_symmetry_filter",
                 "order": order,
-                "stabilizer_count": len(m.pmsv_stabilizers),
-                "retention_rate": m.pmsv_retention_rate,
+                "stabilizer_count": len(m.pmsv.stabilizers),
+                "retention_rate": m.pmsv.retention_rate,
             }
         )
         edges.append({"source": prev, "target": nid, "dep": "sequential"})
         prev = nid
-    if m.zne_enabled:
+    if m.zne.enabled:
         order += 1
         nid = f"n{order}"
         nodes.append(
@@ -82,7 +80,7 @@ def build_qermit_style_mitigation_report(cfg: ExperimentConfig) -> dict[str, Any
                 "id": nid,
                 "kind": "ZNE_extrapolation_stub",
                 "order": order,
-                "zne_scales": [float(x) for x in m.zne_scales] if m.zne_scales else [1.0, 1.5, 2.0],
+                "zne_scales": [float(x) for x in m.zne.scales] if m.zne.scales else [1.0, 1.5, 2.0],
             }
         )
         edges.append({"source": prev, "target": nid, "dep": "sequential"})

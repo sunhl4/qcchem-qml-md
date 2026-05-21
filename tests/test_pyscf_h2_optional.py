@@ -32,14 +32,15 @@ def test_h2_active_space_vqe(tmp_path_factory) -> None:
     cfg_path = root / "h2.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: t
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -47,8 +48,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -73,12 +76,12 @@ def test_h2_active_space_bravyi_kitaev_meta() -> None:
         experiment_id="bk_meta",
         random_seed=0,
         molecule=MoleculeSpec(
-            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
         ),
         active_space=ActiveSpaceSpec(
-            n_active_orbitals=2,
-            n_active_electrons=2,
-            fermion_qubit_mapping="bravyi_kitaev",
+            strategy="cas",
+            cas={"n_orbitals": 2, "n_electrons": 2},
+            mapping={"fermion_qubit": "bravyi_kitaev"},
         ),
     )
     drv = PySCFDriver.from_config(cfg)
@@ -97,12 +100,12 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
         experiment_id="scbk_meta",
         random_seed=0,
         molecule=MoleculeSpec(
-            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
         ),
         active_space=ActiveSpaceSpec(
-            n_active_orbitals=2,
-            n_active_electrons=2,
-            fermion_qubit_mapping="symmetry_conserving_bravyi_kitaev",
+            strategy="cas",
+            cas={"n_orbitals": 2, "n_electrons": 2},
+            mapping={"fermion_qubit": "symmetry_conserving_bravyi_kitaev"},
         ),
     )
     drv = PySCFDriver.from_config(cfg)
@@ -135,9 +138,9 @@ def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
     r = drv.run_rhf()
     qh = molecular_hamiltonian_from_classical_reference(
         _as_reference(r),
-        n_active_orbitals=int(cfg.active_space.n_active_orbitals),
-        n_active_electrons=int(cfg.active_space.n_active_electrons),
-        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+        n_active_orbitals=int(cfg.active_space.cas.n_orbitals),
+        n_active_electrons=int(cfg.active_space.cas.n_electrons),
+        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
     )
     exe = executor_from_spec(backend_spec_from_config(cfg))
     mo = r.mf.mo_coeff

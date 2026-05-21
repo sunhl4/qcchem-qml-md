@@ -2,8 +2,10 @@
 
 from __future__ import annotations
 
-from collections.abc import Mapping
-from typing import Any
+from typing import TYPE_CHECKING, Any
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 # Bump when adding/removing required canonical meta keys consumed by exporters / parity.
 CANONICAL_CLASSICAL_BRIDGE_META_VERSION = 1

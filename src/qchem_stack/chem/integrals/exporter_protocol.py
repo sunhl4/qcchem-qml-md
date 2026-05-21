@@ -2,10 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
-from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 
 
 @runtime_checkable

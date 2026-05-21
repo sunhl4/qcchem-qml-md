@@ -6,7 +6,7 @@ P1 对应化学问题定义层：把“要算什么”描述清楚，再交给�
 
 - 定义分子几何、基组、电荷与自旋
 - 选择 SCF 驱动与活性空间参数
-- 配置 projection/DMET 等嵌入相关键
+- 配置 projection/DMET 等嵌入相关键（详见仓库 [`docs/说明_embedding配置.md`](https://github.com/NVIDIA/qcchem-qml-md/blob/main/docs/说明_embedding配置.md)）
 
 ## 输入与输出（维护视角）
 

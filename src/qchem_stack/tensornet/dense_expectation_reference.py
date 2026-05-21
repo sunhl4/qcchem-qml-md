@@ -11,10 +11,12 @@ from typing import Any
 import numpy as np
 from openfermion.linalg import get_sparse_operator
 
+from qchem_stack.contracts.schema_ids import DENSE_EXPECTATION_REFERENCE_V1
+
 
 def dense_expectation_api_descriptor() -> dict[str, Any]:
     return {
-        "schema": "dense_expectation_reference_v1",
+        "schema": DENSE_EXPECTATION_REFERENCE_V1,
         "function": "qchem_stack.tensornet.dense_expectation_reference.expectation_qubit_operator_dense",
         "max_qubits_recommended": 16,
         "note": "Explicit dense matrix — for auditing small systems; not scalable TN chemistry.",

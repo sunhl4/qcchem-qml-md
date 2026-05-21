@@ -30,14 +30,15 @@ def test_pipeline_records_mo_coeff_transform_hook_metadata(tmp_path) -> None:
     cfg_path = tmp_path / "hook.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: hook_meta
 random_seed: 3
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -46,17 +47,21 @@ scf:
   method: RHF
 active_space:
   strategy: cas
-  ncas: 2
-  nelecas: 2
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 backend:
   provider: statevector
 quantum:
   algorithm: vqe
-  vqe_depth: 1
-  vqe_maxiter: 5
-  use_pauli_protocol: false
+  vqe:
+    depth: 1
+    maxiter: 5
+  pauli:
+    use_protocol: false
 chemistry_extended:
-  mo_coeff_transform_hook: reverse_mo_columns
+  mo_transform:
+    hook: reverse_mo_columns
 """,
         encoding="utf-8",
     )

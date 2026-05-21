@@ -7,12 +7,14 @@ algorithms run, so downstream modules avoid backend-specific branching.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.contracts.schema_ids import PRE_QUANTUM_INPUT_SCHEMA_V1
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 # Keys copied from ``QubitHamiltonian.meta`` into branch-stable handoff meta / summaries.
 HAMILTONIAN_META_BRANCH_KEYS: tuple[str, ...] = (
@@ -123,6 +125,14 @@ class PreQuantumInput:
         for key in HAMILTONIAN_SEMANTICS_KEYS:
             if key in self.meta:
                 summary[key] = self.meta[key]
+        dm = dict(self.classical_reference.driver_meta or {})
+        bindings = dm.get("kernel_bindings")
+        if bindings:
+            summary["classical_kernel_bindings"] = list(bindings)
+        bound = dm.get("epistemic_bound")
+        if bound:
+            text = str(bound)
+            summary["classical_epistemic_bound"] = text[:512] + ("…" if len(text) > 512 else "")
         if pack is not None:
             summary["canonical_active_space_integral_pack"] = {
                 "schema": pack.schema,

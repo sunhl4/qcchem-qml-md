@@ -55,8 +55,8 @@ def test_restricted_spatial_fermion_equals_get_fermion_operator_h2_cas() -> None
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(
         rhf,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     h2_of = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(compact.dense_h2_chemist_spatial())
     h1 = np.asarray(compact.h1_active_mo, dtype=float)
@@ -77,28 +77,28 @@ def test_compact_restricted_qubit_hamiltonian_matches_interaction_operator_path(
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(
         rhf,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
     )
     mol_op = compact.to_interaction_operator()
     n_so = int(mol_op.one_body_tensor.shape[0])
-    fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=cfg.active_space.n_active_electrons)
+    fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=cfg.active_space.cas.n_electrons)
 
     from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_active_space_fermionic_operator
 
     qh_ref = qubit_hamiltonian_from_active_space_fermionic_operator(
         mol_op,
         fs,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
         rhf=_as_reference(rhf),
     )
     qh_sp = qubit_hamiltonian_from_compact_restricted_active_space(
         compact,
         fs,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
         rhf=_as_reference(rhf),
     )
@@ -117,14 +117,14 @@ def test_build_problem_prefer_spatial_matches_default() -> None:
     ref = _as_reference(rhf)
     p0 = build_restricted_active_space_quantum_problem(
         ref,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
     )
     p1 = build_restricted_active_space_quantum_problem(
         ref,
-        n_active_orbitals=cfg.active_space.n_active_orbitals,
-        n_active_electrons=cfg.active_space.n_active_electrons,
+        n_active_orbitals=cfg.active_space.cas.n_orbitals,
+        n_active_electrons=cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
         prefer_restricted_spatial_fermion_for_jordan_wigner=True,
     )
@@ -193,8 +193,8 @@ def test_driver_from_config_inherits_prefer_spatial_fermion_from_yaml() -> None:
     cfg2 = cfg.model_copy(update={"active_space": cx})
     drv = PySCFDriver.from_config(cfg2)
     prob = drv.get_restricted_active_space_quantum_problem(
-        cfg2.active_space.n_active_orbitals,
-        cfg2.active_space.n_active_electrons,
+        cfg2.active_space.cas.n_orbitals,
+        cfg2.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
     )
     assert prob.meta.get("jw_build") == "restricted_spatial_fermion_operator"
@@ -209,8 +209,8 @@ def test_driver_explicit_false_overrides_yaml_prefer_spatial() -> None:
     cfg2 = cfg.model_copy(update={"active_space": cx})
     drv = PySCFDriver.from_config(cfg2)
     prob = drv.get_restricted_active_space_quantum_problem(
-        cfg2.active_space.n_active_orbitals,
-        cfg2.active_space.n_active_electrons,
+        cfg2.active_space.cas.n_orbitals,
+        cfg2.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
         prefer_restricted_spatial_fermion_for_jordan_wigner=False,
     )
@@ -223,8 +223,8 @@ def test_driver_from_config_inherits_jordan_wigner_coeff_atol() -> None:
     cfg2 = cfg.model_copy(update={"active_space": cx})
     drv = PySCFDriver.from_config(cfg2)
     prob = drv.get_restricted_active_space_quantum_problem(
-        cfg2.active_space.n_active_orbitals,
-        cfg2.active_space.n_active_electrons,
+        cfg2.active_space.cas.n_orbitals,
+        cfg2.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
     )
     assert prob.qubit_hamiltonian.meta.get("jordan_wigner_coeff_atol") == pytest.approx(1e-15)
@@ -234,11 +234,11 @@ def test_raises_when_spatial_fermion_path_with_jw_atol() -> None:
     cfg = load_experiment_config(_CFG_H2)
     rhf = PySCFDriver.from_config(cfg).run_rhf()
     ref = _as_reference(rhf)
-    with pytest.raises(ValueError, match="jordan_wigner_coeff_atol"):
+    with pytest.raises(ValueError, match="coeff_atol"):
         build_restricted_active_space_quantum_problem(
             ref,
-            n_active_orbitals=cfg.active_space.n_active_orbitals,
-            n_active_electrons=cfg.active_space.n_active_electrons,
+            n_active_orbitals=cfg.active_space.cas.n_orbitals,
+            n_active_electrons=cfg.active_space.cas.n_electrons,
             prefer_restricted_spatial_fermion_for_jordan_wigner=True,
             jordan_wigner_coeff_atol=1e-9,
         )
@@ -250,14 +250,14 @@ def test_molecular_hamiltonian_from_classical_reference_prefers_spatial_matches_
     ref = _as_reference(rhf)
     qh0 = molecular_hamiltonian_from_classical_reference(
         ref,
-        cfg.active_space.n_active_orbitals,
-        cfg.active_space.n_active_electrons,
+        cfg.active_space.cas.n_orbitals,
+        cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
     )
     qh1 = molecular_hamiltonian_from_classical_reference(
         ref,
-        cfg.active_space.n_active_orbitals,
-        cfg.active_space.n_active_electrons,
+        cfg.active_space.cas.n_orbitals,
+        cfg.active_space.cas.n_electrons,
         fermion_qubit_mapping="jordan_wigner",
         prefer_restricted_spatial_fermion_for_jordan_wigner=True,
     )
@@ -280,7 +280,7 @@ def test_active_space_spec_validates_jw_optimizer_combo() -> None:
         prefer_restricted_spatial_fermion_for_jordan_wigner=True,
         fermion_qubit_mapping="jordan_wigner",
     )
-    with pytest.raises(ValueError, match="prefer_restricted_spatial_fermion_for_jordan_wigner"):
+    with pytest.raises(ValueError, match="prefer_restricted_spatial"):
         ActiveSpaceSpec(
             strategy="cas",
             ncas=2,
@@ -288,7 +288,7 @@ def test_active_space_spec_validates_jw_optimizer_combo() -> None:
             prefer_restricted_spatial_fermion_for_jordan_wigner=True,
             fermion_qubit_mapping="bravyi_kitaev",
         )
-    with pytest.raises(ValueError, match="jordan_wigner_coeff_atol"):
+    with pytest.raises(ValueError, match="coeff_atol"):
         ActiveSpaceSpec(
             strategy="cas",
             ncas=2,

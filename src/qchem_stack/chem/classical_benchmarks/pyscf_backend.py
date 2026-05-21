@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext
 from qchem_stack.chem.classical_benchmarks.schema import CLASSICAL_POST_HF_BENCHMARKS_SCHEMA_V1
 from qchem_stack.chem.drivers.pyscf_driver import unwrap_pyscf_rhf_for_backend_operations
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext
 
 
 def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any]:
@@ -43,10 +45,7 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
     try:
         from pyscf import mp
 
-        if method == "UHF":
-            emp2 = float(mp.UMP2(mf).kernel()[0])
-        else:
-            emp2 = float(mp.MP2(mf).kernel()[0])
+        emp2 = float(mp.UMP2(mf).kernel()[0]) if method == "UHF" else float(mp.MP2(mf).kernel()[0])
         out["mp2"] = _ok(emp2)
     except Exception as e:  # noqa: BLE001
         out["mp2"] = _failed(str(e))
@@ -54,10 +53,7 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
     try:
         from pyscf import cc
 
-        if method == "UHF":
-            mycc = cc.UCCSD(mf)
-        else:
-            mycc = cc.CCSD(mf)
+        mycc = cc.UCCSD(mf) if method == "UHF" else cc.CCSD(mf)
         ecc, *_ = mycc.kernel()
         out["ccsd"] = _ok(float(mf.e_tot) + float(ecc))
     except Exception as e:  # noqa: BLE001
@@ -73,7 +69,9 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
         try:
             from pyscf import mcscf
 
-            mc = mcscf.CASCI(mf, int(na_o), int(na_e))
+            from qchem_stack.chem.pyscf_typing import as_pyscf_cas, as_pyscf_mf
+
+            mc = as_pyscf_cas(mcscf.CASCI(as_pyscf_mf(mf), int(na_o), int(na_e)))
             ecas, *_ = mc.kernel()
             out["casci"] = _ok(float(ecas))
         except Exception as e:  # noqa: BLE001

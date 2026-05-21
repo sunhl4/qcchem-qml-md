@@ -7,9 +7,17 @@ alignment artifacts are intentionally kept out of the default release payloads.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.config import ExperimentConfig, QuantumSpec
+from qchem_stack.contracts.schema_ids import (
+    MITIGATION_EXECUTION_MODEL_V1,
+    OPEN_STACK_DIFFERENTIATORS_V1,
+    PRODUCT_GAP_ANCHOR_INDEX_V1,
+    PROTOCOL_EXPECTATION_SEMANTICS_V1,
+)
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig, QuantumSpec
 
 # Stable JSON tokens for parity snapshot / export scripts.
 PAULI_PATH_DISABLED = "pauli_protocol_disabled"
@@ -135,15 +143,15 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
 
 def classify_pauli_expectation_path(q: QuantumSpec) -> str:
     """Classify how ``energy_pauli_protocol`` is produced from config intent."""
-    if not q.use_pauli_protocol:
+    if not q.pauli.use_protocol:
         return PAULI_PATH_DISABLED
-    if q.run_sampled_pauli_protocol and q.run_qiskit_shots_pauli_protocol:
+    if q.pauli.run_sampled and q.pauli.run_qiskit_shots:
         raise ValueError(
             "run_sampled_pauli_protocol and run_qiskit_shots_pauli_protocol are mutually exclusive"
         )
-    if q.run_sampled_pauli_protocol:
+    if q.pauli.run_sampled:
         return PAULI_PATH_STATEVECTOR_SHOT_SIM
-    if q.run_qiskit_shots_pauli_protocol:
+    if q.pauli.run_qiskit_shots:
         return PAULI_PATH_QISKIT_COUNTS
     return PAULI_PATH_EXACT
 
@@ -156,10 +164,10 @@ def pauli_protocol_expectation_path_for_config(cfg: ExperimentConfig) -> str:
 def protocol_expectation_semantics_public() -> dict[str, Any]:
     """Stable mapping from YAML intent to protocol expectation semantics."""
     return {
-        "schema": "protocol_expectation_semantics_v1",
+        "schema": PROTOCOL_EXPECTATION_SEMANTICS_V1,
         "doc_anchor": "docs/技术文档_设备比特串与Qiskit采样路径.md (section 2)",
         "yaml_mutual_exclusion": (
-            "QuantumSpec.run_sampled_pauli_protocol XOR run_qiskit_shots_pauli_protocol "
+            "QuantumSpec.pauli.run_sampled XOR run_qiskit_shots_pauli_protocol "
             "(validated in QuantumSpec model_validator)"
         ),
         "paths": [
@@ -198,7 +206,7 @@ def protocol_expectation_semantics_public() -> dict[str, Any]:
 def mitigation_execution_model_public() -> dict[str, Any]:
     """Structured mitigation execution boundary for capability surfaces."""
     return {
-        "schema": "mitigation_execution_model_v1",
+        "schema": MITIGATION_EXECUTION_MODEL_V1,
         "sync_dag": {
             "open_stack": "mitigation/qermit_analog.py JSON graph + optional mitigation_dag_execution trace on pipeline result",
         },
@@ -213,7 +221,7 @@ def mitigation_execution_model_public() -> dict[str, Any]:
 def open_stack_differentiators_public() -> dict[str, Any]:
     """Open-stack strengths as a machine-readable bundle."""
     return {
-        "schema": "open_stack_differentiators_v1",
+        "schema": OPEN_STACK_DIFFERENTIATORS_V1,
         "scope_excludes": ["managed_cloud_runtime", "proprietary_hardware_calibration"],
         "bundle": [
             {
@@ -269,7 +277,7 @@ def product_gap_anchor_index_v1() -> dict[str, Any]:
     gaps = product_gap_categories()
     pairs = _gap_id_and_anchor_pairs(gaps)
     return {
-        "schema": "product_gap_anchor_index_v1",
+        "schema": PRODUCT_GAP_ANCHOR_INDEX_V1,
         "id_to_anchor": {rid: anchor for rid, anchor in pairs},
         "anchor_to_ids": {
             anchor: sorted([rid for rid, anchor2 in pairs if anchor2 == anchor])

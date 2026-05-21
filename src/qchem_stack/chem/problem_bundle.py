@@ -7,11 +7,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.fermion import FermionSpace
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import CHEMISTRY_PROBLEM_BUNDLE_V1
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.fermion import FermionSpace
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.chem.molecular_problem import RestrictedActiveSpaceQuantumProblem
 
 
@@ -37,7 +38,7 @@ class ChemistryProblemBundle:
 
         qh = self.qubit_hamiltonian
         return {
-            "schema": "chemistry_problem_bundle_v1",
+            "schema": CHEMISTRY_PROBLEM_BUNDLE_V1,
             "constant_energies_au": dict(self.constant_energies_au),
             "fermion_space": {
                 "n_spin_orbitals": self.fermion_space.n_spin_orbitals,

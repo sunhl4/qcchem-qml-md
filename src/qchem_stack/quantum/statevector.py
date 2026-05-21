@@ -1,7 +1,11 @@
 from __future__ import annotations
 
+from typing import TYPE_CHECKING
+
 import numpy as np
-from openfermion.ops import QubitOperator
+
+if TYPE_CHECKING:
+    from openfermion.ops import QubitOperator
 
 
 def _pauli_char_to_mat(c: str) -> np.ndarray:
@@ -41,7 +45,7 @@ def qubit_operator_to_sparse(h: QubitOperator, n_qubits: int) -> np.ndarray:
 def expectation_qubit_operator(state: np.ndarray, h: QubitOperator, n_qubits: int) -> complex:
     """``<psi|H|psi>`` for normalized ``state``."""
     op = qubit_operator_to_sparse(h, n_qubits)
-    return np.vdot(state, op @ state)
+    return complex(np.vdot(state, op @ state))
 
 
 def hea_state(

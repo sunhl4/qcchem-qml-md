@@ -31,9 +31,11 @@ def test_list_specs_matches_refs_for_minimal_config() -> None:
     cfg = ExperimentConfig(
         experiment_id="c",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H"], coordinates_bohr=[[0, 0, 0]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=1, n_active_electrons=1),
-        quantum=QuantumSpec(algorithm="vqe", use_pauli_protocol=True),
+        molecule=MoleculeSpec(symbols=["H"], coordinates=[[0, 0, 0]], coordinate_unit="bohr"),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 1, "n_electrons": 1}}
+        ),
+        quantum=QuantumSpec(algorithm="vqe", pauli={"use_protocol": True}),
     )
     refs = list_computables_for_config(cfg)
     specs = list_computable_specs_for_config(cfg)
@@ -46,10 +48,15 @@ def test_list_specs_includes_iqeb_ground_energy_item() -> None:
     cfg = ExperimentConfig(
         experiment_id="c2",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H"], coordinates_bohr=[[0, 0, 0]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=1, n_active_electrons=1),
+        molecule=MoleculeSpec(symbols=["H"], coordinates=[[0, 0, 0]], coordinate_unit="bohr"),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 1, "n_electrons": 1}}
+        ),
         quantum=QuantumSpec(
-            algorithm="iqeb", iqeb_max_rounds=4, vqe_depth=2, use_pauli_protocol=False
+            algorithm="iqeb",
+            iqeb={"max_rounds": 4},
+            vqe={"depth": 2},
+            pauli={"use_protocol": False},
         ),
     )
     refs = list_computables_for_config(cfg)

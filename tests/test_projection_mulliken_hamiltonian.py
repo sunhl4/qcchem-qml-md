@@ -15,12 +15,12 @@ from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_re
 from qchem_stack.config import (
     ActiveSpaceSpec,
     BackendSpecConfig,
-    EmbeddingSpec,
     ExperimentConfig,
     MoleculeSpec,
     QuantumSpec,
     SCFSpec,
 )
+from tests.embedding_nested import embedding_projection
 
 
 def _h2_cfg(*, fragment_atoms: list[int]) -> ExperimentConfig:
@@ -28,16 +28,17 @@ def _h2_cfg(*, fragment_atoms: list[int]) -> ExperimentConfig:
         experiment_id="proj_h2",
         random_seed=0,
         molecule=MoleculeSpec(
-            symbols=["H", "H"], coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]]
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
         ),
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
         quantum=QuantumSpec(),
-        embedding=EmbeddingSpec(
-            mode="projection",
-            projection_quantum_hamiltonian="fragment_mulliken_mo",
-            projection_fragment_atom_indices=list(fragment_atoms),
+        embedding=embedding_projection(
+            quantum_hamiltonian="fragment_mulliken_mo",
+            fragment_atom_indices=list(fragment_atoms),
         ),
     )
 
@@ -63,7 +64,7 @@ def test_projection_mulliken_h2_full_system_matches_global() -> None:
 def test_projection_mulliken_h4_subfragment_changes_hamiltonian() -> None:
     molecule = MoleculeSpec(
         symbols=["H", "H", "H", "H"],
-        coordinates_bohr=[
+        coordinates=[
             [0.0, 0.0, 0.0],
             [0.0, 0.0, 1.4],
             [0.0, 0.0, 2.8],
@@ -76,24 +77,24 @@ def test_projection_mulliken_h4_subfragment_changes_hamiltonian() -> None:
         random_seed=0,
         molecule=molecule,
         scf=SCFSpec(method="RHF"),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
         backend=BackendSpecConfig(provider="statevector"),
         quantum=QuantumSpec(),
     )
     cfg_global = ExperimentConfig(
         **base,
-        embedding=EmbeddingSpec(
-            mode="projection",
-            projection_quantum_hamiltonian="fragment_mulliken_mo",
-            projection_fragment_atom_indices=[0, 1, 2, 3],
+        embedding=embedding_projection(
+            quantum_hamiltonian="fragment_mulliken_mo",
+            fragment_atom_indices=[0, 1, 2, 3],
         ),
     )
     cfg_sub = ExperimentConfig(
         **base,
-        embedding=EmbeddingSpec(
-            mode="projection",
-            projection_quantum_hamiltonian="fragment_mulliken_mo",
-            projection_fragment_atom_indices=[0],
+        embedding=embedding_projection(
+            quantum_hamiltonian="fragment_mulliken_mo",
+            fragment_atom_indices=[0],
         ),
     )
     rhf = PySCFDriver.from_config(cfg_global).run_rhf()

@@ -20,10 +20,13 @@ def test_validate_pre_quantum_contract_accepts_h2_pyscf() -> None:
 def test_validate_pre_quantum_contract_rejects_precomputed_with_benchmark() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2_precomputed_bundle.yaml")
+    ce = cfg.chemistry_extended
     bad = cfg.model_copy(
         update={
-            "chemistry_extended": cfg.chemistry_extended.model_copy(
-                update={"classical_benchmark_enabled": True}
+            "chemistry_extended": ce.model_copy(
+                update={
+                    "benchmarks": ce.benchmarks.model_copy(update={"enabled": True}),
+                }
             )
         }
     )

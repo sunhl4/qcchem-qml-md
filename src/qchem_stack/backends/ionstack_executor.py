@@ -1,11 +1,13 @@
 from __future__ import annotations
 
 from collections.abc import Callable
+from typing import TYPE_CHECKING
 
 import numpy as np
 from openfermion.ops import QubitOperator
 
-from qchem_stack.backends.spec import BackendSpec
+if TYPE_CHECKING:
+    from qchem_stack.backends.spec import BackendSpec
 
 ExpectationFn = Callable[[QubitOperator, int, np.ndarray, int], float]
 ExpectationStateFn = Callable[[np.ndarray, QubitOperator, int], float]

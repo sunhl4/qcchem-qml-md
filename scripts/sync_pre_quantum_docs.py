@@ -25,7 +25,9 @@ def main() -> int:
         raise RuntimeError(f"failed to load module spec from {module_path}")
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
-    generated_pre_quantum_path_registry_markdown = module.generated_pre_quantum_path_registry_markdown
+    generated_pre_quantum_path_registry_markdown = (
+        module.generated_pre_quantum_path_registry_markdown
+    )
     generated_pre_quantum_source_table_markdown = module.generated_pre_quantum_source_table_markdown
 
     targets = [
@@ -52,4 +54,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

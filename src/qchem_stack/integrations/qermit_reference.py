@@ -6,15 +6,18 @@ This is documentation-as-data for parity exports — **not** a CQCL binary.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import QERMIT_EXECUTION_OVERLAY_V1, QERMIT_OPEN_REFERENCE_V1
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig
 
 
 def qermit_capability_matrix() -> dict[str, Any]:
     """Map named Qermit-style capabilities to ``qchem_stack`` modules and ``MitigationSpec`` knobs."""
     return {
-        "schema": "qermit_open_reference_v1",
+        "schema": QERMIT_OPEN_REFERENCE_V1,
         "disclaimer": "Analog behavior only; not Quantinuum Qermit MitEx/MitRes binaries.",
         "rows": [
             {
@@ -56,7 +59,7 @@ def qermit_mitigation_execution_overlays(cfg: ExperimentConfig) -> dict[str, Any
     m = cfg.mitigation
     ex = m.execution_class
     out: dict[str, Any] = {
-        "schema": "qermit_execution_overlay_v1",
+        "schema": QERMIT_EXECUTION_OVERLAY_V1,
         "execution_class": ex,
     }
     if ex == "async_batch":
@@ -72,7 +75,7 @@ def qermit_mitigation_execution_overlays(cfg: ExperimentConfig) -> dict[str, Any
         }
     elif ex == "shot_postselect":
         out["shot_postselect_model"] = {
-            "retention_rate": m.pmsv_retention_rate,
+            "retention_rate": m.pmsv.retention_rate,
             "kind": "PMSV_style",
         }
     return out

@@ -1,10 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
-
-import numpy as np
+from typing import TYPE_CHECKING, Any
 
 from qchem_stack.backends.spec import CircuitIR
+
+if TYPE_CHECKING:
+    import numpy as np
 
 
 def hea_operations(n_qubits: int, depth: int, angles: np.ndarray) -> list[dict[str, Any]]:

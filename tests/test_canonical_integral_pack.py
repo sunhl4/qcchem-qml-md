@@ -22,8 +22,8 @@ def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
     rhf = drv.run_rhf()
-    na = cfg.active_space.n_active_orbitals
-    ne = cfg.active_space.n_active_electrons
+    na = cfg.active_space.cas.n_orbitals
+    ne = cfg.active_space.cas.n_electrons
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),
@@ -40,14 +40,14 @@ def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
         pack,
         n_active_orbitals=na,
         n_active_electrons=ne,
-        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
         classical_reference_for_meta=ref,
     )
     q_ref = molecular_hamiltonian_from_classical_reference(
         ref,
         n_active_orbitals=na,
         n_active_electrons=ne,
-        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
     )
     assert q_ref.meta["hamiltonian_fingerprint"] == q_pack.meta["hamiltonian_fingerprint"]
     assert q_pack.meta.get("canonical_integral_pack", {}).get("schema")
@@ -83,8 +83,8 @@ def test_classical_reference_fermionic_operator_matches_canonical_pack() -> None
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     drv = PySCFDriver.from_config(cfg)
     rhf = drv.run_rhf()
-    na = cfg.active_space.n_active_orbitals
-    ne = cfg.active_space.n_active_electrons
+    na = cfg.active_space.cas.n_orbitals
+    ne = cfg.active_space.cas.n_electrons
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),

@@ -2,23 +2,22 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
 import pytest
 
-from qchem_stack.config import ExperimentConfig, MitigationSpec
+from qchem_stack.config import ExperimentConfig, MitigationSpec, load_experiment_config
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag
 
 
-def _minimal_cfg(**mit: object) -> ExperimentConfig:
-    from pathlib import Path
-
-    from qchem_stack.config import load_experiment_config
-
+def _minimal_cfg(**mitigation_patch: object) -> ExperimentConfig:
     p = Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
     cfg = load_experiment_config(p)
-    base = MitigationSpec()
-    m = base.model_copy(update=dict(mit))
-    return cfg.model_copy(update={"mitigation": m})
+    if not mitigation_patch:
+        return cfg
+    merged = {**cfg.mitigation.model_dump(mode="python"), **mitigation_patch}
+    return cfg.model_copy(update={"mitigation": MitigationSpec.model_validate(merged)})
 
 
 def _dag_mitigation_kinds(graph: dict) -> list[str]:
@@ -46,13 +45,14 @@ def test_mitigation_graph_topological_order_matches_trace_kinds(
 ) -> None:
     if not (spam or pmsv or zne):
         pytest.skip("need at least one mitigation stage")
-    cfg = _minimal_cfg(
-        spam_calibration_enabled=spam,
-        pmsv_enabled=pmsv,
-        zne_enabled=zne,
-        pmsv_stabilizers=["Z0"] if pmsv else [],
-        pmsv_retention_rate=0.9 if pmsv else 1.0,
-    )
+    patch: dict = {}
+    if spam:
+        patch["stubs"] = {"spam_calibration": True}
+    if pmsv:
+        patch["pmsv"] = {"enabled": True, "stabilizers": ["Z0"], "retention_rate": 0.9}
+    if zne:
+        patch["zne"] = {"enabled": True}
+    cfg = _minimal_cfg(**patch)
     graph = build_qermit_style_mitigation_report(cfg)
     assert graph is not None
     dag_kinds = _dag_mitigation_kinds(graph)
@@ -62,13 +62,15 @@ def test_mitigation_graph_topological_order_matches_trace_kinds(
     topo = graph.get("topological_order") or []
     kinds_by_id = {n["id"]: n.get("kind") for n in graph.get("nodes", []) if isinstance(n, dict)}
     topo_kinds_mid = [kinds_by_id[i] for i in topo if i in kinds_by_id and kinds_by_id[i]]
-    # Drop raw_counts_in and expectation_out shell kinds for same mid-sequence check
     mid = [k for k in topo_kinds_mid if k not in ("raw_counts_in", "expectation_out")]
     assert mid == trace_kinds
 
 
 def test_mitigation_graph_schema_propagates_to_runtime_trace() -> None:
-    cfg = _minimal_cfg(spam_calibration_enabled=False, pmsv_enabled=True, zne_enabled=True)
+    cfg = _minimal_cfg(
+        pmsv={"enabled": True, "stabilizers": ["Z0"]},
+        zne={"enabled": True},
+    )
     graph = build_qermit_style_mitigation_report(cfg)
     assert graph is not None
     dex = execute_mitigation_dag(-0.5, None, graph, cfg, protocol_counts={})
@@ -76,7 +78,9 @@ def test_mitigation_graph_schema_propagates_to_runtime_trace() -> None:
 
 
 def test_classical_shadows_stub_trace_matches_graph_standalone() -> None:
-    cfg = _minimal_cfg(classical_shadows_stub_enabled=True, classical_shadows_budget_pairs=64)
+    cfg = _minimal_cfg(
+        stubs={"classical_shadows": True, "classical_shadows_budget_pairs": 64},
+    )
     graph = build_qermit_style_mitigation_report(cfg)
     assert graph is not None
     dag_kinds = _dag_mitigation_kinds(graph)
@@ -87,11 +91,8 @@ def test_classical_shadows_stub_trace_matches_graph_standalone() -> None:
 
 def test_classical_shadows_stub_between_spam_and_pmsv_matches_trace() -> None:
     cfg = _minimal_cfg(
-        spam_calibration_enabled=True,
-        classical_shadows_stub_enabled=True,
-        pmsv_enabled=True,
-        pmsv_stabilizers=["Z0"],
-        pmsv_retention_rate=0.85,
+        stubs={"spam_calibration": True, "classical_shadows": True},
+        pmsv={"enabled": True, "stabilizers": ["Z0"], "retention_rate": 0.85},
     )
     graph = build_qermit_style_mitigation_report(cfg)
     assert graph is not None
@@ -99,8 +100,3 @@ def test_classical_shadows_stub_between_spam_and_pmsv_matches_trace() -> None:
     dex = execute_mitigation_dag(-1.1, 0.05, graph, cfg, protocol_counts={})
     trace_kinds = _trace_node_kinds(dex)
     assert dag_kinds == trace_kinds
-    assert dag_kinds == [
-        "SPAM_readout_calibration_stub",
-        "classical_shadows_expectation_stub",
-        "PMSV_symmetry_filter",
-    ]

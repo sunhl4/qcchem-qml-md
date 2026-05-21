@@ -4,6 +4,11 @@ from __future__ import annotations
 
 from typing import Any
 
+from qchem_stack.contracts.schema_ids import (
+    ML_MD_BRIDGE_SURFACE_V1,
+    ML_MD_TRAINER_STUB_FIT_V1,
+    QMEF_VALIDATE_V1,
+)
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
 
 
@@ -21,7 +26,7 @@ def ml_md_bridge_surface_v1() -> dict[str, Any]:
         qmframe_fields[name] = desc
 
     return {
-        "schema": "ml_md_bridge_surface_v1",
+        "schema": ML_MD_BRIDGE_SURFACE_V1,
         "qchem_stack_version": __version__,
         "qmframe_fields": qmframe_fields,
         "qmef_dataset": {
@@ -64,7 +69,7 @@ def validate_qmef_dict(raw: dict[str, Any]) -> QMEFDataset:
 def qmef_validate_response_dict(ds: QMEFDataset) -> dict[str, Any]:
     """Normalized JSON-safe payload for ``POST /v1/meta/qmef-validate``."""
     return {
-        "schema": "qmef_validate_v1",
+        "schema": QMEF_VALIDATE_V1,
         "n_frames": len(ds.frames),
         "qmef": ds.model_dump(mode="json"),
         "qmframe_field_names": list(QMFrame.model_fields.keys()),
@@ -78,7 +83,7 @@ def trainer_stub_fit_response_dict(ds: QMEFDataset, hyperparams: dict[str, Any])
     trainer = StubTorchMLIPTrainer()
     art = trainer.fit(ds, hyperparams)
     return {
-        "schema": "ml_md_trainer_stub_fit_v1",
+        "schema": ML_MD_TRAINER_STUB_FIT_V1,
         "artifact": {
             "path": art.path,
             "metrics": art.metrics,

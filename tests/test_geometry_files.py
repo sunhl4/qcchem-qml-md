@@ -57,7 +57,7 @@ def test_load_experiment_config_geometry_file_relative(tmp_path: Path) -> None:
     cfg_yaml = tmp_path / "exp.yaml"
     cfg_yaml.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: geom_file_test
 random_seed: 0
 molecule:
@@ -69,8 +69,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -113,12 +115,12 @@ def test_from_yaml_dict_geometry_files_base_dir(tmp_path: Path) -> None:
     xyz.write_text("1\nx\nH 0 0 0\n", encoding="utf-8")
     cfg = ExperimentConfig.from_yaml_dict(
         {
-            "schema_version": "1",
+            "schema_version": "2",
             "experiment_id": "g",
             "random_seed": 0,
             "molecule": {"geometry_file": "a.xyz", "basis": "sto-3g"},
             "scf": {"driver": "pyscf", "method": "RHF"},
-            "active_space": {"n_active_orbitals": 2, "n_active_electrons": 2},
+            "active_space": {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}},
         },
         geometry_files_base_dir=tmp_path,
     )

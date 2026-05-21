@@ -32,9 +32,9 @@ def main() -> int:
 
     print("=== Restricted active-space tuple (canonical get_system shape) ===")
     prob = drv.get_restricted_active_space_quantum_problem(
-        int(cfg.active_space.n_active_orbitals),
-        int(cfg.active_space.n_active_electrons),
-        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
+        int(cfg.active_space.cas.n_orbitals),
+        int(cfg.active_space.cas.n_electrons),
+        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
     )
     print("meta:", prob.meta)
     print("qubit_hamiltonian.meta jw_build:", prob.qubit_hamiltonian.meta.get("jw_build"))

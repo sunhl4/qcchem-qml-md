@@ -23,9 +23,7 @@ def test_pre_quantum_default_builder_registry_lists_all_paths() -> None:
     cfg = load_experiment_config(cfg_path)
     rhf = run_scf_reference(cfg)
     build_pre_quantum_input_with_context(cfg, rhf, cfg_path=cfg_path)
-    assert set(list_pre_quantum_branch_builders()) == {
-        path.value for path in PreQuantumPath
-    }
+    assert set(list_pre_quantum_branch_builders()) == {path.value for path in PreQuantumPath}
 
 
 def test_pre_quantum_builder_registry_requires_explicit_override() -> None:

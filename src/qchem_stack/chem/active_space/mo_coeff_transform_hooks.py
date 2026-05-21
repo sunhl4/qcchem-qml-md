@@ -1,11 +1,15 @@
 from __future__ import annotations
 
 from importlib import import_module
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import MO_COEFF_TRANSFORM_HOOK_V1
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
 
 
 def _resolve_hook(name: str):
@@ -30,7 +34,7 @@ def _resolve_hook(name: str):
 
 
 def apply_mo_coeff_transform_hook(cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference) -> None:
-    hook_name = str(cfg.chemistry_extended.mo_coeff_transform_hook or "").strip()
+    hook_name = str(cfg.chemistry_extended.mo_transform.hook or "").strip()
     if not hook_name:
         return
     hook = _resolve_hook(hook_name)
@@ -45,18 +49,18 @@ def apply_mo_coeff_transform_hook(cfg: ExperimentConfig, rhf: ClassicalMeanField
             "mo_coeff_transform_hook currently supports molecular ndarray mo_coeff only."
         )
     before_shape = tuple(mo_coeff.shape)
-    transformed = np.asarray(
-        hook(mo_coeff, **dict(cfg.chemistry_extended.mo_coeff_transform_kwargs))
-    )
+    transformed = np.asarray(hook(mo_coeff, **dict(cfg.chemistry_extended.mo_transform.kwargs)))
     if tuple(transformed.shape) != before_shape:
         raise ValueError(
             "mo_coeff_transform_hook must preserve mo_coeff shape: "
             f"got {tuple(transformed.shape)} vs expected {before_shape}."
         )
-    mf.mo_coeff = transformed
+    from qchem_stack.chem.pyscf_typing import as_pyscf_mf
+
+    as_pyscf_mf(mf).mo_coeff = transformed
     rhf.driver_meta["mo_coeff_transform_hook_v1"] = {
-        "schema": "mo_coeff_transform_hook_v1",
+        "schema": MO_COEFF_TRANSFORM_HOOK_V1,
         "hook": hook_name,
-        "kwargs": dict(cfg.chemistry_extended.mo_coeff_transform_kwargs),
+        "kwargs": dict(cfg.chemistry_extended.mo_transform.kwargs),
         "shape": [int(before_shape[0]), int(before_shape[1])],
     }

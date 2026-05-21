@@ -34,8 +34,8 @@ def test_legacy_hamiltonian_helper_emits_deprecation_and_matches_build() -> None
         warnings.simplefilter("always", DeprecationWarning)
         legacy = molecular_hamiltonian_from_classical_reference(
             ref,
-            n_active_orbitals=int(cfg.active_space.n_active_orbitals),
-            n_active_electrons=int(cfg.active_space.n_active_electrons),
+            n_active_orbitals=int(cfg.active_space.cas.n_orbitals),
+            n_active_electrons=int(cfg.active_space.cas.n_electrons),
         )
     assert any(isinstance(w.message, DeprecationWarning) for w in caught)
     assert legacy.n_qubits == built.qubit_hamiltonian.n_qubits

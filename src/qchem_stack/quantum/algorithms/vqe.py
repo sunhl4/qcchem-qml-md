@@ -1,16 +1,17 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from scipy.optimize import minimize
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import ALGORITHM_VQE_REPORT_V1
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
 
 if TYPE_CHECKING:
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 @dataclass
@@ -79,10 +80,13 @@ class VQE(AlgorithmBase):
                 auxiliary=dict(self._auxiliary_expressions),
                 gradient=gradient_expr,
             )
-        return super().build(
-            protocol_objective=protocol_objective is not None,
-            protocol_gradient=protocol_gradient is not None,
-            optimizer_method=self._optimizer_method,
+        return cast(
+            "VQE",
+            super().build(
+                protocol_objective=protocol_objective is not None,
+                protocol_gradient=protocol_gradient is not None,
+                optimizer_method=self._optimizer_method,
+            ),
         )
 
     def run(
@@ -164,7 +168,7 @@ class VQE(AlgorithmBase):
             return super().generate_report()
         r = self._last_result
         return {
-            "schema": "algorithm_vqe_report_v1",
+            "schema": ALGORITHM_VQE_REPORT_V1,
             "final_value": float(r.energy),
             "nfev": int(r.nfev),
             "gradient_at_optimum": r.gradient_at_optimum,

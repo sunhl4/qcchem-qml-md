@@ -1,10 +1,12 @@
 from __future__ import annotations
 
 from pathlib import Path
+from typing import TYPE_CHECKING
 
 import numpy as np
 
-from qchem_stack.md_bridge.schema import QMEFDataset
+if TYPE_CHECKING:
+    from qchem_stack.md_bridge.schema import QMEFDataset
 
 
 def export_extended_xyz(dataset: QMEFDataset, path: str | Path) -> None:
@@ -20,7 +22,10 @@ def export_extended_xyz(dataset: QMEFDataset, path: str | Path) -> None:
             f"charge={fr.charge} mult={fr.multiplicity} method={fr.method_tag}"
         )
         for z, r, f in zip(
-            fr.atomic_numbers, fr.positions_bohr, fr.forces_hartree_bohr or [[0, 0, 0]] * n
+            fr.atomic_numbers,
+            fr.positions_bohr,
+            fr.forces_hartree_bohr or [[0, 0, 0]] * n,
+            strict=False,
         ):
             sym = {1: "H", 6: "C", 7: "N", 8: "O"}.get(int(z), "X")
             lines.append(f"{sym} {r[0]:.8f} {r[1]:.8f} {r[2]:.8f} {f[0]:.8f} {f[1]:.8f} {f[2]:.8f}")

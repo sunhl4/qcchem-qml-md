@@ -1,14 +1,16 @@
 from __future__ import annotations
 
-import logging
-from collections.abc import Callable
 from dataclasses import dataclass
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.pre_quantum_input import PreQuantumInput
-from qchem_stack.config import ExperimentConfig
-from qchem_stack.orchestration.run_context import PipelineStageTimer
+if TYPE_CHECKING:
+    import logging
+    from collections.abc import Callable
+
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+    from qchem_stack.config import ExperimentConfig
+    from qchem_stack.orchestration.run_context import PipelineStageTimer
 
 
 @dataclass(slots=True)

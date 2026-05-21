@@ -4,9 +4,13 @@ from __future__ import annotations
 
 import time
 import uuid
-from collections.abc import Mapping
 from dataclasses import dataclass
-from typing import Any, ClassVar
+from typing import TYPE_CHECKING, Any, ClassVar
+
+from qchem_stack.contracts.schema_ids import PIPELINE_PROFILE_V1
+
+if TYPE_CHECKING:
+    from collections.abc import Mapping
 
 
 @dataclass(frozen=True)
@@ -73,7 +77,7 @@ class PipelineStageTimer:
     def to_profile_dict(self) -> dict[str, Any]:
         total_ms = (self._last - self._t0) * 1000.0
         return {
-            "schema": "pipeline_profile_v1",
+            "schema": PIPELINE_PROFILE_V1,
             "stages": list(self._stages),
             "total_wall_ms": round(float(total_ms), 3),
         }

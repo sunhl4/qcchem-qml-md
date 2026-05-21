@@ -10,6 +10,8 @@ from typing import Any
 
 import numpy as np
 
+from qchem_stack.contracts.schema_ids import CUTENSORTNET_PROTOCOL_STUB_V1
+
 
 def _demo_triangle_closed_path() -> tuple[str, list[np.ndarray], int]:
     """Build a 3-tensor network that contracts to a scalar (parity-sized demo)."""
@@ -42,7 +44,7 @@ def run_cutensornet_expectation_stub(
         be = "cuquantum_if_available"
 
     base: dict[str, Any] = {
-        "schema": "cutensornet_protocol_stub_v1",
+        "schema": CUTENSORTNET_PROTOCOL_STUB_V1,
         "n_qubits": int(n_qubits),
         "requested_backend": requested_backend,
     }

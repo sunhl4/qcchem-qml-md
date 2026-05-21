@@ -6,11 +6,17 @@ Used by :func:`~qchem_stack.orchestration.pipeline._attach_qpe_demo_track_if_req
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any, cast
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import PHASE_ESTIMATION_CONTRACT_V1, QPE_QEC_DEMO_TRACK_V1
 from qchem_stack.qpe_qec_demo import BayesianQPEStub, kitaev_qpe_energy_estimate
-from qchem_stack.quantum.algorithms.qpe import AlgorithmInfoTheoryQPE, AlgorithmKitaevQPE
+from qchem_stack.quantum.algorithms.qpe import (
+    AlgorithmInfoTheoryQPE,
+    AlgorithmKitaevQPE,
+)
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 def qpe_demo_track_payload(
@@ -20,12 +26,14 @@ def qpe_demo_track_payload(
     bayesian_pairs: list[tuple[float, float]] | None = None,
 ) -> dict[str, Any]:
     pairs = bayesian_pairs if bayesian_pairs is not None else [(0.0, 0.5), (1.0, 1.0)]
-    kitaev = AlgorithmKitaevQPE(qh, n_bits=max(2, bits)).build().run()
-    info = AlgorithmInfoTheoryQPE(qh, n_samples=32).build().run(seed=17)
+    kitaev_alg = cast("AlgorithmKitaevQPE", AlgorithmKitaevQPE(qh, n_bits=max(2, bits)).build())
+    info_alg = cast("AlgorithmInfoTheoryQPE", AlgorithmInfoTheoryQPE(qh, n_samples=32).build())
+    kitaev = kitaev_alg.run()
+    info = info_alg.run(seed=17)
     return {
-        "schema": "qpe_qec_demo_track_v1",
+        "schema": QPE_QEC_DEMO_TRACK_V1,
         "phase_estimation_contract_v1": {
-            "schema": "phase_estimation_contract_v1",
+            "schema": PHASE_ESTIMATION_CONTRACT_V1,
             "implementations_surfaces": (
                 "AlgorithmKitaevQPE + AlgorithmInfoTheoryQPE in qchem_stack.quantum.algorithms.qpe; "
                 "dense emulation only (Methods sidecar)."

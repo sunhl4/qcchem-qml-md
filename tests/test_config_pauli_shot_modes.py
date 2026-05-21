@@ -8,36 +8,45 @@ from pydantic import ValidationError
 from qchem_stack.config import ExperimentConfig
 
 
-def _minimal_cfg(**quantum_overrides) -> dict:
+def _minimal_cfg(**pauli_overrides) -> dict:
     return {
+        "schema_version": "2",
         "experiment_id": "t",
         "molecule": {
             "symbols": ["H", "H"],
-            "coordinates_bohr": [[0, 0, 0], [0, 0, 1.4]],
+            "coordinates": [[0, 0, 0], [0, 0, 1.4]],
+            "coordinate_unit": "bohr",
             "charge": 0,
             "multiplicity": 1,
             "basis": "sto-3g",
         },
-        "active_space": {"n_active_orbitals": 2, "n_active_electrons": 2},
-        "quantum": {"algorithm": "vqe", "vqe_depth": 1, "vqe_maxiter": 1, **quantum_overrides},
+        "active_space": {
+            "strategy": "cas",
+            "cas": {"n_orbitals": 2, "n_electrons": 2},
+        },
+        "quantum": {
+            "algorithm": "vqe",
+            "vqe": {"depth": 1, "maxiter": 1},
+            "pauli": pauli_overrides,
+        },
     }
 
 
 def test_cannot_set_both_sampled_and_qiskit_shots() -> None:
     with pytest.raises(ValidationError):
-        ExperimentConfig.model_validate(
+        ExperimentConfig.from_yaml_dict(
             _minimal_cfg(
-                run_sampled_pauli_protocol=True,
-                run_qiskit_shots_pauli_protocol=True,
+                run_sampled=True,
+                run_qiskit_shots=True,
             )
         )
 
 
 def test_both_off_ok() -> None:
-    c = ExperimentConfig.model_validate(
+    c = ExperimentConfig.from_yaml_dict(
         _minimal_cfg(
-            run_sampled_pauli_protocol=False,
-            run_qiskit_shots_pauli_protocol=False,
+            run_sampled=False,
+            run_qiskit_shots=False,
         )
     )
-    assert c.quantum.run_qiskit_shots_pauli_protocol is False
+    assert c.quantum.pauli.run_sampled is False

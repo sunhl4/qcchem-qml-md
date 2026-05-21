@@ -14,7 +14,9 @@
 
 ## 主矩阵（简表）
 
-| scf.driver | embedding.mode | active_space.strategy | dmet_hamiltonian_source | 默认 qubit 路径 |
+> **Schema v2（nested）**：DMET 字段在 `embedding.dmet.*`；projection 在 `embedding.projection.*`；plugin 在 `embedding.plugin.*`。详见 [`docs/说明_embedding配置.md`](说明_embedding配置.md)。
+
+| scf.driver | embedding.mode | active_space.strategy | dmet.hamiltonian_source | 默认 qubit 路径 |
 |------------|----------------|----------------------|-------------------------|-----------------|
 | pyscf | none | cas / manual | — | canonical pack → Y |
 | pyscf | dmet | cas | whole_active_system | canonical pack → Y |
@@ -29,9 +31,9 @@
 ## P0 校验条目（与计划项 1 对应）
 
 1. `precomputed` 禁止 `classical_benchmark_enabled` 与非 `none` 的 `rdm_correction_method`
-2. `schmidt_atomic_production` 要求 `scf.method=RHF`
+2. `embedding.dmet.hamiltonian_source=schmidt_atomic_production` 要求 `scf.method=RHF`
 3. 非 PySCF 禁止 Schmidt、Mulliken projection、AVAS（Psi4 在实现 canonical pack 后仍禁止 Schmidt/AVAS）
-4. `schmidt_dmet_max_cycles` ≤ 50（常量 `SCHMIDT_DMET_MAX_CYCLES_LIMIT`）
+4. `embedding.dmet.schmidt.dmet_max_cycles` ≤ 50（常量 `SCHMIDT_DMET_MAX_CYCLES_LIMIT`）
 5. PBC 开启时禁止 CASSCF audit / AVAS refine
 
 ## 代码驱动分支注册表

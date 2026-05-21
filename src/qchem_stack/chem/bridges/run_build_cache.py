@@ -4,14 +4,19 @@ from __future__ import annotations
 
 import hashlib
 import json
-from collections.abc import Callable
 from dataclasses import dataclass, field
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.config import ExperimentConfig
+from qchem_stack.contracts.schema_ids import RUN_BUILD_CACHE_V1
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
 
 
 def _array_digest(arr: np.ndarray) -> str:
@@ -21,7 +26,11 @@ def _array_digest(arr: np.ndarray) -> str:
 
 def _driver_meta_digest(ref: ClassicalMeanFieldReference) -> str:
     data = dict(ref.driver_meta or {})
-    canonical = json.dumps(data, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str)
+    for key in ("kernel_bindings", "integral_crosscheck_casci_v1"):
+        data.pop(key, None)
+    canonical = json.dumps(
+        data, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str
+    )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
 
@@ -58,8 +67,12 @@ def _resolved_active_space_counts(
     n_active_orbitals: int | None,
     n_active_electrons: int | None,
 ) -> tuple[int, int]:
-    na = int(n_active_orbitals if n_active_orbitals is not None else cfg.active_space.n_active_orbitals)
-    ne = int(n_active_electrons if n_active_electrons is not None else cfg.active_space.n_active_electrons)
+    na = int(
+        n_active_orbitals if n_active_orbitals is not None else cfg.active_space.cas.n_orbitals
+    )
+    ne = int(
+        n_active_electrons if n_active_electrons is not None else cfg.active_space.cas.n_electrons
+    )
     return na, ne
 
 
@@ -73,7 +86,7 @@ def _pack_cache_key_material(
     return (
         f"{cfg.experiment_id}|{cfg.scf.driver}|{cfg.scf.method}|"
         f"{n_active_orbitals}|{n_active_electrons}|"
-        f"{cfg.active_space.fermion_qubit_mapping}|{_mf_checksum(ref)}"
+        f"{cfg.active_space.mapping.fermion_qubit}|{_mf_checksum(ref)}"
     )
 
 
@@ -119,9 +132,9 @@ class RunBuildCache:
         self.pack_builds += 1
         return pack
 
-    def stats_dict(self) -> dict[str, int]:
+    def stats_dict(self) -> dict[str, Any]:
         return {
-            "schema": "run_build_cache_v1",
+            "schema": RUN_BUILD_CACHE_V1,
             "pack_count": len(self.packs),
             "pack_hits": int(self.pack_hits),
             "pack_builds": int(self.pack_builds),

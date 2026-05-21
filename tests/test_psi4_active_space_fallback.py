@@ -14,7 +14,7 @@ def test_casci_effective_blocks_no_core_is_identity_projection() -> None:
     eri[1, 1, 0, 0] = 0.3
     enuc = 0.7
 
-    constant, h1, h2 = _casci_effective_blocks_from_mo_integrals(
+    constant, h1, h2, _route = _casci_effective_blocks_from_mo_integrals(
         h_core_mo=h_mo,
         eri_mo_chemist=eri,
         enuc=enuc,
@@ -37,7 +37,7 @@ def test_casci_effective_blocks_adds_core_energy_and_core_shift() -> None:
     eri[1, 0, 0, 1] = 0.1  # (ui|iv) with u=v=1,i=0
     enuc = 0.5
 
-    constant, h1, h2 = _casci_effective_blocks_from_mo_integrals(
+    constant, h1, h2, _route = _casci_effective_blocks_from_mo_integrals(
         h_core_mo=h_mo,
         eri_mo_chemist=eri,
         enuc=enuc,

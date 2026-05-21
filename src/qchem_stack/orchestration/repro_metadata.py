@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import hashlib
 import sys
-from collections.abc import Callable
-from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.config import ExperimentConfig, dump_experiment_config
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
+    from pathlib import Path
+
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 def package_versions() -> dict[str, str]:

@@ -12,11 +12,11 @@ from qchem_stack.chem.bridges.mean_field_like import (
     nuclear_repulsion_energy_au,
     wrap_mean_field_like,
 )
-from qchem_stack.chem.system import MolecularSystem
 
 if TYPE_CHECKING:
     from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
     from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
+    from qchem_stack.chem.system import MolecularSystem
 
 
 @dataclass
@@ -59,6 +59,11 @@ class ClassicalMeanFieldReference:
     def backend_tag(self) -> str:
         raw = (self.driver_meta or {}).get("upstream_classical_software_tag")
         return str(raw).strip().lower() if raw is not None else ""
+
+    def ao_basis_view(self) -> Any:
+        from qchem_stack.chem.bridges.ao_basis_view import ao_basis_view_from_reference
+
+        return ao_basis_view_from_reference(self)
 
     def as_pyscf_rhf_result(self) -> PySCFRHFResult:
         """Convert to PySCF-specific container for PySCF-only branches."""

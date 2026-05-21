@@ -6,12 +6,14 @@ and surfaces it as :class:`MolecularMeanFieldResult` for pipeline integration.
 
 from __future__ import annotations
 
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.precomputed_bundle import molecular_mean_field_result_from_bundle
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
-from qchem_stack.config import ExperimentConfig
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
 
 
 class PrecomputedIntegralSolver:
@@ -28,7 +30,7 @@ class PrecomputedIntegralSolver:
                 "PrecomputedIntegralSolver requires cfg.scf.driver='precomputed' "
                 f"(got {cfg.scf.driver!r})."
             )
-        raw = (cfg.scf.precomputed_bundle_path or "").strip()
+        raw = (cfg.scf.precomputed.bundle_path or "").strip()
         if not raw:
             raise ValueError(
                 "scf.driver='precomputed' requires scf.precomputed_bundle_path to be non-empty."
@@ -72,7 +74,7 @@ class PrecomputedIntegralSolver:
         return self.run_molecular_mean_field()
 
     def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
-        raw = str(self._cfg.scf.precomputed_bundle_path or "")
+        raw = str(self._cfg.scf.precomputed.bundle_path or "")
         return molecular_mean_field_result_from_bundle(raw, cfg_path=None)
 
     def run_periodic_mean_field(self) -> MolecularMeanFieldResult:

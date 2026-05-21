@@ -12,14 +12,15 @@ def test_embedding_input_lowdin_payload_in_workflow(tmp_path) -> None:
     cfg_path = tmp_path / "h2_lowdin.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: phase_b_lowdin
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -27,8 +28,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 embedding:
   mode: dmet
   fragment_labels: ["frag0"]
@@ -56,14 +59,15 @@ def test_rdm_correction_stub_report_and_run_summary(tmp_path) -> None:
     cfg_path = tmp_path / "h2_rdm_stub.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: phase_c_rdm_stub
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -71,8 +75,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 quantum:
   use_pauli_protocol: false
 chemistry_extended:
@@ -112,14 +118,15 @@ def test_rdm_correction_pyscf_nevpt2_casci_pipeline(tmp_path) -> None:
     cfg_path = tmp_path / "h2_nevpt.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: phase3_nevpt
 random_seed: 1
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -127,8 +134,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 quantum:
   use_pauli_protocol: false
 chemistry_extended:

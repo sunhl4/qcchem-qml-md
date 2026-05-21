@@ -10,6 +10,8 @@ from __future__ import annotations
 from enum import Enum
 from typing import Any
 
+from qchem_stack.contracts.schema_ids import TENSORNET_CLOSURE_REFERENCE_V1
+
 
 class TensorNetClosureStrategy(str, Enum):
     """How to attempt TN / einsum closure for auditing (not a single best default)."""
@@ -27,7 +29,7 @@ class TensorNetClosureStrategy(str, Enum):
 def tensornet_closure_strategy() -> dict[str, Any]:
     """JSON-serializable map for docs / export sidecars."""
     return {
-        "schema": "tensornet_closure_reference_v1",
+        "schema": TENSORNET_CLOSURE_REFERENCE_V1,
         "strategies": [s.value for s in TensorNetClosureStrategy],
         "stub_entrypoint": "qchem_stack.tensornet.cutensornet_protocol_stub.run_cutensornet_expectation_stub",
         "cross_check_note": (

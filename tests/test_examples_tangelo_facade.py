@@ -15,4 +15,4 @@ def test_packaged_paths_exist_and_load() -> None:
         assert p.is_file(), p
     cfg = load_packaged_example("h2_pec_stub")
     assert cfg.experiment_id == "h2_sto3g_pec_stub_demo"
-    assert cfg.mitigation.pec_literature_stub_enabled is True
+    assert cfg.mitigation.stubs.pec_literature is True

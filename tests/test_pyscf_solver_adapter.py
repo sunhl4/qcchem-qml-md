@@ -46,14 +46,15 @@ def test_pyscf_integral_solver_from_experiment_config(tmp_path: Path) -> None:
     cfg_path = tmp_path / "h2.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: adapter
 random_seed: 0
 molecule:
   symbols: ["H", "H"]
-  coordinates_bohr:
+  coordinates:
     - [0.0, 0.0, 0.0]
     - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
   charge: 0
   multiplicity: 1
   basis: sto-3g
@@ -63,8 +64,10 @@ scf:
   chkfile: null
   init_guess: minao
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )
@@ -122,7 +125,7 @@ def test_zmatrix_config_path_runs_mean_field(tmp_path: Path) -> None:
     cfg_path = tmp_path / "h2_zmatrix.yaml"
     cfg_path.write_text(
         """
-schema_version: "1"
+schema_version: "2"
 experiment_id: adapter_zmatrix
 random_seed: 0
 molecule:
@@ -137,8 +140,10 @@ scf:
   driver: pyscf
   method: RHF
 active_space:
-  n_active_orbitals: 2
-  n_active_electrons: 2
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
 """,
         encoding="utf-8",
     )

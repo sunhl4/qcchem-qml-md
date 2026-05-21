@@ -18,7 +18,7 @@ def test_zne_circuit_fold_protocol_counts_and_shots() -> None:
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     pc = out["protocol_counts"]
-    scales = [float(x) for x in cfg.mitigation.zne_scales]
+    scales = [float(x) for x in cfg.mitigation.zne.scales]
     assert pc.get("zne_mode") == "circuit_scale_fold"
     assert isinstance(pc.get("zne_curve"), list)
     assert len(pc["zne_curve"]) == len(scales)

@@ -10,11 +10,14 @@ Enable only for small active spaces (explicit opt-in via ``EmbeddingSpec``).
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.embedding.dmet import DMETContext, QubitHamiltonianFragmentSolverVQE
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import DMET_UNIFORM_MULTIFRAGMENT_TOY_V1
 from qchem_stack.integrations.dmet_self_consistent import DMETBathState, DMETSelfConsistencyLoop
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 def run_uniform_hamiltonian_multifragment_toy(
@@ -36,14 +39,14 @@ def run_uniform_hamiltonian_multifragment_toy(
     labs = [x for x in fragment_labels if str(x).strip()]
     if len(labs) < 2:
         return {
-            "schema": "dmet_uniform_multifragment_toy_v1",
+            "schema": DMET_UNIFORM_MULTIFRAGMENT_TOY_V1,
             "status": "skipped_need_two_or_more_fragments",
             "fragment_labels": labs,
         }
 
     solver = QubitHamiltonianFragmentSolverVQE(
-        depth=cfg.quantum.vqe_depth,
-        maxiter=cfg.quantum.vqe_maxiter,
+        depth=cfg.quantum.vqe.depth,
+        maxiter=cfg.quantum.vqe.maxiter,
         executor=executor,
         random_seed=cfg.random_seed,
     )

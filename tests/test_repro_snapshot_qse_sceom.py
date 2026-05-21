@@ -8,7 +8,6 @@ import pytest
 
 from qchem_stack.config import (
     ActiveSpaceSpec,
-    EmbeddingSpec,
     ExperimentConfig,
     MoleculeSpec,
     QuantumSpec,
@@ -19,19 +18,31 @@ from qchem_stack.protocols.product_contract import (
     PAULI_PATH_EXACT,
     PAULI_PATH_STATEVECTOR_SHOT_SIM,
 )
+from tests.embedding_nested import embedding_dmet
 
 
 def _minimal_cfg(**quantum_overrides: object) -> ExperimentConfig:
-    q = QuantumSpec(**quantum_overrides)
+    quantum_data: dict = {
+        "algorithm": "vqe",
+        "vqe": {"depth": 1, "maxiter": 200},
+        "pauli": {"use_protocol": True},
+        "adapt": {"max_iter": 5},
+        "iqeb": {"max_rounds": 2},
+    }
+    quantum_data.update(dict(quantum_overrides))
     return ExperimentConfig(
+        schema_version="2",
         experiment_id="snap_qse",
         random_seed=1,
         molecule=MoleculeSpec(
             symbols=["H", "H"],
-            coordinates_bohr=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
+            coordinates=[[0, 0, 0], [0, 0, 1.4]],
+            coordinate_unit="bohr",
         ),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-        quantum=q,
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
+        quantum=QuantumSpec.model_validate(quantum_data),
     )
 
 
@@ -47,17 +58,20 @@ def test_parity_snapshot_embedding_and_pmsv_fields() -> None:
     cfg = _minimal_cfg()
     cfg = cfg.model_copy(
         update={
-            "embedding": EmbeddingSpec(
-                mode="dmet",
+            "embedding": embedding_dmet(
+                fragment_labels=["A"],
                 n_scf_cycles_embedding=3,
                 classical_reference_method="NEVPT2",
-                fragment_labels=["A"],
             ),
             "mitigation": cfg.mitigation.model_copy(
                 update={
-                    "pmsv_enabled": True,
-                    "pmsv_stabilizers": ["Z0"],
-                    "pmsv_retention_rate": 0.88,
+                    "pmsv": cfg.mitigation.pmsv.model_copy(
+                        update={
+                            "enabled": True,
+                            "stabilizers": ["Z0"],
+                            "retention_rate": 0.88,
+                        }
+                    ),
                 }
             ),
         }
@@ -73,13 +87,19 @@ def test_parity_snapshot_embedding_and_pmsv_fields() -> None:
 
 def test_parity_snapshot_has_qse_sceom_from_config() -> None:
     cfg = _minimal_cfg(
-        qse_after_variational=True,
-        qse_shot_mode="pauli_transitions",
-        qse_shots_per_ij_term=128,
-        qse_max_basis=6,
-        sceom_after_variational=True,
-        sceom_shots_per_matrix_element=200,
-        sceom_subspace_dim=3,
+        excited={
+            "qse": {
+                "after_variational": True,
+                "shot_mode": "pauli_transitions",
+                "shots_per_ij_term": 128,
+                "max_basis": 6,
+            },
+            "sceom": {
+                "after_variational": True,
+                "shots_per_matrix_element": 200,
+                "subspace_dim": 3,
+            },
+        }
     )
     r = collect_repro_metadata(cfg)
     snap = r["parity_snapshot"]
@@ -94,17 +114,20 @@ def test_parity_snapshot_has_qse_sceom_from_config() -> None:
 
 def test_parity_snapshot_variational_backend_mitigation_flags() -> None:
     cfg = _minimal_cfg(
-        use_pauli_protocol=False,
-        vqe_depth=2,
-        vqe_maxiter=150,
-        adapt_max_iter=8,
-        run_sampled_pauli_protocol=True,
-        record_pauli_measurement_histograms=True,
+        vqe={"depth": 2, "maxiter": 150},
+        adapt={"max_iter": 8},
+        pauli={
+            "use_protocol": False,
+            "run_sampled": True,
+            "record_histograms": True,
+        },
     )
     cfg = cfg.model_copy(
         update={
             "backend": cfg.backend.model_copy(update={"provider": "qiskit"}),
-            "mitigation": cfg.mitigation.model_copy(update={"zne_enabled": True}),
+            "mitigation": cfg.mitigation.model_copy(
+                update={"zne": cfg.mitigation.zne.model_copy(update={"enabled": True})}
+            ),
         }
     )
     r = collect_repro_metadata(cfg)
@@ -126,7 +149,7 @@ def test_parity_snapshot_pauli_path_exact_vs_sampled() -> None:
     c1 = _minimal_cfg()
     s1 = collect_repro_metadata(c1)["parity_snapshot"]
     assert s1["pauli_protocol_expectation_path"] == PAULI_PATH_EXACT
-    c2 = _minimal_cfg(run_sampled_pauli_protocol=True)
+    c2 = _minimal_cfg(pauli={"use_protocol": True, "run_sampled": True})
     s2 = collect_repro_metadata(c2)["parity_snapshot"]
     assert s2["pauli_protocol_expectation_path"] == PAULI_PATH_STATEVECTOR_SHOT_SIM
 
@@ -134,29 +157,42 @@ def test_parity_snapshot_pauli_path_exact_vs_sampled() -> None:
 def test_embedding_whole_active_system_yaml_validation() -> None:
     from pydantic import ValidationError
 
-    with pytest.raises(ValidationError, match="embedding.mode"):
+    with pytest.raises(
+        ValidationError, match="embedding.none.dmet|dmet_hamiltonian_source|embedding.mode"
+    ):
         ExperimentConfig(
+            schema_version="2",
             experiment_id="bad_mode",
             random_seed=0,
-            molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-            active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-            embedding=EmbeddingSpec(
-                mode="none",
-                dmet_hamiltonian_source="whole_active_system",
-                fragment_labels=["a"],
+            molecule=MoleculeSpec(
+                symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
             ),
+            active_space=ActiveSpaceSpec.model_validate(
+                {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+            ),
+            embedding={
+                "mode": "none",
+                "dmet": {"hamiltonian_source": "whole_active_system", "fragment_labels": ["a"]},
+            },
         )
     with pytest.raises(ValidationError, match="exactly one"):
         ExperimentConfig(
+            schema_version="2",
             experiment_id="bad_frags",
             random_seed=0,
-            molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-            active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-            embedding=EmbeddingSpec(
-                mode="dmet",
-                dmet_hamiltonian_source="whole_active_system",
-                fragment_labels=["a", "b"],
+            molecule=MoleculeSpec(
+                symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
             ),
+            active_space=ActiveSpaceSpec.model_validate(
+                {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+            ),
+            embedding={
+                "mode": "dmet",
+                "dmet": {
+                    "hamiltonian_source": "whole_active_system",
+                    "fragment_labels": ["a", "b"],
+                },
+            },
         )
 
 

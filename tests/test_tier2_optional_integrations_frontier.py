@@ -9,6 +9,7 @@ from qchem_stack.config import (
     ActiveSpaceSpec,
     ChemistryExtendedSpec,
     ExperimentConfig,
+    MitigationSpec,
     MoleculeSpec,
     NexusAnalogSpec,
     QuantumSpec,
@@ -25,11 +26,16 @@ from qchem_stack.tensornet import run_cutensornet_expectation_stub
 
 def _cfg(**q) -> ExperimentConfig:
     return ExperimentConfig(
+        schema_version="2",
         experiment_id="x",
         random_seed=0,
-        molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-        active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
-        quantum=QuantumSpec(**q),
+        molecule=MoleculeSpec(
+            symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+        ),
+        active_space=ActiveSpaceSpec.model_validate(
+            {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+        ),
+        quantum=QuantumSpec.model_validate(dict(q)),
     )
 
 
@@ -72,7 +78,11 @@ def test_qermit_report_when_pmsv() -> None:
     c = c.model_copy(
         update={
             "mitigation": c.mitigation.model_copy(
-                update={"pmsv_enabled": True, "pmsv_stabilizers": ["Z0 Z1"]}
+                update={
+                    "pmsv": c.mitigation.pmsv.model_copy(
+                        update={"enabled": True, "stabilizers": ["Z0 Z1"]}
+                    )
+                }
             )
         }
     )
@@ -100,34 +110,39 @@ def test_tensornet_stub() -> None:
 def test_pbc_cell_singular_rejected() -> None:
     with pytest.raises(ValidationError):
         ExperimentConfig(
+            schema_version="2",
             experiment_id="p",
             random_seed=0,
-            molecule=MoleculeSpec(symbols=["H", "H"], coordinates_bohr=[[0, 0, 0], [0, 0, 1.4]]),
-            active_space=ActiveSpaceSpec(n_active_orbitals=2, n_active_electrons=2),
+            molecule=MoleculeSpec(
+                symbols=["H", "H"], coordinates=[[0, 0, 0], [0, 0, 1.4]], coordinate_unit="bohr"
+            ),
+            active_space=ActiveSpaceSpec.model_validate(
+                {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
+            ),
             chemistry_extended=ChemistryExtendedSpec(
-                pbc_cell_vectors_bohr=[[1.0, 0, 0], [2.0, 0, 0], [0, 0, 1.0]]
+                pbc={"cell_vectors_bohr": [[1.0, 0, 0], [2.0, 0, 0], [0, 0, 1.0]]}
             ),
         )
 
 
 def test_pbc_mesh_invalid_rejected() -> None:
     with pytest.raises(ValidationError):
-        ChemistryExtendedSpec(pbc_kpoint_mesh=[0, 1, 1])
+        ChemistryExtendedSpec(pbc={"kpoint_mesh": [0, 1, 1]})
 
 
 def test_pbc_with_ddcosmo_allowed() -> None:
     s = ChemistryExtendedSpec(
-        solvent_model="ddcosmo",
-        pbc_cell_vectors_bohr=[[4.0, 0, 0], [0, 4.0, 0], [0, 0, 4.0]],
+        solvent={"model": "ddcosmo"},
+        pbc={"cell_vectors_bohr": [[4.0, 0, 0], [0, 4.0, 0], [0, 0, 4.0]]},
     )
-    assert s.solvent_model == "ddcosmo"
+    assert s.solvent.model == "ddcosmo"
 
 
 def test_mitigation_zne_scales_default() -> None:
     from qchem_stack.config import MitigationSpec
 
-    m = MitigationSpec(zne_enabled=True)
-    assert len(m.zne_scales) >= 1
+    m = MitigationSpec.model_validate({"zne": {"enabled": True}})
+    assert len(m.zne.scales) >= 1
 
 
 def test_qermit_runtime_trace() -> None:
@@ -136,8 +151,12 @@ def test_qermit_runtime_trace() -> None:
     c = _cfg()
     c = c.model_copy(
         update={
-            "mitigation": c.mitigation.model_copy(
-                update={"pmsv_enabled": True, "zne_enabled": True}
+            "mitigation": MitigationSpec.model_validate(
+                {
+                    **c.mitigation.model_dump(mode="python"),
+                    "pmsv": {"enabled": True, "stabilizers": ["Z0"]},
+                    "zne": {"enabled": True},
+                }
             )
         }
     )

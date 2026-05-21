@@ -36,7 +36,9 @@ class _GoodSolver:
         del args, kwargs
         return {}
 
-    def build_embedding_input_system(self, reference: Any, *, representation: str) -> dict[str, Any]:
+    def build_embedding_input_system(
+        self, reference: Any, *, representation: str
+    ) -> dict[str, Any]:
         del reference, representation
         return {}
 

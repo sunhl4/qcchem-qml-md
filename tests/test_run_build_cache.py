@@ -61,16 +61,16 @@ def test_pack_cache_key_defaults_match_explicit_and_changes_with_active_space() 
     explicit_key = pack_cache_key(
         cfg,
         rhf,
-        n_active_orbitals=int(cfg.active_space.n_active_orbitals),
-        n_active_electrons=int(cfg.active_space.n_active_electrons),
+        n_active_orbitals=int(cfg.active_space.cas.n_orbitals),
+        n_active_electrons=int(cfg.active_space.cas.n_electrons),
     )
     assert default_key == explicit_key
 
     changed_key = pack_cache_key(
         cfg,
         rhf,
-        n_active_orbitals=int(cfg.active_space.n_active_orbitals) + 1,
-        n_active_electrons=int(cfg.active_space.n_active_electrons),
+        n_active_orbitals=int(cfg.active_space.cas.n_orbitals) + 1,
+        n_active_electrons=int(cfg.active_space.cas.n_electrons),
     )
     assert changed_key != default_key
 
@@ -102,7 +102,7 @@ def test_pack_cache_key_changes_with_driver_meta_and_geometry() -> None:
         mo_energy=rhf.mo_energy.copy(),
         molecular_system=type(ms)(
             symbols=list(ms.symbols),
-            coordinates_bohr=ms_shift,
+            coordinates=ms_shift,
             charge=int(ms.charge),
             multiplicity=int(ms.multiplicity),
             basis=str(ms.basis),

@@ -4,10 +4,18 @@ from typing import Any
 
 import numpy as np
 
+from qchem_stack.chem.pyscf_typing import (
+    PyscfMeanField,
+    as_complex_array,
+    as_pyscf_cas,
+    as_real_array,
+    max_abs_imag,
+)
 
-def _unwrap_mean_field_handle(rhf: Any) -> Any:
+
+def _unwrap_mean_field_handle(rhf: Any) -> PyscfMeanField:
     """Return raw PySCF mean-field handle when wrapped by MeanFieldLike."""
-    mf = getattr(rhf, "mf")
+    mf = rhf.mf
     if hasattr(mf, "raw_handle"):
         raw = mf.raw_handle()
         if raw is not mf:
@@ -37,18 +45,18 @@ def active_space_casci_raw_blocks(
     ik = int(_ik if _ik is not None else 0)
     mo_coeff = mf.mo_coeff
     if isinstance(mo_coeff, np.ndarray):
-        mo = mo_coeff
+        mo = np.asarray(mo_coeff, dtype=float)
     else:
         moc = list(mo_coeff)
         if ik >= len(moc):
             ik = 0
-        mo = np.asarray(moc[ik], dtype=complex)
-        if np.max(np.abs(mo.imag)) < 1e-10:
-            mo = np.asarray(mo.real, dtype=float)
+        mo = as_complex_array(moc[ik])
+        if max_abs_imag(mo, tol=1e-10) < 1e-10:
+            mo = as_real_array(mo)
     n_mo = int(mo.shape[1])
     if n_active_orbitals > n_mo:
         raise ValueError("active orbitals exceed MO count at chosen k-point")
-    cas = mcscf.CASCI(mf, n_active_orbitals, n_active_electrons)
+    cas = as_pyscf_cas(mcscf.CASCI(mf, n_active_orbitals, n_active_electrons))
     frozen_cfg = list(meta.get("active_space_frozen_orbitals") or [])
     if frozen_cfg:
         if any(i < 0 for i in frozen_cfg):
@@ -63,7 +71,7 @@ def active_space_casci_raw_blocks(
     h1a = np.asarray(h1, dtype=complex)
     h2a = np.asarray(h2, dtype=complex)
     for label, arr in (("h1", h1a), ("h2", h2a)):
-        if np.max(np.abs(arr.imag)) > 1e-7:
+        if max_abs_imag(arr) > 1e-7:
             raise ValueError(
                 f"Active space {label} has non-trivial imaginary part; use Gamma (mesh [1,1,1]) or a real k-point."
             )
@@ -71,8 +79,8 @@ def active_space_casci_raw_blocks(
     # ``energy_nuc()`` and adds inactive-orbital contributions when ``ncore > 0``;
     # do not add ``mol.energy_nuc()`` again (would double-count nuclear repulsion).
     constant = float(e_core)
-    h1_out = np.asarray(h1a.real, dtype=float)
-    h2_real = np.asarray(h2a.real, dtype=float)
+    h1_out = as_real_array(h1a)
+    h2_real = as_real_array(h2a)
     # PySCF 2.x ``get_h2eff`` often returns chemists' ERIs in compact 2D form
     # (``n * (n + 1) // 2`` square); OpenFermion expects full ``(n, n, n, n)``.
     n_act = int(n_active_orbitals)

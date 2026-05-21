@@ -1,6 +1,6 @@
 """Closed-shell spin-orbital UCCSD variational ansatz.
 
-Pauli averaging protocol prepends HEA circuits; dense UCCSD energy uses ``use_pauli_protocol: false``.
+Pauli averaging protocol prepends HEA circuits; dense UCCSD energy uses ``quantum.pauli.use_protocol: false``.
 
 Transforms:
   * ``jordan_wigner``: JW Hartree–Fock reference + JW-mapped fermionic generators; optional
@@ -16,7 +16,6 @@ Trotterized cluster prep (:class:`UCCSDTrotterVQE`) inherits the same mapping se
 
 from __future__ import annotations
 
-from collections.abc import Sequence
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
@@ -28,11 +27,14 @@ from openfermion.ops import FermionOperator, QubitOperator
 from scipy.linalg import expm
 from scipy.optimize import minimize
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
+from qchem_stack.contracts.schema_ids import UCCSD_MAPPING_SUPPORT_MATRIX_V1
 from qchem_stack.integrations.ucc_reference import build_spin_uccsd_fermion_generators
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 def _occupied_string_creation_op(n_electrons: int) -> FermionOperator:
@@ -159,7 +161,7 @@ class UCCSDVQE:
 
     def _state_from_angles(self, angles: np.ndarray) -> np.ndarray:
         psi = self._reference_state()
-        for th, a in zip(angles, self._antiherm_mats):
+        for th, a in zip(angles, self._antiherm_mats, strict=False):
             psi = expm(float(th) * a) @ psi
             nrm = float(np.linalg.norm(psi))
             if nrm < 1e-14:
@@ -217,7 +219,7 @@ class UCCSDVQE:
         if bounds is not None:
             kwargs["bounds"] = list(bounds)
         res = minimize(**kwargs)
-        proj_meta = True if self._fermion_mapping == "jordan_wigner" else False
+        proj_meta = self._fermion_mapping == "jordan_wigner"
         meta: dict[str, Any] = {
             "scipy_message": str(res.message),
             "variational_ansatz": "uccsd",
@@ -316,7 +318,7 @@ class UCCSDTrotterVQE(UCCSDVQE):
         if bounds is not None:
             kwargs["bounds"] = list(bounds)
         res = minimize(**kwargs)
-        proj_meta = True if self._fermion_mapping == "jordan_wigner" else False
+        proj_meta = self._fermion_mapping == "jordan_wigner"
         meta: dict[str, Any] = {
             "scipy_message": str(res.message),
             "variational_ansatz": "uccsd",
@@ -347,10 +349,10 @@ class UCCSDTrotterVQE(UCCSDVQE):
 def uccsd_mapping_support_matrix_v1() -> dict[str, Any]:
     """Machine-readable boundary for UCCSD ansatz mapping support."""
     return {
-        "schema": "uccsd_mapping_support_matrix_v1",
+        "schema": UCCSD_MAPPING_SUPPORT_MATRIX_V1,
         "yaml_fields": {
-            "variational_ansatz": "quantum.variational_ansatz",
-            "fermion_qubit_mapping": "active_space.fermion_qubit_mapping",
+            "variational_ansatz": "quantum.variational.ansatz",
+            "fermion_qubit_mapping": "active_space.mapping.fermion_qubit",
         },
         "rows": [
             {

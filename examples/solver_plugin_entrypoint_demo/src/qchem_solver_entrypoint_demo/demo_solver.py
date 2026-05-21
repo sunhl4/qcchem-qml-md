@@ -44,8 +44,8 @@ class EntrypointDemoIntegralSolver:
         return self.run_molecular_mean_field()
 
     def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
-        n_orb = max(1, int(self._cfg.active_space.n_active_orbitals))
-        n_occ = min(n_orb, max(1, int(self._cfg.active_space.n_active_electrons // 2)))
+        n_orb = max(1, int(self._cfg.active_space.cas.n_orbitals))
+        n_occ = min(n_orb, max(1, int(self._cfg.active_space.cas.n_electrons // 2)))
         mo_energy = np.linspace(-1.2, 0.4, n_orb, dtype=float)
         mo_energy[:n_occ] -= 0.1
         return MolecularMeanFieldResult(

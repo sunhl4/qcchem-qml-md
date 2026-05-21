@@ -10,9 +10,12 @@ from __future__ import annotations
 import os
 import urllib.error
 import urllib.request
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
-from qchem_stack.config import ExperimentConfig, NexusCloudSpec
+from qchem_stack.contracts.schema_ids import NEXUS_CLOUD_ADAPTER_V1
+
+if TYPE_CHECKING:
+    from qchem_stack.config import ExperimentConfig, NexusCloudSpec
 
 
 def nexus_cloud_repro_sidecar(cfg: ExperimentConfig) -> dict[str, Any] | None:
@@ -22,20 +25,20 @@ def nexus_cloud_repro_sidecar(cfg: ExperimentConfig) -> dict[str, Any] | None:
         return None
     if cloud.mode == "mock":
         return {
-            "schema": "nexus_cloud_adapter_v1",
+            "schema": NEXUS_CLOUD_ADAPTER_V1,
             "mode": "mock",
             "synthetic_job_id": "nexus-mock-00000000",
             "note": "No HTTP; set nexus_cloud.mode=http and base_url for a real endpoint.",
         }
     if cloud.mode == "http":
         return _http_probe(cloud)
-    return {"schema": "nexus_cloud_adapter_v1", "error": f"unknown mode {cloud.mode!r}"}
+    return {"schema": NEXUS_CLOUD_ADAPTER_V1, "error": f"unknown mode {cloud.mode!r}"}
 
 
 def _http_probe(cloud: NexusCloudSpec) -> dict[str, Any]:
     if not (cloud.base_url or "").strip():
         return {
-            "schema": "nexus_cloud_adapter_v1",
+            "schema": NEXUS_CLOUD_ADAPTER_V1,
             "mode": "http",
             "ok": False,
             "error": "nexus_cloud.base_url is empty",
@@ -54,7 +57,7 @@ def _http_probe(cloud: NexusCloudSpec) -> dict[str, Any]:
             code = r.getcode()
     except urllib.error.HTTPError as e:
         return {
-            "schema": "nexus_cloud_adapter_v1",
+            "schema": NEXUS_CLOUD_ADAPTER_V1,
             "mode": "http",
             "ok": False,
             "url": url,
@@ -63,7 +66,7 @@ def _http_probe(cloud: NexusCloudSpec) -> dict[str, Any]:
         }
     except (urllib.error.URLError, TimeoutError, OSError) as e:
         return {
-            "schema": "nexus_cloud_adapter_v1",
+            "schema": NEXUS_CLOUD_ADAPTER_V1,
             "mode": "http",
             "ok": False,
             "url": url,
@@ -71,7 +74,7 @@ def _http_probe(cloud: NexusCloudSpec) -> dict[str, Any]:
             "note": "Expected to fail without a real Nexus/Quantinuum API endpoint and credentials.",
         }
     return {
-        "schema": "nexus_cloud_adapter_v1",
+        "schema": NEXUS_CLOUD_ADAPTER_V1,
         "mode": "http",
         "ok": True,
         "url": url,

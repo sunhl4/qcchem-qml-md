@@ -8,14 +8,13 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from openfermion import bravyi_kitaev, jordan_wigner
 from openfermion.ops import QubitOperator
 from scipy.linalg import eigh
 
-from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.integrations.ucc_reference import build_spin_ucc_singles_only_fermion_generators
 from qchem_stack.quantum.algorithms.excited import qse_matrices_hs
 from qchem_stack.quantum.statevector import (
@@ -23,6 +22,9 @@ from qchem_stack.quantum.statevector import (
     hea_state,
     qubit_operator_to_sparse,
 )
+
+if TYPE_CHECKING:
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
 @dataclass
