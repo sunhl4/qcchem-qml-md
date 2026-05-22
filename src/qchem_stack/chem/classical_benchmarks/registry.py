@@ -1,4 +1,8 @@
-"""Resolve ``classical_benchmark_backend`` and dispatch to a runner."""
+"""Resolve ``classical_benchmark_backend`` and dispatch to a runner.
+
+Psi4 benchmark requests currently resolve to :mod:`stub_backend` placeholders until a native
+``psi4_backend`` runner is implemented.
+"""
 
 from __future__ import annotations
 

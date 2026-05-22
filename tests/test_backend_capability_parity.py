@@ -1,4 +1,8 @@
-"""PySCF vs Psi4 capability bit parity (registry contract)."""
+"""PySCF vs Psi4 capability bit parity (registry contract).
+
+Complements ``test_solver_capabilities_presets.py::test_pyscf_psi4_differ_only_on_pbc_k_mesh``:
+this module checks runtime ``create_solver(cfg).capabilities``; presets tests compare static factories.
+"""
 
 from __future__ import annotations
 
@@ -9,11 +13,6 @@ from qchem_stack.config import load_experiment_config
 
 _SHARED_PARITY_FIELDS = (
     "supports_restricted_active_space_qubit_hamiltonian",
-    "supports_rhf",
-    "supports_rohf",
-    "supports_uhf",
-)
-_PYSCF_ONLY_FIELDS = (
     "supports_projection_fragment_mulliken_hamiltonian",
     "supports_schmidt_atomic_hamiltonian",
     "supports_embedding_input_ao_lowdin",
@@ -22,6 +21,12 @@ _PYSCF_ONLY_FIELDS = (
     "supports_rdm_correction_hooks",
     "supports_rdm_nevpt2_casci",
     "supports_get_integrals",
+    "supports_rhf",
+    "supports_rohf",
+    "supports_uhf",
+    "supports_molecular_scf",
+    "supports_pbc_scf",
+    "supports_implicit_solvent_ddcosmo",
 )
 
 
@@ -36,6 +41,5 @@ def test_pyscf_psi4_pre_quantum_capability_parity() -> None:
         assert getattr(pyscf_caps, field) == getattr(psi4_caps, field), (
             f"capability mismatch on {field}"
         )
-    for field in _PYSCF_ONLY_FIELDS:
-        assert getattr(pyscf_caps, field) is True
-        assert getattr(psi4_caps, field) is False
+    assert pyscf_caps.supports_pbc_k_mesh is True
+    assert psi4_caps.supports_pbc_k_mesh is False

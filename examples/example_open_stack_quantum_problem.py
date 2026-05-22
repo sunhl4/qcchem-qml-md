@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Chemistry → quantum problem construction using qchem_stack (open PySCF driver).
+"""Chemistry → quantum problem construction using qchem_stack (registry-backed bridge).
 
 Run from repo root::
 
@@ -22,20 +22,15 @@ def main() -> int:
 
     import numpy as np
 
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+    import qchem_stack.chem as chem
     from qchem_stack.config import load_experiment_config
     from qchem_stack.tensornet.dense_expectation_reference import expectation_qubit_operator_dense
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
 
     print("=== Restricted active-space tuple (canonical get_system shape) ===")
-    prob = drv.get_restricted_active_space_quantum_problem(
-        int(cfg.active_space.cas.n_orbitals),
-        int(cfg.active_space.cas.n_electrons),
-        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
-    )
+    prob = chem.restricted_active_space_quantum_problem_from_config(cfg)
     print("meta:", prob.meta)
     print("qubit_hamiltonian.meta jw_build:", prob.qubit_hamiltonian.meta.get("jw_build"))
     print(
@@ -70,7 +65,7 @@ def main() -> int:
     )
 
     print("\n=== AO-wrapped SCF (get_system_ao shape) ===")
-    ao = drv.get_system_ao(run_hf=True)
+    ao = chem.pyscf_ao_system_from_config(cfg, run_hf=True)
     print("integral_representation:", ao.driver_meta.get("integral_representation"))
     print("ao_run_hf:", ao.driver_meta.get("ao_run_hf"), "e_tot:", ao.e_tot)
     print("AO summary df:\n", ao.ao_driver_summary_df().to_string(index=False))
@@ -78,8 +73,7 @@ def main() -> int:
     print("\n=== Optional PySCF molecular symmetry (cf. classical-side savings) ===")
     cx = cfg.chemistry_extended.model_copy(update={"pyscf_symmetry": True})
     cfg_sym = cfg.model_copy(update={"chemistry_extended": cx})
-    drv_sym = PySCFDriver.from_config(cfg_sym)
-    prob_sym = drv_sym.get_restricted_active_space_quantum_problem(2, 2)
+    prob_sym = chem.restricted_active_space_quantum_problem_from_config(cfg_sym)
     print(
         "symmetry snapshot:",
         {

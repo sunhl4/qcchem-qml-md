@@ -9,13 +9,14 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.restricted_integral_operator import (
     RestrictedActiveSpaceIntegralOperatorCompact,
 )
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+    from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
 
 
 SCHEMA_V1 = "qchem_canonical_active_space_integral_pack_v1"
@@ -35,7 +36,7 @@ def _pack_provenance(
         "classical_backend": classical_backend,
     }
     if driver_meta:
-        out["classical_reference_meta"] = dict(driver_meta)
+        out["classical_reference_meta"] = fork_driver_meta(driver_meta)
     return out
 
 
@@ -58,7 +59,9 @@ class CanonicalActiveSpaceIntegralPack:
         n_active_orbitals: int,
         n_active_electrons: int,
     ) -> CanonicalActiveSpaceIntegralPack:
-        from qchem_stack.chem.drivers.pyscf_driver import unwrap_pyscf_rhf_for_backend_operations
+        from qchem_stack.chem.drivers.pyscf_driver_types import (
+            unwrap_pyscf_rhf_for_backend_operations,
+        )
 
         ref = unwrap_pyscf_rhf_for_backend_operations(rhf)
         compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(

@@ -23,10 +23,10 @@ from openfermion.linalg.sparse_tools import jw_number_indices
 from pyscf import ao2mo, fci, gto, mcscf, scf
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
 from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
+from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import load_experiment_config
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 pyscf = pytest.importorskip("pyscf")
 
@@ -50,13 +50,8 @@ def test_h2_sector_ground_matches_pyscf_fci() -> None:
     e_fci = float(fci.FCI(mol, mf.mo_coeff).kernel()[0])
 
     cfg = load_experiment_config(_CFG_H2)
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(rhf),
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-    )
+    rhf = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(rhf)).hamiltonian
     H = get_sparse_operator(qh.operator, n_qubits=qh.n_qubits).toarray()
     ne = int(qh.fermion_space.n_electrons)
     nq = int(qh.n_qubits)
@@ -88,12 +83,8 @@ def test_transpose_matches_explicit_tangelo_recipe() -> None:
     qop_ref = jordan_wigner(mol_op)
 
     cfg = load_experiment_config(_CFG_H2)
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(rhf),
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-    )
+    rhf = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(rhf)).hamiltonian
     m1 = get_sparse_operator(qh.operator, n_qubits=4).toarray()
     m2 = get_sparse_operator(qop_ref, n_qubits=4).toarray()
     assert float(np.max(np.abs(m1 - m2))) < 1e-10
@@ -116,12 +107,8 @@ def test_optional_tangelo_package_matches_if_installed() -> None:
     q_t = tangelo_jw(mol_t.fermionic_hamiltonian)
 
     cfg = load_experiment_config(_CFG_H2)
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(rhf),
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-    )
+    rhf = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(rhf)).hamiltonian
     m1 = get_sparse_operator(qh.operator, n_qubits=4).toarray()
     m2 = get_sparse_operator(q_t, n_qubits=4).toarray()
     assert float(np.max(np.abs(m1 - m2))) < 1e-5

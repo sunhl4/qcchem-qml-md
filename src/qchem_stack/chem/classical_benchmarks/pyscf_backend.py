@@ -5,7 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.classical_benchmarks.schema import CLASSICAL_POST_HF_BENCHMARKS_SCHEMA_V1
-from qchem_stack.chem.drivers.pyscf_driver import unwrap_pyscf_rhf_for_backend_operations
+from qchem_stack.chem.drivers.pyscf_driver_types import unwrap_pyscf_rhf_for_backend_operations
 
 if TYPE_CHECKING:
     from qchem_stack.chem.classical_benchmarks.context import ClassicalBenchmarkContext

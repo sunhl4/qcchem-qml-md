@@ -40,7 +40,12 @@ python examples/run_all_smoke.py
 - Mean-field + VQE: `configs/example_h2.yaml`
 - Decomposition plugin（contract schema + fragment energy stubs）: `configs/example_decomposition_plugin_contract.yaml`
 - AVAS **stub**（`strategy=avas_stub`）: `configs/example_h2_avas_stub.yaml` — meta 经 `chem.active_space.mean_field_meta`
-- **PySCF AVAS**（`strategy=avas` 且 `chemistry_extended.avas_ao_labels` 非空）: `configs/example_h2_avas.yaml`
+- **PySCF AVAS**（`strategy=avas` 且 `chemistry_extended.avas.ao_labels` 非空）: `configs/example_h2_avas.yaml`
+- **Psi4 双后端（capability 门控）**:
+  - RHF → CASCI: `configs/example_h2_psi4_rhf_sto3g.yaml`
+  - Schmidt DMET: `configs/example_h2_psi4_schmidt_dmet.yaml`
+  - AVAS: `configs/example_h2_psi4_avas.yaml`
+  - Mulliken projection: `configs/example_h2_psi4_projection_mulliken.yaml`
 - Classical shadows **stub**: `configs/example_h2_classical_shadows_stub.yaml`
 
 CI 中 parity export 抽样见 `scripts/check_parity_export_sample.py`。

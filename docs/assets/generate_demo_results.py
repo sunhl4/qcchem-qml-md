@@ -245,9 +245,9 @@ def plot_driver_interface_design():
     driver_box = FancyBboxPatch((0.5, 5.5), 13, 1.5, boxstyle="round,pad=0.1",
                                facecolor='#d3f9d8', edgecolor='#37b24d', linewidth=3)
     ax.add_patch(driver_box)
-    ax.text(7, 6.6, 'PySCFDriver (Unified Interface)', fontsize=12, ha='center',
+    ax.text(7, 6.6, 'ChemIntegralSolver + classical bridge', fontsize=12, ha='center',
            fontweight='bold', color='#2c3e50')
-    ax.text(7, 6.2, 'from_config(cfg) → run_rhf() / run_rohf() / run_uhf()', fontsize=10, 
+    ax.text(7, 6.2, 'create_solver(cfg) → compute_mean_field()', fontsize=10, 
            ha='center', color='#495057', family='monospace')
     ax.text(7, 5.85, 'Extensions: ddCOSMO | PBC (Γ/k-mesh) | CASSCF audit', fontsize=9,
            ha='center', color='#2f9e44', style='italic')

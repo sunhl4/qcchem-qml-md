@@ -6,7 +6,10 @@ Analogous to PySCF ``get_system()``-style tuples:
 :class:`openfermion.InteractionOperator`, :class:`~qchem_stack.chem.fermion.FermionSpace`,
 Jordan–Wigner HF reference, and :class:`~qchem_stack.chem.hamiltonian.QubitHamiltonian`.
 
-AO mean-field handles mirror ``get_system_ao`` via :meth:`qchem_stack.chem.drivers.pyscf_driver.PySCFDriver.get_system_ao`.
+AO mean-field handles mirror ``get_system_ao`` via
+:func:`~qchem_stack.chem.systems.pyscf_factory.pyscf_ao_system_from_config` /
+:func:`~qchem_stack.chem.systems.pyscf_factory.pyscf_ao_system_from_rhf` (preferred over deprecated
+:meth:`qchem_stack.chem.drivers.pyscf_driver.PySCFDriver.get_system_ao`).
 """
 
 from __future__ import annotations
@@ -109,7 +112,7 @@ def build_restricted_active_space_quantum_problem(
     mol_op = compact.to_interaction_operator()
     n_so = int(mol_op.one_body_tensor.shape[0])
     fs = FermionSpace(n_spin_orbitals=n_so, n_electrons=n_active_electrons)
-    from qchem_stack.chem.hamiltonian import _use_restricted_spatial_fermion_build
+    from qchem_stack.chem.hamiltonian_mapping import _use_restricted_spatial_fermion_build
 
     if _use_restricted_spatial_fermion_build(
         fermion_qubit_mapping=fermion_qubit_mapping,

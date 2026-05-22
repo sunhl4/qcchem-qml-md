@@ -63,3 +63,18 @@ def validate_vqd_max_overlap_warn_nonneg(value: float | None) -> float | None:
     if normalized < 0.0:
         raise ValueError("quantum.excited.vqd.max_overlap_warn must be >= 0 when set")
     return normalized
+
+
+def validate_operator_pool_ids(spec: QuantumSpec) -> None:
+    from qchem_stack.quantum.operator_pool_registry import is_registered_operator_pool_id
+
+    for field_path, pool_id in (
+        ("quantum.adapt.pool_id", spec.adapt.pool_id),
+        ("quantum.iqeb.pool_id", spec.iqeb.pool_id),
+    ):
+        pid = str(pool_id)
+        if not is_registered_operator_pool_id(pid):
+            raise ValueError(
+                f"Unknown {field_path}={pid!r}. "
+                "Use a registered operator pool id (see operator_pool_registry)."
+            )

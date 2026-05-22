@@ -1,4 +1,4 @@
-"""YAML-driven pipelines (PySCF → Hamiltonian → VQE → Pauli protocol → jobs)."""
+"""YAML-driven pipelines (solver bridge → pre-quantum → variational → Pauli protocol → jobs)."""
 
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.pipeline import (

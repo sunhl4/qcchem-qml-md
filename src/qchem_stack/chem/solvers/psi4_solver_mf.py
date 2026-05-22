@@ -126,7 +126,7 @@ def execute_molecular_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFie
     if mo_energies is None:
         mo_energies = np.asarray([float(e_au)], dtype=float)
     nmo = psi4_nmo(wfn)
-    return MolecularMeanFieldResult(
+    result = MolecularMeanFieldResult(
         mf=wfn,
         e_tot=float(e_au),
         mo_energy=np.asarray(mo_energies, dtype=float),
@@ -141,6 +141,8 @@ def execute_molecular_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFie
             },
         ),
     )
+    solver._last_molecular_mf_result = result
+    return result
 
 
 def execute_periodic_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFieldResult:
@@ -169,7 +171,7 @@ def execute_periodic_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFiel
     )
     if e_au is None or wfn is None:
         raise RuntimeError(f"Psi4 periodic SCF unavailable: {reason}")
-    return MolecularMeanFieldResult(
+    result = MolecularMeanFieldResult(
         mf=wfn,
         e_tot=float(e_au),
         mo_energy=np.asarray(mo_energies, dtype=float),
@@ -184,3 +186,5 @@ def execute_periodic_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFiel
             },
         ),
     )
+    solver._last_molecular_mf_result = result
+    return result

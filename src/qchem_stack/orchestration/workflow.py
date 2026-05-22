@@ -8,12 +8,15 @@ and ``hamiltonian_fingerprint`` when present in pipeline output.
 from __future__ import annotations
 
 from pathlib import Path
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
 from qchem_stack.integrations.workflow_preview import workflow_preview_payload
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config
 from qchem_stack.protocols.computable import computables_export_dict
+
+if TYPE_CHECKING:
+    from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
 
 class WorkflowCoordinator:
@@ -28,7 +31,7 @@ class WorkflowCoordinator:
     def config(self) -> ExperimentConfig:
         return self._cfg
 
-    def run(self) -> dict[str, Any]:
+    def run(self) -> PipelineResultV1:
         out = run_pipeline_from_config(self.config_path, job_db=self.job_db)
         pc = out.get("protocol_counts") if isinstance(out.get("protocol_counts"), dict) else None
         side: dict[str, Any] = {

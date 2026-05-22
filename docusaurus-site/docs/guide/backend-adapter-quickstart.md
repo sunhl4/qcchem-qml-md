@@ -56,7 +56,7 @@ my_backend = "my_plugin.solver:MyBackendIntegralSolver"
 from qchem_stack.chem.solvers import registered_solvers_detail, set_entrypoint_conflict_policy
 
 for sid, meta in registered_solvers_detail().items():
-    print(sid, meta.source, meta.provider)  # source: builtin | entrypoint | runtime
+    print(sid, meta.source, meta.provider, meta.capability_notes)  # source: builtin | entrypoint | runtime
 ```
 
 多个 entry point 争抢同一名称时：

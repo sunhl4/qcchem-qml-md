@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.bridges.interchange import merge_canonical_classical_bridge_headers
 from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
 
@@ -22,7 +23,7 @@ def mean_field_reference_for_benchmarks(
 
     if rhf is None:
         pr = run_molecular_mean_field(driver)
-        meta = dict(pr.driver_meta)
+        meta = fork_driver_meta(pr.driver_meta)
         meta.setdefault("upstream_classical_software_tag", "pyscf")
         return ClassicalMeanFieldReference(
             mf=pr.mf,
@@ -33,7 +34,7 @@ def mean_field_reference_for_benchmarks(
         )
     if isinstance(rhf, ClassicalMeanFieldReference):
         return rhf
-    meta = dict(rhf.driver_meta)
+    meta = fork_driver_meta(rhf.driver_meta)
     meta.setdefault("upstream_classical_software_tag", "pyscf")
     return ClassicalMeanFieldReference(
         mf=rhf.mf,
@@ -46,7 +47,7 @@ def mean_field_reference_for_benchmarks(
 
 def run_molecular_mean_field(driver: PySCFDriver) -> PySCFRHFResult:
     run = driver._integral_solver().compute_mean_field(periodic=False)
-    meta = dict(run.driver_meta)
+    meta = fork_driver_meta(run.driver_meta)
     if driver.chemistry_extended.solvent.model == "ddcosmo":
         meta.setdefault("solvent", "ddcosmo")
         meta.setdefault("ddcosmo_epsilon", float(driver.chemistry_extended.solvent.epsilon))
@@ -66,7 +67,7 @@ def run_molecular_mean_field(driver: PySCFDriver) -> PySCFRHFResult:
 
 def run_pbc_mean_field(driver: PySCFDriver) -> PySCFRHFResult:
     run = driver._integral_solver().compute_mean_field(periodic=True)
-    meta = dict(run.driver_meta)
+    meta = fork_driver_meta(run.driver_meta)
     if driver.chemistry_extended.solvent.model == "ddcosmo":
         meta.setdefault("solvent", "ddcosmo")
         meta.setdefault("ddcosmo_epsilon", float(driver.chemistry_extended.solvent.epsilon))

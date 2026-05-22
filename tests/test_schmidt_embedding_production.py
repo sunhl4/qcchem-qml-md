@@ -7,7 +7,6 @@ from pathlib import Path
 import pytest
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
 from qchem_stack.chem.embedding.schmidt_production import build_schmidt_impurity_integrals
 from qchem_stack.chem.hamiltonian import qubit_hamiltonian_from_spatial_chemist_integrals
 from qchem_stack.config import (
@@ -19,6 +18,7 @@ from qchem_stack.config import (
     SCFSpec,
 )
 from tests.embedding_nested import embedding_dmet, schmidt_embedding_dmet
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_embedding_spec_rejects_schmidt_with_uniform_toy() -> None:
@@ -60,6 +60,43 @@ def test_qubit_hamiltonian_from_spatial_integrals_shape() -> None:
     qh = qubit_hamiltonian_from_spatial_chemist_integrals(0.0, h1, h2, 2)
     assert qh.n_qubits == 4
     assert qh.meta["n_active_orbitals"] == 2
+
+
+def test_schmidt_density_feedback_accepts_psi4_backend_tag() -> None:
+    import numpy as np
+
+    from qchem_stack.chem.bridges.ao_basis_view import AOBasisView
+    from qchem_stack.chem.embedding.schmidt_dmet_self_consistent import (
+        _initial_ao_density_state,
+        _schmidt_feedback_reference,
+    )
+
+    class _Psi4AOStub:
+        backend_tag = "psi4"
+
+        def overlap_ao(self) -> np.ndarray:
+            return np.eye(2, dtype=float)
+
+        def make_rdm1_ao(self) -> np.ndarray:
+            return np.eye(2, dtype=float)
+
+    class _Psi4RefStub:
+        def __init__(self) -> None:
+            self.driver_meta = {"upstream_classical_software_tag": "psi4"}
+
+        def backend_tag(self) -> str:
+            return "psi4"
+
+        def ao_basis_view(self) -> AOBasisView:
+            return _Psi4AOStub()  # type: ignore[return-value]
+
+    ref = _Psi4RefStub()
+    out = _schmidt_feedback_reference(ref, context="test")  # type: ignore[arg-type]
+    assert out is ref
+    S, D, nel = _initial_ao_density_state(ref)  # type: ignore[arg-type]
+    assert S.shape == (2, 2)
+    assert D.shape == (2, 2)
+    assert nel == 2
 
 
 def _have_pyscf() -> bool:
@@ -105,8 +142,7 @@ def test_build_schmidt_h2_single_atom_fragment() -> None:
             {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
         ),
     )
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     model = build_schmidt_impurity_integrals(
         _as_reference(rhf),
         fragment_atom_indices=[0],

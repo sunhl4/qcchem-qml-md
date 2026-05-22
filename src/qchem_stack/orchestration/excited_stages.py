@@ -6,7 +6,6 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.orchestration.excited_stages_qse import run_qse_stage
 from qchem_stack.orchestration.excited_stages_resource import (
     build_excited_resource_summary,
     build_excited_resource_summary_for_export,
@@ -15,8 +14,8 @@ from qchem_stack.orchestration.excited_stages_resource import (
     excited_shot_channel_upper_bounds,
     excited_shots_upper_bound,
 )
-from qchem_stack.orchestration.excited_stages_sceom import run_sceom_stage
-from qchem_stack.orchestration.excited_stages_vqd import run_vqd_stage
+from qchem_stack.quantum.excited_plugins.registry import run_excited_stages_from_context
+from qchem_stack.quantum.excited_plugins.spec import ExcitedRunContext
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -49,14 +48,15 @@ def run_excited_stages(
     profile: PipelineStageTimer,
     emit: Callable[[str], None],
 ) -> ExcitedResourceSummary | None:
-    q = cfg.quantum
-    ang = np.asarray(angles, dtype=float)
-    if q.excited.vqd.after_variational:
-        run_vqd_stage(cfg, qh=qh, exe=exe, angles=ang, energy_pre=energy_pre, out=out)
-    if q.excited.qse.after_variational:
-        run_qse_stage(cfg, qh=qh, angles=ang, out=out)
-    if q.excited.sceom.after_variational:
-        run_sceom_stage(cfg, qh=qh, angles=ang, out=out)
+    ctx = ExcitedRunContext(
+        cfg=cfg,
+        hamiltonian=qh,
+        executor=exe,
+        seed=int(cfg.random_seed),
+        ground_angles=np.asarray(angles, dtype=float),
+        ground_energy=float(energy_pre),
+    )
+    run_excited_stages_from_context(ctx, out=out)
     excited_rs = build_excited_resource_summary(cfg, out)
     if excited_rs is not None:
         out["excited_resource_summary"] = excited_rs

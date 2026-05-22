@@ -50,7 +50,7 @@
 
 **不可闭合部分**：与 Vendor platform 内部完全相同的 regrouping 与 Trotter 剖分；未公开常数与启发式。
 
-**开放实现策略**：见 `qchem_stack.integrations.ucc_reference`：`IdentityRegrouping`（基线）+ 可插入的 `ChemicallyAwareUCCPolicy` 协议；未来可接论文 2210.14834 的可公开算法实现。
+**开放实现策略**：见 `qchem_stack.chem.kernels.spin_ucc`（`IdentityRegrouping` 基线 + 可插入的 `ChemicallyAwareUCCPolicy` 协议）；`integrations.ucc_reference` 仅为 deprecated 兼容 re-export。未来可接论文 2210.14834 的可公开算法实现。
 
 ### 2.3 真 Nexus / qnexus 与 HQC
 
@@ -105,7 +105,7 @@ flowchart TB
   end
   subgraph integration [integrations 闭合扩展层]
     TKET[tket_fullchain]
-    UCC[ucc_reference]
+    UCC[spin_ucc kernel]
     DMET[dmet_self_consistent]
     Nexus[nexus_optional]
     Qermit[qermit_reference]
@@ -310,7 +310,7 @@ flowchart TB
 | **缓解（Qermit 风格 + 存根）**    | `mitigation/qermit_analog.py`, `mitigation/qermit_runtime.py`, `mitigation/pmsv.py`, `mitigation/zne.py`                         |
 | **张量网（CuTensorNet 类比）**    | `tensornet/cutensornet_protocol_stub.py`（`quantum.tensornet_expectation_stub`、`tensornet_contraction_engine`）                 |
 | **计价 / 云侧车**                 | `jobs/nexus_analog.py`, `jobs/cost.py`, `jobs/nexus_cloud.py`                                                                    |
-| **周期 / 溶剂（PySCF）**          | `chem/drivers/pyscf_driver.py`, `config.ChemistryExtendedSpec`（PBC、k 网、ddCOSMO）；覆盖面见 `integrations/open_driver_surface.py` |
+| **周期 / 溶剂（PySCF）**          | `chem/solvers/pyscf_solver.py`（canonical）、`chem/bridges/reference_factory.py`；legacy `chem/drivers/pyscf_driver.py`（deprecated）；`config.ChemistryExtendedSpec`（PBC、k 网、ddCOSMO）；覆盖面见 `integrations/open_driver_surface.py` |
 | **资源行（自研）**                | `backends/spec.py`（`CircuitIR`, `circuit_resource_row`）                                                                        |
 | **TKET 桥（可选）**               | `backends/pytket_bridge.py`；`pip install qchem-stack[pytket]`                                                                   |
 | 作业与队列                        | `jobs/store.py`（`JobHandle`, `SqliteJobStore`，`full_pipeline` + `list_jobs`/`count_by_status`）                                |
@@ -415,9 +415,9 @@ flowchart TB
 
 | 公开叙事要点                    | `qchem_stack` 落点                                                                                                    | 备注                                                                                   |
 | --------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| Geometry / drivers / mean-field | `chem/drivers/pyscf_driver.py`、`chem/hamiltonian.py`；扩展 `chemistry_extended`（ddCOSMO、PBC、k 点等）              | Driver 能力与矩阵汇总：`integrations/open_driver_surface.open_driver_coverage_matrix`                            |
+| Geometry / drivers / mean-field | `chem/solvers/` + `chem/bridges/reference_factory.py`、`chem/hamiltonian.py`；扩展 `chemistry_extended`（ddCOSMO、PBC、k 点等）；legacy `chem/drivers/`（deprecated） | Driver 能力与矩阵汇总：`integrations/open_driver_surface.open_driver_coverage_matrix`                            |
 | FCIDUMP 互操作                  | 以 PySCF 为主路径；FCIDUMP**未**作为一等入口时在 [parity 矩阵 §3](public_parity_matrix.md) 标保守 `partial` |                                                                                        |
-| Embedding（DMET 等手册分支）    | `chem/embedding/`、`integrations/schmidt_dmet_self_consistent.py` 等                                                  | [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md) |
+| Embedding（DMET 等手册分支）    | `chem/embedding/`（含 `schmidt_dmet_self_consistent.py`、`dmet_self_consistent.py`、`chem/kernels/`）；`integrations/*` 为 compat re-export shim | [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md) |
 
 ---
 
@@ -529,8 +529,8 @@ flowchart TB
 | NEVPT2 / AC0                      | `manual` / embedding           | placeholder           | —                                                                                     | **无**     | 无独立量子化学实现；配置中`classical_reference_method` 等为文档 / parity 占位                                                                                                                                       |
 | Fe4N2 案例（AVAS+CASSCF 等）      | `tutorials/case_study_fe4n2/*` | placeholder           | 无单独「Fe4N2」化学包                                                                  | **低**     | 教程树为镜像占位；量子管线见`configs/`、`quantum.*`                                                                                                                                                                 |
 | Fe4N2：噪声硬件评估               | tutorials                      | 刻意不做              | —                                                                                     | **无**     | 与公开矩阵「非专有硬件专优」一致                                                                                                                                                                                    |
-| 碎片化教程 / 大体系 DMET 等       | `tutorials/fragmentation`      | partial / placeholder | 同嵌入与`PySCFDriver`                                                                  | **中～低** | 与 manual 同源能力，无第二套代码路径                                                                                                                                                                                |
-| Vendor platform-PySCF（扩展叙事）        | `extensions`                   | partial               | `chem/drivers/pyscf_driver.py`                                                         | **中**     | 气相 RHF/ROHF/UHF、ddCOSMO、PBC（Γ / KRHF）；**非** vendor-pyscf 二进制                                                                                                                                          |
+| 碎片化教程 / 大体系 DMET 等       | `tutorials/fragmentation`      | partial / placeholder | 同嵌入与 `create_solver` / `ClassicalMeanFieldReference` 主线                                                          | **中～低** | 与 manual 同源能力，无第二套代码路径                                                                                                                                                                                |
+| Vendor platform-PySCF（扩展叙事）        | `extensions`                   | partial               | `chem/solvers/pyscf_solver.py` + `chem/bridges/`（legacy `chem/drivers/pyscf_driver.py`）                                                         | **中**     | 气相 RHF/ROHF/UHF、ddCOSMO、PBC（Γ / KRHF）；**非** vendor-pyscf 二进制                                                                                                                                          |
 | Vendor platform-NGLView                  | `extensions`                   | 刻意不做              | —                                                                                     | **无**     | 无 3D 可视化栈                                                                                                                                                                                                      |
 | `vendor.embeddings`（厂商包名） | api / 文档                     | 刻意不做              | `EmbeddingSpec` 等 YAML 表达                                                           | **无**     | 不复制厂商包名级 API                                                                                                                                                                                                |
 
@@ -542,9 +542,9 @@ flowchart TB
 | 镜像 / Vendor platform 相邻名                   | 镜像常见 status | 复现程度 | `qchem_stack` 锚点                     | 备注               |
 | ------------------------------------------ | ----------------- | ---------- | ---------------------------------------- | -------------------- |
 | `vendor.geometries`                    | partial         | **高**   | `MoleculeSpec`、`MolecularSystem`      | 与「几何」行一致   |
-| `vendor.extensions.pyscf`              | partial         | **中**   | `PySCFDriver`、`ChemistryExtendedSpec` | 见 §4 driver 细表 |
+| `vendor.extensions.pyscf`              | partial         | **中**   | `PySCFIntegralSolver` / `classical_mean_field_reference_from_config`；legacy `PySCFDriver`；`ChemistryExtendedSpec` | 见 §4 driver 细表 |
 | `qchem_stack.chem.embedding`（镜像指向） | partial         | **中**   | `chem/embedding`                       | 与 §2 嵌入行一致  |
-| `qchem_stack.chem.drivers.pyscf_driver`  | partial         | **中**   | `chem/drivers/pyscf_driver.py`         | 同上               |
+| `qchem_stack.chem.drivers.pyscf_driver`  | partial         | **中**   | **Deprecated** legacy shim；canonical：`chem/solvers/pyscf_solver.py`         | 同上               |
 
 ---
 
@@ -565,9 +565,9 @@ flowchart TB
 
 | Vendor platform 镜像类                            | 镜像 status（常见）  | 复现程度 | `qchem_stack` 行为                                                                                          |
 | -------------------------------------------- | ---------------------- | ---------- | ------------------------------------------------------------------------------------------------------------- |
-| ChemistryDriverPySCFMolecular**RHF**       | partial              | **高**   | `PySCFDriver.run_rhf()` → `scf.RHF`                                                                        |
-| ChemistryDriverPySCFMolecular**ROHF**      | partial              | **高**   | `run_rohf()` → `scf.ROHF`                                                                                  |
-| ChemistryDriverPySCFMolecular**UHF**       | 占位（若树中为占位） | **高**   | `run_uhf()` → `scf.UHF`；若镜像标占位，**应以源码为准改镜像**                                              |
+| ChemistryDriverPySCFMolecular**RHF**       | partial              | **高**   | `PySCFIntegralSolver.compute_mean_field()` → `scf.RHF`（legacy：`PySCFDriver.run_rhf()`）                                                                        |
+| ChemistryDriverPySCFMolecular**ROHF**      | partial              | **高**   | `compute_mean_field` with ROHF（legacy：`run_rohf()`）                                                                                  |
+| ChemistryDriverPySCFMolecular**UHF**       | 占位（若树中为占位） | **高**   | UHF via solver adapter（legacy：`run_uhf()`）；若镜像标占位，**应以源码为准改镜像**                                              |
 | …Molecular**RHF**QMMMCOSMO                | partial              | **中**   | `solvent_model=ddcosmo` 时 `solvent.ddCOSMO(mf)` 接在 **已构建的 mf** 上；当前主路径与 **RHF+ddCOSMO** 一致 |
 | …Molecular**ROHF**/…**UHF**QMMMCOSMO     | 占位                 | **低**   | **无**与 Vendor platform 一一对应的独立 ROHF/UHF+QM/MM driver 类；是否可接 PySCF 视版本，**未**作产品级承诺        |
 | ChemistryDriverPySCF**GammaRHF**           | partial              | **中**   | `run_pbc_rhf` + `pbc_kpoint_mesh=[1,1,1]` → Γ 点 RHF                                                      |
@@ -628,7 +628,7 @@ Vendor platform 文档中的 **scf.driver** 字面量请以 `pyscf_driver` 支�
 ### 7. 维护约定
 
 - 镜像页 `status` 或 `qchem_module` 变更时：同步检查本文 §4 对应行，并更新 [public_parity_matrix.md](public_parity_matrix.md) §1 经典化学行（若涉及公开承诺）。
-- 新增 PySCF 支路时：更新 `pyscf_driver.py`、`open_driver_coverage_matrix`、相关 YAML/`config` **`Literal`** 与本节 §4 叙述。
+- 新增 PySCF 支路时：更新 `chem/solvers/pyscf_solver.py`、`open_driver_coverage_matrix`、相关 YAML/`config` **`Literal`** 与本节 §4 叙述；legacy `pyscf_driver.py` 仅作兼容层同步。
 
 ---
 

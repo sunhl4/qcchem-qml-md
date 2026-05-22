@@ -10,9 +10,7 @@ from typing import TYPE_CHECKING, Any, cast
 from qchem_stack.chem.embedding.dmet import (
     DMETContext,
     QubitHamiltonianFragmentSolverExact,
-    QubitHamiltonianFragmentSolverVQE,
 )
-from qchem_stack.chem.embedding.schmidt_variational_sidecar import run_schmidt_per_fragment_vqe
 from qchem_stack.config.embedding_enums import (
     DmetHamiltonianSource,
     EmbeddingMode,
@@ -20,13 +18,16 @@ from qchem_stack.config.embedding_enums import (
 )
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels, require_dmet
 from qchem_stack.config.embedding_specs import EmbeddingDmet, EmbeddingPlugin, EmbeddingProjection
+from qchem_stack.config.quantum_helpers import resolve_vqe_depth, resolve_vqe_maxiter
 from qchem_stack.contracts.schema_ids import (
     EMBEDDING_WORKFLOW_V1,
     ONIOM_TOY_V1,
     PROJECTION_EMBEDDING_WORKFLOW_V1,
 )
 from qchem_stack.exceptions import PipelineError
+from qchem_stack.integrations.dmet_fragment_solvers import QubitHamiltonianFragmentSolverVQE
 from qchem_stack.integrations.dmet_self_consistent import OneShotEmbeddingDriver
+from qchem_stack.integrations.schmidt_per_fragment_vqe import run_schmidt_per_fragment_vqe
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -70,8 +71,8 @@ def run_dmet_fragment_solve_if_requested(
         )
     else:
         solver = QubitHamiltonianFragmentSolverVQE(
-            depth=cfg.quantum.vqe.depth,
-            maxiter=cfg.quantum.vqe.maxiter,
+            depth=resolve_vqe_depth(cfg),
+            maxiter=resolve_vqe_maxiter(cfg),
             executor=exe,
             random_seed=cfg.random_seed,
         )
@@ -125,7 +126,7 @@ def apply_embedding_workflow_stage(
             wf["impurity_solver_used"] = (
                 "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverExact"
                 if dmet.fragment_solver.use_exact
-                else "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverVQE"
+                else "qchem_stack.integrations.dmet_fragment_solvers.QubitHamiltonianFragmentSolverVQE"
             )
             if dmet.multifragment_one_shot_shared_hamiltonian:
                 wf["multifragment_one_shot_shared_hamiltonian"] = True
@@ -141,13 +142,13 @@ def apply_embedding_workflow_stage(
                     schmidt.multi_primary_fragment_index
                 )
                 wf["schmidt_dmet_density_feedback_module"] = (
-                    "qchem_stack.integrations.schmidt_dmet_self_consistent."
+                    "qchem_stack.chem.embedding.schmidt_dmet_self_consistent."
                     "run_schmidt_multifragment_density_cycles"
                 )
             else:
                 wf["schmidt_fragment_atom_indices"] = list(schmidt.fragment_atom_indices)
                 wf["schmidt_dmet_density_feedback_module"] = (
-                    "qchem_stack.integrations.schmidt_dmet_self_consistent."
+                    "qchem_stack.chem.embedding.schmidt_dmet_self_consistent."
                     "run_schmidt_density_feedback_cycles"
                 )
         else:

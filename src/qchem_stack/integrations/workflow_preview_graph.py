@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.config.quantum_helpers import (
+    pauli_protocol_enabled,
+    resolve_quantum_algorithm_factory,
+    resolve_variational_algorithm,
+    resolve_variational_ansatz,
+)
 from qchem_stack.contracts.schema_ids import (
     COMPUTABLE_GRAPH_V1,
     COMPUTABLE_GRAPH_V2,
@@ -41,8 +47,8 @@ def protocol_stages_preview_v1(cfg: ExperimentConfig) -> list[dict[str, Any]]:
             "stage_key": "build",
             "title": "Build",
             "hints": [
-                f"algorithm={cfg.quantum.algorithm}",
-                f"ansatz={cfg.quantum.variational.ansatz}",
+                f"algorithm={resolve_variational_algorithm(cfg)}",
+                f"ansatz={resolve_variational_ansatz(cfg)}",
             ],
         },
         {
@@ -65,7 +71,7 @@ def protocol_stages_preview_v1(cfg: ExperimentConfig) -> list[dict[str, Any]]:
             "stage_key": "evaluate",
             "title": "Evaluate",
             "hints": [
-                "pauli_protocol" if cfg.quantum.pauli.use_protocol else "variational_only",
+                "pauli_protocol" if pauli_protocol_enabled(cfg) else "variational_only",
             ],
         },
     ]
@@ -133,11 +139,12 @@ def computable_graph_v2(
     }
     if cfg is not None and (cfg.quantum.graph.extra_edges or cfg.quantum.graph.remove_edges):
         out["declarative_edge_overrides"] = True
-    if cfg is not None and cfg.quantum.algorithm_factory:
+    if cfg is not None and resolve_quantum_algorithm_factory(cfg):
+        factory = resolve_quantum_algorithm_factory(cfg)
         out["variational_execution"] = {
             "schema": VARIATIONAL_YAML_PLUGIN_DISPATCH_V1,
-            "algorithm_factory": cfg.quantum.algorithm_factory,
-            "algorithm_label": cfg.quantum.algorithm,
+            "algorithm_factory": factory,
+            "algorithm_label": resolve_variational_algorithm(cfg),
             "dag_note": "Variational executor selected via YAML algorithm_factory.",
         }
     return out

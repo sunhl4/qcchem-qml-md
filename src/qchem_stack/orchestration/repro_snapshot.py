@@ -16,12 +16,15 @@ from qchem_stack.config.embedding_enums import (
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels
 from qchem_stack.config.embedding_specs import EmbeddingDmet, EmbeddingProjection
 from qchem_stack.config.mitigation_helpers import mitigation_repro_core_fields
-from qchem_stack.config.quantum_helpers import quantum_repro_core_fields
+from qchem_stack.config.quantum_helpers import (
+    classify_pauli_expectation_path_for_config,
+    quantum_repro_core_fields,
+    quantum_repro_sidecar_fields,
+)
 from qchem_stack.contracts.schema_ids import (
     DMET_OPEN_ARCHITECTURE_V1,
     PROJECTION_EMBEDDING_OPEN_TRACE_V1,
 )
-from qchem_stack.protocols.product_contract import classify_pauli_expectation_path
 
 if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
@@ -57,7 +60,7 @@ def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig)
 
         snap["tensornet_closure_reference"] = tensornet_closure_strategy()
     if pis.uccsd_excitation_reference:
-        from qchem_stack.integrations.ucc_reference import count_uccsd_excitations
+        from qchem_stack.chem.kernels.spin_ucc import count_uccsd_excitations
 
         n_so = 2 * resolve_n_orbitals(cfg.active_space)
         ne = resolve_n_electrons(cfg.active_space)
@@ -65,7 +68,7 @@ def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig)
             "n_spin_orbitals": n_so,
             "n_electrons_spin": ne,
             "excitation_counts": count_uccsd_excitations(n_so, ne),
-            "module": "qchem_stack.integrations.ucc_reference",
+            "module": "qchem_stack.chem.kernels.spin_ucc",
             "caveat": "Spatial active space → spin orbitals assumes closed-shell counting; "
             "open-shell or symmetry blocking needs an explicit user mapping.",
         }
@@ -143,9 +146,10 @@ def repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -
     """Falsifiability/parity fields aligned with Methods tables."""
     snap: dict[str, Any] = {
         **quantum_repro_core_fields(cfg),
+        **quantum_repro_sidecar_fields(cfg),
         **mitigation_repro_core_fields(cfg),
         "fermion_qubit_mapping": resolve_fermion_qubit_mapping(cfg.active_space),
-        "pauli_protocol_expectation_path": classify_pauli_expectation_path(cfg.quantum),
+        "pauli_protocol_expectation_path": classify_pauli_expectation_path_for_config(cfg),
         "shots_per_circuit": cfg.backend.shots_per_circuit,
         "target_energy_stderr": cfg.backend.target_energy_stderr,
         "backend_provider": cfg.backend.provider,
@@ -154,43 +158,6 @@ def repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -
         "compiler_preoptimize_passes": list(cfg.compiler.preoptimize_passes),
         "compiler_passes_yaml": list(cfg.compiler.compiler_passes),
         "compiler_bundle_signature": compiler_bundle_signature_from_config(cfg),
-        "pauli_support_max_terms": cfg.quantum.pauli.support_max_terms,
-        "vqd_overlap_exponent_yaml": float(cfg.quantum.excited.vqd.overlap_exponent),
-        "vqd_cobyla_maxiter_yaml": int(cfg.quantum.excited.vqd.cobyla_maxiter),
-        "vqd_after_variational": cfg.quantum.excited.vqd.after_variational,
-        "vqd_n_states": cfg.quantum.excited.vqd.n_states,
-        "vqd_penalty_weight": cfg.quantum.excited.vqd.penalty_weight,
-        "vqd_penalty_weights": cfg.quantum.excited.vqd.penalty_weights,
-        "vqd_optimizer_method_yaml": cfg.quantum.excited.vqd.optimizer_method,
-        "vqd_init_strategy_yaml": cfg.quantum.excited.vqd.init_strategy,
-        "vqd_init_noise_scale_yaml": float(cfg.quantum.excited.vqd.init_noise_scale),
-        "vqd_max_overlap_warn_yaml": cfg.quantum.excited.vqd.max_overlap_warn,
-        "vqd_overlap_mode_yaml": cfg.quantum.excited.vqd.overlap_mode,
-        "vqd_shots_objective": cfg.quantum.excited.vqd.shots_objective,
-        "vqd_shots_overlap": cfg.quantum.excited.vqd.shots_overlap,
-        "vqd_shots_weight": cfg.quantum.excited.vqd.shots_weight,
-        "qse_after_variational": cfg.quantum.excited.qse.after_variational,
-        "qse_subspace_dim": cfg.quantum.excited.qse.subspace_dim,
-        "qse_max_basis": cfg.quantum.excited.qse.max_basis,
-        "qse_shot_mode": cfg.quantum.excited.qse.shot_mode,
-        "qse_shots_per_matrix_element": cfg.quantum.excited.qse.shots_per_matrix_element,
-        "qse_shots_per_ij_term": cfg.quantum.excited.qse.shots_per_ij_term,
-        "sceom_after_variational": cfg.quantum.excited.sceom.after_variational,
-        "sceom_subspace_dim": cfg.quantum.excited.sceom.subspace_dim,
-        "sceom_shots_per_matrix_element": cfg.quantum.excited.sceom.shots_per_matrix_element,
-        "sceom_generator_strategy_yaml": cfg.quantum.excited.sceom.generator_strategy,
-        "vqs_track_after_variational": cfg.quantum.demos.vqs.track_after_variational,
-        "vqs_pipeline_integration": cfg.quantum.demos.vqs.pipeline_integration,
-        "vqs_mode": cfg.quantum.demos.vqs.mode,
-        "vqs_n_times": cfg.quantum.demos.vqs.n_times,
-        "vqs_dt": float(cfg.quantum.demos.vqs.dt),
-        "vqs_rhs_mode_yaml": cfg.quantum.demos.vqs.rhs_mode,
-        "vqs_tangent_fd_epsilon_yaml": float(cfg.quantum.demos.vqs.tangent_fd_epsilon),
-        "qpe_demo_track_after_variational_yaml": cfg.quantum.demos.qpe.track_after_variational,
-        "qpe_pipeline_integration_yaml": cfg.quantum.demos.qpe.pipeline_integration,
-        "qpe_demo_track_n_bits_yaml": int(cfg.quantum.demos.qpe.demo_track_n_bits),
-        "qpe_three_pack_after_variational_yaml": cfg.quantum.demos.qpe.three_pack.after_variational,
-        "qpe_three_pack_time_yaml": float(cfg.quantum.demos.qpe.three_pack.time),
     }
     if qh is not None and qh.meta:
         snap["hamiltonian_meta"] = dict(qh.meta)
@@ -215,8 +182,6 @@ def repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -
     snap["chemistry_extended"] = cfg.chemistry_extended.model_dump(mode="json")
     snap["nexus_analog"] = cfg.nexus_analog.model_dump(mode="json")
     snap["nexus_cloud"] = cfg.nexus_cloud.model_dump(mode="json")
-    snap["tensornet_expectation_stub"] = bool(cfg.quantum.tensornet.expectation_stub)
-    snap["tensornet_contraction_engine"] = cfg.quantum.tensornet.contraction_engine
     from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
 
     snap.update(pre_quantum_hamiltonian_semantics(cfg))

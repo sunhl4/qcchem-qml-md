@@ -9,19 +9,20 @@ import pytest
 
 pytest.importorskip("pyscf")
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver, active_space_integrals
+from qchem_stack.chem.integrals.pyscf_active_space import active_space_integrals
 from qchem_stack.chem.restricted_integral_operator import (
     RestrictedActiveSpaceIntegralOperatorCompact,
     interaction_operator_to_dataframe,
 )
+from qchem_stack.chem.systems.pyscf_factory import pyscf_ao_system_from_config
 from qchem_stack.config import load_experiment_config
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_compact_restores_same_dense_quantities_as_active_space_integrals() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     na, ne = 2, 2
     c0, h1_ref, h2_ref = active_space_integrals(rhf, na, ne)
     compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(
@@ -40,8 +41,7 @@ def test_compact_restores_same_dense_quantities_as_active_space_integrals() -> N
 def test_df_mo_and_spin_sectors_have_rows() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     compact = RestrictedActiveSpaceIntegralOperatorCompact.from_pyscf_rhf(
         rhf, n_active_orbitals=2, n_active_electrons=2
     )
@@ -57,8 +57,7 @@ def test_df_mo_and_spin_sectors_have_rows() -> None:
 def test_ao_system_summary_df_smoke() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    ao = drv.get_system_ao(run_hf=True)
+    ao = pyscf_ao_system_from_config(cfg, run_hf=True)
     dfa = ao.ao_driver_summary_df()
     assert list(dfa.columns) == ["quantity", "value"]
     assert int(dfa.loc[dfa["quantity"] == "nao_nr", "value"].iloc[0]) >= 2

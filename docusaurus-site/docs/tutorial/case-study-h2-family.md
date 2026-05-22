@@ -10,10 +10,22 @@
 
 ## 案例步骤
 
-1. 以 `example_h2` 为基线
+1. 以 `example_h2` 为基线（`scf.driver: pyscf`）
 2. 调整活性空间与算法参数
-3. 比较不同后端和 shots 的输出差异
+3. 比较不同 **量子** backend 和 shots 的输出差异
 4. 汇总 `run_summary` 与 `repro` 做对照表
+
+### 经典化学 driver 变体（同一 H₂ 骨架）
+
+| 主题 | 配置 |
+|------|------|
+| PySCF 默认 canonical | `configs/example_h2.yaml` |
+| Psi4 canonical CASCI | `configs/example_h2_psi4_rhf_sto3g.yaml` |
+| Psi4 Schmidt DMET | `configs/example_h2_psi4_schmidt_dmet.yaml` |
+| Psi4 AVAS | `configs/example_h2_psi4_avas.yaml` |
+| Psi4 Mulliken projection | `configs/example_h2_psi4_projection_mulliken.yaml` |
+
+加载期组合规则见仓库 [`docs/pre_quantum_yaml_matrix.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/pre_quantum_yaml_matrix.md)。
 
 ## 实施建议
 

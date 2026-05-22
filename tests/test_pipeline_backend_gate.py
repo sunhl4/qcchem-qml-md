@@ -5,7 +5,6 @@ from pathlib import Path
 import numpy as np
 import pytest
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
 from qchem_stack.chem.pre_quantum_build import (
     build_pre_quantum_input_with_context,
     schmidt_hamiltonian_and_context,
@@ -15,6 +14,7 @@ from qchem_stack.chem.solvers.registry import register_solver
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 class _MockChemSolver:
@@ -56,7 +56,7 @@ def test_plugin_mode_bypasses_backend_active_space_gate() -> None:
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "example_decomposition_plugin_toy.yaml"
     cfg = load_experiment_config(p)
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     cfg.scf.driver = "psi4"
     pre_q, _ctx = build_pre_quantum_input_with_context(cfg, rhf, cfg_path=p)
     hmeta = pre_q.qubit_hamiltonian.meta
@@ -70,8 +70,9 @@ def test_schmidt_path_rejects_backend_without_schmidt_capability() -> None:
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "example_h2.yaml"
     cfg = load_experiment_config(p)
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
-    cfg.scf.driver = "psi4"
+    rhf = pyscf_rhf_from_config(cfg)
+    register_solver("mockchem", _MockChemSolver)
+    cfg.scf.driver = "mockchem"
     with pytest.raises(PipelineError, match="schmidt_atomic_production"):
         schmidt_hamiltonian_and_context(cfg, rhf)
 
@@ -80,8 +81,9 @@ def test_projection_fragment_mulliken_rejects_backend_without_capability() -> No
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "example_h4_projection_mulliken.yaml"
     cfg = load_experiment_config(p)
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
-    cfg.scf.driver = "psi4"
+    rhf = pyscf_rhf_from_config(cfg)
+    register_solver("mockchem", _MockChemSolver)
+    cfg.scf.driver = "mockchem"
     with pytest.raises(PipelineError, match="projection\\.fragment_mulliken_mo"):
         build_pre_quantum_input_with_context(cfg, rhf, cfg_path=p)
 

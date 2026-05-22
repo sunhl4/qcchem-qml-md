@@ -8,10 +8,6 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 from scipy.optimize import minimize
 
-from qchem_stack.contracts.schema_ids import (
-    TANGELO_DEFLATION_ANALOGY_V1,
-    VQD_CROSS_STACK_SEMANTICS_V1,
-)
 from qchem_stack.quantum.algorithms.vqe import VQE
 from qchem_stack.quantum.statevector import hea_state
 
@@ -23,6 +19,7 @@ if TYPE_CHECKING:
 
 from .excited_basis import (
     _vqd_three_protocol_channels,
+    vqd_cross_stack_semantics_meta,
 )
 
 
@@ -236,7 +233,13 @@ class VQD:
                 "reused_pipeline_ground": reused_ground,
                 "vqd_variety_yaml": "uccsd" if self.prepare_state else "hea",
             }
-            meta.update(_vqd_cross_stack_semantics_meta(self))
+            meta.update(
+                vqd_cross_stack_semantics_meta(
+                    penalty_weight=self.penalty_weight,
+                    penalty_weights_resolved=[],
+                    overlap_mode=self.overlap_mode,
+                )
+            )
             return VQDResult(energies=energies, meta=meta)
 
         lam0 = penalties[0] if penalties else self.penalty_weight
@@ -345,38 +348,11 @@ class VQD:
         }
         if warnings:
             meta["vqd_warnings"] = warnings
-        meta.update(_vqd_cross_stack_semantics_meta(self))
+        meta.update(
+            vqd_cross_stack_semantics_meta(
+                penalty_weight=self.penalty_weight,
+                penalty_weights_resolved=penalties,
+                overlap_mode=self.overlap_mode,
+            )
+        )
         return VQDResult(energies=energies, meta=meta)
-
-
-def _vqd_cross_stack_semantics_meta(vqd: VQD) -> dict[str, Any]:
-    """Cross-stack narrative hooks without claiming closed-source parity."""
-    pw = vqd._resolve_penalties() if vqd.n_states >= 2 else []
-    coeff = float(pw[0]) if pw else float(vqd.penalty_weight)
-    overlap_repr = (
-        "statevector_amplitude_overlap"
-        if vqd.overlap_mode == "statevector_overlap"
-        else "statevector_overlap_with_tangelo_circuit_analogy_reporting"
-    )
-    return {
-        "tangelo_deflation_analogy_v1": {
-            "schema": TANGELO_DEFLATION_ANALOGY_V1,
-            "deflation_coeff_yaml": coeff,
-            "penalty_schedule_resolved": pw,
-            "selected_overlap_mode": vqd.overlap_mode,
-            "open_stack_overlap_representation": overlap_repr,
-            "tangelo_deflation_circuits_analogy": (
-                "Tangelo VQESolver adds deflation via deflation_circuits + deflation_coeff "
-                "on measured overlaps; this stack collapses overlaps into one classical objective."
-            ),
-        },
-        "vqd_cross_stack_semantics_v1": {
-            "schema": VQD_CROSS_STACK_SEMANTICS_V1,
-            "optimization_model": "single_objective_collapsed",
-            "three_protocol_role": "reporting_and_optional_shots_not_triple_optimizer",
-            "note": (
-                "Closed vendor AlgorithmVQD exposes separate ExpectationValue / OverlapSquared computables; "
-                "open stack matches Higgott et al. scalar penalty + optional Pauli/swap-test channels."
-            ),
-        },
-    }

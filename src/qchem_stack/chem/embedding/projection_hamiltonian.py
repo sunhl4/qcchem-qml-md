@@ -10,6 +10,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.chem.bridges.ao_basis_view import require_ao_basis_view
 from qchem_stack.chem.bridges.casci_core_count import casci_ncore_spatial
 from qchem_stack.chem.embedding.active_integrals import casci_spatial_integrals_on_mo_coeff
 from qchem_stack.chem.embedding.ao_fragment import (
@@ -34,6 +35,15 @@ def mulliken_mo_populations_on_atoms(
     atom_indices: list[int],
 ) -> np.ndarray:
     """Legacy PySCF-mf entry point; prefer :func:`ao_fragment.mulliken_mo_populations_on_atoms`."""
+    import warnings
+
+    warnings.warn(
+        "qchem_stack.chem.embedding.projection_hamiltonian.mulliken_mo_populations_on_atoms "
+        "is deprecated; use qchem_stack.chem.embedding.ao_fragment.mulliken_mo_populations_on_atoms "
+        "with an AOBasisView instead.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     from qchem_stack.chem.bridges.ao_basis_view import PySCFAOBasisView
 
     return _mulliken_on_ao(PySCFAOBasisView(_mf=mf), mo, atom_indices)
@@ -62,16 +72,16 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     cfg: ExperimentConfig,
 ) -> tuple[QubitHamiltonian, dict[str, Any]]:
     tag = rhf.backend_tag()
-    if tag not in ("pyscf", "psi4"):
-        raise EmbeddingError(
-            f"projection.fragment_mulliken_mo requires backend pyscf or psi4 (got backend={tag!r})."
-        )
     if cfg.scf.method != "RHF":
         raise EmbeddingError(
             "projection_quantum_hamiltonian='fragment_mulliken_mo' requires scf.method='RHF' in this stack."
         )
 
-    ao = rhf.ao_basis_view()
+    ao = require_ao_basis_view(
+        rhf,
+        context="projection.fragment_mulliken_mo",
+        error_cls=EmbeddingError,
+    )
     mo = np.asarray(ao.mo_coeff_ao(), dtype=float)
     n_mo = int(mo.shape[1])
     ne = int(cfg.active_space.cas.n_electrons)

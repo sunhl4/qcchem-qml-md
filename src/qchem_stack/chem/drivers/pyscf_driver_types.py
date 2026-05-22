@@ -5,6 +5,8 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
+
 if TYPE_CHECKING:
     import numpy as np
 
@@ -32,6 +34,6 @@ def unwrap_pyscf_rhf_for_backend_operations(rhf: PySCFRHFResult) -> PySCFRHFResu
                 e_tot=rhf.e_tot,
                 mo_energy=rhf.mo_energy,
                 molecular_system=rhf.molecular_system,
-                driver_meta=dict(rhf.driver_meta),
+                driver_meta=fork_driver_meta(rhf.driver_meta),
             )
     return rhf

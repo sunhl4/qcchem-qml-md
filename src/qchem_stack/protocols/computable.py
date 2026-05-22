@@ -12,9 +12,24 @@ from typing import TYPE_CHECKING, Any, Protocol
 
 import numpy as np
 
-from qchem_stack.protocols.product_contract import (
-    classify_pauli_expectation_path,
-    pauli_protocol_expectation_path_for_config,
+from qchem_stack.config.quantum_helpers import (
+    classify_pauli_expectation_path_for_config,
+    excited_qse_after_variational,
+    excited_sceom_after_variational,
+    excited_vqd_after_variational,
+    pauli_protocol_enabled,
+    qpe_demo_track_requested,
+    quantum_workflow_preview_vqs_fields,
+    resolve_adapt_max_iter,
+    resolve_excited_qse_subspace_dim,
+    resolve_excited_sceom_subspace_dim,
+    resolve_excited_vqd_n_states,
+    resolve_iqeb_max_rounds,
+    resolve_pauli_grouping,
+    resolve_quantum_algorithm_factory,
+    resolve_variational_algorithm,
+    resolve_vqe_depth,
+    vqs_track_requested,
 )
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
@@ -189,43 +204,45 @@ def specs_from_computable_graph_v2(graph: dict[str, Any]) -> list[ComputableSpec
 def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
     """List what the current YAML is configured to *evaluate* (best-effort, documentation-first)."""
     out: list[ComputableRef] = []
-    q = cfg.quantum
-    if q.algorithm_factory:
+    algo = resolve_variational_algorithm(cfg)
+    if resolve_quantum_algorithm_factory(cfg):
         out.append(
             ComputableRef(
                 "ground_state_energy",
                 "energy",
                 {
-                    "algorithm_label": q.algorithm,
+                    "algorithm_label": algo,
                     "variational_dispatch": "yaml_algorithm_factory_v1",
-                    "algorithm_factory": q.algorithm_factory,
-                    "vqe_depth": q.vqe.depth,
+                    "algorithm_factory": resolve_quantum_algorithm_factory(cfg),
+                    "vqe_depth": resolve_vqe_depth(cfg),
                 },
             )
         )
-    elif q.algorithm == "vqe":
-        out.append(
-            ComputableRef(
-                "ground_state_energy", "energy", {"algorithm": "vqe", "vqe_depth": q.vqe.depth}
-            )
-        )
-    elif q.algorithm in ("adapt", "tetris_adapt"):
+    elif algo == "vqe":
         out.append(
             ComputableRef(
                 "ground_state_energy",
                 "energy",
-                {"algorithm": q.algorithm, "adapt_max_iter": q.adapt.max_iter},
+                {"algorithm": "vqe", "vqe_depth": resolve_vqe_depth(cfg)},
             )
         )
-    elif q.algorithm == "iqeb":
+    elif algo in ("adapt", "tetris_adapt"):
+        out.append(
+            ComputableRef(
+                "ground_state_energy",
+                "energy",
+                {"algorithm": algo, "adapt_max_iter": resolve_adapt_max_iter(cfg)},
+            )
+        )
+    elif algo == "iqeb":
         out.append(
             ComputableRef(
                 "ground_state_energy",
                 "energy",
                 {
                     "algorithm": "iqeb",
-                    "iqeb_max_rounds": q.iqeb.max_rounds,
-                    "vqe_depth": q.vqe.depth,
+                    "iqeb_max_rounds": resolve_iqeb_max_rounds(cfg),
+                    "vqe_depth": resolve_vqe_depth(cfg),
                 },
             )
         )
@@ -235,54 +252,65 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
                 "ground_state_energy",
                 "energy",
                 {
-                    "algorithm": q.algorithm,
-                    "variational_plugin_registry_id": q.algorithm,
-                    "vqe_depth": q.vqe.depth,
+                    "algorithm": algo,
+                    "variational_plugin_registry_id": algo,
+                    "vqe_depth": resolve_vqe_depth(cfg),
                 },
             )
         )
-    if q.pauli.use_protocol:
+    if pauli_protocol_enabled(cfg):
         out.append(
             ComputableRef(
                 "hamiltonian_expectation_pauli_protocol",
                 "energy",
                 {
-                    "pauli_grouping": q.pauli.grouping,
-                    "pauli_protocol_expectation_path": classify_pauli_expectation_path(q),
+                    "pauli_grouping": resolve_pauli_grouping(cfg),
+                    "pauli_protocol_expectation_path": classify_pauli_expectation_path_for_config(
+                        cfg
+                    ),
                 },
             )
         )
-    if q.excited.vqd.after_variational:
-        out.append(
-            ComputableRef("excited_energies_vqd", "spectrum", {"n_states": q.excited.vqd.n_states})
-        )
-    if q.excited.qse.after_variational:
+    if excited_vqd_after_variational(cfg):
         out.append(
             ComputableRef(
-                "excitation_energies_qse", "spectrum", {"subspace_dim": q.excited.qse.subspace_dim}
+                "excited_energies_vqd",
+                "spectrum",
+                {"n_states": resolve_excited_vqd_n_states(cfg)},
             )
         )
-    if q.excited.sceom.after_variational:
+    if excited_qse_after_variational(cfg):
         out.append(
             ComputableRef(
-                "sceom_energies", "spectrum", {"subspace_dim": q.excited.sceom.subspace_dim}
+                "excitation_energies_qse",
+                "spectrum",
+                {"subspace_dim": resolve_excited_qse_subspace_dim(cfg)},
             )
         )
-    if q.qpe_demo_track_requested():
+    if excited_sceom_after_variational(cfg):
+        out.append(
+            ComputableRef(
+                "sceom_energies",
+                "spectrum",
+                {"subspace_dim": resolve_excited_sceom_subspace_dim(cfg)},
+            )
+        )
+    if qpe_demo_track_requested(cfg):
         out.append(
             ComputableRef(
                 "qpe_demo_track", "phase", {"hook": "qpe_qec_demo.kitaev + bayesian_stub"}
             )
         )
-    if q.vqs_track_requested():
+    if vqs_track_requested(cfg):
+        vqs_fields = quantum_workflow_preview_vqs_fields(cfg)
         out.append(
             ComputableRef(
                 "vqs_track",
                 "dynamics",
                 {
                     "hook": "quantum.algorithms.vqs + vqs_pipeline_track",
-                    "vqs_mode": q.demos.vqs.mode,
-                    "vqs_n_times": q.demos.vqs.n_times,
+                    "vqs_mode": vqs_fields["vqs_mode"],
+                    "vqs_n_times": vqs_fields["vqs_n_times"],
                 },
             )
         )
@@ -322,7 +350,7 @@ def computables_export_dict(
     )
     return {
         "schema": "qchem_computable_abstract_v2",
-        "pauli_protocol_expectation_path": pauli_protocol_expectation_path_for_config(cfg),
+        "pauli_protocol_expectation_path": classify_pauli_expectation_path_for_config(cfg),
         "evaluate_note": (
             "Strict evaluate reuse (conservative): each required Pauli label must appear "
             "in hamiltonian_pauli_strings from protocol_counts; see "

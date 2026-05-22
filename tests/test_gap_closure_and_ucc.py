@@ -6,6 +6,10 @@ import numpy as np
 import pytest
 from openfermion.ops import QubitOperator
 
+from qchem_stack.chem.kernels.spin_ucc import (
+    GreedyCommutingFermionicLayers,
+    build_spin_uccsd_fermion_generators,
+)
 from qchem_stack.config import (
     ActiveSpaceSpec,
     BackendSpecConfig,
@@ -15,13 +19,10 @@ from qchem_stack.config import (
     SCFSpec,
 )
 from qchem_stack.integrations.gap_closure_bundle import build_open_gap_closure_reference
-from qchem_stack.integrations.ucc_reference import (
-    GreedyCommutingFermionicLayers,
-    build_spin_uccsd_fermion_generators,
-)
 from qchem_stack.orchestration.pipeline import collect_repro_metadata
 from qchem_stack.tensornet.dense_expectation_reference import expectation_qubit_operator_dense
 from tests.embedding_nested import embedding_dmet
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_open_gap_closure_reference_has_schemas() -> None:
@@ -75,15 +76,13 @@ def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
 
     from qchem_stack.backends.executor_base import StatevectorHeaExecutor
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
     from qchem_stack.config import load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),
@@ -91,11 +90,7 @@ def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
         molecular_system=rhf.molecular_system,
         driver_meta=dict(rhf.driver_meta),
     )
-    qh = molecular_hamiltonian_from_classical_reference(
-        ref,
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-    )
+    qh = build_pre_quantum_input(cfg, ref).hamiltonian
     ur = UCCSDVQE(qh, executor=StatevectorHeaExecutor()).run(maxiter=400, seed=42)
     assert ur.meta.get("jw_fixed_electron_sector_projection") is True
     e = float(ur.energy)
@@ -111,15 +106,13 @@ def test_uccsd_vqe_h2_bravyi_kitaev_energy_window() -> None:
 
     from qchem_stack.backends.executor_base import StatevectorHeaExecutor
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
     from qchem_stack.config import load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),
@@ -127,12 +120,18 @@ def test_uccsd_vqe_h2_bravyi_kitaev_energy_window() -> None:
         molecular_system=rhf.molecular_system,
         driver_meta=dict(rhf.driver_meta),
     )
-    qh = molecular_hamiltonian_from_classical_reference(
-        ref,
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-        fermion_qubit_mapping="bravyi_kitaev",
+    cfg_bk = cfg.model_copy(
+        update={
+            "active_space": cfg.active_space.model_copy(
+                update={
+                    "mapping": cfg.active_space.mapping.model_copy(
+                        update={"fermion_qubit": "bravyi_kitaev"}
+                    )
+                }
+            )
+        }
     )
+    qh = build_pre_quantum_input(cfg_bk, ref).hamiltonian
     ur = UCCSDVQE(qh, executor=StatevectorHeaExecutor()).run(maxiter=400, seed=7)
     assert ur.meta.get("fermion_to_qubit_map") == "bravyi_kitaev"
     assert ur.meta.get("jw_fixed_electron_sector_projection") is False

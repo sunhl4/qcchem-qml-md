@@ -36,7 +36,39 @@ def test_experiment_validation_rejects_avas_without_labels() -> None:
         ExperimentConfig.from_yaml_dict(raw)
 
 
-def test_experiment_validation_rejects_avas_on_psi4_driver() -> None:
+def test_experiment_validation_rejects_avas_on_driver_without_capability() -> None:
+    from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
+    from qchem_stack.chem.solvers.registry import register_solver
+    from tests.helpers.solver_registry_state import reset_solver_registry_state
+
+    reset_solver_registry_state()
+
+    class _MockChemSolver:
+        def __init__(self, cfg: ExperimentConfig) -> None:
+            self.cfg = cfg
+
+        @property
+        def capabilities(self) -> SolverCapabilities:
+            return SolverCapabilities(
+                backend_id="mockchem",
+                supports_molecular_scf=True,
+                supports_avas_active_space_projection=False,
+            )
+
+        def set_physical_data(self, cfg: ExperimentConfig) -> None:
+            self.cfg = cfg
+
+        def compute_mean_field(self, *, periodic: bool = False) -> MolecularMeanFieldResult:
+            import numpy as np
+
+            return MolecularMeanFieldResult(
+                mf={"backend": "mockchem"},
+                e_tot=0.0,
+                mo_energy=np.zeros(2),
+                driver_meta={"driver_family": "mockchem"},
+            )
+
+    register_solver("mockchem", _MockChemSolver)
     raw = {
         "schema_version": "2",
         "experiment_id": "bad_avas_driver",
@@ -49,10 +81,11 @@ def test_experiment_validation_rejects_avas_on_psi4_driver() -> None:
             "multiplicity": 1,
             "basis": "sto-3g",
         },
-        "scf": {"driver": "psi4", "method": "RHF"},
-        "active_space": {"strategy": "avas", "ncas": 2, "nelecas": 2},
-        "chemistry_extended": {"avas_ao_labels": ["H 1s"]},
-        "quantum": {"use_pauli_protocol": False},
+        "scf": {"driver": "mockchem", "method": "RHF"},
+        "active_space": {"strategy": "avas", "cas": {"n_orbitals": 2, "n_electrons": 2}},
+        "chemistry_extended": {"avas": {"ao_labels": ["H 1s"]}},
+        "quantum": {"algorithm": "vqe", "vqe": {"depth": 1, "maxiter": 5}},
+        "embedding": {"mode": "none"},
     }
     with pytest.raises(ConfigurationError, match="supports_avas_active_space_projection"):
         ExperimentConfig.from_yaml_dict(raw)
@@ -74,25 +107,36 @@ def test_pipeline_h2_avas_sets_resolution_and_executes_projection() -> None:
     assert int(res["n_active_electrons"]) == 2
 
 
-def test_pyscf_driver_from_mean_field_and_ncas_helper() -> None:
+def test_mean_field_spin_symmetry_and_ncas_helper() -> None:
     pytest.importorskip("pyscf")
+    import numpy as np
     from pyscf import gto, scf
 
+    from qchem_stack.chem.active_space.sizing import (
+        classify_mean_field_spin_symmetry,
+        ncas_nelec_couplet,
+    )
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+    from qchem_stack.chem.system import MolecularSystem
     from qchem_stack.config import ActiveSpaceSpec
+    from qchem_stack.config.active_space_specs import ActiveSpaceCasSpec
 
     mol = gto.M(atom="H 0 0 0; H 0 0 1.4", basis="sto3g")
     mf = scf.RHF(mol).run()
-    drv = PySCFDriver.from_pyscf_mean_field(
-        mf, active_space=ActiveSpaceSpec(strategy="cas", ncas=2, nelecas=2)
+    assert classify_mean_field_spin_symmetry(mf) == "RHF"
+    ms = MolecularSystem(
+        symbols=["H", "H"],
+        coordinates_bohr=np.asarray([[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]], dtype=float),
+        charge=0,
+        multiplicity=1,
+        basis="sto-3g",
     )
-    assert drv.classify_mean_field_spin_symmetry(mf) == "RHF"
     ref = ClassicalMeanFieldReference(
         mf=mf,
         e_tot=float(mf.e_tot),
         mo_energy=mf.mo_energy,
-        molecular_system=drv.system,
+        molecular_system=ms,
         driver_meta={"upstream_classical_software_tag": "pyscf"},
     )
-    assert drv.get_ncas_nelec_couplet(resolved_reference=ref) == (2, 2)
+    asp = ActiveSpaceSpec(strategy="cas", cas=ActiveSpaceCasSpec(n_orbitals=2, n_electrons=2))
+    assert ncas_nelec_couplet(asp, reference=ref) == (2, 2)

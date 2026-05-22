@@ -102,7 +102,7 @@ def test_pack_cache_key_changes_with_driver_meta_and_geometry() -> None:
         mo_energy=rhf.mo_energy.copy(),
         molecular_system=type(ms)(
             symbols=list(ms.symbols),
-            coordinates=ms_shift,
+            coordinates_bohr=ms_shift,
             charge=int(ms.charge),
             multiplicity=int(ms.multiplicity),
             basis=str(ms.basis),

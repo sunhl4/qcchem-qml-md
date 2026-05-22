@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from qchem_stack.chem.integration.checklist import run_integration_checklist
-from qchem_stack.chem.integration.driver_meta import (
+from qchem_stack.chem.integration.meta_schema import (
     append_kernel_bindings,
     merge_integration_driver_meta,
 )
@@ -60,6 +60,18 @@ def test_psi4_capabilities_include_notes() -> None:
     caps = Psi4IntegralSolver.from_experiment_config(cfg).capabilities
     assert caps.supports_pbc_k_mesh is False
     assert "avas_active_space_projection" in caps.capability_notes
+
+
+def test_integration_presets_public_exports() -> None:
+    from qchem_stack.chem.integration import (
+        capabilities_precomputed_offline,
+        capabilities_psi4_production,
+        capabilities_pyscf_production,
+    )
+
+    assert capabilities_pyscf_production().backend_id == "pyscf"
+    assert capabilities_psi4_production().backend_id == "psi4"
+    assert capabilities_precomputed_offline().backend_id == "precomputed"
 
 
 def test_integration_checklist_template_solver() -> None:

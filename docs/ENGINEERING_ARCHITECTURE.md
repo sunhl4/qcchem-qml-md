@@ -7,11 +7,11 @@ This document anchors **qchem‑stack internals**: layering, HTTP contracts wher
 | Layer | Packages / modules | Responsibility |
 |--------|-------------------|----------------|
 | **Domain config** | `qchem_stack.config` | Pydantic `ExperimentConfig` — single source of truth for YAML, validation, cost guards. |
-| **Chemistry drivers / adapters** | `qchem_stack.chem.*` (`chem.solvers`, **`chem.bridges`**) | `ChemIntegralSolver` registry + **interchange façade** (`classical_mean_field_via_solver_bridge` → `MolecularMeanFieldResult`); Hamiltonian builders, Schmidt / DMET *shapes*. |
-| **Quantum algorithms** | `qchem_stack.quantum.*` | VQE, ADAPT, excited-state drivers — no YAML parsing. |
+| **Chemistry drivers / adapters** | `qchem_stack.chem.*` (`chem.solvers`, **`chem.bridges`**, **`chem.embedding`**, **`chem.kernels`**) | `ChemIntegralSolver` registry + **interchange façade** (`classical_mean_field_via_solver_bridge` → `MolecularMeanFieldResult`); Hamiltonian builders, Schmidt / DMET shapes; L3 numerical kernels (NEVPT2/RDM, FCI delegates) live in `chem.kernels` / embedding modules. |
+| **Quantum algorithms** | `qchem_stack.quantum.*` | VQE, ADAPT, excited-state drivers — no YAML parsing. Style: [`quantum_模块风格约定.md`](quantum_模块风格约定.md). |
 | **Backends & protocol** | `qchem_stack.backends.*`, `qchem_stack.protocols.*` | Executor abstraction, Pauli averaging, resource rows. |
 | **Orchestration** | `qchem_stack.orchestration` | `run_pipeline_sync` / `run_pipeline_from_config` — **wires** layers; logging at INFO. |
-| **Integrations** | `qchem_stack.integrations` | TKET/qnexus/Qermit *analogs*, gap-closure reference bundles, Schmidt↔DMET loop glue. |
+| **Integrations** | `qchem_stack.integrations` | TKET/qnexus/Qermit *analogs*, gap-closure reference bundles, Schmidt↔VQE orchestration glue; **compat re-export shims** for moved chem modules. |
 | **Jobs / cloud analogs** | `qchem_stack.jobs` | SQLite worker, Nexus-shaped ledgers — async boundary. |
 | **Repro export** | `qchem_stack.repro` | Strict JSON for `repro` blobs (no silent `default=str`). |
 | **Errors** | `qchem_stack.exceptions` | Typed base errors for ops and API gateways. |
@@ -38,6 +38,8 @@ The project is pinned to this invariant:
 
 ## 1.2 PySCF boundary refactor (maintainer note)
 
+**Canonical path (new code):** `create_solver` → `PySCFIntegralSolver` → `classical_mean_field_reference_from_config` → `build_pre_quantum_input`. Legacy `PySCFDriver` remains a thin compatibility facade.
+
 To keep `PySCFDriver` as a compatibility facade (not a monolithic implementation file), PySCF-specific computation helpers are split by responsibility:
 
 - **Driver facade / onboarding / workflow glue**: `qchem_stack.chem.drivers.pyscf_driver`
@@ -45,6 +47,8 @@ To keep `PySCFDriver` as a compatibility facade (not a monolithic implementation
 - **One-electron operator builders (fermion / Pauli)**: `qchem_stack.chem.integrals.pyscf_onebody`
 - **Lowdin AO transformed views**: `qchem_stack.chem.integrals.pyscf_lowdin`
 - **AO / Lowdin data view dataclasses**: `qchem_stack.chem.systems.pyscf_views`
+
+Naming: `qchem_stack.chem.system` holds backend-agnostic `MolecularSystem`; `qchem_stack.chem.systems` holds backend-specific view dataclasses (currently PySCF only).
 
 Maintainer rule:
 

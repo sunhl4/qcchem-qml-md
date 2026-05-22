@@ -5,6 +5,12 @@ from typing import TYPE_CHECKING, Any
 from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
 from qchem_stack.config.embedding_enums import DmetHamiltonianSource, EmbeddingMode
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels, require_dmet
+from qchem_stack.config.quantum_helpers import (
+    pauli_run_qiskit_shots,
+    resolve_tensornet_contraction_engine,
+    resolve_vqe_depth,
+    tensornet_expectation_stub_enabled,
+)
 from qchem_stack.contracts.schema_ids import (
     CUTENSORTNET_PROTOCOL_STUB_V1,
     SCHMIDT_PER_FRAGMENT_VQE_PARITY_SUMMARY_V1,
@@ -99,7 +105,7 @@ def finalize_open_stack_parity_snapshot(
         else:
             labels = nonempty_fragment_labels(emb) or ["fragment_0"]
             ctx = DMETContext(
-                fragments=labels, solver=VQEFragmentSolverStub(depth=cfg.quantum.vqe.depth)
+                fragments=labels, solver=VQEFragmentSolverStub(depth=resolve_vqe_depth(cfg))
             )
             hams = {
                 fid: {
@@ -128,8 +134,8 @@ def finalize_open_stack_parity_snapshot(
             str(st) if st is not None else "cutensornet_stub_no_status"
         )
     elif pis.enabled:
-        snap["tensornet_engine_resolved"] = str(cfg.quantum.tensornet.contraction_engine)
-        if cfg.quantum.tensornet.expectation_stub:
+        snap["tensornet_engine_resolved"] = resolve_tensornet_contraction_engine(cfg)
+        if tensornet_expectation_stub_enabled(cfg):
             snap["tensornet_fallback_reason"] = "tensornet_stub_not_emitted_pipeline_branch"
         else:
             snap["tensornet_fallback_reason"] = "tensornet_expectation_stub_disabled"
@@ -141,7 +147,7 @@ def finalize_open_stack_parity_snapshot(
         snap["uccsd_trotter_steps"] = int(vm["uccsd_trotter_steps"])
 
     pc_fold = out.get("protocol_counts")
-    if cfg.mitigation.zne.enabled and cfg.quantum.pauli.run_qiskit_shots:
+    if cfg.mitigation.zne.enabled and pauli_run_qiskit_shots(cfg):
         zm = cfg.mitigation.zne.mode
         proto_mode = pc_fold.get("zne_mode") if isinstance(pc_fold, dict) else None
         fb = pc_fold.get("zne_circuit_fold_fallback_reason") if isinstance(pc_fold, dict) else None

@@ -81,6 +81,10 @@ def test_plugin_takes_priority_over_canonical() -> None:
         ("example_h2_precomputed_bundle.yaml", PreQuantumPath.PRECOMPUTED_BUNDLE),
         ("example_decomposition_plugin_toy.yaml", PreQuantumPath.EMBEDDING_PLUGIN),
         ("example_h4_projection_mulliken.yaml", PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO),
+        (
+            "example_h2_psi4_projection_mulliken.yaml",
+            PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO,
+        ),
     ],
 )
 def test_semantics_branch_matches_resolve(yaml_name: str, expected: PreQuantumPath) -> None:

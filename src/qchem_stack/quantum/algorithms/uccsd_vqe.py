@@ -12,6 +12,8 @@ Transforms:
 does not match the JW/BK-square layout required here.
 
 Trotterized cluster prep (:class:`UCCSDTrotterVQE`) inherits the same mapping semantics as the dense chain.
+
+Mapping helpers live in :mod:`~qchem_stack.quantum.algorithms.uccsd_mapping`.
 """
 
 from __future__ import annotations
@@ -20,63 +22,22 @@ from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
-import openfermion as of
-from openfermion import bravyi_kitaev, get_sparse_operator, jordan_wigner
 from openfermion.linalg.sparse_tools import jw_number_indices
-from openfermion.ops import FermionOperator, QubitOperator
 from scipy.linalg import expm
 from scipy.optimize import minimize
 
+from qchem_stack.chem.kernels.spin_ucc import build_spin_uccsd_fermion_generators
 from qchem_stack.contracts.schema_ids import UCCSD_MAPPING_SUPPORT_MATRIX_V1
-from qchem_stack.integrations.ucc_reference import build_spin_uccsd_fermion_generators
+from qchem_stack.quantum.algorithms.uccsd_mapping import (
+    antihermitian_cluster_matrices,
+    reference_state_dense,
+)
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
-
-
-def _occupied_string_creation_op(n_electrons: int) -> FermionOperator:
-    op = FermionOperator(())
-    for spin_orb_idx in range(int(n_electrons)):
-        op *= FermionOperator(((int(spin_orb_idx), 1),), 1.0)
-    return op
-
-
-def _map_fermion_generator(
-    ferm_op: FermionOperator,
-    mapping: str,
-) -> QubitOperator:
-    if mapping == "jordan_wigner":
-        q = jordan_wigner(ferm_op)
-    elif mapping == "bravyi_kitaev":
-        q = bravyi_kitaev(ferm_op)
-    else:
-        raise ValueError(f"Unsupported fermion_to_qubit_map for UCCSDVQE: {mapping!r}")
-    if not isinstance(q, QubitOperator):
-        raise TypeError(f"Expected QubitOperator from OpenFermion map, got {type(q)}")
-    return q
-
-
-def _reference_state_dense(*, mapping: str, n_spin_orbitals: int, n_electrons: int) -> np.ndarray:
-    if mapping == "jordan_wigner":
-        v = np.asarray(
-            of.jw_hartree_fock_state(int(n_electrons), int(n_spin_orbitals)), dtype=np.complex128
-        ).ravel()
-    elif mapping == "bravyi_kitaev":
-        fop = _occupied_string_creation_op(int(n_electrons))
-        q_op = bravyi_kitaev(fop)
-        mat = get_sparse_operator(q_op, n_qubits=int(n_spin_orbitals))
-        vac = np.zeros(2 ** int(n_spin_orbitals), dtype=np.complex128)
-        vac[0] = 1.0
-        v = np.asarray(mat @ vac, dtype=np.complex128).ravel()
-    else:
-        raise ValueError(mapping)
-    nrm = float(np.linalg.norm(v))
-    if nrm < 1e-14:
-        raise ValueError("UCCSD reference state has zero norm.")
-    return v / nrm
 
 
 @dataclass
@@ -125,17 +86,15 @@ class UCCSDVQE:
             )
 
         ferm_ops = build_spin_uccsd_fermion_generators(self._n_so, self._n_e)
-        self._antiherm_mats: list[np.ndarray] = []
-        for fer in ferm_ops:
-            qop = _map_fermion_generator(fer, self._fermion_mapping)
-            sm = get_sparse_operator(qop, n_qubits=self.n_qubits)
-            d = sm.toarray()
-            a = d - np.conjugate(d.T)
-            self._antiherm_mats.append(np.asarray(a, dtype=np.complex128))
+        self._antiherm_mats = antihermitian_cluster_matrices(
+            ferm_ops,
+            mapping=self._fermion_mapping,
+            n_qubits=self.n_qubits,
+        )
         self.n_params = len(self._antiherm_mats)
 
     def _reference_state(self) -> np.ndarray:
-        return _reference_state_dense(
+        return reference_state_dense(
             mapping=self._fermion_mapping,
             n_spin_orbitals=self._n_so,
             n_electrons=self._n_e,
@@ -173,17 +132,33 @@ class UCCSDVQE:
         """Dense statevector for variational parameters (e.g. VQD deflation on the UCCSD ansatz)."""
         return self._state_from_angles(np.asarray(angles, dtype=float))
 
-    def run(
+    def _run_meta_base(self) -> dict[str, Any]:
+        proj_meta = self._fermion_mapping == "jordan_wigner"
+        meta: dict[str, Any] = {
+            "variational_ansatz": "uccsd",
+            "uccsd_n_parameters": self.n_params,
+            "fermion_to_qubit_map": self._fermion_mapping,
+            "jw_fixed_electron_sector_projection": proj_meta,
+        }
+        if self._fermion_mapping == "bravyi_kitaev":
+            meta["mapping_note"] = (
+                "BK-encoded reference + BK-matched cluster exponentials on square Hilbert; "
+                "no JW particle-sector projector."
+            )
+        return meta
+
+    def _run_variational_optimize(
         self,
-        maxiter: int = 200,
         *,
-        seed: int = 0,
-        executor: HamiltonianExpectationExecutor | None = None,
-        record_energy_trace: bool = False,
-        scipy_method: str = "COBYLA",
-        bounds: Sequence[tuple[float, float]] | None = None,
-        initial_parameters: np.ndarray | None = None,
-        scipy_options: dict[str, Any] | None = None,
+        maxiter: int,
+        seed: int,
+        executor: HamiltonianExpectationExecutor | None,
+        record_energy_trace: bool,
+        scipy_method: str,
+        bounds: Sequence[tuple[float, float]] | None,
+        initial_parameters: np.ndarray | None,
+        scipy_options: dict[str, Any] | None,
+        extra_meta: dict[str, Any] | None = None,
     ) -> UCCSDVQEResult:
         exe = executor or self._executor
         rng = np.random.default_rng(seed)
@@ -219,20 +194,11 @@ class UCCSDVQE:
         if bounds is not None:
             kwargs["bounds"] = list(bounds)
         res = minimize(**kwargs)
-        proj_meta = self._fermion_mapping == "jordan_wigner"
-        meta: dict[str, Any] = {
-            "scipy_message": str(res.message),
-            "variational_ansatz": "uccsd",
-            "uccsd_n_parameters": self.n_params,
-            "fermion_to_qubit_map": self._fermion_mapping,
-            "jw_fixed_electron_sector_projection": proj_meta,
-            "scipy_method": str(scipy_method),
-        }
-        if self._fermion_mapping == "bravyi_kitaev":
-            meta["mapping_note"] = (
-                "BK-encoded reference + BK-matched cluster exponentials on square Hilbert; "
-                "no JW particle-sector projector."
-            )
+        meta = self._run_meta_base()
+        if extra_meta:
+            meta.update(extra_meta)
+        meta["scipy_message"] = str(res.message)
+        meta["scipy_method"] = str(scipy_method)
         if bounds is not None:
             meta["uccsd_parameter_bounds"] = [list(b) for b in bounds]
         if record_energy_trace:
@@ -242,6 +208,29 @@ class UCCSDVQE:
             angles=np.asarray(res.x, dtype=float),
             nfev=nfev,
             meta=meta,
+        )
+
+    def run(
+        self,
+        maxiter: int = 200,
+        *,
+        seed: int = 0,
+        executor: HamiltonianExpectationExecutor | None = None,
+        record_energy_trace: bool = False,
+        scipy_method: str = "COBYLA",
+        bounds: Sequence[tuple[float, float]] | None = None,
+        initial_parameters: np.ndarray | None = None,
+        scipy_options: dict[str, Any] | None = None,
+    ) -> UCCSDVQEResult:
+        return self._run_variational_optimize(
+            maxiter=maxiter,
+            seed=seed,
+            executor=executor,
+            record_energy_trace=record_energy_trace,
+            scipy_method=scipy_method,
+            bounds=bounds,
+            initial_parameters=initial_parameters,
+            scipy_options=scipy_options,
         )
 
 
@@ -284,65 +273,19 @@ class UCCSDTrotterVQE(UCCSDVQE):
         initial_parameters: np.ndarray | None = None,
         scipy_options: dict[str, Any] | None = None,
     ) -> UCCSDVQEResult:
-        exe = executor or self._executor
-        rng = np.random.default_rng(seed)
-        if initial_parameters is not None:
-            x0 = np.asarray(initial_parameters, dtype=float).ravel()
-            if x0.shape != (self.n_params,):
-                raise ValueError(
-                    f"initial_parameters must have shape ({self.n_params},), got {x0.shape}"
-                )
-        else:
-            x0 = rng.uniform(-np.pi, np.pi, size=self.n_params)
-        nfev = 0
-        trace: list[float] = []
-
-        def objective(x: np.ndarray) -> float:
-            nonlocal nfev
-            nfev += 1
-            st = self._state_from_angles(x)
-            val = float(exe.expectation_state(st, self.h_op, self.n_qubits))
-            if record_energy_trace:
-                trace.append(val)
-            return val
-
-        opts: dict[str, Any] = {"maxiter": int(maxiter)}
-        if scipy_options:
-            opts.update(scipy_options)
-        kwargs: dict[str, Any] = {
-            "fun": objective,
-            "x0": x0,
-            "method": str(scipy_method),
-            "options": opts,
-        }
-        if bounds is not None:
-            kwargs["bounds"] = list(bounds)
-        res = minimize(**kwargs)
-        proj_meta = self._fermion_mapping == "jordan_wigner"
-        meta: dict[str, Any] = {
-            "scipy_message": str(res.message),
-            "variational_ansatz": "uccsd",
-            "uccsd_n_parameters": self.n_params,
-            "uccsd_trotter_steps": self._n_trotter_steps,
-            "uccsd_product_formula": "first_order_layer_repeat",
-            "fermion_to_qubit_map": self._fermion_mapping,
-            "jw_fixed_electron_sector_projection": proj_meta,
-            "scipy_method": str(scipy_method),
-        }
-        if self._fermion_mapping == "bravyi_kitaev":
-            meta["mapping_note"] = (
-                "BK-encoded reference + BK-matched cluster exponentials on square Hilbert; "
-                "no JW particle-sector projector."
-            )
-        if bounds is not None:
-            meta["uccsd_parameter_bounds"] = [list(b) for b in bounds]
-        if record_energy_trace:
-            meta["energy_trace"] = list(trace)
-        return UCCSDVQEResult(
-            energy=float(res.fun),
-            angles=np.asarray(res.x, dtype=float),
-            nfev=nfev,
-            meta=meta,
+        return self._run_variational_optimize(
+            maxiter=maxiter,
+            seed=seed,
+            executor=executor,
+            record_energy_trace=record_energy_trace,
+            scipy_method=scipy_method,
+            bounds=bounds,
+            initial_parameters=initial_parameters,
+            scipy_options=scipy_options,
+            extra_meta={
+                "uccsd_trotter_steps": self._n_trotter_steps,
+                "uccsd_product_formula": "first_order_layer_repeat",
+            },
         )
 
 

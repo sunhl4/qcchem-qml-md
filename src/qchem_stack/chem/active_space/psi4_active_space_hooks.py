@@ -7,9 +7,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from qchem_stack.chem.active_space.avas_projection import apply_avas_projection
-from qchem_stack.chem.active_space.pyscf_active_space_hooks import (
-    RESOLVED_ACTIVE_SPACE_META_KEY,
-)
+from qchem_stack.chem.active_space.resolution import RESOLVED_ACTIVE_SPACE_META_KEY
 from qchem_stack.chem.bridges.ao_basis_view import ao_basis_view_from_reference
 from qchem_stack.contracts.schema_ids import CASSCF_ORBITAL_AUDIT_V1
 from qchem_stack.exceptions import PipelineError
@@ -58,7 +56,6 @@ class Psi4ActiveSpaceHooks:
 
         nmo = int(wfn.nmo())
         nfrozen = nmo - ncas
-        nelec // 2
         psi4.set_options(
             {
                 "reference": "rhf",

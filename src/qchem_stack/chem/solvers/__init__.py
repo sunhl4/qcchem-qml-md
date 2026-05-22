@@ -1,4 +1,9 @@
+# pyright: reportUnsupportedDunderAll=false
 """Pluggable classical integral / mean-field backends (Tangelo-style ``IntegralSolver`` analog)."""
+
+from __future__ import annotations
+
+from typing import Any
 
 from qchem_stack.chem.solvers.adapter_contract import (
     SolverAdapterContractReport,
@@ -17,7 +22,6 @@ from qchem_stack.chem.solvers.mock_external_solver_example import (
     MockExternalIntegralSolver,
     register_mock_external_solver,
 )
-from qchem_stack.chem.solvers.precomputed_solver import PrecomputedIntegralSolver
 from qchem_stack.chem.solvers.registry import (
     InvalidSolverIdError,
     SolverRegistrationInfo,
@@ -49,3 +53,11 @@ __all__ = [
     "set_entrypoint_conflict_policy",
     "validate_solver_adapter_contract",
 ]
+
+
+def __getattr__(name: str) -> Any:
+    if name == "PrecomputedIntegralSolver":
+        from qchem_stack.chem.solvers.precomputed_solver import PrecomputedIntegralSolver
+
+        return PrecomputedIntegralSolver
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

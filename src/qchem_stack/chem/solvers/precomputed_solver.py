@@ -8,11 +8,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.integration.presets import capabilities_precomputed_offline
 from qchem_stack.chem.precomputed_bundle import molecular_mean_field_result_from_bundle
-from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
     from qchem_stack.config import ExperimentConfig
 
 
@@ -38,25 +39,7 @@ class PrecomputedIntegralSolver:
 
     @property
     def capabilities(self) -> SolverCapabilities:
-        return SolverCapabilities(
-            backend_id="precomputed",
-            supports_molecular_scf=True,
-            supports_pbc_scf=False,
-            supports_rhf=True,
-            supports_rohf=True,
-            supports_uhf=True,
-            supports_implicit_solvent_ddcosmo=False,
-            supports_qmmm=False,
-            supports_restricted_active_space_qubit_hamiltonian=False,
-            supports_projection_fragment_mulliken_hamiltonian=False,
-            supports_schmidt_atomic_hamiltonian=False,
-            supports_embedding_input_ao_lowdin=False,
-            supports_casscf_orbital_audit=False,
-            supports_avas_active_space_projection=False,
-            supports_rdm_correction_hooks=False,
-            supports_rdm_nevpt2_casci=False,
-            supports_get_integrals=False,
-        )
+        return capabilities_precomputed_offline()
 
     @classmethod
     def from_experiment_config(cls, cfg: ExperimentConfig) -> PrecomputedIntegralSolver:

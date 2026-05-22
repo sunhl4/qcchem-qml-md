@@ -7,7 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
 
-from qchem_stack.chem.integration.driver_meta import (
+from qchem_stack.chem.integration.meta_schema import (
     binding_mean_field_scf,
     merge_integration_driver_meta,
 )

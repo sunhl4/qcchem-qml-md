@@ -219,13 +219,13 @@ AVAS **分岔处理**：
 
 ## 6. **`qchem_stack` 对齐与已知局限**
 
-本节据 **`ActiveSpaceSpec`、**`chem.active_space.mean_field_meta`**、`chem/drivers/pyscf_driver.py`、`integrations/open_driver_surface`、CASCI glue**写成；随代码演进请以 **`src/qchem_stack/chem/active_space/`、`config.py`、`pyscf_driver.py`** 为准。
+本节据 **`ActiveSpaceSpec`、**`chem.active_space.mean_field_meta`**、`chem/solvers/pyscf_solver.py`、`chem/integrals/pyscf_active_space.py`、`integrations/open_driver_surface`、CASCI glue**写成；随代码演进请以 **`src/qchem_stack/chem/active_space/`、`config.py`、`chem/solvers/`、`chem/bridges/reference_factory.py`** 为准（legacy `chem/drivers/pyscf_driver.py` 仅兼容）。
 
 | Vendor platform 教程概念 | **`qchem_stack` 近似 / 等价** |
 |-------------------|------------------------------|
 | `frozen=[…]` 驱动级改变活性 MO 集合 | **`active_space.strategy=manual`** + **`frozen_orbitals`** 当前 **记入 `driver_meta` / recipe**（`pipeline._run_scf`），**不等价于自动重排 **`mo_coeff`**；默认 **`active_space_casci_raw_blocks`** 仍按 **PySCF `CASCI` 与传入 MO 次序**截取——需非连续 frozen 时请 **自行置换 MO 列**或走 **embedding/projection** 路径。 |
 | `FromActiveSpace` | **`strategy=cas`** + **`ncas` / `nelecas`**（或 legacy `n_active_*`）；对应 **CAS(n e , n o)** **尺寸**。 |
-| `AVAS` **阈值投影**（PySCF、`mo_coeff` 再接 CASCI） | **`strategy=avas`**（**仅** `scf.driver=pyscf`，**必须**非空 **`chemistry_extended.avas_ao_labels`**）；`configs/example_h2_avas.yaml`；钩子 **`chem.active_space.pyscf_active_space_hooks`**；写入 **`qchem_active_space_resolution_v1`** + **`avas_atomic_projection_executed`**；管线回填 **`ncas`/`nelecas`** 与 **`SolverCapabilities.supports_avas_active_space_projection`** 门控。 |
+| `AVAS` **阈值投影**（PySCF `mcscf.avas` 核、`mo_coeff` 再接 CASCI） | **`strategy=avas`**（**必须**非空 **`chemistry_extended.avas.ao_labels`** + **`supports_avas_active_space_projection`**）；PySCF：`configs/example_h2_avas.yaml`；Psi4：`configs/example_h2_psi4_avas.yaml`（MO 导入 shadow 后同一 AVAS 核）；实现 **`chem.active_space.avas_projection`**；写入 **`qchem_active_space_resolution_v1`** + **`avas_atomic_projection_executed`**；管线回填 **`ncas`/`nelecas`**。 |
 | **`AVAS` stub（parity 钩子，无阈值投影）** | **`strategy=avas_stub`**（CAS 同款 **`ncas`/`nelecas`**）；**meta**：`avas_partial_stub`、`avas_atomic_projection_executed=false`、`avas_stub_semantics`。**`avas_ao_labels`** 在非 **`strategy=avas`** 下仍为 **仅日志**。 |
 | `get_restricted_active_space_quantum_problem`（量子哈密顿流水线） | 提供 **`RestrictedActiveSpaceQuantumProblem`**：**紧凑 MO 积分、`InteractionOperator`、费米/qubit哈密顿**。 |
 
@@ -233,7 +233,7 @@ AVAS **分岔处理**：
 
 ### 诚实边界（避免误用）
 
-- **`strategy=avas`**：**阈值投影选轨 + 回填活性空间尺寸**已由 PySCF 路径接入（见上表）；**不构成**「与 Vendor platform **闭源产品 driver** 全流程」的二进制/L0 等价。**`frozen=avas.frozenf` 风格的自动 frozen 列表**若以独立元数据字段暴露，仍为 roadmap（当前以 **`qchem_active_space_resolution_v1`** 收敛尺寸为主）。  
+- **`strategy=avas`**：**阈值投影选轨 + 回填活性空间尺寸**已由 PySCF/Psi4 路径接入（AVAS 核为 PySCF `mcscf.avas`，见上表）；**不构成**「与 Vendor platform **闭源产品 driver** 全流程」的二进制/L0 等价。**`frozen=avas.frozenf` 风格的自动 frozen 列表**若以独立元数据字段暴露，仍为 roadmap（当前以 **`qchem_active_space_resolution_v1`** 收敛尺寸为主）。  
 - **`strategy=avas_stub`**：仍为 **钩子 / 诚实 partial**，不改变 MO。
 - 若你只设 **`frozen_orbitals`** 但未改 **MO ordering**，CASCI **`get_h1eff`**拿到的 **不一定是**你想要的那个化学 active block——应 **自检 PySCF 文档**或通过 **embedding / 自定义 permutation**显式对齐 Vendor platform 教程。
 

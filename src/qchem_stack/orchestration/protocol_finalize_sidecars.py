@@ -4,6 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.config.quantum_helpers import (
+    qpe_demo_track_requested,
+    qpe_three_pack_requested,
+    resolve_qpe_demo_track_n_bits,
+    resolve_tensornet_contraction_engine,
+    resolve_vqs_track_payload_kwargs,
+    tensornet_expectation_stub_enabled,
+    vqs_track_requested,
+)
 from qchem_stack.contracts.schema_ids import QPE_ALGORITHM_THREE_PACK_V1
 from qchem_stack.jobs.nexus_analog import nexus_analog_ledger_from_rows
 from qchem_stack.jobs.nexus_cloud import nexus_cloud_repro_sidecar
@@ -38,11 +47,11 @@ def attach_nexus_mitigation_tn(
     nc = nexus_cloud_repro_sidecar(cfg)
     if nc is not None:
         out["nexus_cloud_repro"] = nc
-    if cfg.quantum.tensornet.expectation_stub:
+    if tensornet_expectation_stub_enabled(cfg):
         from qchem_stack.tensornet import run_cutensornet_expectation_stub
 
         out["tensornet_protocol_stub"] = run_cutensornet_expectation_stub(
-            qh.n_qubits, requested_backend=cfg.quantum.tensornet.contraction_engine
+            qh.n_qubits, requested_backend=resolve_tensornet_contraction_engine(cfg)
         )
 
 
@@ -50,35 +59,28 @@ def attach_qpe_demo_track_if_requested(
     out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Optional dense QPE + Bayesian toy, same as ``scripts/run_qpe_track_demo.py``."""
-    if not cfg.quantum.qpe_demo_track_requested():
+    if not qpe_demo_track_requested(cfg):
         return
     from qchem_stack.qpe_qec_demo.pipeline_track import qpe_demo_track_payload
 
-    out["qpe_demo_track"] = qpe_demo_track_payload(
-        qh, bits=int(cfg.quantum.demos.qpe.demo_track_n_bits)
-    )
+    out["qpe_demo_track"] = qpe_demo_track_payload(qh, bits=resolve_qpe_demo_track_n_bits(cfg))
 
 
 def attach_vqs_track_if_requested(
     out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Optional VQS / McLachlan dynamics on variational parameters."""
-    if not cfg.quantum.vqs_track_requested():
+    if not vqs_track_requested(cfg):
         return
     ang = out.get("angles")
     if ang is None:
         return
     from qchem_stack.quantum.algorithms.vqs_pipeline_track import vqs_track_payload
 
-    q = cfg.quantum
     out["vqs_track"] = vqs_track_payload(
         qh,
         ang,
-        mode=q.demos.vqs.mode,
-        n_times=q.demos.vqs.n_times,
-        dt=float(q.demos.vqs.dt),
-        rhs_mode_yaml=q.demos.vqs.rhs_mode,
-        tangent_fd_epsilon_yaml=float(q.demos.vqs.tangent_fd_epsilon),
+        **resolve_vqs_track_payload_kwargs(cfg),
     )
 
 
@@ -86,7 +88,7 @@ def attach_qpe_three_algorithm_pack_if_requested(
     out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Dense QPE trio from :mod:`~qchem_stack.quantum.algorithms.qpe`."""
-    if not cfg.quantum.qpe_three_pack_requested():
+    if not qpe_three_pack_requested(cfg):
         return
     from qchem_stack.quantum.algorithms.qpe import (
         AlgorithmDeterministicQPE,

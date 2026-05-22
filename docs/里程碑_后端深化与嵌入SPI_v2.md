@@ -8,8 +8,8 @@
 
 | 维度 | 当前约定 | 说明 |
 |------|----------|------|
-| 哈密顿量 / 活性空间主线 | **`scf.driver=pyscf`** → `PySCFDriver` / `PySCFIntegralSolver` | 全套 MO 积分、`RestrictedActiveSpaceQuantumProblem`、默认 CI 语义以此为准。 |
-| Psi4 | **可选**：`psi4_hf_total_energy_au`、``scripts/check_cross_solver_parity.py`` | 用于 **闭合壳层 HF 总能量对照**；不参与默认 pipeline 哈密顿量构建。 |
+| 哈密顿量 / 活性空间主线 | **`scf.driver=pyscf`** → `PySCFIntegralSolver` / `classical_mean_field_reference_from_config`（legacy `PySCFDriver` deprecated） | 全套 MO 积分、`RestrictedActiveSpaceQuantumProblem`、默认 CI 语义以此为准。 |
+| Psi4 | **可选主路径**：`scf.driver=psi4` → `Psi4IntegralSolver` + bridge；亦保留 `psi4_hf_total_energy_au`、``scripts/check_cross_solver_parity.py`` 用于 **闭合壳层 HF 总能量对照**。 |
 | **统一桥接（interchange）** | `qchem_stack.chem.bridges` | 所有经典 SCF 经注册表 **同一出口**：`classical_mean_field_via_solver_bridge` → `MolecularMeanFieldResult`，并在 `driver_meta` 写入 `canonical_classical_bridge_*`；新软件只需实现 ``ChemIntegralSolver`` + 必要定制元数据，再汇入该 interchange。 |
 | 嵌入 | DMET / Schmidt / `plugin` / `projection` 现有骨架 | 新 SPI 在 **不破坏现有 YAML 默认可跑** 的前提下增量扩展。 |
 

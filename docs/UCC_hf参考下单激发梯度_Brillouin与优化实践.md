@@ -77,7 +77,7 @@ $$
 | 常假定 **从零初始化 singles** | `run()` 里 **`x0 ~ Uniform(-π, π)`（随 `seed`）** 对每个参数 **统一随机**——包含 singles：**初值字面未必为零**。若在零梯度方向上，**仍会很快显得「粘在初值邻域」。 |
 | JW + 中段归一化 + 末端 **固定电子数子空间投影** | 离散化后与「纯 Gaussian 代数 Brillouin」**形式上略有差别**，但以 **闭环壳 HF 仍为经典驻点**，**定性结论不变**。 |
 
-若要 **严格 Freeze singles**，须在 **上层**删减 `build_spin_uccsd_fermion_generators`（`src/qchem_stack/integrations/ucc_reference.py`）输出中的 singles 项，或对 `UCCSDVQE` 做 **参数 mask / doubles‑only** 补丁。当前默认 **不裁剪** OpenFermion 生成元列表。
+若要 **严格 Freeze singles**，须在 **上层**删减 `build_spin_uccsd_fermion_generators`（`src/qchem_stack/chem/kernels/spin_ucc.py`）输出中的 singles 项，或对 `UCCSDVQE` 做 **参数 mask / doubles‑only** 补丁。当前默认 **不裁剪** OpenFermion 生成元列表。
 
 入口配置：`quantum.variational_ansatz: uccsd`，`configs/example_h2_uccsd.yaml` / `*_trotter*.yaml`。
 
@@ -203,6 +203,6 @@ $$
 ## 参阅
 
 - 公开矩阵：`docusaurus-site` parity — `AlgorithmVQE` + **`uccsd`**。  
-- 生成元构建：`src/qchem_stack/integrations/ucc_reference.py`；parity：`docs/public_parity_matrix.md`（`AlgorithmVQE` + `uccsd`）。  
+- 生成元构建：`src/qchem_stack/chem/kernels/spin_ucc.py`；parity：`docs/public_parity_matrix.md`（`AlgorithmVQE` + `uccsd`）。  
 - Vendor platform 官方：`ExpectationValueDerivative` [API 锚点](https://www.quantinuum.com/)；本站镜像 `/mirror/api/computables/classes/ExpectationValueDerivative/`。  
 - 本仓库 HEA 导数占位：`src/qchem_stack/protocols/computable.py`（`ExpectationValueDerivative` · 中心差分）；VQE 入口示例：`src/qchem_stack/quantum/algorithms/vqe.py`。

@@ -139,7 +139,7 @@ def run_scf_stage(
                     int(cfg.active_space.cas.n_electrons),
                 ),
             )
-            from qchem_stack.chem.integration.driver_meta import (
+            from qchem_stack.chem.integration.meta_schema import (
                 merge_rdm_correction_bindings_into_reference,
             )
 

@@ -114,8 +114,8 @@
 
 - **现阶段产品与 CI 数值闭环**：默认 **`scf.driver=pyscf`** —— 受限活性空间积分 → qubit 哈密顿量、CASCI 型主路径、Schmidt / 多数 projection / RDM 校正等 **生产口径以 PySCF 为准**。示例 YAML、parity 抽样与核心 pytest **以此为准**。  
 - **架构契约已统一（为多后端预留）**：经典阶段统一经 **`ChemIntegralSolver` / `create_solver`** → **`merge_canonical_classical_bridge_headers`** → **`ClassicalMeanFieldReference`**（`upstream_classical_software_tag` 标识上游）；活性空间诚实元数据见 **`qchem_stack.chem.active_space.mean_field_meta`**；经典后 HF 基准见 **`qchem_stack.chem.classical_benchmarks`** registry——**与具体程序解耦**，便于我方或用户增量接入。  
-- **扩展方式（维护者 / 用户插件）**：在 **`chem/solvers/registry.py`** 注册适配器；实现 **`compute_mean_field`**（及周期性等变体若需要）；按需点亮 **`SolverCapabilities`**（尤其是 **`supports_restricted_active_space_qubit_hamiltonian`** 与 **`CanonicalActiveSpaceIntegralPack.from_classical_reference`** 可消费的积分）；经典基准可为新后端增加 runner；嵌入路径若调用 **`_require_pyscf_reference`**，须在适配层单独放行或提供等价实现。  
-- **Psi4 等**：registry 与 **`supports_molecular_scf`** 已点亮；**可选环境**下可跑 **RHF 总能量**（`MolecularMeanFieldResult` 为 energy-only stub，无 `CanonicalActiveSpaceIntegralPack` / 默认管线哈密顿量通道）；**仍不宣称**与 PySCF 数值主线等价。详见 [ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §1.1。
+- **扩展方式（维护者 / 用户插件）**：在 **`chem/solvers/registry.py`** 注册适配器；实现 **`compute_mean_field`**（及周期性等变体若需要）；按需点亮 **`SolverCapabilities`**（尤其是 **`supports_restricted_active_space_qubit_hamiltonian`** 与 **`CanonicalActiveSpaceIntegralPack.from_classical_reference`** 可消费的积分）；经典基准可为新后端增加 runner；嵌入与 Schmidt 路径经 **`ClassicalMeanFieldReference.ao_basis_view()`** + capability 门控，不再依赖 PySCF 原生 MF handle gate。  
+- **Psi4 等**：registry 已点亮 **full pre-quantum** 能力面（CASCI 型哈密顿量、Schmidt、AVAS、projection、RDM 等；**唯一结构性差异**为 `supports_pbc_k_mesh=False`，即 PBC 仅 Γ-only）。AVAS / NEVPT2 / Schmidt FCI 等步骤可委托 PySCF 核（见 `chem/integration/presets.py` 的 `capability_notes`）。样例：`configs/example_h2_psi4_rhf_sto3g.yaml`、`configs/example_h2_psi4_schmidt_dmet.yaml`、`configs/example_h2_psi4_avas.yaml`。**仍不宣称**与 PySCF 数值主线逐位等价；CI 数值主线仍以 PySCF 为准。
 
 **明确不进入承诺**：
 

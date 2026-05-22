@@ -1,24 +1,22 @@
-"""MO manipulation and active-space sizing helpers for PySCF driver workflows."""
+"""MO manipulation helpers for PySCF driver workflows."""
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Literal
+from typing import TYPE_CHECKING
 
 import numpy as np
+
+from qchem_stack.chem.active_space.sizing import ncas_nelec_couplet
+
+__all__ = [
+    "get_ncas_nelec_couplet",
+    "make_actives_contiguous_columns",
+    "reorder_molecular_orbitals_columns",
+]
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-
-
-def classify_mean_field_spin_symmetry(mf: object) -> Literal["RHF", "ROHF", "UHF"]:
-    from pyscf import scf as scf_mod
-
-    if isinstance(mf, scf_mod.uhf.UHF):
-        return "UHF"
-    if isinstance(mf, scf_mod.rohf.ROHF):
-        return "ROHF"
-    return "RHF"
 
 
 def reorder_molecular_orbitals_columns(mo_coeff: np.ndarray, column_order: list[int]) -> np.ndarray:
@@ -56,14 +54,6 @@ def get_ncas_nelec_couplet(
     *,
     resolved_reference: ClassicalMeanFieldReference | None = None,
 ) -> tuple[int, int]:
-    from qchem_stack.chem.active_space.pyscf_active_space_hooks import (
-        RESOLVED_ACTIVE_SPACE_META_KEY,
-    )
-
-    if resolved_reference is not None:
-        blk = resolved_reference.driver_meta.get(RESOLVED_ACTIVE_SPACE_META_KEY)
-        if isinstance(blk, dict) and blk.get("n_active_orbitals") is not None:
-            return int(blk["n_active_orbitals"]), int(blk["n_active_electrons"])  # type: ignore[index]
     if driver.active_space is None:
         raise ValueError("active_space unavailable; construct PySCFDriver.from_config(...) first.")
-    return int(driver.active_space.cas.n_orbitals), int(driver.active_space.cas.n_electrons)
+    return ncas_nelec_couplet(driver.active_space, reference=resolved_reference)

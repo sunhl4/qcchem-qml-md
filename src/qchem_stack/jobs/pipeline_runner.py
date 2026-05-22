@@ -16,6 +16,7 @@ from qchem_stack.orchestration.run_context import RunContext
 
 if TYPE_CHECKING:
     from qchem_stack.jobs.store import SqliteJobStore
+    from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
 _RESULT_KEYS = (
     "repro",
@@ -52,9 +53,10 @@ _RESULT_KEYS = (
 )
 
 
-def pipeline_result_for_job_store(out: dict[str, Any]) -> dict[str, Any]:
+def pipeline_result_for_job_store(out: PipelineResultV1) -> dict[str, Any]:
     """Drop large redundant fields (e.g. shot rows) while keeping reproducibility core."""
-    slim: dict[str, Any] = {k: out[k] for k in _RESULT_KEYS if k in out}
+    payload = dict(out)
+    slim: dict[str, Any] = {k: payload[k] for k in _RESULT_KEYS if k in payload}
     slim["schema"] = FULL_PIPELINE_JOB_RESULT_V1
     return slim
 

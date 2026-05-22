@@ -6,7 +6,11 @@ from pathlib import Path
 
 import pytest
 
-from qchem_stack.config import ExperimentConfig, load_experiment_config
+from qchem_stack.config import (
+    ExperimentConfig,
+    load_experiment_config,
+    validate_pre_quantum_contract,
+)
 from qchem_stack.config._embedding_validation import SCHMIDT_DMET_MAX_CYCLES_LIMIT
 from qchem_stack.exceptions import ConfigurationError
 
@@ -108,3 +112,56 @@ def test_example_h2_yaml_still_loads() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
     assert cfg.scf.driver == "pyscf"
+
+
+def test_psi4_schmidt_yaml_loads() -> None:
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_h2_psi4_schmidt_dmet.yaml")
+    assert cfg.scf.driver == "psi4"
+    validate_pre_quantum_contract(cfg)
+
+
+def test_psi4_avas_yaml_loads() -> None:
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_h2_psi4_avas.yaml")
+    assert cfg.scf.driver == "psi4"
+    assert cfg.active_space.strategy == "avas"
+    validate_pre_quantum_contract(cfg)
+
+
+def test_psi4_projection_mulliken_yaml_loads() -> None:
+    root = Path(__file__).resolve().parents[1]
+    cfg = load_experiment_config(root / "configs" / "example_h2_psi4_projection_mulliken.yaml")
+    assert cfg.scf.driver == "psi4"
+    assert cfg.embedding.projection.quantum_hamiltonian == "fragment_mulliken_mo"
+    validate_pre_quantum_contract(cfg)
+
+
+def test_precomputed_schmidt_rejected_by_capability() -> None:
+    data = _h2_base()
+    data["scf"] = {
+        "driver": "precomputed",
+        "precomputed": {"bundle_path": "configs/precomputed_classical_reference_h2.json"},
+    }
+    data["embedding"] = _schmidt_embedding()
+    with pytest.raises(ConfigurationError, match="supports_schmidt_atomic_hamiltonian"):
+        ExperimentConfig.from_yaml_dict(data)
+
+
+def test_precomputed_projection_rejected_by_capability() -> None:
+    data = _h2_base()
+    data["scf"] = {
+        "driver": "precomputed",
+        "precomputed": {"bundle_path": "configs/precomputed_classical_reference_h2.json"},
+    }
+    data["embedding"] = {
+        "mode": "projection",
+        "projection": {
+            "quantum_hamiltonian": "fragment_mulliken_mo",
+            "fragment_atom_indices": [0, 1],
+        },
+    }
+    with pytest.raises(
+        ConfigurationError, match="supports_projection_fragment_mulliken_hamiltonian"
+    ):
+        ExperimentConfig.from_yaml_dict(data)

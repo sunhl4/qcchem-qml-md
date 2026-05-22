@@ -10,6 +10,10 @@ from openfermion.ops import QubitOperator
 
 from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.pauli_shot_sim import energy_estimate_grouped_shot_simulation
+from qchem_stack.contracts.schema_ids import (
+    TANGELO_DEFLATION_ANALOGY_V1,
+    VQD_CROSS_STACK_SEMANTICS_V1,
+)
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 
@@ -125,3 +129,43 @@ def _vqd_three_protocol_channels(
         wt["weight_shot_mean"] = float(penalty_weight * ov["overlap_squared_sum_shot_mean"])
         wt["weight_shot_stderr"] = float(penalty_weight * ov["overlap_squared_sum_shot_stderr"])
     return {"objective": obj, "overlap": ov, "weight": wt}
+
+
+def vqd_cross_stack_semantics_meta(
+    *,
+    penalty_weight: float,
+    penalty_weights_resolved: list[float],
+    overlap_mode: str,
+) -> dict[str, Any]:
+    """Cross-stack narrative hooks for VQD reporting (parity / Methods export)."""
+    coeff = (
+        float(penalty_weights_resolved[0]) if penalty_weights_resolved else float(penalty_weight)
+    )
+    overlap_repr = (
+        "statevector_amplitude_overlap"
+        if overlap_mode == "statevector_overlap"
+        else "statevector_overlap_with_tangelo_circuit_analogy_reporting"
+    )
+    return {
+        "tangelo_deflation_analogy_v1": {
+            "schema": TANGELO_DEFLATION_ANALOGY_V1,
+            "deflation_coeff_yaml": coeff,
+            "penalty_schedule_resolved": list(penalty_weights_resolved),
+            "selected_overlap_mode": overlap_mode,
+            "open_stack_overlap_representation": overlap_repr,
+            "tangelo_deflation_circuits_analogy": (
+                "Tangelo VQESolver adds deflation via deflation_circuits + deflation_coeff "
+                "on measured overlaps; this stack collapses overlaps into one classical objective."
+            ),
+        },
+        "vqd_cross_stack_semantics_v1": {
+            "schema": VQD_CROSS_STACK_SEMANTICS_V1,
+            "optimization_model": "single_objective_collapsed",
+            "three_protocol_role": "reporting_and_optional_shots_not_triple_optimizer",
+            "note": (
+                "Closed vendor AlgorithmVQD exposes separate ExpectationValue / OverlapSquared "
+                "computables; open stack matches Higgott et al. scalar penalty + optional "
+                "Pauli/swap-test channels."
+            ),
+        },
+    }

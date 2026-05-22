@@ -6,24 +6,41 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.chem.solvers._active_space_common import resolve_active_space_spec
 from qchem_stack.contracts.schema_ids import PSI4_ACTIVE_SPACE_INTEGRALS_V1
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
     from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
 
 
-def resolve_active_space_spec(kwargs: dict[str, Any]) -> tuple[int, int]:
-    ncas_raw = kwargs.get("n_active_orbitals", kwargs.get("ncas"))
-    nele_raw = kwargs.get("n_active_electrons", kwargs.get("nelecas"))
-    if ncas_raw is None or nele_raw is None:
-        raise ValueError(
-            "get_integrals requires n_active_orbitals/n_active_electrons (aliases: ncas/nelecas)."
-        )
-    ncas = int(ncas_raw)
-    nelecas = int(nele_raw)
-    if ncas <= 0 or nelecas <= 0:
-        raise ValueError("n_active_orbitals and n_active_electrons must be positive integers.")
-    return ncas, nelecas
+def _resolve_psi4_wavefunction(
+    solver: Psi4IntegralSolver,
+    kwargs: dict[str, Any],
+) -> tuple[Any, float, MolecularMeanFieldResult | None]:
+    wfn = kwargs.get("wfn")
+    if wfn is not None:
+        scf_energy = kwargs.get("scf_energy")
+        if scf_energy is None:
+            raise ValueError("get_integrals with wfn= requires scf_energy=.")
+        return wfn, float(scf_energy), None
+
+    reference = kwargs.get("reference")
+    run_scf = bool(kwargs.get("run_scf", True))
+    if not run_scf:
+        if reference is not None:
+            mf_handle = (
+                reference.mf.raw_handle() if hasattr(reference.mf, "raw_handle") else reference.mf
+            )
+            return mf_handle, float(reference.e_tot), None
+        cached = getattr(solver, "_last_molecular_mf_result", None)
+        if cached is not None:
+            mf_handle = cached.mf.raw_handle() if hasattr(cached.mf, "raw_handle") else cached.mf
+            return mf_handle, float(cached.e_tot), cached
+
+    mf_res = solver.run_molecular_mean_field()
+    wfn_out = mf_res.mf.raw_handle() if hasattr(mf_res.mf, "raw_handle") else mf_res.mf
+    return wfn_out, float(mf_res.e_tot), mf_res
 
 
 def get_active_space_integrals(
@@ -36,8 +53,9 @@ def get_active_space_integrals(
         raise NotImplementedError(
             f"Psi4 get_integrals supports RHF/ROHF only (got method={solver._method!r})."
         )
-    mf_res = solver.run_molecular_mean_field()
-    wfn = mf_res.mf.raw_handle() if hasattr(mf_res.mf, "raw_handle") else mf_res.mf
+    wfn, scf_energy, mf_res = _resolve_psi4_wavefunction(solver, kwargs)
+    if mf_res is not None:
+        solver._last_molecular_mf_result = mf_res
     from qchem_stack.chem.integral_convention import (
         spatial_mo_eri_pyscf_to_openfermion_mo_ordering,
     )
@@ -57,6 +75,6 @@ def get_active_space_integrals(
         "h2_spatial_mo_chemist": h2_chemist,
         "h2_spatial_mo_openfermion": h2_openfermion,
         "openfermion_bridge": "psi4_mo_to_openfermion_v1",
-        "scf_energy": float(mf_res.e_tot),
+        "scf_energy": float(scf_energy),
         "psi4_converged": True,
     }

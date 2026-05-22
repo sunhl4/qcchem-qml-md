@@ -7,16 +7,16 @@ import pytest
 
 pytest.importorskip("pyscf")
 
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver, active_space_casci_raw_blocks
+from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_active_space_casci_respects_frozen_orbitals_metadata() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     c0, h10, _ = active_space_casci_raw_blocks(rhf, 1, 0)
     rhf_frozen = rhf
     rhf_frozen.driver_meta["active_space_frozen_orbitals"] = [0]

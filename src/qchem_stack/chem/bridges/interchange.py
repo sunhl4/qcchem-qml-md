@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
+
 if TYPE_CHECKING:
     from collections.abc import Mapping
 
@@ -18,7 +20,7 @@ def merge_canonical_classical_bridge_headers(
     periodic_boundary_condition: bool,
 ) -> dict[str, Any]:
     """Merge immutable bridge bookkeeping into solver ``driver_meta`` (copies shallow)."""
-    out = dict(driver_meta)
+    out = fork_driver_meta(driver_meta)
     out["canonical_classical_bridge_meta_version"] = int(CANONICAL_CLASSICAL_BRIDGE_META_VERSION)
     out["canonical_classical_bridge_schema"] = "qchem_classical_mean_field_bridge_v1"
     out["upstream_classical_software_tag"] = str(upstream_software_tag).strip().lower()

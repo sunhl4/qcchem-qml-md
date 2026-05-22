@@ -54,7 +54,12 @@ from .parity_integrations import ParityIntegrationsSpec
 from .quantum import QuantumSpec
 from .quantum_enums import OperatorPoolId
 from .quantum_graph import ComputableGraphEdgeDecl, ComputableGraphEdgeRemove
-from .quantum_helpers import quantum_repro_core_fields
+from .quantum_helpers import (
+    classify_pauli_expectation_path_for_config,
+    pauli_protocol_enabled,
+    quantum_repro_core_fields,
+    quantum_repro_sidecar_fields,
+)
 from .scf import SCFSpec
 from .scf_helpers import resolve_scf_density_fit, resolve_scf_max_cycle
 
@@ -79,6 +84,7 @@ __all__ = [
     "SCFSpec",
     "SCHMIDT_DMET_MAX_CYCLES_LIMIT",
     "backend_spec_from_config",
+    "classify_pauli_expectation_path_for_config",
     "compiler_bundle_signature_from_config",
     "compiler_pass_bundle_from_config",
     "dump_experiment_config",
@@ -92,7 +98,9 @@ __all__ = [
     "mitigation_repro_core_fields",
     "pbc_cell_vectors_bohr",
     "pmsv_enabled",
+    "pauli_protocol_enabled",
     "quantum_repro_core_fields",
+    "quantum_repro_sidecar_fields",
     "resolve_fermion_qubit_mapping",
     "resolve_n_electrons",
     "resolve_n_orbitals",
@@ -102,3 +110,5 @@ __all__ = [
     "validate_pre_quantum_contract",
     "zne_enabled",
 ]
+
+ExperimentConfig.model_rebuild()

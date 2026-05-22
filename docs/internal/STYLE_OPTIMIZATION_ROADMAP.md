@@ -52,3 +52,10 @@ Regenerate after each major phase:
 ```
 
 Target at P4 end: zero files >500 lines under `src/qchem_stack`; orchestration reads `quantum` via helpers only.
+
+## Large-file watch (chem)
+
+Before adding the next feature, split submodules if either file grows further:
+
+- `src/qchem_stack/chem/hamiltonian_build.py` (~385 lines)
+- `src/qchem_stack/chem/embedding/schmidt_production.py` (~377 lines)

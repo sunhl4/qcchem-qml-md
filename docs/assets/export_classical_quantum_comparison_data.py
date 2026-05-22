@@ -51,16 +51,17 @@ def main() -> None:
     from pyscf import cc, mcscf, mp
 
     from qchem_stack.backends.factory import executor_from_spec
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
+    from qchem_stack.chem.bridges.reference_factory import pyscf_rhf_result_from_config
+    from qchem_stack.chem.molecular_problem_build import (
+        restricted_active_space_quantum_problem_from_config,
+    )
     from qchem_stack.config import backend_spec_from_config, load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
 
     cfg_path = ROOT / CFG_REL
     cfg = load_experiment_config(cfg_path)
 
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_result_from_config(cfg)
     mf = rhf.mf
     hf_total = float(rhf.e_tot)
 
@@ -88,12 +89,8 @@ def main() -> None:
     # Best achievable VQE on this run stack:
     # scan several bounded L-BFGS-B boxes from zero-initialized amplitudes and
     # choose the absolute minimum achieved in real runs.
-    qh = molecular_hamiltonian_from_pyscf(
-        rhf,
-        n_active_orbitals=int(cfg.active_space.n_active_orbitals),
-        n_active_electrons=int(cfg.active_space.n_active_electrons),
-        fermion_qubit_mapping=cfg.active_space.fermion_qubit_mapping,
-    )
+    prob = restricted_active_space_quantum_problem_from_config(cfg)
+    qh = prob.qubit_hamiltonian
     exe = executor_from_spec(backend_spec_from_config(cfg))
     ur = UCCSDVQE(qh, executor=exe)
     npar = ur.n_params

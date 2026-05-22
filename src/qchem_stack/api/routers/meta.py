@@ -1,15 +1,16 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Body, HTTPException, Query
 
 from qchem_stack.api.deps import (
     default_job_db_path,
     experiment_config_from_request_yaml,
     sqlite_job_store,
 )
+from qchem_stack.api.models import YamlPreviewBody
 from qchem_stack.contracts.schema_ids import (
     CAPABILITY_GAP_EXPORT_V1,
     CAPABILITY_SURFACE_V2,
@@ -19,9 +20,6 @@ from qchem_stack.contracts.schema_ids import (
 )
 from qchem_stack.integrations.workflow_preview import workflow_preview_payload
 from qchem_stack.protocols.computable import computables_export_dict, list_computables_for_config
-
-if TYPE_CHECKING:
-    from qchem_stack.api.models import YamlPreviewBody
 
 router = APIRouter(tags=["meta", "product"])
 
@@ -107,13 +105,13 @@ def parity_gaps() -> dict[str, object]:
 
 
 @router.post("/v1/meta/workflow-preview", tags=["product"])
-def workflow_preview(body: YamlPreviewBody) -> dict[str, object]:
+def workflow_preview(body: Annotated[YamlPreviewBody, Body()]) -> dict[str, object]:
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
     return workflow_preview_payload(cfg, include_computables_rich=body.include_computables_rich)
 
 
 @router.post("/v1/meta/computables-preview")
-def computables_preview(body: YamlPreviewBody) -> dict[str, object]:
+def computables_preview(body: Annotated[YamlPreviewBody, Body()]) -> dict[str, object]:
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
     refs = list_computables_for_config(cfg)
     return {

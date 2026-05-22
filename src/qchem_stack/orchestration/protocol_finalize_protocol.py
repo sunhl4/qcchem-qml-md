@@ -4,6 +4,13 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.config.quantum_helpers import (
+    pauli_record_histograms,
+    pauli_run_qiskit_shots,
+    pauli_run_sampled,
+    resolve_pauli_grouping,
+    resolve_pauli_support_max_terms,
+)
 from qchem_stack.mitigation.pmsv import PMSVConfig
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
@@ -20,7 +27,6 @@ def protocol_for_job(
     exe: Any,
     bundle: Any,
 ) -> PauliAveragingProtocol:
-    q = cfg.quantum
     pmsv = None
     if cfg.mitigation.pmsv.enabled:
         pmsv = PMSVConfig(
@@ -39,11 +45,11 @@ def protocol_for_job(
         if cfg.mitigation.zne.enabled
         else None,
         zne_mode=cfg.mitigation.zne.mode,
-        measurement_grouping=q.pauli.grouping,
-        run_sampled=q.pauli.run_sampled,
-        run_qiskit_shots=q.pauli.run_qiskit_shots,
-        record_histograms=q.pauli.record_histograms,
+        measurement_grouping=resolve_pauli_grouping(cfg),
+        run_sampled=pauli_run_sampled(cfg),
+        run_qiskit_shots=pauli_run_qiskit_shots(cfg),
+        record_histograms=pauli_record_histograms(cfg),
         executor=exe,
         nexus_analog=cfg.nexus_analog,
-        pauli_support_max_terms=q.pauli.support_max_terms,
+        pauli_support_max_terms=resolve_pauli_support_max_terms(cfg),
     )

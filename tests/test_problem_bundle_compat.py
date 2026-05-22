@@ -8,25 +8,23 @@ import pytest
 
 pytest.importorskip("pyscf")
 
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+from qchem_stack.chem.molecular_problem_build import (
+    restricted_active_space_quantum_problem_from_config,
+)
 from qchem_stack.chem.problem_bundle import ChemistryProblemBundle
 from qchem_stack.config import load_experiment_config
+from tests.fixtures.classical_reference import (
+    classical_reference_from_config,
+    pyscf_rhf_from_config,
+)
 
 
 def test_bundle_from_ras_problem_roundtrip_public_dump() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
-    ref = ClassicalMeanFieldReference(
-        mf=rhf.mf,
-        e_tot=float(rhf.e_tot),
-        mo_energy=rhf.mo_energy,
-        molecular_system=rhf.molecular_system,
-        driver_meta=dict(rhf.driver_meta),
-    )
-    prob = drv.get_restricted_active_space_quantum_problem(2, 2, rhf=rhf)
+    rhf = pyscf_rhf_from_config(cfg)
+    ref = classical_reference_from_config(cfg)
+    prob = restricted_active_space_quantum_problem_from_config(cfg, reference=ref)
     b = ChemistryProblemBundle.from_restricted_active_space_problem(prob, reference=ref)
     assert b.reference_energy_hf_au == pytest.approx(float(rhf.e_tot))
     assert b.backend_driver_meta.get("driver_family") == "pyscf"
@@ -39,16 +37,9 @@ def test_bundle_from_ras_problem_roundtrip_public_dump() -> None:
 def test_bundle_accepts_classical_reference_directly() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
-    ref = ClassicalMeanFieldReference(
-        mf=rhf.mf,
-        e_tot=float(rhf.e_tot),
-        mo_energy=rhf.mo_energy,
-        molecular_system=rhf.molecular_system,
-        driver_meta=dict(rhf.driver_meta),
-    )
-    prob = drv.get_restricted_active_space_quantum_problem(2, 2, rhf=rhf)
+    rhf = pyscf_rhf_from_config(cfg)
+    ref = classical_reference_from_config(cfg)
+    prob = restricted_active_space_quantum_problem_from_config(cfg, reference=ref)
     b = ChemistryProblemBundle.from_restricted_active_space_problem(prob, reference=ref)
     assert b.classical_mean_field_snapshot is ref
     assert b.reference_energy_hf_au == pytest.approx(float(rhf.e_tot))

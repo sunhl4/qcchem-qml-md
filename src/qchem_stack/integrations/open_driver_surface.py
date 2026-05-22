@@ -20,7 +20,10 @@ def open_driver_coverage_matrix() -> dict[str, Any]:
             {
                 "parity_matrix_row_label": "gas-phase RHF/UHF/ROHF",
                 "status": "yes_pyscf",
-                "implementation": "PySCFDriver.run_rhf / run_uhf / run_rohf",
+                "implementation": (
+                    "create_solver(cfg).compute_mean_field / "
+                    "classical_mean_field_reference_from_config"
+                ),
             },
             {
                 "parity_matrix_row_label": "ddCOSMO / implicit solvent",

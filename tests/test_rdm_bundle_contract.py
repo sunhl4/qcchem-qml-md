@@ -10,10 +10,10 @@ import pytest
 pytest.importorskip("pyscf")
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+from qchem_stack.chem.kernels.rdm_corrections import rdm_bundle_from_mean_field
 from qchem_stack.chem.rdm_bundle import QuantumRDMInput, RDMBundle
 from qchem_stack.config import load_experiment_config
-from qchem_stack.integrations.rdm_corrections import rdm_bundle_from_mean_field
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_rdm_bundle_requires_lineage_tags() -> None:
@@ -43,7 +43,7 @@ def test_rdm_bundle_metadata_syncs_canonical_fields() -> None:
 def test_rdm_bundle_from_mean_field_matches_protocol() -> None:
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),

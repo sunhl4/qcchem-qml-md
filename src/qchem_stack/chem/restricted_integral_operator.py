@@ -14,7 +14,7 @@ from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfer
 from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
 
 if TYPE_CHECKING:
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+    from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
 
 
 def interaction_operator_to_dataframe(
@@ -109,15 +109,11 @@ class RestrictedActiveSpaceIntegralOperatorCompact:
 
     def dense_h2_chemist_spatial(self) -> np.ndarray:
         """Chemist-notation active-space MO ERIs ``(na, na, na, na)`` (PySCF layout before OF transpose)."""
-        from pyscf import ao2mo
+        from qchem_stack.chem.integral_convention import restore_packed_mo_eri_chemist
 
         x = np.asarray(self.eri_active_mo_compact, dtype=float)
         na = int(self.n_active_orbitals)
-        if x.ndim == 4:
-            if x.shape != (na, na, na, na):
-                raise ValueError(f"unexpected dense h2eff shape {x.shape}, expected ({na},)*4")
-            return x.copy()
-        return np.asarray(ao2mo.restore(1, x, na), dtype=float)
+        return restore_packed_mo_eri_chemist(x, na)
 
     def to_interaction_operator(self) -> InteractionOperator:
         """Materialize OpenFermion :class:`InteractionOperator` in the spin-orbital basis."""

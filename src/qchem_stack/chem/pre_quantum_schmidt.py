@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.hamiltonian import (
     QubitHamiltonian,
     qubit_hamiltonian_from_spatial_chemist_integrals,
@@ -32,24 +33,20 @@ def schmidt_hamiltonian_and_context(
             "embedding.dmet.hamiltonian_source='schmidt_atomic_production' requires backend support "
             f"(backend={caps.backend_id!r})."
         )
-    if rhf.backend_tag() not in ("pyscf", "psi4"):
-        raise PipelineError(
-            f"schmidt_atomic_production requires backend pyscf or psi4 (got {rhf.backend_tag()!r})."
-        )
     if cfg.scf.method != "RHF":
         raise PipelineError(
             "embedding.dmet.hamiltonian_source='schmidt_atomic_production' requires scf.method='RHF' "
             "(closed-shell single density matrix)."
         )
+    from qchem_stack.chem.embedding.schmidt_dmet_self_consistent import (
+        run_schmidt_density_feedback_cycles,
+        run_schmidt_multifragment_density_cycles,
+    )
     from qchem_stack.chem.embedding.schmidt_production import (
         apply_chemical_potential_fragment_block,
         bisection_mu_for_fragment_electron_count,
         fci_fragment_ground_state,
         fragment_mulliken_electrons,
-    )
-    from qchem_stack.integrations.schmidt_dmet_self_consistent import (
-        run_schmidt_density_feedback_cycles,
-        run_schmidt_multifragment_density_cycles,
     )
 
     emb = require_dmet(cfg.embedding)
@@ -154,9 +151,8 @@ def schmidt_hamiltonian_and_context(
         fermion_qubit_mapping=resolve_fermion_qubit_mapping(cfg.active_space),
         integral_source="schmidt_impurity_spatial",
         meta_extra={"schmidt_production_audit": audit},
-        classical_driver_meta=dict(rhf.driver_meta) if getattr(rhf, "driver_meta", None) else None,
-        pyscf_driver_meta=dict(rhf.driver_meta)
-        if getattr(rhf, "driver_meta", None) and rhf.backend_tag() == "pyscf"
+        classical_driver_meta=fork_driver_meta(rhf.driver_meta)
+        if getattr(rhf, "driver_meta", None)
         else None,
     )
     return qh, schmidt_ctx

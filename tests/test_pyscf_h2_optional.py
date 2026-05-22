@@ -3,8 +3,7 @@ from __future__ import annotations
 import pytest
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import (
     ActiveSpaceSpec,
     ExperimentConfig,
@@ -13,6 +12,7 @@ from qchem_stack.config import (
 )
 from qchem_stack.qpe_qec_demo import FaultTolerantDemoAdapter
 from qchem_stack.quantum.algorithms.vqe import VQE
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 pyscf = pytest.importorskip("pyscf")
 
@@ -56,11 +56,8 @@ active_space:
         encoding="utf-8",
     )
     cfg = load_experiment_config(cfg_path)
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(r), n_active_orbitals=2, n_active_electrons=2
-    )
+    r = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(r)).qubit_hamiltonian
     assert qh.meta.get("fermion_to_qubit_map") == "jordan_wigner"
     assert qh.meta.get("integral_source") == "pyscf_casci_h2eff_compact"
     assert qh.meta.get("integral_openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
@@ -84,14 +81,8 @@ def test_h2_active_space_bravyi_kitaev_meta() -> None:
             mapping={"fermion_qubit": "bravyi_kitaev"},
         ),
     )
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(r),
-        n_active_orbitals=2,
-        n_active_electrons=2,
-        fermion_qubit_mapping="bravyi_kitaev",
-    )
+    r = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(r)).qubit_hamiltonian
     assert qh.meta.get("fermion_to_qubit_map") == "bravyi_kitaev"
 
 
@@ -108,14 +99,8 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
             mapping={"fermion_qubit": "symmetry_conserving_bravyi_kitaev"},
         ),
     )
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(r),
-        n_active_orbitals=2,
-        n_active_electrons=2,
-        fermion_qubit_mapping="symmetry_conserving_bravyi_kitaev",
-    )
+    r = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(r)).qubit_hamiltonian
     assert qh.meta.get("fermion_to_qubit_map") == "symmetry_conserving_bravyi_kitaev"
     assert qh.n_qubits == 2
     assert qh.meta.get("n_qubits") == 2
@@ -134,14 +119,8 @@ def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2_vqe_figure_near_casci.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
-    qh = molecular_hamiltonian_from_classical_reference(
-        _as_reference(r),
-        n_active_orbitals=int(cfg.active_space.cas.n_orbitals),
-        n_active_electrons=int(cfg.active_space.cas.n_electrons),
-        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
-    )
+    r = pyscf_rhf_from_config(cfg)
+    qh = build_pre_quantum_input(cfg, _as_reference(r)).qubit_hamiltonian
     exe = executor_from_spec(backend_spec_from_config(cfg))
     mo = r.mf.mo_coeff
     mo_arr = mo if isinstance(mo, np.ndarray) else np.asarray(mo[0], dtype=float)

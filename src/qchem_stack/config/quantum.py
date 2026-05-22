@@ -9,6 +9,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 
 from ._quantum_validation import (
     validate_algorithm_registered_or_factory,
+    validate_operator_pool_ids,
     validate_pauli_shot_mode_mutually_exclusive,
     validate_uccsd_trotter_steps,
     validate_vqd_max_overlap_warn_nonneg,
@@ -55,15 +56,6 @@ class QuantumSpec(BaseModel):
     tensornet: QuantumTensornetSpec = Field(default_factory=QuantumTensornetSpec)
     graph: QuantumGraphSpec = Field(default_factory=QuantumGraphSpec)
 
-    def qpe_demo_track_requested(self) -> bool:
-        return self.demos.qpe.track_requested()
-
-    def qpe_three_pack_requested(self) -> bool:
-        return self.demos.qpe.three_pack_requested()
-
-    def vqs_track_requested(self) -> bool:
-        return self.demos.vqs.track_requested()
-
     @field_validator("algorithm")
     @classmethod
     def _strip_algorithm(cls, v: str) -> str:
@@ -92,6 +84,11 @@ class QuantumSpec(BaseModel):
     @model_validator(mode="after")
     def _vqd_penalty_weights_len(self) -> QuantumSpec:
         validate_vqd_penalty_weights_len(self)
+        return self
+
+    @model_validator(mode="after")
+    def _operator_pool_ids_registered(self) -> QuantumSpec:
+        validate_operator_pool_ids(self)
         return self
 
     @field_validator("excited", mode="before")

@@ -6,6 +6,12 @@ See ``docs/工程记忆_Quantinuum对标与数据流技术文档.md`` §0 for ep
 
 from __future__ import annotations
 
+from qchem_stack.chem.kernels.spin_ucc import (
+    ChemicallyAwareUCCPolicy,
+    IdentityRegrouping,
+    build_spin_uccsd_fermion_generators,
+    count_uccsd_excitations,
+)
 from qchem_stack.integrations.dmet_self_consistent import (
     DMETBathState,
     DMETFragmentResult,
@@ -19,12 +25,6 @@ from qchem_stack.integrations.tket_fullchain import (
     TketCompileMode,
     circuit_ir_to_tket_stats_or_none,
     describe_tket_closure_layer,
-)
-from qchem_stack.integrations.ucc_reference import (
-    ChemicallyAwareUCCPolicy,
-    IdentityRegrouping,
-    build_spin_uccsd_fermion_generators,
-    count_uccsd_excitations,
 )
 
 __all__ = [

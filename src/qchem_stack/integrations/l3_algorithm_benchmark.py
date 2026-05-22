@@ -19,6 +19,11 @@ import time
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.config import load_experiment_config
+from qchem_stack.config.quantum_helpers import (
+    resolve_adapt_pool_id,
+    resolve_iqeb_pool_id,
+    resolve_variational_algorithm,
+)
 from qchem_stack.contracts.schema_ids import (
     ALGORITHM_BENCHMARK_BUNDLE_V1,
     MERGED_EXPERIMENT_BENCHMARK_V1,
@@ -69,9 +74,9 @@ def algorithm_benchmark_bundle_v1(*, repo_root: Path, config_rels: list[str]) ->
         row: dict[str, Any] = {
             "experiment_id": exp_id,
             "config_rel": rel,
-            "quantum_algorithm_yaml": cfg.quantum.algorithm,
-            "adapt_pool_id_yaml": cfg.quantum.adapt.pool_id,
-            "iqeb_pool_id_yaml": cfg.quantum.iqeb.pool_id,
+            "quantum_algorithm_yaml": resolve_variational_algorithm(cfg),
+            "adapt_pool_id_yaml": resolve_adapt_pool_id(cfg),
+            "iqeb_pool_id_yaml": resolve_iqeb_pool_id(cfg),
             "scf_energy_au": out.get("scf_energy"),
             "energy_after_variational_au": out.get("energy_after_variational"),
             "nfev": nfev,

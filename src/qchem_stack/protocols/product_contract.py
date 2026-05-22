@@ -9,6 +9,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.config.quantum_helpers import (
+    PAULI_PATH_EXACT,
+    PAULI_PATH_QISKIT_COUNTS,
+    PAULI_PATH_STATEVECTOR_SHOT_SIM,
+)
 from qchem_stack.contracts.schema_ids import (
     MITIGATION_EXECUTION_MODEL_V1,
     OPEN_STACK_DIFFERENTIATORS_V1,
@@ -19,11 +24,7 @@ from qchem_stack.contracts.schema_ids import (
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig, QuantumSpec
 
-# Stable JSON tokens for parity snapshot / export scripts.
-PAULI_PATH_DISABLED = "pauli_protocol_disabled"
-PAULI_PATH_EXACT = "exact_executor"
-PAULI_PATH_STATEVECTOR_SHOT_SIM = "statevector_grouped_shot_simulation"
-PAULI_PATH_QISKIT_COUNTS = "qiskit_get_counts_bitstrings"
+# Stable JSON tokens for parity snapshot / export scripts (canonical in quantum_helpers).
 
 PARITY_EXPORT_V3_STABLE_KEYS: frozenset[str] = frozenset(
     {
@@ -143,22 +144,20 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
 
 def classify_pauli_expectation_path(q: QuantumSpec) -> str:
     """Classify how ``energy_pauli_protocol`` is produced from config intent."""
-    if not q.pauli.use_protocol:
-        return PAULI_PATH_DISABLED
-    if q.pauli.run_sampled and q.pauli.run_qiskit_shots:
-        raise ValueError(
-            "run_sampled_pauli_protocol and run_qiskit_shots_pauli_protocol are mutually exclusive"
-        )
-    if q.pauli.run_sampled:
-        return PAULI_PATH_STATEVECTOR_SHOT_SIM
-    if q.pauli.run_qiskit_shots:
-        return PAULI_PATH_QISKIT_COUNTS
-    return PAULI_PATH_EXACT
+    from qchem_stack.config.quantum_helpers import classify_pauli_expectation_path_from_flags
+
+    return classify_pauli_expectation_path_from_flags(
+        use_protocol=bool(q.pauli.use_protocol),
+        run_sampled=bool(q.pauli.run_sampled),
+        run_qiskit_shots=bool(q.pauli.run_qiskit_shots),
+    )
 
 
 def pauli_protocol_expectation_path_for_config(cfg: ExperimentConfig) -> str:
-    """Convenience wrapper over :func:`classify_pauli_expectation_path`."""
-    return classify_pauli_expectation_path(cfg.quantum)
+    """Convenience wrapper over :func:`classify_pauli_expectation_path_for_config`."""
+    from qchem_stack.config.quantum_helpers import classify_pauli_expectation_path_for_config
+
+    return classify_pauli_expectation_path_for_config(cfg)
 
 
 def protocol_expectation_semantics_public() -> dict[str, Any]:

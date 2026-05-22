@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
+
 from .hamiltonian_meta import (
     FermionQubitMappingName,
     _attach_reference_energy_meta,
@@ -69,9 +71,9 @@ def assemble_qubit_hamiltonian(
     if fp_trunc:
         meta["hamiltonian_fingerprint_truncated"] = True
     if classical_driver_meta:
-        meta["classical_driver"] = dict(classical_driver_meta)
+        meta["classical_driver"] = fork_driver_meta(classical_driver_meta)
     elif pyscf_driver_meta:
-        meta["pyscf_driver"] = dict(pyscf_driver_meta)
+        meta["pyscf_driver"] = fork_driver_meta(pyscf_driver_meta)
     elif driver_meta:
         if backend_tag == "pyscf":
             meta["pyscf_driver"] = driver_meta

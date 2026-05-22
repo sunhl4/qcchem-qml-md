@@ -6,16 +6,14 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
-from qchem_stack.chem.active_space.pyscf_active_space_hooks import (
-    RESOLVED_ACTIVE_SPACE_META_KEY,
-    _mo_energy_from_fock,
-)
+from qchem_stack.chem.active_space.pyscf_active_space_hooks import _mo_energy_from_fock
+from qchem_stack.chem.active_space.resolution import RESOLVED_ACTIVE_SPACE_META_KEY
 from qchem_stack.chem.bridges.ao_basis_view import (
     PySCFAOBasisView,
     ao_basis_view_from_reference,
 )
 from qchem_stack.chem.bridges.pyscf_shadow_reference import build_pyscf_rhf_shadow
-from qchem_stack.chem.integration.driver_meta import (
+from qchem_stack.chem.integration.meta_schema import (
     append_kernel_bindings,
     binding_avas_projection,
 )

@@ -1,9 +1,9 @@
 from __future__ import annotations
 
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import Annotated, Any
 
-from fastapi import APIRouter, HTTPException, Query, Request
+from fastapi import APIRouter, Body, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
 from qchem_stack.api.deps import (
@@ -12,6 +12,7 @@ from qchem_stack.api.deps import (
     sqlite_job_store,
     trace_response_headers,
 )
+from qchem_stack.api.models import RunRequest
 from qchem_stack.contracts.schema_ids import (
     JOB_EVENTS_V1,
     JOB_LIST_V1,
@@ -26,9 +27,6 @@ from qchem_stack.jobs.pipeline_runner import pipeline_result_for_job_store
 from qchem_stack.jobs.store import JobStatus
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from qchem_stack.orchestration.run_context import RunContext
-
-if TYPE_CHECKING:
-    from qchem_stack.api.models import RunRequest
 
 router = APIRouter(tags=["runs"])
 
@@ -83,7 +81,7 @@ def list_runs(
 
 
 @router.post("/v1/runs", response_model=None)
-def post_run(request: Request, body: RunRequest) -> dict | JSONResponse:
+def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JSONResponse:
     rc = RunContext.from_headers({str(k): str(v) for k, v in request.headers.items()})
     cfg = experiment_config_from_request_yaml(
         body.experiment_yaml,

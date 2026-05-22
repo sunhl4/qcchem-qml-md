@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from qchem_stack.backends.spec import summarize_circuit_shot_rows
+from qchem_stack.config.quantum_helpers import pauli_protocol_enabled, resolve_vqe_depth
 from qchem_stack.orchestration.excited_stages import (
     excited_methods_unified,
     excited_shots_upper_bound,
@@ -66,10 +67,9 @@ def run_protocol_and_finalize_stage(
     profile: PipelineStageTimer,
     emit: Callable[[str], None],
 ) -> dict[str, Any]:
-    q = cfg.quantum
     profile.mark("pre_pauli_protocol")
     emit("pre_pauli_protocol")
-    if not q.pauli.use_protocol:
+    if not pauli_protocol_enabled(cfg):
         if excited_rs is not None:
             out["resource_summary"] = resource_summary_excited_only(qh.n_qubits, excited_rs)
         else:
@@ -93,7 +93,7 @@ def run_protocol_and_finalize_stage(
         return out
 
     proto = protocol_for_job(cfg, qh, bspec=bspec, exe=exe, bundle=bundle)
-    proto.build(np.asarray(angles, dtype=float), hea_depth=q.vqe.depth)
+    proto.build(np.asarray(angles, dtype=float), hea_depth=resolve_vqe_depth(cfg))
     proto.compile()
     proto.run()
     e_proto = proto.evaluate()

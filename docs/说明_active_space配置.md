@@ -52,7 +52,7 @@ active_space:
 | `cas` | **默认、最常见**：在 yaml 里直接写活性轨道数、活性电子数。 |
 | `manual` | 同样手写数目，并可配合 `frozen_orbitals` 记录哪些轨道视为冻住（ bookkeeping ）。 |
 | `avas_stub` | 数字写法同 `cas`，但**不执行**真实 AVAS 轨道投影；元数据标明为占位/桩（见 `example_h2_avas_stub.yaml`）。 |
-| `avas` | 用 PySCF AVAS 按阈值选活性空间；需 `scf.driver: pyscf` 且 `chemistry_extended.avas_ao_labels` 等（见 `example_h2_avas.yaml`）。 |
+| `avas` | 用 PySCF `mcscf.avas` 核按阈值选活性空间；需 **`supports_avas_active_space_projection`** + 非空 **`chemistry_extended.avas.ao_labels`**（PySCF：`example_h2_avas.yaml`；Psi4：`example_h2_psi4_avas.yaml`）。 |
 
 `avas` / `avas_stub` 的化学细节见 [活性空间指定与AVAS_理论实践与开源对照.md](活性空间指定与AVAS_理论实践与开源对照.md)。
 

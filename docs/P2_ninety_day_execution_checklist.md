@@ -27,7 +27,7 @@
 | D13 | TKET 桥与文档一致 | Done | [`技术文档_CircuitIR与TKET桥接及作业契约.md`](技术文档_CircuitIR与TKET桥接及作业契约.md) §2 代码锚点；`backends/pytket_bridge.py`、`integrations/tket_fullchain.py` |
 | D14 | run_summary / protocol_counts / CompilerSpec 联合叙事 | Done | [`joint_compiler_protocol_narrative.md`](joint_compiler_protocol_narrative.md)（含 QPE README 指针）；`qpe_qec_demo/README.md` |
 | D15 | **闸门 A** | Done | `pytest` + `check_parity_export_sample`（CI / 本地） |
-| D16 | PySCF driver 表 ↔ 矩阵 §3 | Done | `chem/drivers/pyscf_driver.py`、`chem/solvers`、`ExperimentConfig.chemistry_extended`；代表 YAML + 编排/pytest |
+| D16 | PySCF driver 表 ↔ 矩阵 §3 | Done | `chem/solvers/pyscf_solver.py`、`chem/bridges/`（legacy `chem/drivers/`）、`ExperimentConfig.chemistry_extended`；代表 YAML + 编排/pytest |
 | D17 | Computable ↔ workflow-preview | Done | `tests/test_workflow_preview_repro_alignment.py`、`protocols/computable.py` |
 | D18 | HTTP capability / workflow-preview ↔ contract | Done | `tests/test_api_runs.py`（需 `[api]`） |
 | D19 | Tangelo VQE notebook → 等价 YAML 指针 | Done | [`Tangelo_notebook_to_yaml_mapping.md`](Tangelo_notebook_to_yaml_mapping.md) |
@@ -51,7 +51,7 @@
 | D31–D33 | 分解 demo / embedding / 单测 | Done | `configs/example_decomposition_plugin_toy.yaml`、`tests/test_decomposition_plugin_pipeline.py` |
 | D34 | Tangelo DMET/QMMM 边界 honesty | Done | [`P2_execution_alignment_notes.md`](P2_execution_alignment_notes.md) §3 |
 | D35–D37 | AVAS/CASSCF 边界 + caveat | Done | [`P2_W3_classical_avas_casscf_boundary.md`](P2_W3_classical_avas_casscf_boundary.md)；`run_summary.classical_active_space_caveat_v1` |
-| D38 | pyscf_driver ↔ YAML 契约 | Done | `chem/drivers/pyscf_driver.py`；相关编排 / config 回归单测 |
+| D38 | pyscf solver ↔ YAML 契约 | Done | `chem/solvers/pyscf_solver.py` + `reference_factory`（legacy `chem/drivers/pyscf_driver.py`）；相关编排 / config 回归单测 |
 | D39–D41 | W4 进阶块 + 单测 | Done | `mitigation.pec_literature_stub_enabled` → `mitigation_pec_literature_stub_v1`；`example_h2_pec_literature_stub.yaml` |
 | D42 | QPE 双轨回归 | Done | `configs/qpe_dual_track_demo.yaml`、pipeline 测 |
 | D43 | 激发态 YAML export | Done | `pytest -m l1_excited`；`tests/test_export_parity_schema.py::test_excited_export_config_only_for_vqd_yaml`；`configs/example_h2_excited_smoke.yaml` |

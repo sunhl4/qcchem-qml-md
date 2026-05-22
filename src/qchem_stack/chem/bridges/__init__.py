@@ -19,9 +19,12 @@ __all__ = [
     "ClassicalChemistrySoftwareBridge",
     "MeanFieldLike",
     "RegistryBackedClassicalBridge",
+    "classical_mean_field_reference_from_config",
     "classical_mean_field_via_solver_bridge",
+    "fork_driver_meta",
     "merge_canonical_classical_bridge_headers",
     "molecular_system_from_experiment",
+    "pyscf_rhf_result_from_config",
     "wrap_mean_field_like",
 ]
 
@@ -42,8 +45,16 @@ _LAZY_ATTRS: dict[str, tuple[str, str]] = {
         "qchem_stack.chem.bridges.facade",
         "classical_mean_field_via_solver_bridge",
     ),
+    "classical_mean_field_reference_from_config": (
+        "qchem_stack.chem.bridges.reference_factory",
+        "classical_mean_field_reference_from_config",
+    ),
+    "pyscf_rhf_result_from_config": (
+        "qchem_stack.chem.bridges.reference_factory",
+        "pyscf_rhf_result_from_config",
+    ),
     "molecular_system_from_experiment": (
-        "qchem_stack.chem.bridges.facade",
+        "qchem_stack.chem.molecular_system_config",
         "molecular_system_from_experiment",
     ),
     "CANONICAL_CLASSICAL_BRIDGE_META_VERSION": (
@@ -53,6 +64,10 @@ _LAZY_ATTRS: dict[str, tuple[str, str]] = {
     "merge_canonical_classical_bridge_headers": (
         "qchem_stack.chem.bridges.interchange",
         "merge_canonical_classical_bridge_headers",
+    ),
+    "fork_driver_meta": (
+        "qchem_stack.chem.bridges.driver_meta",
+        "fork_driver_meta",
     ),
     "MeanFieldLike": ("qchem_stack.chem.bridges.mean_field_like", "MeanFieldLike"),
     "wrap_mean_field_like": ("qchem_stack.chem.bridges.mean_field_like", "wrap_mean_field_like"),

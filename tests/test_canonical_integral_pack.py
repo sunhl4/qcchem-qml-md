@@ -6,22 +6,20 @@ from pathlib import Path
 
 import pytest
 
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
+
 
 def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
     pytest.importorskip("pyscf")
     from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import (
-        molecular_hamiltonian_from_canonical_active_space_pack,
-        molecular_hamiltonian_from_classical_reference,
-    )
+    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_canonical_active_space_pack
+    from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
     from qchem_stack.config import load_experiment_config
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     na = cfg.active_space.cas.n_orbitals
     ne = cfg.active_space.cas.n_electrons
     ref = ClassicalMeanFieldReference(
@@ -43,12 +41,7 @@ def test_pack_roundtrip_matches_unified_hamiltonian_entrypoint() -> None:
         fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
         classical_reference_for_meta=ref,
     )
-    q_ref = molecular_hamiltonian_from_classical_reference(
-        ref,
-        n_active_orbitals=na,
-        n_active_electrons=ne,
-        fermion_qubit_mapping=cfg.active_space.mapping.fermion_qubit,
-    )
+    q_ref = build_pre_quantum_input(cfg, ref).hamiltonian
     assert q_ref.meta["hamiltonian_fingerprint"] == q_pack.meta["hamiltonian_fingerprint"]
     assert q_pack.meta.get("canonical_integral_pack", {}).get("schema")
     assert q_pack.meta.get("integral_source") == pack.provenance.get("upstream_integral_source")
@@ -72,7 +65,6 @@ def test_classical_reference_fermionic_operator_matches_canonical_pack() -> None
     pytest.importorskip("pyscf")
     from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
     from qchem_stack.chem.hamiltonian import (
         fermionic_active_space_interaction_operator_from_canonical_pack,
         fermionic_active_space_interaction_operator_from_classical_reference,
@@ -81,8 +73,7 @@ def test_classical_reference_fermionic_operator_matches_canonical_pack() -> None
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     na = cfg.active_space.cas.n_orbitals
     ne = cfg.active_space.cas.n_electrons
     ref = ClassicalMeanFieldReference(

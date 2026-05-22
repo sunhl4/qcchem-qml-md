@@ -10,10 +10,14 @@ import pytest
 from qchem_stack.chem.active_space.avas_projection import apply_avas_projection
 from qchem_stack.chem.bridges.pyscf_shadow_reference import build_pyscf_rhf_shadow
 from qchem_stack.chem.embedding.impurity_eri import impurity_eri_chemist
+from qchem_stack.chem.embedding.schmidt_dmet_self_consistent import (
+    run_schmidt_density_feedback_cycles,
+)
 from qchem_stack.chem.embedding.schmidt_production import build_schmidt_impurity_integrals
+from qchem_stack.chem.kernels.rdm_corrections import run_nevpt2_casci_correction
 from qchem_stack.chem.solvers import create_solver
 from qchem_stack.config import load_experiment_config
-from qchem_stack.integrations.rdm_corrections import run_nevpt2_casci_correction
+from qchem_stack.contracts.schema_ids import SCHMIDT_DMET_DENSITY_FEEDBACK_V1
 from qchem_stack.orchestration.scf_stage import run_scf_reference
 
 PSI4_PYSCF_ETOT_ATOL = 0.0002
@@ -109,6 +113,26 @@ def test_psi4_schmidt_impurity_eri_matches_pyscf_h2() -> None:
 
 
 @pytest.mark.psi4
+@pytest.mark.pyscf
+def test_psi4_schmidt_density_feedback_cycles_runs() -> None:
+    pytest.importorskip("pyscf")
+    pytest.importorskip("psi4")
+    root = Path(__file__).resolve().parents[1]
+    ref_psi = run_scf_reference(_h2_cfg(root, driver="psi4"))
+    _model, report, _d_final = run_schmidt_density_feedback_cycles(
+        ref_psi,
+        fragment_atom_indices=[0],
+        n_bath_orbitals=1,
+        max_impurity_spatial_orbitals=6,
+        max_cycles=2,
+        mixing_alpha=0.35,
+        convergence_tol=1e-3,
+    )
+    assert report["schema"] == SCHMIDT_DMET_DENSITY_FEEDBACK_V1
+    assert len(report["history"]) >= 1
+
+
+@pytest.mark.psi4
 def test_psi4_pbc_kmesh_gt_one_rejected() -> None:
     pytest.importorskip("psi4")
     root = Path(__file__).resolve().parents[1]
@@ -118,8 +142,16 @@ def test_psi4_pbc_kmesh_gt_one_rejected() -> None:
             "scf": cfg.scf.model_copy(update={"driver": "psi4"}),
             "chemistry_extended": cfg.chemistry_extended.model_copy(
                 update={
-                    "pbc_cell_vectors_bohr": [[10.0, 0.0, 0.0], [0.0, 10.0, 0.0], [0.0, 0.0, 10.0]],
-                    "pbc_kpoint_mesh": [2, 1, 1],
+                    "pbc": cfg.chemistry_extended.pbc.model_copy(
+                        update={
+                            "cell_vectors_bohr": [
+                                [10.0, 0.0, 0.0],
+                                [0.0, 10.0, 0.0],
+                                [0.0, 0.0, 10.0],
+                            ],
+                            "kpoint_mesh": [2, 1, 1],
+                        }
+                    ),
                 }
             ),
         }

@@ -7,11 +7,10 @@ import pytest
 pytest.importorskip("pyscf")
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
 from qchem_stack.chem.embedding.projection_hamiltonian import (
     molecular_hamiltonian_fragment_mulliken_projection,
 )
-from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import (
     ActiveSpaceSpec,
     BackendSpecConfig,
@@ -21,6 +20,7 @@ from qchem_stack.config import (
     SCFSpec,
 )
 from tests.embedding_nested import embedding_projection
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def _h2_cfg(*, fragment_atoms: list[int]) -> ExperimentConfig:
@@ -45,7 +45,7 @@ def _h2_cfg(*, fragment_atoms: list[int]) -> ExperimentConfig:
 
 def test_projection_mulliken_h2_full_system_matches_global() -> None:
     cfg = _h2_cfg(fragment_atoms=[0, 1])
-    rhf = PySCFDriver.from_config(cfg).run_rhf()
+    rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),
@@ -53,7 +53,7 @@ def test_projection_mulliken_h2_full_system_matches_global() -> None:
         molecular_system=rhf.molecular_system,
         driver_meta=dict(rhf.driver_meta),
     )
-    g = molecular_hamiltonian_from_classical_reference(ref, 2, 2)
+    g = build_pre_quantum_input(cfg, ref).hamiltonian
     p, audit = molecular_hamiltonian_fragment_mulliken_projection(ref, cfg)
     assert g.meta["hamiltonian_fingerprint"] == p.meta["hamiltonian_fingerprint"]
     assert p.meta["integral_source"] == "pyscf_projection_fragment_mulliken_v1"
@@ -97,7 +97,7 @@ def test_projection_mulliken_h4_subfragment_changes_hamiltonian() -> None:
             fragment_atom_indices=[0],
         ),
     )
-    rhf = PySCFDriver.from_config(cfg_global).run_rhf()
+    rhf = pyscf_rhf_from_config(cfg_global)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
         e_tot=float(rhf.e_tot),
@@ -105,11 +105,7 @@ def test_projection_mulliken_h4_subfragment_changes_hamiltonian() -> None:
         molecular_system=rhf.molecular_system,
         driver_meta=dict(rhf.driver_meta),
     )
-    g = molecular_hamiltonian_from_classical_reference(
-        ref,
-        n_active_orbitals=2,
-        n_active_electrons=2,
-    )
+    g = build_pre_quantum_input(cfg_global, ref).hamiltonian
     p_sub, audit = molecular_hamiltonian_fragment_mulliken_projection(ref, cfg_sub)
     assert audit["selected_mo_indices"]
     assert g.meta["hamiltonian_fingerprint"] != p_sub.meta["hamiltonian_fingerprint"]

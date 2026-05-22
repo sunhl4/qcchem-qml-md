@@ -42,6 +42,18 @@ def _uccsd_trotter_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> UCCS
     return UCCSDTrotterVQE(hamiltonian, **kwargs)
 
 
+def _adapt_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
+
+    return FermionicAdaptVQE(hamiltonian, **kwargs)
+
+
+def _iqeb_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
+
+    return IQEBVQE(hamiltonian, **kwargs)
+
+
 ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
     "hea": AnsatzRegistryEntry(
         summary="Hardware-efficient layered rotations; depth from ``quantum.vqe.depth``.",
@@ -61,13 +73,13 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
     "fermionic_adapt": AnsatzRegistryEntry(
         summary="Fermionic-pool ADAPT-VQE.",
         implementation="qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
-        factory=_hea_factory,
+        factory=_adapt_factory,
         capabilities={"supports_pool_growth": True},
     ),
     "iqeb": AnsatzRegistryEntry(
         summary="IQEB outer loop with inner VQE.",
         implementation="qchem_stack.quantum.algorithms.iqeb.IQEBVQE",
-        factory=_hea_factory,
+        factory=_iqeb_factory,
         capabilities={"supports_outer_rounds": True},
     ),
     "uccsd_closed_shell_reference": AnsatzRegistryEntry(
@@ -97,7 +109,7 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
             "still resolves to fermionic-pool ADAPT-VQE in this stack."
         ),
         implementation="qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
-        factory=_hea_factory,
+        factory=_adapt_factory,
     ),
 }
 

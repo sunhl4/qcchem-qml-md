@@ -12,17 +12,19 @@ Implementation map:
 
 from __future__ import annotations
 
+import warnings
 from typing import TYPE_CHECKING, Any, Literal, cast
 
 import numpy as np
 
+from qchem_stack.chem.active_space.sizing import (
+    classify_mean_field_spin_symmetry as _classify_mean_field_spin_symmetry,
+)
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.drivers.pyscf_driver_mean_field import (
     mean_field_reference_for_benchmarks,
     run_molecular_mean_field,
     run_pbc_mean_field,
-)
-from qchem_stack.chem.drivers.pyscf_driver_mo import (
-    classify_mean_field_spin_symmetry as _classify_mean_field_spin_symmetry,
 )
 from qchem_stack.chem.drivers.pyscf_driver_mo import (
     get_ncas_nelec_couplet,
@@ -40,6 +42,7 @@ from qchem_stack.chem.integrals.pyscf_onebody import (
     one_electron_operator_fermion_from_rhf,
     one_electron_operator_pauli_from_rhf,
 )
+from qchem_stack.chem.molecular_system_config import molecular_system_from_experiment
 from qchem_stack.chem.solvers.pyscf_solver import PySCFIntegralSolver
 from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.chem.systems.pyscf_views import PySCFAOSystem, PySCFLowdinSystem
@@ -60,7 +63,12 @@ if TYPE_CHECKING:
 
 
 class PySCFDriver:
-    """Compatibility facade over :class:`PySCFIntegralSolver` for PySCF-specific workflows."""
+    """Compatibility facade over :class:`PySCFIntegralSolver` for PySCF-specific workflows.
+
+    .. deprecated::
+        Prefer :func:`qchem_stack.chem.solvers.registry.create_solver` or
+        :class:`~qchem_stack.chem.solvers.pyscf_solver.PySCFIntegralSolver.from_experiment_config`.
+    """
 
     def __init__(
         self,
@@ -79,6 +87,12 @@ class PySCFDriver:
         active_space: ActiveSpaceSpec | None = None,
         experiment_config: ExperimentConfig | None = None,
     ) -> None:
+        warnings.warn(
+            "PySCFDriver is deprecated; use create_solver(cfg) or "
+            "PySCFIntegralSolver.from_experiment_config(cfg).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         self.system = system
         self.method = method
         self.chemistry_extended = chemistry_extended or ChemistryExtendedSpec()
@@ -110,21 +124,19 @@ class PySCFDriver:
 
     @classmethod
     def from_config(cls, cfg: ExperimentConfig) -> PySCFDriver:
+        warnings.warn(
+            "PySCFDriver.from_config is deprecated; use create_solver(cfg) or "
+            "PySCFIntegralSolver.from_experiment_config(cfg).",
+            DeprecationWarning,
+            stacklevel=2,
+        )
         if cfg.scf.driver != "pyscf":
             raise ValueError(
                 "PySCFDriver builds OpenFermion Hamiltonians from PySCF mean fields; "
                 f"scf.driver must be 'pyscf' for this driver (got {cfg.scf.driver!r}). "
                 "Use qchem_stack.chem.solvers.create_solver(cfg) for other backends."
             )
-        m = cfg.molecule
-        sys = MolecularSystem(
-            symbols=m.symbols,
-            coordinates_bohr=np.asarray(m.coordinates_in_bohr(), dtype=float),
-            charge=m.charge,
-            multiplicity=m.multiplicity,
-            basis=m.basis,
-            ecp=m.ecp,
-        )
+        sys = molecular_system_from_experiment(cfg)
         scf = cfg.scf
         return cls(
             sys,
@@ -261,7 +273,7 @@ class PySCFDriver:
         if rhf is None and run_hf:
             rhf = self._run_mean_field()
         if rhf is not None:
-            meta = dict(rhf.driver_meta)
+            meta = fork_driver_meta(rhf.driver_meta)
             meta["integral_representation"] = "ao"
             meta["ao_reference_kind"] = "scf_object"
             meta["ao_run_hf"] = True
@@ -313,8 +325,15 @@ class PySCFDriver:
         jordan_wigner_coeff_atol: float | None = None,
     ) -> Any:
         from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-        from qchem_stack.chem.molecular_problem import build_restricted_active_space_quantum_problem
+        from qchem_stack.chem.molecular_problem_build import (
+            restricted_active_space_quantum_problem_from_config,
+        )
 
+        if self.experiment_config is None:
+            raise ValueError(
+                "get_restricted_active_space_quantum_problem requires experiment_config on PySCFDriver."
+            )
+        cfg = self.experiment_config
         if rhf is None:
             rhf = self.run_rhf()
         reference = ClassicalMeanFieldReference(
@@ -322,26 +341,16 @@ class PySCFDriver:
             e_tot=float(rhf.e_tot),
             mo_energy=np.asarray(rhf.mo_energy, dtype=float),
             molecular_system=rhf.molecular_system,
-            driver_meta=dict(rhf.driver_meta),
+            driver_meta=fork_driver_meta(rhf.driver_meta),
         )
-        if prefer_restricted_spatial_fermion_for_jordan_wigner is None:
-            prefer_eff = (
-                bool(self.active_space.jw.prefer_restricted_spatial)
-                if self.active_space is not None
-                else False
-            )
-        else:
-            prefer_eff = prefer_restricted_spatial_fermion_for_jordan_wigner
-        atol_eff = jordan_wigner_coeff_atol
-        if atol_eff is None and self.active_space is not None:
-            atol_eff = self.active_space.jw.coeff_atol
-        return build_restricted_active_space_quantum_problem(
+        return restricted_active_space_quantum_problem_from_config(
+            cfg,
             reference,
             n_active_orbitals=n_active_orbitals,
             n_active_electrons=n_active_electrons,
             fermion_qubit_mapping=fermion_qubit_mapping,
-            prefer_restricted_spatial_fermion_for_jordan_wigner=prefer_eff,
-            jordan_wigner_coeff_atol=atol_eff,
+            prefer_restricted_spatial_fermion_for_jordan_wigner=prefer_restricted_spatial_fermion_for_jordan_wigner,
+            jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
         )
 
     def run_classical_benchmarks(
@@ -369,4 +378,7 @@ class PySCFDriver:
         return run_pbc_mean_field(self)
 
 
-__all__ = ["PySCFDriver", "PySCFRHFResult", "unwrap_pyscf_rhf_for_backend_operations"]
+__all__ = [
+    "PySCFDriver",
+    "PySCFRHFResult",
+]

@@ -49,6 +49,7 @@ docusaurus-site/.docusaurus/
 
 # SQLite / local jobs (if created at repo root)
 *.db
+timer.dat
 
 # Jupyter
 .ipynb_checkpoints/

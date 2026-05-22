@@ -10,12 +10,12 @@ from openfermion import bravyi_kitaev, jordan_wigner
 from openfermion.ops import QubitOperator
 
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
-from qchem_stack.contracts.schema_ids import OPERATOR_POOL_REGISTRY_EXPORT_V1
-from qchem_stack.integrations.ucc_reference import (
+from qchem_stack.chem.kernels.spin_ucc import (
     build_spin_ucc_doubles_only_fermion_generators,
     build_spin_ucc_singles_only_fermion_generators,
     build_spin_uccsd_fermion_generators,
 )
+from qchem_stack.contracts.schema_ids import OPERATOR_POOL_REGISTRY_EXPORT_V1
 
 OperatorPoolFactory = Callable[[QubitHamiltonian], list[QubitOperator]]
 
@@ -228,6 +228,12 @@ OPERATOR_POOL_REGISTRY: Final[dict[str, OperatorPoolRegistryEntry]] = {
 
 def list_registered_operator_pool_ids() -> tuple[str, ...]:
     return tuple(sorted(set(OPERATOR_POOL_REGISTRY) | set(OPERATOR_POOL_ID_ALIASES)))
+
+
+def is_registered_operator_pool_id(pool_id: str) -> bool:
+    """Return True when ``pool_id`` (or a known alias) maps to a registry entry."""
+    canonical = resolve_operator_pool_id(str(pool_id).strip())
+    return canonical in OPERATOR_POOL_REGISTRY
 
 
 def build_registered_operator_pool(

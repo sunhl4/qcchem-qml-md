@@ -13,6 +13,8 @@ description: 根据你的目标选择上手路径：先跑通、先规划、先�
 2. [工作流与 YAML 概览](/tutorial/workflow)  
 3. 继续阅读 [案例：H2 家族](/tutorial/case-study-h2-family) 或 [UCCSD Trotter 导出](/tutorial/uccsd-trotter-export)
 
+**经典化学双后端（PySCF 默认 / Psi4 可选）**：仓库 `configs/` 下 H₂ 示例包括 `example_h2.yaml`（PySCF）、`example_h2_psi4_rhf_sto3g.yaml`（Psi4 canonical）、`example_h2_psi4_schmidt_dmet.yaml`、`example_h2_psi4_avas.yaml`、`example_h2_psi4_projection_mulliken.yaml`。Psi4 需本地 micromamba 环境；CI 用 `pytest -m psi4` 验证。
+
 ## 路径 B：先理解规划与契约
 
 适合：需要维护导出键、验收文档与路线图的维护者。

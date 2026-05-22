@@ -5,6 +5,7 @@ from __future__ import annotations
 import hashlib
 from typing import TYPE_CHECKING, Any, Literal
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
 
 if TYPE_CHECKING:
@@ -32,7 +33,7 @@ def _attach_reference_energy_meta(
 def _classical_driver_meta_payload(reference: Any) -> tuple[dict[str, Any], str]:
     if reference is None or not getattr(reference, "driver_meta", None):
         return {}, ""
-    driver_meta = dict(reference.driver_meta)
+    driver_meta = fork_driver_meta(reference.driver_meta)
     backend_tag = (
         str(
             driver_meta.get("upstream_classical_software_tag")

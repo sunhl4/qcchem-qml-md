@@ -12,8 +12,10 @@ from __future__ import annotations
 from dataclasses import replace
 from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.embedding.dmet import DMETContext, QubitHamiltonianFragmentSolverVQE
+from qchem_stack.chem.embedding.dmet import DMETContext
+from qchem_stack.config.quantum_helpers import resolve_vqe_depth, resolve_vqe_maxiter
 from qchem_stack.contracts.schema_ids import DMET_UNIFORM_MULTIFRAGMENT_TOY_V1
+from qchem_stack.integrations.dmet_fragment_solvers import QubitHamiltonianFragmentSolverVQE
 from qchem_stack.integrations.dmet_self_consistent import DMETBathState, DMETSelfConsistencyLoop
 
 if TYPE_CHECKING:
@@ -45,8 +47,8 @@ def run_uniform_hamiltonian_multifragment_toy(
         }
 
     solver = QubitHamiltonianFragmentSolverVQE(
-        depth=cfg.quantum.vqe.depth,
-        maxiter=cfg.quantum.vqe.maxiter,
+        depth=resolve_vqe_depth(cfg),
+        maxiter=resolve_vqe_maxiter(cfg),
         executor=executor,
         random_seed=cfg.random_seed,
     )

@@ -6,7 +6,7 @@ document stable keys for integrators, HTTP adapters, and static analysis.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NotRequired, TypedDict
+from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, cast
 
 from qchem_stack.contracts.schema_ids import PIPELINE_RESULT_V1
 
@@ -90,6 +90,7 @@ class PipelineResultV1(TypedDict, total=False):
     embedding_workflow: dict[str, object]
     job: PipelineJobEnqueueV1
     job_result: dict[str, object]
+    methods_sidecar: dict[str, object]
     nfev: NotRequired[int]
     algorithm: NotRequired[str]
 
@@ -120,11 +121,11 @@ def assert_pipeline_result_core_keys(payload: Mapping[str, object]) -> None:
         raise KeyError("pipeline result payload missing core keys: " + ", ".join(missing))
 
 
-def tag_pipeline_result(payload: dict[str, Any]) -> dict[str, Any]:
+def tag_pipeline_result(payload: PipelineResultV1 | dict[str, Any]) -> PipelineResultV1:
     """Attach ``schema: pipeline_result_v1`` without mutating nested structures."""
     tagged = dict(payload)
     tagged.setdefault("schema", PIPELINE_RESULT_V1)
-    return tagged
+    return cast("PipelineResultV1", tagged)
 
 
 __all__ = [

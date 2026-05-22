@@ -61,6 +61,14 @@ def test_registered_solvers_detail_includes_builtin_metadata() -> None:
     assert isinstance(pyscf, SolverRegistrationInfo)
     assert pyscf.source == "builtin"
     assert "pyscf_solver" in pyscf.provider
+    assert "schmidt_atomic_hamiltonian" in pyscf.capability_notes
+
+    psi4 = details["psi4"]
+    assert "avas_active_space_projection" in psi4.capability_notes
+    assert "pbc_k_mesh" in psi4.capability_notes
+
+    pre = details["precomputed"]
+    assert "restricted_active_space_qubit_hamiltonian" in pre.capability_notes
 
 
 def test_register_solver_adds_custom_id() -> None:

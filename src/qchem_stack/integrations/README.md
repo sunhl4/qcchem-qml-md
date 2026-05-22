@@ -17,8 +17,10 @@ Use this index to tell **product paths** (stable imports, HTTP/meta surfaces, CI
 | `resource_estimation_preview.py` | Shot/circuit preview without chemistry | Meta APIs, export scripts |
 | `cross_solver_parity.py` | HF energy cross-check reports | Tests, parity scripts |
 | `open_driver_surface.py` | Registered classical driver catalog | Capability / parity exports |
-| `rdm_corrections.py` | RDM correction hooks wired from orchestration | SCF stage when YAML enables |
+| `rdm_corrections.py` | RDM correction orchestration glue (re-exports chem L3 kernels) | SCF stage when YAML enables |
 | `rdm_corrections_types.py` | Typed shapes for RDM sidecars | `rdm_corrections` |
+| `schmidt_per_fragment_vqe.py` | Post-variational Schmidt impurity VQE sidecar | `embedding_workflow_stage` |
+| `dmet_fragment_solvers.py` | DMET fragment VQE solver (uses `quantum.*`) | DMET demo / workflow stage |
 
 These modules are covered by contract tests (`tests/test_workflow_preview_contract.py`,
 `tests/test_methods_resource_unified_export.py`, etc.) and documented in
@@ -28,8 +30,8 @@ These modules are covered by contract tests (`tests/test_workflow_preview_contra
 
 | Module | Role | Epistemic note |
 |--------|------|----------------|
-| `dmet_self_consistent.py` | DMET self-consistency loop + one-shot driver | Open architecture; not full literature DMET |
-| `schmidt_dmet_self_consistent.py` | Schmidt ↔ DMET density feedback | Production-shaped; see embedding YAML |
+| `dmet_self_consistent.py` | Re-export shim → `chem.embedding.dmet_self_consistent` | Open architecture; not full literature DMET |
+| `schmidt_dmet_self_consistent.py` | Re-export shim → `chem.embedding.schmidt_dmet_self_consistent` | Production-shaped; see embedding YAML |
 | `dmet_multifragment_toy.py` | Uniform multifragment toy sweep | **Toy** — smoke only |
 | `gap_closure_bundle.py` | Gap-closure reference bundle | Parity / Methods narrative |
 | `l3_algorithm_benchmark.py` | Deep numerical benchmark gate | Optional `pytest -m l3` |
@@ -38,19 +40,23 @@ These modules are covered by contract tests (`tests/test_workflow_preview_contra
 | `tensornet_closure.py` | Tensor-network closure strategy doc blob | Stub / research |
 | `tket_fullchain.py` | TKET compile stats bridge | Optional `pip install .[pytket]` |
 | `nexus_optional.py` | qnexus installation probe | Optional `pip install .[nexus]` |
-| `ucc_reference.py` | UCCSD pool / regrouping reference | Algorithm parity, not runtime default |
+| `ucc_reference.py` | **Deprecated** re-export → `chem.kernels.spin_ucc` | Legacy import path only |
 
 ## Package `__init__` exports
 
 `integrations/__init__.py` re-exports a **small stable subset** (DMET loop, TKET bridge,
-Qermit matrix, UCC reference, nexus probe). Everything else is imported by explicit submodule path.
+Qermit matrix, spin_ucc UCC helpers via `__init__`, nexus probe). Everything else is imported by explicit submodule path.
 
 ## Dependency rule
 
+Canonical L3 numerical kernels live under `qchem_stack.chem.kernels` and
+`qchem_stack.chem.embedding` (Schmidt/DMET loops, NEVPT2). `integrations` may re-export
+those symbols for backward-compatible import paths.
+
 ```
-integrations  →  orchestration, protocols, chem, quantum, jobs  (may)
-orchestration →  integrations  (optional sidecars only)
-chem/quantum  →  integrations  (must NOT)
+integrations  →  chem, orchestration, protocols, quantum, jobs  (may)
+orchestration →  integrations, chem  (optional sidecars)
+chem          →  integrations, quantum  (must NOT at module scope)
 ```
 
 When adding a new file here, classify it in this README and add a focused test under `tests/`.

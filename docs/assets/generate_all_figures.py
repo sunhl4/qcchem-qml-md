@@ -1152,8 +1152,9 @@ def fig_driver_interface():
          'ExperimentConfig  (YAML, Pydantic)',
          'molecule | scf.method | active_space | chemistry_extended'),
         ('#d4f1ec', C['green'],
-         'PySCFDriver  (Unified Interface)',
-         'from_config(cfg) → run_rhf() / ROHF / UHF / PBC gamma-k\n'
+         'ChemIntegralSolver + classical bridge',
+         'create_solver(cfg) → compute_mean_field()\n'
+         'classical_mean_field_reference_from_config (legacy: PySCFDriver)\n'
          'Extensions: ddCOSMO solvent | k-mesh | CASSCF audit'),
         ('#fdebd0', '#d4520d',
          'Hamiltonian + Mapping',

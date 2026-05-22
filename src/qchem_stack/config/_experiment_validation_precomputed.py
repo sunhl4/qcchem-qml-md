@@ -27,6 +27,21 @@ def validate_precomputed_driver_excludes_live_hooks(spec: ExperimentConfig) -> N
             "chemistry_extended.post_hf.rdm_correction_method requires live backend hooks and is "
             "unsupported with scf.driver='precomputed'."
         )
+    from qchem_stack.config.embedding_enums import EmbeddingMode
+    from qchem_stack.config.embedding_helpers import is_projection_mulliken, is_schmidt_production
+
+    emb = spec.embedding
+    if emb.mode == EmbeddingMode.DMET and is_schmidt_production(emb):
+        raise ConfigurationError(
+            "embedding.dmet.hamiltonian_source='schmidt_atomic_production' requires "
+            "supports_schmidt_atomic_hamiltonian=True; scf.driver='precomputed' is bundle-only."
+        )
+    if emb.mode == EmbeddingMode.PROJECTION and is_projection_mulliken(emb):
+        raise ConfigurationError(
+            "embedding.projection.quantum_hamiltonian='fragment_mulliken_mo' requires "
+            "supports_projection_fragment_mulliken_hamiltonian=True; "
+            "scf.driver='precomputed' is bundle-only."
+        )
 
 
 def preprocess_precomputed_bundle_path(

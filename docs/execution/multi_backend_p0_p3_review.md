@@ -42,10 +42,15 @@
 
 | Item | Notes |
 |------|--------|
-| Schmidt DMET density feedback | `run_schmidt_density_feedback_cycles` still requires PySCF MF internally; `test_schmidt_path_allows_psi4_when_capability_enabled` fails when Psi4 is installed (capability vs implementation gap). |
 | Central L3 scheduler | `kernels/dispatch` is thin; full catalog dispatch remains future work. |
 | ORCA / Gaussian spike | Not in scope. |
-| `registered_solvers_detail` | Does not yet embed `capability_notes`; use `solver_capability_notes_for_config(cfg)` or live `create_solver(cfg).capabilities`. |
+| `registered_solvers_detail` | ~~Does not yet embed `capability_notes`~~ **Resolved (2026-05-21 Phase 5)** — built-in `pyscf` / `psi4` / `precomputed` embed production preset `capability_notes`; runtime/entrypoint plugins return `{}` until queried via `create_solver(cfg).capabilities`. |
+
+**Resolved (2026-05-21):** Schmidt DMET density feedback and per-fragment VQE sidecar now use `ao_basis_view` / backend-neutral entry (`pyscf` \| `psi4`); capability matrix centralized in `chem/integration/presets.py` with anti-drift tests.
+
+**Resolved (2026-05-21 Phase 3/4):** Secondary doc sync (`pre_quantum_yaml_matrix`, dual-line PreQuantumInput, active-space guide); combo tests for Psi4 schmidt/avas/projection; new `configs/example_h2_psi4_projection_mulliken.yaml` + `-m psi4` pipeline smoke; precomputed live-embedding rejection at config load.
+
+**Resolved (2026-05-21 Phase 5):** Psi4 vs PySCF projection Mulliken parity test; `test_pre_quantum_path` psi4 projection YAML; Docusaurus H2/Psi4 onboarding links; `registered_solvers_detail().capability_notes` for built-in presets.
 
 ## Cache / meta
 

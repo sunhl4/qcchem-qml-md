@@ -12,12 +12,12 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
-from qchem_stack.orchestration.pipeline import collect_repro_metadata
-from qchem_stack.protocols.product_contract import (
+from qchem_stack.config.quantum_helpers import (
     PAULI_PATH_DISABLED,
     PAULI_PATH_EXACT,
     PAULI_PATH_STATEVECTOR_SHOT_SIM,
 )
+from qchem_stack.orchestration.pipeline import collect_repro_metadata
 from tests.embedding_nested import embedding_dmet
 
 

@@ -152,4 +152,4 @@ python scripts/build_precomputed_bundle.py \
 - 配置约束：
   - `scf.driver='precomputed'` 时必须给 `scf.precomputed_bundle_path`
   - 其它 driver 不允许给 `scf.precomputed_bundle_path`
-- `scf.driver=psi4`：闭壳 RHF + 小活性空间可走 `CanonicalActiveSpaceIntegralPack`（`chem.integrals.psi4_active_space_exporter`）；**不**支持 Schmidt / AVAS / Mulliken projection（配置层拒绝，见 `pre_quantum_yaml_matrix.md`）。
+- `scf.driver=psi4`：闭壳 RHF + 小活性空间可走 `CanonicalActiveSpaceIntegralPack`（`chem.integrals.psi4_active_space_exporter`）；Schmidt / AVAS / Mulliken projection 在 **capability 门控** 下允许（部分 L3 核委托 PySCF，见 `presets.capability_notes`）。样例：`configs/example_h2_psi4_rhf_sto3g.yaml`、`configs/example_h2_psi4_schmidt_dmet.yaml`、`configs/example_h2_psi4_avas.yaml`、`configs/example_h2_psi4_projection_mulliken.yaml`。组合矩阵见 [`pre_quantum_yaml_matrix.md`](pre_quantum_yaml_matrix.md)。

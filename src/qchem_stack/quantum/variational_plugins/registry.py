@@ -15,6 +15,10 @@ from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any, Final
 
+from qchem_stack.config.quantum_helpers import (
+    resolve_quantum_algorithm_factory,
+    resolve_variational_algorithm,
+)
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.quantum.variational_plugins.builtins import BUILTIN_RUNNERS
 from qchem_stack.quantum.variational_plugins.loader import load_variational_runner_from_factory
@@ -225,8 +229,8 @@ def resolve_variational_runner(
 
 
 def run_variational_stage(ctx: VariationalRunContext) -> VariationalStageOutcome:
-    q = ctx.cfg.quantum
     runner = resolve_variational_runner(
-        algorithm=q.algorithm, algorithm_factory=q.algorithm_factory
+        algorithm=resolve_variational_algorithm(ctx.cfg),
+        algorithm_factory=resolve_quantum_algorithm_factory(ctx.cfg),
     )
     return runner(ctx)

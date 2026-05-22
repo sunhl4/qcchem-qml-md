@@ -15,7 +15,7 @@ Stage map (``run_pipeline_sync``)
    mitigation DAG, resource summaries, ``attach_run_summary``.
 
 ``run_pipeline_from_config`` adds an optional **job_enqueue** step when
-``cfg.quantum.pauli.use_protocol`` and ``job_db`` are set (build → compile → SQLite store).
+``pauli_protocol_enabled(cfg)`` and ``job_db`` are set (build → compile → SQLite store).
 """
 
 from __future__ import annotations
@@ -23,7 +23,7 @@ from __future__ import annotations
 import hashlib
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -37,6 +37,11 @@ from qchem_stack.config import (
     backend_spec_from_config,
     compiler_pass_bundle_from_config,
     load_experiment_config,
+)
+from qchem_stack.config.quantum_helpers import (
+    pauli_protocol_enabled,
+    resolve_variational_algorithm,
+    resolve_vqe_depth,
 )
 from qchem_stack.contracts.schema_ids import (
     ACTIVE_SPACE_EXPORTERS_REGISTRY_V1,
@@ -191,7 +196,7 @@ def run_pipeline_sync(
         pre_quantum_input=pre_q_input,
     )
     stage = run_variational_stage(vctx)
-    algo_meta = stage.algo_meta_must_include_algorithm(cfg.quantum.algorithm)
+    algo_meta = stage.algo_meta_must_include_algorithm(resolve_variational_algorithm(cfg))
     angles = stage.angles
     energy_pre = float(stage.energy)
 
@@ -310,16 +315,19 @@ def run_pipeline_from_config(
     qh_lane: list[QubitHamiltonian] = []
     sync = run_pipeline_sync(cfg, cfg_path=p, hamiltonian_out=qh_lane, run_context=run_context)
 
-    if job_db is None or not cfg.quantum.pauli.use_protocol:
+    if job_db is None or not pauli_protocol_enabled(cfg):
         return tag_pipeline_result(sync)
 
     qh = qh_lane[0]
-    angles = np.asarray(sync["angles"], dtype=float)
+    angles_raw = sync.get("angles")
+    if angles_raw is None:
+        raise KeyError("pipeline sync missing angles before job enqueue")
+    angles = np.asarray(angles_raw, dtype=float)
     bspec2 = backend_spec_from_config(cfg)
     exe2 = executor_from_spec(bspec2)
     bundle2 = compiler_pass_bundle_from_config(cfg)
     proto = protocol_for_job(cfg, qh, bspec=bspec2, exe=exe2, bundle=bundle2)
-    proto.build(angles, hea_depth=cfg.quantum.vqe.depth)
+    proto.build(angles, hea_depth=resolve_vqe_depth(cfg))
     proto.compile()
     blob = proto.dumps()
     ph = hashlib.sha256(blob).hexdigest()[:24]
@@ -329,5 +337,5 @@ def run_pipeline_from_config(
     if not enqueue_only:
         PauliAveragingProtocol.process_job(store, handle.job_id)
         sync["job_result"] = store.result(handle.job_id)
-    attach_run_summary(sync, cfg)
+    attach_run_summary(cast("dict[str, Any]", sync), cfg)
     return tag_pipeline_result(sync)

@@ -4,6 +4,15 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any, cast
 
+from qchem_stack.config.quantum_helpers import (
+    excited_any_after_variational,
+    excited_qse_after_variational,
+    excited_qse_plugin_params,
+    excited_sceom_after_variational,
+    excited_sceom_plugin_params,
+    excited_vqd_after_variational,
+    excited_vqd_plugin_params,
+)
 from qchem_stack.contracts.schema_ids import EXCITED_PROTOCOL_CONTRACT_V1
 from qchem_stack.orchestration.excited_stages_types import (
     ExcitedProtocolContractV1,
@@ -47,45 +56,45 @@ def excited_protocol_contract_v1_block() -> ExcitedProtocolContractV1:
     }
 
 
-def build_excited_resource_summary_for_export(
-    cfg: ExperimentConfig,
-) -> ExcitedResourceSummary | None:
-    q = cfg.quantum
-    if not (
-        q.excited.vqd.after_variational
-        or q.excited.qse.after_variational
-        or q.excited.sceom.after_variational
-    ):
-        return None
-    er: ExcitedResourceSummary = {}
-    if q.excited.vqd.after_variational:
-        ns = q.excited.vqd.n_states
-        n_exc = max(0, ns - 1)
-        n_pairs = n_exc * (n_exc + 1) // 2
-        er["vqd"] = VqdResourceBlock(
-            n_states=ns,
-            shots_objective_per_reporting_level=q.excited.vqd.shots_objective,
-            shots_overlap_per_pair=q.excited.vqd.shots_overlap,
-            shots_weight_channel=q.excited.vqd.shots_weight,
-            deflated_cobyla_levels=n_exc,
-            swap_test_pair_count_if_shots=n_pairs if q.excited.vqd.shots_overlap > 0 else 0,
-        )
-    if q.excited.qse.after_variational:
-        er["qse"] = cast(
-            "QseResourceBlock",
-            {
-                "shot_mode": str(q.excited.qse.shot_mode),
-                "qse_shots_per_matrix_element_yaml": q.excited.qse.shots_per_matrix_element,
-                "qse_shots_per_ij_term_yaml": q.excited.qse.shots_per_ij_term,
-            },
-        )
-    if q.excited.sceom.after_variational:
-        k = q.excited.sceom.subspace_dim
-        er["sceom"] = SceomResourceBlock(
-            generator_count_k=k,
-            m_matrix_elements=k * k,
-            shots_per_matrix_element_yaml=q.excited.sceom.shots_per_matrix_element,
-        )
+def _vqd_resource_block(cfg: ExperimentConfig) -> VqdResourceBlock:
+    p = excited_vqd_plugin_params(cfg)
+    ns = int(p["n_states"])
+    n_exc = max(0, ns - 1)
+    n_pairs = n_exc * (n_exc + 1) // 2
+    shots_overlap = int(p["shots_overlap"])
+    return VqdResourceBlock(
+        n_states=ns,
+        shots_objective_per_reporting_level=int(p["shots_objective"]),
+        shots_overlap_per_pair=shots_overlap,
+        shots_weight_channel=int(p["shots_weight"]),
+        deflated_cobyla_levels=n_exc,
+        swap_test_pair_count_if_shots=n_pairs if shots_overlap > 0 else 0,
+    )
+
+
+def _qse_resource_block_from_config(cfg: ExperimentConfig) -> QseResourceBlock:
+    p = excited_qse_plugin_params(cfg)
+    return cast(
+        "QseResourceBlock",
+        {
+            "shot_mode": str(p["shot_mode"]),
+            "qse_shots_per_matrix_element_yaml": p["shots_per_matrix_element"],
+            "qse_shots_per_ij_term_yaml": p["shots_per_ij_term"],
+        },
+    )
+
+
+def _sceom_resource_block(cfg: ExperimentConfig) -> SceomResourceBlock:
+    p = excited_sceom_plugin_params(cfg)
+    k = int(p["subspace_dim"])
+    return SceomResourceBlock(
+        generator_count_k=k,
+        m_matrix_elements=k * k,
+        shots_per_matrix_element_yaml=int(p["shots_per_matrix_element"]),
+    )
+
+
+def _finalize_excited_resource_summary(er: ExcitedResourceSummary) -> ExcitedResourceSummary:
     ch = excited_shot_channel_upper_bounds(er)
     er["shot_channel_upper_bounds"] = ch
     er["excited_methods_unified"] = excited_methods_unified(er)
@@ -93,33 +102,34 @@ def build_excited_resource_summary_for_export(
     return er
 
 
+def build_excited_resource_summary_for_export(
+    cfg: ExperimentConfig,
+) -> ExcitedResourceSummary | None:
+    if not excited_any_after_variational(cfg):
+        return None
+    er: ExcitedResourceSummary = {}
+    if excited_vqd_after_variational(cfg):
+        er["vqd"] = _vqd_resource_block(cfg)
+    if excited_qse_after_variational(cfg):
+        er["qse"] = _qse_resource_block_from_config(cfg)
+    if excited_sceom_after_variational(cfg):
+        er["sceom"] = _sceom_resource_block(cfg)
+    return _finalize_excited_resource_summary(er)
+
+
 def build_excited_resource_summary(
     cfg: ExperimentConfig,
     out: dict[str, Any],
 ) -> ExcitedResourceSummary | None:
-    q = cfg.quantum
-    if not (
-        q.excited.vqd.after_variational
-        or q.excited.qse.after_variational
-        or q.excited.sceom.after_variational
-    ):
+    if not excited_any_after_variational(cfg):
         return None
     er: ExcitedResourceSummary = {}
-    if q.excited.vqd.after_variational:
-        ns = q.excited.vqd.n_states
-        n_exc = max(0, ns - 1)
-        n_pairs = n_exc * (n_exc + 1) // 2
-        er["vqd"] = VqdResourceBlock(
-            n_states=ns,
-            shots_objective_per_reporting_level=q.excited.vqd.shots_objective,
-            shots_overlap_per_pair=q.excited.vqd.shots_overlap,
-            shots_weight_channel=q.excited.vqd.shots_weight,
-            deflated_cobyla_levels=n_exc,
-            swap_test_pair_count_if_shots=n_pairs if q.excited.vqd.shots_overlap > 0 else 0,
-        )
-    if q.excited.qse.after_variational and "qse" in out:
+    if excited_vqd_after_variational(cfg):
+        er["vqd"] = _vqd_resource_block(cfg)
+    qse_kw = excited_qse_plugin_params(cfg)
+    if excited_qse_after_variational(cfg) and "qse" in out:
         meta = out["qse"].get("meta") or {}
-        block: QseResourceBlock = {"shot_mode": str(q.excited.qse.shot_mode)}
+        block: QseResourceBlock = {"shot_mode": str(qse_kw["shot_mode"])}
         k_val = meta.get("K")
         if isinstance(k_val, int):
             block["K"] = k_val
@@ -134,28 +144,19 @@ def build_excited_resource_summary(
             npt = sched.get("n_pauli_terms")
             if isinstance(npt, int):
                 block["n_pauli_terms_in_schedule"] = npt
-        if q.excited.qse.shot_mode == "gaussian_h":
+        if qse_kw["shot_mode"] == "gaussian_h":
             k = meta.get("K")
             if isinstance(k, int) and k > 0:
                 block["h_matrix_elements"] = k * k
                 block["gaussian_h_shots_budget_reference"] = (
-                    k * k * q.excited.qse.shots_per_matrix_element
+                    k * k * int(qse_kw["shots_per_matrix_element"])
                 )
-        if q.excited.qse.shot_mode == "pauli_transitions":
-            block["shots_per_ij_term_yaml"] = q.excited.qse.shots_per_ij_term
+        if qse_kw["shot_mode"] == "pauli_transitions":
+            block["shots_per_ij_term_yaml"] = qse_kw["shots_per_ij_term"]
         er["qse"] = cast("QseResourceBlock", {k2: v for k2, v in block.items() if v is not None})
-    if q.excited.sceom.after_variational:
-        k = q.excited.sceom.subspace_dim
-        er["sceom"] = SceomResourceBlock(
-            generator_count_k=k,
-            m_matrix_elements=k * k,
-            shots_per_matrix_element_yaml=q.excited.sceom.shots_per_matrix_element,
-        )
-    ch = excited_shot_channel_upper_bounds(er)
-    er["shot_channel_upper_bounds"] = ch
-    er["excited_methods_unified"] = excited_methods_unified(er)
-    er["excited_protocol_contract_v1"] = excited_protocol_contract_v1_block()
-    return er
+    if excited_sceom_after_variational(cfg):
+        er["sceom"] = _sceom_resource_block(cfg)
+    return _finalize_excited_resource_summary(er)
 
 
 def vqd_channel_upper(v: VqdResourceBlock) -> int:

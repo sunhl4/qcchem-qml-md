@@ -61,8 +61,8 @@ molecule:
 scf:
   driver: pyscf
   method: RHF
-  chkfile: null
-  init_guess: minao
+  pyscf:
+    init_guess: minao
 active_space:
   strategy: cas
   cas:

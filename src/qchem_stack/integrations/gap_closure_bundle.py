@@ -9,17 +9,17 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.backends.spec import CircuitIR
+from qchem_stack.chem.kernels.spin_ucc import (
+    GreedyCommutingFermionicLayers,
+    SinglesBeforeDoublesLexicographic,
+    build_spin_uccsd_fermion_generators,
+)
 from qchem_stack.contracts.schema_ids import OPEN_GAP_CLOSURE_REFERENCE_V1
 from qchem_stack.integrations.l3_statistics_reference import energy_bootstrap_ci_stub
 from qchem_stack.integrations.nexus_optional import nexus_public_workflow_blueprint
 from qchem_stack.integrations.open_driver_surface import open_driver_coverage_matrix
 from qchem_stack.integrations.qermit_reference import qermit_mitigation_execution_overlays
 from qchem_stack.integrations.tket_fullchain import circuit_ir_tket_peephole_optimize_stats_or_none
-from qchem_stack.integrations.ucc_reference import (
-    GreedyCommutingFermionicLayers,
-    SinglesBeforeDoublesLexicographic,
-    build_spin_uccsd_fermion_generators,
-)
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.tensornet.dense_expectation_reference import dense_expectation_api_descriptor
 
@@ -57,8 +57,8 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
             "or explicitly labeled toy methods. Not Quantinuum closed binaries."
         ),
         "ucc": {
-            "module": "qchem_stack.integrations.ucc_reference",
-            "chemically_aware_ucc_policy_protocol": "qchem_stack.integrations.ucc_reference.ChemicallyAwareUCCPolicy",
+            "module": "qchem_stack.chem.kernels.spin_ucc",
+            "chemically_aware_ucc_policy_protocol": "qchem_stack.chem.kernels.spin_ucc.ChemicallyAwareUCCPolicy",
             "build_spin_uccsd_fermion_generators_policy_param": (
                 "Optional ``policy: ChemicallyAwareUCCPolicy``; default ``IdentityRegrouping`` when omitted."
             ),

@@ -196,6 +196,32 @@ def test_run_variational_stage_builtin_vqe_zero_init() -> None:
     assert "nfev" in st.algo_meta
 
 
+def test_run_variational_stage_uccsd_branch() -> None:
+    from qchem_stack.chem.fermion import FermionSpace
+
+    op = QubitOperator(((0, "Z"),), -0.5) + QubitOperator(((1, "Z"),), -0.5)
+    qh = QubitHamiltonian(
+        operator=op,
+        n_qubits=4,
+        fermion_space=FermionSpace(n_spin_orbitals=4, n_electrons=2),
+        meta={"fermion_to_qubit_map": "jordan_wigner"},
+    )
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="vqe",
+            variational={"ansatz": "uccsd"},
+            vqe={"maxiter": 3},
+            pauli={"use_protocol": False},
+        ),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+    )
+    st = run_variational_stage(ctx)
+    assert st.algo_meta.get("algorithm") == "vqe"
+    assert st.algo_meta.get("vqe_meta", {}).get("variational_ansatz") == "uccsd"
+
+
 def test_algorithm_registry_synced_with_variational_builtins() -> None:
     from qchem_stack.quantum.algorithm_registry import ALGORITHM_REGISTRY
     from qchem_stack.quantum.variational_plugins.registry import is_registered_variational_id

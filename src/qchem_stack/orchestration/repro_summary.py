@@ -7,6 +7,13 @@ from typing import TYPE_CHECKING, Any
 from qchem_stack.config.embedding_enums import DmetHamiltonianSource, EmbeddingMode
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels
 from qchem_stack.config.embedding_specs import EmbeddingDmet, EmbeddingPlugin
+from qchem_stack.config.quantum_helpers import (
+    classify_pauli_expectation_path_for_config,
+    excited_qse_after_variational,
+    excited_sceom_after_variational,
+    excited_vqd_after_variational,
+    pauli_protocol_enabled,
+)
 from qchem_stack.contracts.schema_ids import (
     PIPELINE_PROFILE_V1,
     SCHMIDT_PER_FRAGMENT_VQE_V1,
@@ -15,7 +22,6 @@ from qchem_stack.orchestration.repro_summary_classical import classical_benchmar
 from qchem_stack.orchestration.repro_summary_quantum_tracks import (
     apply_quantum_and_demo_run_summary_fields,
 )
-from qchem_stack.protocols.product_contract import classify_pauli_expectation_path
 
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig
@@ -47,13 +53,13 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
     spfv_out = out.get("schmidt_per_fragment_vqe")
     if isinstance(spfv_out, dict) and spfv_out.get("schema") == SCHMIDT_PER_FRAGMENT_VQE_V1:
         stages.append("schmidt_per_fragment_vqe")
-    if q.excited.vqd.after_variational and "vqd" in out:
+    if excited_vqd_after_variational(cfg) and "vqd" in out:
         stages.append("vqd")
-    if q.excited.qse.after_variational and "qse" in out:
+    if excited_qse_after_variational(cfg) and "qse" in out:
         stages.append("qse")
-    if q.excited.sceom.after_variational and "sceom" in out:
+    if excited_sceom_after_variational(cfg) and "sceom" in out:
         stages.append("sceom")
-    if q.pauli.use_protocol and "energy_pauli_protocol" in out:
+    if pauli_protocol_enabled(cfg) and "energy_pauli_protocol" in out:
         stages.append("pauli_averaging_protocol")
     sm: dict[str, Any] = {
         "stages_completed": stages,
@@ -61,7 +67,7 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         "quantum_algorithm_yaml": q.algorithm,
         "classical_backend_id": str(cfg.scf.driver),
         "variational_ansatz_yaml": q.variational.ansatz,
-        "pauli_protocol_expectation_path": classify_pauli_expectation_path(q),
+        "pauli_protocol_expectation_path": classify_pauli_expectation_path_for_config(cfg),
         "energy_after_variational": out.get("energy_after_variational"),
         "mitigation_zne_mode_yaml": cfg.mitigation.zne.mode,
         "mitigation_zne_scales_yaml": [float(x) for x in cfg.mitigation.zne.scales],

@@ -6,7 +6,7 @@ import importlib.util
 from pathlib import Path
 
 from qchem_stack.config import load_experiment_config
-from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
+from qchem_stack.orchestration.excited_stages import build_excited_resource_summary_for_export
 
 
 def _load_export_script():

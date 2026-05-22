@@ -2,14 +2,11 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
-from qchem_stack.chem.active_space.mean_field_meta import (
-    apply_active_space_strategy_to_mean_field_meta,
-)
-from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.exceptions import PipelineError
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.config import ExperimentConfig
 
 
@@ -18,52 +15,11 @@ def solver_capabilities(cfg: ExperimentConfig) -> Any:
 
 
 def run_scf_reference(cfg: ExperimentConfig) -> ClassicalMeanFieldReference:
-    from qchem_stack.chem.bridges import (
-        classical_mean_field_via_solver_bridge,
-        molecular_system_from_experiment,
+    from qchem_stack.chem.bridges.reference_factory import (
+        classical_mean_field_reference_from_config,
     )
 
-    if cfg.active_space.strategy == "manual":
-        frz = list(cfg.active_space.manual.frozen_orbitals)
-        recipe = (
-            "manual:"
-            f"n_active_orbitals={cfg.active_space.cas.n_orbitals},"
-            f"n_active_electrons={cfg.active_space.cas.n_electrons},"
-            f"frozen_orbitals={frz}"
-        )
-    elif cfg.active_space.strategy == "avas_stub":
-        recipe = (
-            "avas_stub:"
-            f"n_orbitals={cfg.active_space.cas.n_orbitals},"
-            f"n_electrons={cfg.active_space.cas.n_electrons}:partial_open_stack_no_avas_projection"
-        )
-    elif cfg.active_space.strategy == "avas":
-        recipe = (
-            "avas:"
-            f"ao_labels={cfg.chemistry_extended.avas.ao_labels}:"
-            f"threshold={cfg.chemistry_extended.avas.threshold}:pyscf_mcscf_avas"
-        )
-    else:
-        recipe = (
-            f"cas:n_orbitals={cfg.active_space.cas.n_orbitals},"
-            f"n_electrons={cfg.active_space.cas.n_electrons}"
-        )
-    mf_pack = classical_mean_field_via_solver_bridge(cfg)
-    rhf = ClassicalMeanFieldReference.from_mean_field_pack(
-        mf_pack,
-        molecular_system=molecular_system_from_experiment(cfg),
-    )
-    apply_active_space_strategy_to_mean_field_meta(
-        rhf.driver_meta,
-        strategy=cfg.active_space.strategy,
-        recipe=recipe,
-        avas_ao_labels=cfg.chemistry_extended.avas.ao_labels,
-    )
-    if cfg.active_space.manual.frozen_orbitals:
-        rhf.driver_meta["active_space_frozen_orbitals"] = list(
-            cfg.active_space.manual.frozen_orbitals
-        )
-    return rhf
+    return classical_mean_field_reference_from_config(cfg)
 
 
 def refine_mean_field_for_active_space(

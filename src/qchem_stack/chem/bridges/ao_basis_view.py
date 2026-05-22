@@ -165,3 +165,18 @@ def ao_basis_view_from_reference(reference: ClassicalMeanFieldReference) -> AOBa
     if tag == "psi4":
         return Psi4AOBasisView(_wfn=raw)
     raise ValueError(f"No AOBasisView for backend {tag!r}; supported: pyscf, psi4.")
+
+
+def require_ao_basis_view(
+    reference: ClassicalMeanFieldReference,
+    *,
+    context: str,
+    error_cls: type[Exception] = ValueError,
+) -> AOBasisView:
+    try:
+        return reference.ao_basis_view()
+    except Exception as e:  # noqa: BLE001
+        raise error_cls(
+            f"{context} requires a mean-field reference with AO basis view "
+            f"(backend={reference.backend_tag()!r}): {e}"
+        ) from e

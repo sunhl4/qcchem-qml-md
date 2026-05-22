@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from qchem_stack.integrations.ucc_reference import (
+from qchem_stack.chem.kernels.spin_ucc import (
     build_spin_ucc_doubles_only_fermion_generators,
     build_spin_ucc_singles_only_fermion_generators,
     build_spin_uccsd_fermion_generators,

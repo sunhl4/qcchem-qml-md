@@ -4,6 +4,12 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.config.quantum_helpers import (
+    quantum_demo_open_stack_yaml_flags,
+    quantum_excited_run_summary_yaml_fields,
+    quantum_variational_run_summary_yaml_fields,
+    resolve_vqe_maxiter,
+)
 from qchem_stack.contracts.schema_ids import (
     QPE_OPEN_STACK_CONTRACT_V1,
     VQS_OPEN_STACK_CONTRACT_V1,
@@ -21,12 +27,13 @@ def apply_quantum_and_demo_run_summary_fields(
 ) -> None:
     q = cfg.quantum
     if q.algorithm == "vqe":
-        sm["vqe_maxiter_yaml"] = q.vqe.maxiter
+        sm["vqe_maxiter_yaml"] = resolve_vqe_maxiter(cfg)
         if "nfev" in out:
             sm["vqe_nfev"] = out["nfev"]
-    elif q.algorithm in ("adapt", "tetris_adapt"):
-        sm["adapt_pool_id_yaml"] = q.adapt.pool_id
-        sm["adapt_max_iter_yaml"] = q.adapt.max_iter
+    variational_yaml = quantum_variational_run_summary_yaml_fields(cfg)
+    if q.algorithm in ("adapt", "tetris_adapt"):
+        sm["adapt_pool_id_yaml"] = variational_yaml["adapt_pool_id_yaml"]
+        sm["adapt_max_iter_yaml"] = variational_yaml["adapt_max_iter_yaml"]
         am = out.get("adapt_meta")
         if isinstance(am, dict) and "total_gradient_evals" in am:
             sm["adapt_total_gradient_evals"] = am["total_gradient_evals"]
@@ -38,8 +45,8 @@ def apply_quantum_and_demo_run_summary_fields(
         if isinstance(pool, list):
             sm["adapt_excitation_layers"] = len(pool)
     elif q.algorithm == "iqeb":
-        sm["iqeb_pool_id_yaml"] = q.iqeb.pool_id
-        sm["iqeb_max_rounds_yaml"] = q.iqeb.max_rounds
+        sm["iqeb_pool_id_yaml"] = variational_yaml["iqeb_pool_id_yaml"]
+        sm["iqeb_max_rounds_yaml"] = variational_yaml["iqeb_max_rounds_yaml"]
         im = out.get("iqeb_meta")
         if isinstance(im, dict) and im.get("rounds") is not None:
             sm["iqeb_outer_rounds_recorded"] = int(im["rounds"])
@@ -89,10 +96,21 @@ def apply_quantum_and_demo_run_summary_fields(
         if isinstance(pc.get("pmsv_report"), dict):
             sm["protocol_pmsv_report"] = pc["pmsv_report"]
     vqd = out.get("vqd")
+    excited_yaml = quantum_excited_run_summary_yaml_fields(cfg)
     if isinstance(vqd, dict):
-        sm["vqd_n_states_yaml"] = q.excited.vqd.n_states
-        sm["vqd_overlap_exponent_yaml"] = float(q.excited.vqd.overlap_exponent)
-        sm["vqd_cobyla_maxiter_yaml"] = int(q.excited.vqd.cobyla_maxiter)
+        sm.update(
+            {
+                k: excited_yaml[k]
+                for k in (
+                    "vqd_n_states_yaml",
+                    "vqd_overlap_exponent_yaml",
+                    "vqd_cobyla_maxiter_yaml",
+                    "vqd_optimizer_method_yaml",
+                    "vqd_init_strategy_yaml",
+                    "vqd_overlap_mode_yaml",
+                )
+            }
+        )
         en = vqd.get("energies")
         if isinstance(en, list):
             sm["vqd_n_energies_recorded"] = len(en)
@@ -113,18 +131,18 @@ def apply_quantum_and_demo_run_summary_fields(
                 sm["vqd_shots_overlap_yaml"] = vm["shots_overlap"]
             if vm.get("shots_weight") is not None:
                 sm["vqd_shots_weight_yaml"] = vm["shots_weight"]
-            sm["vqd_optimizer_method_yaml"] = q.excited.vqd.optimizer_method
-            sm["vqd_init_strategy_yaml"] = q.excited.vqd.init_strategy
-            sm["vqd_overlap_mode_yaml"] = q.excited.vqd.overlap_mode
             if vm.get("vqd_warnings"):
                 sm["vqd_warnings_present"] = True
             if vm.get("vqd_variety_yaml"):
                 sm["vqd_variety_yaml"] = vm["vqd_variety_yaml"]
     qse_out = out.get("qse")
     if isinstance(qse_out, dict):
-        sm["qse_shot_mode"] = q.excited.qse.shot_mode
-        sm["qse_subspace_dim_yaml"] = q.excited.qse.subspace_dim
-        sm["qse_max_basis_yaml"] = q.excited.qse.max_basis
+        sm.update(
+            {
+                k: excited_yaml[k]
+                for k in ("qse_shot_mode", "qse_subspace_dim_yaml", "qse_max_basis_yaml")
+            }
+        )
         exc = qse_out.get("excitation_energies")
         if isinstance(exc, list):
             sm["qse_n_excitation_energies"] = len(exc)
@@ -142,9 +160,16 @@ def apply_quantum_and_demo_run_summary_fields(
                     sm["qse_total_shots_upper_bound"] = sched["total_shots_upper_bound"]
     sceom_out = out.get("sceom")
     if isinstance(sceom_out, dict):
-        sm["sceom_shots_per_matrix_element"] = q.excited.sceom.shots_per_matrix_element
-        sm["sceom_subspace_dim_yaml"] = q.excited.sceom.subspace_dim
-        sm["sceom_generator_strategy_yaml"] = q.excited.sceom.generator_strategy
+        sm.update(
+            {
+                k: excited_yaml[k]
+                for k in (
+                    "sceom_shots_per_matrix_element",
+                    "sceom_subspace_dim_yaml",
+                    "sceom_generator_strategy_yaml",
+                )
+            }
+        )
         sce = sceom_out.get("energies")
         if isinstance(sce, list):
             sm["sceom_n_energies_recorded"] = len(sce)
@@ -171,6 +196,7 @@ def apply_quantum_and_demo_run_summary_fields(
         if jr.get("total_shots_budget") is not None:
             sm["job_async_total_shots_budget"] = jr["total_shots_budget"]
     if isinstance(out.get("qpe_demo_track"), dict):
+        demo_flags = quantum_demo_open_stack_yaml_flags(cfg)
         sm["qpe_demo_track_ran"] = True
         sm["qpe_open_stack_contract_v1"] = {
             "schema": QPE_OPEN_STACK_CONTRACT_V1,
@@ -185,8 +211,8 @@ def apply_quantum_and_demo_run_summary_fields(
             },
             "bayesian_stub": "qchem_stack.qpe_qec_demo.BayesianQPEStub",
             "yaml_flags": {
-                "qpe_demo_track_after_variational": q.demos.qpe.track_after_variational,
-                "qpe_pipeline_integration": q.demos.qpe.pipeline_integration,
+                "qpe_demo_track_after_variational": demo_flags["qpe_demo_track_after_variational"],
+                "qpe_pipeline_integration": demo_flags["qpe_pipeline_integration"],
             },
             "pipeline_attach": "_attach_qpe_demo_track_if_requested (orchestration/pipeline.py)",
         }
@@ -203,6 +229,7 @@ def apply_quantum_and_demo_run_summary_fields(
             qp3.get("info_theory_qpe_report_v1") or {}
         ).get("energy_estimate")
     if isinstance(out.get("vqs_track"), dict):
+        demo_flags = quantum_demo_open_stack_yaml_flags(cfg)
         sm["vqs_track_ran"] = True
         sm["vqs_open_stack_contract_v1"] = {
             "schema": VQS_OPEN_STACK_CONTRACT_V1,
@@ -214,11 +241,11 @@ def apply_quantum_and_demo_run_summary_fields(
             },
             "pipeline_track_module": "qchem_stack.quantum.algorithms.vqs_pipeline_track",
             "yaml_flags": {
-                "vqs_track_after_variational": q.demos.vqs.track_after_variational,
-                "vqs_pipeline_integration": q.demos.vqs.pipeline_integration,
-                "vqs_rhs_mode_yaml": q.demos.vqs.rhs_mode,
-                "vqs_tangent_fd_epsilon_yaml": float(q.demos.vqs.tangent_fd_epsilon),
+                "vqs_track_after_variational": demo_flags["vqs_track_after_variational"],
+                "vqs_pipeline_integration": demo_flags["vqs_pipeline_integration"],
+                "vqs_rhs_mode_yaml": demo_flags["vqs_rhs_mode_yaml"],
+                "vqs_tangent_fd_epsilon_yaml": demo_flags["vqs_tangent_fd_epsilon_yaml"],
             },
-            "vqs_mode_yaml": q.demos.vqs.mode,
+            "vqs_mode_yaml": demo_flags["vqs_mode_yaml"],
             "pipeline_attach": "_attach_vqs_track_if_requested (orchestration/pipeline.py)",
         }

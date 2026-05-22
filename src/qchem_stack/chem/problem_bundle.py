@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.contracts.schema_ids import CHEMISTRY_PROBLEM_BUNDLE_V1
 
 if TYPE_CHECKING:
@@ -67,7 +68,7 @@ class ChemistryProblemBundle:
         mol_op = prob.interaction_operator
         c = float(mol_op.constant)
         hf_e = float(reference.e_tot) if reference is not None else None
-        meta_backend = dict(reference.driver_meta) if reference is not None else {}
+        meta_backend = fork_driver_meta(reference.driver_meta) if reference is not None else {}
         hf_block = mol_op.two_body_tensor  # noqa: SLF001
         return cls(
             constant_energies_au={"interaction_constant": c, "hf_total_au": hf_e}
@@ -84,3 +85,6 @@ class ChemistryProblemBundle:
             backend_driver_meta=meta_backend,
             classical_mean_field_snapshot=reference,
         )
+
+
+__all__ = ["ChemistryProblemBundle"]

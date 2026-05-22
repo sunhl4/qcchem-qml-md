@@ -9,6 +9,7 @@ from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.excited import QSE, VQD
 from qchem_stack.quantum.algorithms.sceom import run_sceom_reference_subspace
 from qchem_stack.quantum.algorithms.vqe import VQE
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_qse_dense_first_excitation_gap_matches_two_level_z_model() -> None:
@@ -25,8 +26,7 @@ def test_qse_dense_first_excitation_gap_matches_two_level_z_model() -> None:
 def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
     pytest.importorskip("pyscf")
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
+    from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
     from qchem_stack.config import ActiveSpaceSpec, ExperimentConfig, MoleculeSpec, SCFSpec
 
     cfg = ExperimentConfig(
@@ -42,8 +42,7 @@ def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
         ),
         scf=SCFSpec(),
     )
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
+    r = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=r.mf,
         e_tot=float(r.e_tot),
@@ -51,9 +50,7 @@ def test_qse_from_vqe_basis_matches_dense_order_h2() -> None:
         molecular_system=r.molecular_system,
         driver_meta=dict(r.driver_meta),
     )
-    qh = molecular_hamiltonian_from_classical_reference(
-        ref, n_active_orbitals=2, n_active_electrons=2
-    )
+    qh = build_pre_quantum_input(cfg, ref).hamiltonian
     v = VQE(qh, depth=1).run(maxiter=100, seed=0)
     qse = QSE(qh, subspace_dim=8)
     sub = qse.run_from_vqe_hea_basis(v.angles, depth=1, max_basis=min(6, 2**qh.n_qubits))

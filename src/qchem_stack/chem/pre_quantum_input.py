@@ -91,6 +91,10 @@ class PreQuantumInput:
     def schema(self) -> str:
         return PRE_QUANTUM_INPUT_SCHEMA_V1
 
+    @property
+    def hamiltonian(self) -> QubitHamiltonian:
+        return self.qubit_hamiltonian
+
     def as_summary_dict(self) -> dict[str, Any]:
         pack = self.canonical_active_space_integral_pack
         hmeta = dict(self.qubit_hamiltonian.meta)

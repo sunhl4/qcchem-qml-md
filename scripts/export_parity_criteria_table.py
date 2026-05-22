@@ -23,9 +23,9 @@ import json
 import sys
 from pathlib import Path
 
-from qchem_stack.chem.bridges.facade import molecular_system_from_experiment
 from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
 from qchem_stack.chem.fermion_mapping_registry import DOCUMENTED_FERMION_QUBIT_MAPPINGS
+from qchem_stack.chem.molecular_system_config import molecular_system_from_experiment
 from qchem_stack.chem.solvers.registry import create_solver, registered_solver_ids
 from qchem_stack.config import compiler_bundle_signature_from_config, load_experiment_config
 from qchem_stack.integrations.methods_resource_unified import build_methods_resource_unified_v1
@@ -38,7 +38,7 @@ from qchem_stack.integrations.workflow_preview import (
     workflow_preview_vqs_track_slice_v1,
 )
 from qchem_stack.md_bridge import QMFrame
-from qchem_stack.orchestration.pipeline import build_excited_resource_summary_for_export
+from qchem_stack.orchestration.excited_stages import build_excited_resource_summary_for_export
 from qchem_stack.protocols.computable import computables_export_dict
 from qchem_stack.protocols.product_contract import (
     classify_pauli_expectation_path,

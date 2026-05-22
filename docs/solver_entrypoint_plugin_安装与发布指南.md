@@ -78,7 +78,7 @@ scf:
 
 ## 5.1 可观测性（排障）
 
-`registered_solvers_detail()` 返回**只读**映射：每个 `solver_id` 对应 `source`（`builtin` / `entrypoint` / `runtime`）与 `provider`（例如 entry point 的 `module:attr` 字符串或内置注册路径），便于确认「当前进程里到底是谁提供了该 driver」。
+`registered_solvers_detail()` 返回**只读**映射：每个 `solver_id` 对应 `source`（`builtin` / `entrypoint` / `runtime`）、`provider`（例如 entry point 的 `module:attr` 字符串或内置注册路径），以及内置后端的 **`capability_notes`**（来自 `chem/integration/presets.py` 生产 preset；自定义插件为空 dict），便于确认「当前进程里到底是谁提供了该 driver」及其诚实能力披露。
 
 ## 6. 常见错误与排障
 

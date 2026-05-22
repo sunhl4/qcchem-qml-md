@@ -7,6 +7,16 @@ pytest.importorskip("pyscf")
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
+_MINIMAL_QUANTUM = """
+quantum:
+  algorithm: vqe
+  pauli:
+    use_protocol: false
+  vqe:
+    depth: 1
+    maxiter: 5
+"""
+
 
 def test_embedding_input_lowdin_payload_in_workflow(tmp_path) -> None:
     cfg_path = tmp_path / "h2_lowdin.yaml"
@@ -34,12 +44,12 @@ active_space:
     n_electrons: 2
 embedding:
   mode: dmet
-  fragment_labels: ["frag0"]
-  dmet_hamiltonian_source: parity_stub
   embedding_input_representation: lowdin_orth_ao
-quantum:
-  use_pauli_protocol: false
-""",
+  dmet:
+    fragment_labels: ["frag0"]
+    hamiltonian_source: parity_stub
+"""
+        + _MINIMAL_QUANTUM,
         encoding="utf-8",
     )
     cfg = load_experiment_config(cfg_path)
@@ -79,11 +89,11 @@ active_space:
   cas:
     n_orbitals: 2
     n_electrons: 2
-quantum:
-  use_pauli_protocol: false
 chemistry_extended:
-  rdm_correction_method: stub_nevpt2
-""",
+  post_hf:
+    rdm_correction_method: stub_nevpt2
+"""
+        + _MINIMAL_QUANTUM,
         encoding="utf-8",
     )
     cfg = load_experiment_config(cfg_path)
@@ -138,11 +148,11 @@ active_space:
   cas:
     n_orbitals: 2
     n_electrons: 2
-quantum:
-  use_pauli_protocol: false
 chemistry_extended:
-  rdm_correction_method: pyscf_nevpt2_casci
-""",
+  post_hf:
+    rdm_correction_method: pyscf_nevpt2_casci
+"""
+        + _MINIMAL_QUANTUM,
         encoding="utf-8",
     )
     cfg = load_experiment_config(cfg_path)

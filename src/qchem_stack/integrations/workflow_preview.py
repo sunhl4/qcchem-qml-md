@@ -4,6 +4,14 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.config.quantum_helpers import (
+    qpe_demo_track_requested,
+    quantum_workflow_preview_qpe_fields,
+    quantum_workflow_preview_vqs_fields,
+    resolve_quantum_algorithm_factory,
+    resolve_variational_algorithm,
+    vqs_track_requested,
+)
 from qchem_stack.contracts.schema_ids import (
     COMPUTABLES_RICH_V1,
     RUN_PRODUCT_SUMMARY_V1,
@@ -28,39 +36,26 @@ if TYPE_CHECKING:
 
 
 def workflow_preview_variational_execution_slice_v1(cfg: ExperimentConfig) -> dict[str, Any] | None:
-    if not cfg.quantum.algorithm_factory:
+    factory = resolve_quantum_algorithm_factory(cfg)
+    if not factory:
         return None
     return {
         "schema": VARIATIONAL_YAML_PLUGIN_DISPATCH_V1,
-        "algorithm_factory": cfg.quantum.algorithm_factory,
-        "algorithm_label": cfg.quantum.algorithm,
+        "algorithm_factory": factory,
+        "algorithm_label": resolve_variational_algorithm(cfg),
     }
 
 
 def workflow_preview_vqs_track_slice_v1(cfg: ExperimentConfig) -> dict[str, Any] | None:
-    if not cfg.quantum.vqs_track_requested():
+    if not vqs_track_requested(cfg):
         return None
-    q = cfg.quantum
-    return {
-        "schema": WORKFLOW_PREVIEW_VQS_TRACK_V1,
-        "vqs_track_after_variational": q.demos.vqs.track_after_variational,
-        "vqs_pipeline_integration": q.demos.vqs.pipeline_integration,
-        "vqs_mode": q.demos.vqs.mode,
-        "vqs_n_times": q.demos.vqs.n_times,
-        "vqs_dt": float(q.demos.vqs.dt),
-    }
+    return {"schema": WORKFLOW_PREVIEW_VQS_TRACK_V1, **quantum_workflow_preview_vqs_fields(cfg)}
 
 
 def workflow_preview_qpe_track_slice_v1(cfg: ExperimentConfig) -> dict[str, Any] | None:
-    if not cfg.quantum.qpe_demo_track_requested():
+    if not qpe_demo_track_requested(cfg):
         return None
-    q = cfg.quantum
-    return {
-        "schema": WORKFLOW_PREVIEW_QPE_TRACK_V1,
-        "qpe_demo_track_after_variational": q.demos.qpe.track_after_variational,
-        "qpe_pipeline_integration": q.demos.qpe.pipeline_integration,
-        "qpe_demo_track_n_bits": int(q.demos.qpe.demo_track_n_bits),
-    }
+    return {"schema": WORKFLOW_PREVIEW_QPE_TRACK_V1, **quantum_workflow_preview_qpe_fields(cfg)}
 
 
 def workflow_preview_payload(

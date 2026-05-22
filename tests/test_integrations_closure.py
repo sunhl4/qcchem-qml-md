@@ -6,6 +6,11 @@ from dataclasses import replace
 
 from qchem_stack.backends.spec import CircuitIR
 from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
+from qchem_stack.chem.kernels.spin_ucc import (
+    IdentityRegrouping,
+    build_spin_uccsd_fermion_generators,
+    count_uccsd_excitations,
+)
 from qchem_stack.integrations import (
     OneShotEmbeddingDriver,
     probe_qnexus_installation,
@@ -17,11 +22,6 @@ from qchem_stack.integrations.tket_fullchain import (
     TketCompileMode,
     circuit_ir_to_tket_stats_or_none,
     describe_tket_closure_layer,
-)
-from qchem_stack.integrations.ucc_reference import (
-    IdentityRegrouping,
-    build_spin_uccsd_fermion_generators,
-    count_uccsd_excitations,
 )
 
 

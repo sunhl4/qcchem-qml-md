@@ -13,6 +13,37 @@ from __future__ import annotations
 import numpy as np
 
 
+def restore_packed_mo_eri_chemist(packed: np.ndarray, norb: int) -> np.ndarray:
+    """Unpack PySCF ipack=4 MO ERIs to ``(norb, norb, norb, norb)`` without importing PySCF.
+
+    Matches :func:`pyscf.ao2mo.restore` with ``symmetry=1`` for the common ``(npair, npair)``
+    compact layout produced by CASCI ``get_h2eff`` and related exporters.
+    """
+    npair = norb * (norb + 1) // 2
+    x = np.asarray(packed, dtype=float)
+    if x.ndim == 4:
+        if x.shape != (norb, norb, norb, norb):
+            raise ValueError(f"unexpected dense h2 shape {x.shape}, expected ({norb},)*4")
+        return x.copy()
+    if x.ndim != 2 or x.shape != (npair, npair):
+        raise ValueError(
+            f"h2 packed array must have shape ({npair}, {npair}) for norb={norb}; got {x.shape}"
+        )
+    out = np.zeros((norb, norb, norb, norb), dtype=float)
+    for i in range(norb):
+        for j in range(i + 1):
+            ij = i * (i + 1) // 2 + j
+            for k in range(norb):
+                for el in range(k + 1):
+                    kl = k * (k + 1) // 2 + el
+                    val = float(x[ij, kl])
+                    out[i, j, k, el] = val
+                    out[j, i, k, el] = val
+                    out[i, j, el, k] = val
+                    out[j, i, el, k] = val
+    return out
+
+
 def spatial_mo_eri_pyscf_to_openfermion_mo_ordering(h2_spatial: np.ndarray) -> np.ndarray:
     """Reorder spatial MO chemist ERIs from PySCF ``ao2mo``/CASCI layout to OpenFermion pairing.
 

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.bridges.mean_field_like import (
     MeanFieldLike,
     nuclear_repulsion_energy_au,
@@ -14,7 +15,7 @@ from qchem_stack.chem.bridges.mean_field_like import (
 )
 
 if TYPE_CHECKING:
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+    from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
     from qchem_stack.chem.solvers.base import MolecularMeanFieldResult
     from qchem_stack.chem.system import MolecularSystem
 
@@ -53,7 +54,7 @@ class ClassicalMeanFieldReference:
             e_tot=float(pack.e_tot),
             mo_energy=np.asarray(pack.mo_energy, dtype=float),
             molecular_system=molecular_system,
-            driver_meta=dict(pack.driver_meta),
+            driver_meta=fork_driver_meta(pack.driver_meta),
         )
 
     def backend_tag(self) -> str:
@@ -67,7 +68,7 @@ class ClassicalMeanFieldReference:
 
     def as_pyscf_rhf_result(self) -> PySCFRHFResult:
         """Convert to PySCF-specific container for PySCF-only branches."""
-        from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+        from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
 
         mf_handle = self.mf.raw_handle() if hasattr(self.mf, "raw_handle") else self.mf
         return PySCFRHFResult(
@@ -75,7 +76,7 @@ class ClassicalMeanFieldReference:
             e_tot=float(self.e_tot),
             mo_energy=np.asarray(self.mo_energy, dtype=float),
             molecular_system=self.molecular_system,
-            driver_meta=dict(self.driver_meta),
+            driver_meta=fork_driver_meta(self.driver_meta),
         )
 
     def nuclear_repulsion_au(self) -> float | None:

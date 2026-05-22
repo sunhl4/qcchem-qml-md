@@ -91,6 +91,22 @@ text = repro_json_dumps(out["repro"])
 
 ## 6. Where to change things
 
+### chem recommended imports
+
+**Style standard:** [chem_模块风格约定.md](chem_模块风格约定.md) · **Module reference:** [说明_chem模块技术参考手册.md](说明_chem模块技术参考手册.md) · **Package index:** [`src/qchem_stack/chem/README.md`](../src/qchem_stack/chem/README.md)
+
+| Area | Import from |
+|------|-------------|
+| **Top-level (preferred)** | `qchem_stack.chem` — `create_solver`, `classical_mean_field_reference_from_config`, `build_pre_quantum_input`, `restricted_active_space_quantum_problem_from_config` |
+| Classical drivers | `qchem_stack.chem.solvers` (`ChemIntegralSolver`, `SolverCapabilities`, registry detail) |
+| Bridge interchange | `qchem_stack.chem.bridges` (canonical pack, `fork_driver_meta`) |
+| Qubit Hamiltonian | `qchem_stack.chem.hamiltonian` |
+| Pre-quantum assembly | `qchem_stack.chem.pre_quantum_build` (branch registry internals) |
+| Embedding (chem-only) | `qchem_stack.chem.embedding` (projection, Schmidt production builders) |
+| Integrals | `qchem_stack.chem.integrals` (PySCF exports); Psi4: `qchem_stack.chem.integrals.psi4_active_space` |
+
+Variational sidecars that call `quantum.*` live under `qchem_stack.integrations` (for example `schmidt_per_fragment_vqe`, `dmet_fragment_solvers`).
+
 | Goal | Start here |
 |------|------------|
 | New classical backend | `chem/solvers/registry.py`, template `custom_solver_template.py` |

@@ -13,7 +13,10 @@ from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpac
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.fermion import FermionSpace
 from qchem_stack.chem.hamiltonian import hamiltonian_fingerprint_from_qubit_operator
+from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.chem.system import MolecularSystem
+from qchem_stack.config import load_experiment_config
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_fingerprint_stable_for_same_operator() -> None:
@@ -42,14 +45,10 @@ def test_fingerprint_truncation_flag() -> None:
 
 def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
     pytest.importorskip("pyscf")
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
-    from qchem_stack.config import load_experiment_config
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
+    r = pyscf_rhf_from_config(cfg)
     ref1 = ClassicalMeanFieldReference(
         mf=r.mf,
         e_tot=float(r.e_tot),
@@ -57,12 +56,8 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
         molecular_system=r.molecular_system,
         driver_meta=dict(r.driver_meta),
     )
-    h1 = molecular_hamiltonian_from_classical_reference(
-        ref1,
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-    )
-    r2 = drv.run_rhf()
+    h1 = build_pre_quantum_input(cfg, ref1).qubit_hamiltonian
+    r2 = pyscf_rhf_from_config(cfg)
     ref2 = ClassicalMeanFieldReference(
         mf=r2.mf,
         e_tot=float(r2.e_tot),
@@ -70,11 +65,7 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
         molecular_system=r2.molecular_system,
         driver_meta=dict(r2.driver_meta),
     )
-    h2 = molecular_hamiltonian_from_classical_reference(
-        ref2,
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-    )
+    h2 = build_pre_quantum_input(cfg, ref2).qubit_hamiltonian
     fp1 = h1.meta["hamiltonian_fingerprint"]
     fp2 = h2.meta["hamiltonian_fingerprint"]
     assert fp1 == fp2
@@ -84,14 +75,10 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
 
 def test_h2_fingerprint_sensitive_to_fermion_mapping() -> None:
     pytest.importorskip("pyscf")
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_classical_reference
-    from qchem_stack.config import load_experiment_config
 
     root = Path(__file__).resolve().parents[1]
     cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    drv = PySCFDriver.from_config(cfg)
-    r = drv.run_rhf()
+    r = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=r.mf,
         e_tot=float(r.e_tot),
@@ -99,18 +86,19 @@ def test_h2_fingerprint_sensitive_to_fermion_mapping() -> None:
         molecular_system=r.molecular_system,
         driver_meta=dict(r.driver_meta),
     )
-    h_jw = molecular_hamiltonian_from_classical_reference(
-        ref,
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-        fermion_qubit_mapping="jordan_wigner",
+    h_jw = build_pre_quantum_input(cfg, ref).qubit_hamiltonian
+    cfg_bk = cfg.model_copy(
+        update={
+            "active_space": cfg.active_space.model_copy(
+                update={
+                    "mapping": cfg.active_space.mapping.model_copy(
+                        update={"fermion_qubit": "bravyi_kitaev"}
+                    )
+                }
+            )
+        }
     )
-    h_bk = molecular_hamiltonian_from_classical_reference(
-        ref,
-        n_active_orbitals=cfg.active_space.cas.n_orbitals,
-        n_active_electrons=cfg.active_space.cas.n_electrons,
-        fermion_qubit_mapping="bravyi_kitaev",
-    )
+    h_bk = build_pre_quantum_input(cfg_bk, ref).qubit_hamiltonian
     assert h_jw.meta["hamiltonian_fingerprint"] != h_bk.meta["hamiltonian_fingerprint"]
 
 

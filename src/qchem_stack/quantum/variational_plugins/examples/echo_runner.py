@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import numpy as np
 
+from qchem_stack.config.quantum_helpers import resolve_variational_algorithm, resolve_vqe_depth
 from qchem_stack.quantum.variational_plugins.spec import (
     VariationalRunContext,
     VariationalStageOutcome,
@@ -12,14 +13,14 @@ from qchem_stack.quantum.variational_plugins.spec import (
 
 def run_echo_variational(ctx: VariationalRunContext) -> VariationalStageOutcome:
     qh = ctx.resolved_hamiltonian()
-    depth = int(ctx.cfg.quantum.vqe.depth)
+    depth = resolve_vqe_depth(ctx.cfg)
     angles = np.zeros(2 * qh.n_qubits * depth, dtype=float)
     energy = float(ctx.executor.expectation_hea(qh.operator, qh.n_qubits, angles, depth))
     return VariationalStageOutcome(
         energy=energy,
         angles=angles,
         algo_meta={
-            "algorithm": ctx.cfg.quantum.algorithm,
+            "algorithm": resolve_variational_algorithm(ctx.cfg),
             "nfev": 0,
             "variational_echo_plugin": True,
         },

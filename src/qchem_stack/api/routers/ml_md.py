@@ -1,19 +1,17 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import Annotated
 
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, Body, HTTPException
 from pydantic import ValidationError
 
+from qchem_stack.api.models import QMEFTrainerStubFitBody, QMEFValidateBody
 from qchem_stack.md_bridge.http_surface import (
     ml_md_bridge_surface_v1,
     qmef_validate_response_dict,
     trainer_stub_fit_response_dict,
     validate_qmef_dict,
 )
-
-if TYPE_CHECKING:
-    from qchem_stack.api.models import QMEFTrainerStubFitBody, QMEFValidateBody
 
 router = APIRouter(tags=["ml_md"])
 
@@ -24,7 +22,7 @@ def ml_md_bridge_meta() -> dict[str, object]:
 
 
 @router.post("/v1/meta/qmef-validate")
-def qmef_validate(body: QMEFValidateBody) -> dict[str, object]:
+def qmef_validate(body: Annotated[QMEFValidateBody, Body()]) -> dict[str, object]:
     try:
         ds = validate_qmef_dict(body.qmef)
     except ValidationError as exc:
@@ -33,7 +31,7 @@ def qmef_validate(body: QMEFValidateBody) -> dict[str, object]:
 
 
 @router.post("/v1/meta/ml-md-trainer-stub-fit")
-def ml_md_trainer_stub_fit(body: QMEFTrainerStubFitBody) -> dict[str, object]:
+def ml_md_trainer_stub_fit(body: Annotated[QMEFTrainerStubFitBody, Body()]) -> dict[str, object]:
     try:
         ds = validate_qmef_dict(body.qmef)
     except ValidationError as exc:

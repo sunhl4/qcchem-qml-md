@@ -39,7 +39,10 @@
     "supports_molecular_scf": true,
     "supports_pbc_scf": true,
     "supports_pbc_k_mesh": true,
-    "capability_notes": {},
+    "capability_notes": {
+      "pbc_k_mesh": "Monkhorst–Pack meshes via PySCF PBC driver.",
+      "schmidt_atomic_hamiltonian": "Impurity FCI solve uses PySCF direct_spin0 on spatial integrals (native=True)."
+    },
     "supports_rhf": true,
     "supports_rohf": true,
     "supports_uhf": true,
@@ -57,19 +60,17 @@
   },
   "active_space": {
     "strategy": "cas",
-    "fermion_qubit_mapping": "jordan_wigner",
+    "mapping": {
+      "fermion_qubit": "jordan_wigner"
+    },
     "cas": {
-      "ncas": 2,
-      "nelecas": 2,
-      "n_active_orbitals": 2,
-      "n_active_electrons": 2
+      "n_orbitals": 2,
+      "n_electrons": 2
     },
     "manual": {
-      "n_active_orbitals": null,
-      "n_active_electrons": null,
-      "frozen_orbitals": [],
-      "ncas": null,
-      "nelecas": null
+      "n_orbitals": null,
+      "n_electrons": null,
+      "frozen_orbitals": []
     },
     "jw": {
       "prefer_restricted_spatial": false,

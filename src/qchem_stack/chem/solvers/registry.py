@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import warnings
 from collections.abc import Callable, Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from importlib.metadata import EntryPoint, entry_points
 from threading import RLock
 from types import MappingProxyType
@@ -32,6 +32,7 @@ class SolverRegistrationInfo:
     solver_id: str
     source: SolverSource
     provider: str
+    capability_notes: Mapping[str, str] = field(default_factory=dict)
 
 
 @dataclass(frozen=True)
@@ -134,8 +135,28 @@ def registered_solvers_detail() -> Mapping[str, SolverRegistrationInfo]:
                 solver_id=solver_id,
                 source=record.source,
                 provider=record.provider,
+                capability_notes=_production_capability_notes_for_builtin(solver_id),
             )
     return MappingProxyType(details)
+
+
+def _production_capability_notes_for_builtin(solver_id: str) -> dict[str, str]:
+    """Static capability_notes for built-in production presets (no ExperimentConfig required)."""
+    from qchem_stack.chem.integration.presets import (
+        capabilities_precomputed_offline,
+        capabilities_psi4_production,
+        capabilities_pyscf_production,
+    )
+
+    factories = {
+        "pyscf": capabilities_pyscf_production,
+        "psi4": capabilities_psi4_production,
+        "precomputed": capabilities_precomputed_offline,
+    }
+    factory = factories.get(solver_id)
+    if factory is None:
+        return {}
+    return dict(factory().capability_notes)
 
 
 def solver_capability_notes_for_config(cfg: ExperimentConfig) -> dict[str, str]:

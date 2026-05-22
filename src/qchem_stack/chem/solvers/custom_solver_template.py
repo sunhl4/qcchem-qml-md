@@ -24,7 +24,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from qchem_stack.chem.bridges.mean_field_like import wrap_mean_field_like
-from qchem_stack.chem.integration.driver_meta import merge_integration_driver_meta
+from qchem_stack.chem.integration.meta_schema import merge_integration_driver_meta
 from qchem_stack.chem.integration.presets import capabilities_driver_scf_only
 from qchem_stack.chem.kernels.catalog import KERNEL_MEAN_FIELD_SCF, kernel_binding
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities

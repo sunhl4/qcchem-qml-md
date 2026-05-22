@@ -16,6 +16,9 @@ from typing import TYPE_CHECKING, Any, Literal
 if TYPE_CHECKING:
     from collections.abc import MutableMapping, Sequence
 
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.config import ExperimentConfig
+
 ActiveSpaceStrategy = Literal["manual", "cas", "avas_stub", "avas"]
 
 AVAS_PARTIAL_STUB_META_KEY = "avas_partial_stub"
@@ -65,3 +68,49 @@ def apply_active_space_strategy_to_mean_field_meta(
         driver_meta[AVAS_STUB_SEMANTICS_META_KEY] = AVAS_STUB_SEMANTICS_CAS_EQUIVALENT_V1
     elif strategy == "avas":
         driver_meta[AVAS_ATOMIC_PROJECTION_EXECUTED_META_KEY] = False
+
+
+def build_active_space_recipe(cfg: ExperimentConfig) -> str:
+    """Human-readable active-space recipe string for repro / parity export."""
+    if cfg.active_space.strategy == "manual":
+        frz = list(cfg.active_space.manual.frozen_orbitals)
+        return (
+            "manual:"
+            f"n_active_orbitals={cfg.active_space.cas.n_orbitals},"
+            f"n_active_electrons={cfg.active_space.cas.n_electrons},"
+            f"frozen_orbitals={frz}"
+        )
+    if cfg.active_space.strategy == "avas_stub":
+        return (
+            "avas_stub:"
+            f"n_orbitals={cfg.active_space.cas.n_orbitals},"
+            f"n_electrons={cfg.active_space.cas.n_electrons}:partial_open_stack_no_avas_projection"
+        )
+    if cfg.active_space.strategy == "avas":
+        return (
+            "avas:"
+            f"ao_labels={cfg.chemistry_extended.avas.ao_labels}:"
+            f"threshold={cfg.chemistry_extended.avas.threshold}:pyscf_mcscf_avas"
+        )
+    return (
+        f"cas:n_orbitals={cfg.active_space.cas.n_orbitals},"
+        f"n_electrons={cfg.active_space.cas.n_electrons}"
+    )
+
+
+def annotate_mean_field_reference_active_space(
+    cfg: ExperimentConfig,
+    ref: ClassicalMeanFieldReference,
+) -> ClassicalMeanFieldReference:
+    """Apply active-space strategy metadata to a classical mean-field reference."""
+    apply_active_space_strategy_to_mean_field_meta(
+        ref.driver_meta,
+        strategy=cfg.active_space.strategy,
+        recipe=build_active_space_recipe(cfg),
+        avas_ao_labels=cfg.chemistry_extended.avas.ao_labels,
+    )
+    if cfg.active_space.manual.frozen_orbitals:
+        ref.driver_meta["active_space_frozen_orbitals"] = list(
+            cfg.active_space.manual.frozen_orbitals
+        )
+    return ref

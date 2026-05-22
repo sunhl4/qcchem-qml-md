@@ -11,7 +11,8 @@
 ## 前置条件
 
 - 已跑通 `configs/example_h2.yaml`
-- 至少准备两份仅后端不同的配置（例如 statevector / qiskit shots）
+- 至少准备两份仅 **量子** `backend.provider` 不同的配置（例如 statevector / qiskit shots）
+- （可选）比较 **经典** `scf.driver`：`example_h2.yaml` vs `example_h2_psi4_rhf_sto3g.yaml`（Psi4 需本地安装）
 
 ## 对比步骤
 
@@ -32,6 +33,8 @@
 ```bash
 python scripts/smoke_pipeline.py --config configs/example_h2.yaml
 python scripts/smoke_pipeline.py --config configs/example_h2_qiskit_shots.yaml
+# 经典 driver 对照（Psi4 环境）：
+python scripts/smoke_pipeline.py --config configs/example_h2_psi4_rhf_sto3g.yaml
 ```
 
 然后对比两次输出中的 `run_summary` 核心键。

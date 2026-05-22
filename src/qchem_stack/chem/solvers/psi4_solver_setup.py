@@ -6,12 +6,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
-from qchem_stack.chem.integration.driver_meta import (
+from qchem_stack.chem.integration.meta_schema import (
     binding_mean_field_scf,
     merge_integration_driver_meta,
 )
+from qchem_stack.chem.molecular_system_config import molecular_system_from_experiment
 from qchem_stack.chem.solvers.psi4_solver_common import psi4_version_or_unknown
-from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config.scf_helpers import (
     resolve_scf_chkfile,
     resolve_scf_density_fit,
@@ -25,6 +25,7 @@ from qchem_stack.config.scf_helpers import (
 
 if TYPE_CHECKING:
     from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
+    from qchem_stack.chem.system import MolecularSystem
     from qchem_stack.config import ChemistryExtendedSpec, ExperimentConfig
 
 
@@ -91,15 +92,7 @@ def validate_cfg_driver_and_method(cfg: ExperimentConfig) -> None:
 
 
 def molecular_system_from_config(cfg: ExperimentConfig) -> MolecularSystem:
-    m = cfg.molecule
-    return MolecularSystem(
-        symbols=m.symbols,
-        coordinates_bohr=np.asarray(m.coordinates_in_bohr(), dtype=float),
-        charge=m.charge,
-        multiplicity=m.multiplicity,
-        basis=m.basis,
-        ecp=m.ecp,
-    )
+    return molecular_system_from_experiment(cfg)
 
 
 def base_driver_meta(
@@ -109,6 +102,9 @@ def base_driver_meta(
     extra: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     scf = solver._cfg.scf
+    scf_max_cycle = resolve_scf_max_cycle(scf)
+    scf_level_shift = resolve_scf_level_shift(scf)
+    scf_diis_space_dimension = resolve_scf_diis_space_dimension(scf)
     meta: dict[str, Any] = {
         "driver_meta_schema_version": 1,
         "driver_family": "psi4",
@@ -118,21 +114,13 @@ def base_driver_meta(
         "psi4_energy_reason": reason,
         "psi4_version": psi4_version_or_unknown(),
         "ecp": solver._system.ecp,
-        "scf_max_cycle": (
-            int(resolve_scf_max_cycle(scf)) if resolve_scf_max_cycle(scf) is not None else None
-        ),
+        "scf_max_cycle": int(scf_max_cycle) if scf_max_cycle is not None else None,
         "scf_chkfile": resolve_scf_chkfile(scf),
         "scf_init_guess": resolve_scf_init_guess(scf),
-        "scf_level_shift": (
-            float(resolve_scf_level_shift(scf))
-            if resolve_scf_level_shift(scf) is not None
-            else None
-        ),
+        "scf_level_shift": float(scf_level_shift) if scf_level_shift is not None else None,
         "scf_use_newton": bool(resolve_scf_use_newton(scf)),
         "scf_diis_space_dimension": (
-            int(resolve_scf_diis_space_dimension(scf))
-            if resolve_scf_diis_space_dimension(scf) is not None
-            else None
+            int(scf_diis_space_dimension) if scf_diis_space_dimension is not None else None
         ),
         "scf_density_fit": bool(resolve_scf_density_fit(scf)),
         "scf_density_fit_auxbasis": (

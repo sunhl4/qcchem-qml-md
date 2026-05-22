@@ -6,6 +6,7 @@ from pathlib import Path
 
 import pytest
 
+from qchem_stack.chem.integration.presets import capabilities_psi4_production
 from qchem_stack.chem.solvers import create_solver
 from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
 from qchem_stack.config import ExperimentConfig, load_experiment_config
@@ -42,11 +43,12 @@ active_space:
     return load_experiment_config(p)
 
 
-def test_psi4_solver_capabilities_are_conservative(psi4_hf_config: ExperimentConfig) -> None:
+def test_psi4_solver_capabilities_match_production_preset(
+    psi4_hf_config: ExperimentConfig,
+) -> None:
     s = Psi4IntegralSolver.from_experiment_config(psi4_hf_config)
-    caps = s.capabilities
-    assert caps.backend_id == "psi4"
-    assert caps.supports_molecular_scf is True
+    assert s.capabilities == capabilities_psi4_production()
+    assert create_solver(psi4_hf_config).capabilities == capabilities_psi4_production()
 
 
 def test_psi4_create_solver_runtime_behavior(psi4_hf_config: ExperimentConfig) -> None:

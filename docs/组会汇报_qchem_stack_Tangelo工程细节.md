@@ -167,24 +167,23 @@ ExperimentConfig.model_validate({
 
 ---
 
-### 4.2 经典计算化学：**统一契约** + **驱动层**（当前主路径：PySCF 全绑定）
+### 4.2 经典计算化学：**统一契约** + **求解器注册表**（当前主路径：PySCF 全绑定）
 
-经典计算不埋进 VQE Solver，而是收敛到独立 Driver 层。当前默认 PySCF；未来替换驱动或走 plugin 分支时，量子算法仍消费同一份标准结果。
+经典计算不埋进 VQE Solver，而是收敛到 `ChemIntegralSolver` + `chem.bridges` 交换层。当前默认 PySCF；未来替换驱动或走 plugin 分支时，量子算法仍消费同一份 `ClassicalMeanFieldReference`。
 
-**文件**：`src/qchem_stack/chem/drivers/pyscf_driver.py`
+**Canonical 文件**：`src/qchem_stack/chem/solvers/pyscf_solver.py`、`src/qchem_stack/chem/bridges/reference_factory.py`（legacy：`chem/drivers/pyscf_driver.py`，deprecated）
 
 ```python
+solver = create_solver(cfg)
+mf_pack = solver.compute_mean_field(periodic=False)
+ref = classical_mean_field_reference_from_config(cfg)  # SCF + active-space meta
+
 @dataclass
-class PySCFRHFResult:
+class PySCFRHFResult:  # legacy container; still exported from pyscf_driver_types
     mf: Any
     e_tot: float
-    mo_energy: np.ndarray
-    molecular_system: MolecularSystem
-    driver_meta: dict
-
-class PySCFDriver:
-    @classmethod
-    def from_config(cls, cfg: ExperimentConfig) -> "PySCFDriver": ...
+    ...
+```
 
     def run_rhf(self) -> PySCFRHFResult: ...
     def run_rohf(self) -> PySCFRHFResult: ...

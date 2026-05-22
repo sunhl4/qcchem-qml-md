@@ -15,7 +15,7 @@ from openfermion import bravyi_kitaev, jordan_wigner
 from openfermion.ops import QubitOperator
 from scipy.linalg import eigh
 
-from qchem_stack.integrations.ucc_reference import build_spin_ucc_singles_only_fermion_generators
+from qchem_stack.chem.kernels.spin_ucc import build_spin_ucc_singles_only_fermion_generators
 from qchem_stack.quantum.algorithms.excited import qse_matrices_hs
 from qchem_stack.quantum.statevector import (
     expectation_qubit_operator,

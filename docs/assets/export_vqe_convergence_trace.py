@@ -34,8 +34,10 @@ def main() -> None:
     from pyscf import mcscf
 
     from qchem_stack.backends.factory import executor_from_spec
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
-    from qchem_stack.chem.hamiltonian import molecular_hamiltonian_from_pyscf
+    from qchem_stack.chem.bridges.reference_factory import pyscf_rhf_result_from_config
+    from qchem_stack.chem.molecular_problem_build import (
+        restricted_active_space_quantum_problem_from_config,
+    )
     from qchem_stack.config import backend_spec_from_config, load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDTrotterVQE, UCCSDVQE
 
@@ -44,8 +46,7 @@ def main() -> None:
     q = cfg.quantum
     asp = cfg.active_space
 
-    drv = PySCFDriver.from_config(cfg)
-    rhf = drv.run_rhf()
+    rhf = pyscf_rhf_result_from_config(cfg)
     mf = rhf.mf
     mo_coeff = mf.mo_coeff
     mo = mo_coeff if isinstance(mo_coeff, np.ndarray) else np.asarray(mo_coeff[0], dtype=float)
@@ -53,12 +54,8 @@ def main() -> None:
     cas = mcscf.CASCI(mf, int(asp.n_active_orbitals), int(asp.n_active_electrons))
     casci_total_ha = float(cas.kernel(mo)[0])
 
-    qh = molecular_hamiltonian_from_pyscf(
-        rhf,
-        n_active_orbitals=int(asp.n_active_orbitals),
-        n_active_electrons=int(asp.n_active_electrons),
-        fermion_qubit_mapping=asp.fermion_qubit_mapping,
-    )
+    prob = restricted_active_space_quantum_problem_from_config(cfg)
+    qh = prob.qubit_hamiltonian
     exe = executor_from_spec(backend_spec_from_config(cfg))
 
     if q.variational_ansatz != "uccsd":

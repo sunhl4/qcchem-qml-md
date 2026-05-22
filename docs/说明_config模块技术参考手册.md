@@ -286,7 +286,25 @@ validate_pre_quantum_contract(cfg)  # 进入 pre-quantum 前显式调用
 |------|------|
 | `zne_enabled`, `pmsv_enabled` | 布尔开关 |
 | `quantum_repro_core_fields(cfg)` | repro snapshot 稳定键 dict |
-| `mitigation_repro_core_fields(cfg)` | 同上 |
+| `quantum_repro_sidecar_fields(cfg)` | VQD/QSE/SCEOM、demo、tensornet 详细 YAML 键 |
+| `mitigation_repro_core_fields(cfg)` | mitigation repro 键 |
+
+#### Quantum helpers（`quantum_helpers.py`）
+
+插件 runner、orchestration、workflow preview 读取 `quantum.*` 时**优先**使用下表，而非在业务层重复 `cfg.quantum....`。
+
+| 类别 | 函数 | 说明 |
+|------|------|------|
+| 变分 | `resolve_variational_algorithm`, `resolve_variational_ansatz`, `resolve_vqe_depth`, `resolve_vqe_maxiter`, `resolve_vqe_optimizer_method`, `resolve_vqe_initial_parameters_strategy`, `resolve_uccsd_trotter_steps`, `resolve_quantum_algorithm_factory` | VQE / UCCSD / 插件 dispatch |
+| ADAPT | `resolve_adapt_max_iter`, `resolve_adapt_pool_id` | ADAPT / tetris_adapt |
+| IQEB | `resolve_iqeb_max_rounds`, `resolve_iqeb_pool_id`, `resolve_iqeb_n_grads`, `resolve_iqeb_energy_tolerance` | IQEB 外轮与 pool |
+| Pauli | `pauli_protocol_enabled`, `pauli_run_sampled`, `pauli_run_qiskit_shots`, `resolve_pauli_grouping`, `pauli_record_histograms`, `resolve_pauli_support_max_terms`, `classify_pauli_expectation_path_for_config` | 协议开关与路径分类（`PAULI_PATH_*` 常量同模块） |
+| 激发态 | `excited_vqd_after_variational`, …, `excited_vqd_plugin_params`, `excited_qse_plugin_params`, `excited_sceom_plugin_params` | sidecar 开关、维度与插件 runner 参数块 |
+| Demo track | `qpe_demo_track_requested`, `qpe_three_pack_requested`, `vqs_track_requested`, `resolve_qpe_demo_track_n_bits`, `resolve_vqs_track_payload_kwargs`, `quantum_workflow_preview_qpe_fields`, `quantum_workflow_preview_vqs_fields`, `quantum_demo_open_stack_yaml_flags` | QPE/VQS 演示轨 |
+| TensorNet | `tensornet_expectation_stub_enabled`, `resolve_tensornet_contraction_engine` | stub 侧车 |
+| Repro / summary | `quantum_excited_run_summary_yaml_fields`, `quantum_variational_run_summary_yaml_fields` | `run_summary` 字段块 |
+
+`protocols.product_contract` 仍 re-export `PAULI_PATH_*` 与 `classify_pauli_expectation_path(QuantumSpec)`；canonical 实现在 `quantum_helpers`。
 
 #### Chemistry extended
 
@@ -311,7 +329,7 @@ validate_pre_quantum_contract(cfg)  # 进入 pre-quantum 前显式调用
 | `require_dmet`, `require_projection`, `require_plugin` | `embedding_helpers` | 窄化 `EmbeddingSpec` Union |
 | `is_schmidt_production`, `is_projection_mulliken` | `embedding_helpers` | 路径判别 |
 | `resolve_schmidt_per_fragment_vqe_maxiter` | `embedding_helpers` | fragment VQE 迭代预算 |
-| `resolve_variational_algorithm`, `pauli_protocol_enabled` | `quantum_helpers` | 量子阶段开关 |
+| `resolve_variational_algorithm`, `resolve_adapt_pool_id`, `classify_pauli_expectation_path_for_config` | `quantum_helpers` | 量子阶段开关与 repro |
 | `resolve_scf_driver_controls` | `scf_helpers` | 完整 driver 控制子块 |
 | `EXPERIMENT_CROSS_VALIDATORS` | `_experiment_validation` | 注册表扩展点 |
 | `scf_driver_id` | `_driver_helpers` | 归一化 driver 字符串 |

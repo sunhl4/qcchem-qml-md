@@ -1,14 +1,14 @@
 {
   "src_root": "src/qchem_stack",
   "line_threshold": 400,
-  "python_file_count": 321,
+  "python_file_count": 326,
   "files_over_line_threshold": 0,
   "files_over_500_lines": 0,
   "large_files": [],
   "dict_str_any_top": [
     {
       "count": 15,
-      "path": "src/qchem_stack/integrations/dmet_self_consistent.py"
+      "path": "src/qchem_stack/chem/embedding/dmet_self_consistent.py"
     },
     {
       "count": 12,
@@ -80,6 +80,14 @@
     },
     {
       "count": 6,
+      "path": "src/qchem_stack/chem/embedding/schmidt_dmet_self_consistent.py"
+    },
+    {
+      "count": 6,
+      "path": "src/qchem_stack/chem/kernels/rdm_corrections.py"
+    },
+    {
+      "count": 6,
       "path": "src/qchem_stack/chem/pre_quantum_schmidt.py"
     },
     {
@@ -92,19 +100,11 @@
     },
     {
       "count": 6,
-      "path": "src/qchem_stack/integrations/schmidt_dmet_self_consistent.py"
-    },
-    {
-      "count": 6,
       "path": "src/qchem_stack/orchestration/embedding_workflow_stage.py"
     },
     {
       "count": 6,
       "path": "src/qchem_stack/orchestration/protocol_finalize_sidecars.py"
-    },
-    {
-      "count": 6,
-      "path": "src/qchem_stack/protocols/computable.py"
     }
   ]
 }

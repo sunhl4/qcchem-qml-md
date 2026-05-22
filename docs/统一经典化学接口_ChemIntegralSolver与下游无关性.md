@@ -23,22 +23,22 @@ PySCF 是当前**实现最完整**的适配器，不是架构上的唯一真源�
 
 - `active_space.strategy=avas`（`mcscf.avas`）
 - `chemistry_extended` 中与 `CASSCF` 轨道优化审计强绑定的路径
-- `pyscf_active_space_hooks`、`PySCFDriver` 提供的量子问题三元组等
+- `pyscf_active_space_hooks`、`restricted_active_space_quantum_problem_from_config` 等（legacy：`PySCFDriver` 量子问题三元组）
 
-这些路径应在**进入统一交换物之前**完成，或在门控处明确：**当前 reference 是否暴露 PySCF MF**（见 `pipeline._require_pyscf_reference` 类工具函数）。
+这些路径应在**进入统一交换物之前**完成，或在门控处明确仍依赖 PySCF 原生 MF/API 的分支（见下列列表）。Schmidt 变分 sidecar 与密度反馈循环已改为 `ClassicalMeanFieldReference.ao_basis_view()`，不再调用历史 `require_pyscf_reference` gate。
 
 ## 4. 维护纪律
 
 - 新增经典后端：实现 `ChemIntegralSolver` + `register_solver(name, factory)` + 填满 `SolverCapabilities`。
 - 新增编排阶段：只依赖 `ClassicalMeanFieldReference` / `CanonicalActiveSpaceIntegralPack` / capability，不直接 `import pyscf`。
 - 90 天执行日历：`docs/execution/day001_day090_unified_chemistry_interface_calendar.md`。
-- **Parity / Methods 导出**：`scripts/export_parity_criteria_table.py`（config-only）写出 **`registered_solvers`**（`chem.solvers.registered_solver_ids()`）与 **`solver_capabilities_snapshot`**（当前 YAML 选中驱动）；**`scf.driver=psi4`** 的代表样例：`configs/example_h2_psi4_rhf_sto3g.yaml`（已纳入 `scripts/check_parity_export_sample.py` 抽样）。完整经典路径仍以 PySCF 为主；Psi4 为 **能量/注册表** 浅接入，能力位见 `Psi4IntegralSolver.capabilities`。
+- **Parity / Methods 导出**：`scripts/export_parity_criteria_table.py`（config-only）写出 **`registered_solvers`**（`chem.solvers.registered_solver_ids()`）与 **`solver_capabilities_snapshot`**（当前 YAML 选中驱动）；**`scf.driver=psi4`** 的代表样例：`configs/example_h2_psi4_rhf_sto3g.yaml`、`configs/example_h2_psi4_schmidt_dmet.yaml`（已纳入 `scripts/check_parity_export_sample.py` 抽样）。Psi4 已覆盖完整 pre-quantum 与 Schmidt 单 fragment 路径（能力位见 `capabilities_psi4_production()`）；**PBC k-mesh（`max(pbc_kpoint_mesh)>1`）** 仍仅 PySCF 完整支持。
 
 ## 5. 可选经典钩子：按 backend 插件挂载
 
 - AVAS、CASSCF 轨道审计、AO/Lowdin 输入、Schmidt impurity 构造等属于 **backend plugin hook**，不属于通用编排内核。
 - 编排层只能检查能力位（`supports_*`），并在缺失时给出明确报错，不允许散落 `if driver == "pyscf"` 语句。
-- 当前实现中，PySCF 是这些钩子的默认提供者；Psi4 仍保持 energy-only 路径，能力位显式为 `False`。
+- PySCF 与 Psi4 均通过 backend plugin hook 提供 AVAS / Schmidt / 投影等路径；Psi4 部分 L3 核（AVAS、NEVPT2、Schmidt FCI）委托 PySCF，见各 backend 的 `capability_notes`。
 
 ## 6. `classical_benchmark_backend` 与上游标签对齐
 

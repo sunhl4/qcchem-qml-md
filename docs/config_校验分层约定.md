@@ -173,6 +173,8 @@ raw dict
   → 可选 validate_pre_quantum_contract()（管线二次门禁，规则子集）
 ```
 
+**包 init**：公开 API 从 [`src/qchem_stack/config/__init__.py`](../src/qchem_stack/config/__init__.py) 导入后，`ExperimentConfig.model_rebuild()` 在模块末尾执行，以解析 `experiment.py` 中对 `MoleculeSpec` / `ActiveSpaceSpec` / `EmbeddingSpec` 的 forward ref（`TYPE_CHECKING` 引用）。
+
 ### 4.1 构造时校验 vs 管线二次门禁
 
 | 函数 | 何时运行 | 示例 |

@@ -104,7 +104,7 @@ pre_quantum_build / hamiltonian                     （OpenFermion 等；映射�
 
 | 用户可见行为 | 实际机制 | 未来演进 |
 |--------------|----------|----------|
-| 文档写「avas 需 PySCF」 | AVAS **代码** 在 PySCF driver；validator 还检查 `driver=='pyscf'` | 其它后端实现 AVAS 后：capabilities=True + 去掉 pyscf 字面量（备忘 C2） |
+| `strategy: avas` | AVAS **投影核** 为 PySCF `mcscf.avas`；加载期仅查 **capability** + `avas.ao_labels`（C2 已完成） | Psi4 等：`build_pyscf_rhf_shadow` 导入 MO 后跑同一 AVAS 核（`configs/example_h2_psi4_avas.yaml`） |
 | `chemistry_extended.avas_ao_labels` | PySCF AVAS 输入格式 | 可演进为后端中性「AO 选择 DSL」，由 adapter 翻译 |
 | `chemistry_extended.pyscf_symmetry` | 名称带 pyscf，属扩展段 | 可并行增加 `psi4_*` 或通用 `point_group` 字段 |
 | JW/BK/SCBK 映射 | OpenFermion + 本仓库 `hamiltonian.py` | 与 driver 无关 |

@@ -16,8 +16,9 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFRHFResult
+    from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
     from qchem_stack.config import ExperimentConfig
+    from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
 MD_ML_MAX_EXTRA_GEOMETRIES = 48
 
@@ -95,7 +96,9 @@ def _normalize_coords(coords: list[list[float]]) -> list[list[float]]:
     return [[float(x), float(y), float(z)] for x, y, z in coords]
 
 
-def _energy_hartree_from_pipeline_out(cfg: ExperimentConfig, out: dict[str, Any]) -> float:
+def _energy_hartree_from_pipeline_out(
+    cfg: ExperimentConfig, out: PipelineResultV1 | dict[str, Any]
+) -> float:
     ref = cfg.md_ml_export.energy_reference
     if ref == "scf":
         scf = out.get("scf_energy")
@@ -111,12 +114,15 @@ def _energy_hartree_from_pipeline_out(cfg: ExperimentConfig, out: dict[str, Any]
                 "(missing energy_pauli_protocol on pipeline output)."
             )
         return float(out["energy_pauli_protocol"])
-    return float(out["energy_after_variational"])
+    energy_var = out.get("energy_after_variational")
+    if energy_var is None:
+        raise PipelineError("md_ml_export requires energy_after_variational on pipeline output.")
+    return float(energy_var)
 
 
 def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PySCFRHFResult:
     """Fresh mean-field solve at ``coords`` (same stoichiometry / charge / mult / basis / solvent / PBC as ``cfg``)."""
-    from qchem_stack.chem.drivers.pyscf_driver import PySCFDriver
+    from qchem_stack.chem.bridges.reference_factory import pyscf_rhf_result_from_config
     from qchem_stack.config import MdMlExportSpec
 
     child = cfg.model_copy(
@@ -128,14 +134,7 @@ def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PyS
             "md_ml_export": MdMlExportSpec(),
         },
     )
-    drv = PySCFDriver.from_config(child)
-    if child.chemistry_extended.pbc.cell_vectors_bohr is not None:
-        return drv.run_pbc_rhf()
-    if child.scf.method == "RHF":
-        return drv.run_rhf()
-    if child.scf.method == "ROHF":
-        return drv.run_rohf()
-    return drv.run_uhf()
+    return pyscf_rhf_result_from_config(child)
 
 
 def _as_pyscf_rhf(reference: ClassicalMeanFieldReference) -> PySCFRHFResult:

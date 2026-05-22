@@ -5,12 +5,12 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.active_space.backend_hooks import apply_avas_to_reference
-from qchem_stack.chem.integration.driver_meta import (
+from qchem_stack.chem.integration.meta_schema import (
     append_kernel_bindings,
     binding_mean_field_scf,
 )
 from qchem_stack.chem.kernels.catalog import KERNEL_MEAN_FIELD_SCF
-from qchem_stack.integrations.rdm_corrections import run_nevpt2_casci_correction
+from qchem_stack.chem.kernels.rdm_corrections import run_nevpt2_casci_correction
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference

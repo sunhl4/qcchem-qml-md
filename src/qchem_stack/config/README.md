@@ -12,7 +12,7 @@ Experiment YAML → typed [`ExperimentConfig`](experiment.py) models.
 |------|--------|-----------|
 | Top-level | `experiment.py` | [说明_实验配置加载_io.md](../../../docs/说明_实验配置加载_io.md) |
 | Embedding | `embedding*.py` | [说明_embedding配置.md](../../../docs/说明_embedding配置.md) |
-| Quantum | `quantum*.py` | nested 字段见 style doc §3.1 |
+| Quantum | `quantum*.py` | [说明_quantum配置.md](../../../docs/说明_quantum配置.md), [quantum_模块风格约定.md](../../../docs/quantum_模块风格约定.md) |
 | Active space | `active_space.py` | [说明_active_space配置.md](../../../docs/说明_active_space配置.md) |
 | Chemistry extended | `chemistry_extended*.py` | style doc §3.2 |
 | Mitigation / MD-ML | `mitigation*.py`, `md_ml_export.py` | nested `zne` / `pmsv` / `stubs`; `trajectory` |

@@ -89,7 +89,7 @@ def active_space_casci_raw_blocks_psi4(
     if n_active_electrons % 2 != 0:
         raise ValueError("psi4 active-space pack v1 requires even electron count (RHF)")
     nfrozen = nmo - int(n_active_orbitals)
-    int(n_active_electrons) // 2
+    _ = int(n_active_electrons) // 2  # active electron pairs (closed-shell RHF)
 
     psi4.set_options(
         {
