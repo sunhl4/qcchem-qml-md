@@ -23,7 +23,6 @@ from qchem_stack.chem.solvers.registry import create_solver
 __all__ = [
     "build_pre_quantum_input",
     "build_pre_quantum_input_with_context",
-    "hamiltonian",
     "hamiltonian_with_schmidt_context",
     "schmidt_hamiltonian_and_context",
 ]

@@ -617,7 +617,7 @@ Entrypoint 组：`qchem_stack.chem_solvers`（`importlib.metadata.entry_points`�
 | `pre_quantum_schmidt.py` | Schmidt 上下文 |
 | `precomputed_pre_quantum.py` | bundle 加载 |
 
-**`pre_quantum_build.__all__`：** `build_pre_quantum_input`, `build_pre_quantum_input_with_context`, `hamiltonian`, `hamiltonian_with_schmidt_context`, `schmidt_hamiltonian_and_context`。
+**`pre_quantum_build.__all__`：** `build_pre_quantum_input`, `build_pre_quantum_input_with_context`, `hamiltonian_with_schmidt_context`, `schmidt_hamiltonian_and_context`（`hamiltonian()` 仍保留为 deprecated 模块级函数，不在 `__all__` 中）。
 
 ### 8.4 `qchem_stack.chem.hamiltonian`
 
