@@ -1,6 +1,7 @@
 """Closed-shell spin-orbital UCCSD variational ansatz.
 
-Pauli averaging protocol prepends HEA circuits; dense UCCSD energy uses ``quantum.pauli.use_protocol: false``.
+Pauli averaging may use ansatz-native prep (HEA or UCCSD CircuitIR); dense-only UCCSD VQE
+still supports ``quantum.pauli.use_protocol: false`` for statevector energy without measurement circuits.
 
 Transforms:
   * ``jordan_wigner``: JW Hartree–Fock reference + JW-mapped fermionic generators; optional

@@ -15,6 +15,8 @@ from openfermion import bravyi_kitaev, jordan_wigner
 from openfermion.ops import QubitOperator
 from scipy.linalg import eigh
 
+from qchem_stack.backends.pauli_grouping import build_measurement_plan
+from qchem_stack.backends.pauli_shot_sim import energy_estimate_grouped_shot_simulation
 from qchem_stack.chem.kernels.spin_ucc import build_spin_ucc_singles_only_fermion_generators
 from qchem_stack.quantum.algorithms.excited import qse_matrices_hs
 from qchem_stack.quantum.statevector import (
@@ -214,19 +216,33 @@ def run_sceom_nested_commutator(
     k = len(s_ops)
     m_mat = np.zeros((k, k), dtype=float)
     task_meta: list[dict[str, Any]] = []
-    for i in range(k):
-        for j in range(k):
-            op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
-            val = expectation_qubit_operator(ref, op, n)
-            m_mat[i, j] = float(np.real(val))
-            task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
-    m_mat = (m_mat + m_mat.T) / 2.0
+    shot_noise_model = "none"
     if shots_per_matrix_element > 0:
         rng = np.random.default_rng(seed)
-        scale = 1.0 / math.sqrt(max(1, shots_per_matrix_element))
-        nz = rng.normal(0.0, scale, m_mat.shape)
-        nz = (nz + nz.T) / 2.0
-        m_mat = m_mat + nz
+        for i in range(k):
+            for j in range(k):
+                op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
+                plan = build_measurement_plan(op, n, grouping="tensor_product")
+                est, _, _ = energy_estimate_grouped_shot_simulation(
+                    ref,
+                    op,
+                    plan,
+                    n,
+                    int(shots_per_matrix_element),
+                    rng,
+                    return_histograms=False,
+                )
+                m_mat[i, j] = float(est)
+                task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
+        shot_noise_model = "grouped_statevector_shot_simulation_per_m_element"
+    else:
+        for i in range(k):
+            for j in range(k):
+                op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
+                val = expectation_qubit_operator(ref, op, n)
+                m_mat[i, j] = float(np.real(val))
+                task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
+    m_mat = (m_mat + m_mat.T) / 2.0
     evals, _ = eigh(m_mat)
     evals = np.sort(np.real(evals))
     sceom_analysis = [
@@ -244,9 +260,14 @@ def run_sceom_nested_commutator(
         "subspace_dim": k,
         "construction": (f"M_ij=<psi|[Si,[H,Sj]]|psi>; n_generators={k};strategy={strat_label}"),
         "tasking": task_meta[: min(8, len(task_meta))],
-        "shot_noise_model": "symmetric_gaussian_on_real_M"
-        if shots_per_matrix_element > 0
-        else "none",
+        "sceom_m_element_tasks": {
+            "n_generators": k,
+            "n_matrix_elements": k * k,
+            "n_tasks_total": len(task_meta),
+            "shots_per_matrix_element": shots_per_matrix_element,
+            "tasks_preview": task_meta[: min(8, len(task_meta))],
+        },
+        "shot_noise_model": shot_noise_model,
         "shots_per_matrix_element": shots_per_matrix_element,
         "sceom_analysis": sceom_analysis,
         "symmetry_filter": "none",

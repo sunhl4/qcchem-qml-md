@@ -11,7 +11,7 @@ from scipy.linalg import eigh
 
 from qchem_stack.quantum.qse_transition import (
     build_qse_transition_schedule,
-    qse_h_matrix_transition_shots,
+    qse_h_matrix_transition_grouped_pauli_shots,
     solve_qse_ghep,
 )
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
@@ -145,11 +145,11 @@ class QSE:
         shots_per_ij_term: int = 512,
         seed: int = 0,
     ) -> QSEResult:
-        """Per-(i,j,Pauli-term) complex Gaussian noise; ``S`` exact; schedule for parity tables."""
+        """Per-(i,j,Pauli-term) grouped statevector shots; ``S`` exact; schedule for parity tables."""
         rng = np.random.default_rng(seed)
         kb = max_basis or self.subspace_dim
         basis = build_qse_basis_from_vqe_hea(angles, self.hamiltonian.n_qubits, depth, max_basis=kb)
-        h_sym, s_mat, records = qse_h_matrix_transition_shots(
+        h_sym, s_mat, records = qse_h_matrix_transition_grouped_pauli_shots(
             basis,
             self.hamiltonian.operator,
             self.hamiltonian.n_qubits,
@@ -171,7 +171,7 @@ class QSE:
             meta={
                 "reference": "arXiv:1603.05681",
                 "K": len(basis),
-                "shot_noise_model": "independent_complex_gaussian_per_ij_term",
+                "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
                 "shots_per_ij_term": shots_per_ij_term,
                 "S_condition_number": cond_s,
                 "qse_pauli_transition_schedule": {
@@ -257,5 +257,59 @@ class QSE:
                 "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
                 "shots_per_matrix_element": shots_per_matrix_element,
                 "S_condition_number": cond_s,
+            },
+        )
+
+    def run_from_uccsd_basis_pauli_transitions(
+        self,
+        angles: np.ndarray,
+        prepare_state: Callable[[np.ndarray], np.ndarray],
+        *,
+        max_basis: int | None = None,
+        shots_per_ij_term: int = 512,
+        seed: int = 0,
+    ) -> QSEResult:
+        """Fermionic-singles QSE basis with per-(i,j,Pauli-term) transition shot bookkeeping."""
+        rng = np.random.default_rng(seed)
+        kb = max_basis or self.subspace_dim
+        basis = build_qse_basis_from_uccsd_reference(
+            angles,
+            self.hamiltonian,
+            prepare_state,
+            max_basis=kb,
+        )
+        h_sym, s_mat, records = qse_h_matrix_transition_grouped_pauli_shots(
+            basis,
+            self.hamiltonian.operator,
+            self.hamiltonian.n_qubits,
+            shots_per_ij_term=shots_per_ij_term,
+            rng=rng,
+        )
+        sched = build_qse_transition_schedule(
+            self.hamiltonian.operator,
+            len(basis),
+            self.hamiltonian.n_qubits,
+            shots_per_ij_term=shots_per_ij_term,
+            records=records,
+        )
+        _, exc = solve_qse_ghep(h_sym, s_mat)
+        svals = np.linalg.svd(np.real(s_mat), compute_uv=False)
+        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
+        return QSEResult(
+            excitation_energies=exc,
+            meta={
+                "reference": "arXiv:1603.05681",
+                "basis_reference": "uccsd_fermionic_singles",
+                "K": len(basis),
+                "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
+                "shots_per_ij_term": shots_per_ij_term,
+                "S_condition_number": cond_s,
+                "qse_pauli_transition_schedule": {
+                    "n_qubits": sched.n_qubits,
+                    "subspace_dim": sched.subspace_dim,
+                    "n_pauli_terms": sched.n_pauli_terms,
+                    "n_transition_tasks": sched.n_transition_tasks,
+                    "total_shots_upper_bound": sched.total_shots_budget_upper_bound,
+                },
             },
         )

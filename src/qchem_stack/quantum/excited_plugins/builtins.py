@@ -113,9 +113,12 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
                 seed=ctx.seed,
             )
         else:
-            raise ValueError(
-                "quantum.excited.qse.shot_mode='pauli_transitions' is incompatible with "
-                "quantum.variational.ansatz='uccsd' (HEA Pauli-X bump basis only)."
+            qse_res = qse.run_from_uccsd_basis_pauli_transitions(
+                angles,
+                prepare_state,
+                max_basis=kb,
+                shots_per_ij_term=int(qse_kw["shots_per_ij_term"]),
+                seed=ctx.seed,
             )
     elif shot_mode == "exact":
         qse_res = qse.run_from_vqe_hea_basis(angles, depth, max_basis=kb)

@@ -37,6 +37,7 @@ class SceomResourceBlock(TypedDict, total=False):
     generator_count_k: int
     m_matrix_elements: int
     shots_per_matrix_element_yaml: int
+    sceom_m_element_tasks: dict[str, int]
 
 
 class ExcitedShotChannelBounds(TypedDict):

@@ -366,7 +366,7 @@ Capability surface（`GET /v1/meta/capability-surface`）另含 `variational_reg
 | `validate_md_ml_extra_coordinates_shape` | 同上 | extra 几何数量与 `(n_atom, 3)` 形状 |
 | `validate_md_ml_pauli_energy_requires_pauli_protocol` | 同上 | `energy_reference=pauli_protocol` → `quantum.pauli.use_protocol` |
 | `validate_avas_strategy_requires_labels_and_capability` | 同上 | `strategy=avas` → 非空 `ao_labels` + solver capability |
-| `validate_uccsd_variational_constraints` | 同上 | UCCSD 与 mapping / pauli protocol 互斥；`uccsd + qse.pauli_transitions` 互斥 |
+| `validate_uccsd_variational_constraints` | 同上 | UCCSD 需 JW mapping；`uccsd + use_protocol + zne.circuit_scale_fold` 互斥 |
 | `validate_precomputed_driver_excludes_live_hooks` | `_experiment_validation_precomputed.py` | precomputed 禁 benchmarks / rdm_correction |
 | `validate_pbc_excludes_casscf_hooks` | `_experiment_validation_pbc.py` | PBC 与 CASSCF 轨道优化 hook 互斥 |
 | `validate_pbc_k_mesh_solver_capability` | 同上 | k-mesh 与 solver 能力（**不在** pre_quantum_contract 内） |
@@ -647,7 +647,7 @@ mapping = resolve_fermion_qubit_mapping(cfg.active_space)
 | `vqe` | VQE 超参 | `depth`, `maxiter`, `optimizer_method`, `initial_parameters_strategy` |
 | `adapt` | ADAPT | `max_iter`, `pool_id` |
 | `iqeb` | IQEB | `pool_id`, `n_grads`, `energy_tolerance`, `max_rounds` |
-| `pauli` | Pauli 协议 | `use_protocol`, `grouping`, `run_sampled`, `run_qiskit_shots` |
+| `pauli` | Pauli 协议 | `use_protocol`, `grouping`, `run_sampled`, `run_qiskit_shots`（UCCSD JW 可与 `variational.ansatz: uccsd` 联用；与 `zne.mode=circuit_scale_fold` 互斥） |
 | `excited.vqd` | VQD | `after_variational`, `n_states`, penalty 相关 |
 | `excited.qse` | QSE | `after_variational`, `subspace_dim`, `shot_mode` |
 | `excited.sceom` | SCEOM | `after_variational`, `generator_strategy` |

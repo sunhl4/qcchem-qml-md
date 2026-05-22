@@ -61,7 +61,10 @@ def _apply_zne(
 ) -> None:
     scales_f = [float(s) for s in (proto.zne_scales or ())]
     fold_requested = proto.zne_mode == "circuit_scale_fold"
-    unsupported_fold = fold_requested and (proto.run_sampled or proto.run_qiskit_shots)
+    uccsd_prep = proto.ansatz_prep is not None and proto.ansatz_prep.kind == "uccsd"
+    unsupported_fold = fold_requested and (
+        proto.run_sampled or proto.run_qiskit_shots or uccsd_prep
+    )
     if fold_requested and not unsupported_fold:
         base_depth = int(proto.hea_depth)
         curve: list[float] = []
@@ -100,9 +103,14 @@ def _apply_zne(
         proto._counts["zne_energies"] = [zne_scale_energy(e_val, s) for s in scales_f]
         proto._counts["zne_mode"] = "scalar_stub"
         if unsupported_fold:
+            reasons: list[str] = []
+            if proto.run_sampled or proto.run_qiskit_shots:
+                reasons.append("disable run_sampled / run_qiskit_shots")
+            if uccsd_prep:
+                reasons.append("UCCSD ansatz prep is HEA-depth-fold incompatible")
             proto._counts["zne_circuit_fold_fallback_reason"] = (
                 "circuit_scale_fold requires exact executor path "
-                "(disable run_sampled / run_qiskit_shots)"
+                f"({'; '.join(reasons) or 'unsupported configuration'})"
             )
 
 

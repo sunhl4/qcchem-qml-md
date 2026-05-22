@@ -15,6 +15,7 @@ from qchem_stack.config.quantum_helpers import (
     PAULI_PATH_STATEVECTOR_SHOT_SIM,
 )
 from qchem_stack.contracts.schema_ids import (
+    ANSATZ_PROTOCOL_MATRIX_V1,
     MITIGATION_EXECUTION_MODEL_V1,
     OPEN_STACK_DIFFERENTIATORS_V1,
     PRODUCT_GAP_ANCHOR_INDEX_V1,
@@ -197,6 +198,79 @@ def protocol_expectation_semantics_public() -> dict[str, Any]:
                 "pauli_protocol_expectation_path": PAULI_PATH_QISKIT_COUNTS,
                 "protocol_counts_expectation_source": "qiskit_shot_counts_get_counts",
                 "protocol_counts_energy_stderr_model": "empirical_shot_variance_independent_groups_approx",
+            },
+        ],
+    }
+
+
+def ansatz_protocol_matrix_v1() -> dict[str, Any]:
+    """Ansatz × protocol compatibility matrix (InQuanto/Tangelo-style orthogonality)."""
+    return {
+        "schema": ANSATZ_PROTOCOL_MATRIX_V1,
+        "doc_anchor": "docs/quantum_模块风格约定.md#8-epistemic-bounds算法实现边界",
+        "entries": [
+            {
+                "ansatz": "hea",
+                "protocol": "pauli_averaging_exact",
+                "status": "supported",
+                "prep": "hea_operations",
+            },
+            {
+                "ansatz": "hea",
+                "protocol": "pauli_averaging_sampled",
+                "status": "supported",
+                "prep": "hea_operations",
+            },
+            {
+                "ansatz": "hea",
+                "protocol": "pauli_averaging_qiskit",
+                "status": "supported",
+                "prep": "hea_operations",
+            },
+            {
+                "ansatz": "hea",
+                "protocol": "zne_circuit_scale_fold",
+                "status": "supported",
+                "prep": "hea_depth_fold",
+            },
+            {
+                "ansatz": "uccsd",
+                "protocol": "pauli_averaging_exact",
+                "status": "supported",
+                "prep": "uccsd_circuit_ir_jw",
+                "mapping": "jordan_wigner",
+            },
+            {
+                "ansatz": "uccsd",
+                "protocol": "pauli_averaging_sampled",
+                "status": "supported",
+                "prep": "uccsd_circuit_ir_jw",
+                "mapping": "jordan_wigner",
+            },
+            {
+                "ansatz": "uccsd",
+                "protocol": "pauli_averaging_qiskit",
+                "status": "supported",
+                "prep": "uccsd_circuit_ir_jw",
+                "mapping": "jordan_wigner",
+            },
+            {
+                "ansatz": "uccsd",
+                "protocol": "zne_circuit_scale_fold",
+                "status": "unsupported",
+                "reason": "HEA-only depth fold; use zne.mode=scalar_stub",
+            },
+            {
+                "ansatz": "hea",
+                "protocol": "qse_pauli_transitions",
+                "status": "supported",
+                "basis": "hea_pauli_x_bump_legacy",
+            },
+            {
+                "ansatz": "uccsd",
+                "protocol": "qse_pauli_transitions",
+                "status": "supported",
+                "basis": "uccsd_fermionic_singles",
             },
         ],
     }

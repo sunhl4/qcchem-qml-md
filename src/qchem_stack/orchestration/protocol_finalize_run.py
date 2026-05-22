@@ -13,7 +13,10 @@ from qchem_stack.orchestration.excited_stages import (
     excited_shots_upper_bound,
 )
 from qchem_stack.orchestration.parity_finalize import finalize_open_stack_parity_snapshot
-from qchem_stack.orchestration.protocol_finalize_protocol import protocol_for_job
+from qchem_stack.orchestration.protocol_finalize_protocol import (
+    ansatz_prep_for_job,
+    protocol_for_job,
+)
 from qchem_stack.orchestration.protocol_finalize_resource import resource_summary_excited_only
 from qchem_stack.orchestration.protocol_finalize_sidecars import (
     attach_nexus_mitigation_tn,
@@ -23,6 +26,7 @@ from qchem_stack.orchestration.protocol_finalize_sidecars import (
     maybe_attach_md_ml_qmef_dataset,
 )
 from qchem_stack.orchestration.repro_summary import attach_run_summary as attach_run_summary_impl
+from qchem_stack.protocols.ansatz_prep import ansatz_prep_meta
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -93,13 +97,19 @@ def run_protocol_and_finalize_stage(
         return out
 
     proto = protocol_for_job(cfg, qh, bspec=bspec, exe=exe, bundle=bundle)
-    proto.build(np.asarray(angles, dtype=float), hea_depth=resolve_vqe_depth(cfg))
+    prep = ansatz_prep_for_job(cfg, qh, angles, hea_depth=resolve_vqe_depth(cfg))
+    proto.build(
+        np.asarray(angles, dtype=float),
+        hea_depth=resolve_vqe_depth(cfg),
+        ansatz_prep=prep,
+    )
     proto.compile()
     proto.run()
     e_proto = proto.evaluate()
     rows = proto.dataframe_circuit_shot_rows()
     df_sum = summarize_circuit_shot_rows(rows)
     pc = proto._counts
+    pc["ansatz_prep"] = ansatz_prep_meta(prep)
     resource_summary = {
         **df_sum,
         "n_pauli_terms": pc.get("n_pauli_terms"),

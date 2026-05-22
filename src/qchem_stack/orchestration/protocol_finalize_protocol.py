@@ -4,19 +4,41 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
+
 from qchem_stack.config.quantum_helpers import (
     pauli_record_histograms,
     pauli_run_qiskit_shots,
     pauli_run_sampled,
     resolve_pauli_grouping,
     resolve_pauli_support_max_terms,
+    resolve_uccsd_trotter_steps,
+    resolve_variational_ansatz,
 )
 from qchem_stack.mitigation.pmsv import PMSVConfig
+from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.config import ExperimentConfig
+
+
+def ansatz_prep_for_job(
+    cfg: ExperimentConfig,
+    qh: QubitHamiltonian,
+    angles: Any,
+    *,
+    hea_depth: int,
+) -> AnsatzPrepSpec:
+    ang = np.asarray(angles, dtype=float)
+    if resolve_variational_ansatz(cfg) == "uccsd":
+        return AnsatzPrepSpec.uccsd(
+            hamiltonian=qh,
+            angles=ang,
+            trotter_steps=resolve_uccsd_trotter_steps(cfg),
+        )
+    return AnsatzPrepSpec.hea(n_qubits=qh.n_qubits, angles=ang, depth=int(hea_depth))
 
 
 def protocol_for_job(

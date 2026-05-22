@@ -207,6 +207,7 @@ def test_export_results_merge_includes_algorithm_sidecars() -> None:
         "configs/example_h2_uccsd_trotter.yaml",
         "configs/example_h2_vqd_uccsd.yaml",
         "configs/example_h2_uccsd_bk.yaml",
+        "configs/example_h2_uccsd_pauli_protocol.yaml",
         "configs/example_h2_zne_circuit_fold.yaml",
         "configs/example_decomposition_plugin_toy.yaml",
         "configs/example_decomposition_plugin_two_fragment.yaml",

@@ -213,20 +213,15 @@ def validate_uccsd_variational_constraints(spec: ExperimentConfig) -> None:
             "quantum.variational.ansatz='uccsd' requires active_space.mapping.fermion_qubit in "
             "{'jordan_wigner', 'bravyi_kitaev'} (square encodings; symmetry_conserving_bravyi_kitaev is unsupported)."
         )
-    if quantum_spec.pauli.use_protocol:
-        raise ValueError(
-            "quantum.variational.ansatz='uccsd' is incompatible with quantum.pauli.use_protocol=True "
-            "(Pauli measurement circuits use HEA). Set quantum.pauli.use_protocol: false."
-        )
     if (
-        quantum_spec.excited.qse.after_variational
-        and quantum_spec.variational.ansatz == "uccsd"
-        and quantum_spec.excited.qse.shot_mode == "pauli_transitions"
+        quantum_spec.pauli.use_protocol
+        and spec.mitigation.zne.enabled
+        and spec.mitigation.zne.mode == "circuit_scale_fold"
     ):
         raise ValueError(
-            "quantum.variational.ansatz='uccsd' cannot combine with "
-            "quantum.excited.qse.shot_mode='pauli_transitions' "
-            "(Pauli-X bump basis is HEA-only; use exact or gaussian_h)."
+            "quantum.variational.ansatz='uccsd' with quantum.pauli.use_protocol=True "
+            "does not support mitigation.zne.mode='circuit_scale_fold' (HEA depth fold only). "
+            "Use zne.mode='scalar_stub' or disable ZNE."
         )
 
 

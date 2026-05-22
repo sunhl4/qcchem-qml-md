@@ -340,7 +340,7 @@ def test_attach_run_summary_qse_schedule_fields() -> None:
             "excitation_energies": [0.1, 0.2],
             "meta": {
                 "K": 3,
-                "shot_noise_model": "independent_complex_gaussian_per_ij_term",
+                "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
                 "qse_pauli_transition_schedule": {
                     "n_transition_tasks": 9,
                     "total_shots_upper_bound": 900,
@@ -379,7 +379,7 @@ def test_attach_run_summary_sceom_nested_meta() -> None:
             "meta": {
                 "subspace_dim": 2,
                 "construction": "M_ij=<psi|[Si,[H,Sj]]|psi> with Pauli toy generators",
-                "shot_noise_model": "symmetric_gaussian_on_real_M",
+                "shot_noise_model": "grouped_statevector_shot_simulation_per_m_element",
             },
         },
     }

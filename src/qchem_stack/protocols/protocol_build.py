@@ -11,9 +11,9 @@ from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.pauli_measure_expand import (
     build_synthesized_pauli_shot_circuit,
     deserialize_basis_key,
-    hea_operations,
 )
 from qchem_stack.backends.spec import CircuitIR
+from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec, build_prep_operations, prep_box_label
 from qchem_stack.protocols.protocol_phase import ProtocolPhase
 
 if TYPE_CHECKING:
@@ -21,11 +21,27 @@ if TYPE_CHECKING:
 
 
 def build_logical_circuits(
-    proto: PauliAveragingProtocol, angles: np.ndarray, hea_depth: int = 1
+    proto: PauliAveragingProtocol,
+    angles: np.ndarray,
+    hea_depth: int = 1,
+    *,
+    ansatz_prep: AnsatzPrepSpec | None = None,
 ) -> None:
     proto._phase = ProtocolPhase.BUILD
     proto.angles = np.asarray(angles, dtype=float)
-    proto.hea_depth = hea_depth
+    if ansatz_prep is not None:
+        proto.ansatz_prep = ansatz_prep
+    elif proto.ansatz_prep is None:
+        proto.ansatz_prep = AnsatzPrepSpec.hea(
+            n_qubits=proto.n_qubits,
+            angles=proto.angles,
+            depth=hea_depth,
+        )
+    else:
+        proto.ansatz_prep.angles = proto.angles
+    proto.hea_depth = hea_depth if proto.ansatz_prep.kind == "hea" else proto.hea_depth
+    prep_ops = build_prep_operations(proto.ansatz_prep)
+    prep_box = prep_box_label(proto.ansatz_prep)
     proto._measurement_plan = build_measurement_plan(
         proto.hamiltonian, proto.n_qubits, grouping=proto.measurement_grouping
     )
@@ -38,26 +54,28 @@ def build_logical_circuits(
             circuits.append(
                 CircuitIR(
                     n_qubits=proto.n_qubits,
-                    operations=hea_operations(proto.n_qubits, hea_depth, proto.angles),
-                    boxes=["HEA"],
+                    operations=list(prep_ops),
+                    boxes=[prep_box],
                 )
             )
         elif bk is not None:
             circuits.append(
                 build_synthesized_pauli_shot_circuit(
                     proto.n_qubits,
-                    hea_depth,
-                    proto.angles,
+                    prep_ops,
                     basis_key=bk,
                     support_qubits=qs,
+                    prep_box=prep_box,
                 )
             )
         else:
-            ops = hea_operations(proto.n_qubits, hea_depth, proto.angles)
+            ops = list(prep_ops)
             ops.append({"name": "JOINT_PAULI_MEASURE", "qubits": qs, "params": dict(meta)})
             circuits.append(
                 CircuitIR(
-                    n_qubits=proto.n_qubits, operations=ops, boxes=["HEA", "JointPauliMeasure"]
+                    n_qubits=proto.n_qubits,
+                    operations=ops,
+                    boxes=[prep_box, "JointPauliMeasure"],
                 )
             )
     proto._logical_circuits = circuits

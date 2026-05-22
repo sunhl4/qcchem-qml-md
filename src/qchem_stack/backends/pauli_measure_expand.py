@@ -74,18 +74,18 @@ def serialize_basis_key(basis_key: tuple[tuple[int, str], ...] | None) -> Any:
 
 def build_synthesized_pauli_shot_circuit(
     n_qubits: int,
-    hea_depth: int,
-    angles: np.ndarray,
+    prep_operations: list[dict[str, Any]],
     *,
     basis_key: tuple[tuple[int, str], ...],
     support_qubits: list[int],
+    prep_box: str = "HEA",
 ) -> CircuitIR:
     ops: list[dict[str, Any]] = []
-    ops.extend(hea_operations(n_qubits, hea_depth, angles))
+    ops.extend(prep_operations)
     ops.extend(basis_change_operations(basis_key, n_qubits))
     ops.extend(measure_support_operations(support_qubits))
     return CircuitIR(
         n_qubits=n_qubits,
         operations=ops,
-        boxes=["HEA", "PauliBasis", "Measure"],
+        boxes=[prep_box, "PauliBasis", "Measure"],
     )

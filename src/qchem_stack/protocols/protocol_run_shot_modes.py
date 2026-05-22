@@ -5,8 +5,8 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.backends.shot_budget import energy_estimate_with_uncertainty
+from qchem_stack.protocols.ansatz_prep import prepare_statevector
 from qchem_stack.protocols.protocol_hea import hea_angles_for_depth
-from qchem_stack.quantum.statevector import hea_state
 
 if TYPE_CHECKING:
     import numpy as np
@@ -49,6 +49,18 @@ def _base_counts(
     return counts
 
 
+def _resolved_ansatz_prep(proto: PauliAveragingProtocol):
+    from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec
+
+    if proto.ansatz_prep is not None:
+        return proto.ansatz_prep
+    return AnsatzPrepSpec.hea(
+        n_qubits=proto.n_qubits,
+        angles=proto.angles,
+        depth=int(proto.hea_depth),
+    )
+
+
 def run_sampled_shot_simulation(
     proto: PauliAveragingProtocol,
     *,
@@ -61,7 +73,8 @@ def run_sampled_shot_simulation(
 ) -> dict[str, Any]:
     from qchem_stack.backends.pauli_shot_sim import energy_estimate_grouped_shot_simulation
 
-    psi = hea_state(proto.angles, proto.n_qubits, proto.hea_depth)
+    prep = _resolved_ansatz_prep(proto)
+    psi = prepare_statevector(prep)
     e_sim, se_sim, sim_meta = energy_estimate_grouped_shot_simulation(
         psi,
         proto.hamiltonian,
@@ -102,6 +115,7 @@ def run_qiskit_shot_counts(
 ) -> dict[str, Any]:
     from qchem_stack.backends.qiskit_pauli_shots import energy_estimate_grouped_qiskit_shots
 
+    prep = _resolved_ansatz_prep(proto)
     e_q, se_q, q_meta = energy_estimate_grouped_qiskit_shots(
         proto.hamiltonian,
         plan,
@@ -112,6 +126,7 @@ def run_qiskit_shot_counts(
         proto.backend,
         noise_rng,
         return_histograms=proto.record_histograms,
+        ansatz_prep=prep,
     )
     counts = _base_counts(
         proto,
@@ -142,17 +157,22 @@ def run_exact_executor_expectation(
     pmsv_stderr_scale: float,
     exe: HamiltonianExpectationExecutor,
 ) -> dict[str, Any]:
-    e = exe.expectation_hea(
-        proto.hamiltonian,
-        proto.n_qubits,
-        hea_angles_for_depth(
-            proto.angles,
-            n_qubits=proto.n_qubits,
-            base_depth=int(proto.hea_depth),
-            eff_depth=int(proto.hea_depth),
-        ),
-        proto.hea_depth,
-    )
+    prep = _resolved_ansatz_prep(proto)
+    if prep.kind == "hea":
+        e = exe.expectation_hea(
+            proto.hamiltonian,
+            proto.n_qubits,
+            hea_angles_for_depth(
+                proto.angles,
+                n_qubits=proto.n_qubits,
+                base_depth=int(proto.hea_depth),
+                eff_depth=int(proto.hea_depth),
+            ),
+            proto.hea_depth,
+        )
+    else:
+        psi = prepare_statevector(prep)
+        e = exe.expectation_state(psi, proto.hamiltonian, proto.n_qubits)
     est = energy_estimate_with_uncertainty(e, plan, terms_dict, shots)
     return _base_counts(
         proto,

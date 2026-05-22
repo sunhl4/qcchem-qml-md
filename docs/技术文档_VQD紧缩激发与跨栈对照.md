@@ -33,7 +33,8 @@
 
 **约束**：
 
-- **UCCSD + VQD / QSE / SCEOM**：均允许。QSE/SCEOM 在 `variational_ansatz=uccsd` 时通过 `build_uccsd_variational_model().prepare_state` 构建参考态；**例外**：`qse.shot_mode=pauli_transitions` 仍为 HEA Pauli-X bump 专用（见 `validate_uccsd_variational_constraints`）。
+- **UCCSD + VQD / QSE / SCEOM**：均允许。QSE/SCEOM 在 `variational_ansatz=uccsd` 时通过 `build_uccsd_variational_model().prepare_state` 构建参考态；`qse.shot_mode=pauli_transitions` 使用 **fermionic singles** 基 + **grouped statevector Pauli shots**（`qse_transition.py`）；SCEOM `shots_per_matrix_element>0` 时对 M 元素使用 grouped Pauli shot sim。
+- **UCCSD + PauliAveraging**：JW UCCSD CircuitIR prep + grouped Pauli shots（`quantum.pauli.use_protocol: true`）；`zne.mode=circuit_scale_fold` 与 UCCSD 互斥。
 - **UCCSD + VQD** 要求前置变分已产出基态角；`VQD.run(..., ground_angles=..., ground_energy=...)` 内若使用 `prepare_state` 则禁止在无 `ground_angles` 时单独跑紧缩。
 
 ---

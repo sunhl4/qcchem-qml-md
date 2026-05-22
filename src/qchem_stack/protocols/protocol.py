@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from qchem_stack.config import NexusAnalogSpec
     from qchem_stack.jobs.store import JobHandle, SqliteJobStore
     from qchem_stack.mitigation.pmsv import PMSVConfig
+    from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec
 
 # Pauli ``run``/``evaluate`` expectation paths (P0): exact executor vs grouped statevector MC vs Qiskit
 # ``get_counts`` — see ``docs/技术文档_设备比特串与Qiskit采样路径.md`` §2 and
@@ -50,6 +51,7 @@ class PauliAveragingProtocol:
     zne_mode: Literal["scalar_stub", "circuit_scale_fold"] = "scalar_stub"
     hea_depth: int = 1
     angles: np.ndarray = field(default_factory=lambda: np.zeros(1, dtype=float))
+    ansatz_prep: AnsatzPrepSpec | None = None
     measurement_grouping: Literal["tensor_product", "greedy_commuting"] = "tensor_product"
     run_sampled: bool = False
     run_qiskit_shots: bool = False
@@ -75,8 +77,14 @@ class PauliAveragingProtocol:
     def instantiate(self) -> None:
         self._phase = ProtocolPhase.INSTANTIATE
 
-    def build(self, angles: np.ndarray, hea_depth: int = 1) -> None:
-        build_logical_circuits(self, angles, hea_depth)
+    def build(
+        self,
+        angles: np.ndarray,
+        hea_depth: int = 1,
+        *,
+        ansatz_prep: AnsatzPrepSpec | None = None,
+    ) -> None:
+        build_logical_circuits(self, angles, hea_depth, ansatz_prep=ansatz_prep)
 
     def compile(self) -> None:
         compile_circuits(self)

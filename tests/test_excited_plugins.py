@@ -279,6 +279,7 @@ def _uccsd_excited_cfg(**excited_kw: object) -> ExperimentConfig:
 def test_excited_registry_export_uccsd_capabilities() -> None:
     export = excited_registry_export()
     assert export["qse"]["capabilities"].get("supports_uccsd_prepare_state") is True
+    assert export["qse"]["capabilities"].get("uccsd_pauli_transitions_fermionic_basis") is True
     assert export["sceom"]["capabilities"].get("supports_uccsd_prepare_state") is True
 
 
@@ -329,14 +330,76 @@ def test_run_excited_sceom_uccsd_plugin_bundle_schema() -> None:
     assert bundle["schema"] == EXCITED_SCEOM_BUNDLE_V1
     assert bundle["meta"]["variational_ansatz"] == "uccsd"
     assert len(bundle["energies"]) >= 1
+    tasks = bundle["meta"].get("sceom_m_element_tasks") or {}
+    assert tasks.get("n_tasks_total", 0) >= 1
 
 
-def test_uccsd_qse_pauli_transitions_rejected_at_config() -> None:
-    with pytest.raises(ValidationError, match="pauli_transitions"):
-        _uccsd_excited_cfg(
-            qse={
-                "after_variational": True,
-                "subspace_dim": 2,
-                "shot_mode": "pauli_transitions",
-            }
+def test_uccsd_use_protocol_zne_circuit_fold_rejected_at_config() -> None:
+    from qchem_stack.config import MitigationSpec
+
+    with pytest.raises(ValidationError, match="circuit_scale_fold"):
+        ExperimentConfig(
+            schema_version="2",
+            experiment_id="t",
+            molecule=MoleculeSpec(
+                symbols=["H", "H"], coordinates=[[0.0, 0.0, 0.0], [0.0, 0.0, 0.74]]
+            ),
+            scf=SCFSpec(),
+            active_space=ActiveSpaceSpec.model_validate(
+                {
+                    "strategy": "cas",
+                    "cas": {"n_orbitals": 2, "n_electrons": 2},
+                    "mapping": {"fermion_qubit": "jordan_wigner"},
+                }
+            ),
+            mitigation=MitigationSpec.model_validate(
+                {"zne": {"enabled": True, "mode": "circuit_scale_fold"}}
+            ),
+            quantum=QuantumSpec.model_validate(
+                {
+                    "variational": {"ansatz": "uccsd"},
+                    "pauli": {"use_protocol": True},
+                }
+            ),
         )
+
+
+def test_uccsd_qse_pauli_transitions_allowed_at_config() -> None:
+    cfg = _uccsd_excited_cfg(
+        qse={
+            "after_variational": True,
+            "subspace_dim": 2,
+            "shot_mode": "pauli_transitions",
+        }
+    )
+    assert cfg.quantum.excited.qse.shot_mode == "pauli_transitions"
+
+
+def test_run_excited_qse_uccsd_pauli_transitions_plugin_bundle() -> None:
+    cfg = _uccsd_excited_cfg(
+        qse={
+            "after_variational": True,
+            "subspace_dim": 2,
+            "shot_mode": "pauli_transitions",
+            "shots_per_ij_term": 64,
+        }
+    )
+    qh = _h2_like_qh()
+    exe = StatevectorHeaExecutor()
+    model = build_uccsd_variational_model(qh, exe, trotter_steps=None)
+    ctx = ExcitedRunContext(
+        cfg=cfg,
+        hamiltonian=qh,
+        executor=exe,
+        seed=1,
+        ground_angles=np.zeros(model.n_params, dtype=float),
+        ground_energy=-1.0,
+    )
+    out: dict[str, object] = {}
+    run_excited_stages_from_context(ctx, out=out)
+    bundle = out["qse"]
+    assert isinstance(bundle, dict)
+    assert bundle["schema"] == EXCITED_QSE_BUNDLE_V1
+    assert bundle["meta"]["variational_ansatz"] == "uccsd"
+    assert bundle["meta"]["basis_reference"] == "uccsd_fermionic_singles"
+    assert bundle["meta"].get("qse_pauli_transition_schedule", {}).get("n_transition_tasks", 0) > 0

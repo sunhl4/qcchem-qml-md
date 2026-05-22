@@ -48,6 +48,7 @@ def product_surface() -> dict[str, object]:
 def capability_surface() -> dict[str, object]:
     from qchem_stack import __version__
     from qchem_stack.protocols.product_contract import (
+        ansatz_protocol_matrix_v1,
         mitigation_execution_model_public,
         open_stack_differentiators_public,
         product_capability_map_for_docs,
@@ -80,6 +81,7 @@ def capability_surface() -> dict[str, object]:
         "variational_registry_export_v1": variational_registry_export(),
         "excited_registry_export_v1": excited_registry_export(),
         "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
+        "ansatz_protocol_matrix_v1": ansatz_protocol_matrix_v1(),
     }
 
 

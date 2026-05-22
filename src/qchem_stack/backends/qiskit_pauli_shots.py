@@ -16,12 +16,14 @@ import numpy as np
 from qchem_stack.backends.pauli_measure_expand import deserialize_basis_key
 from qchem_stack.backends.pauli_shot_sim import _pauli_eigenvalue_on_comp_bit
 from qchem_stack.backends.qiskit_executor import hea_circuit_qiskit
+from qchem_stack.backends.uccsd_circuit_qiskit import uccsd_circuit_qiskit
 
 if TYPE_CHECKING:
     from openfermion.ops import QubitOperator
 
     from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
     from qchem_stack.backends.spec import BackendSpec
+    from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec
 
 
 def _basis_key_for_term(term: tuple[tuple[int, str], ...]) -> tuple[tuple[int, str], ...]:
@@ -140,6 +142,20 @@ def _run_counts(
     return dict(job.result().get_counts())
 
 
+def _prep_circuit_qiskit(
+    n_qubits: int,
+    hea_depth: int,
+    angles: np.ndarray,
+    *,
+    ansatz_prep: AnsatzPrepSpec | None = None,
+) -> Any:
+    if ansatz_prep is None or ansatz_prep.kind == "hea":
+        return hea_circuit_qiskit(n_qubits, hea_depth, np.asarray(angles, dtype=float))
+    if ansatz_prep.uccsd_ctx is None:
+        raise ValueError("uccsd ansatz_prep missing uccsd_ctx")
+    return uccsd_circuit_qiskit(n_qubits, np.asarray(angles, dtype=float), ansatz_prep.uccsd_ctx)
+
+
 def energy_estimate_grouped_qiskit_shots(
     hamiltonian: QubitOperator,
     plan: PauliMeasurementPlan,
@@ -151,6 +167,7 @@ def energy_estimate_grouped_qiskit_shots(
     rng: np.random.Generator,
     *,
     return_histograms: bool = True,
+    ansatz_prep: AnsatzPrepSpec | None = None,
 ) -> tuple[float, float, dict[str, Any]]:
     """
     Energy from grouped Pauli readouts, each group executed as **HEA + basis + measure** on Qiskit.
@@ -189,7 +206,7 @@ def energy_estimate_grouped_qiskit_shots(
             var_sum = 0.0
             for t, c in coeffs:
                 bk1 = _basis_key_for_term(t)
-                qc = hea_circuit_qiskit(n_qubits, hea_depth, angles)
+                qc = _prep_circuit_qiskit(n_qubits, hea_depth, angles, ansatz_prep=ansatz_prep)
                 _append_pauli_basis_to_qiskit(qc, bk1, n_qubits)
                 qc.barrier()
                 qc.measure_all()
@@ -236,7 +253,7 @@ def energy_estimate_grouped_qiskit_shots(
             per_group_var_over_shots.append(var_sum)
             continue
 
-        qc = hea_circuit_qiskit(n_qubits, hea_depth, angles)
+        qc = _prep_circuit_qiskit(n_qubits, hea_depth, angles, ansatz_prep=ansatz_prep)
         _append_pauli_basis_to_qiskit(qc, bk, n_qubits)
         qc.barrier()
         qc.measure_all()

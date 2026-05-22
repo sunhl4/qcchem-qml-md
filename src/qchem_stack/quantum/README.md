@@ -10,7 +10,7 @@ Quantum algorithms: variational ground state, excited-state sidecars, demo track
 
 | Area | Modules | Notes |
 |------|---------|-------|
-| Algorithms | `algorithms/` | `VQE`, `FermionicAdaptVQE`, `IQEBVQE`, `VQD`, `QSE`, QPE/VQS demos; UCCSD mapping in `uccsd_mapping.py` |
+| Algorithms | `algorithms/` | `VQE`, `FermionicAdaptVQE`, `IQEBVQE`, `VQD`, `QSE`, QPE/VQS demos; UCCSD mapping in `uccsd_mapping.py`, CircuitIR in `uccsd_circuit.py` |
 | Variational plugins | `variational_plugins/` | `run_variational_stage`, `register_variational_plugin` |
 | Excited plugins | `excited_plugins/` | VQD / QSE / SCEOM sidecar dispatch |
 | Branch factory | `variational_branch.py` | Shared UCCSD vs HEA wiring |
@@ -24,7 +24,7 @@ Quantum algorithms: variational ground state, excited-state sidecars, demo track
 PreQuantumInput / QubitHamiltonian
   → run_variational_stage(VariationalRunContext)     # quantum.algorithm registry
   → run_excited_stages_from_context(ExcitedRunContext)  # quantum.excited.* flags
-  → protocol finalize (Pauli averaging, demo sidecars — orchestration)
+  → protocol finalize (Pauli averaging via `protocols/ansatz_prep`, demo sidecars — orchestration)
 ```
 
 Config is read in plugin runners via `config.quantum_helpers`; algorithm classes receive typed parameters only.

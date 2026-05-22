@@ -49,7 +49,7 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "bundle_schema": EXCITED_QSE_BUNDLE_V1,
         "capabilities": {
             "supports_uccsd_prepare_state": True,
-            "hea_pauli_transitions_only": True,
+            "uccsd_pauli_transitions_fermionic_basis": True,
         },
     },
     "sceom": {

@@ -58,6 +58,7 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "capabilities": {
             "supports_auxiliary_expression": True,
             "supports_gradient_expression": True,
+            "supports_uccsd_pauli_protocol": True,
         },
     },
     "adapt": {

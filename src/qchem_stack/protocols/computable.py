@@ -28,6 +28,7 @@ from qchem_stack.config.quantum_helpers import (
     resolve_pauli_grouping,
     resolve_quantum_algorithm_factory,
     resolve_variational_algorithm,
+    resolve_variational_ansatz,
     resolve_vqe_depth,
     vqs_track_requested,
 )
@@ -280,11 +281,26 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
             )
         )
     if excited_qse_after_variational(cfg):
+        qse_details: dict[str, Any] = {"subspace_dim": resolve_excited_qse_subspace_dim(cfg)}
+        if resolve_variational_ansatz(cfg) == "uccsd":
+            qse_details.update(
+                {
+                    "shot_mode": cfg.quantum.excited.qse.shot_mode,
+                    "expansion_pool": "fermionic_singles",
+                }
+            )
+            out.append(
+                ComputableRef(
+                    "qse_matrices_uccsd",
+                    "spectrum",
+                    qse_details,
+                )
+            )
         out.append(
             ComputableRef(
                 "excitation_energies_qse",
                 "spectrum",
-                {"subspace_dim": resolve_excited_qse_subspace_dim(cfg)},
+                qse_details,
             )
         )
     if excited_sceom_after_variational(cfg):

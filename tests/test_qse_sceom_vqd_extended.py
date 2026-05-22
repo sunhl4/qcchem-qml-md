@@ -32,6 +32,18 @@ def test_run_sceom_nested_from_hea() -> None:
     res = run_sceom_nested_commutator_from_hea(qh, np.zeros(2), depth=1, subspace_dim=2)
     assert len(res.energies) == 2
     assert "D2SC05371C" in res.meta.get("reference", "")
+    tasks = res.meta.get("sceom_m_element_tasks") or {}
+    assert tasks.get("n_matrix_elements") == 4
+    assert tasks.get("n_tasks_total") == 4
+
+
+def test_run_sceom_nested_from_hea_grouped_shots() -> None:
+    h = QubitOperator(((0, "Z"),), 0.4) + QubitOperator((), 0.05)
+    qh = QubitHamiltonian(operator=h, n_qubits=1, fermion_space=FermionSpace(1, 1))
+    res = run_sceom_nested_commutator_from_hea(
+        qh, np.zeros(2), depth=1, subspace_dim=2, shots_per_matrix_element=128, seed=2
+    )
+    assert res.meta.get("shot_noise_model") == "grouped_statevector_shot_simulation_per_m_element"
 
 
 def test_default_sceom_generators_count() -> None:

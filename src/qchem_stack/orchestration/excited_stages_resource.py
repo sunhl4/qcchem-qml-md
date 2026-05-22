@@ -155,7 +155,22 @@ def build_excited_resource_summary(
             block["shots_per_ij_term_yaml"] = qse_kw["shots_per_ij_term"]
         er["qse"] = cast("QseResourceBlock", {k2: v for k2, v in block.items() if v is not None})
     if excited_sceom_after_variational(cfg):
-        er["sceom"] = _sceom_resource_block(cfg)
+        sceom_block = _sceom_resource_block(cfg)
+        if "sceom" in out:
+            meta = out["sceom"].get("meta") or {}
+            tasks = meta.get("sceom_m_element_tasks")
+            if isinstance(tasks, dict):
+                sceom_block["sceom_m_element_tasks"] = {
+                    k: tasks[k]
+                    for k in (
+                        "n_generators",
+                        "n_matrix_elements",
+                        "n_tasks_total",
+                        "shots_per_matrix_element",
+                    )
+                    if k in tasks
+                }
+        er["sceom"] = sceom_block
     return _finalize_excited_resource_summary(er)
 
 

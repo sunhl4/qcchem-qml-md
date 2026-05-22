@@ -495,7 +495,7 @@ quantum:
     assert "qse" in out
     rsum = out["repro"]["run_summary"]
     assert rsum.get("qse_shot_mode") == "pauli_transitions"
-    assert rsum.get("qse_shot_noise_model") == "independent_complex_gaussian_per_ij_term"
+    assert rsum.get("qse_shot_noise_model") == "grouped_statevector_shot_simulation_per_ij_term"
     assert out["qse"]["meta"].get("qse_shot_mode") == "pauli_transitions"
 
 
@@ -779,6 +779,27 @@ def test_run_pipeline_sync_packaged_h2_uccsd_yaml() -> None:
     rs = out["resource_summary"]
     assert rs["pauli_averaging_protocol_ran"] is False
     assert "energy_pauli_protocol" not in out
+
+
+def test_run_pipeline_sync_packaged_h2_uccsd_pauli_protocol_yaml() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_uccsd_pauli_protocol.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_uccsd_pauli_protocol.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["vqe_meta"].get("variational_ansatz") == "uccsd"
+    ev = float(out["energy_after_variational"])
+    assert math.isfinite(ev)
+    rs = out["resource_summary"]
+    assert rs["pauli_averaging_protocol_ran"] is True
+    epp = out.get("energy_pauli_protocol")
+    assert epp is not None
+    assert math.isfinite(float(epp))
+    snap = out["repro"]["parity_snapshot"]
+    assert snap.get("pauli_protocol_expectation_path") == "statevector_grouped_shot_simulation"
+    prep = out["protocol_counts"].get("ansatz_prep") or {}
+    assert prep.get("ansatz_kind") == "uccsd"
 
 
 def test_run_pipeline_sync_packaged_h2_uccsd_trotter_yaml() -> None:
