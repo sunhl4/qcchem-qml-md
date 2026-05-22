@@ -89,6 +89,25 @@ def test_classical_shadows_stub_trace_matches_graph_standalone() -> None:
     assert dag_kinds == trace_kinds == ["classical_shadows_expectation_stub"]
 
 
+def test_classical_shadows_stub_uses_computable_runtime() -> None:
+    from openfermion.ops import QubitOperator
+
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
+
+    cfg = _minimal_cfg(stubs={"classical_shadows": True, "classical_shadows_budget_pairs": 32})
+    qh = QubitHamiltonian(operator=QubitOperator(((0, "Z"),), 0.5), n_qubits=1)
+    out = {"energy_after_variational": -0.2, "angles": [0.1, 0.2]}
+    from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag_runtime
+
+    out["mitigation_graph_report"] = build_qermit_style_mitigation_report(cfg)
+    dex = execute_mitigation_dag_runtime(cfg, out, qh=qh)
+    assert dex is not None
+    assert out.get("classical_shadows_computable_runtime") is not None
+    cs = dex["trace"][0]
+    assert cs["node"] == "classical_shadows_expectation_stub"
+    assert cs.get("computable_runtime") == "ExpectationValueComputable"
+
+
 def test_classical_shadows_stub_between_spam_and_pmsv_matches_trace() -> None:
     cfg = _minimal_cfg(
         stubs={"spam_calibration": True, "classical_shadows": True},

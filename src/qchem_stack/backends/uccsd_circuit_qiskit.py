@@ -50,7 +50,8 @@ def circuit_ir_to_qiskit(ir: CircuitIR) -> Any:
     from qiskit import QuantumCircuit
 
     n = int(ir.n_qubits)
-    qc = QuantumCircuit(n)
+    has_measure = any(str(op.get("name", "")) == "MEASURE" for op in ir.operations)
+    qc = QuantumCircuit(n, 1 if has_measure else 0)
     for op in ir.operations:
         name = str(op.get("name", ""))
         qs = [int(q) for q in op.get("qubits", [])]
@@ -68,14 +69,43 @@ def circuit_ir_to_qiskit(ir: CircuitIR) -> Any:
             qc.ry(float(p["theta"]), _wire(n, qs[0]))
         elif name == "RX":
             qc.rx(float(p["theta"]), _wire(n, qs[0]))
+        elif name == "RZ":
+            qc.rz(float(p["theta"]), _wire(n, qs[0]))
+        elif name == "PAULI_ROTATION":
+            from qiskit.circuit.library import PauliEvolutionGate
+            from qiskit.quantum_info import Pauli
+
+            ps = str(p["pauli_string"])
+            phi = float(p["phi"])
+            gate = PauliEvolutionGate(Pauli(ps[::-1]), time=phi / 2.0)
+            qc.append(gate, [_wire(n, q) for q in range(n)])
         elif name in ("CX", "CNOT"):
             qc.cx(_wire(n, qs[0]), _wire(n, qs[1]))
         elif name == "H":
             qc.h(_wire(n, qs[0]))
         elif name == "SDG":
             qc.sdg(_wire(n, qs[0]))
+        elif name == "S":
+            qc.s(_wire(n, qs[0]))
+        elif name == "X":
+            qc.x(_wire(n, qs[0]))
+        elif name == "SX":
+            qc.sx(_wire(n, qs[0]))
+        elif name == "SXDG":
+            qc.sxdg(_wire(n, qs[0]))
         elif name == "MEASURE":
-            qc.measure(_wire(n, qs[0]), qs[0])
+            cbit = 0 if qc.num_clbits else None
+            if cbit is None:
+                continue
+            qc.measure(_wire(n, qs[0]), cbit)
+        elif name in ("CSWAP", "FREDKIN"):
+            qc.cswap(_wire(n, qs[0]), _wire(n, qs[1]), _wire(n, qs[2]))
+        elif name == "SWAP_TEST_SKETCH":
+            anc = _wire(n, qs[0])
+            sys_qs = [_wire(n, q) for q in qs[1:]]
+            qc.h(anc)
+            for q in sys_qs:
+                qc.cswap(anc, q, q)
         elif name == "JOINT_PAULI_MEASURE":
             continue
         else:

@@ -20,7 +20,7 @@
 
 **与 Vendor platform `AlgorithmVQD` 的边界**：公开文档中可将 Hamiltonian 期望值、重叠平方、权重等建模为多个 `Computable`；本栈在优化阶段将它们**折叠为上述单一标量**，便于与经典优化器直接对接。优化完成后仍可按通道写出 **`three_protocol`** 报告块（能量 / 重叠 / 权重及其可选 shot 估计），见 §4。
 
-**与 Tangelo「deflation」叙事的边界**：Tangelo 侧常见叙事为在测量流程中附加 `deflation_circuits` 与系数；本栈在 **态向量或给定 executor** 上直接计算振幅重叠并写入正则项，机读块 `meta.tangelo_deflation_analogy_v1` 仅作**叙事对齐**，不声称电路逆合成路径一致。
+**与 Tangelo「deflation」叙事的边界**：Tangelo 侧常见叙事为在测量流程中附加 `deflation_circuits` 与系数。本栈默认在 **态向量或给定 executor** 上直接计算振幅重叠并写入正则项；当 `quantum.vqd_overlap_mode: deflation_circuit` 时，额外导出 **Fredkin/CSWAP swap-test CircuitIR sketch** 与 `qiskit_export_v1` 资源摘要（`backends/vqd_deflation_qiskit.py`），优化路径仍与 `statevector_overlap` 相同除非设置 VQD shot budgets。
 
 ---
 

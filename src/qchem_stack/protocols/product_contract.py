@@ -272,8 +272,90 @@ def ansatz_protocol_matrix_v1() -> dict[str, Any]:
                 "status": "supported",
                 "basis": "uccsd_fermionic_singles",
             },
+            {
+                "ansatz": "uccsd",
+                "protocol": "qse_pauli_transitions_qiskit",
+                "status": "supported",
+                "basis": "uccsd_fermionic_singles_or_doubles",
+            },
+            {
+                "ansatz": "hea",
+                "protocol": "sceom_nested_commutator",
+                "status": "supported",
+                "prep": "hea_statevector",
+            },
+            {
+                "ansatz": "uccsd",
+                "protocol": "sceom_nested_commutator",
+                "status": "supported",
+                "prep": "uccsd_prepare_state",
+            },
         ],
     }
+
+
+def matrix_pauli_protocol_name(cfg: ExperimentConfig) -> str:
+    """Map YAML Pauli flags to :func:`ansatz_protocol_matrix_v1` protocol ids."""
+    from qchem_stack.config.quantum_helpers import (
+        PAULI_PATH_EXACT,
+        PAULI_PATH_QISKIT_COUNTS,
+        PAULI_PATH_STATEVECTOR_SHOT_SIM,
+        classify_pauli_expectation_path_for_config,
+    )
+
+    path = classify_pauli_expectation_path_for_config(cfg)
+    return {
+        PAULI_PATH_EXACT: "pauli_averaging_exact",
+        PAULI_PATH_STATEVECTOR_SHOT_SIM: "pauli_averaging_sampled",
+        PAULI_PATH_QISKIT_COUNTS: "pauli_averaging_qiskit",
+    }[path]
+
+
+def matrix_qse_protocol_name(shot_mode: str) -> str:
+    sm = str(shot_mode).strip().lower()
+    if sm == "pauli_transitions_qiskit":
+        return "qse_pauli_transitions_qiskit"
+    if sm in {"pauli_transitions", "gaussian_h"}:
+        return "qse_pauli_transitions"
+    return "qse_exact"
+
+
+def validate_pauli_protocol_for_config(cfg: ExperimentConfig, *, ansatz: str) -> None:
+    validate_ansatz_protocol_combo(str(ansatz).lower(), matrix_pauli_protocol_name(cfg))
+
+
+def validate_qse_protocol_for_config(cfg: ExperimentConfig, *, ansatz: str, shot_mode: str) -> None:
+    prot = matrix_qse_protocol_name(shot_mode)
+    if prot == "qse_exact":
+        return
+    validate_ansatz_protocol_combo(
+        str(ansatz).lower(),
+        prot,
+        computable_kind="qse_matrices",
+    )
+
+
+def validate_ansatz_protocol_combo(
+    ansatz: str,
+    protocol: str,
+    *,
+    computable_kind: str | None = None,
+) -> None:
+    """Runtime guard aligned with :func:`ansatz_protocol_matrix_v1` entries."""
+    matrix = ansatz_protocol_matrix_v1()
+    ans = str(ansatz).strip().lower()
+    prot = str(protocol).strip().lower()
+    for entry in matrix["entries"]:
+        if entry.get("ansatz") != ans or entry.get("protocol") != prot:
+            continue
+        if entry.get("status") == "unsupported":
+            raise ValueError(
+                f"ansatz={ans!r} protocol={prot!r} unsupported: {entry.get('reason', '')}"
+            )
+        return
+    if computable_kind in {"qse_matrices", "sceom_matrix"} and prot.startswith("pauli"):
+        return
+    raise ValueError(f"ansatz={ans!r} protocol={prot!r} not in ansatz_protocol_matrix_v1")
 
 
 def mitigation_execution_model_public() -> dict[str, Any]:

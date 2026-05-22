@@ -82,6 +82,9 @@ def test_computable_workflow_graph_roundtrip_example_configs() -> None:
         "configs/qpe_dual_track_demo.yaml",
         "configs/example_h2_vqs_track.yaml",
         "configs/example_h2_echo_variational_plugin.yaml",
+        "configs/example_h2_uccsd_pauli_protocol.yaml",
+        "configs/example_h2_sa_vqe.yaml",
+        "configs/example_h2_vqd_deflation_circuit.yaml",
     ):
         cfg = load_experiment_config(root / rel)
         assert_computable_workflow_graph_roundtrip(cfg)

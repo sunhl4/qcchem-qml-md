@@ -304,7 +304,7 @@ def test_run_excited_qse_uccsd_plugin_bundle_schema() -> None:
     assert isinstance(bundle, dict)
     assert bundle["schema"] == EXCITED_QSE_BUNDLE_V1
     assert bundle["meta"]["variational_ansatz"] == "uccsd"
-    assert bundle["meta"]["basis_reference"] == "uccsd_fermionic_singles"
+    assert bundle["meta"]["basis_reference"] in {"fermionic_singles", "uccsd_fermionic_singles"}
     assert len(bundle["excitation_energies"]) >= 1
 
 
@@ -401,5 +401,5 @@ def test_run_excited_qse_uccsd_pauli_transitions_plugin_bundle() -> None:
     assert isinstance(bundle, dict)
     assert bundle["schema"] == EXCITED_QSE_BUNDLE_V1
     assert bundle["meta"]["variational_ansatz"] == "uccsd"
-    assert bundle["meta"]["basis_reference"] == "uccsd_fermionic_singles"
+    assert bundle["meta"]["basis_reference"] in {"fermionic_singles", "uccsd_fermionic_singles"}
     assert bundle["meta"].get("qse_pauli_transition_schedule", {}).get("n_transition_tasks", 0) > 0

@@ -18,7 +18,10 @@ if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 from .excited_basis import (
+    _vqd_objective_computable,
+    _vqd_overlap_computable,
     _vqd_three_protocol_channels,
+    _vqd_weight_computable,
     vqd_cross_stack_semantics_meta,
 )
 
@@ -61,6 +64,7 @@ class VQD:
         init_noise_scale: float = 0.15,
         max_overlap_warn: float | None = 0.05,
         overlap_mode: str = "statevector_overlap",
+        optimizer_mode: str = "collapsed",
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> None:
         self.hamiltonian = hamiltonian
@@ -78,9 +82,15 @@ class VQD:
         self.init_noise_scale = float(max(0.0, init_noise_scale))
         self.max_overlap_warn = max_overlap_warn
         self.overlap_mode = str(overlap_mode).strip()
-        if self.overlap_mode not in {"statevector_overlap", "tangelo_circuit_analogy"}:
+        self.optimizer_mode = str(optimizer_mode).strip().lower()
+        if self.overlap_mode not in {
+            "statevector_overlap",
+            "tangelo_circuit_analogy",
+            "deflation_circuit",
+        }:
             raise ValueError(
-                "VQD overlap_mode must be 'statevector_overlap' or 'tangelo_circuit_analogy'"
+                "VQD overlap_mode must be 'statevector_overlap', "
+                "'tangelo_circuit_analogy', or 'deflation_circuit'"
             )
         self._executor = executor
 
@@ -268,6 +278,7 @@ class VQD:
 
         warnings: list[str] = []
         x_prev: np.ndarray | None = None
+        opt_trace: list[dict[str, Any]] = []
 
         for level in range(1, self.n_states):
             lam = penalties[level - 1]
@@ -284,8 +295,53 @@ class VQD:
                 x: np.ndarray,
                 states: list[np.ndarray] = prev_states,
                 lam_local: float = lam,
+                vqd_level: int = level,
             ) -> float:
                 g = self._prep(x)
+                if self.optimizer_mode == "three_computable":
+                    obj_ch = _vqd_objective_computable(
+                        states,
+                        g,
+                        self.hamiltonian.operator,
+                        self.hamiltonian.n_qubits,
+                        shots_objective=shots_objective,
+                        rng=rng,
+                        pauli_grouping=pauli_grouping,
+                    )
+                    ov_ch = _vqd_overlap_computable(
+                        states,
+                        g,
+                        self.hamiltonian.operator,
+                        self.hamiltonian.n_qubits,
+                        shots_overlap=shots_overlap,
+                        rng=rng,
+                    )
+                    wt_ch = _vqd_weight_computable(
+                        states,
+                        g,
+                        self.hamiltonian.operator,
+                        self.hamiltonian.n_qubits,
+                        lam_local,
+                        shots_overlap=shots_overlap,
+                        shots_weight=shots_weight,
+                        rng=rng,
+                    )
+                    channels = {"objective": obj_ch, "overlap": ov_ch, "weight": wt_ch}
+                    e = float(channels["objective"].get("energy_exact", 0.0))
+                    ov = float(channels["overlap"].get("overlap_squared_sum_exact", 0.0))
+                    wt = float(channels["weight"].get("weight_exact", lam_local * ov))
+                    opt_trace.append(
+                        {
+                            "level": vqd_level,
+                            "three_protocol": channels,
+                            "computable_runtime": [
+                                "ExpectationValueComputable",
+                                "OverlapSquaredComputable",
+                                "vqd_weight_channel",
+                            ],
+                        }
+                    )
+                    return e + wt
                 p = float(self.overlap_exponent)
                 ov_sum = sum(abs(np.vdot(s, g)) ** (2.0 * p) for s in states)
                 e = exe.expectation_state(g, self.hamiltonian.operator, self.hamiltonian.n_qubits)
@@ -341,6 +397,8 @@ class VQD:
             "overlap_exponent_yaml": float(self.overlap_exponent),
             "cobyla_maxiter_yaml": int(self.cobyla_maxiter),
             "vqd_optimizer_method": self.optimizer_method,
+            "vqd_optimizer_mode": self.optimizer_mode,
+            "vqd_optimizer_trace": opt_trace if self.optimizer_mode == "three_computable" else [],
             "vqd_init_strategy_yaml": self.init_strategy,
             "vqd_init_noise_scale_yaml": float(self.init_noise_scale),
             "vqd_overlap_mode_yaml": self.overlap_mode,
@@ -353,6 +411,8 @@ class VQD:
                 penalty_weight=self.penalty_weight,
                 penalty_weights_resolved=penalties,
                 overlap_mode=self.overlap_mode,
+                optimizer_mode=self.optimizer_mode,
+                n_system_qubits=int(self.hamiltonian.n_qubits),
             )
         )
         return VQDResult(energies=energies, meta=meta)

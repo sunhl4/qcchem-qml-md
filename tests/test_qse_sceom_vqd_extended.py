@@ -72,6 +72,33 @@ def test_vqd_three_protocol_with_shots() -> None:
     assert tp["objective"].get("energy_shot_mean") is not None
 
 
+def test_vqd_three_computable_optimizer_mode() -> None:
+    op = QubitOperator(((0, "Z"),), 0.3) + QubitOperator((), 0.1)
+    qh = QubitHamiltonian(operator=op, n_qubits=1, fermion_space=FermionSpace(1, 1))
+    r = VQD(qh, n_states=2, depth=1, optimizer_mode="three_computable").run(seed=0)
+    assert r.meta.get("vqd_optimizer_mode") == "three_computable"
+    trace = r.meta.get("vqd_optimizer_trace") or []
+    assert len(trace) >= 1
+    assert "three_protocol" in trace[0]
+    assert trace[0].get("computable_runtime")
+
+
+def test_vqd_deflation_circuit_overlap_mode_meta() -> None:
+    op = QubitOperator(((0, "Z"),), 0.3) + QubitOperator((), 0.1)
+    qh = QubitHamiltonian(operator=op, n_qubits=1, fermion_space=FermionSpace(1, 1))
+    r = VQD(qh, n_states=2, depth=1, overlap_mode="deflation_circuit").run(seed=0)
+    tda = r.meta.get("tangelo_deflation_analogy_v1") or {}
+    assert tda.get("selected_overlap_mode") == "deflation_circuit"
+    recipe = tda.get("deflation_circuit_recipe_v1") or {}
+    assert isinstance(recipe, dict)
+    sketch = recipe.get("circuit_ir_sketch_v1") or {}
+    assert sketch.get("schema") == "vqd_deflation_swap_test_circuit_sketch_v1"
+    assert any(str(op.get("name")) == "CSWAP" for op in (sketch.get("operations") or []))
+    qiskit_ex = recipe.get("qiskit_export_v1") or {}
+    assert qiskit_ex.get("schema") == "vqd_deflation_swap_test_qiskit_export_v1"
+    assert qiskit_ex.get("twoq_gate_count", 0) >= 1
+
+
 def test_pauli_protocol_records_histograms_when_requested() -> None:
     h = QubitOperator(((0, "Z"),), 1.0)
     proto = PauliAveragingProtocol(

@@ -27,6 +27,7 @@ from qchem_stack.orchestration.protocol_finalize_sidecars import (
 )
 from qchem_stack.orchestration.repro_summary import attach_run_summary as attach_run_summary_impl
 from qchem_stack.protocols.ansatz_prep import ansatz_prep_meta
+from qchem_stack.protocols.product_contract import validate_pauli_protocol_for_config
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -98,6 +99,7 @@ def run_protocol_and_finalize_stage(
 
     proto = protocol_for_job(cfg, qh, bspec=bspec, exe=exe, bundle=bundle)
     prep = ansatz_prep_for_job(cfg, qh, angles, hea_depth=resolve_vqe_depth(cfg))
+    validate_pauli_protocol_for_config(cfg, ansatz=prep.kind)
     proto.build(
         np.asarray(angles, dtype=float),
         hea_depth=resolve_vqe_depth(cfg),

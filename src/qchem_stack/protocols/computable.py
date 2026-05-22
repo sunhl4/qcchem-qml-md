@@ -286,7 +286,7 @@ def list_computables_for_config(cfg: ExperimentConfig) -> list[ComputableRef]:
             qse_details.update(
                 {
                     "shot_mode": cfg.quantum.excited.qse.shot_mode,
-                    "expansion_pool": "fermionic_singles",
+                    "expansion_pool": cfg.quantum.excited.qse.expansion_pool,
                 }
             )
             out.append(

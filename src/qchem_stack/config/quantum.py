@@ -26,6 +26,7 @@ from .quantum_specs import (
     QuantumIqebSpec,
     QuantumPauliSpec,
     QuantumTensornetSpec,
+    QuantumUccsdSpec,
     QuantumVariationalSpec,
     QuantumVqeSpec,
 )
@@ -47,6 +48,7 @@ class QuantumSpec(BaseModel):
         description="Import path module:callable for custom variational runner.",
     )
     variational: QuantumVariationalSpec = Field(default_factory=QuantumVariationalSpec)
+    uccsd: QuantumUccsdSpec = Field(default_factory=QuantumUccsdSpec)
     vqe: QuantumVqeSpec = Field(default_factory=QuantumVqeSpec)
     adapt: QuantumAdaptSpec = Field(default_factory=QuantumAdaptSpec)
     iqeb: QuantumIqebSpec = Field(default_factory=QuantumIqebSpec)

@@ -802,6 +802,65 @@ def test_run_pipeline_sync_packaged_h2_uccsd_pauli_protocol_yaml() -> None:
     assert prep.get("ansatz_kind") == "uccsd"
 
 
+def test_run_pipeline_sync_classical_shadows_stub_e2e() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_classical_shadows_stub.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_classical_shadows_stub.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    dex = out.get("mitigation_dag_execution")
+    assert isinstance(dex, dict)
+    trace = dex.get("trace") or []
+    assert trace and trace[0].get("node") == "classical_shadows_expectation_stub"
+    assert trace[0].get("computable_runtime") == "ExpectationValueComputable"
+    assert out.get("classical_shadows_computable_runtime") is not None
+
+
+def test_run_pipeline_sync_packaged_h2_vqd_three_computable_yaml() -> None:
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_vqd_uccsd_three_computable.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_vqd_uccsd_three_computable.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    vqd = out.get("vqd") or {}
+    meta = vqd.get("meta") or {}
+    assert meta.get("vqd_optimizer_mode") == "three_computable"
+    assert len(meta.get("vqd_optimizer_trace") or []) >= 1
+
+
+def test_run_pipeline_sync_packaged_h2_uccsd_qse_pauli_qiskit_yaml() -> None:
+    pytest.importorskip("qiskit")
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_uccsd_qse_pauli_qiskit.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_uccsd_qse_pauli_qiskit.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    qse = out.get("qse") or {}
+    meta = qse.get("meta") or {}
+    assert meta.get("qse_shot_mode") == "pauli_transitions_qiskit"
+    assert meta.get("computable_runtime") == "QSEMatricesComputable"
+    assert len(qse.get("excitation_energies") or []) >= 1
+
+
+def test_run_pipeline_sync_packaged_h2_vqd_deflation_circuit_yaml() -> None:
+    pytest.importorskip("qiskit")
+    root = Path(__file__).resolve().parents[1]
+    p = root / "configs" / "example_h2_vqd_deflation_circuit.yaml"
+    if not p.is_file():
+        pytest.skip("configs/example_h2_vqd_deflation_circuit.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    vqd = out.get("vqd") or {}
+    meta = vqd.get("meta") or {}
+    assert meta.get("vqd_overlap_mode_yaml") == "deflation_circuit"
+    tda = meta.get("tangelo_deflation_analogy_v1") or {}
+    recipe = tda.get("deflation_circuit_recipe_v1") or {}
+    assert recipe.get("qiskit_export_v1", {}).get("twoq_gate_count", 0) >= 1
+
+
 def test_run_pipeline_sync_packaged_h2_uccsd_trotter_yaml() -> None:
     root = Path(__file__).resolve().parents[1]
     p = root / "configs" / "example_h2_uccsd_trotter.yaml"

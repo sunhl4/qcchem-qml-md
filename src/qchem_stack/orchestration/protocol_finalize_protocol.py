@@ -12,6 +12,7 @@ from qchem_stack.config.quantum_helpers import (
     pauli_run_sampled,
     resolve_pauli_grouping,
     resolve_pauli_support_max_terms,
+    resolve_uccsd_decomposition_mode,
     resolve_uccsd_trotter_steps,
     resolve_variational_ansatz,
 )
@@ -37,6 +38,7 @@ def ansatz_prep_for_job(
             hamiltonian=qh,
             angles=ang,
             trotter_steps=resolve_uccsd_trotter_steps(cfg),
+            decomposition_mode=resolve_uccsd_decomposition_mode(cfg),  # type: ignore[arg-type]
         )
     return AnsatzPrepSpec.hea(n_qubits=qh.n_qubits, angles=ang, depth=int(hea_depth))
 

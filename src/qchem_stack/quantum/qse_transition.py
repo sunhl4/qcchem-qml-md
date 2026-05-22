@@ -150,6 +150,53 @@ def qse_h_matrix_transition_grouped_pauli_shots(
     return h_sym, s_mat, records
 
 
+def qse_h_matrix_transition_qiskit_shots(
+    basis: list[np.ndarray],
+    h: QubitOperator,
+    n_qubits: int,
+    *,
+    shots_per_ij_term: int,
+) -> tuple[np.ndarray, np.ndarray, list[dict[str, Any]]]:
+    """Qiskit Aer histogram path per (i,j,Pauli-term); ``S`` exact."""
+    from qchem_stack.backends.qiskit_qse_transition import (
+        estimate_transition_pauli_amplitude_qiskit_shots,
+    )
+
+    k = len(basis)
+    s_mat = np.zeros((k, k), dtype=complex)
+    for i in range(k):
+        for j in range(k):
+            s_mat[i, j] = np.vdot(basis[i], basis[j])
+    h_acc = np.zeros((k, k), dtype=complex)
+    records: list[dict[str, Any]] = []
+    for i in range(k):
+        for j in range(k):
+            for term, c in h.terms.items():
+                c = complex(c)
+                if len(term) == 0:
+                    h_acc[i, j] += c * s_mat[i, j]
+                    continue
+                amp = estimate_transition_pauli_amplitude_qiskit_shots(
+                    basis[i],
+                    basis[j],
+                    term,
+                    n_qubits,
+                    shots_per_ij_term,
+                )
+                h_acc[i, j] += c * amp
+                records.append(
+                    {
+                        "i": i,
+                        "j": j,
+                        "pauli_term": str(term),
+                        "shots_budget": shots_per_ij_term,
+                        "noise_model": "qiskit_histogram_per_ij_term",
+                    }
+                )
+    h_sym = (h_acc + np.conj(h_acc.T)) / 2.0
+    return h_sym, s_mat, records
+
+
 def qse_h_matrix_transition_shots(
     basis: list[np.ndarray],
     h: QubitOperator,

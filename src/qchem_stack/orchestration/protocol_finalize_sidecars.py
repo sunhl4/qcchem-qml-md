@@ -41,7 +41,7 @@ def attach_nexus_mitigation_tn(
     mgr = build_qermit_style_mitigation_report(cfg)
     if mgr is not None:
         out["mitigation_graph_report"] = mgr
-    dex = execute_mitigation_dag_runtime(cfg, out)
+    dex = execute_mitigation_dag_runtime(cfg, out, qh=qh)
     if dex is not None:
         out["mitigation_dag_execution"] = dex
     nc = nexus_cloud_repro_sidecar(cfg)

@@ -18,6 +18,7 @@ from qchem_stack.contracts.schema_ids import (
     EXCITED_SCEOM_BUNDLE_V1,
     EXCITED_VQD_BUNDLE_V1,
 )
+from qchem_stack.protocols.product_contract import validate_qse_protocol_for_config
 from qchem_stack.quantum.algorithms.excited import QSE, VQD
 from qchem_stack.quantum.excited_plugins.spec import ExcitedRunContext, ExcitedStageOutcome
 from qchem_stack.quantum.variational_branch import build_uccsd_variational_model
@@ -69,6 +70,7 @@ def run_vqd_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
         init_noise_scale=float(vqd_kw["init_noise_scale"]),
         max_overlap_warn=vqd_kw["max_overlap_warn"],
         overlap_mode=str(vqd_kw["overlap_mode"]),
+        optimizer_mode=str(vqd_kw["optimizer_mode"]),
         executor=exe,
     )
     vqd_res = vqd.run(
@@ -100,10 +102,16 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     kb = qse_kw["max_basis"]
     shot_mode = str(qse_kw["shot_mode"])
     use_uccsd = resolve_variational_ansatz(cfg) == "uccsd"
+    validate_qse_protocol_for_config(
+        cfg, ansatz="uccsd" if use_uccsd else "hea", shot_mode=shot_mode
+    )
+    expansion_pool = str(qse_kw["expansion_pool"])
     if use_uccsd:
         prepare_state = _uccsd_prepare_state(ctx)
         if shot_mode == "exact":
-            qse_res = qse.run_from_uccsd_basis(angles, prepare_state, max_basis=kb)
+            qse_res = qse.run_from_uccsd_basis(
+                angles, prepare_state, max_basis=kb, expansion_pool=expansion_pool
+            )
         elif shot_mode == "gaussian_h":
             qse_res = qse.run_from_uccsd_basis_shot_noise(
                 angles,
@@ -111,6 +119,15 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
                 max_basis=kb,
                 shots_per_matrix_element=int(qse_kw["shots_per_matrix_element"]),
                 seed=ctx.seed,
+                expansion_pool=expansion_pool,
+            )
+        elif shot_mode == "pauli_transitions_qiskit":
+            qse_res = qse.run_from_uccsd_basis_pauli_transitions_qiskit(
+                angles,
+                prepare_state,
+                max_basis=kb,
+                shots_per_ij_term=int(qse_kw["shots_per_ij_term"]),
+                expansion_pool=expansion_pool,
             )
         else:
             qse_res = qse.run_from_uccsd_basis_pauli_transitions(
@@ -119,6 +136,7 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
                 max_basis=kb,
                 shots_per_ij_term=int(qse_kw["shots_per_ij_term"]),
                 seed=ctx.seed,
+                expansion_pool=expansion_pool,
             )
     elif shot_mode == "exact":
         qse_res = qse.run_from_vqe_hea_basis(angles, depth, max_basis=kb)
@@ -153,49 +171,48 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
 
 
 def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
-    from qchem_stack.quantum.algorithms.sceom import (
-        resolve_sceom_s_generators,
-        run_sceom_nested_commutator_from_hea,
-        run_sceom_nested_commutator_from_uccsd,
-    )
+    from qchem_stack.protocols.computables.base import EvaluationContext
+    from qchem_stack.protocols.computables.sceom_matrix import SCEOMMatrixComputable
+    from qchem_stack.quantum.algorithms.sceom import resolve_sceom_s_generators
 
     cfg = ctx.cfg
     qh = ctx.resolved_hamiltonian()
     sceom_kw = excited_sceom_plugin_params(cfg)
-    extra: dict[str, object] = {}
     gens, _ = resolve_sceom_s_generators(
         strategy=str(sceom_kw["generator_strategy"]),
         hamiltonian=qh,
         subspace_dim=int(sceom_kw["subspace_dim"]),
     )
-    if gens is not None:
-        extra["s_generators"] = gens
-    extra["generator_strategy_yaml"] = sceom_kw["generator_strategy"]
     angles = np.asarray(ctx.ground_angles, dtype=float)
+    prepare_state = None
     if resolve_variational_ansatz(cfg) == "uccsd":
         prepare_state = _uccsd_prepare_state(ctx)
-        sceom_res = run_sceom_nested_commutator_from_uccsd(
-            qh,
-            angles,
-            prepare_state,
-            subspace_dim=int(sceom_kw["subspace_dim"]),
-            shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
-            seed=ctx.seed,
-            **extra,
+    comp = SCEOMMatrixComputable(
+        name="sceom",
+        hamiltonian=qh,
+        subspace_dim=int(sceom_kw["subspace_dim"]),
+        generator_strategy=str(sceom_kw["generator_strategy"]),
+        shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
+        self_consistent_rounds=int(sceom_kw["self_consistent_rounds"]),
+        shots_backend=str(sceom_kw["shots_backend"]),
+        s_generators=gens,
+        prepare_state=prepare_state,
+        hea_depth=resolve_vqe_depth(cfg),
+    )
+    comp_out = comp.evaluate(
+        EvaluationContext(
+            angles=angles,
+            rng=np.random.default_rng(ctx.seed),
+            extra={"hea_depth": resolve_vqe_depth(cfg), "s_generators": gens},
         )
-        sceom_meta = dict(sceom_res.meta)
+    )
+    sceom_meta = dict(comp_out.meta)
+    sceom_meta["generator_strategy_yaml"] = sceom_kw["generator_strategy"]
+    if prepare_state is not None:
         sceom_meta["variational_ansatz"] = "uccsd"
-    else:
-        sceom_res = run_sceom_nested_commutator_from_hea(
-            qh,
-            angles,
-            resolve_vqe_depth(cfg),
-            subspace_dim=int(sceom_kw["subspace_dim"]),
-            shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
-            seed=ctx.seed,
-            **extra,
-        )
-        sceom_meta = dict(sceom_res.meta)
+    sceom_res = type("_SceomOut", (), {})()
+    sceom_res.energies = list(comp_out.value.get("excitation_energies") or [])
+    sceom_res.meta = sceom_meta
     return ExcitedStageOutcome(
         bundle_key="sceom",
         bundle={

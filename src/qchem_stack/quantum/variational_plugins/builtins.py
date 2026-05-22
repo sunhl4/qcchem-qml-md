@@ -21,6 +21,7 @@ from qchem_stack.config.quantum_helpers import (
 )
 from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
 from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
+from qchem_stack.quantum.algorithms.sa_vqe import SAVQE
 from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_algorithm_report_v1
 from qchem_stack.quantum.algorithms.vqe import VQE
 from qchem_stack.quantum.variational_branch import run_uccsd_vqe_from_config
@@ -125,9 +126,25 @@ def run_iqeb(ctx: VariationalRunContext) -> VariationalStageOutcome:
     )
 
 
+def run_sa_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
+    cfg = ctx.cfg
+    qh = ctx.resolved_hamiltonian()
+    exe = ctx.executor
+    depth = resolve_vqe_depth(cfg)
+    sa = SAVQE(qh, depth=depth, executor=exe)
+    sr = sa.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
+    return VariationalStageOutcome(
+        energy=float(sr.energy),
+        angles=np.asarray(sr.angles, dtype=float),
+        algo_meta={"algorithm": "sa_vqe", "nfev": sr.nfev, "sa_vqe_meta": sr.meta},
+        algorithm_report={"schema": "algorithm_sa_vqe_report_v1", "final_value": sr.energy},
+    )
+
+
 BUILTIN_RUNNERS: dict[str, object] = {
     "vqe": run_vqe_branch,
     "adapt": run_adapt_family,
     "tetris_adapt": run_adapt_family,
     "iqeb": run_iqeb,
+    "sa_vqe": run_sa_vqe_branch,
 }

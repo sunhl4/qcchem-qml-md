@@ -142,7 +142,8 @@ Deprecation 发 `DeprecationWarning`；保留 re-export 至少一个迁移窗口
 | 算法 | 实现特点 | 局限 |
 |------|----------|------|
 | **ADAPT / IQEB** | dense statevector（`qubit_operator_to_sparse` + `expm` / HEA state） | 内存随 qubit 数指数增长；见 `algorithms/adapt.py` pool mat 预计算 |
-| **QSE / SCEOM** | HEA Pauli-X bump 或 UCCSD fermionic-singles 基；`exact` / `gaussian_h` / `pauli_transitions` | `pauli_transitions` 使用 grouped statevector shot sim（`qse_transition.py`）；`gaussian_h` 仍为快速占位；UCCSD + `use_protocol` 走 CircuitIR prep |
-| **VQD** | 支持 UCCSD `prepare_state`；可配置 shot 通道 | COBYLA 内层优化；大体系需资源估算 |
+| **QSE / SCEOM** | HEA Pauli-X bump 或 UCCSD fermionic-singles 基；`exact` / `gaussian_h` / `pauli_transitions` / **`pauli_transitions_qiskit`** | `pauli_transitions` 经 **`QSEMatricesComputable`** + grouped statevector shot sim；Qiskit 过渡路径见 `backends/qiskit_qse_transition.py`；`gaussian_h` 标 `legacy_fast_path` |
+| **VQD** | 支持 UCCSD `prepare_state`；`optimizer_mode: three_computable` 分通道优化 | COBYLA 内层优化；大体系需资源估算 |
+| **Computable 运行时** | InQuanto Computable × Protocol | `protocols/computables/`（Expectation / QSE / SCEOM / Overlap）+ `ProtocolList.run_all`；classical shadows stub 接线 `ExpectationValueComputable`（`mitigation/qermit_runtime.py`） |
 
 文档化这些边界是为了 Methods / parity 导出时不夸大设备可扩展性。

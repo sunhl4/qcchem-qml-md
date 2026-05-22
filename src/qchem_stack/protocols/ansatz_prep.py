@@ -16,6 +16,7 @@ from qchem_stack.quantum.algorithms.uccsd_circuit import (
 
 if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import DecompositionMode
 
 
 @dataclass
@@ -25,6 +26,7 @@ class AnsatzPrepSpec:
     angles: np.ndarray = field(default_factory=lambda: np.zeros(1, dtype=float))
     hea_depth: int = 1
     uccsd_ctx: UCCSDCircuitContext | None = None
+    uccsd_decomposition_mode: DecompositionMode = "pauli"
 
     @classmethod
     def hea(
@@ -48,6 +50,7 @@ class AnsatzPrepSpec:
         hamiltonian: QubitHamiltonian,
         angles: np.ndarray,
         trotter_steps: int | None,
+        decomposition_mode: DecompositionMode = "pauli",
     ) -> AnsatzPrepSpec:
         ctx = UCCSDCircuitContext.from_hamiltonian(hamiltonian, trotter_steps=trotter_steps)
         return cls(
@@ -55,6 +58,7 @@ class AnsatzPrepSpec:
             n_qubits=int(hamiltonian.n_qubits),
             angles=np.asarray(angles, dtype=float),
             uccsd_ctx=ctx,
+            uccsd_decomposition_mode=decomposition_mode,
         )
 
 
@@ -63,7 +67,12 @@ def build_prep_operations(spec: AnsatzPrepSpec) -> list[dict[str, Any]]:
         return hea_operations(spec.n_qubits, spec.hea_depth, spec.angles)
     if spec.uccsd_ctx is None:
         raise ValueError("uccsd AnsatzPrepSpec requires uccsd_ctx")
-    return uccsd_prep_operations(spec.angles, spec.uccsd_ctx, n_qubits=spec.n_qubits)
+    return uccsd_prep_operations(
+        spec.angles,
+        spec.uccsd_ctx,
+        n_qubits=spec.n_qubits,
+        decomposition_mode=spec.uccsd_decomposition_mode,
+    )
 
 
 def prepare_statevector(spec: AnsatzPrepSpec) -> np.ndarray:
@@ -90,4 +99,5 @@ def ansatz_prep_meta(spec: AnsatzPrepSpec) -> dict[str, Any]:
     elif spec.uccsd_ctx is not None:
         meta["uccsd_trotter_steps"] = int(spec.uccsd_ctx.n_trotter_steps)
         meta["fermion_to_qubit_map"] = spec.uccsd_ctx.mapping
+        meta["uccsd_decomposition_mode"] = spec.uccsd_decomposition_mode
     return meta

@@ -11,7 +11,6 @@ from scipy.linalg import eigh
 
 from qchem_stack.quantum.qse_transition import (
     build_qse_transition_schedule,
-    qse_h_matrix_transition_grouped_pauli_shots,
     solve_qse_ghep,
 )
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
@@ -24,6 +23,32 @@ if TYPE_CHECKING:
     from openfermion.ops import QubitOperator
 
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
+
+
+def _qse_h_s_via_computable(
+    basis: list[np.ndarray],
+    h_op: QubitOperator,
+    n_qubits: int,
+    *,
+    shot_mode: str,
+    shots_per_ij_term: int,
+    rng: np.random.Generator | None = None,
+) -> tuple[np.ndarray, np.ndarray, list[Any]]:
+    from qchem_stack.protocols.computables.base import EvaluationContext
+    from qchem_stack.protocols.computables.qse_matrices import QSEMatricesComputable
+
+    comp = QSEMatricesComputable(
+        name="qse_h_s",
+        hamiltonian=h_op,
+        n_qubits=n_qubits,
+        basis=basis,
+        shot_mode=str(shot_mode),
+        shots_per_ij_term=int(shots_per_ij_term),
+    )
+    ctx = EvaluationContext(angles=np.zeros(0, dtype=float), rng=rng)
+    out = comp.evaluate(ctx)
+    records = out.meta.get("transition_records") or []
+    return out.value["H"], out.value["S"], list(records)
 
 
 def qse_matrices_hs(
@@ -131,6 +156,7 @@ class QSE:
                 "reference": "arXiv:1603.05681",
                 "K": len(basis),
                 "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
+                "legacy_fast_path": True,
                 "shots_per_matrix_element": shots_per_matrix_element,
                 "S_condition_number": cond_s,
             },
@@ -149,10 +175,11 @@ class QSE:
         rng = np.random.default_rng(seed)
         kb = max_basis or self.subspace_dim
         basis = build_qse_basis_from_vqe_hea(angles, self.hamiltonian.n_qubits, depth, max_basis=kb)
-        h_sym, s_mat, records = qse_h_matrix_transition_grouped_pauli_shots(
+        h_sym, s_mat, records = _qse_h_s_via_computable(
             basis,
             self.hamiltonian.operator,
             self.hamiltonian.n_qubits,
+            shot_mode="pauli_transitions",
             shots_per_ij_term=shots_per_ij_term,
             rng=rng,
         )
@@ -171,6 +198,7 @@ class QSE:
             meta={
                 "reference": "arXiv:1603.05681",
                 "K": len(basis),
+                "computable_runtime": "QSEMatricesComputable",
                 "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
                 "shots_per_ij_term": shots_per_ij_term,
                 "S_condition_number": cond_s,
@@ -190,6 +218,7 @@ class QSE:
         prepare_state: Callable[[np.ndarray], np.ndarray],
         *,
         max_basis: int | None = None,
+        expansion_pool: str = "fermionic_singles",
     ) -> QSEResult:
         """Build orthonormal micro-basis from UCCSD reference + mapped fermionic singles."""
         kb = max_basis or self.subspace_dim
@@ -198,6 +227,7 @@ class QSE:
             self.hamiltonian,
             prepare_state,
             max_basis=kb,
+            expansion_pool=expansion_pool,
         )
         h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
         evals, _ = eigh(h_sub, s_sub)
@@ -225,6 +255,7 @@ class QSE:
         max_basis: int | None = None,
         shots_per_matrix_element: int = 4096,
         seed: int = 0,
+        expansion_pool: str = "fermionic_singles",
     ) -> QSEResult:
         """Symmetric Gaussian noise on ``real(H_sub)`` for UCCSD micro-basis (placeholder)."""
         rng = np.random.default_rng(seed)
@@ -234,6 +265,7 @@ class QSE:
             self.hamiltonian,
             prepare_state,
             max_basis=kb,
+            expansion_pool=expansion_pool,
         )
         h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
         h_real = np.real(h_sub)
@@ -255,6 +287,7 @@ class QSE:
                 "basis_reference": "uccsd_fermionic_singles",
                 "K": len(basis),
                 "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
+                "legacy_fast_path": True,
                 "shots_per_matrix_element": shots_per_matrix_element,
                 "S_condition_number": cond_s,
             },
@@ -268,6 +301,7 @@ class QSE:
         max_basis: int | None = None,
         shots_per_ij_term: int = 512,
         seed: int = 0,
+        expansion_pool: str = "fermionic_singles",
     ) -> QSEResult:
         """Fermionic-singles QSE basis with per-(i,j,Pauli-term) transition shot bookkeeping."""
         rng = np.random.default_rng(seed)
@@ -277,11 +311,13 @@ class QSE:
             self.hamiltonian,
             prepare_state,
             max_basis=kb,
+            expansion_pool=expansion_pool,
         )
-        h_sym, s_mat, records = qse_h_matrix_transition_grouped_pauli_shots(
+        h_sym, s_mat, records = _qse_h_s_via_computable(
             basis,
             self.hamiltonian.operator,
             self.hamiltonian.n_qubits,
+            shot_mode="pauli_transitions",
             shots_per_ij_term=shots_per_ij_term,
             rng=rng,
         )
@@ -299,11 +335,63 @@ class QSE:
             excitation_energies=exc,
             meta={
                 "reference": "arXiv:1603.05681",
-                "basis_reference": "uccsd_fermionic_singles",
+                "basis_reference": f"uccsd_{expansion_pool}",
                 "K": len(basis),
+                "computable_runtime": "QSEMatricesComputable",
                 "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
                 "shots_per_ij_term": shots_per_ij_term,
                 "S_condition_number": cond_s,
+                "qse_pauli_transition_schedule": {
+                    "n_qubits": sched.n_qubits,
+                    "subspace_dim": sched.subspace_dim,
+                    "n_pauli_terms": sched.n_pauli_terms,
+                    "n_transition_tasks": sched.n_transition_tasks,
+                    "total_shots_upper_bound": sched.total_shots_budget_upper_bound,
+                },
+            },
+        )
+
+    def run_from_uccsd_basis_pauli_transitions_qiskit(
+        self,
+        angles: np.ndarray,
+        prepare_state: Callable[[np.ndarray], np.ndarray],
+        *,
+        max_basis: int | None = None,
+        shots_per_ij_term: int = 512,
+        expansion_pool: str = "fermionic_singles",
+    ) -> QSEResult:
+        kb = max_basis or self.subspace_dim
+        basis = build_qse_basis_from_uccsd_reference(
+            angles,
+            self.hamiltonian,
+            prepare_state,
+            max_basis=kb,
+            expansion_pool=expansion_pool,
+        )
+        h_sym, s_mat, records = _qse_h_s_via_computable(
+            basis,
+            self.hamiltonian.operator,
+            self.hamiltonian.n_qubits,
+            shot_mode="pauli_transitions_qiskit",
+            shots_per_ij_term=shots_per_ij_term,
+        )
+        sched = build_qse_transition_schedule(
+            self.hamiltonian.operator,
+            len(basis),
+            self.hamiltonian.n_qubits,
+            shots_per_ij_term=shots_per_ij_term,
+            records=records,
+        )
+        _, exc = solve_qse_ghep(h_sym, s_mat)
+        return QSEResult(
+            excitation_energies=exc,
+            meta={
+                "reference": "arXiv:1603.05681",
+                "basis_reference": f"uccsd_{expansion_pool}",
+                "K": len(basis),
+                "computable_runtime": "QSEMatricesComputable",
+                "shot_noise_model": "qiskit_histogram_per_ij_term",
+                "shots_per_ij_term": shots_per_ij_term,
                 "qse_pauli_transition_schedule": {
                     "n_qubits": sched.n_qubits,
                     "subspace_dim": sched.subspace_dim,

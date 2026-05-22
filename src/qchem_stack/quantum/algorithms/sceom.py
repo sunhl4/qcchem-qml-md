@@ -185,6 +185,8 @@ def resolve_sceom_s_generators(
     if s in {"", "legacy", "default", "pauli_x_toy"}:
         return None, "default_pauli_x_toy"
     if s in {"fermionic_singles_mapped", "fermionic_mapped_singles"}:
+        if hamiltonian.fermion_space is None:
+            return None, "fallback_pauli_x_toy_no_fermion_space"
         pool = fermionic_singles_generators_matching_h_mapping(hamiltonian)
         k = max(1, int(subspace_dim))
         trimmed = pool[: min(k, len(pool))]
@@ -206,6 +208,8 @@ def run_sceom_nested_commutator(
     shots_per_matrix_element: int = 0,
     seed: int = 0,
     generator_strategy_yaml: str | None = None,
+    self_consistent_rounds: int = 0,
+    shots_backend: str = "statevector",
 ) -> SCEOMResult:
     """Build ``M_{ij} = \\langle\\psi|[S_i^\\dagger,[H,S_j]]|\\psi\\rangle`` and diagonalize (``V\\approx I`` toy)."""
     n = hamiltonian.n_qubits
@@ -214,43 +218,87 @@ def run_sceom_nested_commutator(
     k_target = subspace_dim or 4
     s_ops = s_generators or default_sceom_pauli_generators(n, k_target)
     k = len(s_ops)
-    m_mat = np.zeros((k, k), dtype=float)
+    iteration_trace: list[dict[str, Any]] = []
+    rounds = max(0, int(self_consistent_rounds))
+    final_evals: np.ndarray | None = None
+    final_m: np.ndarray | None = None
     task_meta: list[dict[str, Any]] = []
     shot_noise_model = "none"
-    if shots_per_matrix_element > 0:
-        rng = np.random.default_rng(seed)
-        for i in range(k):
-            for j in range(k):
-                op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
-                plan = build_measurement_plan(op, n, grouping="tensor_product")
-                est, _, _ = energy_estimate_grouped_shot_simulation(
-                    ref,
-                    op,
-                    plan,
-                    n,
-                    int(shots_per_matrix_element),
-                    rng,
-                    return_histograms=False,
-                )
-                m_mat[i, j] = float(est)
-                task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
-        shot_noise_model = "grouped_statevector_shot_simulation_per_m_element"
-    else:
-        for i in range(k):
-            for j in range(k):
-                op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
-                val = expectation_qubit_operator(ref, op, n)
-                m_mat[i, j] = float(np.real(val))
-                task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
-    m_mat = (m_mat + m_mat.T) / 2.0
-    evals, _ = eigh(m_mat)
-    evals = np.sort(np.real(evals))
+
+    for sc_round in range(rounds + 1):
+        m_mat = np.zeros((k, k), dtype=float)
+        task_meta = []
+        if shots_per_matrix_element > 0:
+            rng = np.random.default_rng(seed + sc_round)
+            for i in range(k):
+                for j in range(k):
+                    op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
+                    if shots_backend == "qiskit":
+                        from qchem_stack.backends.qiskit_qse_transition import (
+                            expectation_grouped_qiskit_shots,
+                        )
+
+                        est = expectation_grouped_qiskit_shots(
+                            ref,
+                            op,
+                            n,
+                            int(shots_per_matrix_element),
+                        )
+                    else:
+                        plan = build_measurement_plan(op, n, grouping="tensor_product")
+                        est, _, _ = energy_estimate_grouped_shot_simulation(
+                            ref,
+                            op,
+                            plan,
+                            n,
+                            int(shots_per_matrix_element),
+                            rng,
+                            return_histograms=False,
+                        )
+                    m_mat[i, j] = float(est)
+                    task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
+            shot_noise_model = (
+                "grouped_qiskit_shot_simulation_per_m_element"
+                if shots_backend == "qiskit"
+                else "grouped_statevector_shot_simulation_per_m_element"
+            )
+        else:
+            for i in range(k):
+                for j in range(k):
+                    op = nested_sceom_q_sc_eom_operator(hamiltonian.operator, s_ops[i], s_ops[j])
+                    val = expectation_qubit_operator(ref, op, n)
+                    m_mat[i, j] = float(np.real(val))
+                    task_meta.append({"i": i, "j": j, "n_operator_terms": len(op.terms)})
+        m_mat = (m_mat + m_mat.T) / 2.0
+        evals, evecs = eigh(m_mat)
+        evals = np.sort(np.real(evals))
+        final_evals = evals
+        final_m = m_mat
+        iteration_trace.append(
+            {
+                "round": sc_round,
+                "ground_m_energy": float(evals[0]),
+                "n_generators": k,
+            }
+        )
+        if sc_round < rounds and k > 0:
+            vec = np.real(evecs[:, 0])
+            delta = np.zeros_like(ref, dtype=complex)
+            for coeff, sop in zip(vec, s_ops, strict=False):
+                delta += float(coeff) * (qubit_operator_to_sparse(sop, n) @ ref)
+            nrm = float(np.linalg.norm(delta))
+            if nrm > 1e-12:
+                ref = delta / nrm
+
+    assert final_evals is not None and final_m is not None
+    evals = final_evals
+    m_mat = final_m
     sceom_analysis = [
         {
             "state_index": int(i),
             "sz_expectation": 0.0,
             "s2_expectation": 0.0,
-            "ground_state_overlap": 0.0,
+            "ground_state_overlap": float(abs(evals[i] - evals[0])),
         }
         for i in range(len(evals))
     ]
@@ -269,8 +317,12 @@ def run_sceom_nested_commutator(
         },
         "shot_noise_model": shot_noise_model,
         "shots_per_matrix_element": shots_per_matrix_element,
+        "shots_backend": shots_backend,
         "sceom_analysis": sceom_analysis,
         "symmetry_filter": "none",
+        "n_generators_resolved": k,
+        "sceom_iteration_trace": iteration_trace,
+        "M_matrix": m_mat.tolist(),
     }
     if generator_strategy_yaml:
         meta_block["generator_strategy_yaml"] = generator_strategy_yaml

@@ -45,6 +45,16 @@ def _twoq_gate_count(ops: list[dict[str, Any]], native: str) -> int:
         n = op.get("name", "")
         if n in ("CX", "CNOT", "ZZ", "ZZPhase", "MS", "CP"):
             c += 1
+        elif n == "PAULI_ROTATION":
+            from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import (
+                pauli_rotation_elementary_ops,
+            )
+
+            p = op.get("params") or {}
+            c += _twoq_gate_count(
+                pauli_rotation_elementary_ops(str(p["pauli_string"]), float(p["phi"])),
+                native,
+            )
     return c
 
 

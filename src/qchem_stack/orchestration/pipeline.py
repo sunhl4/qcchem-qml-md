@@ -62,6 +62,7 @@ from qchem_stack.orchestration.precomputed_stage import (
     precomputed_pre_quantum_input,
 )
 from qchem_stack.orchestration.protocol_finalize_stage import (
+    ansatz_prep_for_job,
     protocol_for_job,
     run_protocol_and_finalize_stage,
 )
@@ -330,7 +331,11 @@ def run_pipeline_from_config(
     exe2 = executor_from_spec(bspec2)
     bundle2 = compiler_pass_bundle_from_config(cfg)
     proto = protocol_for_job(cfg, qh, bspec=bspec2, exe=exe2, bundle=bundle2)
-    proto.build(angles, hea_depth=resolve_vqe_depth(cfg))
+    prep = ansatz_prep_for_job(cfg, qh, angles, hea_depth=resolve_vqe_depth(cfg))
+    from qchem_stack.protocols.product_contract import validate_pauli_protocol_for_config
+
+    validate_pauli_protocol_for_config(cfg, ansatz=prep.kind)
+    proto.build(angles, hea_depth=resolve_vqe_depth(cfg), ansatz_prep=prep)
     proto.compile()
     blob = proto.dumps()
     ph = hashlib.sha256(blob).hexdigest()[:24]

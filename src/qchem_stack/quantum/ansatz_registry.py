@@ -111,6 +111,24 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
         implementation="qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
         factory=_adapt_factory,
     ),
+    "ucc1_tangelo_partial": AnsatzRegistryEntry(
+        summary="Partial alias: documented Tangelo UCC1 naming; execution redirects to HEA depth tuning.",
+        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
+        factory=_hea_factory,
+        capabilities={"partial_tangelo_alias": True},
+    ),
+    "qcc_tangelo_partial": AnsatzRegistryEntry(
+        summary="Partial alias: QCC naming parity; execution uses HEA until dedicated QCC ansatz lands.",
+        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
+        factory=_hea_factory,
+        capabilities={"partial_tangelo_alias": True},
+    ),
+    "vsqs_tangelo_partial": AnsatzRegistryEntry(
+        summary="Partial alias: VSQS naming parity; execution uses HEA layers.",
+        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
+        factory=_hea_factory,
+        capabilities={"partial_tangelo_alias": True},
+    ),
 }
 
 

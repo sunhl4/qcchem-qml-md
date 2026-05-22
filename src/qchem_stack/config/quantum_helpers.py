@@ -20,7 +20,8 @@ class ExcitedVqdPluginParams(TypedDict):
     ]
     init_noise_scale: float
     max_overlap_warn: float | None
-    overlap_mode: Literal["statevector_overlap", "tangelo_circuit_analogy"]
+    overlap_mode: Literal["statevector_overlap", "tangelo_circuit_analogy", "deflation_circuit"]
+    optimizer_mode: Literal["collapsed", "three_computable"]
     shots_objective: int
     shots_overlap: int
     shots_weight: int
@@ -29,7 +30,8 @@ class ExcitedVqdPluginParams(TypedDict):
 class ExcitedQsePluginParams(TypedDict):
     subspace_dim: int
     max_basis: int | None
-    shot_mode: Literal["exact", "gaussian_h", "pauli_transitions"]
+    shot_mode: Literal["exact", "gaussian_h", "pauli_transitions", "pauli_transitions_qiskit"]
+    expansion_pool: str
     shots_per_matrix_element: int
     shots_per_ij_term: int
 
@@ -38,6 +40,8 @@ class ExcitedSceomPluginParams(TypedDict):
     generator_strategy: Literal["legacy", "fermionic_singles_mapped", "pauli_xy_extended"]
     subspace_dim: int
     shots_per_matrix_element: int
+    self_consistent_rounds: int
+    shots_backend: Literal["statevector", "qiskit"]
 
 
 class VqsTrackPayloadKwargs(TypedDict):
@@ -66,6 +70,10 @@ def resolve_variational_ansatz(cfg: ExperimentConfig) -> str:
 
 def resolve_uccsd_trotter_steps(cfg: ExperimentConfig) -> int | None:
     return cfg.quantum.variational.uccsd_trotter_steps
+
+
+def resolve_uccsd_decomposition_mode(cfg: ExperimentConfig) -> str:
+    return str(cfg.quantum.uccsd.decomposition_mode)
 
 
 def resolve_vqe_optimizer_method(cfg: ExperimentConfig) -> str:
@@ -122,6 +130,8 @@ def excited_sceom_plugin_params(cfg: ExperimentConfig) -> ExcitedSceomPluginPara
         "generator_strategy": s.generator_strategy,
         "subspace_dim": s.subspace_dim,
         "shots_per_matrix_element": s.shots_per_matrix_element,
+        "self_consistent_rounds": s.self_consistent_rounds,
+        "shots_backend": s.shots_backend,
     }
 
 
@@ -138,6 +148,7 @@ def excited_vqd_plugin_params(cfg: ExperimentConfig) -> ExcitedVqdPluginParams:
         "init_noise_scale": v.init_noise_scale,
         "max_overlap_warn": v.max_overlap_warn,
         "overlap_mode": v.overlap_mode,
+        "optimizer_mode": v.optimizer_mode,
         "shots_objective": v.shots_objective,
         "shots_overlap": v.shots_overlap,
         "shots_weight": v.shots_weight,
@@ -150,6 +161,7 @@ def excited_qse_plugin_params(cfg: ExperimentConfig) -> ExcitedQsePluginParams:
         "subspace_dim": qse.subspace_dim,
         "max_basis": qse.max_basis,
         "shot_mode": qse.shot_mode,
+        "expansion_pool": qse.expansion_pool,
         "shots_per_matrix_element": qse.shots_per_matrix_element,
         "shots_per_ij_term": qse.shots_per_ij_term,
     }

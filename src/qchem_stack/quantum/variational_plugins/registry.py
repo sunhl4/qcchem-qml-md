@@ -89,6 +89,13 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "materialization_result_schema": "algorithm_report_v1",
         "capabilities": {"supports_operator_pool": True, "supports_outer_rounds": True},
     },
+    "sa_vqe": {
+        "summary": "Minimal state-averaged VQE with overlap penalty (Tangelo SA-VQE partial).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sa_vqe_branch",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sa_vqe.SAVQE",
+        "materialization_result_schema": "algorithm_sa_vqe_report_v1",
+        "capabilities": {"supports_state_averaging_penalty": True},
+    },
 }
 
 
@@ -111,6 +118,10 @@ def _model_factory_from_plugin_id(pid: str) -> Callable[..., Any] | None:
         from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
 
         return lambda hamiltonian, **kwargs: IQEBVQE(hamiltonian, **kwargs)
+    if pid == "sa_vqe":
+        from qchem_stack.quantum.algorithms.sa_vqe import SAVQE
+
+        return lambda hamiltonian, **kwargs: SAVQE(hamiltonian, **kwargs)
     return None
 
 

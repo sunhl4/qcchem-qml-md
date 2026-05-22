@@ -1,7 +1,7 @@
 """UCCSD state-prep as :class:`~qchem_stack.backends.spec.CircuitIR` (JW-first Trotter product).
 
-Uses dense cluster exponentials as ``UNITARY`` blocks (valid for small active spaces; parity-gated).
-Per-Pauli-string gate decomposition (InQuanto-style ``exp(-iθP)`` chains) is deferred to follow-up.
+Default ``decomposition_mode='pauli'`` emits InQuanto-style ``exp(-iθP)`` gate chains.
+``decomposition_mode='unitary'`` retains dense ``UNITARY`` blocks for parity fallback.
 """
 
 from __future__ import annotations
@@ -14,6 +14,10 @@ from scipy.linalg import expm
 
 from qchem_stack.backends.spec import CircuitIR
 from qchem_stack.quantum.algorithms.uccsd_mapping import reference_state_dense
+from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import (
+    DecompositionMode,
+    cluster_layer_ops,
+)
 
 if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
@@ -108,8 +112,9 @@ def uccsd_prep_operations(
     ctx: UCCSDCircuitContext,
     *,
     n_qubits: int,
+    decomposition_mode: DecompositionMode = "pauli",
 ) -> list[dict[str, Any]]:
-    """CircuitIR ops: reference INIT + sequential UNITARY cluster layers."""
+    """CircuitIR ops: reference INIT + cluster layers (Pauli rotations or dense UNITARY)."""
     ref = uccsd_reference_statevector(ctx)
     ops: list[dict[str, Any]] = [
         {
@@ -120,20 +125,36 @@ def uccsd_prep_operations(
     ]
     inv = 1.0 / float(max(1, ctx.n_trotter_steps))
     ang = np.asarray(angles, dtype=float).ravel()
+    if ang.size != len(ctx.antiherm_mats):
+        raise ValueError(f"expected {len(ctx.antiherm_mats)} angles, got {ang.size}")
     for step in range(max(1, ctx.n_trotter_steps)):
         for idx, (th, mat) in enumerate(zip(ang, ctx.antiherm_mats, strict=True)):
-            u = expm(float(th * inv) * mat)
-            ops.append(
-                {
-                    "name": "UNITARY",
-                    "qubits": list(range(n_qubits)),
-                    "params": {
-                        "matrix": np.asarray(u, dtype=np.complex128).tolist(),
-                        "layer": int(step),
-                        "generator_index": int(idx),
-                    },
-                }
-            )
+            layer_angle = float(th * inv)
+            if decomposition_mode == "pauli":
+                ops.extend(
+                    cluster_layer_ops(
+                        mat,
+                        layer_angle,
+                        n_qubits,
+                        layer=step,
+                        generator_index=idx,
+                    )
+                )
+            elif decomposition_mode == "unitary":
+                u = expm(layer_angle * mat)
+                ops.append(
+                    {
+                        "name": "UNITARY",
+                        "qubits": list(range(n_qubits)),
+                        "params": {
+                            "matrix": np.asarray(u, dtype=np.complex128).tolist(),
+                            "layer": int(step),
+                            "generator_index": int(idx),
+                        },
+                    }
+                )
+            else:
+                raise ValueError(f"unknown uccsd decomposition_mode: {decomposition_mode!r}")
     return ops
 
 
@@ -142,10 +163,16 @@ def uccsd_circuit_ir(
     ctx: UCCSDCircuitContext,
     *,
     n_qubits: int,
+    decomposition_mode: DecompositionMode = "pauli",
 ) -> CircuitIR:
     return CircuitIR(
         n_qubits=n_qubits,
-        operations=uccsd_prep_operations(angles, ctx, n_qubits=n_qubits),
+        operations=uccsd_prep_operations(
+            angles,
+            ctx,
+            n_qubits=n_qubits,
+            decomposition_mode=decomposition_mode,
+        ),
         boxes=["UCCSDPrep"],
     )
 

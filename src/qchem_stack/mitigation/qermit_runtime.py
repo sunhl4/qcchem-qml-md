@@ -19,7 +19,7 @@ if TYPE_CHECKING:
 
 
 def execute_mitigation_dag_runtime(
-    cfg: ExperimentConfig, out: dict[str, Any]
+    cfg: ExperimentConfig, out: dict[str, Any], *, qh: Any | None = None
 ) -> dict[str, Any] | None:
     """If mitigation is on and an energy is present in ``out``, return an execution trace."""
     m = cfg.mitigation
@@ -36,7 +36,53 @@ def execute_mitigation_dag_runtime(
     pc: dict[str, Any] = _pc0 if isinstance(_pc0, dict) else {}
     stderr = pc.get("energy_stderr")
     graph = out.get("mitigation_graph_report")
-    return execute_mitigation_dag(float(e_raw), stderr, graph, cfg, protocol_counts=pc)
+    shadows_computable = _classical_shadows_computable_batch(cfg, out, qh)
+    if shadows_computable is not None:
+        out["classical_shadows_computable_runtime"] = shadows_computable
+    return execute_mitigation_dag(
+        float(e_raw),
+        stderr,
+        graph,
+        cfg,
+        protocol_counts=pc,
+        classical_shadows_computable=shadows_computable,
+    )
+
+
+def _classical_shadows_computable_batch(
+    cfg: ExperimentConfig,
+    out: dict[str, Any],
+    qh: Any | None,
+) -> dict[str, Any] | None:
+    """Route classical-shadows expectation through P1 ``ExpectationValueComputable`` + ``ProtocolList``."""
+    if not cfg.mitigation.stubs.classical_shadows or qh is None:
+        return None
+    angles = out.get("angles")
+    if angles is None:
+        return None
+    import numpy as np
+
+    from qchem_stack.backends.executor_base import StatevectorHeaExecutor
+    from qchem_stack.config.quantum_helpers import resolve_vqe_depth
+    from qchem_stack.protocols.computables.base import EvaluationContext
+    from qchem_stack.protocols.computables.expectation import ExpectationValueComputable
+    from qchem_stack.protocols.protocol_list import ProtocolList
+
+    depth = resolve_vqe_depth(cfg)
+    exe = StatevectorHeaExecutor()
+    comp = ExpectationValueComputable(
+        name="classical_shadows_expectation",
+        hamiltonian=qh.operator,
+        n_qubits=int(qh.n_qubits),
+        hea_depth=int(depth),
+        executor=exe,
+    )
+    ctx = EvaluationContext(angles=np.asarray(angles, dtype=float))
+    batch = ProtocolList.from_computables(
+        [comp], protocol_name="classical_shadows_expectation_protocol"
+    ).run_all(ctx)
+    batch["budget_pairs_hint"] = int(cfg.mitigation.stubs.classical_shadows_budget_pairs)
+    return batch
 
 
 def execute_mitigation_dag(
@@ -46,6 +92,7 @@ def execute_mitigation_dag(
     cfg: ExperimentConfig,
     *,
     protocol_counts: dict[str, Any] | None = None,
+    classical_shadows_computable: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Run optional SPAM, classical-shadows stub, PMSV, then ZNE stubs in graph order."""
     m = cfg.mitigation
@@ -66,17 +113,22 @@ def execute_mitigation_dag(
         )
 
     if m.stubs.classical_shadows:
-        trace.append(
-            {
-                "node": "classical_shadows_expectation_stub",
-                "energy_in": e,
-                "energy_out": e,
-                "energy_stderr_in": se,
-                "energy_stderr_out": se,
-                "budget_pairs_hint": int(m.stubs.classical_shadows_budget_pairs),
-                "note": "Identity stub — open-stack analog to shadows narratives without sampling.",
+        cs_node: dict[str, Any] = {
+            "node": "classical_shadows_expectation_stub",
+            "energy_in": e,
+            "energy_out": e,
+            "energy_stderr_in": se,
+            "energy_stderr_out": se,
+            "budget_pairs_hint": int(m.stubs.classical_shadows_budget_pairs),
+            "note": "Identity stub — open-stack analog to shadows narratives without sampling.",
+        }
+        if classical_shadows_computable is not None:
+            cs_node["computable_runtime"] = "ExpectationValueComputable"
+            cs_node["protocol_list"] = {
+                "results": classical_shadows_computable.get("results"),
+                "computable_meta": classical_shadows_computable.get("computable_meta"),
             }
-        )
+        trace.append(cs_node)
 
     if m.pmsv.enabled:
         rr = float(m.pmsv.retention_rate)

@@ -28,6 +28,15 @@ class QuantumVariationalSpec(BaseModel):
     )
 
 
+class QuantumUccsdSpec(BaseModel):
+    model_config = _FORBID
+
+    decomposition_mode: Literal["pauli", "unitary"] = Field(
+        default="pauli",
+        description="UCCSD CircuitIR prep: pauli rotation chains or dense unitary blocks.",
+    )
+
+
 class QuantumVqeSpec(BaseModel):
     model_config = _FORBID
 
@@ -129,9 +138,15 @@ class QuantumExcitedVqdSpec(BaseModel):
         default=0.05,
         description="Warn when summed squared overlaps exceed threshold; null disables.",
     )
-    overlap_mode: Literal["statevector_overlap", "tangelo_circuit_analogy"] = Field(
-        default="statevector_overlap",
-        description="Overlap semantics for metadata/export.",
+    overlap_mode: Literal["statevector_overlap", "tangelo_circuit_analogy", "deflation_circuit"] = (
+        Field(
+            default="statevector_overlap",
+            description="Overlap semantics for metadata/export.",
+        )
+    )
+    optimizer_mode: Literal["collapsed", "three_computable"] = Field(
+        default="collapsed",
+        description="collapsed: single objective; three_computable: decoupled channel evaluation.",
     )
     shots_objective: int = Field(
         default=0, ge=0, description="Pauli shots per excited level (0=exact)."
@@ -146,9 +161,15 @@ class QuantumExcitedQseSpec(BaseModel):
     after_variational: bool = Field(default=False, description="Run QSE after variational stage.")
     subspace_dim: int = Field(default=4, ge=1, description="QSE subspace dimension.")
     max_basis: int | None = Field(default=None, ge=1, description="Optional max_basis override.")
-    shot_mode: Literal["exact", "gaussian_h", "pauli_transitions"] = Field(
-        default="exact",
-        description="QSE matrix element evaluation mode.",
+    shot_mode: Literal["exact", "gaussian_h", "pauli_transitions", "pauli_transitions_qiskit"] = (
+        Field(
+            default="exact",
+            description="QSE matrix element evaluation mode.",
+        )
+    )
+    expansion_pool: Literal["fermionic_singles", "fermionic_singles_doubles"] = Field(
+        default="fermionic_singles",
+        description="UCCSD QSE basis pool.",
     )
     shots_per_matrix_element: int = Field(
         default=4096, ge=1, description="Shots for gaussian_h mode."
@@ -169,8 +190,18 @@ class QuantumExcitedSceomSpec(BaseModel):
         description="Gaussian noise shots on M when > 0.",
     )
     generator_strategy: Literal["legacy", "fermionic_singles_mapped", "pauli_xy_extended"] = Field(
-        default="legacy",
+        default="fermionic_singles_mapped",
         description="SCEOM excitation generator strategy.",
+    )
+    self_consistent_rounds: int = Field(
+        default=0,
+        ge=0,
+        le=4,
+        description="Optional SCEOM self-consistent iterations after M diagonalization.",
+    )
+    shots_backend: Literal["statevector", "qiskit"] = Field(
+        default="statevector",
+        description="Shot backend for SCEOM M-matrix elements when shots_per_matrix_element > 0.",
     )
 
 
