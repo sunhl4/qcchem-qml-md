@@ -223,6 +223,8 @@ def test_registry_and_mdml_blocks_in_config_only_export() -> None:
     vre = reg.get("variational_registry_export_v1")
     assert isinstance(vre, dict) and "vqe" in vre
     assert isinstance(vre["vqe"], dict) and vre["vqe"].get("has_materialization") is True
+    ere = reg.get("excited_registry_export_v1")
+    assert isinstance(ere, dict) and set(ere.keys()) >= {"vqd", "qse", "sceom"}
     pre = reg.get("operator_pool_registry_export_v1")
     assert isinstance(pre, dict)
     assert pre.get("schema") == "operator_pool_registry_export_v1"

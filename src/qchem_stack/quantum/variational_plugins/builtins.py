@@ -21,6 +21,7 @@ from qchem_stack.config.quantum_helpers import (
 )
 from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
 from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
+from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_algorithm_report_v1
 from qchem_stack.quantum.algorithms.vqe import VQE
 from qchem_stack.quantum.variational_branch import run_uccsd_vqe_from_config
 from qchem_stack.quantum.variational_plugins.spec import (
@@ -45,6 +46,7 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
             energy=float(ur.energy),
             angles=np.asarray(ur.angles, dtype=float),
             algo_meta={"algorithm": "vqe", "nfev": ur.nfev, "vqe_meta": ur.meta},
+            algorithm_report=uccsd_algorithm_report_v1(ur),
         )
 
     depth = resolve_vqe_depth(cfg)
@@ -53,12 +55,13 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
         if resolve_vqe_initial_parameters_strategy(cfg) == "zeros"
         else None
     )
-    vr = VQE(
+    vqe = VQE(
         qh,
         depth=depth,
         executor=exe,
         optimizer_method=resolve_vqe_optimizer_method(cfg),
-    ).run(
+    )
+    vr = vqe.run(
         maxiter=resolve_vqe_maxiter(cfg),
         initial_parameters=init,
         seed=ctx.seed,
@@ -67,6 +70,7 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
         energy=float(vr.energy),
         angles=np.asarray(vr.angles, dtype=float),
         algo_meta={"algorithm": "vqe", "nfev": vr.nfev, "vqe_meta": vr.meta},
+        algorithm_report=vqe.generate_report(),
     )
 
 
@@ -91,6 +95,7 @@ def run_adapt_family(ctx: VariationalRunContext) -> VariationalStageOutcome:
             "adapt_meta": ar.meta,
             "adapt_pool": ar.pool_indices,
         },
+        algorithm_report=av.generate_report(),
     )
 
 
@@ -116,6 +121,7 @@ def run_iqeb(ctx: VariationalRunContext) -> VariationalStageOutcome:
             "nfev": ir.vqe.nfev,
             "vqe_meta": ir.vqe.meta,
         },
+        algorithm_report=iq.generate_report(),
     )
 
 

@@ -29,6 +29,8 @@ PreQuantumInput / QubitHamiltonian
 
 Config is read in plugin runners via `config.quantum_helpers`; algorithm classes receive typed parameters only.
 
+Excited-stage shot/resource accounting is emitted as `out["excited_resource_summary"]` by orchestration (not on `ExcitedStageOutcome`).
+
 ## Recommended imports
 
 `quantum/__init__.py` intentionally exports nothing (avoids import cycles). Use:

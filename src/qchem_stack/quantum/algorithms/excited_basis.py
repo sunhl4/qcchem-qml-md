@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import Any
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -16,6 +16,11 @@ from qchem_stack.contracts.schema_ids import (
 )
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
+if TYPE_CHECKING:
+    from collections.abc import Callable
+
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
+
 
 def _gram_schmidt(vectors: list[np.ndarray], *, eps: float = 1e-10) -> list[np.ndarray]:
     out: list[np.ndarray] = []
@@ -27,6 +32,29 @@ def _gram_schmidt(vectors: list[np.ndarray], *, eps: float = 1e-10) -> list[np.n
         if nrm > eps:
             out.append(w / nrm)
     return out
+
+
+def build_qse_basis_from_uccsd_reference(
+    angles: np.ndarray,
+    hamiltonian: QubitHamiltonian,
+    prepare_state: Callable[[np.ndarray], np.ndarray],
+    *,
+    max_basis: int,
+) -> list[np.ndarray]:
+    """Microscopic subspace: |psi0>, S_k|psi0> with mapped fermionic singles on UCCSD reference."""
+    from qchem_stack.quantum.algorithms.sceom import fermionic_singles_generators_matching_h_mapping
+
+    ref = np.asarray(prepare_state(np.asarray(angles, dtype=float)), dtype=complex).ravel()
+    ref = ref / (np.linalg.norm(ref) + 1e-15)
+    raw = [ref]
+    gens = fermionic_singles_generators_matching_h_mapping(hamiltonian)
+    n_qubits = hamiltonian.n_qubits
+    for gen in gens:
+        if len(raw) >= max_basis:
+            break
+        m = qubit_operator_to_sparse(gen, n_qubits)
+        raw.append(m @ ref)
+    return _gram_schmidt(raw)[:max_basis]
 
 
 def _apply_pauli_string(state: np.ndarray, n_qubits: int, qubit: int, letter: str) -> np.ndarray:

@@ -31,7 +31,10 @@ class AdaptResult:
 
 
 class FermionicAdaptVQE(AlgorithmBase):
-    """ADAPT-VQE loop with commutator gradients and executable operator pools."""
+    """ADAPT-VQE loop with commutator gradients and executable operator pools.
+
+    Epistemic bounds: dense statevector only (see docs/quantum_模块风格约定.md §8).
+    """
 
     def __init__(
         self,

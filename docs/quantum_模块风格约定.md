@@ -47,6 +47,10 @@ L5  Kernels        statevector.py        HEA statevector、dense Pauli 期望
 | `algorithms/uccsd_mapping.py` | JW/BK reference 与 cluster 矩阵映射 | `reference_state_dense`, `antihermitian_cluster_matrices` |
 | `variational_plugins/` | YAML `quantum.algorithm` 管线 runner | `run_variational_stage`, `register_variational_plugin` |
 | `excited_plugins/` | YAML `quantum.excited.*` sidecar runner | `run_excited_stages_from_context`, `register_excited_plugin` |
+
+激发态资源估算 canonical 路径：`orchestration/excited_stages_resource.py` → pipeline `out["excited_resource_summary"]`；**不在** `ExcitedStageOutcome` 重复 resource 字段。
+
+变分 `algorithm_report`：HEA VQE / ADAPT / IQEB 经 `AlgorithmBase.generate_report()`；UCCSD 经 `uccsd_algorithm_report_v1`；pipeline 写入 `out["algorithm_report"]`，`repro.run_summary` 镜像 `algorithm_report_*` 摘要键。
 | `variational_branch.py` | UCCSD / HEA 分支共享 factory | `build_uccsd_variational_model`, `run_uccsd_vqe_from_config` |
 | `algorithm_registry.py` | 物化/导出（sync 自 variational） | `build_registered_algorithm` |
 | `ansatz_registry.py` | UX/文档 ansatz 命名 | `ansatz_registry_export` |
@@ -75,6 +79,15 @@ L5  Kernels        statevector.py        HEA statevector、dense Pauli 期望
 2. 在 `tests/test_quantum_public_surface.py` 覆盖 import。
 3. 更新 `quantum/README.md` Layout 表（一行即可）。
 4. **不** 未经 cycle 测试向 `quantum/__init__.py` 加 lazy export。
+
+`quantum.algorithms` 子包使用 **lazy `__getattr__`**（见 `algorithms/__init__.py`）；按需加载算法类，与根包空 export 策略一致。
+
+### 3.1 `algorithm_factory` 安全约定
+
+- YAML `quantum.algorithm_factory` 经 `variational_plugins.loader` 动态 import。
+- **默认 allowlist**：模块名必须以 `qchem_stack.` 开头（内置示例插件均在此命名空间下）。
+- **逃逸**：设置环境变量 `QCHEM_QUANTUM_ALGORITHM_FACTORY_ALLOW_EXTERNAL=1` 可加载任意外部模块（用户自担可复现与安全风险）。
+- 违规模块 → `PipelineError`，消息说明 allowlist 与 env 开关。
 
 ---
 
@@ -119,3 +132,17 @@ Deprecation 发 `DeprecationWarning`；保留 re-export 至少一个迁移窗口
 - [ ] 插件路径使用 `quantum_helpers`，未新增 Spec 重复方法
 - [ ] 测试优先 toy `QubitHamiltonian` / `tests/fixtures/quantum_problem`，非 PySCF driver
 - [ ] `quantum/README.md` 或本文 Layout 表已更新（若新增 area）
+
+---
+
+## 8) Epistemic bounds（算法实现边界）
+
+以下算法路径为 **open-stack prototype**，适用小 active space / CI；**非** shot-native 大体系生产路径：
+
+| 算法 | 实现特点 | 局限 |
+|------|----------|------|
+| **ADAPT / IQEB** | dense statevector（`qubit_operator_to_sparse` + `expm` / HEA state） | 内存随 qubit 数指数增长；见 `algorithms/adapt.py` pool mat 预计算 |
+| **QSE / SCEOM** | HEA Pauli-X 或 UCCSD fermionic-singles 基；`exact` / `gaussian_h` / `pauli_transitions`（后者 HEA-only） | UCCSD + QSE/SCEOM 已支持（`prepare_state` 分支）；`uccsd + qse.shot_mode=pauli_transitions` 仍被 config 拒绝 |
+| **VQD** | 支持 UCCSD `prepare_state`；可配置 shot 通道 | COBYLA 内层优化；大体系需资源估算 |
+
+文档化这些边界是为了 Methods / parity 导出时不夸大设备可扩展性。

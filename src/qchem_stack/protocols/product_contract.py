@@ -55,7 +55,7 @@ PRODUCT_CAPABILITY_MAP: dict[str, str] = {
     "ResourceRows": "qchem_stack.backends.spec.circuit_resource_row + dataframe_circuit_shot_rows",
     "JobRuntime": "qchem_stack.jobs.store.SqliteJobStore + qchem_stack.jobs.nexus_analog",
     "MitigationPipeline": "qchem_stack.mitigation.qermit_analog + qchem_stack.mitigation.qermit_runtime",
-    "ChemistryDrivers": "qchem_stack.chem.drivers + qchem_stack.chem.solvers",
+    "ChemistryDrivers": "qchem_stack.chem.solvers + qchem_stack.chem.bridges (legacy: chem.drivers)",
     "EmbeddingFlow": "qchem_stack.chem.embedding + qchem_stack.integrations.dmet_self_consistent",
     "MLMDBridge": "qchem_stack.md_bridge",
 }

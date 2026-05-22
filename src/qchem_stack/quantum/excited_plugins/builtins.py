@@ -23,6 +23,17 @@ from qchem_stack.quantum.excited_plugins.spec import ExcitedRunContext, ExcitedS
 from qchem_stack.quantum.variational_branch import build_uccsd_variational_model
 
 
+def _uccsd_prepare_state(ctx: ExcitedRunContext):
+    if ctx.executor is None:
+        raise ValueError("UCCSD excited plugins require HamiltonianExpectationExecutor")
+    model = build_uccsd_variational_model(
+        ctx.resolved_hamiltonian(),
+        ctx.executor,
+        trotter_steps=resolve_uccsd_trotter_steps(ctx.cfg),
+    )
+    return model.prepare_state
+
+
 def run_vqd_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     cfg = ctx.cfg
     qh = ctx.resolved_hamiltonian()
@@ -88,7 +99,25 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     qse = QSE(qh, subspace_dim=int(qse_kw["subspace_dim"]))
     kb = qse_kw["max_basis"]
     shot_mode = str(qse_kw["shot_mode"])
-    if shot_mode == "exact":
+    use_uccsd = resolve_variational_ansatz(cfg) == "uccsd"
+    if use_uccsd:
+        prepare_state = _uccsd_prepare_state(ctx)
+        if shot_mode == "exact":
+            qse_res = qse.run_from_uccsd_basis(angles, prepare_state, max_basis=kb)
+        elif shot_mode == "gaussian_h":
+            qse_res = qse.run_from_uccsd_basis_shot_noise(
+                angles,
+                prepare_state,
+                max_basis=kb,
+                shots_per_matrix_element=int(qse_kw["shots_per_matrix_element"]),
+                seed=ctx.seed,
+            )
+        else:
+            raise ValueError(
+                "quantum.excited.qse.shot_mode='pauli_transitions' is incompatible with "
+                "quantum.variational.ansatz='uccsd' (HEA Pauli-X bump basis only)."
+            )
+    elif shot_mode == "exact":
         qse_res = qse.run_from_vqe_hea_basis(angles, depth, max_basis=kb)
     elif shot_mode == "gaussian_h":
         qse_res = qse.run_from_vqe_hea_basis_shot_noise(
@@ -108,6 +137,8 @@ def run_qse_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
         )
     qse_meta = dict(qse_res.meta)
     qse_meta["qse_shot_mode"] = shot_mode
+    if use_uccsd:
+        qse_meta["variational_ansatz"] = "uccsd"
     return ExcitedStageOutcome(
         bundle_key="qse",
         bundle={
@@ -122,6 +153,7 @@ def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     from qchem_stack.quantum.algorithms.sceom import (
         resolve_sceom_s_generators,
         run_sceom_nested_commutator_from_hea,
+        run_sceom_nested_commutator_from_uccsd,
     )
 
     cfg = ctx.cfg
@@ -136,21 +168,37 @@ def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     if gens is not None:
         extra["s_generators"] = gens
     extra["generator_strategy_yaml"] = sceom_kw["generator_strategy"]
-    sceom_res = run_sceom_nested_commutator_from_hea(
-        qh,
-        np.asarray(ctx.ground_angles, dtype=float),
-        resolve_vqe_depth(cfg),
-        subspace_dim=int(sceom_kw["subspace_dim"]),
-        shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
-        seed=ctx.seed,
-        **extra,
-    )
+    angles = np.asarray(ctx.ground_angles, dtype=float)
+    if resolve_variational_ansatz(cfg) == "uccsd":
+        prepare_state = _uccsd_prepare_state(ctx)
+        sceom_res = run_sceom_nested_commutator_from_uccsd(
+            qh,
+            angles,
+            prepare_state,
+            subspace_dim=int(sceom_kw["subspace_dim"]),
+            shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
+            seed=ctx.seed,
+            **extra,
+        )
+        sceom_meta = dict(sceom_res.meta)
+        sceom_meta["variational_ansatz"] = "uccsd"
+    else:
+        sceom_res = run_sceom_nested_commutator_from_hea(
+            qh,
+            angles,
+            resolve_vqe_depth(cfg),
+            subspace_dim=int(sceom_kw["subspace_dim"]),
+            shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
+            seed=ctx.seed,
+            **extra,
+        )
+        sceom_meta = dict(sceom_res.meta)
     return ExcitedStageOutcome(
         bundle_key="sceom",
         bundle={
             "schema": EXCITED_SCEOM_BUNDLE_V1,
             "energies": sceom_res.energies,
-            "meta": sceom_res.meta,
+            "meta": sceom_meta,
         },
     )
 

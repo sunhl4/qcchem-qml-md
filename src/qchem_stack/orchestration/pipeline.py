@@ -217,6 +217,8 @@ def run_pipeline_sync(
         "angles": angles.tolist() if isinstance(angles, np.ndarray) else list(angles),
         **algo_meta,
     }
+    if stage.algorithm_report is not None:
+        out["algorithm_report"] = stage.algorithm_report
     out["pre_quantum_input"] = pre_q_input.as_summary_dict()
     if classical_benchmarks is not None:
         out["classical_benchmarks"] = classical_benchmarks
@@ -282,6 +284,7 @@ def run_pipeline_sync(
         out=out,
         profile=profile,
         emit=_emit,
+        pre_quantum_input=pre_q_input,
     )
 
     return tag_pipeline_result(

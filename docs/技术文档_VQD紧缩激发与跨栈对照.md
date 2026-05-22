@@ -33,7 +33,7 @@
 
 **约束**：
 
-- **UCCSD + VQD**：允许；与 **QSE / SCEOM** 仍不可同时写在 `variational_ansatz=uccsd` 上 —— 后两者当前仍按 **HEA 角打包** 的接口消费角度（配置校验见 `ExperimentConfig._uccsd_variational_constraints`）。
+- **UCCSD + VQD / QSE / SCEOM**：均允许。QSE/SCEOM 在 `variational_ansatz=uccsd` 时通过 `build_uccsd_variational_model().prepare_state` 构建参考态；**例外**：`qse.shot_mode=pauli_transitions` 仍为 HEA Pauli-X bump 专用（见 `validate_uccsd_variational_constraints`）。
 - **UCCSD + VQD** 要求前置变分已产出基态角；`VQD.run(..., ground_angles=..., ground_energy=...)` 内若使用 `prepare_state` 则禁止在无 `ground_angles` 时单独跑紧缩。
 
 ---

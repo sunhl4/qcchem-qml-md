@@ -47,6 +47,7 @@ from qchem_stack.protocols.product_contract import (
 )
 from qchem_stack.quantum.algorithm_registry import ALGORITHM_REGISTRY
 from qchem_stack.quantum.ansatz_registry import ANSATZ_REGISTRY
+from qchem_stack.quantum.excited_plugins.registry import excited_registry_export
 from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
 from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
@@ -170,6 +171,7 @@ def _table_from_config(
             "schema": "algorithm_registry_alignment_v1",
             "algorithm_registry_ids": sorted(ALGORITHM_REGISTRY.keys()),
             "variational_registry_export_v1": variational_registry_export(),
+            "excited_registry_export_v1": excited_registry_export(),
             "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
             "ansatz_registry_ids": sorted(ANSATZ_REGISTRY.keys()),
             "documented_fermion_qubit_mappings": list(DOCUMENTED_FERMION_QUBIT_MAPPINGS),

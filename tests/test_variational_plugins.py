@@ -118,7 +118,7 @@ def test_resolve_variational_runner_prefers_factory() -> None:
 
 def test_load_bad_factory_module_raises_pipeline_error() -> None:
     with pytest.raises(PipelineError, match="import failed"):
-        load_variational_runner_from_factory("__not_a_python_module_xx__:fn")
+        load_variational_runner_from_factory("qchem_stack.__not_a_python_module_xx__:fn")
 
 
 @pytest.mark.parametrize("algo", ["vqe", "adapt", "iqeb", "tetris_adapt"])
@@ -220,6 +220,9 @@ def test_run_variational_stage_uccsd_branch() -> None:
     st = run_variational_stage(ctx)
     assert st.algo_meta.get("algorithm") == "vqe"
     assert st.algo_meta.get("vqe_meta", {}).get("variational_ansatz") == "uccsd"
+    assert st.algorithm_report is not None
+    assert st.algorithm_report.get("schema") == "algorithm_uccsd_report_v1"
+    assert st.algorithm_report.get("algorithm") == "vqe"
 
 
 def test_algorithm_registry_synced_with_variational_builtins() -> None:
@@ -270,3 +273,114 @@ def test_variational_context_falls_back_without_pre_quantum_input() -> None:
     )
     out = run_echo_variational(ctx)
     assert out.angles.shape == (4,)
+
+
+def test_run_variational_stage_hea_returns_algorithm_report() -> None:
+    qh = _tiny_qh()
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="vqe",
+            vqe={"depth": 1, "maxiter": 1, "initial_parameters_strategy": "zeros"},
+            pauli={"use_protocol": False},
+        ),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+    )
+    st = run_variational_stage(ctx)
+    assert st.algorithm_report is not None
+    assert st.algorithm_report.get("schema") == "algorithm_vqe_report_v1"
+    assert "final_value" in st.algorithm_report
+    assert "nfev" in st.algorithm_report
+
+
+def test_run_variational_stage_adapt_smoke() -> None:
+    qh = _tiny_qh()
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="adapt",
+            adapt={"max_iter": 1, "pool_id": "qubit_excitation"},
+            vqe={"depth": 1},
+            pauli={"use_protocol": False},
+        ),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+    )
+    st = run_variational_stage(ctx)
+    assert "adapt_meta" in st.algo_meta
+    assert st.algorithm_report is not None
+    assert st.algorithm_report.get("algorithm") == "adapt"
+
+
+def test_run_variational_stage_tetris_adapt_smoke() -> None:
+    qh = _tiny_qh()
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="tetris_adapt",
+            adapt={"max_iter": 1, "pool_id": "qubit_excitation"},
+            vqe={"depth": 1},
+            pauli={"use_protocol": False},
+        ),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+    )
+    st = run_variational_stage(ctx)
+    assert st.algo_meta.get("adapt_meta", {}).get("tetris_style") is True
+
+
+def test_run_variational_stage_iqeb_smoke() -> None:
+    qh = _tiny_qh()
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(
+            algorithm="iqeb",
+            iqeb={"max_rounds": 1, "pool_id": "qubit_excitation"},
+            vqe={"depth": 1},
+            pauli={"use_protocol": False},
+        ),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+    )
+    st = run_variational_stage(ctx)
+    assert "iqeb_meta" in st.algo_meta
+    assert st.angles.ndim == 1
+    assert st.algorithm_report is not None
+    assert st.algorithm_report.get("algorithm") == "iqeb"
+
+
+def test_algorithm_factory_rejects_external_module_by_default() -> None:
+    with pytest.raises(PipelineError, match="outside the default allowlist"):
+        load_variational_runner_from_factory("os.path:join")
+
+
+def test_algorithm_factory_allows_qchem_stack_examples() -> None:
+    runner = load_variational_runner_from_factory(
+        "qchem_stack.quantum.variational_plugins.examples.echo_runner:echo_runner_factory"
+    )
+    qh = _tiny_qh()
+    ctx = VariationalRunContext(
+        cfg=_minimal_cfg(),
+        hamiltonian=qh,
+        executor=StatevectorHeaExecutor(),
+        seed=0,
+    )
+    out = runner(ctx)
+    assert out.algo_meta.get("variational_echo_plugin") is True
+
+
+def test_algorithm_factory_allow_external_env_escape(monkeypatch: pytest.MonkeyPatch) -> None:
+    import importlib
+
+    monkeypatch.setenv("QCHEM_QUANTUM_ALGORITHM_FACTORY_ALLOW_EXTERNAL", "1")
+    calls: list[str] = []
+
+    def _fake_import(name: str) -> object:
+        calls.append(name)
+        raise ImportError("stop after allowlist")
+
+    monkeypatch.setattr(importlib, "import_module", _fake_import)
+    with pytest.raises(PipelineError, match="import failed"):
+        load_variational_runner_from_factory("os.path:join")
+    assert calls == ["os.path"]

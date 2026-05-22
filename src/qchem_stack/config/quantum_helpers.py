@@ -189,6 +189,27 @@ def quantum_variational_run_summary_yaml_fields(cfg: ExperimentConfig) -> dict[s
     }
 
 
+def quantum_algorithm_report_run_summary_fields(out: dict[str, object]) -> dict[str, object]:
+    """Stable ``run_summary`` keys mirrored from pipeline ``algorithm_report``."""
+    ar = out.get("algorithm_report")
+    if not isinstance(ar, dict):
+        return {}
+    fields: dict[str, object] = {}
+    schema = ar.get("schema")
+    if isinstance(schema, str):
+        fields["algorithm_report_schema"] = schema
+    algorithm = ar.get("algorithm")
+    if isinstance(algorithm, str):
+        fields["algorithm_report_algorithm"] = algorithm
+    nfev = ar.get("nfev")
+    if isinstance(nfev, (int, float)):
+        fields["algorithm_report_nfev"] = int(nfev)
+    final_value = ar.get("final_value")
+    if isinstance(final_value, (int, float)):
+        fields["algorithm_report_final_value_au"] = float(final_value)
+    return fields
+
+
 def qpe_demo_track_requested(cfg: ExperimentConfig) -> bool:
     return bool(cfg.quantum.demos.qpe.track_requested())
 

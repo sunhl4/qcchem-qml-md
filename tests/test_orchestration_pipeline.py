@@ -72,6 +72,10 @@ quantum:
     assert rs["n_pauli_groups"] is not None and rs["n_pauli_groups"] >= 0
     assert rs.get("pauli_averaging_protocol_ran") is True
     assert "excited_stages" not in rs
+    ar = out.get("algorithm_report")
+    assert isinstance(ar, dict)
+    assert ar.get("schema") == "algorithm_vqe_report_v1"
+    assert out["repro"]["run_summary"].get("algorithm_report_schema") == "algorithm_vqe_report_v1"
 
 
 def test_run_pipeline_sync_h2_with_classical_benchmarks(tmp_path) -> None:
@@ -194,6 +198,9 @@ def test_adapt_uccsd_jw_alias_pool_yaml_runs_via_pipeline() -> None:
     out = run_pipeline_sync(cfg, cfg_path=p)
     assert out["repro"]["run_summary"].get("adapt_pool_id_yaml") == "uccsd_jw"
     assert math.isfinite(float(out["energy_after_variational"]))
+    ar = out.get("algorithm_report")
+    assert isinstance(ar, dict)
+    assert ar.get("algorithm") == "adapt"
 
 
 def test_iqeb_fermionic_doubles_pool_yaml_runs_via_pipeline() -> None:
@@ -538,6 +545,10 @@ quantum:
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     assert out["algorithm"] == "adapt"
     assert "adapt_meta" in out
+    ar = out.get("algorithm_report")
+    assert isinstance(ar, dict)
+    assert ar.get("algorithm") == "adapt"
+    assert out["repro"]["run_summary"].get("algorithm_report_algorithm") == "adapt"
     assert out["vqd"]["meta"].get("reused_pipeline_ground") is True
     assert out["vqd"]["energies"][0] == pytest.approx(out["energy_after_variational"])
 
@@ -761,6 +772,10 @@ def test_run_pipeline_sync_packaged_h2_uccsd_yaml() -> None:
     rsum = out["repro"]["run_summary"]
     assert rsum["variational_ansatz_yaml"] == "uccsd"
     assert rsum["uccsd_n_parameters"] == int(vm["uccsd_n_parameters"])
+    ar = out.get("algorithm_report")
+    assert isinstance(ar, dict)
+    assert ar.get("schema") == "algorithm_uccsd_report_v1"
+    assert rsum.get("algorithm_report_schema") == "algorithm_uccsd_report_v1"
     rs = out["resource_summary"]
     assert rs["pauli_averaging_protocol_ran"] is False
     assert "energy_pauli_protocol" not in out

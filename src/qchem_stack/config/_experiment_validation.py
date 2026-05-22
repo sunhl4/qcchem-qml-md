@@ -218,10 +218,15 @@ def validate_uccsd_variational_constraints(spec: ExperimentConfig) -> None:
             "quantum.variational.ansatz='uccsd' is incompatible with quantum.pauli.use_protocol=True "
             "(Pauli measurement circuits use HEA). Set quantum.pauli.use_protocol: false."
         )
-    if quantum_spec.excited.qse.after_variational or quantum_spec.excited.sceom.after_variational:
+    if (
+        quantum_spec.excited.qse.after_variational
+        and quantum_spec.variational.ansatz == "uccsd"
+        and quantum_spec.excited.qse.shot_mode == "pauli_transitions"
+    ):
         raise ValueError(
-            "quantum.variational.ansatz='uccsd' cannot combine with QSE/SCEOM "
-            "(those stages expect HEA angle packing)."
+            "quantum.variational.ansatz='uccsd' cannot combine with "
+            "quantum.excited.qse.shot_mode='pauli_transitions' "
+            "(Pauli-X bump basis is HEA-only; use exact or gaussian_h)."
         )
 
 

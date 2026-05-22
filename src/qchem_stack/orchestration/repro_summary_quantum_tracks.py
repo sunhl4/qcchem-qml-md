@@ -5,6 +5,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.config.quantum_helpers import (
+    quantum_algorithm_report_run_summary_fields,
     quantum_demo_open_stack_yaml_flags,
     quantum_excited_run_summary_yaml_fields,
     quantum_variational_run_summary_yaml_fields,
@@ -26,6 +27,7 @@ def apply_quantum_and_demo_run_summary_fields(
     repro: dict[str, Any],
 ) -> None:
     q = cfg.quantum
+    sm.update(quantum_algorithm_report_run_summary_fields(out))
     if q.algorithm == "vqe":
         sm["vqe_maxiter_yaml"] = resolve_vqe_maxiter(cfg)
         if "nfev" in out:

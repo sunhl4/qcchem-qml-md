@@ -22,6 +22,7 @@ if TYPE_CHECKING:
 
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.chem.pre_quantum_input import PreQuantumInput
     from qchem_stack.config import ExperimentConfig
     from qchem_stack.orchestration.excited_stages_types import ExcitedResourceSummary
     from qchem_stack.orchestration.run_context import PipelineStageTimer
@@ -47,6 +48,7 @@ def run_excited_stages(
     out: dict[str, Any],
     profile: PipelineStageTimer,
     emit: Callable[[str], None],
+    pre_quantum_input: PreQuantumInput | None = None,
 ) -> ExcitedResourceSummary | None:
     ctx = ExcitedRunContext(
         cfg=cfg,
@@ -55,6 +57,7 @@ def run_excited_stages(
         seed=int(cfg.random_seed),
         ground_angles=np.asarray(angles, dtype=float),
         ground_energy=float(energy_pre),
+        pre_quantum_input=pre_quantum_input,
     )
     run_excited_stages_from_context(ctx, out=out)
     excited_rs = build_excited_resource_summary(cfg, out)

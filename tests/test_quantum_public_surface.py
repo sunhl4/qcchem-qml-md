@@ -18,6 +18,26 @@ def test_quantum_algorithms_all_importable() -> None:
     assert not missing, "failed quantum.algorithms.__all__ imports:\n" + "\n".join(missing)
 
 
+def test_quantum_algorithms_lazy_import_does_not_load_adapt_at_import_time() -> None:
+    import sys
+
+    adapt_key = "qchem_stack.quantum.algorithms.adapt"
+    vqe_key = "qchem_stack.quantum.algorithms.vqe"
+    for key in list(sys.modules):
+        if key == "qchem_stack.quantum.algorithms" or key.startswith(
+            "qchem_stack.quantum.algorithms."
+        ):
+            del sys.modules[key]
+    mod = importlib.import_module("qchem_stack.quantum.algorithms")
+    assert adapt_key not in sys.modules
+    assert vqe_key not in sys.modules
+    _ = mod.VQE
+    assert vqe_key in sys.modules
+    assert adapt_key not in sys.modules
+    _ = mod.FermionicAdaptVQE
+    assert adapt_key in sys.modules
+
+
 @pytest.mark.parametrize(
     "symbol",
     [
@@ -54,6 +74,8 @@ def test_algorithm_registry_symbols_importable(symbol: str) -> None:
         "resolve_excited_plugin_ids",
         "list_registered_excited_ids",
         "register_excited_plugin",
+        "excited_registry_export",
+        "get_excited_plugin_record",
     ],
 )
 def test_excited_plugins_registry_symbols_importable(symbol: str) -> None:

@@ -302,7 +302,9 @@ validate_pre_quantum_contract(cfg)  # 进入 pre-quantum 前显式调用
 | 激发态 | `excited_vqd_after_variational`, …, `excited_vqd_plugin_params`, `excited_qse_plugin_params`, `excited_sceom_plugin_params` | sidecar 开关、维度与插件 runner 参数块 |
 | Demo track | `qpe_demo_track_requested`, `qpe_three_pack_requested`, `vqs_track_requested`, `resolve_qpe_demo_track_n_bits`, `resolve_vqs_track_payload_kwargs`, `quantum_workflow_preview_qpe_fields`, `quantum_workflow_preview_vqs_fields`, `quantum_demo_open_stack_yaml_flags` | QPE/VQS 演示轨 |
 | TensorNet | `tensornet_expectation_stub_enabled`, `resolve_tensornet_contraction_engine` | stub 侧车 |
-| Repro / summary | `quantum_excited_run_summary_yaml_fields`, `quantum_variational_run_summary_yaml_fields` | `run_summary` 字段块 |
+| Repro / summary | `quantum_excited_run_summary_yaml_fields`, `quantum_variational_run_summary_yaml_fields`, `quantum_algorithm_report_run_summary_fields` | `run_summary` 字段块；后者从 pipeline `algorithm_report` 镜像 `algorithm_report_*` 键 |
+
+Capability surface（`GET /v1/meta/capability-surface`）另含 `variational_registry_export_v1` 与 `excited_registry_export_v1`（与 parity export 同源）。
 
 `protocols.product_contract` 仍 re-export `PAULI_PATH_*` 与 `classify_pauli_expectation_path(QuantumSpec)`；canonical 实现在 `quantum_helpers`。
 
@@ -364,7 +366,7 @@ validate_pre_quantum_contract(cfg)  # 进入 pre-quantum 前显式调用
 | `validate_md_ml_extra_coordinates_shape` | 同上 | extra 几何数量与 `(n_atom, 3)` 形状 |
 | `validate_md_ml_pauli_energy_requires_pauli_protocol` | 同上 | `energy_reference=pauli_protocol` → `quantum.pauli.use_protocol` |
 | `validate_avas_strategy_requires_labels_and_capability` | 同上 | `strategy=avas` → 非空 `ao_labels` + solver capability |
-| `validate_uccsd_variational_constraints` | 同上 | UCCSD 与 mapping / pauli / QSE/SCEOM 互斥 |
+| `validate_uccsd_variational_constraints` | 同上 | UCCSD 与 mapping / pauli protocol 互斥；`uccsd + qse.pauli_transitions` 互斥 |
 | `validate_precomputed_driver_excludes_live_hooks` | `_experiment_validation_precomputed.py` | precomputed 禁 benchmarks / rdm_correction |
 | `validate_pbc_excludes_casscf_hooks` | `_experiment_validation_pbc.py` | PBC 与 CASSCF 轨道优化 hook 互斥 |
 | `validate_pbc_k_mesh_solver_capability` | 同上 | k-mesh 与 solver 能力（**不在** pre_quantum_contract 内） |

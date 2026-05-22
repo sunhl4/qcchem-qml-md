@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any
 
 if TYPE_CHECKING:
@@ -38,4 +38,3 @@ class ExcitedStageOutcome:
 
     bundle_key: str
     bundle: dict[str, Any]
-    resource_meta: dict[str, Any] = field(default_factory=dict)

@@ -16,9 +16,11 @@ from qchem_stack.quantum.qse_transition import (
 )
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
 
-from .excited_basis import build_qse_basis_from_vqe_hea
+from .excited_basis import build_qse_basis_from_uccsd_reference, build_qse_basis_from_vqe_hea
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from openfermion.ops import QubitOperator
 
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
@@ -179,5 +181,81 @@ class QSE:
                     "n_transition_tasks": sched.n_transition_tasks,
                     "total_shots_upper_bound": sched.total_shots_budget_upper_bound,
                 },
+            },
+        )
+
+    def run_from_uccsd_basis(
+        self,
+        angles: np.ndarray,
+        prepare_state: Callable[[np.ndarray], np.ndarray],
+        *,
+        max_basis: int | None = None,
+    ) -> QSEResult:
+        """Build orthonormal micro-basis from UCCSD reference + mapped fermionic singles."""
+        kb = max_basis or self.subspace_dim
+        basis = build_qse_basis_from_uccsd_reference(
+            angles,
+            self.hamiltonian,
+            prepare_state,
+            max_basis=kb,
+        )
+        h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
+        evals, _ = eigh(h_sub, s_sub)
+        evals = np.sort(np.real(evals))
+        e0 = float(evals[0])
+        exc = [float(evals[i] - e0) for i in range(1, len(evals))]
+        svals = np.linalg.svd(np.real(s_sub), compute_uv=False)
+        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
+        return QSEResult(
+            excitation_energies=exc,
+            meta={
+                "reference": "arXiv:1603.05681",
+                "basis_reference": "uccsd_fermionic_singles",
+                "K": len(basis),
+                "H_sub_shape": list(h_sub.shape),
+                "S_condition_number": cond_s,
+            },
+        )
+
+    def run_from_uccsd_basis_shot_noise(
+        self,
+        angles: np.ndarray,
+        prepare_state: Callable[[np.ndarray], np.ndarray],
+        *,
+        max_basis: int | None = None,
+        shots_per_matrix_element: int = 4096,
+        seed: int = 0,
+    ) -> QSEResult:
+        """Symmetric Gaussian noise on ``real(H_sub)`` for UCCSD micro-basis (placeholder)."""
+        rng = np.random.default_rng(seed)
+        kb = max_basis or self.subspace_dim
+        basis = build_qse_basis_from_uccsd_reference(
+            angles,
+            self.hamiltonian,
+            prepare_state,
+            max_basis=kb,
+        )
+        h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
+        h_real = np.real(h_sub)
+        scale = 1.0 / math.sqrt(max(1, shots_per_matrix_element))
+        noise = rng.normal(0.0, scale, h_real.shape)
+        noise = (noise + noise.T) / 2.0
+        h_noisy = h_real + noise
+        s_real = np.real(s_sub)
+        evals, _ = eigh(h_noisy, s_real)
+        evals = np.sort(np.real(evals))
+        e0 = float(evals[0])
+        exc = [float(evals[i] - e0) for i in range(1, len(evals))]
+        svals = np.linalg.svd(s_real, compute_uv=False)
+        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
+        return QSEResult(
+            excitation_energies=exc,
+            meta={
+                "reference": "arXiv:1603.05681",
+                "basis_reference": "uccsd_fermionic_singles",
+                "K": len(basis),
+                "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
+                "shots_per_matrix_element": shots_per_matrix_element,
+                "S_condition_number": cond_s,
             },
         )

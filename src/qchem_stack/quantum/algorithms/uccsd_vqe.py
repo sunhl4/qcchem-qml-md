@@ -27,7 +27,10 @@ from scipy.linalg import expm
 from scipy.optimize import minimize
 
 from qchem_stack.chem.kernels.spin_ucc import build_spin_uccsd_fermion_generators
-from qchem_stack.contracts.schema_ids import UCCSD_MAPPING_SUPPORT_MATRIX_V1
+from qchem_stack.contracts.schema_ids import (
+    ALGORITHM_UCCSD_REPORT_V1,
+    UCCSD_MAPPING_SUPPORT_MATRIX_V1,
+)
 from qchem_stack.quantum.algorithms.uccsd_mapping import (
     antihermitian_cluster_matrices,
     reference_state_dense,
@@ -46,6 +49,18 @@ class UCCSDVQEResult:
     angles: np.ndarray
     nfev: int
     meta: dict[str, Any] = field(default_factory=dict)
+
+
+def uccsd_algorithm_report_v1(result: UCCSDVQEResult) -> dict[str, Any]:
+    """Standardized variational report for UCCSD VQE runs."""
+    return {
+        "schema": ALGORITHM_UCCSD_REPORT_V1,
+        "algorithm": "vqe",
+        "final_value": float(result.energy),
+        "nfev": int(result.nfev),
+        "final_parameters": np.asarray(result.angles, dtype=float).tolist(),
+        "meta": dict(result.meta),
+    }
 
 
 class UCCSDVQE:

@@ -24,6 +24,8 @@ from qchem_stack.quantum.statevector import (
 )
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
@@ -262,4 +264,15 @@ def run_sceom_nested_commutator_from_hea(
 ) -> SCEOMResult:
     """Reference = HEA state ``|psi(theta)\\rangle`` (same ansatz as pipeline VQE)."""
     ref = hea_state(np.asarray(angles, dtype=float), hamiltonian.n_qubits, depth)
+    return run_sceom_nested_commutator(hamiltonian, ref, **kwargs)
+
+
+def run_sceom_nested_commutator_from_uccsd(
+    hamiltonian: QubitHamiltonian,
+    angles: np.ndarray,
+    prepare_state: Callable[[np.ndarray], np.ndarray],
+    **kwargs: Any,
+) -> SCEOMResult:
+    """Reference = UCCSD state ``|psi(theta)\\rangle`` from ``prepare_state``."""
+    ref = np.asarray(prepare_state(np.asarray(angles, dtype=float)), dtype=complex).ravel()
     return run_sceom_nested_commutator(hamiltonian, ref, **kwargs)

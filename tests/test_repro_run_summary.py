@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import pytest
+
 from qchem_stack.config import (
     ActiveSpaceSpec,
     ExperimentConfig,
@@ -167,6 +169,11 @@ def test_attach_run_summary_adapt_meta() -> None:
         "repro": collect_repro_metadata(cfg),
         "scf_energy": -1.0,
         "energy_after_variational": -1.2,
+        "algorithm_report": {
+            "schema": "algorithm_adapt_report_v1",
+            "algorithm": "adapt",
+            "metrics": {"energy": -1.2, "n_selected_ops": 1},
+        },
         "adapt_meta": {
             "total_gradient_evals": 99,
             "adapt_steps": [{"iteration": 0}, {"iteration": 1}],
@@ -180,6 +187,29 @@ def test_attach_run_summary_adapt_meta() -> None:
     assert sm["adapt_total_gradient_evals"] == 99
     assert sm["adapt_steps_recorded"] == 2
     assert sm["adapt_excitation_layers"] == 1
+    assert sm["algorithm_report_schema"] == "algorithm_adapt_report_v1"
+    assert sm["algorithm_report_algorithm"] == "adapt"
+
+
+def test_attach_run_summary_surfaces_algorithm_report() -> None:
+    cfg = _base_cfg(QuantumSpec(pauli={"use_protocol": False}))
+    out: dict = {
+        "repro": collect_repro_metadata(cfg),
+        "scf_energy": -1.0,
+        "energy_after_variational": -1.2,
+        "algorithm_report": {
+            "schema": "algorithm_vqe_report_v1",
+            "algorithm": "vqe",
+            "final_value": -1.2,
+            "nfev": 7,
+        },
+    }
+    _attach_run_summary(out, cfg)
+    sm = out["repro"]["run_summary"]
+    assert sm["algorithm_report_schema"] == "algorithm_vqe_report_v1"
+    assert sm["algorithm_report_algorithm"] == "vqe"
+    assert sm["algorithm_report_nfev"] == 7
+    assert sm["algorithm_report_final_value_au"] == pytest.approx(-1.2)
 
 
 def test_attach_run_summary_iqeb() -> None:

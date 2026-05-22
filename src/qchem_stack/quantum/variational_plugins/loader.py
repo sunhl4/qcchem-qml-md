@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import importlib
+import os
 from collections.abc import Callable
 from typing import Any
 
@@ -13,6 +14,19 @@ from qchem_stack.quantum.variational_plugins.spec import (
 )
 
 VariationalRunner = Callable[[VariationalRunContext], VariationalStageOutcome]
+
+_FACTORY_ALLOW_EXTERNAL_ENV = "QCHEM_QUANTUM_ALGORITHM_FACTORY_ALLOW_EXTERNAL"
+
+
+def _assert_factory_module_allowed(mod_name: str) -> None:
+    if mod_name.startswith("qchem_stack."):
+        return
+    if os.environ.get(_FACTORY_ALLOW_EXTERNAL_ENV) == "1":
+        return
+    raise PipelineError(
+        f"algorithm_factory module {mod_name!r} is outside the default allowlist "
+        f"(must start with 'qchem_stack.'). Set {_FACTORY_ALLOW_EXTERNAL_ENV}=1 to allow external modules."
+    )
 
 
 def validate_factory_import_path(spec: str) -> tuple[str, str]:
@@ -50,6 +64,7 @@ def load_variational_runner_from_factory(spec: str) -> VariationalRunner:
        - a **plugin instance** with ``run_variational``.
     """
     mod_name, attr_path = validate_factory_import_path(spec)
+    _assert_factory_module_allowed(mod_name)
     try:
         module = importlib.import_module(mod_name)
     except ImportError as exc:

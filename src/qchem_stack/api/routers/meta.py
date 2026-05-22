@@ -57,6 +57,7 @@ def capability_surface() -> dict[str, object]:
     )
     from qchem_stack.quantum.algorithm_registry import algorithm_registry_export
     from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_mapping_support_matrix_v1
+    from qchem_stack.quantum.excited_plugins.registry import excited_registry_export
     from qchem_stack.quantum.operator_pool_registry import operator_pool_registry_export_v1
     from qchem_stack.quantum.variational_plugins.registry import variational_registry_export
 
@@ -77,6 +78,7 @@ def capability_surface() -> dict[str, object]:
         "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
         "algorithm_registry_export_v1": algorithm_registry_export(),
         "variational_registry_export_v1": variational_registry_export(),
+        "excited_registry_export_v1": excited_registry_export(),
         "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
     }
 

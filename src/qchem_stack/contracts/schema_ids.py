@@ -131,6 +131,7 @@ OPERATOR_POOL_REGISTRY_EXPORT_V1 = "operator_pool_registry_export_v1"
 VQS_TRACK_V1 = "vqs_track_v1"
 VQS_INTEGRATION_CONTRACT_V1 = "vqs_integration_contract_v1"
 ALGORITHM_VQE_REPORT_V1 = "algorithm_vqe_report_v1"
+ALGORITHM_UCCSD_REPORT_V1 = "algorithm_uccsd_report_v1"
 PHASE_ESTIMATION_CONTRACT_V1 = "phase_estimation_contract_v1"
 QPE_QEC_DEMO_TRACK_V1 = "qpe_qec_demo_track_v1"
 BAYESIAN_QPE_STUB_MAP_V1 = "bayesian_qpe_stub_map_v1"
@@ -246,6 +247,7 @@ __all__ = [
     "VQS_TRACK_V1",
     "VQS_INTEGRATION_CONTRACT_V1",
     "ALGORITHM_VQE_REPORT_V1",
+    "ALGORITHM_UCCSD_REPORT_V1",
     "PHASE_ESTIMATION_CONTRACT_V1",
     "QPE_QEC_DEMO_TRACK_V1",
     "BAYESIAN_QPE_STUB_MAP_V1",

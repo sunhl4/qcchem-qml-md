@@ -26,7 +26,7 @@
 - **多后端可插拔**：同一 YAML 下 statevector / Qiskit / ionstack mock。
 - **MD/ML 扩展面**：`md_bridge` / QMEFDataset（相对纯化学闭合产品的长板）。
 
-机读汇总（与 HTTP 同源）：同一响应体含 **`object_map`**、**`gaps`**、**`mitigation_execution_model`**、**`open_stack_differentiators`**（schema **`open_stack_differentiators_v1`**：`scope_excludes`、`beyond_public_doc_bundle`）、**`tangelo_public_mapping_alias_surface_v1`**、**`operator_pool_registry_export_v1`**（ADAPT/IQEB 池 id 与 **`pool_id_aliases`**）、**`algorithm_registry_export_v1`**、**`variational_registry_export_v1`**。
+机读汇总（与 HTTP 同源）：同一响应体含 **`object_map`**、**`gaps`**、**`mitigation_execution_model`**、**`open_stack_differentiators`**（schema **`open_stack_differentiators_v1`**：`scope_excludes`、`beyond_public_doc_bundle`）、**`tangelo_public_mapping_alias_surface_v1`**、**`operator_pool_registry_export_v1`**（ADAPT/IQEB 池 id 与 **`pool_id_aliases`**）、**`algorithm_registry_export_v1`**、**`variational_registry_export_v1`**、**`excited_registry_export_v1`**。
 
 ## 1. Protocols 与工作流
 

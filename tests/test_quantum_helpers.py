@@ -316,3 +316,23 @@ def test_qpe_three_pack_requested_helper() -> None:
         }
     )
     assert qpe_three_pack_requested(cfg) is True
+
+
+def test_quantum_algorithm_report_run_summary_fields() -> None:
+    from qchem_stack.config.quantum_helpers import quantum_algorithm_report_run_summary_fields
+
+    assert quantum_algorithm_report_run_summary_fields({}) == {}
+    fields = quantum_algorithm_report_run_summary_fields(
+        {
+            "algorithm_report": {
+                "schema": "algorithm_vqe_report_v1",
+                "algorithm": "vqe",
+                "final_value": -1.23,
+                "nfev": 5,
+            }
+        }
+    )
+    assert fields["algorithm_report_schema"] == "algorithm_vqe_report_v1"
+    assert fields["algorithm_report_algorithm"] == "vqe"
+    assert fields["algorithm_report_nfev"] == 5
+    assert fields["algorithm_report_final_value_au"] == -1.23

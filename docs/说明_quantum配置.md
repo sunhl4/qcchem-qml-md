@@ -7,7 +7,7 @@ YAML 路径与 Python 属性一致，例如 `cfg.quantum.vqe.maxiter`。
 | 字段 | 说明 |
 |------|------|
 | `algorithm` | 变分算法 id：`vqe`、`adapt`、`iqeb`、`tetris_adapt` 等 |
-| `algorithm_factory` | 可选插件导入路径 `module:callable` |
+| `algorithm_factory` | 可选插件导入路径 `module:callable`；默认仅允许 `qchem_stack.*` 模块（见风格文档 §3.1） |
 
 ## 子块
 
