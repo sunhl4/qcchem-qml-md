@@ -451,7 +451,7 @@ def build_embedding_input_system(
 
 ### 6.12 文件数量统计
 
-- Python 源文件：约 127（含各子包）
+- Python 源文件：约 128（含各子包）
 - 顶层 `chem.__all__` 符号：29
 - `PreQuantumPath` 分支：5
 - 内置 solver：`pyscf`, `psi4`, `precomputed`（+ entrypoint / runtime 扩展）

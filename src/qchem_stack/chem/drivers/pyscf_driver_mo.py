@@ -56,7 +56,7 @@ def get_ncas_nelec_couplet(
 ) -> tuple[int, int]:
     if driver.active_space is None:
         raise ValueError(
-            "active_space unavailable; construct PySCFDriver.from_config(...) first "
-            "(prefer classical_mean_field_reference_from_config)."
+            "active_space unavailable; use classical_mean_field_reference_from_config(cfg) "
+            "(legacy PySCFDriver.from_config is deprecated)."
         )
     return ncas_nelec_couplet(driver.active_space, reference=resolved_reference)
