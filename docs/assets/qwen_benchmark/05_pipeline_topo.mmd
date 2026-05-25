@@ -1,0 +1,17 @@
+flowchart TB
+    subgraph flash_topo ["flash: Adapt + VQD + QSE sidecar"]
+        A1[Adapt-VQE] --> V1[VQD 2 states]
+        V1 --> Q1[QSE gaussian_h 修正]
+    end
+
+    subgraph coder_topo ["coder-next: Adapt + VQD 主干"]
+        A2[Adapt-VQE 8轮] --> V2[VQD E1 E2]
+        A2 --> Q2[QSE 仅离线验证]
+    end
+
+    subgraph max_topo ["3.7-max: Adapt + QSE 推荐"]
+        A3[FermionicAdaptVQE] --> Q3[QSE fermionic singles]
+        Q3 --> OUT["广义本征值 -> 基态+2激发态"]
+    end
+
+    style max_topo fill:#e8f5e9
