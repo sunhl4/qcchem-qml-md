@@ -1,0 +1,47 @@
+{
+  "md_bridge_native": {
+    "n_frames": 13,
+    "train_meta": {
+      "n_epochs": 80,
+      "batch_size": 4,
+      "learning_rate": 0.001,
+      "force_weight": 100.0,
+      "lr_scheduler": "constant",
+      "grad_clip": 1.0,
+      "energy_normalization": "subtract_mean",
+      "backend": "qmlff_quantum",
+      "n_train_frames": 13,
+      "energy_norm_params": {
+        "method": "subtract_mean",
+        "mean": -29.116883178260927
+      },
+      "final_metrics": {
+        "epoch": 79.0,
+        "energy_weight": 1.0,
+        "force_weight": 100.0,
+        "force_mode_train": "autodiff",
+        "force_mode_eval": "autodiff",
+        "loss": 6472.3985595703125,
+        "energy_mae": 0.7742251083254814,
+        "force_rmse": 5.637146255001426,
+        "energy_mae_per_atom_norm": 0.7742251083254814,
+        "energy_mae_per_structure_norm": 1.5484502166509628,
+        "energy_mae_per_atom_phys": 0.7742249965667725,
+        "energy_mae_per_structure_phys": 1.548449993133545,
+        "force_rmse_components": 5.637146255001426,
+        "force_mae_components": 3.254607979208231,
+        "energy_loss": 0.9818332493305206,
+        "force_loss": 64.71416521072388,
+        "consistency_loss": 0.0,
+        "hessian_loss": 0.0,
+        "symmetry_reg_loss": 0.0
+      }
+    },
+    "final_energy_mae_ev": 0.7742251083254814,
+    "final_force_rmse_ev_ang": 5.637146255001426,
+    "energy_mae_hartree": 0.04673140923906094,
+    "energy_max_hartree": 0.15770273326919004,
+    "pred_min_hartree": -1.1197817434557138,
+    "pred_max_hartree": -1.1050106643852267
+  }
+}

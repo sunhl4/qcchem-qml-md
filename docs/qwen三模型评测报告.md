@@ -8,7 +8,7 @@
 | 维度         | 说明                                                             |
 | -------------- | ------------------------------------------------------------------ |
 | **评测对象** | `qwen-flash` / `qwen3-coder-next` / `qwen3.7-max`                |
-| **场景数**   | 3（日常解释 / 编程 / 架构设计）                                  |
+| **场景数**   | 3（日常解释 / 编程 / 架构设计）                               |
 | **总调用**   | 9 次（3×3 全矩阵）                                              |
 | **角色定位** | flash → 简单日常；coder-next → 编程 Agent；3.7-max → 复杂推理 |
 
@@ -16,53 +16,19 @@
 
 ![模型路由建议](assets/qwen_benchmark/01_model_routing.png)
 
-<details>
-<summary>Mermaid 源码</summary>
-
-```mermaid
-flowchart LR
-    subgraph input [用户任务]
-        Q[问题/需求]
-    end
-
-    Q --> R{任务类型?}
-
-    R -->|问答/摘要/翻译| F[qwen-flash<br/>~60% 用量]
-    R -->|写代码/调试/重构| C[qwen3-coder-next<br/>~30% 用量]
-    R -->|架构/复杂推理/长程| M[qwen3.7-max<br/>~10% 用量]
-
-    F --> O[输出]
-    C --> O
-    M --> O
-
-    style F fill:#e8f5e9
-    style C fill:#e3f2fd
-    style M fill:#fce4ec
-```
-
 </details>
 
-### 2.1 雷达图（相对表现）
+### 2  雷达图（相对表现）
 
 ![三模型场景得分雷达图](assets/qwen_benchmark/02_score_radar.png)
 
-<details>
-<summary>Mermaid 源码</summary>
 
-```mermaid
-radar-beta
-  title 三模型场景得分（满分 5）
-  axis s1["S1日常"], s2["S2编程"], s3["S3架构"], eff["效率"], con["约束遵守"]
-  curve flash{4.0, 1.5, 3.5, 5.0, 2.5}
-  curve coder{4.0, 5.0, 4.0, 4.5, 3.5}
-  curve max{3.5, 5.0, 5.0, 2.0, 4.5}
-```
 
 ---
 
 ## 3. 效率对比
 
-### 3.2 Token 消耗
+### 3.1 Token 消耗
 
 ![Token 消耗对比](assets/qwen_benchmark/04_tokens.png)
 
@@ -72,8 +38,6 @@ radar-beta
 | qwen-flash       |   472 | 1,085 | 1,804 |  **3,361** |   1.0×   |
 | qwen3-coder-next |   445 | 1,139 | 2,305 |  **3,889** |   1.2×   |
 | qwen3.7-max      | 3,850 | 2,099 | 4,432 | **10,381** | **3.1×** |
-
-> 3.7-max 在 S1 的 completion_tokens=3683，主要为深度思考开销；可见正文仅 ~192 字，物理内容正确。
 
 ---
 
@@ -96,7 +60,7 @@ radar-beta
 
 ### 4.2 S2 — `select_adapt_candidates` 编程
 
-**任务**：实现 ADAPT 算符贪心选择（梯度过滤 → 降序 → qubit 宽度约束），含 3 组 assert。
+**任务**：实现 ADAPT 算符贪心选择（梯度过滤 → 降序 → qubit 宽度约束）。
 
 
 | 模型       |  延迟 | tokens | 代码可运行 | 关键问题                               |
@@ -130,12 +94,23 @@ qubits = [q for q in pool[filtered_sorted.index(name)][1]]
 | flash       | ⚠️ 乐观（三模块叠加仍称 ≤5e5） |   结构完整   | 推荐 Adapt+VQD+QSE 全链路            |
 | coder-next  |    ⚠️ Adapt+VQD ≈4.8×10⁵    |  细节最丰富  | VQD 作主路径，QSE 仅对照             |
 | **3.7-max** |        ✅**明确否决 VQD**        | **约束最严** | **Adapt+QSE 主路径，~3×10⁵ shots** |
+| **GPT 5.5** | ✅**预算分层管理** | **约束严格 + 验证闭环** | **Adapt+QSE 主路径，增加 bootstrap / FCI / 对称性验证** |
 
-**3.7-max 核心判断（采纳为实验草案依据）**：
+#### S3 最终判定：qwen3.7-max vs GPT 5.5
 
-1. **推荐**：`FermionicAdaptVQE` → `QSE(fermionic singles)` → 经典广义本征值求解
-2. **条件推荐**：Adapt + VQD（shots > 10⁶，超出本预算）
-3. **不推荐**：UCCSD-VQE only；Adapt + VQD @ ≤5×10⁵；Adapt + SCEOM sidecar
+| 维度 | qwen3.7-max | GPT 5.5 | 胜者 |
+| --- | --- | --- | --- |
+| 主路径决断 | Adapt + QSE，~3×10⁵ shots | Adapt + QSE，~3×10⁵ shots | 平 |
+| shots 预算论证 | 明确否决 VQD；含负向压测（强行 Adapt+VQD 预期 >5×10⁵） | 三档分层（筛查 / 主路径 / 增强），预算合并管理 | **3.7-max** |
+| 架构风险识别 | QSE 矩阵病态、梯度 SNR、SCEOM 过度设计 | overlap 条件数、selected doubles 升级、噪声回退 | 平 |
+| 验证实验（E） | 5 条带阈值，偏算法诊断 | FCI 标尺 + bootstrap + 对称性 + 几何扫描 + shots 消融 | **GPT 5.5** |
+| memo 体裁 | 精炼，A–E 结构紧凑 | 完整，但更偏实验执行手册 | **3.7-max** |
+
+**结论：GPT 5.5 综合略优，但两者应合并使用，而非二选一。**
+
+- **架构决断与 shots 约束**：两者在最关键问题上完全一致，均正确给出 `Adapt + QSE` 主路径并在 ≤5×10⁵ 预算下否决 VQD。`3.7-max` 的 VQD 负向压测（V5）和 QSE 条件数阈值（κ(S) < 100）论证更硬，适合作为“为什么不用 VQD”的否决依据。
+- **实验可落地性**：GPT 5.5 在验证闭环上明显更强——FCI 对照、误差条、bootstrap、对称性守恒与 shots 分配消融，更接近算法工程师可直接执行的 checklist。
+- **采纳建议**：**主路径与预算红线以 3.7-max 为准**；**验证方案与 shots 分层以 GPT 5.5 补全**。合并后即为 S3 最优实验草案。
 
 ---
 
@@ -149,80 +124,16 @@ qubits = [q for q in pool[filtered_sorted.index(name)][1]]
 | 流水线架构、shot 预算论证 | qwen3.7-max      | coder-next（细节多但约束弱） |
 | 成本敏感、批量问答        | qwen-flash       | coder-next                   |
 
----
-
-## 6. Cursor 本地配置
 
 
-| 场景     | 模型 ID            | Cursor 用途            |
-| ---------- | -------------------- | ------------------------ |
-| 简单日常 | `qwen-flash`       | 问答、摘要、简单 Cmd+K |
-| 日常编程 | `qwen3-coder-next` | Agent / Composer       |
-| 千问最强 | `qwen3.7-max`      | 架构设计、复杂推理     |
-
-**配置脚本**：`~/.cursor/configure_qwen_models.py`
-
-```bash
-# 关闭 Cursor 后执行（推荐）
-DASHSCOPE_API_KEY="sk-..." python3 ~/.cursor/configure_qwen_models.py --region cn
-
-# 若 Cursor 仍在运行（可能因 DB 锁失败）
-DASHSCOPE_API_KEY="sk-..." python3 ~/.cursor/configure_qwen_models.py --region cn --force
-```
-
-**重启后**：Settings → Models → 关闭 Auto → 手动选择上述模型。
-
----
-
-## 7. 实验配置草案
-
-基于 3.7-max S3 memo，已生成 H4 实验配置：
-
-- **文件**：`configs/example_h4_adapt_qse_benchmark.yaml`
-- **路径**：`FermionicAdaptVQE` → `QSE(fermionic singles)`，VQD 关闭
-- **shots 预算**：`extra.shot_budget_total: 500000`（文档化约束，供 benchmark 对照）
-
----
-
-## 8. 总结与行动项
-
-
-| # | 行动                                                   | 优先级 |
-| --- | -------------------------------------------------------- | :------: |
-| 1 | Cursor 默认编程模型设为**qwen3-coder-next**            |   高   |
-| 2 | 架构/资源论证类任务切换**qwen3.7-max**                 |   高   |
-| 3 | 简单问答用**qwen-flash**，避免 max 的 thinking 开销    |   中   |
-| 4 | 运行`example_h4_adapt_qse_benchmark.yaml` 验证 S3 结论 |   中   |
-| 5 | **轮换已暴露的 API Key**                               |   高   |
-
-**一句话结论**：编程选 coder-next，架构选 3.7-max，日常选 flash；H4 激发态 pipeline 优先 **Adapt + QSE**，在 ≤5×10⁵ shots 下避免 VQD 主路径。
-
----
-
-## 附录 A — 原始指标表
-
-
-| scenario | model | latency_s | prompt | completion | total |
-| ---------- | ------- | ----------: | -------: | -----------: | ------: |
-| S1       | flash |      3.41 |    171 |        301 |   472 |
-| S1       | coder |      2.11 |    171 |        274 |   445 |
-| S1       | max   |     31.77 |    167 |       3683 |  3850 |
-| S2       | flash |      8.01 |    267 |        818 |  1085 |
-| S2       | coder |      4.02 |    267 |        872 |  1139 |
-| S2       | max   |     14.93 |    266 |       1833 |  2099 |
-| S3       | flash |     18.82 |    371 |       1433 |  1804 |
-| S3       | coder |     12.61 |    371 |       1934 |  2305 |
-| S3       | max   |     34.84 |    369 |       4063 |  4432 |
-
-## 附录 B — 模型参数量（公开信息）
+## 附录 A — 模型参数量（公开信息）
 
 
 | 模型             | 参数量                   | 备注                    |
 | ------------------ | -------------------------- | ------------------------- |
 | qwen-flash       | 未公开                   | 商业 API，侧重速度/成本 |
-| qwen3-coder-next | 80B total / 3B activated | MoE                     |
-| qwen3.7-max      | >1T total                | MoE，激活参数量未公开   |
+| qwen3-coder-next | 80B total / 3B activated |                      |
+| qwen3.7-max      | >1T total                | 激活参数量未公开   |
 
-<style>#mermaid-1779692914274{font-family:sans-serif;font-size:16px;fill:#333;}#mermaid-1779692914274 .error-icon{fill:#552222;}#mermaid-1779692914274 .error-text{fill:#552222;stroke:#552222;}#mermaid-1779692914274 .edge-thickness-normal{stroke-width:2px;}#mermaid-1779692914274 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1779692914274 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1779692914274 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1779692914274 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1779692914274 .marker{fill:#333333;}#mermaid-1779692914274 .marker.cross{stroke:#333333;}#mermaid-1779692914274 svg{font-family:sans-serif;font-size:16px;}#mermaid-1779692914274 .label{font-family:sans-serif;color:#333;}#mermaid-1779692914274 .label text{fill:#333;}#mermaid-1779692914274 .node rect,#mermaid-1779692914274 .node circle,#mermaid-1779692914274 .node ellipse,#mermaid-1779692914274 .node polygon,#mermaid-1779692914274 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-1779692914274 .node .label{text-align:center;}#mermaid-1779692914274 .node.clickable{cursor:pointer;}#mermaid-1779692914274 .arrowheadPath{fill:#333333;}#mermaid-1779692914274 .edgePath .path{stroke:#333333;stroke-width:1.5px;}#mermaid-1779692914274 .flowchart-link{stroke:#333333;fill:none;}#mermaid-1779692914274 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-1779692914274 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-1779692914274 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-1779692914274 .cluster text{fill:#333;}#mermaid-1779692914274 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:sans-serif;font-size:12px;background:hsl(80,100%,96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1779692914274:root{--mermaid-font-family:sans-serif;}#mermaid-1779692914274:root{--mermaid-alt-font-family:sans-serif;}#mermaid-1779692914274 flowchart{fill:apa;}</style>
 
-<style>#mermaid-1779692914275{font-family:sans-serif;font-size:16px;fill:#333;}#mermaid-1779692914275 .error-icon{fill:#552222;}#mermaid-1779692914275 .error-text{fill:#552222;stroke:#552222;}#mermaid-1779692914275 .edge-thickness-normal{stroke-width:2px;}#mermaid-1779692914275 .edge-thickness-thick{stroke-width:3.5px;}#mermaid-1779692914275 .edge-pattern-solid{stroke-dasharray:0;}#mermaid-1779692914275 .edge-pattern-dashed{stroke-dasharray:3;}#mermaid-1779692914275 .edge-pattern-dotted{stroke-dasharray:2;}#mermaid-1779692914275 .marker{fill:#333333;}#mermaid-1779692914275 .marker.cross{stroke:#333333;}#mermaid-1779692914275 svg{font-family:sans-serif;font-size:16px;}#mermaid-1779692914275 .label{font-family:sans-serif;color:#333;}#mermaid-1779692914275 .label text{fill:#333;}#mermaid-1779692914275 .node rect,#mermaid-1779692914275 .node circle,#mermaid-1779692914275 .node ellipse,#mermaid-1779692914275 .node polygon,#mermaid-1779692914275 .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#mermaid-1779692914275 .node .label{text-align:center;}#mermaid-1779692914275 .node.clickable{cursor:pointer;}#mermaid-1779692914275 .arrowheadPath{fill:#333333;}#mermaid-1779692914275 .edgePath .path{stroke:#333333;stroke-width:1.5px;}#mermaid-1779692914275 .flowchart-link{stroke:#333333;fill:none;}#mermaid-1779692914275 .edgeLabel{background-color:#e8e8e8;text-align:center;}#mermaid-1779692914275 .edgeLabel rect{opacity:0.5;background-color:#e8e8e8;fill:#e8e8e8;}#mermaid-1779692914275 .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#mermaid-1779692914275 .cluster text{fill:#333;}#mermaid-1779692914275 div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:sans-serif;font-size:12px;background:hsl(80,100%,96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#mermaid-1779692914275:root{--mermaid-font-family:sans-serif;}#mermaid-1779692914275:root{--mermaid-alt-font-family:sans-serif;}#mermaid-1779692914275 flowchart{fill:apa;}</style>
+

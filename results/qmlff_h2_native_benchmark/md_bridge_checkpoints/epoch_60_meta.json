@@ -1,0 +1,15 @@
+{
+  "schema_version": 1,
+  "epoch": 59,
+  "step": 240,
+  "best_val_loss": Infinity,
+  "species_list": [
+    "H"
+  ],
+  "model_preset": null,
+  "loss": 6747.795318603516,
+  "energy_mae": 0.6820892952382565,
+  "force_rmse": 5.565751455724239,
+  "energy_loss": 0.833641117438674,
+  "force_loss": 67.46961975097656
+}

@@ -1,0 +1,54 @@
+# Phase 2 — QML-FF QMP H2 path (Schur Scheme B, H2-native architecture).
+#
+#     python examples/qmlff_md_pipeline_demo.py \
+#         --experiment configs/example_h2.yaml \
+#         --loop       configs/example_h2_qmp_md.yaml \
+#         --output     results/qmlff_md_h2_qmp
+
+max_rounds: 5
+energy_tolerance_hartree: 5.0e-4
+n_candidate_frames: 4
+add_top_k_per_round: 2
+label_energy_reference: scf
+label_screening_theory_level: hf_scf
+label_top_theory_level: hf_scf
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+
+n_seed_geometries: 12
+seed_mode: bond_stretch
+seed_bond_min_bohr: 0.8
+seed_bond_max_bohr: 2.2
+
+force_field_backend: qmlff_qmp_h2
+qmlff_species_list: [H]
+qmp_h2_overrides:
+  cutoff: 5.0
+  cg_l: 1
+  n_radial_basis: 8
+  decoder_type: linear
+  energy_readout: L0_L1norm
+  seed: 42
+
+n_epochs_per_round: 80
+batch_size: 1
+learning_rate: 1.0e-4
+lr_scheduler: constant
+force_weight: 50.0
+warm_start: true
+warm_start_params_only: true
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 200
+md_dt_fs: 0.5
+md_temperature_K: 300.0
+md_save_stride: 10
+md_seed: 0
+md_gamma_ps_inv: 0.1
+md_tau_fs: 100.0
+cutoff_ang: 5.0
+max_neighbors: 16
+
+write_per_round_extxyz: true
+seed: 0

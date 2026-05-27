@@ -1,0 +1,392 @@
+{
+  "round": {
+    "round_index": 3,
+    "n_train_before": 17,
+    "n_train_after": 19,
+    "n_md_frames_sampled": 4,
+    "max_abs_delta_hartree": 0.7608537985868876,
+    "mean_abs_delta_hartree": 0.29550453170405305,
+    "converged": false,
+    "training_metrics": {
+      "n_epochs": 50,
+      "batch_size": 1,
+      "learning_rate": 0.001,
+      "force_weight": 50.0,
+      "n_train_frames": 17,
+      "final_metrics": {
+        "epoch": 49.0,
+        "energy_weight": 1.0,
+        "force_weight": 50.0,
+        "force_mode_train": "autodiff",
+        "force_mode_eval": "autodiff",
+        "loss": 2654.8089219401863,
+        "energy_mae": 11.722537489498363,
+        "force_rmse": 3.5174473663792014,
+        "energy_mae_per_atom_norm": 11.722537489498363,
+        "energy_mae_per_structure_norm": 23.445074978996725,
+        "energy_mae_per_atom_phys": 11.722537489498363,
+        "energy_mae_per_structure_phys": 23.445074978996725,
+        "force_rmse_components": 3.5174473663792014,
+        "force_mae_components": 2.0313084413133122,
+        "energy_loss": 155.43707170205957,
+        "force_loss": 49.9874368983417,
+        "consistency_loss": 0.0,
+        "hessian_loss": 0.0,
+        "symmetry_reg_loss": 0.0
+      }
+    },
+    "frames": [
+      {
+        "frame_index": 0,
+        "time_ps": 0.005,
+        "energy_qml_hartree": -0.009568351512697295,
+        "energy_qchem_hartree": -0.7704221500995849,
+        "delta_hartree": 0.7608537985868876,
+        "abs_delta_hartree": 0.7608537985868876,
+        "converged": false,
+        "theory_level": "hf_scf"
+      },
+      {
+        "frame_index": 1,
+        "time_ps": 0.035,
+        "energy_qml_hartree": -0.038655644898816205,
+        "energy_qchem_hartree": -0.18121735259987518,
+        "delta_hartree": 0.14256170770105897,
+        "abs_delta_hartree": 0.14256170770105897,
+        "converged": false,
+        "theory_level": "hf_scf"
+      },
+      {
+        "frame_index": 2,
+        "time_ps": 0.065,
+        "energy_qml_hartree": -0.038655644898816205,
+        "energy_qchem_hartree": -0.17902717086325395,
+        "delta_hartree": 0.14037152596443775,
+        "abs_delta_hartree": 0.14037152596443775,
+        "converged": false,
+        "theory_level": "hf_scf"
+      },
+      {
+        "frame_index": 3,
+        "time_ps": 0.095,
+        "energy_qml_hartree": -0.038655644898816205,
+        "energy_qchem_hartree": -0.17688673946264405,
+        "delta_hartree": 0.13823109456382784,
+        "abs_delta_hartree": 0.13823109456382784,
+        "converged": false,
+        "theory_level": "hf_scf"
+      }
+    ],
+    "failures": []
+  },
+  "frames_debug": {
+    "0": {
+      "qml_prediction": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            -0.6724964577463699,
+            1.1597097776752883,
+            1.7385917691382158
+          ],
+          [
+            0.11317777814107173,
+            0.04005293887631013,
+            -1.9203666193110593
+          ]
+        ],
+        "energy_hartree": -0.009568351512697295,
+        "forces_hartree_bohr": [
+          [
+            0.001232390512814443,
+            -0.0017562678473934756,
+            -0.005739357467982765
+          ],
+          [
+            -0.001232390512814443,
+            0.0017562678473934756,
+            0.005739357467982765
+          ]
+        ],
+        "method_tag": "qmlff_prediction",
+        "active_space_hash": "",
+        "protocol_hash": "",
+        "repro_config_sha256_prefix": "",
+        "backend_noise_tag": "qmlff"
+      },
+      "qchem_reference": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            -0.6724964577463699,
+            1.1597097776752883,
+            1.7385917691382158
+          ],
+          [
+            0.11317777814107173,
+            0.04005293887631013,
+            -1.9203666193110593
+          ]
+        ],
+        "energy_hartree": -0.7704221500995849,
+        "forces_hartree_bohr": [
+          [
+            0.020530852093023293,
+            -0.029258320945667975,
+            -0.09561409812931382
+          ],
+          [
+            -0.020530852093023293,
+            0.029258320945667975,
+            0.09561409812931387
+          ]
+        ],
+        "charge": 0,
+        "multiplicity": 1,
+        "box": null,
+        "method_tag": "RHF/HF-SCF-trajectory[0]",
+        "active_space_hash": "29239e9cb8a5a4ba",
+        "protocol_hash": "f11698e8ce7c38e0",
+        "repro_config_sha256_prefix": "5f0f9371da0930c3",
+        "backend_noise_tag": "statevector"
+      }
+    },
+    "1": {
+      "qml_prediction": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            -4.794137297997813,
+            5.396066059664565,
+            19.190276421959588
+          ],
+          [
+            0.3581309294800945,
+            -14.021602188037027,
+            -20.103357982304303
+          ]
+        ],
+        "energy_hartree": -0.038655644898816205,
+        "forces_hartree_bohr": [
+          [
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          [
+            -0.0,
+            -0.0,
+            -0.0
+          ]
+        ],
+        "method_tag": "qmlff_prediction",
+        "active_space_hash": "",
+        "protocol_hash": "",
+        "repro_config_sha256_prefix": "",
+        "backend_noise_tag": "qmlff"
+      },
+      "qchem_reference": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            -4.794137297997813,
+            5.396066059664565,
+            19.190276421959588
+          ],
+          [
+            0.3581309294800945,
+            -14.021602188037027,
+            -20.103357982304303
+          ]
+        ],
+        "energy_hartree": -0.18121735259987518,
+        "forces_hartree_bohr": [
+          [
+            5.99452854670771e-05,
+            -0.0002259194620353188,
+            -0.0004571710996800244
+          ],
+          [
+            -5.99452854670771e-05,
+            0.0002259194620353188,
+            0.0004571710996800244
+          ]
+        ],
+        "charge": 0,
+        "multiplicity": 1,
+        "box": null,
+        "method_tag": "RHF/HF-SCF-trajectory[1]",
+        "active_space_hash": "29239e9cb8a5a4ba",
+        "protocol_hash": "f11698e8ce7c38e0",
+        "repro_config_sha256_prefix": "5f0f9371da0930c3",
+        "backend_noise_tag": "statevector"
+      }
+    },
+    "2": {
+      "qml_prediction": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            2.571143783786713,
+            2.413462884934075,
+            25.101392493297677
+          ],
+          [
+            -4.590423457149983,
+            -19.5143342044889,
+            -17.962928340791997
+          ]
+        ],
+        "energy_hartree": -0.038655644898816205,
+        "forces_hartree_bohr": [
+          [
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          [
+            -0.0,
+            -0.0,
+            -0.0
+          ]
+        ],
+        "method_tag": "qmlff_prediction",
+        "active_space_hash": "",
+        "protocol_hash": "",
+        "repro_config_sha256_prefix": "",
+        "backend_noise_tag": "qmlff"
+      },
+      "qchem_reference": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            2.571143783786713,
+            2.413462884934075,
+            25.101392493297677
+          ],
+          [
+            -4.590423457149983,
+            -19.5143342044889,
+            -17.962928340791997
+          ]
+        ],
+        "energy_hartree": -0.17902717086325395,
+        "forces_hartree_bohr": [
+          [
+            -6.142206448291335e-05,
+            -0.00018806645549537013,
+            -0.00036934645758325194
+          ],
+          [
+            6.142206448291335e-05,
+            0.00018806645549537013,
+            0.00036934645758325194
+          ]
+        ],
+        "charge": 0,
+        "multiplicity": 1,
+        "box": null,
+        "method_tag": "RHF/HF-SCF-trajectory[2]",
+        "active_space_hash": "29239e9cb8a5a4ba",
+        "protocol_hash": "f11698e8ce7c38e0",
+        "repro_config_sha256_prefix": "5f0f9371da0930c3",
+        "backend_noise_tag": "statevector"
+      }
+    },
+    "3": {
+      "qml_prediction": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            7.776516326184086,
+            -9.95178667576555,
+            24.62149091248668
+          ],
+          [
+            -1.550327031736842,
+            -15.060191395677874,
+            -28.89049723614386
+          ]
+        ],
+        "energy_hartree": -0.038655644898816205,
+        "forces_hartree_bohr": [
+          [
+            -0.0,
+            -0.0,
+            -0.0
+          ],
+          [
+            -0.0,
+            -0.0,
+            -0.0
+          ]
+        ],
+        "method_tag": "qmlff_prediction",
+        "active_space_hash": "",
+        "protocol_hash": "",
+        "repro_config_sha256_prefix": "",
+        "backend_noise_tag": "qmlff"
+      },
+      "qchem_reference": {
+        "atomic_numbers": [
+          1,
+          1
+        ],
+        "positions_bohr": [
+          [
+            7.776516326184086,
+            -9.95178667576555,
+            24.62149091248668
+          ],
+          [
+            -1.550327031736842,
+            -15.060191395677874,
+            -28.89049723614386
+          ]
+        ],
+        "energy_hartree": -0.17688673946264405,
+        "forces_hartree_bohr": [
+          [
+            -5.743146283538011e-05,
+            -3.145578247227076e-05,
+            -0.00032950824203511125
+          ],
+          [
+            5.743146283538011e-05,
+            3.145578247227076e-05,
+            0.00032950824203511125
+          ]
+        ],
+        "charge": 0,
+        "multiplicity": 1,
+        "box": null,
+        "method_tag": "RHF/HF-SCF-trajectory[3]",
+        "active_space_hash": "29239e9cb8a5a4ba",
+        "protocol_hash": "f11698e8ce7c38e0",
+        "repro_config_sha256_prefix": "5f0f9371da0930c3",
+        "backend_noise_tag": "statevector"
+      }
+    }
+  }
+}

@@ -27,6 +27,12 @@ quantum = ["qiskit>=1.0", "qiskit-aer>=0.13"]
 pytket = ["pytket>=1.25"]
 nexus = ["qnexus>=0.4"]
 api = ["fastapi>=0.100", "uvicorn[standard]>=0.23"]
+# Optional MD bridge to the sibling QML-FF project.
+# QML-FF is not on PyPI under this name; install it from your local checkout, e.g.:
+#   pip install -e /path/to/QML-FF
+# Then add `jax-md` separately. We only declare the JAX-MD dependency here because
+# qmlff is meant to live alongside this repo as a sibling editable install.
+qmlff = ["jax-md>=0.2"]
 all = ["qchem-stack[chem,quantum,pytket,nexus]"]
 dev = ["qchem-stack[all,api]", "pytest>=7.4", "ruff>=0.3", "pre-commit>=3.8"]
 examples_viz = ["matplotlib>=3.7"]
