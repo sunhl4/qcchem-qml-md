@@ -2,70 +2,29 @@
 
 from __future__ import annotations
 
-import math
 from dataclasses import dataclass, field
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 from scipy.linalg import eigh
 
-from qchem_stack.quantum.qse_transition import (
-    build_qse_transition_schedule,
-    solve_qse_ghep,
+from qchem_stack.quantum.algorithms.qse_basis_strategies import (
+    UccsdBasisStrategy,
+    VqeHeaBasisStrategy,
+)
+from qchem_stack.quantum.algorithms.qse_solve_helpers import (
+    build_basis_from_strategy,
+    excitation_energies_dense,
+    excitation_energies_pauli_transitions,
+    excitation_energies_shot_noise,
+    s_condition_number,
 )
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
-
-from .excited_basis import build_qse_basis_from_uccsd_reference, build_qse_basis_from_vqe_hea
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from openfermion.ops import QubitOperator
-
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
-
-
-def _qse_h_s_via_computable(
-    basis: list[np.ndarray],
-    h_op: QubitOperator,
-    n_qubits: int,
-    *,
-    shot_mode: str,
-    shots_per_ij_term: int,
-    rng: np.random.Generator | None = None,
-) -> tuple[np.ndarray, np.ndarray, list[Any]]:
-    from qchem_stack.protocols.computables.base import EvaluationContext
-    from qchem_stack.protocols.computables.qse_matrices import QSEMatricesComputable
-
-    comp = QSEMatricesComputable(
-        name="qse_h_s",
-        hamiltonian=h_op,
-        n_qubits=n_qubits,
-        basis=basis,
-        shot_mode=str(shot_mode),
-        shots_per_ij_term=int(shots_per_ij_term),
-    )
-    ctx = EvaluationContext(angles=np.zeros(0, dtype=float), rng=rng)
-    out = comp.evaluate(ctx)
-    records = out.meta.get("transition_records") or []
-    return out.value["H"], out.value["S"], list(records)
-
-
-def qse_matrices_hs(
-    h_op: QubitOperator,
-    n_qubits: int,
-    basis: list[np.ndarray],
-) -> tuple[np.ndarray, np.ndarray]:
-    """Hermitian H_ij = <phi_i|H|phi_j>, S_ij = <phi_i|phi_j> (``arXiv:1603.05681`` Galerkin)."""
-    h_mat = qubit_operator_to_sparse(h_op, n_qubits)
-    k = len(basis)
-    h_sub = np.zeros((k, k), dtype=complex)
-    s_sub = np.zeros((k, k), dtype=complex)
-    for i in range(k):
-        for j in range(k):
-            s_sub[i, j] = np.vdot(basis[i], basis[j])
-            h_sub[i, j] = np.vdot(basis[i], h_mat @ basis[j])
-    return h_sub, s_sub
 
 
 @dataclass
@@ -76,6 +35,9 @@ class QSEResult:
 
 class QSE:
     """Quantum subspace expansion: ``arXiv:1603.05681`` Galerkin on a small basis, plus dense spectral reference."""
+
+    _VQE_HEA = VqeHeaBasisStrategy()
+    _UCCSD = UccsdBasisStrategy()
 
     def __init__(self, hamiltonian: QubitHamiltonian, subspace_dim: int = 4) -> None:
         self.hamiltonian = hamiltonian
@@ -102,14 +64,12 @@ class QSE:
     ) -> QSEResult:
         """Build orthonormal micro-basis from VQE+Pauli-X bumps; solve ``H c = E S c``."""
         kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_vqe_hea(angles, self.hamiltonian.n_qubits, depth, max_basis=kb)
-        h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
-        evals, _ = eigh(h_sub, s_sub)
-        evals = np.sort(np.real(evals))
-        e0 = float(evals[0])
-        exc = [float(evals[i] - e0) for i in range(1, len(evals))]
-        svals = np.linalg.svd(np.real(s_sub), compute_uv=False)
-        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
+        basis = build_basis_from_strategy(
+            self._VQE_HEA, angles, self.hamiltonian, max_basis=kb, depth=depth
+        )
+        exc, h_sub, s_sub = excitation_energies_dense(
+            self.hamiltonian.operator, self.hamiltonian.n_qubits, basis
+        )
         return QSEResult(
             excitation_energies=exc,
             meta={
@@ -120,7 +80,7 @@ class QSE:
                     max(0, self.hamiltonian.n_qubits + 1 - len(basis))
                 ),
                 "H_sub_shape": list(h_sub.shape),
-                "S_condition_number": cond_s,
+                "S_condition_number": s_condition_number(s_sub),
             },
         )
 
@@ -136,20 +96,16 @@ class QSE:
         """Symmetric Gaussian noise on ``real(H_sub)`` before GHEP (placeholder; not per-Pauli shot budget)."""
         rng = np.random.default_rng(seed)
         kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_vqe_hea(angles, self.hamiltonian.n_qubits, depth, max_basis=kb)
-        h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
-        h_real = np.real(h_sub)
-        scale = 1.0 / math.sqrt(max(1, shots_per_matrix_element))
-        noise = rng.normal(0.0, scale, h_real.shape)
-        noise = (noise + noise.T) / 2.0
-        h_noisy = h_real + noise
-        s_real = np.real(s_sub)
-        evals, _ = eigh(h_noisy, s_real)
-        evals = np.sort(np.real(evals))
-        e0 = float(evals[0])
-        exc = [float(evals[i] - e0) for i in range(1, len(evals))]
-        svals = np.linalg.svd(s_real, compute_uv=False)
-        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
+        basis = build_basis_from_strategy(
+            self._VQE_HEA, angles, self.hamiltonian, max_basis=kb, depth=depth
+        )
+        exc, s_sub = excitation_energies_shot_noise(
+            self.hamiltonian.operator,
+            self.hamiltonian.n_qubits,
+            basis,
+            shots_per_matrix_element=shots_per_matrix_element,
+            rng=rng,
+        )
         return QSEResult(
             excitation_energies=exc,
             meta={
@@ -158,7 +114,7 @@ class QSE:
                 "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
                 "legacy_fast_path": True,
                 "shots_per_matrix_element": shots_per_matrix_element,
-                "S_condition_number": cond_s,
+                "S_condition_number": s_condition_number(s_sub),
             },
         )
 
@@ -174,25 +130,17 @@ class QSE:
         """Per-(i,j,Pauli-term) grouped statevector shots; ``S`` exact; schedule for parity tables."""
         rng = np.random.default_rng(seed)
         kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_vqe_hea(angles, self.hamiltonian.n_qubits, depth, max_basis=kb)
-        h_sym, s_mat, records = _qse_h_s_via_computable(
-            basis,
+        basis = build_basis_from_strategy(
+            self._VQE_HEA, angles, self.hamiltonian, max_basis=kb, depth=depth
+        )
+        exc, s_mat, schedule_meta = excitation_energies_pauli_transitions(
             self.hamiltonian.operator,
             self.hamiltonian.n_qubits,
-            shot_mode="pauli_transitions",
+            basis,
             shots_per_ij_term=shots_per_ij_term,
+            shot_mode="pauli_transitions",
             rng=rng,
         )
-        sched = build_qse_transition_schedule(
-            self.hamiltonian.operator,
-            len(basis),
-            self.hamiltonian.n_qubits,
-            shots_per_ij_term=shots_per_ij_term,
-            records=records,
-        )
-        _, exc = solve_qse_ghep(h_sym, s_mat)
-        svals = np.linalg.svd(np.real(s_mat), compute_uv=False)
-        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
         return QSEResult(
             excitation_energies=exc,
             meta={
@@ -201,16 +149,31 @@ class QSE:
                 "computable_runtime": "QSEMatricesComputable",
                 "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
                 "shots_per_ij_term": shots_per_ij_term,
-                "S_condition_number": cond_s,
-                "qse_pauli_transition_schedule": {
-                    "n_qubits": sched.n_qubits,
-                    "subspace_dim": sched.subspace_dim,
-                    "n_pauli_terms": sched.n_pauli_terms,
-                    "n_transition_tasks": sched.n_transition_tasks,
-                    "total_shots_upper_bound": sched.total_shots_budget_upper_bound,
-                },
+                "S_condition_number": s_condition_number(s_mat),
+                "qse_pauli_transition_schedule": schedule_meta,
             },
         )
+
+    def _run_uccsd_variant(
+        self,
+        angles: np.ndarray,
+        prepare_state: Callable[[np.ndarray], np.ndarray],
+        *,
+        max_basis: int | None,
+        expansion_pool: str,
+        solve_fn: Callable[..., QSEResult],
+        **solve_kwargs: Any,
+    ) -> QSEResult:
+        kb = max_basis or self.subspace_dim
+        basis = build_basis_from_strategy(
+            self._UCCSD,
+            angles,
+            self.hamiltonian,
+            max_basis=kb,
+            prepare_state=prepare_state,
+            expansion_pool=expansion_pool,
+        )
+        return solve_fn(basis=basis, expansion_pool=expansion_pool, **solve_kwargs)
 
     def run_from_uccsd_basis(
         self,
@@ -221,30 +184,28 @@ class QSE:
         expansion_pool: str = "fermionic_singles",
     ) -> QSEResult:
         """Build orthonormal micro-basis from UCCSD reference + mapped fermionic singles."""
-        kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_uccsd_reference(
+
+        def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
+            exc, h_sub, s_sub = excitation_energies_dense(
+                self.hamiltonian.operator, self.hamiltonian.n_qubits, basis
+            )
+            return QSEResult(
+                excitation_energies=exc,
+                meta={
+                    "reference": "arXiv:1603.05681",
+                    "basis_reference": "uccsd_fermionic_singles",
+                    "K": len(basis),
+                    "H_sub_shape": list(h_sub.shape),
+                    "S_condition_number": s_condition_number(s_sub),
+                },
+            )
+
+        return self._run_uccsd_variant(
             angles,
-            self.hamiltonian,
             prepare_state,
-            max_basis=kb,
+            max_basis=max_basis,
             expansion_pool=expansion_pool,
-        )
-        h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
-        evals, _ = eigh(h_sub, s_sub)
-        evals = np.sort(np.real(evals))
-        e0 = float(evals[0])
-        exc = [float(evals[i] - e0) for i in range(1, len(evals))]
-        svals = np.linalg.svd(np.real(s_sub), compute_uv=False)
-        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "basis_reference": "uccsd_fermionic_singles",
-                "K": len(basis),
-                "H_sub_shape": list(h_sub.shape),
-                "S_condition_number": cond_s,
-            },
+            solve_fn=_solve,
         )
 
     def run_from_uccsd_basis_shot_noise(
@@ -259,38 +220,34 @@ class QSE:
     ) -> QSEResult:
         """Symmetric Gaussian noise on ``real(H_sub)`` for UCCSD micro-basis (placeholder)."""
         rng = np.random.default_rng(seed)
-        kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_uccsd_reference(
+
+        def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
+            exc, s_sub = excitation_energies_shot_noise(
+                self.hamiltonian.operator,
+                self.hamiltonian.n_qubits,
+                basis,
+                shots_per_matrix_element=shots_per_matrix_element,
+                rng=rng,
+            )
+            return QSEResult(
+                excitation_energies=exc,
+                meta={
+                    "reference": "arXiv:1603.05681",
+                    "basis_reference": "uccsd_fermionic_singles",
+                    "K": len(basis),
+                    "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
+                    "legacy_fast_path": True,
+                    "shots_per_matrix_element": shots_per_matrix_element,
+                    "S_condition_number": s_condition_number(s_sub),
+                },
+            )
+
+        return self._run_uccsd_variant(
             angles,
-            self.hamiltonian,
             prepare_state,
-            max_basis=kb,
+            max_basis=max_basis,
             expansion_pool=expansion_pool,
-        )
-        h_sub, s_sub = qse_matrices_hs(self.hamiltonian.operator, self.hamiltonian.n_qubits, basis)
-        h_real = np.real(h_sub)
-        scale = 1.0 / math.sqrt(max(1, shots_per_matrix_element))
-        noise = rng.normal(0.0, scale, h_real.shape)
-        noise = (noise + noise.T) / 2.0
-        h_noisy = h_real + noise
-        s_real = np.real(s_sub)
-        evals, _ = eigh(h_noisy, s_real)
-        evals = np.sort(np.real(evals))
-        e0 = float(evals[0])
-        exc = [float(evals[i] - e0) for i in range(1, len(evals))]
-        svals = np.linalg.svd(s_real, compute_uv=False)
-        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "basis_reference": "uccsd_fermionic_singles",
-                "K": len(basis),
-                "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
-                "legacy_fast_path": True,
-                "shots_per_matrix_element": shots_per_matrix_element,
-                "S_condition_number": cond_s,
-            },
+            solve_fn=_solve,
         )
 
     def run_from_uccsd_basis_pauli_transitions(
@@ -305,50 +262,36 @@ class QSE:
     ) -> QSEResult:
         """Fermionic-singles QSE basis with per-(i,j,Pauli-term) transition shot bookkeeping."""
         rng = np.random.default_rng(seed)
-        kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_uccsd_reference(
-            angles,
-            self.hamiltonian,
-            prepare_state,
-            max_basis=kb,
-            expansion_pool=expansion_pool,
-        )
-        h_sym, s_mat, records = _qse_h_s_via_computable(
-            basis,
-            self.hamiltonian.operator,
-            self.hamiltonian.n_qubits,
-            shot_mode="pauli_transitions",
-            shots_per_ij_term=shots_per_ij_term,
-            rng=rng,
-        )
-        sched = build_qse_transition_schedule(
-            self.hamiltonian.operator,
-            len(basis),
-            self.hamiltonian.n_qubits,
-            shots_per_ij_term=shots_per_ij_term,
-            records=records,
-        )
-        _, exc = solve_qse_ghep(h_sym, s_mat)
-        svals = np.linalg.svd(np.real(s_mat), compute_uv=False)
-        cond_s = float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "basis_reference": f"uccsd_{expansion_pool}",
-                "K": len(basis),
-                "computable_runtime": "QSEMatricesComputable",
-                "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
-                "shots_per_ij_term": shots_per_ij_term,
-                "S_condition_number": cond_s,
-                "qse_pauli_transition_schedule": {
-                    "n_qubits": sched.n_qubits,
-                    "subspace_dim": sched.subspace_dim,
-                    "n_pauli_terms": sched.n_pauli_terms,
-                    "n_transition_tasks": sched.n_transition_tasks,
-                    "total_shots_upper_bound": sched.total_shots_budget_upper_bound,
+
+        def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
+            exc, s_mat, schedule_meta = excitation_energies_pauli_transitions(
+                self.hamiltonian.operator,
+                self.hamiltonian.n_qubits,
+                basis,
+                shots_per_ij_term=shots_per_ij_term,
+                shot_mode="pauli_transitions",
+                rng=rng,
+            )
+            return QSEResult(
+                excitation_energies=exc,
+                meta={
+                    "reference": "arXiv:1603.05681",
+                    "basis_reference": f"uccsd_{expansion_pool}",
+                    "K": len(basis),
+                    "computable_runtime": "QSEMatricesComputable",
+                    "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
+                    "shots_per_ij_term": shots_per_ij_term,
+                    "S_condition_number": s_condition_number(s_mat),
+                    "qse_pauli_transition_schedule": schedule_meta,
                 },
-            },
+            )
+
+        return self._run_uccsd_variant(
+            angles,
+            prepare_state,
+            max_basis=max_basis,
+            expansion_pool=expansion_pool,
+            solve_fn=_solve,
         )
 
     def run_from_uccsd_basis_pauli_transitions_qiskit(
@@ -360,44 +303,31 @@ class QSE:
         shots_per_ij_term: int = 512,
         expansion_pool: str = "fermionic_singles",
     ) -> QSEResult:
-        kb = max_basis or self.subspace_dim
-        basis = build_qse_basis_from_uccsd_reference(
-            angles,
-            self.hamiltonian,
-            prepare_state,
-            max_basis=kb,
-            expansion_pool=expansion_pool,
-        )
-        h_sym, s_mat, records = _qse_h_s_via_computable(
-            basis,
-            self.hamiltonian.operator,
-            self.hamiltonian.n_qubits,
-            shot_mode="pauli_transitions_qiskit",
-            shots_per_ij_term=shots_per_ij_term,
-        )
-        sched = build_qse_transition_schedule(
-            self.hamiltonian.operator,
-            len(basis),
-            self.hamiltonian.n_qubits,
-            shots_per_ij_term=shots_per_ij_term,
-            records=records,
-        )
-        _, exc = solve_qse_ghep(h_sym, s_mat)
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "basis_reference": f"uccsd_{expansion_pool}",
-                "K": len(basis),
-                "computable_runtime": "QSEMatricesComputable",
-                "shot_noise_model": "qiskit_histogram_per_ij_term",
-                "shots_per_ij_term": shots_per_ij_term,
-                "qse_pauli_transition_schedule": {
-                    "n_qubits": sched.n_qubits,
-                    "subspace_dim": sched.subspace_dim,
-                    "n_pauli_terms": sched.n_pauli_terms,
-                    "n_transition_tasks": sched.n_transition_tasks,
-                    "total_shots_upper_bound": sched.total_shots_budget_upper_bound,
+        def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
+            exc, _, schedule_meta = excitation_energies_pauli_transitions(
+                self.hamiltonian.operator,
+                self.hamiltonian.n_qubits,
+                basis,
+                shots_per_ij_term=shots_per_ij_term,
+                shot_mode="pauli_transitions_qiskit",
+            )
+            return QSEResult(
+                excitation_energies=exc,
+                meta={
+                    "reference": "arXiv:1603.05681",
+                    "basis_reference": f"uccsd_{expansion_pool}",
+                    "K": len(basis),
+                    "computable_runtime": "QSEMatricesComputable",
+                    "shot_noise_model": "qiskit_histogram_per_ij_term",
+                    "shots_per_ij_term": shots_per_ij_term,
+                    "qse_pauli_transition_schedule": schedule_meta,
                 },
-            },
+            )
+
+        return self._run_uccsd_variant(
+            angles,
+            prepare_state,
+            max_basis=max_basis,
+            expansion_pool=expansion_pool,
+            solve_fn=_solve,
         )

@@ -7,8 +7,14 @@ before exposing on a network interface.
 
 from __future__ import annotations
 
-from fastapi import FastAPI
+import os
 
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
+
+from qchem_stack.api.middleware import AuthenticationMiddleware, limiter
 from qchem_stack.api.routers import health, meta, ml_md, runs
 
 app = FastAPI(
@@ -29,6 +35,28 @@ app = FastAPI(
         {"name": "runs", "description": "Submit experiments and poll SQLite-backed jobs."},
     ],
 )
+
+# Rate limiting
+if limiter is not None:
+    app.state.limiter = limiter
+    app.add_exception_handler(
+        RateLimitExceeded,
+        _rate_limit_exceeded_handler,  # type: ignore[arg-type]
+    )
+
+# CORS middleware
+cors_origins = os.getenv("QCHEM_STACK_CORS_ORIGINS", "*").split(",")
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=cors_origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+# Authentication middleware (only enabled when API key is configured)
+if os.getenv("QCHEM_STACK_API_KEY"):
+    app.add_middleware(AuthenticationMiddleware)
 
 app.include_router(health.router)
 app.include_router(meta.router)

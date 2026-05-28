@@ -51,6 +51,16 @@ docusaurus-site/.docusaurus/
 *.db
 timer.dat
 
+# Run outputs
+results/
+artifacts/
+
+# Root-level artifacts (should not be committed)
+*.pptx
+psi.*.clean
+deck_build.*
+package-lock.json
+
 # Jupyter
 .ipynb_checkpoints/
 

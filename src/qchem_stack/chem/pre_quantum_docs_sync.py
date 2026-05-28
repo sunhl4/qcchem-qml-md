@@ -24,7 +24,7 @@ _SOURCE_DESCRIPTIONS: dict[str, str] = {
 
 
 def _pre_quantum_path_source_values() -> tuple[str, ...]:
-    path = Path(__file__).resolve().parent / "pre_quantum_path.py"
+    path = Path(__file__).resolve().parent.parent / "config" / "_pre_quantum_path.py"
     tree = ast.parse(path.read_text(encoding="utf-8"))
     class_node = None
     for node in tree.body:
@@ -32,7 +32,7 @@ def _pre_quantum_path_source_values() -> tuple[str, ...]:
             class_node = node
             break
     if class_node is None:
-        raise ValueError("PreQuantumPath class not found in pre_quantum_path.py")
+        raise ValueError("PreQuantumPath class not found in config/_pre_quantum_path.py")
     values: list[str] = []
     for node in class_node.body:
         if isinstance(node, ast.Assign) and len(node.targets) == 1:
@@ -40,7 +40,7 @@ def _pre_quantum_path_source_values() -> tuple[str, ...]:
             if isinstance(value, ast.Constant) and isinstance(value.value, str):
                 values.append(value.value)
     if not values:
-        raise ValueError("No PreQuantumPath enum values found in pre_quantum_path.py")
+        raise ValueError("No PreQuantumPath enum values found in config/_pre_quantum_path.py")
     return tuple(values)
 
 

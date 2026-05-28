@@ -2,24 +2,38 @@
 
 from __future__ import annotations
 
+import contextlib
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
+    from collections.abc import Callable
+
     from .quantum import QuantumSpec
 
 
-def validate_algorithm_registered_or_factory(spec: QuantumSpec) -> None:
-    from qchem_stack.quantum.variational_plugins.loader import validate_factory_import_path
-    from qchem_stack.quantum.variational_plugins.registry import is_registered_variational_id
+# Validator registry: injected by quantum/__init__.py to avoid runtime imports from quantum/
+_algorithm_validator: Callable[[str, str | None], None] | None = None
 
-    if spec.algorithm_factory:
-        validate_factory_import_path(spec.algorithm_factory)
-        return
-    if not is_registered_variational_id(spec.algorithm):
-        raise ValueError(
-            f"Unknown quantum.algorithm={spec.algorithm!r}. "
-            "Use a built-in id or set quantum.algorithm_factory to an import path."
+
+def set_algorithm_validator(validator: Callable[[str, str | None], None]) -> None:
+    """Register the algorithm validator (called by quantum/__init__.py)."""
+    global _algorithm_validator
+    _algorithm_validator = validator
+
+
+def validate_algorithm_registered_or_factory(spec: QuantumSpec) -> None:
+    """Validate that the algorithm is registered or a valid factory path."""
+    global _algorithm_validator
+    if _algorithm_validator is None:
+        with contextlib.suppress(ImportError):
+            import qchem_stack.quantum  # noqa: F401
+    if _algorithm_validator is None:
+        raise RuntimeError(
+            "quantum algorithm validator not injected. "
+            "Import qchem_stack.quantum before constructing QuantumSpec, "
+            "or call set_algorithm_validator() manually."
         )
+    _algorithm_validator(spec.algorithm, spec.algorithm_factory)
 
 
 def validate_pauli_shot_mode_mutually_exclusive(spec: QuantumSpec) -> None:
@@ -65,15 +79,34 @@ def validate_vqd_max_overlap_warn_nonneg(value: float | None) -> float | None:
     return normalized
 
 
-def validate_operator_pool_ids(spec: QuantumSpec) -> None:
-    from qchem_stack.quantum.operator_pool_registry import is_registered_operator_pool_id
+# Operator pool validator registry: injected by quantum/__init__.py
+_operator_pool_validator: Callable[[str], bool] | None = None
 
+
+def set_operator_pool_validator(validator: Callable[[str], bool]) -> None:
+    """Register the operator pool validator (called by quantum/__init__.py)."""
+    global _operator_pool_validator
+    _operator_pool_validator = validator
+
+
+def validate_operator_pool_ids(spec: QuantumSpec) -> None:
+    """Validate that operator pool IDs are registered."""
+    global _operator_pool_validator
+    if _operator_pool_validator is None:
+        with contextlib.suppress(ImportError):
+            import qchem_stack.quantum  # noqa: F401
+    if _operator_pool_validator is None:
+        raise RuntimeError(
+            "operator pool validator not injected. "
+            "Import qchem_stack.quantum before constructing QuantumSpec, "
+            "or call set_operator_pool_validator() manually."
+        )
     for field_path, pool_id in (
         ("quantum.adapt.pool_id", spec.adapt.pool_id),
         ("quantum.iqeb.pool_id", spec.iqeb.pool_id),
     ):
         pid = str(pool_id)
-        if not is_registered_operator_pool_id(pid):
+        if not _operator_pool_validator(pid):
             raise ValueError(
                 f"Unknown {field_path}={pid!r}. "
                 "Use a registered operator pool id (see operator_pool_registry)."

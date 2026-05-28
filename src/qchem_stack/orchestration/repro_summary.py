@@ -129,16 +129,16 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         if isinstance(hm, dict):
             aud = hm.get("schmidt_production_audit")
             if isinstance(aud, dict):
-                dmet = aud.get("schmidt_dmet_self_consistency")
-                if isinstance(dmet, dict):
-                    ce = dmet.get("cycles_executed")
+                dmet_sc = aud.get("schmidt_dmet_self_consistency")
+                if isinstance(dmet_sc, dict):
+                    ce = dmet_sc.get("cycles_executed")
                     if ce is None:
-                        ce = dmet.get("outer_cycles_executed")
+                        ce = dmet_sc.get("outer_cycles_executed")
                     if ce is not None:
                         sm["schmidt_dmet_cycles_executed"] = int(ce)
                     if (
-                        dmet.get("converged_early_on_gamma") is True
-                        or dmet.get("converged_early_on_sweep_max_delta") is True
+                        dmet_sc.get("converged_early_on_gamma") is True
+                        or dmet_sc.get("converged_early_on_sweep_max_delta") is True
                     ):
                         sm["schmidt_dmet_converged_early"] = True
     spfv_rs = out.get("schmidt_per_fragment_vqe")

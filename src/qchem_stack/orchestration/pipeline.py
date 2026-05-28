@@ -93,9 +93,7 @@ from qchem_stack.quantum.variational_plugins.spec import VariationalRunContext
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from qchem_stack.chem.hamiltonian import (
-        QubitHamiltonian,
-    )
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 _pipeline_log = logging.getLogger(__name__)
 
@@ -111,11 +109,6 @@ def collect_repro_metadata(
         cfg_path=cfg_path,
         qh=qh,
     )
-
-
-# Backward-compatible aliases for tests and scripts.
-_run_scf = run_scf_reference
-_attach_run_summary = attach_run_summary
 
 
 def run_pipeline_sync(

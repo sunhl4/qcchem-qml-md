@@ -26,15 +26,16 @@ chem = ["pyscf>=2.4"]
 quantum = ["qiskit>=1.0", "qiskit-aer>=0.13"]
 pytket = ["pytket>=1.25"]
 nexus = ["qnexus>=0.4"]
-api = ["fastapi>=0.100", "uvicorn[standard]>=0.23"]
+uqc = ["uqc-client>=0.1", "qiskit>=2.0", "qiskit-aer>=0.13"]
+api = ["fastapi>=0.100", "uvicorn[standard]>=0.23", "slowapi>=0.1.9"]
 # Optional MD bridge to the sibling QML-FF project.
 # QML-FF is not on PyPI under this name; install it from your local checkout, e.g.:
 #   pip install -e /path/to/QML-FF
 # Then add `jax-md` separately. We only declare the JAX-MD dependency here because
 # qmlff is meant to live alongside this repo as a sibling editable install.
 qmlff = ["jax-md>=0.2"]
-all = ["qchem-stack[chem,quantum,pytket,nexus]"]
-dev = ["qchem-stack[all,api]", "pytest>=7.4", "ruff>=0.3", "pre-commit>=3.8"]
+all = ["qchem-stack[chem,quantum,pytket,nexus,uqc]"]
+dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "mypy>=1.5", "ruff>=0.3", "pre-commit>=3.8"]
 examples_viz = ["matplotlib>=3.7"]
 
 [project.scripts]
@@ -48,16 +49,53 @@ where = ["src"]
 testpaths = ["tests"]
 # Include repo root so ``import examples.*`` and ``import tests.helpers.*`` work under pytest.
 pythonpath = [".", "src"]
+addopts = [
+    "--cov=src/qchem_stack",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-fail-under=75",
+]
 markers = [
     "l3: optional deep numerical benchmarks (QCHEM_RUN_L3=1)",
     "l1_excited: VQD/QSE/SCEOM unit tests (selective CI: pytest -m l1_excited)",
     "l1_md_ml: MD/ML bridge smoke (pytest -m l1_md_ml)",
+    "uqc_mock: UQC cloud mock backend + MD/ML integration (no real hardware)",
     "slow: optional heavier chemistry smoke (DMET multi-fragment exact, etc.)",
     "pyscf: requires PySCF installed",
     "psi4: requires Psi4 installed (optional CI job)",
     "no_pyscf: subprocess isolates precomputed lane without PySCF import",
     "perf: soft wall-time guards (local/nightly only)",
 ]
+
+[tool.coverage.run]
+branch = true
+source = ["src/qchem_stack"]
+omit = [
+    "*/tests/*",
+    "*/examples/*",
+    "*/scripts/*",
+]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if TYPE_CHECKING:",
+    "if __name__ == .__main__.:",
+]
+fail_under = 75
+show_missing = true
+skip_covered = false
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = false
+check_untyped_defs = true
+ignore_missing_imports = true
 
 # CI **lint** job: `ruff check` + `ruff format --check` on `src/qchem_stack`,
 # `tests`, `scripts`, `examples` (`.github/workflows/ci.yml`). Pre-commit mirrors

@@ -57,7 +57,6 @@ def validate_embedding_backend_caps(
     caps: SolverCapabilities,
     scf_driver: str,
 ) -> None:
-    from qchem_stack.chem.pre_quantum_path import PreQuantumPath
     from qchem_stack.config.embedding_enums import EmbeddingMode
     from qchem_stack.config.embedding_helpers import is_projection_mulliken, is_schmidt_production
 
@@ -67,20 +66,13 @@ def validate_embedding_backend_caps(
     if getattr(spec, "mode", None) == EmbeddingMode.PLUGIN:
         return
     if is_schmidt_production(spec):
-        path = PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION
-    elif is_projection_mulliken(spec):
-        path = PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO
-    else:
-        path = PreQuantumPath.CANONICAL_ACTIVE_SPACE_INTEGRAL_PACK
-    if path == PreQuantumPath.SCHMIDT_ATOMIC_PRODUCTION:
         if not caps.supports_schmidt_atomic_hamiltonian:
             raise ConfigurationError(
                 "embedding.dmet.hamiltonian_source='schmidt_atomic_production' requires "
                 f"backend Schmidt support (scf.driver={driver!r})."
             )
     elif (
-        path == PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO
-        and not caps.supports_projection_fragment_mulliken_hamiltonian
+        is_projection_mulliken(spec) and not caps.supports_projection_fragment_mulliken_hamiltonian
     ):
         raise ConfigurationError(
             "embedding.projection.quantum_hamiltonian='fragment_mulliken_mo' requires "

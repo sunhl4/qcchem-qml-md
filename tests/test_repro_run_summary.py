@@ -10,7 +10,8 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
-from qchem_stack.orchestration.pipeline import _attach_run_summary, collect_repro_metadata
+from qchem_stack.orchestration.pipeline import collect_repro_metadata
+from qchem_stack.orchestration.repro_summary import attach_run_summary
 from tests.embedding_nested import embedding_dmet
 
 
@@ -66,7 +67,7 @@ def test_attach_run_summary_stages_and_protocol_semantics() -> None:
             "energy_stderr": 0.01,
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["stages_completed"] == [
         "scf",
@@ -122,7 +123,7 @@ def test_attach_run_summary_surfaces_pre_quantum_handoff() -> None:
             "pack_hits": 0,
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["pre_quantum_source"] == "canonical_active_space_integral_pack"
     assert sm["pre_quantum_backend_tag"] == "pyscf"
@@ -154,7 +155,7 @@ def test_attach_run_summary_includes_scf_and_vqe_counters() -> None:
         "energy_after_variational": -1.5,
         "nfev": 42,
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["scf_energy"] == -1.88
     assert sm["vqe_maxiter_yaml"] == 300
@@ -180,7 +181,7 @@ def test_attach_run_summary_adapt_meta() -> None:
         },
         "adapt_pool": [(0, 1)],
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["quantum_algorithm"] == "adapt"
     assert sm["adapt_max_iter_yaml"] == 4
@@ -204,7 +205,7 @@ def test_attach_run_summary_surfaces_algorithm_report() -> None:
             "nfev": 7,
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["algorithm_report_schema"] == "algorithm_vqe_report_v1"
     assert sm["algorithm_report_algorithm"] == "vqe"
@@ -224,7 +225,7 @@ def test_attach_run_summary_iqeb() -> None:
         "iqeb_meta": {"rounds": 3},
         "iqeb_selected_pauli_strings": ["ZZ_round0", "ZZ_round1"],
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["quantum_algorithm"] == "iqeb"
     assert sm["iqeb_max_rounds_yaml"] == 3
@@ -244,7 +245,7 @@ def test_attach_run_summary_includes_job_worker_expectation() -> None:
             "total_shots_budget": 888,
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["job_async_expectation"] == -1.111
     assert sm["job_async_energy_stderr"] == 0.02
@@ -257,7 +258,7 @@ def test_attach_run_summary_includes_async_job_metadata() -> None:
         "repro": collect_repro_metadata(cfg),
         "job": {"job_id": "jid-1", "protocol_hash": "phash9"},
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["async_job_id"] == "jid-1"
     assert sm["protocol_hash_prefix"] == "phash9"
@@ -306,7 +307,7 @@ def test_attach_run_summary_vqd_energy_and_shot_yaml() -> None:
             },
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["vqd_n_energies_recorded"] == 2
     assert sm["vqd_deflation_levels_completed"] == 1
@@ -348,7 +349,7 @@ def test_attach_run_summary_qse_schedule_fields() -> None:
             },
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["qse_basis_dimension_K"] == 3
     assert sm["qse_n_excitation_energies"] == 2
@@ -383,7 +384,7 @@ def test_attach_run_summary_sceom_nested_meta() -> None:
             },
         },
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["sceom_n_energies_recorded"] == 2
     assert sm["sceom_active_generator_count"] == 2
@@ -414,7 +415,7 @@ def test_attach_run_summary_dmet_embedding_flags() -> None:
         "energy_after_variational": -1.2,
         "dmet_fragment_solve": {"schema": "dmet_one_shot_v1", "fragments": []},
     }
-    _attach_run_summary(out, cfg)
+    attach_run_summary(out, cfg)
     sm = out["repro"]["run_summary"]
     assert sm["dmet_embedding_active"] is True
     assert sm["dmet_hamiltonian_source_yaml"] == "parity_stub"

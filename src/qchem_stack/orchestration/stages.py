@@ -8,7 +8,9 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.chem.pre_quantum_input import PreQuantumInput
+    from qchem_stack.chem.solvers.base import SolverCapabilities
     from qchem_stack.config import ExperimentConfig
     from qchem_stack.orchestration.run_context import PipelineStageTimer
 
@@ -18,7 +20,7 @@ class ScfStageArtifacts:
     cfg: ExperimentConfig
     rhf: ClassicalMeanFieldReference
     precomputed_mode: bool
-    solver_caps: Any
+    solver_caps: SolverCapabilities
     energy_components: dict[str, Any]
     embedding_input_payload: dict[str, Any] | None
     classical_benchmarks: dict[str, Any] | None
@@ -31,7 +33,7 @@ class ScfStageArtifacts:
 class PreQuantumStageArtifacts:
     pre_quantum_input: PreQuantumInput
     schmidt_ctx: dict[str, Any] | None
-    qh: Any
+    qh: QubitHamiltonian
 
 
 def mark_stage_done(

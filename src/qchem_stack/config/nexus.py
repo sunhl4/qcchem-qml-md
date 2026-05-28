@@ -4,16 +4,13 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
 
+from ._base import ForbidExtraBase
 from ._validation import strip_required_text
 
 
-class NexusAnalogSpec(BaseModel):
-    """Local project + HQC **unit** ledger (no Nexus API, no real billing)."""
-
-    model_config = ConfigDict(extra="forbid")
-
+class NexusAnalogSpec(ForbidExtraBase):
     enabled: bool = False
     project_label: str = Field(default="default", min_length=1)
     unit_per_circuit: float = Field(default=1.0, ge=0.0)
@@ -26,16 +23,7 @@ class NexusAnalogSpec(BaseModel):
         return strip_required_text(value, field_name="nexus_analog.project_label")
 
 
-class NexusCloudSpec(BaseModel):
-    """
-    Optional real **Nexus/Quantinuum cloud** job adapter (opt-in, no secrets in YAML).
-
-    Use ``NEXUS_API_KEY`` (or :attr:`api_key_env`) in the process environment; the open stack
-    only ships a typed client + health/submit shims, not a vendor contract.
-    """
-
-    model_config = ConfigDict(extra="forbid")
-
+class NexusCloudSpec(ForbidExtraBase):
     mode: Literal["off", "http", "mock"] = Field(
         default="off",
         description="Cloud adapter mode: off (default), http (real HTTPS client), or mock.",

@@ -7,8 +7,9 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
+from ._base import ForbidExtraBase
 from ._scf_validation import (
     validate_density_fit_auxbasis_consistency,
     validate_precomputed_bundle_requirements,
@@ -16,13 +17,9 @@ from ._scf_validation import (
 from .scf_enums import ScfDriverId
 from .scf_specs import ScfPrecomputedSpec, ScfPsi4Spec, ScfPyscfSpec
 
-_FORBID = ConfigDict(extra="forbid")
 
-
-class SCFSpec(BaseModel):
+class SCFSpec(ForbidExtraBase):
     """Classical Hartree–Fock driver selection (Hamiltonian build path is PySCF-first today)."""
-
-    model_config = _FORBID
 
     driver: str = Field(
         default=ScfDriverId.PYSCF.value,

@@ -70,7 +70,11 @@ def finalize_open_stack_parity_snapshot(
 
     if pis.tket_first_circuit_stats:
         if proto is not None:
-            compiled = getattr(proto, "_compiled", None) or []
+            compiled = (
+                proto.compiled_circuits
+                if hasattr(proto, "compiled_circuits")
+                else getattr(proto, "_compiled", None) or []
+            )
             if compiled:
                 from qchem_stack.integrations.tket_fullchain import circuit_ir_to_tket_stats_or_none
 

@@ -14,7 +14,7 @@ from qchem_stack.chem.bridges import (
     molecular_system_from_experiment,
 )
 from qchem_stack.config import load_experiment_config
-from qchem_stack.orchestration import pipeline as pipe
+from qchem_stack.orchestration.scf_stage import run_scf_reference
 
 
 def test_merge_canonical_headers_updates_forwarding_fields() -> None:
@@ -48,7 +48,7 @@ def test_pipeline_run_scf_includes_bridge_headers() -> None:
     cfg = load_experiment_config(
         Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
     )
-    rhf = pipe._run_scf(cfg)
+    rhf = run_scf_reference(cfg)
     md = rhf.driver_meta
     assert md["canonical_classical_bridge_schema"] == "qchem_classical_mean_field_bridge_v1"
     assert md["upstream_classical_software_tag"] == "pyscf"

@@ -16,9 +16,10 @@ Layout: submodules by area (:mod:`molecule`, :mod:`geometry_files`, :mod:`scf`, 
 
 from __future__ import annotations
 
-from ._constants import ANGSTROM_TO_BOHR
+from ._constants import ANGSTROM_TO_BOHR, MD_ML_MAX_EXTRA_GEOMETRIES
 from ._embedding_validation import SCHMIDT_DMET_MAX_CYCLES_LIMIT
 from ._experiment_validation import validate_pre_quantum_contract
+from ._pre_quantum_path import PreQuantumPath, resolve_pre_quantum_path
 from .active_space import ActiveSpaceSpec
 from .active_space_helpers import (
     resolve_fermion_qubit_mapping,
@@ -71,6 +72,7 @@ __all__ = [
     "CompilerSpec",
     "ComputableGraphEdgeDecl",
     "ComputableGraphEdgeRemove",
+    "MD_ML_MAX_EXTRA_GEOMETRIES",
     "OperatorPoolId",
     "EmbeddingSpec",
     "ExperimentConfig",
@@ -80,6 +82,7 @@ __all__ = [
     "NexusAnalogSpec",
     "NexusCloudSpec",
     "ParityIntegrationsSpec",
+    "PreQuantumPath",
     "QuantumSpec",
     "SCFSpec",
     "SCHMIDT_DMET_MAX_CYCLES_LIMIT",
@@ -104,6 +107,7 @@ __all__ = [
     "resolve_fermion_qubit_mapping",
     "resolve_n_electrons",
     "resolve_n_orbitals",
+    "resolve_pre_quantum_path",
     "resolve_scf_density_fit",
     "resolve_scf_max_cycle",
     "trajectory_theory_level",

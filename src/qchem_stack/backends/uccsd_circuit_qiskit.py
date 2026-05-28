@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.backends._bit_utils import bit_reverse_index
+
 if TYPE_CHECKING:
     from qchem_stack.backends.spec import CircuitIR
     from qchem_stack.quantum.algorithms.uccsd_circuit import UCCSDCircuitContext
@@ -13,15 +15,6 @@ if TYPE_CHECKING:
 
 def _wire(n_qubits: int, q: int) -> int:
     return n_qubits - 1 - q
-
-
-def _bit_reverse_index(value: int, n_qubits: int) -> int:
-    t = int(value) & ((1 << n_qubits) - 1)
-    r = 0
-    for _ in range(n_qubits):
-        r = (r << 1) | (t & 1)
-        t >>= 1
-    return r
 
 
 def _permute_unitary_for_qiskit(u: np.ndarray, n_qubits: int) -> np.ndarray:
@@ -32,7 +25,7 @@ def _permute_unitary_for_qiskit(u: np.ndarray, n_qubits: int) -> np.ndarray:
         raise ValueError(f"expected ({dim}, {dim}) unitary, got {mat.shape}")
     r = np.zeros((dim, dim), dtype=np.complex128)
     for i in range(dim):
-        r[_bit_reverse_index(i, n_qubits), i] = 1.0
+        r[bit_reverse_index(i, n_qubits), i] = 1.0
     return r @ mat @ r
 
 
@@ -41,7 +34,7 @@ def _amplitudes_openfermion_to_qiskit(amps: np.ndarray, n_qubits: int) -> np.nda
     src = np.asarray(amps, dtype=np.complex128).ravel()
     out = np.zeros_like(src)
     for i, amp in enumerate(src):
-        out[_bit_reverse_index(i, n_qubits)] = amp
+        out[bit_reverse_index(i, n_qubits)] = amp
     return out
 
 

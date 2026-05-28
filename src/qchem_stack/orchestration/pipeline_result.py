@@ -6,7 +6,9 @@ document stable keys for integrators, HTTP adapters, and static analysis.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, NotRequired, TypedDict, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
+
+from typing_extensions import NotRequired
 
 from qchem_stack.contracts.schema_ids import PIPELINE_RESULT_V1
 

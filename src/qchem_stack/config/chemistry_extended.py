@@ -5,8 +5,9 @@ Field reference: ``docs/config_校验分层约定.md`` §3.2.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
+from ._base import ForbidExtraBase
 from ._chemistry_extended_validation import validate_pbc_mesh_and_cell
 from .chemistry_extended_specs import (
     ChemistryAvasSpec,
@@ -19,13 +20,9 @@ from .chemistry_extended_specs import (
     ChemistrySymmetrySpec,
 )
 
-_FORBID = ConfigDict(extra="forbid")
 
-
-class ChemistryExtendedSpec(BaseModel):
+class ChemistryExtendedSpec(ForbidExtraBase):
     """Extended driver surface (parity-matrix-facing labels; PySCF where implemented)."""
-
-    model_config = _FORBID
 
     solvent: ChemistrySolventSpec = Field(default_factory=ChemistrySolventSpec)
     pbc: ChemistryPbcSpec = Field(default_factory=ChemistryPbcSpec)

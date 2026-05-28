@@ -2,13 +2,13 @@
 
 from __future__ import annotations
 
-import pickle
 import sqlite3
 from typing import TYPE_CHECKING, Any, cast
 
 from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.spec import circuit_resource_row
 from qchem_stack.jobs.nexus_analog import nexus_analog_billing_for_job_result
+from qchem_stack.protocols.secure_serialization import secure_loads_protocol
 
 if TYPE_CHECKING:
     from qchem_stack.jobs.store import SqliteJobStore
@@ -66,7 +66,7 @@ def process_pauli_protocol_job(store: SqliteJobStore, job_id: str) -> None:
     con.close()
     if row is None:
         raise KeyError(job_id)
-    proto: PauliAveragingProtocol = pickle.loads(row[0])
+    proto: PauliAveragingProtocol = secure_loads_protocol(row[0])
     proto.compile()
     proto.run()
     val = proto.evaluate()

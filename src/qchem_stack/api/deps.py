@@ -59,12 +59,17 @@ def trace_response_headers(rc: RunContext) -> dict[str, str]:
 
 
 def ping_job_db(path: Path) -> None:
-    """Raise HTTPException 503 when the default job DB path is not usable."""
+    """Raise HTTPException 503 when the default job DB path is not usable.
+
+    This is a read-only check that does not create directories or database files.
+    """
+    if not path.exists():
+        # Database doesn't exist yet, but that's okay - it will be created on first use
+        return
+
     try:
-        path.parent.mkdir(parents=True, exist_ok=True)
-        store = SqliteJobStore(path)
-        con = sqlite3.connect(store.path)
+        con = sqlite3.connect(f"file:{path}?mode=ro", uri=True)
         con.execute("SELECT 1").fetchone()
         con.close()
-    except (OSError, sqlite3.Error) as exc:
-        raise HTTPException(status_code=503, detail=str(exc)) from exc
+    except sqlite3.Error as exc:
+        raise HTTPException(status_code=503, detail=f"Job DB not readable: {exc}") from exc

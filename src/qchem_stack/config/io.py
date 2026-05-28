@@ -62,6 +62,17 @@ def backend_spec_from_config(cfg: ExperimentConfig) -> BackendSpec:
     from qchem_stack.backends.spec import BackendSpec
 
     b = cfg.backend
+    meta = dict(b.meta)
+    uqc_kwargs: dict[str, object] = {}
+    if b.provider == "uqc":
+        uqc_kwargs["uqc_token"] = b.uqc_token
+        uqc_kwargs["uqc_backend_name"] = b.uqc_backend_name
+        uqc_kwargs["uqc_mode"] = b.uqc_mode
+        uqc_kwargs["uqc_transpile_opt_level"] = b.uqc_transpile_opt_level
+        meta.setdefault("uqc_token", b.uqc_token)
+        meta.setdefault("uqc_backend_name", b.uqc_backend_name)
+        meta.setdefault("uqc_mode", b.uqc_mode)
+        meta.setdefault("uqc_transpile_opt_level", b.uqc_transpile_opt_level)
     return BackendSpec(
         name=b.name,
         provider=b.provider,
@@ -70,7 +81,8 @@ def backend_spec_from_config(cfg: ExperimentConfig) -> BackendSpec:
         qiskit_mode=b.qiskit_mode,
         ionstack_endpoint=b.ionstack_endpoint,
         native_twoq=cfg.compiler.native_twoq,
-        meta=dict(b.meta),
+        meta=meta,
+        **uqc_kwargs,
     )
 
 

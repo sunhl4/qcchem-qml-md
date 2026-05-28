@@ -79,4 +79,4 @@ def test_tangelo_mapping_alias_surface_v1_stable() -> None:
 def test_algorithm_registry_sorted_ids() -> None:
     from qchem_stack.quantum.algorithm_registry import list_registered_algorithm_ids
 
-    assert list_registered_algorithm_ids() == ("adapt", "iqeb", "tetris_adapt", "vqe")
+    assert list_registered_algorithm_ids() == ("adapt", "iqeb", "sa_vqe", "tetris_adapt", "vqe")

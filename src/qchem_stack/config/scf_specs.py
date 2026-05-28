@@ -2,15 +2,13 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-_FORBID = ConfigDict(extra="forbid")
+from ._base import ForbidExtraBase
 
 
-class ScfDriverControlsSpec(BaseModel):
+class ScfDriverControlsSpec(ForbidExtraBase):
     """Driver-specific mean-field convergence controls (PySCF / Psi4)."""
-
-    model_config = _FORBID
 
     max_cycle: int | None = Field(default=None, ge=1, le=512, description="mf.max_cycle override.")
     chkfile: str | None = Field(default=None, description="Checkpoint path when supported.")
@@ -32,9 +30,7 @@ ScfPyscfSpec = ScfDriverControlsSpec
 ScfPsi4Spec = ScfDriverControlsSpec
 
 
-class ScfPrecomputedSpec(BaseModel):
-    model_config = _FORBID
-
+class ScfPrecomputedSpec(ForbidExtraBase):
     bundle_path: str | None = Field(
         default=None,
         description="classical_reference_bundle_v1 JSON when driver=precomputed.",

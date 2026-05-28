@@ -2,10 +2,12 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from ._base import ForbidExtraBase
 
 
-class ParityIntegrationsSpec(BaseModel):
+class ParityIntegrationsSpec(ForbidExtraBase):
     """
     **Open-stack parity extensions** merged into ``repro.parity_snapshot``.
 
@@ -14,8 +16,6 @@ class ParityIntegrationsSpec(BaseModel):
     Qermit-field mapping, TN strategy map). This is **L1 auditability**, not L0 binary parity with
     closed vendor wheels.
     """
-
-    model_config = ConfigDict(extra="forbid")
 
     enabled: bool = Field(
         default=True, description="Master switch for parity sidecars in repro export."

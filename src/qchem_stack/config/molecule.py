@@ -9,21 +9,18 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, model_validator
+from pydantic import Field, model_validator
 
 from qchem_stack.exceptions import ConfigurationError
 
+from ._base import ForbidExtraBase
 from ._constants import ANGSTROM_TO_BOHR
 
 if TYPE_CHECKING:
     import numpy as np
 
-_FORBID = ConfigDict(extra="forbid")
 
-
-class MoleculeSpec(BaseModel):
-    model_config = _FORBID
-
+class MoleculeSpec(ForbidExtraBase):
     symbols: list[str]
     coordinates: list[list[float]] | None = Field(
         default=None,

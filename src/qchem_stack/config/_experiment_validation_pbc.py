@@ -7,19 +7,24 @@ from typing import TYPE_CHECKING
 from qchem_stack.exceptions import ConfigurationError
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.solvers.base import SolverCapabilities
+
     from .experiment import ExperimentConfig
 
 
-def validate_pbc_k_mesh_solver_capability(spec: ExperimentConfig) -> None:
+def validate_pbc_k_mesh_solver_capability(
+    spec: ExperimentConfig,
+    *,
+    caps: SolverCapabilities | None = None,
+) -> None:
     pbc = spec.chemistry_extended.pbc
     if pbc.cell_vectors_bohr is None:
         return
     mesh = list(pbc.kpoint_mesh or [1, 1, 1])
     if not mesh or max(mesh) <= 1:
         return
-    from qchem_stack.chem.solvers.registry import create_solver
-
-    caps = create_solver(spec).capabilities
+    if caps is None:
+        return
     if not caps.supports_pbc_k_mesh:
         raise ConfigurationError(
             "Periodic Monkhorst–Pack mesh with max(pbc.kpoint_mesh)>1 requires "

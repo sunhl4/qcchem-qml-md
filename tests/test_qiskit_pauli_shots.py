@@ -4,10 +4,10 @@ import numpy as np
 import pytest
 from openfermion.ops import QubitOperator
 
+from qchem_stack.backends._bit_utils import bit_reverse_index
 from qchem_stack.backends.factory import executor_from_spec
 from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.qiskit_pauli_shots import (
-    _bit_reverse_n,
     energy_estimate_grouped_qiskit_shots,
     qiskit_bitstring_to_comp_index,
 )
@@ -18,7 +18,7 @@ from qchem_stack.protocols.protocol import PauliAveragingProtocol
 def test_bit_reverse_roundtrip() -> None:
     for n in (1, 2, 3, 4):
         for k in range(1 << n):
-            r = _bit_reverse_n(_bit_reverse_n(k, n), n)
+            r = bit_reverse_index(bit_reverse_index(k, n), n)
             assert r == (k & ((1 << n) - 1))
 
 

@@ -1,10 +1,9 @@
 from __future__ import annotations
 
 import hashlib
-import pickle
 import uuid
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Literal, cast
+from typing import TYPE_CHECKING, Any, Literal
 
 import numpy as np
 
@@ -16,6 +15,7 @@ from qchem_stack.protocols.protocol_job import (
 )
 from qchem_stack.protocols.protocol_phase import ProtocolPhase
 from qchem_stack.protocols.protocol_run import run_energy_estimation
+from qchem_stack.protocols.secure_serialization import secure_dumps_protocol, secure_loads_protocol
 
 if TYPE_CHECKING:
     from openfermion.ops import QubitOperator
@@ -74,6 +74,21 @@ class PauliAveragingProtocol:
         self.__dict__.update(state)
         self.executor = None
 
+    @property
+    def counts(self) -> dict[str, Any]:
+        """Public read access to the protocol counts/results dictionary."""
+        return self._counts
+
+    @property
+    def compiled_circuits(self) -> list[CircuitIR]:
+        """Public read access to the compiled circuit list."""
+        return self._compiled
+
+    @property
+    def phase(self) -> ProtocolPhase:
+        """Current protocol phase."""
+        return self._phase
+
     def instantiate(self) -> None:
         self._phase = ProtocolPhase.INSTANTIATE
 
@@ -104,7 +119,7 @@ class PauliAveragingProtocol:
         return dataframe_circuit_shot_rows(self)
 
     def launch(self, store: SqliteJobStore) -> JobHandle:
-        blob = pickle.dumps(self)
+        blob = secure_dumps_protocol(self)
         jid = str(uuid.uuid4())
         ph = hashlib.sha256(blob).hexdigest()[:32]
         return store.enqueue(jid, blob, protocol_hash=ph)
@@ -117,11 +132,11 @@ class PauliAveragingProtocol:
         return store.result(handle.job_id)
 
     def dumps(self) -> bytes:
-        return pickle.dumps(self)
+        return secure_dumps_protocol(self)
 
     @staticmethod
     def loads(data: bytes) -> PauliAveragingProtocol:
-        return cast("PauliAveragingProtocol", pickle.loads(data))
+        return secure_loads_protocol(data)
 
 
 __all__ = ["PauliAveragingProtocol", "ProtocolPhase"]

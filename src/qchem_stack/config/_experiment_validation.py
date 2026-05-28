@@ -7,8 +7,13 @@ from typing import TYPE_CHECKING, Any
 
 from qchem_stack.exceptions import ConfigurationError
 
+from ._constants import MD_ML_MAX_EXTRA_GEOMETRIES
 from ._driver_helpers import scf_driver_id
-from ._embedding_validation import EmbeddingValidationContext, validate_embedding
+from ._embedding_validation import (
+    EmbeddingValidationContext,
+    validate_embedding,
+    validate_embedding_backend_caps,
+)
 from ._experiment_validation_pbc import (
     validate_pbc_excludes_casscf_hooks,
     validate_pbc_k_mesh_solver_capability,
@@ -17,9 +22,12 @@ from ._experiment_validation_precomputed import (
     preprocess_precomputed_bundle_path,
     validate_precomputed_driver_excludes_live_hooks,
 )
+from ._pre_quantum_path import PreQuantumPath, resolve_pre_quantum_path
 from .active_space_helpers import resolve_fermion_qubit_mapping
 
 if TYPE_CHECKING:
+    from qchem_stack.chem.solvers.base import SolverCapabilities
+
     from .experiment import ExperimentConfig
 
 _UCCSD_ALLOWED_FERMION_QUBIT_MAPPINGS = frozenset({"jordan_wigner", "bravyi_kitaev"})
@@ -34,7 +42,11 @@ def _raise_missing_backend_capability(
         raise ConfigurationError(message)
 
 
-def validate_pre_quantum_contract(spec: ExperimentConfig) -> None:
+def validate_pre_quantum_contract(
+    spec: ExperimentConfig,
+    *,
+    caps: SolverCapabilities | None = None,
+) -> None:
     """Run the pre-quantum subset of cross-section validators.
 
     Includes precomputed driver guards, embedding contract, PBC/CASSCF exclusion,
@@ -43,11 +55,16 @@ def validate_pre_quantum_contract(spec: ExperimentConfig) -> None:
     Does **not** run the full :data:`EXPERIMENT_CROSS_VALIDATORS` registry (e.g.
     MD/ML geometry shape, UCCSD variational constraints, AVAS ao_labels check,
     or ``validate_pbc_k_mesh_solver_capability``).
+
+    *caps* is optional: when provided, capability-dependent checks run
+    immediately. When ``None``, those checks are skipped (the pipeline
+    layer is responsible for running them separately with real caps).
     """
     validate_precomputed_driver_excludes_live_hooks(spec)
     validate_embedding_contract(spec)
     validate_pbc_excludes_casscf_hooks(spec)
-    validate_backend_capabilities_for_pre_quantum_path(spec)
+    if caps is not None:
+        validate_backend_capabilities_for_pre_quantum_path(spec, caps=caps)
 
 
 def validate_embedding_contract(spec: ExperimentConfig) -> None:
@@ -59,23 +76,23 @@ def validate_embedding_contract(spec: ExperimentConfig) -> None:
     validate_embedding(spec.embedding, ctx)
 
 
-def validate_backend_capabilities_for_pre_quantum_path(spec: ExperimentConfig) -> None:
-    """Reject YAML combos that the selected ``scf.driver`` cannot serve at load time."""
-    from qchem_stack.chem.pre_quantum_path import PreQuantumPath, resolve_pre_quantum_path
-    from qchem_stack.chem.solvers.registry import create_solver
-    from qchem_stack.config.embedding_enums import EmbeddingMode
+def validate_backend_capabilities_for_pre_quantum_path(
+    spec: ExperimentConfig,
+    *,
+    caps: SolverCapabilities,
+) -> None:
+    """Reject YAML combos that the selected ``scf.driver`` cannot serve at load time.
 
+    *caps* must be supplied by the caller — config never instantiates a solver.
+    """
     driver = scf_driver_id(spec.scf.driver)
     path = resolve_pre_quantum_path(spec)
     if path == PreQuantumPath.PRECOMPUTED_BUNDLE:
         return
-    caps = create_solver(spec).capabilities
-
-    from qchem_stack.config._embedding_validation import validate_embedding_backend_caps
 
     validate_embedding_backend_caps(spec.embedding, caps=caps, scf_driver=driver)
 
-    if spec.embedding.mode == EmbeddingMode.PLUGIN:
+    if spec.embedding.mode == "plugin":
         return
 
     if driver in ("pyscf", "psi4"):
@@ -129,8 +146,6 @@ def preprocess_top_level_yaml_dict(
 
 
 def validate_md_ml_extra_coordinates_shape(spec: ExperimentConfig) -> None:
-    from qchem_stack.md_bridge.from_pipeline import MD_ML_MAX_EXTRA_GEOMETRIES
-
     md_ml_spec = spec.md_ml_export
     n_atom = len(spec.molecule.symbols)
     extras = md_ml_spec.trajectory.extra_coordinates_bohr
@@ -177,18 +192,87 @@ def validate_md_ml_pauli_energy_requires_pauli_protocol(spec: ExperimentConfig) 
         )
 
 
-def validate_avas_strategy_requires_labels_and_capability(spec: ExperimentConfig) -> None:
+def validate_avas_strategy_requires_labels_and_capability(
+    spec: ExperimentConfig,
+    *,
+    caps: SolverCapabilities | None = None,
+) -> None:
     if spec.active_space.strategy != "avas":
         return
-    from qchem_stack.chem.solvers.registry import create_solver
-
-    caps = create_solver(spec).capabilities
-    if not caps.supports_avas_active_space_projection:
+    if caps is not None and not caps.supports_avas_active_space_projection:
         raise ConfigurationError(
             "active_space.strategy='avas' requires SolverCapabilities."
             "supports_avas_active_space_projection=True on the selected backend "
             f"(scf.driver={spec.scf.driver!r})."
         )
+    if not spec.chemistry_extended.avas.ao_labels:
+        raise ValueError(
+            "active_space.strategy='avas' requires non-empty chemistry_extended.avas.ao_labels "
+            "(AVAS orbital projection inputs)."
+        )
+
+
+# Drivers known to not support AVAS at config load time
+_DRIVERS_WITHOUT_AVAS = frozenset({"precomputed"})
+
+
+def validate_scf_driver_registered(spec: ExperimentConfig) -> None:
+    """Validate that scf.driver is registered in the solver registry."""
+    try:
+        from qchem_stack.chem.solvers.registry import registered_solver_ids
+    except ImportError:
+        # Solver registry not available, skip validation
+        return
+
+    driver = str(spec.scf.driver).strip().lower()
+    if not driver:
+        return
+
+    registered_ids = registered_solver_ids()
+    if driver not in registered_ids:
+        from pydantic_core import PydanticCustomError
+
+        raise PydanticCustomError(
+            "unknown_solver",
+            "Unknown scf.driver '{driver}'. Registered drivers: {registered}.",
+            {"driver": driver, "registered": sorted(registered_ids)},
+        )
+
+
+def validate_avas_strategy_at_config_load(spec: ExperimentConfig) -> None:
+    """Reject AVAS strategy for drivers known to lack AVAS support."""
+    if spec.active_space.strategy != "avas":
+        return
+    driver = str(spec.scf.driver).strip().lower()
+
+    # Check hardcoded drivers known to not support AVAS
+    if driver in _DRIVERS_WITHOUT_AVAS:
+        raise ConfigurationError(
+            "active_space.strategy='avas' requires supports_avas_active_space_projection=True "
+            f"on the selected backend (scf.driver={driver!r}). "
+            "Driver 'precomputed' does not support AVAS projection."
+        )
+
+    # Dynamically check if driver supports AVAS by querying solver capabilities
+    try:
+        from qchem_stack.chem.solvers.registry import create_solver
+
+        solver = create_solver(spec)
+        if not solver.capabilities.supports_avas_active_space_projection:
+            raise ConfigurationError(
+                "active_space.strategy='avas' requires supports_avas_active_space_projection=True "
+                f"on the selected backend (scf.driver={driver!r})."
+            )
+    except ConfigurationError:
+        # Re-raise our own validation errors
+        raise
+    except ImportError:
+        # Solver registry not available, skip dynamic check
+        pass
+    except Exception:
+        # If solver creation fails (e.g., missing dependencies), skip capability check
+        pass
+
     if not spec.chemistry_extended.avas.ao_labels:
         raise ValueError(
             "active_space.strategy='avas' requires non-empty chemistry_extended.avas.ao_labels "
@@ -226,19 +310,27 @@ def validate_uccsd_variational_constraints(spec: ExperimentConfig) -> None:
 
 
 EXPERIMENT_CROSS_VALIDATORS = (
+    validate_scf_driver_registered,
     validate_embedding_contract,
     validate_md_ml_extra_coordinates_shape,
     validate_md_ml_pauli_energy_requires_pauli_protocol,
-    validate_avas_strategy_requires_labels_and_capability,
     validate_uccsd_variational_constraints,
     validate_precomputed_driver_excludes_live_hooks,
     validate_pbc_excludes_casscf_hooks,
+    validate_avas_strategy_at_config_load,
+)
+
+
+EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS = (
     validate_pbc_k_mesh_solver_capability,
+    validate_avas_strategy_requires_labels_and_capability,
     validate_backend_capabilities_for_pre_quantum_path,
 )
 
+
 __all__ = [
     "EXPERIMENT_CROSS_VALIDATORS",
+    "EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS",
     "preprocess_precomputed_bundle_path",
     "preprocess_top_level_yaml_dict",
     "validate_pre_quantum_contract",

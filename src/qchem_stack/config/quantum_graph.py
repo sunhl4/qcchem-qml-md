@@ -2,19 +2,17 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
+
+from ._base import ForbidExtraBase
 
 
-class ComputableGraphEdgeDecl(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ComputableGraphEdgeDecl(ForbidExtraBase):
     from_ref: str = Field(description="Source computable name.")
     to_ref: str = Field(description="Target computable name.")
     kind: str = Field(default="declared_dataflow", description="Edge kind label for preview UX.")
 
 
-class ComputableGraphEdgeRemove(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ComputableGraphEdgeRemove(ForbidExtraBase):
     from_ref: str = Field(description="Source computable name.")
     to_ref: str = Field(description="Target computable name.")

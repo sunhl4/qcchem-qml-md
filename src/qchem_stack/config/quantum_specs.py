@@ -4,20 +4,17 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
+from ._base import ForbidExtraBase
 from .quantum_enums import OperatorPoolId
 from .quantum_graph import (  # noqa: TC001 — Pydantic resolves graph edge types at runtime
     ComputableGraphEdgeDecl,
     ComputableGraphEdgeRemove,
 )
 
-_FORBID = ConfigDict(extra="forbid")
 
-
-class QuantumVariationalSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumVariationalSpec(ForbidExtraBase):
     ansatz: Literal["hea", "uccsd"] = Field(
         default="hea",
         description="Variational ansatz: hea layers or uccsd cluster expansion.",
@@ -28,18 +25,14 @@ class QuantumVariationalSpec(BaseModel):
     )
 
 
-class QuantumUccsdSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumUccsdSpec(ForbidExtraBase):
     decomposition_mode: Literal["pauli", "unitary"] = Field(
         default="pauli",
         description="UCCSD CircuitIR prep: pauli rotation chains or dense unitary blocks.",
     )
 
 
-class QuantumVqeSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumVqeSpec(ForbidExtraBase):
     depth: int = Field(default=1, ge=1, description="HEA layer depth for VQE.")
     maxiter: int = Field(default=200, ge=1, description="Classical optimizer iteration budget.")
     optimizer_method: Literal["COBYLA", "L-BFGS-B", "Nelder-Mead"] = Field(
@@ -52,9 +45,7 @@ class QuantumVqeSpec(BaseModel):
     )
 
 
-class QuantumAdaptSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumAdaptSpec(ForbidExtraBase):
     max_iter: int = Field(default=5, ge=1, description="ADAPT outer iteration cap.")
     pool_id: OperatorPoolId = Field(
         default=OperatorPoolId.FERMIONIC_UCCSD,
@@ -62,9 +53,7 @@ class QuantumAdaptSpec(BaseModel):
     )
 
 
-class QuantumIqebSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumIqebSpec(ForbidExtraBase):
     pool_id: OperatorPoolId = Field(
         default=OperatorPoolId.IQEB_QUBIT_EXCITATION,
         description="Operator pool for IQEB rounds.",
@@ -76,9 +65,7 @@ class QuantumIqebSpec(BaseModel):
     max_rounds: int = Field(default=2, ge=1, le=64, description="Outer IQEB round cap.")
 
 
-class QuantumPauliSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumPauliSpec(ForbidExtraBase):
     use_protocol: bool = Field(default=True, description="Enable Pauli averaging protocol stage.")
     grouping: Literal["tensor_product", "greedy_commuting"] = Field(
         default="tensor_product",
@@ -103,9 +90,7 @@ class QuantumPauliSpec(BaseModel):
     )
 
 
-class QuantumExcitedVqdSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumExcitedVqdSpec(ForbidExtraBase):
     after_variational: bool = Field(default=False, description="Run VQD after variational stage.")
     n_states: int = Field(default=2, ge=2, description="Number of states including ground.")
     penalty_weight: float = Field(
@@ -155,9 +140,7 @@ class QuantumExcitedVqdSpec(BaseModel):
     shots_weight: int = Field(default=0, ge=0, description="Reserved weight-channel shot budget.")
 
 
-class QuantumExcitedQseSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumExcitedQseSpec(ForbidExtraBase):
     after_variational: bool = Field(default=False, description="Run QSE after variational stage.")
     subspace_dim: int = Field(default=4, ge=1, description="QSE subspace dimension.")
     max_basis: int | None = Field(default=None, ge=1, description="Optional max_basis override.")
@@ -179,9 +162,7 @@ class QuantumExcitedQseSpec(BaseModel):
     )
 
 
-class QuantumExcitedSceomSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumExcitedSceomSpec(ForbidExtraBase):
     after_variational: bool = Field(default=False, description="Run SCEOM after variational stage.")
     subspace_dim: int = Field(default=4, ge=1, description="SCEOM subspace dimension.")
     shots_per_matrix_element: int = Field(
@@ -205,17 +186,13 @@ class QuantumExcitedSceomSpec(BaseModel):
     )
 
 
-class QuantumExcitedSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumExcitedSpec(ForbidExtraBase):
     vqd: QuantumExcitedVqdSpec = Field(default_factory=QuantumExcitedVqdSpec)
     qse: QuantumExcitedQseSpec = Field(default_factory=QuantumExcitedQseSpec)
     sceom: QuantumExcitedSceomSpec = Field(default_factory=QuantumExcitedSceomSpec)
 
 
-class QuantumQpeThreePackSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumQpeThreePackSpec(ForbidExtraBase):
     after_variational: bool = Field(
         default=False, description="Attach dense QPE three-pack reports."
     )
@@ -229,9 +206,7 @@ class QuantumQpeThreePackSpec(BaseModel):
     info_samples: int = Field(default=32, ge=1, le=65536, description="Info-theory sample count.")
 
 
-class QuantumQpeDemoSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumQpeDemoSpec(ForbidExtraBase):
     track_after_variational: bool = Field(
         default=False, description="Attach QPE demo sidecar track."
     )
@@ -251,9 +226,7 @@ class QuantumQpeDemoSpec(BaseModel):
         return bool(self.three_pack.after_variational)
 
 
-class QuantumVqsDemoSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumVqsDemoSpec(ForbidExtraBase):
     track_after_variational: bool = Field(
         default=False, description="Run VQS/McLachlan toy ODE track."
     )
@@ -282,16 +255,12 @@ class QuantumVqsDemoSpec(BaseModel):
         return bool(self.track_after_variational or self.pipeline_integration)
 
 
-class QuantumDemosSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumDemosSpec(ForbidExtraBase):
     qpe: QuantumQpeDemoSpec = Field(default_factory=QuantumQpeDemoSpec)
     vqs: QuantumVqsDemoSpec = Field(default_factory=QuantumVqsDemoSpec)
 
 
-class QuantumTensornetSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumTensornetSpec(ForbidExtraBase):
     expectation_stub: bool = Field(
         default=False, description="Attach CuTensorNet expectation stub."
     )
@@ -300,9 +269,7 @@ class QuantumTensornetSpec(BaseModel):
     ] = Field(default="stub", description="Tensor-network contraction backend selector.")
 
 
-class QuantumGraphSpec(BaseModel):
-    model_config = _FORBID
-
+class QuantumGraphSpec(ForbidExtraBase):
     extra_edges: list[ComputableGraphEdgeDecl] = Field(
         default_factory=list,
         description="Extra DAG edges for workflow preview only.",

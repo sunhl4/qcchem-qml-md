@@ -7,10 +7,11 @@ from qchem_stack.exceptions import PipelineError
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.solvers.base import SolverCapabilities
     from qchem_stack.config import ExperimentConfig
 
 
-def solver_capabilities(cfg: ExperimentConfig) -> Any:
+def solver_capabilities(cfg: ExperimentConfig) -> SolverCapabilities:
     return create_solver(cfg).capabilities
 
 

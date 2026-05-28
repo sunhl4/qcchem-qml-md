@@ -13,6 +13,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.backends._bit_utils import bit_reverse_index
 from qchem_stack.backends.pauli_measure_expand import deserialize_basis_key
 from qchem_stack.backends.pauli_shot_sim import _pauli_eigenvalue_on_comp_bit
 from qchem_stack.backends.qiskit_executor import hea_circuit_qiskit
@@ -30,16 +31,6 @@ def _basis_key_for_term(term: tuple[tuple[int, str], ...]) -> tuple[tuple[int, s
     return tuple(sorted(((int(q), str(p)) for q, p in term), key=lambda x: x[0]))
 
 
-def _bit_reverse_n(value: int, n_qubits: int) -> int:
-    """Reverse the ``n_qubits`` low bits (maps Qiskit wire-0-LSB index ↔ OpenFermion tensor axis-0-LSB)."""
-    t = int(value) & ((1 << n_qubits) - 1)
-    r = 0
-    for _ in range(n_qubits):
-        r = (r << 1) | (t & 1)
-        t >>= 1
-    return r
-
-
 def qiskit_bitstring_to_comp_index(bitstr: str, n_qubits: int) -> int:
     """
     Map a Qiskit ``get_counts`` key to OpenFermion / ``hea_state`` computational index
@@ -55,12 +46,12 @@ def qiskit_bitstring_to_comp_index(bitstr: str, n_qubits: int) -> int:
     s = s.split("|")[-1].strip() if "|" in s else s
     if s.startswith("0x") or s.startswith("0X"):
         k = int(s, 16) & ((1 << n_qubits) - 1)
-        return _bit_reverse_n(k, n_qubits)
+        return bit_reverse_index(k, n_qubits)
     s2 = s.zfill(n_qubits)[-n_qubits:]
     if not all(c in "01" for c in s2):
         raise ValueError(f"invalid Qiskit bitstring: {bitstr!r}")
     k = int(s2, 2)
-    return _bit_reverse_n(k, n_qubits)
+    return bit_reverse_index(k, n_qubits)
 
 
 def _append_pauli_basis_to_qiskit(

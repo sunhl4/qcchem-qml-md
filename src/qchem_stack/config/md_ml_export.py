@@ -4,14 +4,12 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-_FORBID = ConfigDict(extra="forbid")
+from ._base import ForbidExtraBase
 
 
-class MdMlTrajectorySpec(BaseModel):
-    model_config = _FORBID
-
+class MdMlTrajectorySpec(ForbidExtraBase):
     extra_coordinates_bohr: list[list[list[float]]] = Field(
         default_factory=list,
         description="Extra geometries (n_atom x 3 Bohr each).",
@@ -22,10 +20,8 @@ class MdMlTrajectorySpec(BaseModel):
     )
 
 
-class MdMlExportSpec(BaseModel):
+class MdMlExportSpec(ForbidExtraBase):
     """Optional snapshot of md_bridge training schema onto repro."""
-
-    model_config = _FORBID
 
     attach_single_frame_to_repro: bool = Field(
         default=False,

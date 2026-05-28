@@ -5,8 +5,9 @@ Field reference: ``docs/说明_quantum配置.md``.
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
+from ._base import ForbidExtraBase
 from ._quantum_validation import (
     validate_algorithm_registered_or_factory,
     validate_operator_pool_ids,
@@ -31,13 +32,9 @@ from .quantum_specs import (
     QuantumVqeSpec,
 )
 
-_FORBID = ConfigDict(extra="forbid")
 
-
-class QuantumSpec(BaseModel):
+class QuantumSpec(ForbidExtraBase):
     """Quantum stage after classical downfolding and qubit Hamiltonian build."""
-
-    model_config = _FORBID
 
     algorithm: str = Field(
         default="vqe",

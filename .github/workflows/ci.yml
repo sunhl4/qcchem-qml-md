@@ -94,6 +94,8 @@ jobs:
         run: pytest -m l1_excited -q --tb=short
       - name: L1 MD/ML bridge (marker)
         run: pytest -m l1_md_ml -q --tb=short
+      - name: UQC mock + MD/ML pipeline (no hardware, not slow)
+        run: pytest tests/test_uqc_mock_md_ml_integration.py -m "uqc_mock and not slow" -q --tb=short
       - name: HTTP API optional extra (FastAPI)
         run: |
           pip install -e ".[api]"

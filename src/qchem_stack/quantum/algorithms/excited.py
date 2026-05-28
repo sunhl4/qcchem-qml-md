@@ -3,8 +3,9 @@
 from __future__ import annotations
 
 from .excited_basis import build_qse_basis_from_vqe_hea
-from .excited_qse import QSE, QSEResult, qse_matrices_hs
+from .excited_qse import QSE, QSEResult
 from .excited_vqd import VQD, VQDResult
+from .qse_solve_helpers import qse_matrices_hs
 
 __all__ = [
     "VQD",

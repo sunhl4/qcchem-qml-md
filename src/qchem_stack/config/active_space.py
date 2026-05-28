@@ -7,23 +7,20 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
 from ._active_space_validation import (
     normalize_active_space_entry,
     validate_frozen_orbitals,
     validate_jw_optimizer_flags,
 )
+from ._base import ForbidExtraBase
 from .active_space_mapping_specs import ActiveSpaceMappingSpec
 from .active_space_specs import ActiveSpaceCasSpec, ActiveSpaceJwSpec, ActiveSpaceManualSpec
 
-_FORBID = ConfigDict(extra="forbid")
 
-
-class ActiveSpaceSpec(BaseModel):
+class ActiveSpaceSpec(ForbidExtraBase):
     """Active-space sizing, strategy, and fermion-to-qubit mapping."""
-
-    model_config = _FORBID
 
     strategy: Literal["manual", "cas", "avas_stub", "avas"] = Field(
         default="cas",

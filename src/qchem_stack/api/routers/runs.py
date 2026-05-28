@@ -12,6 +12,7 @@ from qchem_stack.api.deps import (
     sqlite_job_store,
     trace_response_headers,
 )
+from qchem_stack.api.middleware import RUNS_GET_LIMIT, RUNS_POST_LIMIT, rate_limit
 from qchem_stack.api.models import RunRequest
 from qchem_stack.contracts.schema_ids import (
     JOB_EVENTS_V1,
@@ -32,7 +33,9 @@ router = APIRouter(tags=["runs"])
 
 
 @router.get("/v1/runs")
+@rate_limit(RUNS_GET_LIMIT)
 def list_runs(
+    request: Request,
     job_db_path: str | None = Query(
         default=None, description="SQLite path; default QCHEM_JOB_DB or temp"
     ),
@@ -81,6 +84,7 @@ def list_runs(
 
 
 @router.post("/v1/runs", response_model=None)
+@rate_limit(RUNS_POST_LIMIT)
 def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JSONResponse:
     rc = RunContext.from_headers({str(k): str(v) for k, v in request.headers.items()})
     cfg = experiment_config_from_request_yaml(

@@ -4,21 +4,17 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-_FORBID = ConfigDict(extra="forbid")
+from ._base import ForbidExtraBase
 
 
-class ChemistrySolventSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistrySolventSpec(ForbidExtraBase):
     model: Literal["none", "ddcosmo"] = Field(default="none", description="Solvent model for SCF.")
     epsilon: float = Field(default=78.3553, description="Dielectric constant for ddCOSMO.")
 
 
-class ChemistryPbcSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistryPbcSpec(ForbidExtraBase):
     cell_vectors_bohr: list[list[float]] | None = Field(
         default=None,
         description="3x3 lattice rows in Bohr for PySCF PBC.",
@@ -34,9 +30,7 @@ class ChemistryPbcSpec(BaseModel):
     )
 
 
-class ChemistryAvasSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistryAvasSpec(ForbidExtraBase):
     ao_labels: list[str] = Field(
         default_factory=list, description="AVAS atomic-orbital label strings."
     )
@@ -52,9 +46,7 @@ class ChemistryAvasSpec(BaseModel):
     ncore: int = Field(default=0, ge=0, le=512, description="Frozen core count for AVAS.")
 
 
-class ChemistryCasscfSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistryCasscfSpec(ForbidExtraBase):
     orbital_optimization_audit: bool = Field(
         default=False,
         description="Run CASSCF orbital audit and record metadata.",
@@ -65,9 +57,7 @@ class ChemistryCasscfSpec(BaseModel):
     )
 
 
-class ChemistryBenchmarksSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistryBenchmarksSpec(ForbidExtraBase):
     enabled: bool = Field(default=False, description="Attach classical post-HF benchmark blocks.")
     backend: Literal["auto", "stub", "pyscf", "psi4"] = Field(
         default="auto",
@@ -75,9 +65,7 @@ class ChemistryBenchmarksSpec(BaseModel):
     )
 
 
-class ChemistryPostHfSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistryPostHfSpec(ForbidExtraBase):
     integral_crosscheck: Literal["none", "pyscf_casci"] = Field(
         default="none",
         description="Optional integral crosscheck audit.",
@@ -91,16 +79,12 @@ class ChemistryPostHfSpec(BaseModel):
     ] = Field(default="none", description="Post-SCF RDM correction hook.")
 
 
-class ChemistryMoTransformSpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistryMoTransformSpec(ForbidExtraBase):
     hook: str = Field(default="", description="Post-SCF MO transform hook name.")
     kwargs: dict[str, Any] = Field(default_factory=dict, description="Opaque kwargs for MO hook.")
 
 
-class ChemistrySymmetrySpec(BaseModel):
-    model_config = _FORBID
-
+class ChemistrySymmetrySpec(ForbidExtraBase):
     pyscf_symmetry: bool | str = Field(
         default=False,
         description="PySCF gto.M symmetry argument on molecular branch.",

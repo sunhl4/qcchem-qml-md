@@ -4,9 +4,9 @@ set -euo pipefail
 # Default Python for this workspace. Override anytime, e.g.:
 #   export QCHEM_STACK_PYTHON=/path/to/python
 #   ./scripts/venv-run pytest tests -q
-default_python=/Users/shl/anaconda3/bin/python
+default_python=${QCHEM_STACK_PYTHON:-$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo "")}
 
-VENV_PYTHON="${QCHEM_STACK_PYTHON:-$default_python}"
+VENV_PYTHON="$default_python"
 
 if [[ ! -x "$VENV_PYTHON" ]]; then
   echo "error: python interpreter not found or not executable: $VENV_PYTHON" >&2

@@ -2,15 +2,14 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import Field, field_validator
 
+from ._base import ForbidExtraBase
 from ._validation import strip_required_text
 
 
-class CompilerSpec(BaseModel):
+class CompilerSpec(ForbidExtraBase):
     """Pass bundles analogous to vendor ``preoptimize_passes`` / ``compiler_passes`` knobs."""
-
-    model_config = ConfigDict(extra="forbid")
 
     optimization_level: int = Field(
         default=1,

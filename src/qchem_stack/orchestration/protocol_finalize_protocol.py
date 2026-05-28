@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -21,6 +21,8 @@ from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 if TYPE_CHECKING:
+    from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
+    from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.config import ExperimentConfig
 
@@ -28,7 +30,7 @@ if TYPE_CHECKING:
 def ansatz_prep_for_job(
     cfg: ExperimentConfig,
     qh: QubitHamiltonian,
-    angles: Any,
+    angles: np.ndarray | list[float],
     *,
     hea_depth: int,
 ) -> AnsatzPrepSpec:
@@ -47,9 +49,9 @@ def protocol_for_job(
     cfg: ExperimentConfig,
     qh: QubitHamiltonian,
     *,
-    bspec: Any,
-    exe: Any,
-    bundle: Any,
+    bspec: BackendSpec,
+    exe: HamiltonianExpectationExecutor,
+    bundle: CompilerPassBundle,
 ) -> PauliAveragingProtocol:
     pmsv = None
     if cfg.mitigation.pmsv.enabled:

@@ -4,8 +4,9 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import Field, field_validator, model_validator
 
+from ._base import ForbidExtraBase
 from ._validation import strip_optional_text
 from .embedding_enums import (
     DmetHamiltonianSource,
@@ -15,9 +16,7 @@ from .embedding_enums import (
 )
 
 
-class DmetFragmentSolverSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class DmetFragmentSolverSpec(ForbidExtraBase):
     use_exact: bool = Field(
         default=False, description="Dense ED impurity solve for small n_qubits."
     )
@@ -26,9 +25,7 @@ class DmetFragmentSolverSpec(BaseModel):
     )
 
 
-class SchmidtEmbeddingSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class SchmidtEmbeddingSpec(ForbidExtraBase):
     fragment_atom_indices: list[int] = Field(default_factory=list)
     multi_fragment_atom_groups: list[list[int]] = Field(default_factory=list)
     multi_primary_fragment_index: int = Field(default=0, ge=0)
@@ -50,9 +47,7 @@ class SchmidtEmbeddingSpec(BaseModel):
         return strip_optional_text(v)
 
 
-class DmetEmbeddingSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class DmetEmbeddingSpec(ForbidExtraBase):
     fragment_labels: list[str] = Field(default_factory=list)
     hamiltonian_source: DmetHamiltonianSource = DmetHamiltonianSource.PARITY_STUB
     target_fragment_electrons: float | None = None
@@ -74,9 +69,7 @@ class DmetEmbeddingSpec(BaseModel):
         return [str(label).strip() for label in v if str(label).strip()]
 
 
-class ProjectionEmbeddingSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class ProjectionEmbeddingSpec(ForbidExtraBase):
     low_level: str = "HF"
     high_level: str = "CAS"
     threshold: float = Field(default=1e-8, gt=0)
@@ -86,9 +79,7 @@ class ProjectionEmbeddingSpec(BaseModel):
     fragment_atom_indices: list[int] = Field(default_factory=list)
 
 
-class PluginEmbeddingSpec(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class PluginEmbeddingSpec(ForbidExtraBase):
     name: str = ""
     json_path: str | None = None
 
@@ -98,57 +89,34 @@ class PluginEmbeddingSpec(BaseModel):
         return strip_optional_text(v)
 
 
-class EmbeddingBase(BaseModel):
-    model_config = ConfigDict(extra="forbid")
-
+class EmbeddingBase(ForbidExtraBase):
     embedding_input_representation: EmbeddingInputRepresentation = EmbeddingInputRepresentation.MO
     n_scf_cycles_embedding: int | None = None
     classical_reference_method: str | None = None
     oniom_layers_v1: list[dict[str, Any]] = Field(default_factory=list)
 
-
-class EmbeddingNone(EmbeddingBase):
-    mode: Literal[EmbeddingMode.NONE] = EmbeddingMode.NONE
-
     @model_validator(mode="after")
-    def _cross_field(self) -> EmbeddingNone:
+    def _cross_field(self) -> EmbeddingBase:
         from ._embedding_validation import validate_embedding_cross_fields
 
         validate_embedding_cross_fields(self)
         return self
+
+
+class EmbeddingNone(EmbeddingBase):
+    mode: Literal[EmbeddingMode.NONE] = EmbeddingMode.NONE
 
 
 class EmbeddingDmet(EmbeddingBase):
     mode: Literal[EmbeddingMode.DMET] = EmbeddingMode.DMET
     dmet: DmetEmbeddingSpec = Field(default_factory=DmetEmbeddingSpec)
 
-    @model_validator(mode="after")
-    def _cross_field(self) -> EmbeddingDmet:
-        from ._embedding_validation import validate_embedding_cross_fields
-
-        validate_embedding_cross_fields(self)
-        return self
-
 
 class EmbeddingProjection(EmbeddingBase):
     mode: Literal[EmbeddingMode.PROJECTION] = EmbeddingMode.PROJECTION
     projection: ProjectionEmbeddingSpec = Field(default_factory=ProjectionEmbeddingSpec)
 
-    @model_validator(mode="after")
-    def _cross_field(self) -> EmbeddingProjection:
-        from ._embedding_validation import validate_embedding_cross_fields
-
-        validate_embedding_cross_fields(self)
-        return self
-
 
 class EmbeddingPlugin(EmbeddingBase):
     mode: Literal[EmbeddingMode.PLUGIN] = EmbeddingMode.PLUGIN
     plugin: PluginEmbeddingSpec = Field(default_factory=PluginEmbeddingSpec)
-
-    @model_validator(mode="after")
-    def _cross_field(self) -> EmbeddingPlugin:
-        from ._embedding_validation import validate_embedding_cross_fields
-
-        validate_embedding_cross_fields(self)
-        return self

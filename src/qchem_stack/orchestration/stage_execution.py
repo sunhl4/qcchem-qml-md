@@ -4,6 +4,10 @@ from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
 from qchem_stack.chem.energy_components import build_energy_components_v1
+from qchem_stack.config import ExperimentConfig  # noqa: TC001 — runtime helper
+from qchem_stack.config._experiment_validation import (
+    EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS,
+)
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.stages import (
     PreQuantumStageArtifacts,
@@ -19,14 +23,22 @@ if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.chem.pre_quantum_input import PreQuantumInput
-    from qchem_stack.config import ExperimentConfig
+    from qchem_stack.chem.solvers.base import SolverCapabilities
     from qchem_stack.orchestration.run_context import PipelineStageTimer
+
+
+def _require_cas_active_counts(cfg: ExperimentConfig) -> tuple[int, int]:
+    n_orbitals = cfg.active_space.cas.n_orbitals
+    n_electrons = cfg.active_space.cas.n_electrons
+    if n_orbitals is None or n_electrons is None:
+        raise PipelineError("CAS active space requires n_orbitals and n_electrons.")
+    return int(n_orbitals), int(n_electrons)
 
 
 @dataclass(frozen=True)
 class ScfStageContext:
     is_precomputed_driver_fn: Callable[[ExperimentConfig], bool]
-    solver_capabilities_fn: Callable[[ExperimentConfig], Any]
+    solver_capabilities_fn: Callable[[ExperimentConfig], SolverCapabilities]
     run_scf_fn: Callable[[ExperimentConfig], ClassicalMeanFieldReference]
     refine_active_space_fn: Callable[
         [ExperimentConfig, ClassicalMeanFieldReference], ExperimentConfig
@@ -58,6 +70,8 @@ def run_scf_stage(
 ) -> ScfStageArtifacts:
     precomputed_mode = context.is_precomputed_driver_fn(cfg)
     solver_caps = context.solver_capabilities_fn(cfg)
+    for validator in EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS:
+        validator(cfg, caps=solver_caps)
     rhf = context.run_scf_fn(cfg)
     if not precomputed_mode:
         cfg = context.refine_active_space_fn(cfg, rhf)
@@ -92,13 +106,14 @@ def run_scf_stage(
             run_classical_post_hf_benchmarks,
         )
 
+        n_active_orbitals, n_active_electrons = _require_cas_active_counts(cfg)
         classical_benchmarks = run_classical_post_hf_benchmarks(
             cfg,
             ClassicalBenchmarkContext(
                 mean_field_reference=rhf,
                 reference_scf_method=str(cfg.scf.method),
-                n_active_orbitals=int(cfg.active_space.cas.n_orbitals),
-                n_active_electrons=int(cfg.active_space.cas.n_electrons),
+                n_active_orbitals=n_active_orbitals,
+                n_active_electrons=n_active_electrons,
             ),
         )
     if precomputed_mode and cfg.chemistry_extended.post_hf.rdm_correction_method != "none":
@@ -130,13 +145,14 @@ def run_scf_stage(
                     f"rdm_correction_method={rdm_m!r} requires backend NEVPT2/CASCI support "
                     f"(backend={solver_caps.backend_id!r})."
                 )
+            n_active_orbitals, n_active_electrons = _require_cas_active_counts(cfg)
             rdm_correction_report = cast(
                 "dict[str, Any]",
                 run_nevpt2_casci(
                     cfg,
                     rhf,
-                    int(cfg.active_space.cas.n_orbitals),
-                    int(cfg.active_space.cas.n_electrons),
+                    n_active_orbitals,
+                    n_active_electrons,
                 ),
             )
             from qchem_stack.chem.integration.meta_schema import (

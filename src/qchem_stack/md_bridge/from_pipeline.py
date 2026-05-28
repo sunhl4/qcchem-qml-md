@@ -20,8 +20,6 @@ if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig
     from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
-MD_ML_MAX_EXTRA_GEOMETRIES = 48
-
 
 def _is_periodic_rhf(rhf: PySCFRHFResult) -> bool:
     dm = getattr(rhf, "driver_meta", None) or {}
@@ -340,7 +338,6 @@ def build_qmef_dataset_single_frame_repro_block(
 
 
 __all__ = [
-    "MD_ML_MAX_EXTRA_GEOMETRIES",
     "build_qmef_dataset_single_frame_repro_block",
     "build_qmef_ml_attachment_repro_block",
 ]

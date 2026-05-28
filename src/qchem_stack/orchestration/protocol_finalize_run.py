@@ -110,7 +110,7 @@ def run_protocol_and_finalize_stage(
     e_proto = proto.evaluate()
     rows = proto.dataframe_circuit_shot_rows()
     df_sum = summarize_circuit_shot_rows(rows)
-    pc = proto._counts
+    pc = proto.counts
     pc["ansatz_prep"] = ansatz_prep_meta(prep)
     resource_summary = {
         **df_sum,
@@ -130,7 +130,7 @@ def run_protocol_and_finalize_stage(
     out.update(
         {
             "energy_pauli_protocol": float(e_proto),
-            "protocol_counts": proto._counts,
+            "protocol_counts": proto.counts,
             "resource_rows": rows,
             "pauli_measurement_ledger": rows,
             "resource_summary": resource_summary,

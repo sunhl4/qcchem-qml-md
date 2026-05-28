@@ -37,5 +37,5 @@ def test_unregister_removes_registration_and_keeps_builtin_intact() -> None:
     unregister_variational_plugin(pid)
     assert not is_registered_variational_id(pid)
     assert sorted(BUILTIN_VARIATIONAL_PLUGIN_IDS) == sorted(
-        ("adapt", "iqeb", "tetris_adapt", "vqe")
+        ("adapt", "iqeb", "sa_vqe", "tetris_adapt", "vqe")
     )

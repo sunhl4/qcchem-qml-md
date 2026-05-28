@@ -2,21 +2,17 @@
 
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-_FORBID = ConfigDict(extra="forbid")
+from ._base import ForbidExtraBase
 
 
-class ActiveSpaceCasSpec(BaseModel):
-    model_config = _FORBID
-
+class ActiveSpaceCasSpec(ForbidExtraBase):
     n_orbitals: int | None = Field(default=None, ge=1, description="Active spatial orbital count.")
     n_electrons: int | None = Field(default=None, ge=1, description="Active electron count.")
 
 
-class ActiveSpaceManualSpec(BaseModel):
-    model_config = _FORBID
-
+class ActiveSpaceManualSpec(ForbidExtraBase):
     n_orbitals: int | None = Field(default=None, ge=1, description="Active orbital count.")
     n_electrons: int | None = Field(default=None, ge=1, description="Active electron count.")
     frozen_orbitals: list[int] = Field(
@@ -25,9 +21,7 @@ class ActiveSpaceManualSpec(BaseModel):
     )
 
 
-class ActiveSpaceJwSpec(BaseModel):
-    model_config = _FORBID
-
+class ActiveSpaceJwSpec(ForbidExtraBase):
     prefer_restricted_spatial: bool = Field(
         default=False,
         description="JW path from spatial MO integrals (no dense spin ERI).",

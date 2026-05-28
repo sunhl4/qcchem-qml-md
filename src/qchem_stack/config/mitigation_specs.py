@@ -4,14 +4,12 @@ from __future__ import annotations
 
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import Field
 
-_FORBID = ConfigDict(extra="forbid")
+from ._base import ForbidExtraBase
 
 
-class MitigationZneSpec(BaseModel):
-    model_config = _FORBID
-
+class MitigationZneSpec(ForbidExtraBase):
     enabled: bool = Field(default=False, description="Enable ZNE stub path.")
     mode: Literal["scalar_stub", "circuit_scale_fold"] = Field(
         default="scalar_stub", description="ZNE mode."
@@ -22,9 +20,7 @@ class MitigationZneSpec(BaseModel):
     )
 
 
-class MitigationPmsvSpec(BaseModel):
-    model_config = _FORBID
-
+class MitigationPmsvSpec(ForbidExtraBase):
     enabled: bool = Field(default=False, description="Enable PMSV post-selection stub.")
     stabilizers: list[str] = Field(default_factory=list, description="PMSV stabilizer labels.")
     retention_rate: float = Field(
@@ -34,9 +30,7 @@ class MitigationPmsvSpec(BaseModel):
     extra: dict[str, Any] = Field(default_factory=dict, description="Opaque PMSV metadata.")
 
 
-class MitigationStubsSpec(BaseModel):
-    model_config = _FORBID
-
+class MitigationStubsSpec(ForbidExtraBase):
     spam_calibration: bool = Field(default=False, description="Readout correction stub node.")
     pec_literature: bool = Field(
         default=False, description="PEC literature stub in parity snapshot."

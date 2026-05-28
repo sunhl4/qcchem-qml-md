@@ -116,9 +116,9 @@ def attach_qpe_three_algorithm_pack_if_requested(
     kit = AlgorithmKitaevQPE(qh, time=t_ev, n_bits=int(qt.demos.qpe.three_pack.kitaev_bits))
     inf = AlgorithmInfoTheoryQPE(qh, time=t_ev, n_samples=int(qt.demos.qpe.three_pack.info_samples))
 
-    rd = det.build().run()  # type: ignore[union-attr]
-    rk = kit.build().run()  # type: ignore[union-attr]
-    ri = inf.build().run(seed=int(cfg.random_seed))  # type: ignore[union-attr]
+    rd = det.build().run()  # type: ignore[attr-defined]
+    rk = kit.build().run()  # type: ignore[attr-defined]
+    ri = inf.build().run(seed=int(cfg.random_seed))  # type: ignore[attr-defined]
 
     out["qpe_algorithm_three_pack"] = {
         "schema": QPE_ALGORITHM_THREE_PACK_V1,
