@@ -37,6 +37,7 @@ from qchem_stack.backends.spec import (
     circuit_resource_row,
     dataframe_circuit_shot,
 )
+from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
 
 __all__ = [
     "BackendSpec",
@@ -51,6 +52,7 @@ __all__ = [
     "QiskitStatevectorHeaExecutor",
     "QiskitPrimitivesHeaExecutor",
     "IonStackHeaExecutor",
+    "UQCCloudHeaExecutor",
     "openfermion_to_sparse_pauli_op",
     "hea_circuit_qiskit",
     "PauliMeasurementPlan",

@@ -8,10 +8,10 @@ import pandas as pd
 
 @dataclass
 class BackendSpec:
-    """Execution target: use ``provider`` to choose API (statevector / Qiskit / IonStack)."""
+    """Execution target: use ``provider`` to choose API (statevector / Qiskit / IonStack / UQC)."""
 
     name: str
-    provider: Literal["statevector", "qiskit", "ionstack"] = "statevector"
+    provider: Literal["statevector", "qiskit", "ionstack", "uqc"] = "statevector"
     # When target_energy_stderr is None, this is the nominal per-circuit shot count (and stderr input).
     shots_per_circuit: int = 1024
     # If set, recommended_shots_per_circuit is used for stderr bookkeeping (classical bound).
@@ -20,6 +20,11 @@ class BackendSpec:
     native_twoq: str = "CX"
     qiskit_mode: Literal["statevector", "estimator"] = "statevector"
     ionstack_endpoint: str | None = None
+    # UQC cloud platform fields
+    uqc_token: str | None = None
+    uqc_backend_name: str | None = None
+    uqc_mode: Literal["real", "mock"] = "real"
+    uqc_transpile_opt_level: int = 2
     meta: dict[str, Any] = field(default_factory=dict)
 
 

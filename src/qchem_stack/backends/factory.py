@@ -16,6 +16,7 @@ from qchem_stack.backends.qiskit_executor import (
     QiskitStatevectorHeaExecutor,
 )
 from qchem_stack.backends.spec import BackendSpec
+from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
 
 BackendFactory = Callable[[BackendSpec], HamiltonianExpectationExecutor]
 _ENTRY_POINT_GROUP = "qchem_stack.backends_executors"
@@ -108,6 +109,10 @@ def _ionstack_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
     return IonStackHeaExecutor(spec)
 
 
+def _uqc_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
+    return UQCCloudHeaExecutor(spec)
+
+
 def _resolve_entry_point_factory(value: object, *, source: str) -> BackendFactory:
     if callable(value):
         return value  # type: ignore[return-value]
@@ -137,6 +142,7 @@ def _register_builtin_backends() -> None:
     _register_record("qiskit", _qiskit_factory, source="builtin", origin="qiskit_factory")
     _register_record("ionstack", _ionstack_factory, source="builtin", origin="ionstack_factory")
     _register_record("ion_stack", _ionstack_factory, source="builtin", origin="ionstack_factory")
+    _register_record("uqc", _uqc_factory, source="builtin", origin="uqc_factory")
 
 
 def _discover_external_backends() -> None:

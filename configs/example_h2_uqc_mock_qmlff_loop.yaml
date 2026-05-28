@@ -1,0 +1,42 @@
+# UQC mock + 分子力场在线学习（主动学习环）— 不连真机，仅本地 mock/statevector 量子能量标注。
+# 实验 YAML: configs/example_h2_uqc_mock_md_ml.yaml
+#
+#   python -c "
+#   from pathlib import Path
+#   from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
+#   cfg = MdValidationLoopConfig.from_yaml('configs/example_h2_uqc_mock_qmlff_loop.yaml')
+#   run_md_validation_loop('configs/example_h2_uqc_mock_md_ml.yaml', config=cfg, output_dir='results/uqc_mock_md_ml')
+#   "
+
+max_rounds: 1
+energy_tolerance_hartree: 1.0
+n_candidate_frames: 2
+add_top_k_per_round: 1
+label_energy_reference: variational
+label_screening_theory_level: hf_scf
+label_top_theory_level: hf_scf
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+
+n_seed_geometries: 0
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_species_list: [H]
+
+n_epochs_per_round: 1
+batch_size: 1
+learning_rate: 1.0e-3
+force_weight: 1.0
+warm_start: false
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 4
+md_dt_fs: 0.25
+md_temperature_K: 300.0
+md_save_stride: 2
+md_seed: 0
+
+write_per_round_extxyz: true
+seed: 0

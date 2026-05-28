@@ -1,0 +1,38 @@
+# UQC 云平台离子阱模拟器 + 两轮分子力场在线学习（需 UQC_API_TOKEN，不连真机 Matrix2）。
+# 实验 YAML: configs/example_h2_uqc_cloud_sim_md_ml.yaml
+#
+#   export UQC_API_TOKEN='从幺正云平台用户中心复制'
+#   python scripts/run_uqc_cloud_sim_online_learning.py
+
+max_rounds: 2
+energy_tolerance_hartree: 1.0
+n_candidate_frames: 2
+add_top_k_per_round: 1
+label_energy_reference: variational
+label_screening_theory_level: hf_scf
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+
+n_seed_geometries: 0
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_species_list: [H]
+
+n_epochs_per_round: 1
+batch_size: 1
+learning_rate: 1.0e-3
+force_weight: 1.0
+warm_start: false
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 8
+md_dt_fs: 0.25
+md_temperature_K: 300.0
+md_save_stride: 4
+md_seed: 0
+
+write_per_round_extxyz: true
+seed: 0
