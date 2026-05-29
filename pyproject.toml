@@ -35,7 +35,7 @@ api = ["fastapi>=0.100", "uvicorn[standard]>=0.23", "slowapi>=0.1.9"]
 # qmlff is meant to live alongside this repo as a sibling editable install.
 qmlff = ["jax-md>=0.2"]
 all = ["qchem-stack[chem,quantum,pytket,nexus,uqc]"]
-dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "mypy>=1.5", "ruff>=0.3", "pre-commit>=3.8"]
+dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.3", "pre-commit>=3.8", "pyright>=1.1"]
 examples_viz = ["matplotlib>=3.7"]
 
 [project.scripts]
@@ -89,13 +89,9 @@ fail_under = 75
 show_missing = true
 skip_covered = false
 
-[tool.mypy]
-python_version = "3.12"
-warn_return_any = true
-warn_unused_configs = true
-disallow_untyped_defs = false
-check_untyped_defs = true
-ignore_missing_imports = true
+# Type checking uses pyright (see CI typecheck-config / typecheck-stack jobs and
+# the [tool.pyright] section below). mypy is intentionally not part of the
+# toolchain to avoid maintaining two type-checker configurations.
 
 # CI **lint** job: `ruff check` + `ruff format --check` on `src/qchem_stack`,
 # `tests`, `scripts`, `examples` (`.github/workflows/ci.yml`). Pre-commit mirrors
