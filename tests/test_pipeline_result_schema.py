@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.contracts.schema_ids import PIPELINE_RESULT_V1
@@ -11,6 +9,7 @@ from qchem_stack.orchestration.pipeline_result import (
     assert_pipeline_result_core_keys,
     tag_pipeline_result,
 )
+from tests.helpers.paths import configs_path
 
 
 def test_pipeline_result_core_keys_constant() -> None:
@@ -32,8 +31,7 @@ def test_tag_pipeline_result_sets_schema() -> None:
 @pytest.mark.pyscf
 def test_run_pipeline_sync_tags_pipeline_result_v1() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     from qchem_stack.config import load_experiment_config
 
     cfg = load_experiment_config(cfg_path)

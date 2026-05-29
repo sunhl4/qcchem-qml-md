@@ -9,9 +9,11 @@ from openfermion import InteractionOperator
 from openfermion.chem.molecular_data import spinorb_from_spatial
 
 from qchem_stack.chem.fermion import FermionSpace
+from qchem_stack.chem.mappings.hcb import hard_core_boson_qubit_hamiltonian
 from qchem_stack.chem.spatial_restricted_fermion import (
     restricted_spatial_integrals_to_fermion_operator,
 )
+from qchem_stack.contracts.schema_ids import PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1
 
 from .hamiltonian_build_assembly import assemble_qubit_hamiltonian
 from .hamiltonian_mapping import (
@@ -39,7 +41,7 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
     prefer_restricted_spatial_fermion_for_jordan_wigner: bool = False,
     jordan_wigner_coeff_atol: float | None = None,
 ) -> QubitHamiltonian:
-    """Map spatial MO integrals to qubits via OpenFermion (Tangelo-style convention).
+    """Map spatial MO integrals to qubits via OpenFermion spin-orbital assembly.
 
     ``h2`` must be **raw** PySCF MO chemist ERIs (same layout as ``ao2mo.restore(1, ...)`` /
     CASCI ``get_h2eff``). They are reordered with
@@ -66,6 +68,30 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
         raise ValueError("n_electrons must be even and fit in 2*norb spin orbitals")
 
     n_spin = 2 * norb
+    vsqs_integral_meta = {
+        "spatial_mo_constant": float(constant),
+        "spatial_mo_h1": np.asarray(h1a, dtype=float).tolist(),
+        "spatial_mo_h2": np.asarray(h2a, dtype=float).tolist(),
+    }
+    merged_meta = {**(meta_extra or {}), **vsqs_integral_meta}
+
+    if fermion_qubit_mapping == "hard_core_boson":
+        qop = hard_core_boson_qubit_hamiltonian(float(constant), h1a, h2a)
+        fs = FermionSpace(n_spin_orbitals=n_spin, n_electrons=n_electrons)
+        return assemble_qubit_hamiltonian(
+            qop,
+            fs,
+            fermion_qubit_mapping=fermion_qubit_mapping,
+            build_route="hard_core_boson_spatial",
+            n_active_orbitals=norb,
+            n_active_electrons=n_electrons,
+            integral_source=integral_source,
+            integral_openfermion_bridge=PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1,
+            jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
+            meta_extra=merged_meta,
+            pyscf_driver_meta=pyscf_driver_meta,
+            classical_driver_meta=classical_driver_meta,
+        )
 
     if _use_restricted_spatial_fermion_build(
         fermion_qubit_mapping=fermion_qubit_mapping,
@@ -100,9 +126,9 @@ def qubit_hamiltonian_from_spatial_chemist_integrals(
         n_active_orbitals=norb,
         n_active_electrons=n_electrons,
         integral_source=integral_source,
-        integral_openfermion_bridge="pyscf_tangelo_openfermion_v1",
+        integral_openfermion_bridge=PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1,
         jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
-        meta_extra=meta_extra,
+        meta_extra=merged_meta,
         pyscf_driver_meta=pyscf_driver_meta,
         classical_driver_meta=classical_driver_meta,
     )

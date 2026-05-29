@@ -84,10 +84,10 @@ class UCCSDVQE:
 
         mapping_raw = (hamiltonian.meta or {}).get("fermion_to_qubit_map")
         mapping = "jordan_wigner" if mapping_raw is None else str(mapping_raw)
-        if mapping == "symmetry_conserving_bravyi_kitaev":
+        if mapping in ("symmetry_conserving_bravyi_kitaev", "hard_core_boson"):
             raise ValueError(
                 "UCCSD dense cluster ansatz requires a square fermion encoding "
-                "(jordan_wigner or bravyi_kitaev with n_spin_orbitals == n_qubits)."
+                "(jordan_wigner, bravyi_kitaev, or jkmn with n_spin_orbitals == n_qubits)."
             )
 
         fs = hamiltonian.fermion_space
@@ -98,7 +98,8 @@ class UCCSDVQE:
         self._n_e = int(fs.n_electrons)
         if self._n_so != self.n_qubits:
             raise ValueError(
-                f"JW/BK-square UCCSD expects n_spin_orbitals == n_qubits ({self._n_so} vs {self.n_qubits})."
+                f"Square-encoding UCCSD expects n_spin_orbitals == n_qubits "
+                f"({self._n_so} vs {self.n_qubits})."
             )
 
         ferm_ops = build_spin_uccsd_fermion_generators(self._n_so, self._n_e)
@@ -106,6 +107,7 @@ class UCCSDVQE:
             ferm_ops,
             mapping=self._fermion_mapping,
             n_qubits=self.n_qubits,
+            n_spin_orbitals=self._n_so,
         )
         self.n_params = len(self._antiherm_mats)
 
@@ -126,7 +128,7 @@ class UCCSDVQE:
         return out / nrm
 
     def _post_propagation_state(self, psi: np.ndarray) -> np.ndarray:
-        """JW: sector projector; BK: normalization only."""
+        """JW: sector projector; BK/JKMN: normalization only."""
         if self._fermion_mapping == "jordan_wigner":
             return self._project_jw_fixed_electron_sector(psi)
         nrm = float(np.linalg.norm(psi))
@@ -325,6 +327,18 @@ def uccsd_mapping_support_matrix_v1() -> dict[str, Any]:
                 "support_status": "supported",
                 "mode": "dense_and_trotter",
                 "note": "Uses BK reference and BK-matched cluster generators.",
+            },
+            {
+                "fermion_qubit_mapping": "jkmn",
+                "support_status": "supported",
+                "mode": "dense",
+                "note": "Uses JKMN reference; normalization-only post-propagation (no JW projector).",
+            },
+            {
+                "fermion_qubit_mapping": "hard_core_boson",
+                "support_status": "not_supported",
+                "mode": "n_a",
+                "note": "Reduced boson register (n_qubits = n_spin_orbitals // 2); use hea on HCB Hamiltonians.",
             },
             {
                 "fermion_qubit_mapping": "symmetry_conserving_bravyi_kitaev",

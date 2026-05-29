@@ -4,214 +4,741 @@ source_of_truth:
   plan_doc: docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md
   contract: src/qchem_stack/protocols/product_contract.py
   capability_surface: src/qchem_stack/api/app.py
-
 phases:
-  - id: A
-    title: Baseline freeze and quick closure
-    day_range: Day121-Day135
+- id: A
+  title: Baseline freeze and quick closure
+  day_range: Day121-Day135
+  status: done
+  objectives:
+  - Freeze parity anchor mapping for public reference documentation comparison (Tangelo
+    index + matrix).
+  - Close first wave of high-impact P0 gaps with test-backed evidence.
+  tasks:
+  - id: A-000
+    title: Establish strict execution governance artifacts
+    owner: program
     status: done
-    objectives:
-      - Freeze parity anchor mapping for public reference documentation comparison (Tangelo index + matrix).
-      - Close first wave of high-impact P0 gaps with test-backed evidence.
-    tasks:
-      - id: A-000
-        title: Establish strict execution governance artifacts
-        owner: program
-        status: done
-        target_files:
-          - docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md
-          - docs/execution/comparative_execution_backlog.yaml
-          - scripts/check_comparative_execution_backlog.py
-        tests:
-          - scripts/check_comparative_execution_backlog.py --path docs/execution/comparative_execution_backlog.yaml
-        acceptance_criteria:
-          - "strict plan document exists and links external capability baselines"
-          - "backlog validator enforces done->evidence invariant"
-          - "validators can reproduce backlog validation locally via scripts/check_comparative_execution_backlog.py"
-        evidence:
-          - "docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md"
-          - "scripts/check_comparative_execution_backlog.py"
-      - id: A-001
-        title: Align parity gap anchors with capability-surface payload
-        owner: core-protocol
-        status: done
-        target_files:
-          - src/qchem_stack/protocols/product_contract.py
-          - src/qchem_stack/api/app.py
-        tests:
-          - tests/test_api_runs.py::test_capability_surface_matches_product_contract
-          - tests/test_api_runs.py::test_parity_gaps_meta
-        acceptance_criteria:
-          - "gap categories are exported by both contract and HTTP meta routes"
-          - "all rows include parity_matrix_anchor"
-        evidence:
-          - "src/qchem_stack/protocols/product_contract.py: validate_product_gap_categories"
-          - "src/qchem_stack/protocols/product_contract.py: product_gap_anchor_index_v1"
-          - "src/qchem_stack/api/app.py: /v1/meta/capability-surface and /v1/meta/parity-gaps include gap_anchor_index_v1"
-          - "tests/test_api_runs.py: test_capability_surface_matches_product_contract"
-          - "tests/test_api_runs.py: test_parity_gaps_meta (product_gap_anchor_index_v1)"
-      - id: A-002
-        title: Expand operator pool registry coverage and aliases
-        owner: quantum-alg
-        status: done
-        target_files:
-          - src/qchem_stack/quantum/operator_pool_registry.py
-          - src/qchem_stack/quantum/algorithms/adapt.py
-          - src/qchem_stack/quantum/algorithms/iqeb.py
-        tests:
-          - tests/test_operator_pool_registry_export.py
-          - tests/test_methods_resource_unified_export.py
-        acceptance_criteria:
-          - "operator_pool_registry_export_v1 includes new pool ids and aliases"
-          - "ADAPT and IQEB configs resolve pool ids without fallback warnings"
-        evidence:
-          - "src/qchem_stack/quantum/operator_pool_registry.py: add uccsd_singles/doubles and BK slice aliases"
-          - "src/qchem_stack/config.py: adapt_pool_id/iqeb_pool_id literals include new alias ids"
-          - "tests/test_operator_pool_registry_export.py: alias export assertions expanded"
-          - "tests/test_algorithm_lifecycle_and_registry.py: alias->canonical runtime equivalence checks expanded"
-      - id: A-003
-        title: VQD dual-overlap mode feature flag design and skeleton
-        owner: excited-state
-        status: done
-        target_files:
-          - src/qchem_stack/quantum/algorithms/excited.py
-          - src/qchem_stack/config.py
-          - configs/example_h2_vqd_uccsd.yaml
-        tests:
-          - tests/test_excited_qse_hs.py
-          - tests/test_orchestration_pipeline.py
-        acceptance_criteria:
-          - "configuration can select overlap_mode"
-          - "run summary captures selected mode"
-        evidence:
-          - "src/qchem_stack/config.py: quantum.vqd_overlap_mode literal field"
-          - "src/qchem_stack/quantum/algorithms/excited.py: VQD overlap_mode validation + metadata export"
-          - "src/qchem_stack/orchestration/pipeline.py: VQD constructor + parity_snapshot/run_summary include vqd_overlap_mode_yaml"
-          - "tests/test_excited_qse_hs.py: overlap-mode metadata assertions"
-          - "configs/example_h2_vqd_uccsd.yaml: tangelo_circuit_analogy sample"
-
-  - id: B
-    title: Algorithm and chemistry parity deepening
-    day_range: Day136-Day155
+    target_files:
+    - docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md
+    - docs/execution/comparative_execution_backlog.yaml
+    - scripts/check_comparative_execution_backlog.py
+    tests:
+    - scripts/check_comparative_execution_backlog.py --path docs/execution/comparative_execution_backlog.yaml
+    acceptance_criteria:
+    - strict plan document exists and links external capability baselines
+    - backlog validator enforces done->evidence invariant
+    - validators can reproduce backlog validation locally via scripts/check_comparative_execution_backlog.py
+    evidence:
+    - docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md
+    - scripts/check_comparative_execution_backlog.py
+  - id: A-001
+    title: Align parity gap anchors with capability-surface payload
+    owner: core-protocol
     status: done
-    objectives:
-      - Close chemistry integral and mapping parity gaps.
-      - Make BK/SCBK and UCCSD boundary machine-checkable.
-    tasks:
-      - id: B-001
-        title: Implement and validate PySCF get_integrals path
-        owner: chem-stack
-        status: done
-        target_files:
-          - src/qchem_stack/chem/solvers/pyscf_solver.py
-          - src/qchem_stack/chem/solvers/base.py
-        tests:
-          - tests/test_chem_integral_solver_tangelo_aliases.py
-          - tests/test_integral_openfermion_tangelo_recipe.py
-        acceptance_criteria:
-          - "get_integrals returns stable shape and metadata"
-          - "openfermion/tangelo recipe compatibility test passes"
-        evidence:
-          - "src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals implemented (CASCI h1/h2 + OpenFermion reorder)"
-          - "src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals normalizes packed ERI to real dtype before ao2mo.restore"
-          - "src/qchem_stack/chem/solvers/pyscf_solver.py: capabilities.supports_get_integrals=True"
-          - "tests/test_chem_integral_solver_tangelo_aliases.py: get_integrals schema/shape assertions"
-          - "tests/test_pyscf_solver_adapter.py: OpenFermion reorder output shape assertions"
-          - "tests/test_backend_capability_conformance.py: supports_get_integrals expectation updated"
-      - id: B-002
-        title: Codify BK/SCBK UCCSD boundary in runtime and docs
-        owner: quantum-alg
-        status: done
-        target_files:
-          - src/qchem_stack/quantum/algorithms/uccsd_vqe.py
-          - docs/public_parity_matrix.md
-        tests:
-          - tests/test_backend_capability_conformance.py
-          - tests/test_algorithm_lifecycle_and_registry.py
-        acceptance_criteria:
-          - "unsupported combinations fail with explicit boundary reason"
-          - "parity matrix row reflects runtime behavior"
-        evidence:
-          - "src/qchem_stack/quantum/algorithms/uccsd_vqe.py: uccsd_mapping_support_matrix_v1"
-          - "src/qchem_stack/api/app.py: capability_surface exports uccsd_mapping_support_matrix_v1"
-          - "tests/test_uccsd_mapping_support_matrix.py: machine-readable boundary assertions"
-          - "tests/test_api_runs.py: capability surface schema assertion includes uccsd mapping matrix"
-      - id: B-003
-        title: Tangelo mapping roadmap rows (JKMN/HCB) with explicit status
-        owner: chem-mapping
-        status: done
-        target_files:
-          - src/qchem_stack/chem/fermion_mapping_registry.py
-          - src/qchem_stack/api/app.py
-        tests:
-          - tests/test_fermion_qubit_mapping.py
-        acceptance_criteria:
-          - "alias surface explicitly marks executable vs planned mappings"
-          - "capability-surface exports consistent mapping statuses"
-        evidence:
-          - "src/qchem_stack/chem/fermion_mapping_registry.py: mapping_status_rows_v1 with executable/planned_not_wired"
-          - "tests/test_fermion_qubit_mapping.py: mapping status surface assertions"
-
-  - id: C
-    title: Mitigation and benchmark evidence closeout
-    day_range: Day156-Day180
+    target_files:
+    - src/qchem_stack/protocols/product_contract.py
+    - src/qchem_stack/api/app.py
+    tests:
+    - tests/test_api_runs.py::test_capability_surface_matches_product_contract
+    - tests/test_api_runs.py::test_parity_gaps_meta
+    acceptance_criteria:
+    - gap categories are exported by both contract and HTTP meta routes
+    - all rows include parity_matrix_anchor
+    evidence:
+    - 'src/qchem_stack/protocols/product_contract.py: validate_product_gap_categories'
+    - 'src/qchem_stack/protocols/product_contract.py: product_gap_anchor_index_v1'
+    - 'src/qchem_stack/api/app.py: /v1/meta/capability-surface and /v1/meta/parity-gaps
+      include gap_anchor_index_v1'
+    - 'tests/test_api_runs.py: test_capability_surface_matches_product_contract'
+    - 'tests/test_api_runs.py: test_parity_gaps_meta (product_gap_anchor_index_v1)'
+  - id: A-002
+    title: Expand operator pool registry coverage and aliases
+    owner: quantum-alg
     status: done
-    objectives:
-      - Finalize mitigation model comparability and reporting evidence.
-      - Expand parity export and L3 benchmark sample coverage.
-    tasks:
-      - id: C-001
-        title: Mitigation runtime trace and async model parity statement
-        owner: mitigation
-        status: done
-        target_files:
-          - src/qchem_stack/mitigation/qermit_runtime.py
-          - src/qchem_stack/protocols/product_contract.py
-          - src/qchem_stack/jobs/store.py
-        tests:
-          - tests/test_api_runs.py::test_capability_surface_has_mitigation_execution_model
-          - tests/test_zne_circuit_fold.py
-          - tests/test_pipeline_job_store.py
-        acceptance_criteria:
-          - "mitigation_dag_execution traces are stable and reproducible"
-          - "async model caveat appears in machine-readable gap row"
-        evidence:
-          - "src/qchem_stack/mitigation/qermit_runtime.py: execute_mitigation_dag_runtime + execute_mitigation_dag trace schema qermit_runtime_v1"
-          - "src/qchem_stack/protocols/product_contract.py: mitigation_execution_model_public async_batch_execution caveat"
-          - "tests/test_api_runs.py: test_capability_surface_has_mitigation_execution_model alignment with product_contract"
-          - "tests/test_zne_circuit_fold.py: circuit_scale_fold runtime trace reuses protocol zne_curve"
-          - "tests/test_pipeline_job_store.py: async full_pipeline job roundtrip keeps timeline evidence"
-      - id: C-002
-        title: Expand parity export sample configs for new dimensions
-        owner: reproducibility
-        status: done
-        target_files:
-          - scripts/check_parity_export_sample.py
-          - tests/test_export_parity_golden.py
-          - configs/example_h2_vqd_uccsd.yaml
-        tests:
-          - tests/test_export_parity_golden.py
-        acceptance_criteria:
-          - "new configs included in sample export gate"
-          - "stable key assertions hold"
-        evidence:
-          - "scripts/check_parity_export_sample.py: SAMPLE_CONFIGS_REL includes configs/example_h2_vqd_uccsd.yaml"
-          - "tests/test_check_parity_export_sample_script.py: sample gate includes VQD UCCSD and de-duplicates configs"
-          - "tests/test_export_parity_golden.py: VQD UCCSD config remains covered by stable-key export assertions"
-      - id: C-003
-        title: Extend L3 benchmark bundle for parity slices
-        owner: benchmark
-        status: done
-        target_files:
-          - src/qchem_stack/integrations/l3_algorithm_benchmark.py
-          - scripts/l3_algorithm_benchmark_report.py
-        tests:
-          - tests/test_l3_algorithm_benchmark_bundle.py
-          - tests/test_l3_benchmark_smoke.py
-        acceptance_criteria:
-          - "bundle includes at least one commercial-stack-aligned and one Tangelo-aligned slice"
-          - "L3 smoke remains optional and deterministic under marker"
-        evidence:
-          - "src/qchem_stack/integrations/l3_algorithm_benchmark.py: DEFAULT_BENCHMARK_YAMLS includes example_h2_vqd_uccsd and iqeb alias slice"
-          - "tests/test_l3_algorithm_benchmark_bundle.py: explicit commercial-stack/Tangelo slice coverage assertions"
-          - "tests/test_l3_benchmark_smoke.py: optional L3 marker gate (QCHEM_RUN_L3) and deterministic schema checks"
+    target_files:
+    - src/qchem_stack/quantum/operator_pool_registry.py
+    - src/qchem_stack/quantum/algorithms/adapt.py
+    - src/qchem_stack/quantum/algorithms/iqeb.py
+    tests:
+    - tests/test_operator_pool_registry_export.py
+    - tests/test_methods_resource_unified_export.py
+    acceptance_criteria:
+    - operator_pool_registry_export_v1 includes new pool ids and aliases
+    - ADAPT and IQEB configs resolve pool ids without fallback warnings
+    evidence:
+    - 'src/qchem_stack/quantum/operator_pool_registry.py: add uccsd_singles/doubles
+      and BK slice aliases'
+    - 'src/qchem_stack/config.py: adapt_pool_id/iqeb_pool_id literals include new
+      alias ids'
+    - 'tests/test_operator_pool_registry_export.py: alias export assertions expanded'
+    - 'tests/test_algorithm_lifecycle_and_registry.py: alias->canonical runtime equivalence
+      checks expanded'
+  - id: A-003
+    title: VQD dual-overlap mode feature flag design and skeleton
+    owner: excited-state
+    status: done
+    target_files:
+    - src/qchem_stack/quantum/algorithms/excited.py
+    - src/qchem_stack/config.py
+    - configs/example_h2_vqd_uccsd.yaml
+    tests:
+    - tests/test_excited_qse_hs.py
+    - tests/test_orchestration_pipeline.py
+    acceptance_criteria:
+    - configuration can select overlap_mode
+    - run summary captures selected mode
+    evidence:
+    - 'src/qchem_stack/config.py: quantum.vqd_overlap_mode literal field'
+    - 'src/qchem_stack/quantum/algorithms/excited.py: VQD overlap_mode validation
+      + metadata export'
+    - 'src/qchem_stack/orchestration/pipeline.py: VQD constructor + parity_snapshot/run_summary
+      include vqd_overlap_mode_yaml'
+    - 'tests/test_excited_qse_hs.py: overlap-mode metadata assertions'
+    - 'configs/example_h2_vqd_uccsd.yaml: tangelo_circuit_analogy sample'
+- id: B
+  title: Algorithm and chemistry parity deepening
+  day_range: Day136-Day155
+  status: done
+  objectives:
+  - Close chemistry integral and mapping parity gaps.
+  - Make BK/SCBK and UCCSD boundary machine-checkable.
+  tasks:
+  - id: B-001
+    title: Implement and validate PySCF get_integrals path
+    owner: chem-stack
+    status: done
+    target_files:
+    - src/qchem_stack/chem/solvers/pyscf_solver.py
+    - src/qchem_stack/chem/solvers/base.py
+    tests:
+    - tests/test_chem_integral_solver_tangelo_aliases.py
+    - tests/test_integral_openfermion_tangelo_recipe.py
+    acceptance_criteria:
+    - get_integrals returns stable shape and metadata
+    - openfermion/tangelo recipe compatibility test passes
+    evidence:
+    - 'src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals implemented (CASCI
+      h1/h2 + OpenFermion reorder)'
+    - 'src/qchem_stack/chem/solvers/pyscf_solver.py: get_integrals normalizes packed
+      ERI to real dtype before ao2mo.restore'
+    - 'src/qchem_stack/chem/solvers/pyscf_solver.py: capabilities.supports_get_integrals=True'
+    - 'tests/test_chem_integral_solver_tangelo_aliases.py: get_integrals schema/shape
+      assertions'
+    - 'tests/test_pyscf_solver_adapter.py: OpenFermion reorder output shape assertions'
+    - 'tests/test_backend_capability_conformance.py: supports_get_integrals expectation
+      updated'
+  - id: B-002
+    title: Codify BK/SCBK UCCSD boundary in runtime and docs
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/quantum/algorithms/uccsd_vqe.py
+    - docs/public_parity_matrix.md
+    tests:
+    - tests/test_backend_capability_conformance.py
+    - tests/test_algorithm_lifecycle_and_registry.py
+    acceptance_criteria:
+    - unsupported combinations fail with explicit boundary reason
+    - parity matrix row reflects runtime behavior
+    evidence:
+    - 'src/qchem_stack/quantum/algorithms/uccsd_vqe.py: uccsd_mapping_support_matrix_v1'
+    - 'src/qchem_stack/api/app.py: capability_surface exports uccsd_mapping_support_matrix_v1'
+    - 'tests/test_uccsd_mapping_support_matrix.py: machine-readable boundary assertions'
+    - 'tests/test_api_runs.py: capability surface schema assertion includes uccsd
+      mapping matrix'
+  - id: B-003
+    title: Tangelo mapping roadmap rows (JKMN/HCB) with explicit status
+    owner: chem-mapping
+    status: done
+    target_files:
+    - src/qchem_stack/chem/fermion_mapping_registry.py
+    - src/qchem_stack/api/app.py
+    tests:
+    - tests/test_fermion_qubit_mapping.py
+    acceptance_criteria:
+    - alias surface explicitly marks executable vs planned mappings
+    - capability-surface exports consistent mapping statuses
+    evidence:
+    - 'src/qchem_stack/chem/fermion_mapping_registry.py: mapping_status_rows_v1 with
+      executable/planned_not_wired'
+    - 'tests/test_fermion_qubit_mapping.py: mapping status surface assertions'
+- id: C
+  title: Mitigation and benchmark evidence closeout
+  day_range: Day156-Day180
+  status: done
+  objectives:
+  - Finalize mitigation model comparability and reporting evidence.
+  - Expand parity export and L3 benchmark sample coverage.
+  tasks:
+  - id: C-001
+    title: Mitigation runtime trace and async model parity statement
+    owner: mitigation
+    status: done
+    target_files:
+    - src/qchem_stack/mitigation/qermit_runtime.py
+    - src/qchem_stack/protocols/product_contract.py
+    - src/qchem_stack/jobs/store.py
+    tests:
+    - tests/test_api_runs.py::test_capability_surface_has_mitigation_execution_model
+    - tests/test_zne_circuit_fold.py
+    - tests/test_pipeline_job_store.py
+    acceptance_criteria:
+    - mitigation_dag_execution traces are stable and reproducible
+    - async model caveat appears in machine-readable gap row
+    evidence:
+    - 'src/qchem_stack/mitigation/qermit_runtime.py: execute_mitigation_dag_runtime
+      + execute_mitigation_dag trace schema qermit_runtime_v1'
+    - 'src/qchem_stack/protocols/product_contract.py: mitigation_execution_model_public
+      async_batch_execution caveat'
+    - 'tests/test_api_runs.py: test_capability_surface_has_mitigation_execution_model
+      alignment with product_contract'
+    - 'tests/test_zne_circuit_fold.py: circuit_scale_fold runtime trace reuses protocol
+      zne_curve'
+    - 'tests/test_pipeline_job_store.py: async full_pipeline job roundtrip keeps timeline
+      evidence'
+  - id: C-002
+    title: Expand parity export sample configs for new dimensions
+    owner: reproducibility
+    status: done
+    target_files:
+    - scripts/check_parity_export_sample.py
+    - tests/test_export_parity_golden.py
+    - configs/example_h2_vqd_uccsd.yaml
+    tests:
+    - tests/test_export_parity_golden.py
+    acceptance_criteria:
+    - new configs included in sample export gate
+    - stable key assertions hold
+    evidence:
+    - 'scripts/check_parity_export_sample.py: SAMPLE_CONFIGS_REL includes configs/example_h2_vqd_uccsd.yaml'
+    - 'tests/test_check_parity_export_sample_script.py: sample gate includes VQD UCCSD
+      and de-duplicates configs'
+    - 'tests/test_export_parity_golden.py: VQD UCCSD config remains covered by stable-key
+      export assertions'
+  - id: C-003
+    title: Extend L3 benchmark bundle for parity slices
+    owner: benchmark
+    status: done
+    target_files:
+    - src/qchem_stack/integrations/l3_algorithm_benchmark.py
+    - scripts/l3_algorithm_benchmark_report.py
+    tests:
+    - tests/test_l3_algorithm_benchmark_bundle.py
+    - tests/test_l3_benchmark_smoke.py
+    acceptance_criteria:
+    - bundle includes at least one commercial-stack-aligned and one Tangelo-aligned
+      slice
+    - L3 smoke remains optional and deterministic under marker
+    evidence:
+    - 'src/qchem_stack/integrations/l3_algorithm_benchmark.py: DEFAULT_BENCHMARK_YAMLS
+      includes example_h2_vqd_uccsd and iqeb alias slice'
+    - 'tests/test_l3_algorithm_benchmark_bundle.py: explicit commercial-stack/Tangelo
+      slice coverage assertions'
+    - 'tests/test_l3_benchmark_smoke.py: optional L3 marker gate (QCHEM_RUN_L3) and
+      deterministic schema checks'
+- id: D
+  title: P0 foundation credibility and test hygiene
+  day_range: Day181-Day210
+  status: done
+  objectives:
+  - Close audit-report test hygiene gaps without new L0 claims.
+  - Expand parity golden and workflow-preview alignment coverage.
+  tasks:
+  - id: D-001
+    title: Add tests/conftest.py with H2 YAML factory and registry cleanup
+    owner: core-protocol
+    status: done
+    target_files:
+    - tests/conftest.py
+    - tests/helpers/h2_yaml.py
+    tests:
+    - tests/orchestration/test_orchestration_pipeline.py
+    acceptance_criteria:
+    - at least three orchestration tests use shared factory instead of inline YAML
+    - solver registry autouse cleanup prevents cross-test pollution
+    evidence:
+    - 'tests/conftest.py: autouse reset_solver_registry_state'
+    - 'tests/helpers/h2_yaml.py: h2_pipeline_dict'
+  - id: D-002
+    title: Parametrize repetitive ADAPT/IQEB pool orchestration tests
+    owner: quantum-alg
+    status: done
+    target_files:
+    - tests/orchestration/test_orchestration_pipeline.py
+    tests:
+    - tests/orchestration/test_orchestration_pipeline.py
+    acceptance_criteria:
+    - pool YAML smoke tests consolidated via pytest.mark.parametrize
+    evidence:
+    - 'tests/orchestration/test_orchestration_pipeline.py: test_adapt_iqeb_pool_alias_yaml_runs_via_pipeline'
+  - id: D-003
+    title: Expand examples/run_all_smoke.py coverage
+    owner: platform
+    status: done
+    target_files:
+    - examples/run_all_smoke.py
+    tests:
+    - tests/test_examples_tangelo_facade.py
+    acceptance_criteria:
+    - smoke runner includes tangelo_facade and open_stack_quantum_problem demos
+    evidence:
+    - 'examples/run_all_smoke.py: tangelo_facade + open_stack_quantum_problem'
+  - id: D-004
+    title: Add minimal tensornet stub test module
+    owner: core-protocol
+    status: done
+    target_files:
+    - tests/test_tensornet_stub.py
+    - src/qchem_stack/tensornet/cutensornet_protocol_stub.py
+    tests:
+    - tests/test_tensornet_stub.py
+    acceptance_criteria:
+    - tensornet_engine_resolved and fallback keys asserted
+    evidence:
+    - tests/test_tensornet_stub.py
+  - id: D-005
+    title: Expand parity export sample configs for DMET projection SA-VQE ZNE
+    owner: reproducibility
+    status: done
+    target_files:
+    - scripts/check_parity_export_sample.py
+    - configs/example_h4_dmet_fragment_exact_small.yaml
+    - configs/example_h4_projection_mulliken.yaml
+    tests:
+    - tests/test_check_parity_export_sample_script.py
+    - tests/test_export_parity_golden.py
+    acceptance_criteria:
+    - SAMPLE_CONFIGS_REL includes new representative YAMLs
+    evidence:
+    - 'scripts/check_parity_export_sample.py: SAMPLE_CONFIGS_REL'
+  - id: D-006
+    title: Workflow-preview to run repro golden alignment for five YAMLs
+    owner: integrations
+    status: done
+    target_files:
+    - tests/test_workflow_preview_repro_alignment.py
+    - src/qchem_stack/integrations/workflow_preview.py
+    tests:
+    - tests/test_workflow_preview_repro_alignment.py
+    acceptance_criteria:
+    - preview computable_graph keys match DONE repro for five configs
+    evidence:
+    - 'tests/test_workflow_preview_repro_alignment.py: test_workflow_preview_after_pipeline_matches_standalone'
+- id: E
+  title: P1-A Tangelo algorithm ansatz and pool breadth
+  day_range: Day211-Day255
+  status: done
+  objectives:
+  - Replace HEA-redirect partial ansatz aliases with at least two real implementations.
+  - Deepen ADAPT/IQEB operator pool taxonomy and mapping conformance.
+  tasks:
+  - id: E-001
+    title: Implement UCCGD minimal VQE branch and example YAML
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/quantum/algorithms/uccgd_vqe.py
+    - src/qchem_stack/quantum/ansatz_registry.py
+    - configs/example_h2_uccgd.yaml
+    tests:
+    - tests/quantum/test_uccgd_vqe.py
+    - tests/orchestration/test_orchestration_pipeline.py
+    acceptance_criteria:
+    - H2 sto-3g UCCGD energy between RHF and FCI window
+    - ansatz_registry lists uccgd as executable not HEA redirect
+    evidence:
+    - src/qchem_stack/quantum/algorithms/uccgd_vqe.py
+    - configs/example_h2_uccgd.yaml
+    - tests/quantum/test_uccgd_qcc_vqe.py
+  - id: E-002
+    title: Implement QCC ansatz circuit builder and registry entry
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/quantum/algorithms/qcc_vqe.py
+    - src/qchem_stack/quantum/ansatz_registry.py
+    - configs/example_h2_qcc.yaml
+    tests:
+    - tests/quantum/test_qcc_vqe.py
+    acceptance_criteria:
+    - qcc_tangelo_partial either removed or points to real QCC implementation
+    evidence:
+    - src/qchem_stack/quantum/algorithms/qcc_vqe.py
+    - configs/example_h2_qcc.yaml
+  - id: E-003
+    title: Expand operator pool registry with generalized excitation slice
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/quantum/operator_pool_registry.py
+    - src/qchem_stack/quantum/algorithms/adapt.py
+    tests:
+    - tests/test_operator_pool_registry_export.py
+    acceptance_criteria:
+    - operator_pool_registry_export_v1 includes new pool id and documents partial
+      taxonomy
+    evidence:
+    - 'src/qchem_stack/quantum/operator_pool_registry.py: fermionic_generalized_doubles'
+  - id: E-004
+    title: SCBK Hamiltonian path for VQE with HEA reference
+    owner: chem-mapping
+    status: done
+    target_files:
+    - src/qchem_stack/chem/fermion_mapping_registry.py
+    - src/qchem_stack/chem/hamiltonian.py
+    - configs/example_h2_scbk_hea.yaml
+    tests:
+    - tests/test_fermion_qubit_mapping.py
+    - tests/test_backend_capability_conformance.py
+    acceptance_criteria:
+    - symmetry_conserving_bk mapping runs end-to-end on H2
+    - uccsd_mapping_support_matrix_v1 still marks BK/SCBK UCCSD Trotter n/a
+    evidence:
+    - configs/example_h2_scbk_hea.yaml
+    - tests/quantum/test_uccgd_qcc_vqe.py::test_scbk_hea_pipeline_runs
+- id: F
+  title: P1-B/C mitigation compiler embedding and multi-backend
+  day_range: Day256-Day330
+  status: done
+  objectives:
+  - Promote mitigation from stub/report to executable workflow blocks.
+  - Deliver DMET bath self-consistency v1 and one new backend conformance adapter.
+  tasks:
+  - id: F-001
+    title: ZNE circuit_scale_fold closed loop on Qiskit counts backend
+    owner: mitigation
+    status: done
+    target_files:
+    - src/qchem_stack/mitigation/qermit_runtime.py
+    - src/qchem_stack/backends/qiskit_pauli_shots.py
+    - configs/example_h2_zne_qiskit_fold.yaml
+    tests:
+    - tests/test_zne_circuit_fold.py
+    acceptance_criteria:
+    - mitigation_dag_execution trace includes multi-scale ZNE curve on Qiskit path
+    evidence:
+    - configs/example_h2_zne_qiskit_fold.yaml
+    - tests/test_zne_circuit_fold.py
+  - id: F-002
+    title: Classical shadows minimal executable expectation path
+    owner: mitigation
+    status: done
+    target_files:
+    - src/qchem_stack/mitigation/classical_shadows.py
+    - src/qchem_stack/mitigation/qermit_runtime.py
+    tests:
+    - tests/test_classical_shadows_runtime.py
+    acceptance_criteria:
+    - fixed-seed H2 shadow expectation within tolerance of statevector
+    evidence:
+    - src/qchem_stack/mitigation/classical_shadows.py
+    - tests/test_classical_shadows_runtime.py
+  - id: F-003
+    title: DMET bath SCF self-consistency loop v1 with parity trace
+    owner: chem-stack
+    status: done
+    target_files:
+    - src/qchem_stack/chem/embedding/dmet.py
+    - src/qchem_stack/integrations/dmet_self_consistent.py
+    - configs/example_h4_dmet_self_consistent.yaml
+    tests:
+    - tests/test_dmet_self_consistency_loop.py
+    acceptance_criteria:
+    - n_scf_cycles_embedding>=2 writes converged trace to parity_snapshot
+    evidence:
+    - configs/example_h4_dmet_self_consistent.yaml
+    - tests/test_dmet_self_consistency_loop.py
+  - id: F-004
+    title: Qulacs backend executor adapter with conformance tests
+    owner: platform
+    status: done
+    target_files:
+    - src/qchem_stack/backends/qulacs_executor.py
+    - src/qchem_stack/backends/factory.py
+    - src/qchem_stack/backends/spec.py
+    tests:
+    - tests/test_qulacs_backend_conformance.py
+    acceptance_criteria:
+    - H2 HEA VQE smoke passes via backend=qulacs
+    - test_backend_capability_conformance parametrized includes qulacs
+    evidence:
+    - src/qchem_stack/backends/qulacs_executor.py
+    - tests/test_qulacs_backend_conformance.py
+- id: G
+  title: P2 decomposition QPE depth and MD-ML science closure
+  day_range: Day331-Day390
+  status: done
+  objectives:
+  - Deliver non-toy ONIOM or QM/MM demo and main-config QPE entry.
+  - Close MD/ML multi-round testing and documented energy accuracy target.
+  tasks:
+  - id: G-001
+    title: ONIOM two-layer runnable demo beyond oniom_toy_v1 metadata
+    owner: chem-stack
+    status: done
+    target_files:
+    - src/qchem_stack/chem/embedding/oniom.py
+    - configs/example_oniom_qm_mm_demo.yaml
+    tests:
+    - tests/test_oniom_qm_mm_demo.py
+    acceptance_criteria:
+    - energy_components_v1 includes classical MM contribution
+    evidence:
+    - src/qchem_stack/chem/embedding/oniom.py
+    - tests/test_oniom_qm_mm_demo.py
+  - id: G-002
+    title: Wire QPE Kitaev algorithm into main ExperimentConfig tree
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/config/quantum_specs.py
+    - src/qchem_stack/orchestration/pipeline.py
+    - configs/example_h2_qpe_main.yaml
+    tests:
+    - tests/test_qpe_main_config_pipeline.py
+    acceptance_criteria:
+    - quantum.algorithm qpe_kitaev runs without qpe_demo_track sidecar only
+    evidence:
+    - configs/example_h2_qpe_main.yaml
+    - tests/test_qpe_main_config_pipeline.py
+  - id: G-003
+    title: MD bridge multi-round active learning integration test
+    owner: md-ml
+    status: done
+    target_files:
+    - tests/test_md_bridge_multi_round.py
+    - src/qchem_stack/md_bridge/active_learning.py
+    tests:
+    - tests/test_md_bridge_multi_round.py
+    acceptance_criteria:
+    - three-round loop with mock labeler completes without failures
+    evidence:
+    - tests/test_md_bridge_multi_round.py
+  - id: G-004
+    title: Document and test MD/ML H2 cloud sim energy delta target
+    owner: md-ml
+    status: done
+    target_files:
+    - scripts/run_uqc_md_ml.py
+    - docs/在线学习云上调度.md
+    - results/uqc_cloud_sim_md_ml_2rounds/md_validation_summary.json
+    tests:
+    - tests/test_uqc_mock_md_ml_integration.py
+    acceptance_criteria:
+    - validation summary schema includes accuracy_threshold_hartree field
+    - documented target threshold for H2 UQC cloud sim path
+    evidence:
+    - 'scripts/run_uqc_md_ml.py: accuracy_threshold_hartree'
+    - tests/test_uqc_mock_md_ml_integration.py
+- id: H
+  title: P3 tutorials plugin ecosystem and benchmark dashboard
+  day_range: Day391-Day450
+  status: done
+  objectives:
+  - Ship three onboarding paths with notebooks and expanded smoke runner.
+  - Publish plugin template v2 and static benchmark dashboard artifact.
+  tasks:
+  - id: H-001
+    title: Docusaurus three-path onboarding navigation
+    owner: platform
+    status: done
+    target_files:
+    - docusaurus-site/docs/tutorial/index.md
+    - docusaurus-site/sidebars.js
+    tests:
+    - docusaurus-site build in CI
+    acceptance_criteria:
+    - three tutorial paths linked from docs home with working internal links
+    evidence:
+    - docusaurus-site/docs/tutorial/index.md
+    - docusaurus-site/sidebars.ts
+  - id: H-002
+    title: Add Jupyter notebooks for core YAML workflows
+    owner: platform
+    status: done
+    target_files:
+    - notebooks/h2_vqe_walkthrough.ipynb
+    - notebooks/dmet_projection_walkthrough.ipynb
+    tests:
+    - optional nbconvert smoke script
+    acceptance_criteria:
+    - at least four notebooks execute on H2 examples with documented deps
+    evidence:
+    - notebooks/h2_vqe_walkthrough.ipynb
+    - notebooks/dmet_projection_walkthrough.ipynb
+  - id: H-003
+    title: Benchmark dashboard generator from L3 JSON
+    owner: platform
+    status: done
+    target_files:
+    - scripts/benchmark_dashboard/generate.py
+    - scripts/l3_algorithm_benchmark_report.py
+    tests:
+    - tests/test_benchmark_dashboard_generate.py
+    acceptance_criteria:
+    - static HTML generated from l3 report JSON in CI artifact
+    evidence:
+    - scripts/benchmark_dashboard/generate.py
+    - tests/test_benchmark_dashboard_generate.py
+  - id: H-004
+    title: Plugin template v2 for solver and variational backends
+    owner: platform
+    status: done
+    target_files:
+    - examples/solver_plugin_entrypoint_demo/
+    - CONTRIBUTING.md
+    tests:
+    - tests/test_create_solver_adapter_scaffold_script.py
+    acceptance_criteria:
+    - pip install -e plugin demo registers solver via entry point
+    evidence:
+    - CONTRIBUTING.md
+    - examples/solver_plugin_entrypoint_demo/README.md
+  - id: H-005
+    title: Publish non-goals product page for deliberate exclusions
+    owner: core-protocol
+    status: done
+    target_files:
+    - docs/product/non_goals.md
+    - docusaurus-site/docs/product/non-goals.md
+    tests:
+    - link check in docusaurus build
+    acceptance_criteria:
+    - Nexus HQC cuTensorNet L0 boundaries documented for end users
+    evidence:
+    - docs/product/non_goals.md
+    - docusaurus-site/docs/product/non-goals.md
+- id: I
+  title: P4-A Tangelo algorithm breadth and backends
+  day_range: Day451-Day520
+  status: done
+  objectives:
+  - Ship UpCCGSD/pUCCD/iQCC/QITE ansatz menu and UCCGD Pauli protocol path.
+  - Add Braket/Cirq backends and staggered operator pools.
+  tasks:
+  - id: I-001
+    title: UpCCGSD pUCCD variational ansatz and YAML smoke
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/quantum/algorithms/upccgsd_vqe.py
+    - src/qchem_stack/quantum/algorithms/puccd_vqe.py
+    - configs/example_h2_upccgsd.yaml
+    - configs/example_h2_uccgd_pauli_protocol.yaml
+    tests:
+    - tests/quantum/test_p4_ansatz_pool.py
+    acceptance_criteria:
+    - H2 energy within FCI window for upccgsd and puccd YAMLs
+    evidence:
+    - tests/quantum/test_p4_ansatz_pool.py
+  - id: I-002
+    title: Braket Cirq backend conformance
+    owner: backends
+    status: done
+    target_files:
+    - src/qchem_stack/backends/braket_executor.py
+    - src/qchem_stack/backends/cirq_executor.py
+    tests:
+    - tests/test_p4_backend_conformance.py
+    acceptance_criteria:
+    - at least four conformance-tested backend providers
+    evidence:
+    - tests/test_p4_backend_conformance.py
+- id: J
+  title: P4-B InQuanto workflow mitigation and compile depth
+  day_range: Day521-Day580
+  status: done
+  objectives:
+  - Productize SPAM Richardson shadows and compiler pass presets.
+  tasks:
+  - id: J-001
+    title: Richardson ZNE and SPAM 2-qubit calibration
+    owner: mitigation
+    status: done
+    target_files:
+    - src/qchem_stack/mitigation/zne.py
+    - src/qchem_stack/mitigation/spam.py
+    - src/qchem_stack/mitigation/qermit_runtime.py
+    tests:
+    - tests/test_p4_mitigation_compile.py
+    acceptance_criteria:
+    - mitigation DAG trace includes Richardson extrapolation metadata
+    evidence:
+    - tests/test_p4_mitigation_compile.py
+  - id: J-002
+    title: HTTP client tutorial and AVAS CASSCF workflow YAML
+    owner: platform
+    status: done
+    target_files:
+    - examples/tutorial_06_http_client.py
+    - configs/example_h2_avas_casscf_workflow.yaml
+    tests:
+    - examples/tutorial_06_http_client.py
+    acceptance_criteria:
+    - HTTP client documents project/workspace submit path
+    evidence:
+    - examples/tutorial_06_http_client.py
+- id: K
+  title: P4-C embedding and MD ML science KPI
+  day_range: Day581-Day650
+  status: done
+  objectives:
+  - DMET density feedback ONIOM production demo and MD science KPI.
+  tasks:
+  - id: K-001
+    title: MD validation science_kpi_met threshold 0.1 Ha
+    owner: md-ml
+    status: done
+    target_files:
+    - src/qchem_stack/md_bridge/md_loop_summary.py
+    tests:
+    - tests/test_p4_md_ml_kpi.py
+    acceptance_criteria:
+    - max_abs_delta_hartree below accuracy_threshold_hartree in test path
+    evidence:
+    - tests/test_p4_md_ml_kpi.py
+  - id: K-002
+    title: DMET PySCF bath hook and ONIOM three-layer
+    owner: embedding
+    status: done
+    target_files:
+    - src/qchem_stack/chem/embedding/dmet_self_consistent.py
+    - src/qchem_stack/chem/embedding/oniom.py
+    tests:
+    - tests/test_p4_md_ml_kpi.py
+    acceptance_criteria:
+    - pyscf_density_feedback_bath_update exported from embedding module
+    evidence:
+    - src/qchem_stack/chem/embedding/dmet_self_consistent.py
+- id: L
+  title: P4-D ecosystem and v0.3.0 closeout
+  day_range: Day651-Day700
+  status: done
+  objectives:
+  - Bilingual examples notebook CI and v0.3.0 release notes.
+  tasks:
+  - id: L-001
+    title: v0.3.0 changelog and bilingual examples index
+    owner: platform
+    status: done
+    target_files:
+    - CHANGELOG.md
+    - examples/README.md
+    tests:
+    - scripts/check_comparative_execution_backlog.py
+    acceptance_criteria:
+    - v0.3.0 section documents P4 deliverables
+    evidence:
+    - CHANGELOG.md
+  - id: L-002
+    title: Optional notebook CI smoke script
+    owner: platform
+    status: done
+    target_files:
+    - scripts/check_notebooks_smoke.py
+    tests:
+    - scripts/check_notebooks_smoke.py
+    acceptance_criteria:
+    - script skips gracefully when nbconvert missing
+    evidence:
+    - scripts/check_notebooks_smoke.py

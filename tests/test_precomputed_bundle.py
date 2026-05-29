@@ -12,6 +12,7 @@ from qchem_stack.chem.precomputed_bundle import (
     parse_precomputed_manifest,
     qubit_hamiltonian_from_bundle,
 )
+from tests.helpers.paths import configs_path
 
 
 def _write_bundle(path: Path) -> None:
@@ -37,8 +38,7 @@ def _write_bundle(path: Path) -> None:
 
 
 def test_load_bundle_dict_accepts_schema() -> None:
-    root = Path(__file__).resolve().parents[1]
-    path, data = load_bundle_dict(str(root / "configs" / "precomputed_classical_reference_h2.json"))
+    path, data = load_bundle_dict(str(configs_path("precomputed_classical_reference_h2.json")))
     assert path.name == "precomputed_classical_reference_h2.json"
     assert data["schema"] == CLASSICAL_REFERENCE_BUNDLE_V1
 

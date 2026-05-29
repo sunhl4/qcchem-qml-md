@@ -1,0 +1,50 @@
+# Experiment template — copy and customize (schema_version 2 required).
+schema_version: "2"
+experiment_id: my-experiment
+random_seed: 1
+
+molecule:
+  symbols: [H, H]
+  coordinates:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 0.74]
+  coordinate_unit: bohr
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+
+active_space:
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+
+scf:
+  driver: pyscf
+  method: RHF
+
+embedding:
+  mode: none
+
+backend:
+  provider: statevector
+  shots_per_circuit: 1024
+
+quantum:
+  algorithm: vqe
+  variational:
+    ansatz: hea
+  vqe:
+    depth: 1
+    maxiter: 50
+    optimizer_method: COBYLA
+  pauli:
+    use_protocol: true
+    run_sampled: false
+    run_qiskit_shots: false
+
+mitigation:
+  pmsv_enabled: false
+  zne_enabled: false
+
+# Optional: md_ml_export, nexus_analog, chemistry_extended — see docs/config_字段索引.md

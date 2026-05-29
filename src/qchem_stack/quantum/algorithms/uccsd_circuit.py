@@ -39,15 +39,25 @@ class UCCSDCircuitContext:
         hamiltonian: QubitHamiltonian,
         *,
         trotter_steps: int | None,
+        cluster_ansatz: str = "uccsd",
     ) -> UCCSDCircuitContext:
+        from qchem_stack.quantum.algorithms.puccd_vqe import PUCCDVQE
+        from qchem_stack.quantum.algorithms.uccgd_vqe import UCCGDVQE
         from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
+        from qchem_stack.quantum.algorithms.upccgsd_vqe import UpCCGSDVQE
 
         n_steps = 1 if trotter_steps is None else int(trotter_steps)
-        ucc = (
-            UCCSDTrotterVQE(hamiltonian, n_trotter_steps=n_steps)
-            if trotter_steps is not None
-            else UCCSDVQE(hamiltonian)
-        )
+        ansatz = str(cluster_ansatz).lower()
+        if ansatz == "uccgd":
+            ucc = UCCGDVQE(hamiltonian)
+        elif ansatz == "upccgsd":
+            ucc = UpCCGSDVQE(hamiltonian)
+        elif ansatz == "puccd":
+            ucc = PUCCDVQE(hamiltonian)
+        elif trotter_steps is not None:
+            ucc = UCCSDTrotterVQE(hamiltonian, n_trotter_steps=n_steps)
+        else:
+            ucc = UCCSDVQE(hamiltonian)
         fs = hamiltonian.fermion_space
         if fs is None:
             raise ValueError("UCCSD circuit context requires hamiltonian.fermion_space")

@@ -210,8 +210,12 @@ def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     sceom_meta["generator_strategy_yaml"] = sceom_kw["generator_strategy"]
     if prepare_state is not None:
         sceom_meta["variational_ansatz"] = "uccsd"
+    comp_value = comp_out.value
+    excitation_energies = (
+        list(comp_value.get("excitation_energies") or []) if isinstance(comp_value, dict) else []
+    )
     sceom_res = type("_SceomOut", (), {})()
-    sceom_res.energies = list(comp_out.value.get("excitation_energies") or [])
+    sceom_res.energies = excitation_energies
     sceom_res.meta = sceom_meta
     return ExcitedStageOutcome(
         bundle_key="sceom",

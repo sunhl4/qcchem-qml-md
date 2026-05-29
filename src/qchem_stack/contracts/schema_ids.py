@@ -95,6 +95,9 @@ PARITY_EXPORT_SCHEMA_VERSION_V3 = 3
 L3_ENERGY_BOOTSTRAP_STUB_V1 = "l3_energy_bootstrap_stub_v1"
 ML_MD_BRIDGE_SURFACE_V1 = "ml_md_bridge_surface_v1"
 QMEF_ML_ATTACHMENT_V1 = "qmef_ml_attachment_v1"
+PUBLIC_MAPPING_ALIAS_SURFACE_V1 = "public_mapping_alias_surface_v1"
+PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1 = "pyscf_spatial_openfermion_v1"
+# Deprecated schema id retained for one release cycle of export readers.
 TANGELO_PUBLIC_MAPPING_ALIAS_SURFACE_V1 = "tangelo_public_mapping_alias_surface_v1"
 
 # Chemistry / embedding / integration (P12)

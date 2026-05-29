@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -15,8 +15,7 @@ from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_one_electron_operator_fermion_and_pauli_hcore() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     fop = one_electron_operator_fermion_from_rhf(rhf, "hcore")
     assert hasattr(fop, "terms")
@@ -26,8 +25,7 @@ def test_one_electron_operator_fermion_and_pauli_hcore() -> None:
 
 
 def test_one_electron_operator_vector_shapes() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     r_ops = one_electron_operator_fermion_from_rhf(rhf, "r")
     dm_ops = one_electron_operator_fermion_from_rhf(rhf, "dm")

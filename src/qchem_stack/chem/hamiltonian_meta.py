@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING, Any, Literal
 
 from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
+from qchem_stack.contracts.schema_ids import PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1
 
 if TYPE_CHECKING:
     from openfermion.ops import QubitOperator
@@ -18,6 +19,8 @@ FermionQubitMappingName = Literal[
     "jordan_wigner",
     "bravyi_kitaev",
     "symmetry_conserving_bravyi_kitaev",
+    "jkmn",
+    "hard_core_boson",
 ]
 
 
@@ -84,7 +87,7 @@ def _resolve_integral_metadata(
     )
     if not bridge:
         if resolved_backend_tag == "pyscf":
-            bridge = "pyscf_tangelo_openfermion_v1"
+            bridge = PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1
         elif resolved_backend_tag:
             bridge = f"{resolved_backend_tag}_openfermion_interaction_operator_v1"
         else:
@@ -116,7 +119,12 @@ def _use_restricted_spatial_fermion_build(
     jordan_wigner_coeff_atol: float | None,
 ) -> bool:
     """Spatial-MO fermion build avoids dense (2*norb)^4 spin ERI for BK/SCBK and optional JW."""
-    if fermion_qubit_mapping in ("bravyi_kitaev", "symmetry_conserving_bravyi_kitaev"):
+    if fermion_qubit_mapping in (
+        "bravyi_kitaev",
+        "symmetry_conserving_bravyi_kitaev",
+        "jkmn",
+        "hard_core_boson",
+    ):
         if jordan_wigner_coeff_atol is not None:
             raise ValueError(
                 "jordan_wigner_coeff_atol applies only to fermion_qubit_mapping='jordan_wigner' "

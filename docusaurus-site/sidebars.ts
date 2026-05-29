@@ -18,7 +18,7 @@ const sidebars: SidebarsConfig = {
     {
       type: 'category',
       label: '产品',
-      items: ['product/features', 'product/roadmap', 'product/positioning'],
+      items: ['product/features', 'product/roadmap', 'product/positioning', 'product/non-goals'],
     },
     {
       type: 'category',
@@ -29,17 +29,20 @@ const sidebars: SidebarsConfig = {
         'guide/onboarding-three-paths',
         'guide/overview',
         'guide/chemistry-and-embedding',
+        'guide/avas-casscf-workflow',
         'guide/backend-adapter-quickstart',
         'guide/program-construction',
         'guide/execution-and-analysis',
         'guide/jobs-and-reproducibility',
         'guide/principles-and-reading',
+        'guide/psi4-backend',
       ],
     },
     {
       type: 'category',
       label: '教程',
       items: [
+        'tutorial/index',
         'tutorial/quickstart',
         'tutorial/workflow',
         'tutorial/async-run-via-http',
@@ -49,6 +52,7 @@ const sidebars: SidebarsConfig = {
         'tutorial/zne-qiskit-repro',
         'tutorial/projection-embedding-deep-dive',
         'tutorial/case-study-h2-family',
+        'tutorial/md-ml-active-learning',
       ],
     },
     {
@@ -61,6 +65,8 @@ const sidebars: SidebarsConfig = {
         'reference/qiskit-shot-counts',
         'reference/dmet-parity-snapshot',
         'reference/parity-contract-import-paths',
+        'reference/configs-catalog',
+        'parity/gap-implementation-plan',
         'reference/cli-http',
       ],
     },
@@ -79,6 +85,7 @@ const sidebars: SidebarsConfig = {
         'cloud/tenant-and-quotas',
         'cloud/backend-registry',
         'cloud/jobs-and-logs',
+        'cloud/uqc-backend',
       ],
     },
     {

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Any, Protocol, cast, runtime_checkable
 
 import numpy as np
 
@@ -82,8 +82,10 @@ class PySCFAOBasisView:
     def make_rdm1_ao(self) -> np.ndarray:
         dm = self._mf.make_rdm1()
         if isinstance(dm, (tuple, list)):
-            return np.asarray(dm[0], dtype=float) + np.asarray(dm[1], dtype=float)
-        return np.asarray(dm, dtype=float)
+            return cast(
+                "np.ndarray", np.asarray(dm[0], dtype=float) + np.asarray(dm[1], dtype=float)
+            )
+        return cast("np.ndarray", np.asarray(dm, dtype=float))
 
     def energy_nuc_au(self) -> float:
         return float(self._mol().energy_nuc())
@@ -174,7 +176,7 @@ def require_ao_basis_view(
     error_cls: type[Exception] = ValueError,
 ) -> AOBasisView:
     try:
-        return reference.ao_basis_view()
+        return cast("AOBasisView", reference.ao_basis_view())
     except Exception as e:  # noqa: BLE001
         raise error_cls(
             f"{context} requires a mean-field reference with AO basis view "

@@ -17,6 +17,10 @@ from .embedding_enums import (
 
 
 class DmetFragmentSolverSpec(ForbidExtraBase):
+    plugin_id: str | None = Field(
+        default=None,
+        description="Fragment solver plugin id (see chem.embedding.fragment_solvers.registry).",
+    )
     use_exact: bool = Field(
         default=False, description="Dense ED impurity solve for small n_qubits."
     )

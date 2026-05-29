@@ -15,11 +15,26 @@ def occupied_string_creation_op(n_electrons: int) -> FermionOperator:
     return op
 
 
-def map_fermion_generator(ferm_op: FermionOperator, mapping: str) -> QubitOperator:
+def map_fermion_generator(
+    ferm_op: FermionOperator,
+    mapping: str,
+    *,
+    n_spin_orbitals: int | None = None,
+) -> QubitOperator:
     if mapping == "jordan_wigner":
         q = jordan_wigner(ferm_op)
     elif mapping == "bravyi_kitaev":
         q = bravyi_kitaev(ferm_op)
+    elif mapping == "jkmn":
+        from qchem_stack.chem.mappings.jkmn import jkmn
+
+        if n_spin_orbitals is None:
+            n_spin_orbitals = (
+                max((idx for term in ferm_op.terms for idx, _ in term), default=-1) + 1
+            )
+        if int(n_spin_orbitals) <= 0:
+            raise ValueError("JKMN generator map requires n_spin_orbitals > 0.")
+        q = jkmn(ferm_op, n_qubits=int(n_spin_orbitals))
     else:
         raise ValueError(f"Unsupported fermion_to_qubit_map for UCCSDVQE: {mapping!r}")
     if not isinstance(q, QubitOperator):
@@ -39,8 +54,20 @@ def reference_state_dense(*, mapping: str, n_spin_orbitals: int, n_electrons: in
         vac = np.zeros(2 ** int(n_spin_orbitals), dtype=np.complex128)
         vac[0] = 1.0
         v = np.asarray(mat @ vac, dtype=np.complex128).ravel()
+    elif mapping == "jkmn":
+        from qchem_stack.chem.mappings.jkmn import jkmn_reference_statevector
+
+        v = jkmn_reference_statevector(
+            n_spin_orbitals=int(n_spin_orbitals), n_electrons=int(n_electrons)
+        )
+    elif mapping == "hard_core_boson":
+        from qchem_stack.chem.mappings.hcb import hcb_reference_statevector
+
+        v = hcb_reference_statevector(
+            n_spin_orbitals=int(n_spin_orbitals), n_electrons=int(n_electrons)
+        )
     else:
-        raise ValueError(mapping)
+        raise ValueError(f"Unsupported fermion_to_qubit_map for reference state: {mapping!r}")
     nrm = float(np.linalg.norm(v))
     if nrm < 1e-14:
         raise ValueError("UCCSD reference state has zero norm.")
@@ -52,11 +79,13 @@ def antihermitian_cluster_matrices(
     *,
     mapping: str,
     n_qubits: int,
+    n_spin_orbitals: int | None = None,
 ) -> list[np.ndarray]:
     """Map fermionic cluster generators to anti-Hermitian dense matrices."""
+    n_so = int(n_spin_orbitals if n_spin_orbitals is not None else n_qubits)
     mats: list[np.ndarray] = []
     for fer in fermion_generators:
-        qop = map_fermion_generator(fer, mapping)
+        qop = map_fermion_generator(fer, mapping, n_spin_orbitals=n_so)
         sm = get_sparse_operator(qop, n_qubits=n_qubits)
         d = sm.toarray()
         a = d - np.conjugate(d.T)

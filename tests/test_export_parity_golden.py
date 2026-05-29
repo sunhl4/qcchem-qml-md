@@ -10,9 +10,11 @@ from pathlib import Path
 
 import pytest
 
-_ROOT = Path(__file__).resolve().parents[1]
-_FIXTURE = _ROOT / "tests" / "fixtures" / "parity_export_example_h2_config_only.json"
-_RESULTS_FIXTURE = _ROOT / "tests" / "fixtures" / "pipeline_results_minimal_export_merge.json"
+from tests.helpers.paths import configs_path, fixtures_path, repo_root, scripts_path
+
+_ROOT = repo_root()
+_FIXTURE = fixtures_path("parity_export_example_h2_config_only.json")
+_RESULTS_FIXTURE = fixtures_path("pipeline_results_minimal_export_merge.json")
 
 
 def _export_json(cfg_rel: str, *, results: Path | None = None) -> dict:
@@ -22,7 +24,7 @@ def _export_json(cfg_rel: str, *, results: Path | None = None) -> dict:
     }
     cmd = [
         sys.executable,
-        str(_ROOT / "scripts" / "export_parity_criteria_table.py"),
+        str(scripts_path("export_parity_criteria_table.py")),
         str(_ROOT / cfg_rel),
     ]
     if results is not None:
@@ -80,7 +82,7 @@ def test_export_example_h2_matches_golden_fixture() -> None:
 
 
 def test_export_zmatrix_yaml_geometry_source_parity() -> None:
-    zm = _ROOT / "configs" / "example_h2_zmatrix_sto3g.yaml"
+    zm = configs_path("example_h2_zmatrix_sto3g.yaml")
     if not zm.is_file():
         pytest.skip("example_h2_zmatrix_sto3g.yaml missing")
     fresh = _normalize_export(_export_json("configs/example_h2_zmatrix_sto3g.yaml"))
@@ -88,7 +90,7 @@ def test_export_zmatrix_yaml_geometry_source_parity() -> None:
 
 
 @pytest.mark.skipif(
-    not (_ROOT / "configs" / "example_h2_echo_variational_plugin.yaml").is_file(),
+    not (configs_path("example_h2_echo_variational_plugin.yaml")).is_file(),
     reason="echo plugin example config missing",
 )
 def test_export_echo_variational_plugin_config_only_yaml_factory_dispatch() -> None:
@@ -108,7 +110,7 @@ def test_export_echo_variational_plugin_config_only_yaml_factory_dispatch() -> N
 
 
 @pytest.mark.skipif(
-    not (_ROOT / "configs" / "example_h2_micro_vqe_plugin.yaml").is_file(),
+    not (configs_path("example_h2_micro_vqe_plugin.yaml")).is_file(),
     reason="micro vqe plugin example config missing",
 )
 def test_export_micro_vqe_variational_plugin_config_only() -> None:
@@ -121,7 +123,7 @@ def test_export_micro_vqe_variational_plugin_config_only() -> None:
 
 
 @pytest.mark.skipif(
-    not (_ROOT / "configs" / "example_h2_psi4_rhf_sto3g.yaml").is_file(),
+    not (configs_path("example_h2_psi4_rhf_sto3g.yaml")).is_file(),
     reason="repo psi4 sample yaml missing",
 )
 def test_export_repo_psi4_example_yaml_capabilities_snapshot() -> None:
@@ -134,7 +136,7 @@ def test_export_repo_psi4_example_yaml_capabilities_snapshot() -> None:
 
 
 def test_export_parity_psi4_config_only_row_present() -> None:
-    cfg = _ROOT / "tests" / "fixtures" / "_tmp_psi4_export.yaml"
+    cfg = fixtures_path("_tmp_psi4_export.yaml")
     cfg.write_text(
         """
 schema_version: "2"
@@ -238,7 +240,7 @@ def test_m2_config_only_export_stable_keys(cfg_rel: str) -> None:
 
 
 @pytest.mark.skipif(
-    not Path(__file__).resolve().parents[1].joinpath("configs", "example_h2.yaml").is_file(),
+    not configs_path("example_h2.yaml").is_file(),
     reason="configs",
 )
 def test_m2_pipeline_then_export_documented_keys() -> None:
@@ -249,12 +251,12 @@ def test_m2_pipeline_then_export_documented_keys() -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    cfg_path = _ROOT / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     ec = out.get("energy_components")
     assert isinstance(ec, dict) and ec.get("schema") == "energy_components_v1"
-    tmp = _ROOT / "tests" / "fixtures" / "_m2_tmp_pipeline_out.json"
+    tmp = fixtures_path("_m2_tmp_pipeline_out.json")
     try:
         tmp.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
         exp = _export_json("configs/example_h2.yaml", results=tmp)
@@ -278,7 +280,7 @@ def test_export_results_merge_includes_plugin_and_zne_run_summary_mirrors() -> N
     out_plugin = run_pipeline_sync(
         load_experiment_config(cfg_plugin_path), cfg_path=cfg_plugin_path
     )
-    tmp_plugin = _ROOT / "tests" / "fixtures" / "_tmp_plugin_export_merge.json"
+    tmp_plugin = fixtures_path("_tmp_plugin_export_merge.json")
     try:
         tmp_plugin.write_text(json.dumps(out_plugin, indent=2) + "\n", encoding="utf-8")
         exp_plugin = _export_json(cfg_plugin_rel, results=tmp_plugin)
@@ -291,7 +293,7 @@ def test_export_results_merge_includes_plugin_and_zne_run_summary_mirrors() -> N
     cfg_zne_rel = "configs/example_h2_zne_circuit_fold.yaml"
     cfg_zne_path = _ROOT / cfg_zne_rel
     out_zne = run_pipeline_sync(load_experiment_config(cfg_zne_path), cfg_path=cfg_zne_path)
-    tmp_zne = _ROOT / "tests" / "fixtures" / "_tmp_zne_export_merge.json"
+    tmp_zne = fixtures_path("_tmp_zne_export_merge.json")
     try:
         tmp_zne.write_text(json.dumps(out_zne, indent=2) + "\n", encoding="utf-8")
         exp_zne = _export_json(cfg_zne_rel, results=tmp_zne)

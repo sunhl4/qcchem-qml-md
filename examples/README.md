@@ -1,10 +1,10 @@
-# Examples index（仓库根 `examples/`）
+# Examples index（仓库根 `examples/`） / Examples index
 
 与 [CONTRIBUTING.md](../CONTRIBUTING.md) 中的 CI、`scripts/check_parity_export_sample.py` 及 **Docusaurus**（`docusaurus-site/`）教程并列使用。
 
-这些路径也对应 **YAML → pipeline → `run_summary` / export → pytest** 的可复现 **open-stack** 入口（见 `docs/execution/day001_day090_tangelo_gap_calendar.md`）；不声称与任何行级闭源/第三方教程 1:1 parity。
+These paths are reproducible **open-stack** entry points (YAML → pipeline → export → pytest). They do not claim line-level parity with closed-source tutorials.
 
-## 新用户三条路径（精简）
+## 新用户三条路径 / Three onboarding paths
 
 | 路径 | 入口 |
 |------|------|
@@ -12,6 +12,7 @@
 | **UCCSD / 管线** | `tutorial_02_uccsd_pipeline.py`；`configs/example_h2_uccsd.yaml` |
 | **QPE / ZNE / parity** | `tutorial_03_qpe_zne_paths.py`；`configs/example_h2_qpe_track_parity_integrations.yaml`、`configs/example_h2_zne_circuit_fold.yaml` |
 | **UCCSD below SCF** | `tutorial_04_uccsd_below_scf.py` |
+| **HTTP API client** | `tutorial_06_http_client.py` |
 | **张量网络 / DMRG toy（自旋链）** | `toy_dmrg_spin_chain.py`；配套讲义 [`docs/tensor_network_qchem_self_study.md`](../docs/tensor_network_qchem_self_study.md) |
 
 详细叙事见站点 [onboarding-three-paths](../docusaurus-site/docs/guide/onboarding-three-paths.md)（`cd docusaurus-site && npm start`）。

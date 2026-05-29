@@ -74,7 +74,11 @@ def build_cross_solver_parity_report(*, atol: float = 5e-4) -> dict[str, Any]:
             }
         )
 
-    summary = {"psi4_installed": psi4_any, "n_cases": len(cases_out), "atol": float(atol)}
+    summary: dict[str, Any] = {
+        "psi4_installed": psi4_any,
+        "n_cases": len(cases_out),
+        "atol": float(atol),
+    }
     if psi4_any:
         flags = [c["within_atol"] for c in cases_out if c["abs_delta_au"] is not None]
         summary["all_within_atol"] = bool(flags) and all(flags)

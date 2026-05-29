@@ -103,4 +103,23 @@ def run_full_pipeline_job(store: SqliteJobStore, job_id: str) -> None:
         run_context=rc,
         job_timeline_emit=lambda e: store.append_timeline_event(job_id, e),
     )
-    store.complete(job_id, pipeline_result_for_job_store(out))
+    slim = pipeline_result_for_job_store(out)
+    meta_raw = row.get("meta")
+    if isinstance(meta_raw, str) and meta_raw.strip():
+        try:
+            meta = json.loads(meta_raw)
+        except json.JSONDecodeError:
+            meta = {}
+    elif isinstance(meta_raw, dict):
+        meta = meta_raw
+    else:
+        meta = {}
+    if isinstance(slim.get("repro"), dict):
+        rs = slim["repro"].setdefault("run_summary", {})
+        if not isinstance(rs, dict):
+            rs = {}
+            slim["repro"]["run_summary"] = rs
+        for key in ("api_workspace_label", "api_project_slug", "experiment_id"):
+            if meta.get(key) is not None:
+                rs[key] = meta[key]
+    store.complete(job_id, slim)

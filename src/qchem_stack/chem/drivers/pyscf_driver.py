@@ -89,7 +89,8 @@ class PySCFDriver:
     ) -> None:
         warnings.warn(
             "PySCFDriver is deprecated; use create_solver(cfg) or "
-            "PySCFIntegralSolver.from_experiment_config(cfg).",
+            "PySCFIntegralSolver.from_experiment_config(cfg). "
+            "See docs/迁移指南_PySCFDriver到ChemIntegralSolver.md",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -191,6 +192,8 @@ class PySCFDriver:
             "jordan_wigner",
             "bravyi_kitaev",
             "symmetry_conserving_bravyi_kitaev",
+            "jkmn",
+            "hard_core_boson",
         ] = "jordan_wigner",
         n_electrons: int | None = None,
         rhf: PySCFRHFResult | None = None,
@@ -319,6 +322,8 @@ class PySCFDriver:
             "jordan_wigner",
             "bravyi_kitaev",
             "symmetry_conserving_bravyi_kitaev",
+            "jkmn",
+            "hard_core_boson",
         ] = "jordan_wigner",
         rhf: PySCFRHFResult | None = None,
         prefer_restricted_spatial_fermion_for_jordan_wigner: bool | None = None,

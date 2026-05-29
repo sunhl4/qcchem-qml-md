@@ -2,7 +2,7 @@
 
 **用途**：矩阵或差距表中仍为 `partial` 且**本年内未收束为 yes** 的项，必须有一行 SLA，避免「口头对齐」。筛选候选时可用机读 backlog：`jq '.nodes[] | select(.status=="partial")'` 见 `docs/public_parity_matrix.md（机读 gaps 以 product_contract 为准）`。
 
-**负责人**：流程角色见 [MAINTAINERS.md](MAINTAINERS.md)；表格内可留空或填职能角色。
+**负责人**：流程角色见 [CONTRIBUTING.md](../CONTRIBUTING.md) §维护角色；表格内可留空或填职能角色。
 
 | gap.id 或矩阵节 | 残余能力摘要 | 目标状态（yes / 仍 partial） | 目标季度 | 负责人 | 依赖（PySCF / GPU / …） |
 |------------------|--------------|------------------------------|----------|--------|-------------------------|

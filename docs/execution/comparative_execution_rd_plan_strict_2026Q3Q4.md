@@ -104,3 +104,10 @@ python scripts/check_comparative_execution_backlog.py
 - 对应测试新增或更新并通过
 - `docs/public_parity_matrix.md` 与 `capability-surface` 保持一致
 - 无新增 lint 错误（至少覆盖改动文件）
+
+## 10. 下一阶段（Day181+）
+
+Phase A–C（Day121–Day180）已封板。全量 P0–P3 执行 WBS 见：
+
+- [`inquanto_tangelo_p0_p3_master_plan_2026Q3Q4.md`](inquanto_tangelo_p0_p3_master_plan_2026Q3Q4.md)
+- 台账 Phase D–H：`comparative_execution_backlog.yaml`

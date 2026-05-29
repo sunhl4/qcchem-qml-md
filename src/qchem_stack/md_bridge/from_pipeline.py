@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import yaml
 
@@ -60,7 +60,7 @@ def _hf_nuclear_forces_neg_gradient_hartree_bohr(
         else:
             return None
         arr = -np.asarray(g.kernel(), dtype=float)
-        return arr.tolist()
+        return cast("list[list[float]]", arr.tolist())
     except Exception:
         return None
 

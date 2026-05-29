@@ -54,7 +54,7 @@ def _classical_shadows_computable_batch(
     out: dict[str, Any],
     qh: Any | None,
 ) -> dict[str, Any] | None:
-    """Route classical-shadows expectation through P1 ``ExpectationValueComputable`` + ``ProtocolList``."""
+    """Route classical-shadows expectation through runtime estimator + optional exact check."""
     if not cfg.mitigation.stubs.classical_shadows or qh is None:
         return None
     angles = out.get("angles")
@@ -62,26 +62,25 @@ def _classical_shadows_computable_batch(
         return None
     import numpy as np
 
-    from qchem_stack.backends.executor_base import StatevectorHeaExecutor
     from qchem_stack.config.quantum_helpers import resolve_vqe_depth
-    from qchem_stack.protocols.computables.base import EvaluationContext
-    from qchem_stack.protocols.computables.expectation import ExpectationValueComputable
-    from qchem_stack.protocols.protocol_list import ProtocolList
+    from qchem_stack.mitigation.classical_shadows import classical_shadows_hamiltonian_expectation
+    from qchem_stack.quantum.statevector import hea_state
 
     depth = resolve_vqe_depth(cfg)
-    exe = StatevectorHeaExecutor()
-    comp = ExpectationValueComputable(
-        name="classical_shadows_expectation",
-        hamiltonian=qh.operator,
-        n_qubits=int(qh.n_qubits),
-        hea_depth=int(depth),
-        executor=exe,
+    st = hea_state(np.asarray(angles, dtype=float), int(qh.n_qubits), int(depth))
+    shadow = classical_shadows_hamiltonian_expectation(
+        st,
+        qh.operator,
+        int(qh.n_qubits),
+        budget_pairs=int(cfg.mitigation.stubs.classical_shadows_budget_pairs),
+        seed=int(cfg.random_seed),
     )
-    ctx = EvaluationContext(angles=np.asarray(angles, dtype=float))
-    batch = ProtocolList.from_computables(
-        [comp], protocol_name="classical_shadows_expectation_protocol"
-    ).run_all(ctx)
-    batch["budget_pairs_hint"] = int(cfg.mitigation.stubs.classical_shadows_budget_pairs)
+    batch = {
+        "results": [{"name": "classical_shadows_expectation", "value": shadow["expectation"]}],
+        "computable_meta": shadow,
+        "budget_pairs_hint": int(cfg.mitigation.stubs.classical_shadows_budget_pairs),
+        "protocol_name": "classical_shadows_expectation_protocol",
+    }
     return batch
 
 
@@ -101,6 +100,9 @@ def execute_mitigation_dag(
     se = float(energy_stderr) if energy_stderr is not None else None
 
     if m.stubs.spam_calibration:
+        from qchem_stack.mitigation.spam import SPAMCalibration, default_two_qubit_spam_matrix
+
+        cal = SPAMCalibration(readout_assignment=default_two_qubit_spam_matrix())
         trace.append(
             {
                 "node": "SPAM_readout_calibration_stub",
@@ -108,7 +110,8 @@ def execute_mitigation_dag(
                 "energy_out": e,
                 "energy_stderr_in": se,
                 "energy_stderr_out": se,
-                "note": "Scalar-energy identity stub; bitstring-level readout correction is not applied here.",
+                "readout_assignment": cal.readout_assignment,
+                "note": "2-qubit assignment matrix registered; histogram path uses correct_two_qubit_histogram.",
             }
         )
 
@@ -123,7 +126,7 @@ def execute_mitigation_dag(
             "note": "Identity stub — open-stack analog to shadows narratives without sampling.",
         }
         if classical_shadows_computable is not None:
-            cs_node["computable_runtime"] = "ExpectationValueComputable"
+            cs_node["computable_runtime"] = "classical_shadows_hamiltonian_expectation"
             cs_node["protocol_list"] = {
                 "results": classical_shadows_computable.get("results"),
                 "computable_meta": classical_shadows_computable.get("computable_meta"),
@@ -165,13 +168,16 @@ def execute_mitigation_dag(
             )
         else:
             curve = [zne_scale_energy(e, s) for s in scales]
-            ex = float(np.mean(np.array(curve, dtype=float)))
+            from qchem_stack.mitigation.zne import richardson_extrapolation
+
+            ex = richardson_extrapolation(curve, scales, order=min(1, len(scales) - 1))
         trace.append(
             {
                 "node": "ZNE_extrapolation_stub",
                 "zne_scales": scales,
                 "zne_energies": curve,
                 "zne_extrapolated_energy": ex,
+                "zne_extrapolation": "richardson",
                 "zne_extrapolated_stub": ex,
             }
         )

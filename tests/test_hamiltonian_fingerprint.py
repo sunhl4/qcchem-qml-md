@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 from openfermion import InteractionOperator
@@ -17,6 +15,7 @@ from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import load_experiment_config
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path
 
 
 def test_fingerprint_stable_for_same_operator() -> None:
@@ -46,8 +45,7 @@ def test_fingerprint_truncation_flag() -> None:
 def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
     pytest.importorskip("pyscf")
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     r = pyscf_rhf_from_config(cfg)
     ref1 = ClassicalMeanFieldReference(
         mf=r.mf,
@@ -76,8 +74,7 @@ def test_h2_molecular_hamiltonian_fingerprint_stable() -> None:
 def test_h2_fingerprint_sensitive_to_fermion_mapping() -> None:
     pytest.importorskip("pyscf")
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     r = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=r.mf,

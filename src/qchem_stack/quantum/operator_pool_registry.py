@@ -13,6 +13,7 @@ from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.chem.kernels.spin_ucc import (
     build_spin_ucc_doubles_only_fermion_generators,
     build_spin_ucc_singles_only_fermion_generators,
+    build_spin_uccgd_fermion_generators,
     build_spin_uccsd_fermion_generators,
 )
 from qchem_stack.contracts.schema_ids import OPERATOR_POOL_REGISTRY_EXPORT_V1
@@ -152,6 +153,33 @@ def _combined_bk_single_double_slices(hamiltonian: QubitHamiltonian) -> list[Qub
     return out or _toy_pair_xx_pool(hamiltonian)
 
 
+def _fermionic_singles_doubles_staggered_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    singles = _fermionic_uccsd_singles_pool(hamiltonian)
+    doubles = _fermionic_uccsd_doubles_pool(hamiltonian)
+    out: list[QubitOperator] = []
+    n = max(len(singles), len(doubles))
+    for i in range(n):
+        if i < len(singles):
+            out.append(singles[i])
+        if i < len(doubles):
+            out.append(doubles[i])
+    return out or _toy_pair_xx_pool(hamiltonian)
+
+
+def _fermionic_generalized_doubles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    fs = hamiltonian.fermion_space
+    if fs is None:
+        return _toy_pair_xx_pool(hamiltonian)
+    ferm_ops = build_spin_uccgd_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+    out: list[QubitOperator] = []
+    for op in ferm_ops:
+        qop = jordan_wigner(op)
+        if not isinstance(qop, QubitOperator):
+            continue
+        out.append(qop)
+    return out or _toy_pair_xx_pool(hamiltonian)
+
+
 OPERATOR_POOL_ID_ALIASES: Final[dict[str, str]] = {
     "qubit_excitation": "iqeb_qubit_excitation",
     "uccsd_jw": "fermionic_uccsd",
@@ -222,6 +250,16 @@ OPERATOR_POOL_REGISTRY: Final[dict[str, OperatorPoolRegistryEntry]] = {
         summary="Flattened BK singles pool followed by BK doubles pool (explicit registry sequencing).",
         factory=_combined_bk_single_double_slices,
         capabilities={"chemistry_aware": True, "sequenced_slices": True, "bravyi_kitaev": True},
+    ),
+    "fermionic_singles_doubles_staggered": OperatorPoolRegistryEntry(
+        summary="Interleaved JW singles/doubles slices for staged ADAPT/IQEB growth.",
+        factory=_fermionic_singles_doubles_staggered_pool,
+        capabilities={"chemistry_aware": True, "staggered_slices": True},
+    ),
+    "fermionic_generalized_doubles": OperatorPoolRegistryEntry(
+        summary="UCCGD-style JW-mapped singles + generalized doubles (ADAPT/IQEB chemistry slice).",
+        factory=_fermionic_generalized_doubles_pool,
+        capabilities={"chemistry_aware": True, "generalized_doubles": True},
     ),
 }
 

@@ -10,6 +10,7 @@ import numpy as np
 from openfermion.linalg import get_sparse_operator
 
 from qchem_stack.chem.fermion import FermionSpace
+from qchem_stack.chem.mappings.hcb import hard_core_boson_qubit_hamiltonian
 from qchem_stack.chem.spatial_restricted_fermion import (
     restricted_spatial_integrals_to_fermion_operator,
 )
@@ -265,8 +266,25 @@ def qubit_hamiltonian_from_compact_restricted_active_space(
             integral_openfermion_bridge=integral_openfermion_bridge,
         )
 
-    h2_of = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(compact.dense_h2_chemist_spatial())
     h1 = np.asarray(compact.h1_active_mo, dtype=float)
+    if fermion_qubit_mapping == "hard_core_boson":
+        qop = hard_core_boson_qubit_hamiltonian(
+            float(compact.constant), h1, compact.dense_h2_chemist_spatial()
+        )
+        return assemble_qubit_hamiltonian(
+            qop,
+            fermion_space,
+            fermion_qubit_mapping=fermion_qubit_mapping,
+            build_route="hard_core_boson_spatial",
+            n_active_orbitals=n_active_orbitals,
+            n_active_electrons=n_active_electrons,
+            rhf=rhf,
+            canonical_pack=canonical_pack,
+            integral_source=integral_source,
+            integral_openfermion_bridge=integral_openfermion_bridge,
+        )
+
+    h2_of = spatial_mo_eri_pyscf_to_openfermion_mo_ordering(compact.dense_h2_chemist_spatial())
     fo = restricted_spatial_integrals_to_fermion_operator(float(compact.constant), h1, h2_of)
     n_spin = int(fermion_space.n_spin_orbitals)
     qop = _fermion_operator_to_qubits(

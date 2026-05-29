@@ -6,8 +6,7 @@ Schemas:
 
 - ``decomposition_plugin_toy_v1``: Pauli-string fragments only.
 - ``decomposition_plugin_contract_v1``: toy Pauli fragments plus optional per-fragment
-  ``fragment_energy_terms`` stubs (open-stack ledger hooks inspired by decomposition narratives in
-  research packages such as Tangelo — **not** a closed embedding energy accountant).
+  ``fragment_energy_terms`` stubs (open-stack ledger hooks — **not** a closed embedding energy accountant).
 """
 
 from __future__ import annotations

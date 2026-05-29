@@ -13,6 +13,7 @@ from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.restricted_integral_operator import (
     RestrictedActiveSpaceIntegralOperatorCompact,
 )
+from qchem_stack.contracts.schema_ids import PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -72,7 +73,7 @@ class CanonicalActiveSpaceIntegralPack:
         prov = _pack_provenance(
             classical_backend="pyscf",
             upstream_integral_source="pyscf_casci_h2eff_compact",
-            integral_openfermion_bridge="pyscf_tangelo_openfermion_v1",
+            integral_openfermion_bridge=PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1,
             driver_meta=getattr(rhf, "driver_meta", None) or {},
         )
         return cls(compact=compact, provenance=prov)

@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any
 
+import numpy as np
+
 from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 
 from .hamiltonian_meta import (
@@ -84,6 +86,14 @@ def assemble_qubit_hamiltonian(
             "schema": canonical_pack.schema,
             "provenance": dict(canonical_pack.provenance),
         }
+        compact = canonical_pack.compact
+        if hasattr(compact, "constant") and hasattr(compact, "h1_active_mo"):
+            meta["spatial_mo_constant"] = float(compact.constant)
+            meta["spatial_mo_h1"] = np.asarray(compact.h1_active_mo, dtype=float).tolist()
+            if hasattr(compact, "dense_h2_chemist_spatial"):
+                meta["spatial_mo_h2"] = np.asarray(
+                    compact.dense_h2_chemist_spatial(), dtype=float
+                ).tolist()
     if meta_extra:
         meta.update(meta_extra)
     _attach_reference_energy_meta(meta, rhf)

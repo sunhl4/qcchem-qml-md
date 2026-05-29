@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -30,11 +28,11 @@ from qchem_stack.chem.system import MolecularSystem
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import EmbeddingError, PipelineError, PreQuantumCapabilityError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 def test_builtin_backend_capability_matrix_smoke() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     cfg.scf.driver = "psi4"
     psi4 = create_solver(cfg).capabilities
     assert psi4.supports_restricted_active_space_qubit_hamiltonian
@@ -63,9 +61,7 @@ def test_builtin_backend_capability_matrix_smoke() -> None:
     assert pyscf.supports_pbc_k_mesh
 
     cfg.scf.driver = "precomputed"
-    cfg.scf.precomputed.bundle_path = str(
-        root / "configs" / "precomputed_classical_reference_h2.json"
-    )
+    cfg.scf.precomputed.bundle_path = str(configs_path("precomputed_classical_reference_h2.json"))
     pre = create_solver(cfg).capabilities
     assert pre.backend_id == "precomputed"
     assert not pre.supports_restricted_active_space_qubit_hamiltonian
@@ -93,8 +89,7 @@ def test_canonical_pack_requires_backend_builder() -> None:
 
 
 def test_rdm_correction_gate_requires_backend_capability() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_decomposition_plugin_toy.yaml"
+    p = configs_path("example_decomposition_plugin_toy.yaml")
     cfg = load_experiment_config(p)
     register_mock_external_solver()
     cfg.scf.driver = "mock_external"
@@ -117,8 +112,7 @@ def test_projection_and_schmidt_builders_require_ao_basis_view() -> None:
         ),
         driver_meta={"upstream_classical_software_tag": "mock_external"},
     )
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h4_projection_mulliken.yaml")
+    cfg = load_experiment_config(configs_path("example_h4_projection_mulliken.yaml"))
     with pytest.raises(EmbeddingError, match="requires a mean-field reference with AO basis view"):
         molecular_hamiltonian_fragment_mulliken_projection(ref, cfg)
     with pytest.raises(
@@ -214,8 +208,7 @@ def _mock_external_reference_with_ao_stub(*, n_atom: int = 2) -> ClassicalMeanFi
 
 def test_schmidt_and_projection_pass_ao_basis_view_gate_for_mock_backend() -> None:
     ref = _mock_external_reference_with_ao_stub()
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h4_projection_mulliken.yaml")
+    cfg = load_experiment_config(configs_path("example_h4_projection_mulliken.yaml"))
 
     with pytest.raises(Exception) as schmidt_exc:
         build_schmidt_impurity_integrals(
@@ -237,8 +230,7 @@ def test_patch_experiment_active_space_resolution_applies_psi4_driver_meta() -> 
     from qchem_stack.chem.active_space.backend_hooks import patch_experiment_active_space_resolution
     from qchem_stack.chem.active_space.resolution import RESOLVED_ACTIVE_SPACE_META_KEY
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     ref = ClassicalMeanFieldReference(
         mf=object(),
         e_tot=0.0,
@@ -276,8 +268,7 @@ def test_schmidt_pre_quantum_uses_capability_and_ao_basis_view_not_backend_white
         ),
         driver_meta={"upstream_classical_software_tag": "mock_external"},
     )
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h4_schmidt_multifragment.yaml")
+    cfg = load_experiment_config(configs_path("example_h4_schmidt_multifragment.yaml"))
     caps = SolverCapabilities(
         backend_id="mock_external",
         supports_schmidt_atomic_hamiltonian=True,

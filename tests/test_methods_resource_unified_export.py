@@ -10,7 +10,9 @@ from pathlib import Path
 
 import pytest
 
-_ROOT = Path(__file__).resolve().parents[1]
+from tests.helpers.paths import configs_path, fixtures_path, repo_root, scripts_path
+
+_ROOT = repo_root()
 
 
 def _export_with_results(cfg_rel: str, results_path: Path) -> dict:
@@ -20,7 +22,7 @@ def _export_with_results(cfg_rel: str, results_path: Path) -> dict:
     }
     cmd = [
         sys.executable,
-        str(_ROOT / "scripts" / "export_parity_criteria_table.py"),
+        str(scripts_path("export_parity_criteria_table.py")),
         str(_ROOT / cfg_rel),
         "--results",
         str(results_path),
@@ -33,12 +35,12 @@ def _export_with_results(cfg_rel: str, results_path: Path) -> dict:
 def test_methods_resource_preview_in_config_only_export() -> None:
     import importlib.util
 
-    ep_path = _ROOT / "scripts" / "export_parity_criteria_table.py"
+    ep_path = scripts_path("export_parity_criteria_table.py")
     spec = importlib.util.spec_from_file_location("export_parity_criteria_table", ep_path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
     spec.loader.exec_module(mod)
-    d = mod._table_from_config(_ROOT / "configs" / "qpe_dual_track_demo.yaml")
+    d = mod._table_from_config(configs_path("qpe_dual_track_demo.yaml"))
     prev = d.get("methods_resource_preview_v1")
     assert isinstance(prev, dict)
     assert prev.get("schema") == "methods_resource_preview_v1"
@@ -52,10 +54,10 @@ def test_methods_resource_preview_in_config_only_export() -> None:
 def test_methods_resource_preview_includes_vqs_flags() -> None:
     import importlib.util
 
-    p_yaml = _ROOT / "configs" / "example_h2_vqs_track.yaml"
+    p_yaml = configs_path("example_h2_vqs_track.yaml")
     if not p_yaml.is_file():
         pytest.skip("example_h2_vqs_track.yaml missing")
-    ep_path = _ROOT / "scripts" / "export_parity_criteria_table.py"
+    ep_path = scripts_path("export_parity_criteria_table.py")
     spec = importlib.util.spec_from_file_location("export_parity_criteria_table", ep_path)
     mod = importlib.util.module_from_spec(spec)
     assert spec.loader is not None
@@ -70,7 +72,7 @@ def test_methods_resource_preview_includes_vqs_flags() -> None:
 
 
 @pytest.mark.skipif(
-    not (_ROOT / "configs" / "qpe_dual_track_demo.yaml").is_file(),
+    not (configs_path("qpe_dual_track_demo.yaml")).is_file(),
     reason="config missing",
 )
 def test_methods_resource_unified_from_qpe_dual_track_pipeline() -> None:
@@ -86,7 +88,7 @@ def test_methods_resource_unified_from_qpe_dual_track_pipeline() -> None:
     cfg_path = _ROOT / cfg_rel
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
-    tmp = _ROOT / "tests" / "fixtures" / "_tmp_qpe_dual_methods_resource.json"
+    tmp = fixtures_path("_tmp_qpe_dual_methods_resource.json")
     try:
         tmp.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
         exp = _export_with_results(cfg_rel, tmp)
@@ -109,7 +111,7 @@ def test_methods_resource_unified_from_qpe_dual_track_pipeline() -> None:
 
 
 @pytest.mark.skipif(
-    not (_ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml").is_file(),
+    not (configs_path("example_h2_qpe_track_parity_integrations.yaml")).is_file(),
     reason="config missing",
 )
 def test_methods_resource_unified_qpe_plus_tket_probe_schema() -> None:
@@ -123,7 +125,7 @@ def test_methods_resource_unified_qpe_plus_tket_probe_schema() -> None:
     cfg_path = _ROOT / cfg_rel
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
-    tmp = _ROOT / "tests" / "fixtures" / "_tmp_methods_resource_qpe_tket.json"
+    tmp = fixtures_path("_tmp_methods_resource_qpe_tket.json")
     try:
         tmp.write_text(json.dumps(out, indent=2) + "\n", encoding="utf-8")
         exp = _export_with_results(cfg_rel, tmp)
@@ -169,9 +171,9 @@ def test_resource_estimation_preview_v1_config_only_export() -> None:
         **os.environ,
         "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
     }
-    cfg = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
+    cfg = configs_path("example_h2_qpe_track_parity_integrations.yaml")
     proc = subprocess.run(
-        [sys.executable, str(_ROOT / "scripts" / "export_parity_criteria_table.py"), str(cfg)],
+        [sys.executable, str(scripts_path("export_parity_criteria_table.py")), str(cfg)],
         cwd=str(_ROOT),
         capture_output=True,
         text=True,
@@ -205,9 +207,9 @@ def test_registry_and_mdml_blocks_in_config_only_export() -> None:
         **os.environ,
         "PYTHONPATH": str(_ROOT / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),
     }
-    cfg = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
+    cfg = configs_path("example_h2_qpe_track_parity_integrations.yaml")
     proc = subprocess.run(
-        [sys.executable, str(_ROOT / "scripts" / "export_parity_criteria_table.py"), str(cfg)],
+        [sys.executable, str(scripts_path("export_parity_criteria_table.py")), str(cfg)],
         cwd=str(_ROOT),
         capture_output=True,
         text=True,
@@ -321,7 +323,7 @@ def test_resource_estimation_preview_pipeline_merges_qpe_three_from_run_summary(
         build_resource_estimation_preview_v1,
     )
 
-    cfg_path = _ROOT / "configs" / "example_h2_qpe_track_parity_integrations.yaml"
+    cfg_path = configs_path("example_h2_qpe_track_parity_integrations.yaml")
     if not cfg_path.is_file():
         pytest.skip("configs/example_h2_qpe_track_parity_integrations.yaml missing")
     cfg = load_experiment_config(cfg_path)

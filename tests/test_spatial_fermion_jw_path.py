@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 from openfermion import InteractionOperator, jordan_wigner
@@ -33,12 +31,13 @@ from qchem_stack.chem.spatial_restricted_fermion import (
 from qchem_stack.config import ActiveSpaceSpec, load_experiment_config
 from qchem_stack.config.active_space_mapping_specs import ActiveSpaceMappingSpec
 from qchem_stack.config.active_space_specs import ActiveSpaceCasSpec, ActiveSpaceJwSpec
+from tests.helpers.paths import configs_path, repo_root
 
 pytest.importorskip("pyscf")
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
-_ROOT = Path(__file__).resolve().parents[1]
-_CFG_H2 = _ROOT / "configs" / "example_h2.yaml"
+_ROOT = repo_root()
+_CFG_H2 = configs_path("example_h2.yaml")
 
 
 def _as_reference(rhf) -> ClassicalMeanFieldReference:

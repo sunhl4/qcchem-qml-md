@@ -1,0 +1,7 @@
+2026-05-28 21:03:08,660: ferrmion.utils: 548: DEBUG: Logging initialised.
+2026-05-28 21:03:08,728: matplotlib: 342: DEBUG: matplotlib data path: /home/sunhl/projects/qchem_qml_md/.venv/lib/python3.12/site-packages/matplotlib/mpl-data
+2026-05-28 21:03:08,735: matplotlib: 342: DEBUG: CONFIGDIR=/home/sunhl/.config/matplotlib
+2026-05-28 21:03:08,736: matplotlib: 1560: DEBUG: interactive is False
+2026-05-28 21:03:08,736: matplotlib: 1561: DEBUG: platform is linux
+2026-05-28 21:03:08,748: matplotlib: 342: DEBUG: CACHEDIR=/home/sunhl/.cache/matplotlib
+2026-05-28 21:03:08,749: matplotlib.font_manager: 1635: DEBUG: Using fontManager instance from /home/sunhl/.cache/matplotlib/fontlist-v390.json

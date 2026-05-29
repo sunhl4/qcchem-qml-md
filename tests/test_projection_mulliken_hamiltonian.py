@@ -57,7 +57,7 @@ def test_projection_mulliken_h2_full_system_matches_global() -> None:
     p, audit = molecular_hamiltonian_fragment_mulliken_projection(ref, cfg)
     assert g.meta["hamiltonian_fingerprint"] == p.meta["hamiltonian_fingerprint"]
     assert p.meta["integral_source"] == "pyscf_projection_fragment_mulliken_v1"
-    assert p.meta["integral_openfermion_bridge"] == "pyscf_tangelo_openfermion_v1"
+    assert p.meta["integral_openfermion_bridge"] == "pyscf_spatial_openfermion_v1"
     assert audit["selected_mo_indices"]
 
 

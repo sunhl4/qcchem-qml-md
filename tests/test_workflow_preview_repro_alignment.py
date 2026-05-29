@@ -2,20 +2,41 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+pyscf = pytest.importorskip("pyscf")
 
 from qchem_stack.config import load_experiment_config
 from qchem_stack.integrations.workflow_preview import (
     slim_product_summary_from_pipeline_result,
     workflow_preview_payload,
 )
-from qchem_stack.orchestration.pipeline import collect_repro_metadata
+from qchem_stack.orchestration.pipeline import collect_repro_metadata, run_pipeline_sync
+from tests.helpers.paths import configs_path
+
+_WORKFLOW_PREVIEW_GOLDEN_YAMLS = (
+    "example_h2.yaml",
+    "example_h2_uccsd.yaml",
+    "example_h2_adapt_singles_pool.yaml",
+    "example_h2_sa_vqe.yaml",
+    "example_h2_zne_circuit_fold.yaml",
+)
+
+
+@pytest.mark.parametrize("config_rel", _WORKFLOW_PREVIEW_GOLDEN_YAMLS)
+def test_workflow_preview_after_pipeline_matches_standalone(config_rel: str) -> None:
+    cfg_path = configs_path(config_rel)
+    if not cfg_path.is_file():
+        pytest.skip(f"configs/{config_rel} missing")
+    cfg = load_experiment_config(cfg_path)
+    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
+    repro_wp = out["repro"]["workflow_preview_v1"]
+    direct = workflow_preview_payload(cfg)
+    assert repro_wp == direct
 
 
 def test_workflow_preview_in_collect_matches_standalone() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     repro = collect_repro_metadata(cfg, cfg_path=cfg_path)
     direct = workflow_preview_payload(cfg)
@@ -23,7 +44,7 @@ def test_workflow_preview_in_collect_matches_standalone() -> None:
 
 
 def test_workflow_preview_rich_superset_matches_base_when_stripped() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     base = workflow_preview_payload(cfg, include_computables_rich=False)
     rich = workflow_preview_payload(cfg, include_computables_rich=True)
@@ -34,7 +55,7 @@ def test_workflow_preview_rich_superset_matches_base_when_stripped() -> None:
 
 
 def test_workflow_preview_rich_in_repro_when_parity_flag() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     cfg_on = cfg.model_copy(
         update={
@@ -68,15 +89,11 @@ def test_slim_summary_surfaces_projection_epistemic_bound() -> None:
 
 
 @pytest.mark.skipif(
-    not Path(__file__)
-    .resolve()
-    .parents[1]
-    .joinpath("configs", "example_h2_vqs_track.yaml")
-    .is_file(),
+    not configs_path("example_h2_vqs_track.yaml").is_file(),
     reason="VQS track sample config missing",
 )
 def test_workflow_preview_vqs_track_nested_equals_repro_top_level_slice() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2_vqs_track.yaml"
+    cfg_path = configs_path("example_h2_vqs_track.yaml")
     cfg = load_experiment_config(cfg_path)
     repro = collect_repro_metadata(cfg, cfg_path=cfg_path)
     top = repro.get("workflow_preview_vqs_track_v1")
@@ -86,15 +103,11 @@ def test_workflow_preview_vqs_track_nested_equals_repro_top_level_slice() -> Non
 
 
 @pytest.mark.skipif(
-    not Path(__file__)
-    .resolve()
-    .parents[1]
-    .joinpath("configs", "qpe_dual_track_demo.yaml")
-    .is_file(),
+    not configs_path("qpe_dual_track_demo.yaml").is_file(),
     reason="QPE dual-track sample config missing",
 )
 def test_workflow_preview_qpe_track_nested_equals_repro_top_level_slice() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "qpe_dual_track_demo.yaml"
+    cfg_path = configs_path("qpe_dual_track_demo.yaml")
     cfg = load_experiment_config(cfg_path)
     repro = collect_repro_metadata(cfg, cfg_path=cfg_path)
     top = repro.get("workflow_preview_qpe_track_v1")

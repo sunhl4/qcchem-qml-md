@@ -58,7 +58,7 @@ active_space:
 backend:
   name: uqc_ion_trap_cloud_sim
   provider: uqc
-  shots_per_circuit: 100
+  shots_per_circuit: 500
   target_energy_stderr: null
   qiskit_mode: statevector
   uqc_token: null
@@ -71,6 +71,8 @@ backend:
     uqc_allow_fallback: false
     uqc_timeout_s: 600.0
     uqc_poll_interval_s: 2.0
+    uqc_multi_basis_pauli: true
+    uqc_pauli_grouping: tensor_product
 mitigation:
   execution_class: unspecified
   zne:
@@ -100,11 +102,11 @@ quantum:
   algorithm: vqe
   algorithm_factory: null
   variational:
-    ansatz: hea
+    ansatz: uccsd
     uccsd_trotter_steps: null
   vqe:
     depth: 1
-    maxiter: 5
+    maxiter: 150
     optimizer_method: COBYLA
     initial_parameters_strategy: random_uniform
   adapt:

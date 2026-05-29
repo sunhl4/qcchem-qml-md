@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -20,8 +20,11 @@ class LowdinTensors:
 def coalesce_spin_summed_rdm1(rdm1_raw: Any) -> np.ndarray:
     """Collapse PySCF alpha/beta tuple densities to a single spatial AO matrix."""
     if isinstance(rdm1_raw, (tuple, list)):
-        return np.asarray(rdm1_raw[0], dtype=float) + np.asarray(rdm1_raw[1], dtype=float)
-    return np.asarray(rdm1_raw, dtype=float)
+        return cast(
+            "np.ndarray",
+            np.asarray(rdm1_raw[0], dtype=float) + np.asarray(rdm1_raw[1], dtype=float),
+        )
+    return cast("np.ndarray", np.asarray(rdm1_raw, dtype=float))
 
 
 def build_lowdin_tensors(

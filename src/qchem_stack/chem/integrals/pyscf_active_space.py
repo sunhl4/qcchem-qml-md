@@ -102,11 +102,10 @@ def active_space_integrals(
 ) -> tuple[float, np.ndarray, np.ndarray]:
     """Return (constant, h1_spatial, h2_spatial) for OpenFermion ``InteractionOperator``.
 
-    ``h2_spatial`` is the active-space MO ERI tensor after **Tangelo/OpenFermion reordering**
+    ``h2_spatial`` is the active-space MO ERI tensor after OpenFermion reordering
     (:func:`~qchem_stack.chem.integral_convention.spatial_mo_eri_pyscf_to_openfermion_mo_ordering`)
     on PySCF ``get_h2eff`` / ``ao2mo.restore`` output. Callers then use
-    ``spinorb_from_spatial`` and ``InteractionOperator(..., 0.5 * h2_spin_orb)`` as in
-    SandboxAQ Tangelo's ``SecondQuantizedMolecule._get_fermionic_hamiltonian``.
+    ``spinorb_from_spatial`` and ``InteractionOperator(..., 0.5 * h2_spin_orb)``.
 
     The constant is PySCF ``get_h1eff``'s ``energy_core`` (nuclear repulsion plus
     frozen-core electronic energy when ``ncore>0``); do not add ``energy_nuc`` again.

@@ -177,6 +177,21 @@ PySCF paths (`pip install qchem-stack[chem]`):
 ./scripts/venv-run python scripts/smoke_pipeline.py --precomputed-only
 ```
 
+## Solver / backend plugin checklist (~10 min)
+
+Reference implementation: [`examples/solver_plugin_entrypoint_demo/`](examples/solver_plugin_entrypoint_demo/README.md).
+
+| Step | Action | Verify |
+|------|--------|--------|
+| 1 | `pip install -e ./examples/solver_plugin_entrypoint_demo` | `"entrypoint_demo" in registered_solver_ids()` |
+| 2 | Scaffold or copy solver module | `python scripts/create_solver_adapter_scaffold.py my_backend --output ...` |
+| 3 | Register `[project.entry-points."qchem_stack.solvers"]` in plugin `pyproject.toml` | No import warning on `import qchem_stack` |
+| 4 | Set `scf.driver: my_backend` in a YAML | `run_pipeline_from_config("configs/example_h2.yaml")` succeeds |
+| 5 | Declare accurate `SolverCapabilities` | `python scripts/check_solver_adapter_contract.py` when CAS integrals are required |
+| 6 | Open PR with README snippet + test or smoke note | CI `lint` + `test` green |
+
+Variational or shot backends use `BackendSpec` / backend registry — not the SCF entry-point group above.
+
 ## Examples / tutorials
 
 See `examples/` and `python examples/run_all_smoke.py` (best-effort; skips steps when PySCF or optional extras are missing).

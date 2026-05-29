@@ -9,6 +9,7 @@ import numpy as np
 from qchem_stack.chem.active_space.avas_projection import apply_avas_projection
 from qchem_stack.chem.active_space.resolution import RESOLVED_ACTIVE_SPACE_META_KEY
 from qchem_stack.chem.bridges.ao_basis_view import ao_basis_view_from_reference
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.contracts.schema_ids import CASSCF_ORBITAL_AUDIT_V1
 from qchem_stack.exceptions import PipelineError
 
@@ -51,8 +52,8 @@ class Psi4ActiveSpaceHooks:
             ncas = int(meta_resolution["n_active_orbitals"])
             nelec = int(meta_resolution["n_active_electrons"])
         else:
-            ncas = int(cfg.active_space.cas.n_orbitals)
-            nelec = int(cfg.active_space.cas.n_electrons)
+            ncas = resolve_n_orbitals(cfg.active_space)
+            nelec = resolve_n_electrons(cfg.active_space)
 
         nmo = int(wfn.nmo())
         nfrozen = nmo - ncas

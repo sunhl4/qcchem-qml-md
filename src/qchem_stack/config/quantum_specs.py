@@ -15,13 +15,39 @@ from .quantum_graph import (  # noqa: TC001 — Pydantic resolves graph edge typ
 
 
 class QuantumVariationalSpec(ForbidExtraBase):
-    ansatz: Literal["hea", "uccsd"] = Field(
+    ansatz: Literal[
+        "hea",
+        "uccsd",
+        "uccgd",
+        "qcc",
+        "upccgsd",
+        "puccd",
+        "iqcc",
+        "qite",
+        "vsqs",
+    ] = Field(
         default="hea",
-        description="Variational ansatz: hea layers or uccsd cluster expansion.",
+        description=(
+            "Variational ansatz: HEA, cluster ansätze, qcc, iqcc/qite research plugins, or VSQS schedule."
+        ),
     )
     uccsd_trotter_steps: int | None = Field(
         default=None,
         description="Optional UCCSD first-order Trotter layer count (uccsd ansatz only).",
+    )
+    vsqs_intervals: int = Field(
+        default=2,
+        ge=2,
+        description="VSQS schedule steps (must be > 1).",
+    )
+    vsqs_time: float = Field(
+        default=1.0,
+        gt=0.0,
+        description="Total VSQS propagation time.",
+    )
+    vsqs_trotter_order: Literal[1, 2] = Field(
+        default=1,
+        description="Trotter order for VSQS Pauli-sum layers.",
     )
 
 
@@ -50,6 +76,11 @@ class QuantumAdaptSpec(ForbidExtraBase):
     pool_id: OperatorPoolId = Field(
         default=OperatorPoolId.FERMIONIC_UCCSD,
         description="Operator pool for ADAPT / tetris_adapt.",
+    )
+    grad_tol: float = Field(
+        default=1.0e-2,
+        gt=0.0,
+        description="Stop ADAPT when best pool-gradient magnitude falls below this threshold.",
     )
 
 
@@ -170,7 +201,12 @@ class QuantumExcitedSceomSpec(ForbidExtraBase):
         ge=0,
         description="Gaussian noise shots on M when > 0.",
     )
-    generator_strategy: Literal["legacy", "fermionic_singles_mapped", "pauli_xy_extended"] = Field(
+    generator_strategy: Literal[
+        "legacy",
+        "fermionic_singles_mapped",
+        "pauli_xy_extended",
+        "symmetry_filtered_partial",
+    ] = Field(
         default="fermionic_singles_mapped",
         description="SCEOM excitation generator strategy.",
     )

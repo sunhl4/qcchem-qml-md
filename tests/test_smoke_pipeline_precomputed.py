@@ -5,11 +5,12 @@ from __future__ import annotations
 import os
 import subprocess
 import sys
-from pathlib import Path
+
+from tests.helpers.paths import repo_root
 
 
 def test_smoke_pipeline_precomputed_only_subprocess() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     env = os.environ.copy()
     env["PYTHONPATH"] = f"{root / 'src'}{os.pathsep}{root}"
     proc = subprocess.run(

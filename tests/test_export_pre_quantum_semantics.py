@@ -6,11 +6,12 @@ import json
 import os
 import subprocess
 import sys
-from pathlib import Path
+
+from tests.helpers.paths import repo_root
 
 
 def _export(cfg_rel: str) -> dict:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     env = {
         **os.environ,
         "PYTHONPATH": str(root / "src") + os.pathsep + os.environ.get("PYTHONPATH", ""),

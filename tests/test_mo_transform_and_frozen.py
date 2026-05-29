@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -14,8 +14,7 @@ from tests.fixtures.classical_reference import pyscf_rhf_from_config
 
 
 def test_active_space_casci_respects_frozen_orbitals_metadata() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     c0, h10, _ = active_space_casci_raw_blocks(rhf, 1, 0)
     rhf_frozen = rhf

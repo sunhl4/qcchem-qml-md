@@ -146,7 +146,9 @@
 
 **已闭合批次（不在本战略文铺陈证据链）**：P0/P1、主线结构增强（QPE 演示轨/主 pipeline、Computable 薄层、TKET CI）及原「不排期」四项之 **开放栈类比 v1**，均已以审计与 CI 收口。权威清单见 [与Vendor platform能力差距与实施计划 — 附录 E / F](public_parity_matrix.md)；机读键与矩阵见 [public_parity_matrix.md](public_parity_matrix.md)、[public_parity_matrix.md](public_parity_matrix.md) §1–§2；**物化链与判据**见 [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md)。
 
-**仍需推进（§141 残余，多为路线图 P2）**：QPE/FT **资源估计与编译器级深度合一**（浅层演示轨已交付，**深度**见 [与Vendor platform能力差距与实施计划 — 附录 A](public_parity_matrix.md) 内 P2-W1）；**化学意义上**完整 DMET bath 自洽与 **产品级** ONIOM/QM-MM；**Vendor platform/Vendor 默认捆绑的 AVAS+CASSCF「产品全流程」叙事**（开放栈已对 PySCF **阈值 AVAS**、`casscf_orbital_optimization_*` **单次核**接线，矩阵仍 honest **`partial`**）；**BK/SCBK 上 UCCSD Trotter**（矩阵 **`n/a`**）；**教程与 examples** 资产扩张。**分阶段 backlog** 见 [public_parity_matrix.md](public_parity_matrix.md) §6；**WBS / 闸门** 见同文 **附录 A**。代表性 YAML 与 README 索引中的后端适配烟测（如 `pytest` 子集、`test_backend_capability_conformance`）见 [README](../README.md)。
+**P4 执行（2026Q2–Q3）**：Ansatz/池/后端（UpCCGSD、pUCCD、Braket/Cirq、staggered pool）、mitigation/编译深度、DMET/ONIOM 生产 demo、MD/ML **`science_kpi_met`**（`|ΔE| < 0.1 Ha`）与 v0.3.0 生态封板 — 见 `docs/execution/comparative_execution_backlog.yaml` Phase I–L。
+
+**仍需推进（§141 残余，多为闭源 L0 或刻意 n/a）**：Nexus/HQC 云 SLA；商业 Qermit/cuTensorNet L0；**BK/SCKB 上 UCCSD Trotter**（矩阵 **`n/a`**）；JKMN/HCB 映射（矩阵 **`n/a`**）。**分阶段 backlog** 见 [public_parity_matrix.md](public_parity_matrix.md) §6。
 **执行周报（2026Q2 收口）**：`docs/execution/day01_gap_inventory_2026Q2.md`～`day90_final_closeout_2026Q2.md`。Week1 之外，已补 Day12 与 Day25/45/65/80/90 里程碑收口页，形成完整审计链。下一阶段执行入口：`docs/execution/day91_next_phase_plan_2026Q3.md` + `docs/execution/day91_day120_daily_breakdown_2026Q3.md`。
 
 ### 6.1 下一步计划（Day91+）

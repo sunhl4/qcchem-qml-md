@@ -11,7 +11,10 @@ from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfer
 from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
 from qchem_stack.chem.solvers._active_space_common import resolve_active_space_spec
 from qchem_stack.chem.solvers.pyscf_solver_mf import build_molecular_mf_without_kernel
-from qchem_stack.contracts.schema_ids import PYSCF_ACTIVE_SPACE_INTEGRALS_V1
+from qchem_stack.contracts.schema_ids import (
+    PYSCF_ACTIVE_SPACE_INTEGRALS_V1,
+    PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1,
+)
 
 if TYPE_CHECKING:
     from qchem_stack.chem.solvers.pyscf_solver import PySCFIntegralSolver
@@ -56,7 +59,7 @@ def get_active_space_integrals(
         "h1_spatial_mo": np.asarray(h1_real, dtype=float),
         "h2_spatial_mo_chemist": np.asarray(h2_chemist, dtype=float),
         "h2_spatial_mo_openfermion": h2_openfermion,
-        "openfermion_bridge": "pyscf_tangelo_openfermion_v1",
+        "openfermion_bridge": PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1,
         "scf_energy": float(mf.e_tot),
         "pyscf_converged": bool(getattr(mf, "converged", False)),
     }

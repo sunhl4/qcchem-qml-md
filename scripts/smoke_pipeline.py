@@ -17,6 +17,7 @@ Usage::
 
 from __future__ import annotations
 
+import os
 import sys
 from pathlib import Path
 
@@ -85,6 +86,9 @@ def main() -> int:
     try:
         import pyscf  # noqa: F401
     except ImportError:
+        if os.environ.get("QCHEM_SMOKE_REQUIRE_PYSCF") == "1":
+            print("smoke_pipeline: PySCF required but not installed", file=sys.stderr)
+            return 1
         print(
             "smoke_pipeline: skip (install PySCF: pip install qchem-stack[chem])", file=sys.stderr
         )

@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from scipy.optimize import minimize
@@ -108,7 +108,7 @@ class VQD:
         else:
             g = hea_state(xv, self.hamiltonian.n_qubits, self.depth)
         g = np.asarray(g, dtype=complex).ravel()
-        return g / (np.linalg.norm(g) + 1e-15)
+        return cast("np.ndarray", g / (np.linalg.norm(g) + 1e-15))
 
     def _resolve_penalties(self) -> list[float]:
         n_exc = max(0, self.n_states - 1)
@@ -136,7 +136,10 @@ class VQD:
         strat = self.init_strategy
         if strat == "legacy":
             if level == 1 and reused_ground and len(v0_angles) == n_param:
-                return np.asarray(v0_angles, dtype=float).copy()
+                return cast(
+                    "np.ndarray",
+                    np.asarray(v0_angles, dtype=float).copy(),
+                )
             return rng.uniform(-np.pi, np.pi, size=n_param)
         if strat == "random_uniform":
             return rng.uniform(-np.pi, np.pi, size=n_param)
@@ -146,8 +149,10 @@ class VQD:
             and reused_ground
             and len(v0_angles) == n_param
         ):
-            return np.asarray(v0_angles, dtype=float) + rng.normal(
-                0.0, self.init_noise_scale, size=n_param
+            return cast(
+                "np.ndarray",
+                np.asarray(v0_angles, dtype=float)
+                + rng.normal(0.0, self.init_noise_scale, size=n_param),
             )
         if (
             strat == "previous_layer_perturb"
@@ -155,8 +160,10 @@ class VQD:
             and x_prev is not None
             and len(x_prev) == n_param
         ):
-            return np.asarray(x_prev, dtype=float) + rng.normal(
-                0.0, self.init_noise_scale, size=n_param
+            return cast(
+                "np.ndarray",
+                np.asarray(x_prev, dtype=float)
+                + rng.normal(0.0, self.init_noise_scale, size=n_param),
             )
         return rng.uniform(-np.pi, np.pi, size=n_param)
 
@@ -384,7 +391,7 @@ class VQD:
             )
             prev_states.append(g_new)
 
-        meta: dict[str, Any] = {
+        result_meta: dict[str, Any] = {
             "orthogonal_weight": self.penalty_weight,
             "vqd_penalty_weights_resolved": penalties,
             "reference": "Quantum 3, 156 (2019)",
@@ -405,8 +412,8 @@ class VQD:
             "vqd_variety_yaml": "uccsd" if self.prepare_state else "hea",
         }
         if warnings:
-            meta["vqd_warnings"] = warnings
-        meta.update(
+            result_meta["vqd_warnings"] = warnings
+        result_meta.update(
             vqd_cross_stack_semantics_meta(
                 penalty_weight=self.penalty_weight,
                 penalty_weights_resolved=penalties,
@@ -415,4 +422,4 @@ class VQD:
                 n_system_qubits=int(self.hamiltonian.n_qubits),
             )
         )
-        return VQDResult(energies=energies, meta=meta)
+        return VQDResult(energies=energies, meta=result_meta)

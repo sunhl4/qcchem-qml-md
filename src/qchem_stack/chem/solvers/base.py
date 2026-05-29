@@ -66,9 +66,9 @@ class MolecularMeanFieldResult:
 
 @runtime_checkable
 class ChemIntegralSolver(Protocol):
-    """Classical integral / Hartree–Fock backend aligned with Tangelo ``IntegralSolver`` *shape*.
+    """Classical integral / Hartree–Fock backend protocol.
 
-    Tangelo-oriented mapping (conceptual, not a fork):
+    Expected surface:
 
     - **set_physical_data**: bind geometry / basis / charge / SCF options from :class:`ExperimentConfig`.
     - **compute_mean_field**: primary SCF entry; ``periodic=False`` molecule, ``periodic=True`` crystal.

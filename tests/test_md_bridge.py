@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import pytest
 
+from tests.helpers.paths import configs_path
+
 pytestmark = pytest.mark.l1_md_ml
 
 from qchem_stack.md_bridge import QMEFDataset, QMFrame, StubTorchMLIPTrainer
@@ -59,13 +61,11 @@ def test_md_export_roundtrip(tmp_path) -> None:
 
 def test_qmef_frame_can_carry_pipeline_repro_config_sha256_prefix() -> None:
     """P2-W6: ``QMFrame.repro_config_sha256_prefix`` aligns with ``repro.config_sha256_prefix`` policy."""
-    from pathlib import Path
 
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import collect_repro_metadata
 
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2.yaml"
+    p = configs_path("example_h2.yaml")
     if not p.is_file():
         pytest.skip("example_h2.yaml missing")
     cfg = load_experiment_config(p)

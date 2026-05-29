@@ -27,7 +27,7 @@
 | `fermionic_adapt` | ADAPT 池驱动 |
 | `iqeb` | IQEB 与算法键一致 |
 | `uccsd_closed_shell_reference` | 激发计数 / bookkeeping 入 `parity_snapshot`，主线仍可 HEA |
-| `trotter_ucc_placeholder` | JW + `quantum.uccsd_trotter_steps` → `UCCSDTrotterVQE`；**BK/SCBK 上 UCCSD Trotter 仍为矩阵 `n/a`** |
+| `trotter_ucc_placeholder` | JW + `quantum.variational.uccsd_trotter_steps` → `UCCSDTrotterVQE`；**BK/SCBK 上 UCCSD Trotter 仍为矩阵 `n/a`** |
 
 源码：`src/qchem_stack/quantum/ansatz_registry.py`。
 

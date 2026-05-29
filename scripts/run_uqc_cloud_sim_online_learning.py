@@ -5,9 +5,11 @@ Run two rounds of MD/ML active learning with UQC cloud ion-trap **simulator** (i
 Requires:
   - pip install -e ".[chem,quantum]" uqc-client
   - pip install -e /path/to/QML-FF && pip install jax-md
-  - export UQC_API_TOKEN='...'   # 30 min validity from 幺正量子云平台
+  - repo ``.env``: UQC_API_TOKEN (30 min), SERVER_HOST for intranet (e.g. 192.168.110.148)
+  - preflight: ``python scripts/check_uqc_connectivity.py``
 
 Does **not** use Matrix2 real hardware (backend.meta.uqc_target=iontrap-sim).
+Public DNS cloud.unitaryqubit.com often times out; use intranet SERVER_HOST.
 """
 
 from __future__ import annotations
@@ -61,6 +63,11 @@ def main() -> int:
     ap.add_argument("--experiment", type=Path, default=DEFAULT_EXP)
     ap.add_argument("--loop", type=Path, default=DEFAULT_LOOP)
     ap.add_argument("--output", type=Path, default=DEFAULT_OUT)
+    ap.add_argument(
+        "--backend-profile",
+        default="uqc_cloud",
+        help="Backend preset (default uqc_cloud = 公司 UQC 内网真云)",
+    )
     ap.add_argument("--token", default=None, help="UQC token (else UQC_API_TOKEN env)")
     ap.add_argument("--skip-preflight", action="store_true")
     args = ap.parse_args()
@@ -68,14 +75,15 @@ def main() -> int:
     token = (
         args.token or os.environ.get("UQC_API_TOKEN") or os.environ.get("USER_TOKEN") or ""
     ).strip()
-    if not token:
+    profile_id = str(args.backend_profile).strip().lower()
+    if profile_id == "uqc_cloud" and not token:
         print(
-            "ERROR: set UQC_API_TOKEN or pass --token (from 幺正量子云平台用户中心).",
+            "ERROR: uqc_cloud profile requires UQC_API_TOKEN or --token (幺正云平台用户中心).",
             file=sys.stderr,
         )
         return 2
-
-    os.environ["UQC_API_TOKEN"] = token
+    if token:
+        os.environ["UQC_API_TOKEN"] = token
 
     try:
         import pyscf  # noqa: F401
@@ -88,22 +96,41 @@ def main() -> int:
     except ImportError:
         print("ERROR: qmlff and jax-md required for online learning loop.", file=sys.stderr)
         return 2
-    try:
-        import uqc_client  # noqa: F401
-    except ImportError:
-        print("ERROR: pip install uqc-client", file=sys.stderr)
-        return 2
+    if profile_id == "uqc_cloud":
+        try:
+            import uqc_client  # noqa: F401
+        except ImportError:
+            print("ERROR: pip install uqc-client", file=sys.stderr)
+            return 2
 
-    from qchem_stack.config import load_experiment_config
+    from qchem_stack.backends.profiles import list_backend_profile_ids
     from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
 
-    exp_cfg = load_experiment_config(args.experiment)
-    if exp_cfg.backend.provider != "uqc" or exp_cfg.backend.uqc_mode != "real":
-        print("ERROR: experiment must use provider=uqc and uqc_mode=real", file=sys.stderr)
+    if profile_id not in list_backend_profile_ids():
+        print(f"ERROR: unknown backend profile {profile_id!r}", file=sys.stderr)
+        return 2
+
+    sys.path.insert(0, str(REPO / "scripts"))
+    from backend_profile_helpers import (
+        load_experiment_with_backend_profile,
+        write_resolved_experiment_yaml,
+    )
+
+    exp_cfg, prof, _ = load_experiment_with_backend_profile(args.experiment, profile_id)
+    args.output.mkdir(parents=True, exist_ok=True)
+    resolved_yaml = write_resolved_experiment_yaml(exp_cfg, args.output, profile_id=profile_id)
+    logging.info("backend profile=%s provider=%s", prof.profile_id, prof.provider)
+
+    if prof.profile_id == "uqc_cloud" and prof.uqc_mode != "real":
+        print("ERROR: uqc_cloud profile must use uqc_mode=real", file=sys.stderr)
         return 2
     target = str((exp_cfg.backend.meta or {}).get("uqc_target", "iontrap-sim"))
 
-    if not args.skip_preflight:
+    server = os.environ.get("SERVER_HOST", "cloud.unitaryqubit.com")
+    port = os.environ.get("SERVER_PORT", "8003")
+    logging.info("UQC endpoint http://%s:%s", server, port)
+
+    if profile_id == "uqc_cloud" and not args.skip_preflight:
         logging.info("UQC preflight (target=%s)...", target)
         try:
             info = _preflight_uqc(token, target)
@@ -131,9 +158,15 @@ def main() -> int:
         args.output,
     )
     summary = run_md_validation_loop(
-        args.experiment,
+        resolved_yaml,
         config=loop_cfg,
         output_dir=args.output,
+    )
+    summary["backend_profile"] = prof.profile_id
+    summary["backend_provider"] = prof.provider
+    (args.output / "md_validation_summary.json").write_text(
+        json.dumps(summary, indent=2, default=str),
+        encoding="utf-8",
     )
     out_json = args.output / "md_validation_summary.json"
     logging.info("Done. summary written to %s", out_json)

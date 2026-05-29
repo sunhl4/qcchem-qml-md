@@ -43,18 +43,18 @@ def dataframe_circuit_shot_rows(proto: PauliAveragingProtocol) -> list[dict[str,
                 )
         return rows
     for i, c in enumerate(proto._compiled):
-        extra: dict[str, Any] = {}
+        row_extra: dict[str, Any] = {}
         if i < len(metas):
-            extra["pauli_group_id"] = metas[i].get("group_id")
-            extra["n_pauli_terms"] = metas[i].get("n_terms")
-            extra["synthesized"] = metas[i].get("synthesized")
+            row_extra["pauli_group_id"] = metas[i].get("group_id")
+            row_extra["n_pauli_terms"] = metas[i].get("n_terms")
+            row_extra["synthesized"] = metas[i].get("synthesized")
         rows.append(
             circuit_resource_row(
                 f"circ_{i}",
                 c,
                 shots=eff,
                 backend=proto.backend,
-                extra=cast("dict[str, Any] | None", extra or None),
+                extra=cast("dict[str, Any] | None", row_extra or None),
             )
         )
     return rows

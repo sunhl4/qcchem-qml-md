@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -13,8 +13,7 @@ from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 
 def test_avas_stub_yaml_sets_driver_meta_flags() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2_avas_stub.yaml"
+    p = configs_path("example_h2_avas_stub.yaml")
     cfg = load_experiment_config(p)
     assert cfg.active_space.strategy == "avas_stub"
     out = run_pipeline_sync(cfg, cfg_path=p)

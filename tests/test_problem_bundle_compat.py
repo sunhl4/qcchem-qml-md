@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -20,8 +20,7 @@ from tests.fixtures.classical_reference import (
 
 
 def test_bundle_from_ras_problem_roundtrip_public_dump() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = classical_reference_from_config(cfg)
     prob = restricted_active_space_quantum_problem_from_config(cfg, reference=ref)
@@ -35,8 +34,7 @@ def test_bundle_from_ras_problem_roundtrip_public_dump() -> None:
 
 
 def test_bundle_accepts_classical_reference_directly() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = classical_reference_from_config(cfg)
     prob = restricted_active_space_quantum_problem_from_config(cfg, reference=ref)

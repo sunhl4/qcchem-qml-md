@@ -11,7 +11,15 @@ class BackendSpec:
     """Execution target: use ``provider`` to choose API (statevector / Qiskit / IonStack / UQC)."""
 
     name: str
-    provider: Literal["statevector", "qiskit", "ionstack", "uqc"] = "statevector"
+    provider: Literal[
+        "statevector",
+        "qiskit",
+        "ionstack",
+        "uqc",
+        "qulacs",
+        "cirq",
+        "braket",
+    ] = "statevector"
     # When target_energy_stderr is None, this is the nominal per-circuit shot count (and stderr input).
     shots_per_circuit: int = 1024
     # If set, recommended_shots_per_circuit is used for stderr bookkeeping (classical bound).

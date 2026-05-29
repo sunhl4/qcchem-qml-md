@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -10,13 +8,13 @@ from qchem_stack.chem.molecular_system_config import molecular_system_from_exper
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.config import load_experiment_config
+from tests.helpers.paths import configs_path
 
 pyscf = pytest.importorskip("pyscf")
 
 
 def test_pbc_h2_cell_rhf_to_qubit_h() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_pbc_gamma.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_pbc_gamma.yaml"))
     solver = create_solver(cfg)
     pack = solver.compute_mean_field(periodic=True)
     ref = ClassicalMeanFieldReference.from_mean_field_pack(

@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.contracts.schema_ids import RUN_BUILD_CACHE_V1
 
 if TYPE_CHECKING:
@@ -68,10 +69,12 @@ def _resolved_active_space_counts(
     n_active_electrons: int | None,
 ) -> tuple[int, int]:
     na = int(
-        n_active_orbitals if n_active_orbitals is not None else cfg.active_space.cas.n_orbitals
+        n_active_orbitals if n_active_orbitals is not None else resolve_n_orbitals(cfg.active_space)
     )
     ne = int(
-        n_active_electrons if n_active_electrons is not None else cfg.active_space.cas.n_electrons
+        n_active_electrons
+        if n_active_electrons is not None
+        else resolve_n_electrons(cfg.active_space)
     )
     return na, ne
 

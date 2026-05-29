@@ -19,6 +19,7 @@ from qchem_stack.chem.solvers import create_solver
 from qchem_stack.config import load_experiment_config
 from qchem_stack.contracts.schema_ids import SCHMIDT_DMET_DENSITY_FEEDBACK_V1
 from qchem_stack.orchestration.scf_stage import run_scf_reference
+from tests.helpers.paths import configs_path, repo_root
 
 PSI4_PYSCF_ETOT_ATOL = 0.0002
 PSI4_PYSCF_MO_MAX_ABS = 0.15
@@ -27,7 +28,7 @@ PSI4_PYSCF_NEVPT2_ATOL = 0.0001
 
 
 def _h2_cfg(root: Path, *, driver: str):
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     return cfg.model_copy(update={"scf": cfg.scf.model_copy(update={"driver": driver})})
 
 
@@ -36,7 +37,7 @@ def _h2_cfg(root: Path, *, driver: str):
 def test_psi4_pyscf_h2_scf_energy_and_mo_parity() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     ref_py = run_scf_reference(_h2_cfg(root, driver="pyscf"))
     ref_psi = run_scf_reference(_h2_cfg(root, driver="psi4"))
     assert abs(float(ref_py.e_tot) - float(ref_psi.e_tot)) < PSI4_PYSCF_ETOT_ATOL
@@ -51,7 +52,7 @@ def test_psi4_pyscf_h2_scf_energy_and_mo_parity() -> None:
 def test_psi4_pyscf_nevpt2_casci_correction_near_parity() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     cfg_py = _h2_cfg(root, driver="pyscf")
     cfg_psi = _h2_cfg(root, driver="psi4")
     ref_py = run_scf_reference(cfg_py)
@@ -73,8 +74,7 @@ def test_psi4_pyscf_nevpt2_casci_correction_near_parity() -> None:
 def test_psi4_avas_shadow_mo_shape_and_finite_energy() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_psi4_avas.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_psi4_avas.yaml"))
     ref = run_scf_reference(cfg)
     mo_before = np.asarray(ref.ao_basis_view().mo_coeff_ao(), dtype=float).copy()
     apply_avas_projection(cfg, ref)
@@ -96,7 +96,7 @@ def test_psi4_avas_shadow_mo_shape_and_finite_energy() -> None:
 def test_psi4_schmidt_impurity_eri_matches_pyscf_h2() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     cfg_py = _h2_cfg(root, driver="pyscf")
     cfg_psi = _h2_cfg(root, driver="psi4")
     ref_py = run_scf_reference(cfg_py)
@@ -117,7 +117,7 @@ def test_psi4_schmidt_impurity_eri_matches_pyscf_h2() -> None:
 def test_psi4_schmidt_density_feedback_cycles_runs() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     ref_psi = run_scf_reference(_h2_cfg(root, driver="psi4"))
     _model, report, _d_final = run_schmidt_density_feedback_cycles(
         ref_psi,
@@ -135,8 +135,7 @@ def test_psi4_schmidt_density_feedback_cycles_runs() -> None:
 @pytest.mark.psi4
 def test_psi4_pbc_kmesh_gt_one_rejected() -> None:
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     cfg = cfg.model_copy(
         update={
             "scf": cfg.scf.model_copy(update={"driver": "psi4"}),
@@ -166,7 +165,7 @@ def test_psi4_pbc_kmesh_gt_one_rejected() -> None:
 def test_psi4_impurity_eri_direct_parity_h2() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     ref_py = run_scf_reference(_h2_cfg(root, driver="pyscf"))
     ref_psi = run_scf_reference(_h2_cfg(root, driver="psi4"))
     c = np.asarray(ref_py.ao_basis_view().mo_coeff_ao(), dtype=float)[:, :2]

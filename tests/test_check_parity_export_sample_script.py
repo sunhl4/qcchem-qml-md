@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 import runpy
-from pathlib import Path
+
+from tests.helpers.paths import repo_root
 
 
 def test_sample_configs_include_vqd_uccsd_and_are_unique() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     script = root / "scripts" / "check_parity_export_sample.py"
     namespace = runpy.run_path(str(script))
     sample_configs = tuple(namespace["SAMPLE_CONFIGS_REL"])

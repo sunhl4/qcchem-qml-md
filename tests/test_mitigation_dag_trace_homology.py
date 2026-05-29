@@ -2,17 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.config import ExperimentConfig, MitigationSpec, load_experiment_config
 from qchem_stack.mitigation.qermit_analog import build_qermit_style_mitigation_report
 from qchem_stack.mitigation.qermit_runtime import execute_mitigation_dag
+from tests.helpers.paths import configs_path
 
 
 def _minimal_cfg(**mitigation_patch: object) -> ExperimentConfig:
-    p = Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
+    p = configs_path("example_h2.yaml")
     cfg = load_experiment_config(p)
     if not mitigation_patch:
         return cfg
@@ -105,7 +104,7 @@ def test_classical_shadows_stub_uses_computable_runtime() -> None:
     assert out.get("classical_shadows_computable_runtime") is not None
     cs = dex["trace"][0]
     assert cs["node"] == "classical_shadows_expectation_stub"
-    assert cs.get("computable_runtime") == "ExpectationValueComputable"
+    assert cs.get("computable_runtime") == "classical_shadows_hamiltonian_expectation"
 
 
 def test_classical_shadows_stub_between_spam_and_pmsv_matches_trace() -> None:

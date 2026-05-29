@@ -8,12 +8,12 @@ import pytest
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 def test_pipeline_precomputed_bundle_lane_runs() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_precomputed_bundle.yaml")
-    out = run_pipeline_sync(cfg, cfg_path=root / "configs" / "example_h2_precomputed_bundle.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_precomputed_bundle.yaml"))
+    out = run_pipeline_sync(cfg, cfg_path=configs_path("example_h2_precomputed_bundle.yaml"))
     assert out["pre_quantum_input"]["schema"] == "pre_quantum_input_v1"
     assert out["pre_quantum_input"]["source"] == "precomputed_bundle"
     assert out["pre_quantum_input"]["integral_source"] == "classical_reference_bundle_v1"
@@ -33,8 +33,7 @@ def test_pipeline_precomputed_bundle_lane_runs() -> None:
 
 
 def test_pipeline_precomputed_manifest_mismatch_fails_fast() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_precomputed_bundle.yaml"
+    cfg_path = configs_path("example_h2_precomputed_bundle.yaml")
     cfg = load_experiment_config(cfg_path)
     cfg_bad = cfg.model_copy(
         update={
@@ -48,15 +47,14 @@ def test_pipeline_precomputed_manifest_mismatch_fails_fast() -> None:
 
 
 def test_pipeline_precomputed_manifest_fingerprint_mismatch_fails_fast(tmp_path: Path) -> None:
-    root = Path(__file__).resolve().parents[1]
-    src_bundle = root / "configs" / "precomputed_classical_reference_h2.json"
+    src_bundle = configs_path("precomputed_classical_reference_h2.json")
     bundle = json.loads(src_bundle.read_text(encoding="utf-8"))
     bundle["manifest"] = dict(bundle.get("manifest") or {})
     bundle["manifest"]["schema"] = "precomputed_manifest_v1"
     bundle["manifest"]["config_fingerprint"] = "deadbeef"
     bad_bundle = tmp_path / "bad_bundle.json"
     bad_bundle.write_text(json.dumps(bundle), encoding="utf-8")
-    cfg_path = root / "configs" / "example_h2_precomputed_bundle.yaml"
+    cfg_path = configs_path("example_h2_precomputed_bundle.yaml")
     cfg = load_experiment_config(cfg_path)
     cfg_bad = cfg.model_copy(
         update={
@@ -74,15 +72,14 @@ def test_pipeline_precomputed_manifest_fingerprint_mismatch_fails_fast(tmp_path:
 
 
 def test_pipeline_precomputed_manifest_missing_required_fields_fails_fast(tmp_path: Path) -> None:
-    root = Path(__file__).resolve().parents[1]
-    src_bundle = root / "configs" / "precomputed_classical_reference_h2.json"
+    src_bundle = configs_path("precomputed_classical_reference_h2.json")
     bundle = json.loads(src_bundle.read_text(encoding="utf-8"))
     manifest = dict(bundle.get("manifest") or {})
     manifest.pop("n_qubits", None)
     bundle["manifest"] = manifest
     bad_bundle = tmp_path / "bad_bundle_missing_manifest_fields.json"
     bad_bundle.write_text(json.dumps(bundle), encoding="utf-8")
-    cfg_path = root / "configs" / "example_h2_precomputed_bundle.yaml"
+    cfg_path = configs_path("example_h2_precomputed_bundle.yaml")
     cfg = load_experiment_config(cfg_path)
     cfg_bad = cfg.model_copy(
         update={

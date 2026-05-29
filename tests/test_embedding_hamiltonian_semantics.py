@@ -2,18 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 def test_hamiltonian_semantics_none_mode() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     sem = pre_quantum_hamiltonian_semantics(cfg)
     assert sem["hamiltonian_branch"] == "canonical_active_space_integral_pack"
     assert sem["hamiltonian_fixed_before_variational"] is True
@@ -23,9 +21,8 @@ def test_hamiltonian_semantics_none_mode() -> None:
 @pytest.mark.pyscf
 def test_fingerprint_unchanged_after_variational_for_embedding_none() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    out = run_pipeline_sync(cfg, cfg_path=root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
+    out = run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
     fp = out["pre_quantum_input"]["hamiltonian_fingerprint"]
     assert fp == out["hamiltonian_meta"]["hamiltonian_fingerprint"]
     assert out["pre_quantum_input"]["hamiltonian_fixed_before_variational"] is True

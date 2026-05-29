@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -19,6 +17,7 @@ from qchem_stack.config import (
 )
 from tests.embedding_nested import embedding_dmet, schmidt_embedding_dmet
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path
 
 
 def test_embedding_spec_rejects_schmidt_with_uniform_toy() -> None:
@@ -157,8 +156,7 @@ def test_build_schmidt_h2_single_atom_fragment() -> None:
 
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_pipeline_schmidt_production_with_bath_sidecar_json() -> None:
-    root = Path(__file__).resolve().parents[1]
-    sidecar = root / "configs" / "schmidt_bath_sidecar_toy.json"
+    sidecar = configs_path("schmidt_bath_sidecar_toy.json")
     cfg = ExperimentConfig(
         schema_version="2",
         experiment_id="schmidt_sidecar",
@@ -183,7 +181,7 @@ def test_pipeline_schmidt_production_with_bath_sidecar_json() -> None:
     )
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    out = run_pipeline_sync(cfg, cfg_path=root / "configs" / "example_h2.yaml")
+    out = run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
     wf = out.get("embedding_workflow") or {}
     sc = wf.get("schmidt_bath_sidecar_v1")
     assert isinstance(sc, dict)

@@ -13,6 +13,7 @@ from qchem_stack.config import (
 )
 from qchem_stack.exceptions import ConfigurationError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 def test_parse_xyz_h2() -> None:
@@ -129,8 +130,7 @@ def test_from_yaml_dict_geometry_files_base_dir(tmp_path: Path) -> None:
 
 def test_pipeline_runs_with_geometry_file_config_when_pyscf_available() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_geometry_file_xyz.yaml"
+    cfg_path = configs_path("example_h2_geometry_file_xyz.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     assert float(out["scf_energy"]) < 0.0

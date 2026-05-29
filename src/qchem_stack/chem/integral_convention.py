@@ -1,11 +1,8 @@
 """PySCF MO ERI layout → OpenFermion / ``spinorb_from_spatial`` ordering.
 
-SandboxAQ `Tangelo`_ applies ``numpy.transpose(eri, (0, 2, 3, 1))`` to PySCF MO integrals
-before :func:`openfermion.chem.molecular_data.spinorb_from_spatial`, then passes
-``0.5 * two_body_spin_orb`` into :class:`openfermion.InteractionOperator` (see
-``tangelo.toolboxes.molecular_computation.molecule.SecondQuantizedMolecule._get_fermionic_hamiltonian``).
-
-.. _Tangelo: https://github.com/sandbox-quantum/Tangelo
+Active-space exporters apply ``numpy.transpose(eri, (0, 2, 3, 1))`` to PySCF MO integrals
+before :func:`openfermion.chem.molecular_data.spinorb_from_spatial`, then pass
+``0.5 * two_body_spin_orb`` into :class:`openfermion.InteractionOperator`.
 """
 
 from __future__ import annotations

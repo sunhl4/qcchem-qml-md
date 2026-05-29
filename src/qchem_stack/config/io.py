@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import yaml
 
@@ -55,7 +55,7 @@ def _strip_callables(obj: object) -> object:
 
 def dump_experiment_config(cfg: ExperimentConfig) -> str:
     raw = _strip_callables(cfg.model_dump(mode="json"))
-    return yaml.safe_dump(raw, sort_keys=False, allow_unicode=True)
+    return cast("str", yaml.safe_dump(raw, sort_keys=False, allow_unicode=True))
 
 
 def backend_spec_from_config(cfg: ExperimentConfig) -> BackendSpec:
@@ -63,12 +63,7 @@ def backend_spec_from_config(cfg: ExperimentConfig) -> BackendSpec:
 
     b = cfg.backend
     meta = dict(b.meta)
-    uqc_kwargs: dict[str, object] = {}
     if b.provider == "uqc":
-        uqc_kwargs["uqc_token"] = b.uqc_token
-        uqc_kwargs["uqc_backend_name"] = b.uqc_backend_name
-        uqc_kwargs["uqc_mode"] = b.uqc_mode
-        uqc_kwargs["uqc_transpile_opt_level"] = b.uqc_transpile_opt_level
         meta.setdefault("uqc_token", b.uqc_token)
         meta.setdefault("uqc_backend_name", b.uqc_backend_name)
         meta.setdefault("uqc_mode", b.uqc_mode)
@@ -82,7 +77,10 @@ def backend_spec_from_config(cfg: ExperimentConfig) -> BackendSpec:
         ionstack_endpoint=b.ionstack_endpoint,
         native_twoq=cfg.compiler.native_twoq,
         meta=meta,
-        **uqc_kwargs,
+        uqc_token=b.uqc_token,
+        uqc_backend_name=b.uqc_backend_name,
+        uqc_mode=b.uqc_mode,
+        uqc_transpile_opt_level=b.uqc_transpile_opt_level,
     )
 
 

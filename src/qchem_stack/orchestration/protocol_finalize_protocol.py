@@ -35,12 +35,24 @@ def ansatz_prep_for_job(
     hea_depth: int,
 ) -> AnsatzPrepSpec:
     ang = np.asarray(angles, dtype=float)
-    if resolve_variational_ansatz(cfg) == "uccsd":
-        return AnsatzPrepSpec.uccsd(
+    from qchem_stack.config.quantum_helpers import resolve_iqeb_pool_id
+
+    ansatz = resolve_variational_ansatz(cfg)
+    decomp = resolve_uccsd_decomposition_mode(cfg)  # type: ignore[arg-type]
+    if ansatz == "qcc":
+        return AnsatzPrepSpec.qcc(
+            hamiltonian=qh,
+            angles=ang,
+            pool_id=resolve_iqeb_pool_id(cfg),
+            decomposition_mode=decomp,
+        )
+    if ansatz in ("uccsd", "uccgd", "upccgsd", "puccd"):
+        return AnsatzPrepSpec.cluster(
+            kind=ansatz,  # type: ignore[arg-type]
             hamiltonian=qh,
             angles=ang,
             trotter_steps=resolve_uccsd_trotter_steps(cfg),
-            decomposition_mode=resolve_uccsd_decomposition_mode(cfg),  # type: ignore[arg-type]
+            decomposition_mode=decomp,
         )
     return AnsatzPrepSpec.hea(n_qubits=qh.n_qubits, angles=ang, depth=int(hea_depth))
 
@@ -78,4 +90,6 @@ def protocol_for_job(
         executor=exe,
         nexus_analog=cfg.nexus_analog,
         pauli_support_max_terms=resolve_pauli_support_max_terms(cfg),
+        classical_shadows_enabled=bool(cfg.mitigation.stubs.classical_shadows),
+        classical_shadows_budget_pairs=int(cfg.mitigation.stubs.classical_shadows_budget_pairs),
     )

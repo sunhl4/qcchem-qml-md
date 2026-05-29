@@ -2,18 +2,17 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from qchem_stack.config import load_experiment_config
 from qchem_stack.integrations.workflow_preview import computable_graph_v2
 from qchem_stack.protocols.computable import (
     list_computables_for_config,
     refs_from_computable_graph_v2,
 )
+from tests.helpers.paths import configs_path
 
 
 def test_computable_refs_roundtrip_via_computable_graph_v2() -> None:
-    cfg_path = Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     refs = list_computables_for_config(cfg)
     graph = computable_graph_v2(refs, cfg)

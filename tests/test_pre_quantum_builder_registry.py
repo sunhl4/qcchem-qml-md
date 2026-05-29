@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input_with_context
@@ -15,11 +13,11 @@ from qchem_stack.chem.pre_quantum_path import PreQuantumPath
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import PreQuantumCapabilityError
 from qchem_stack.orchestration.scf_stage import run_scf_reference
+from tests.helpers.paths import configs_path
 
 
 def test_pre_quantum_default_builder_registry_lists_all_paths() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_precomputed_bundle.yaml"
+    cfg_path = configs_path("example_h2_precomputed_bundle.yaml")
     cfg = load_experiment_config(cfg_path)
     rhf = run_scf_reference(cfg)
     build_pre_quantum_input_with_context(cfg, rhf, cfg_path=cfg_path)
@@ -27,8 +25,7 @@ def test_pre_quantum_default_builder_registry_lists_all_paths() -> None:
 
 
 def test_pre_quantum_builder_registry_requires_explicit_override() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_precomputed_bundle.yaml"
+    cfg_path = configs_path("example_h2_precomputed_bundle.yaml")
     cfg = load_experiment_config(cfg_path)
     rhf = run_scf_reference(cfg)
     build_pre_quantum_input_with_context(cfg, rhf, cfg_path=cfg_path)
@@ -41,8 +38,7 @@ def test_pre_quantum_builder_registry_requires_explicit_override() -> None:
 
 
 def test_pre_quantum_builder_registry_override_is_effective() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     rhf = run_scf_reference(cfg)
     build_pre_quantum_input_with_context(cfg, rhf, cfg_path=cfg_path)

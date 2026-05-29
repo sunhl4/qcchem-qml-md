@@ -133,7 +133,7 @@ def build_measurement_plan(
         )
 
     subops = group_into_tensor_product_basis_sets(h)
-    groups: list[list[tuple]] = []
+    tp_groups: list[list[tuple]] = []
     basis_keys = []
     for basis_key, sub in subops.items():
         ts = [t for t in sub.terms if len(t) > 0]
@@ -141,12 +141,12 @@ def build_measurement_plan(
             continue
         if basis_key == () or not basis_key:
             continue
-        groups.append(ts)
+        tp_groups.append(ts)
         basis_keys.append(tuple((int(i), str(p)) for i, p in basis_key))
 
     return PauliMeasurementPlan(
         n_qubits=n_qubits,
-        groups=groups,
+        groups=tp_groups,
         basis_keys=basis_keys,
         grouping_method="tensor_product",
         identity_coeff=id_coeff,

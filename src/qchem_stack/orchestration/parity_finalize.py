@@ -129,6 +129,12 @@ def finalize_open_stack_parity_snapshot(
     if out.get("dmet_uniform_multifragment_toy"):
         snap["dmet_uniform_multifragment_toy"] = out["dmet_uniform_multifragment_toy"]
 
+    dmet_loop = out.get("dmet_self_consistency_loop")
+    if isinstance(dmet_loop, dict):
+        snap["dmet_self_consistency_loop"] = {
+            k: v for k, v in dmet_loop.items() if not str(k).startswith("_")
+        }
+
     tnstub = out.get("tensornet_protocol_stub")
     if isinstance(tnstub, dict) and str(tnstub.get("schema")) == CUTENSORTNET_PROTOCOL_STUB_V1:
         eng = tnstub.get("engine_resolved") or tnstub.get("requested_backend")
@@ -161,7 +167,8 @@ def finalize_open_stack_parity_snapshot(
             "protocol_counts_zne_mode": proto_mode,
             "circuit_fold_fallback_reason": fb,
             "epistemic_bound": (
-                "Open stack: circuit_scale_fold amplifies HEA depth only on the exact Pauli executor path; "
-                "Qiskit shot counts use scalar_stub energy scaling in protocol_counts (see fallback_reason)."
+                "Open stack: circuit_scale_fold on Qiskit shot counts runs grouped Pauli "
+                "readouts at amplified HEA depths per ZNE scale; mitigation_dag_execution "
+                "reuses protocol_counts.zne_curve when present."
             ),
         }

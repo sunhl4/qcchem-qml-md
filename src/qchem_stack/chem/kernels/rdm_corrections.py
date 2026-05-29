@@ -6,8 +6,9 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.chem.bridges.mean_field_like import PySCFMeanFieldLike
 from qchem_stack.chem.bridges.pyscf_shadow_reference import build_pyscf_rhf_shadow
-from qchem_stack.chem.rdm_bundle import RDMBundle
+from qchem_stack.chem.rdm_bundle import RDMBundle, SpinModelLit
 from qchem_stack.contracts.schema_ids import RDM_CORRECTION_REPORT_V1
 
 if TYPE_CHECKING:
@@ -26,9 +27,9 @@ def rdm_bundle_from_mean_field(reference: ClassicalMeanFieldReference) -> RDMBun
     tag = reference.backend_tag()
     ao = reference.ao_basis_view()
     dm1 = ao.make_rdm1_ao()
-    spin_model = "restricted" if str(reference.mf.__class__.__name__) != "UHF" else "unrestricted"
-    if tag == "pyscf":
-        dm = reference.mf.make_rdm1()  # type: ignore[union-attr]
+    spin_model: SpinModelLit = "restricted"
+    if tag == "pyscf" and isinstance(reference.mf, PySCFMeanFieldLike):
+        dm = reference.mf.make_rdm1()
         if isinstance(dm, (tuple, list)):
             dm1 = np.asarray(dm[0], dtype=float) + np.asarray(dm[1], dtype=float)
             spin_model = "unrestricted"

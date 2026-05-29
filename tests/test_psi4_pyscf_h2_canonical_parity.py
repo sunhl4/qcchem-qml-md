@@ -11,6 +11,7 @@ from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpac
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.scf_stage import run_scf_reference
+from tests.helpers.paths import configs_path, repo_root
 
 # Soft thresholds documented in chem.integrals.psi4_active_space module docstring.
 PSI4_PYSCF_H2_CONSTANT_ATOL = 5e-3
@@ -19,7 +20,7 @@ PSI4_PYSCF_H2_H2_MAX_ABS_ATOL = 8e-2
 
 
 def _h2_cfg_pyscf(root: Path):
-    return load_experiment_config(root / "configs" / "example_h2.yaml")
+    return load_experiment_config(configs_path("example_h2.yaml"))
 
 
 @pytest.mark.psi4
@@ -27,7 +28,7 @@ def _h2_cfg_pyscf(root: Path):
 def test_psi4_pyscf_h2_canonical_pack_constant_near_parity() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     cfg_py = _h2_cfg_pyscf(root)
     cfg_psi = cfg_py.model_copy(update={"scf": cfg_py.scf.model_copy(update={"driver": "psi4"})})
     ref_py = run_scf_reference(cfg_py)
@@ -58,11 +59,11 @@ def test_psi4_pyscf_h2_canonical_pack_constant_near_parity() -> None:
 def test_psi4_pyscf_pre_quantum_build_finite_energies() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     cfg_py = _h2_cfg_pyscf(root)
     cfg_psi = cfg_py.model_copy(update={"scf": cfg_py.scf.model_copy(update={"driver": "psi4"})})
     p_py = build_pre_quantum_input(
-        cfg_py, run_scf_reference(cfg_py), cfg_path=root / "configs" / "example_h2.yaml"
+        cfg_py, run_scf_reference(cfg_py), cfg_path=configs_path("example_h2.yaml")
     )
     p_psi = build_pre_quantum_input(cfg_psi, run_scf_reference(cfg_psi))
     assert p_py.qubit_hamiltonian.n_qubits == p_psi.qubit_hamiltonian.n_qubits

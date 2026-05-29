@@ -30,7 +30,8 @@ if TYPE_CHECKING:
 
     from .experiment import ExperimentConfig
 
-_UCCSD_ALLOWED_FERMION_QUBIT_MAPPINGS = frozenset({"jordan_wigner", "bravyi_kitaev"})
+_CLUSTER_SQUARE_FERMION_QUBIT_MAPPINGS = frozenset({"jordan_wigner", "bravyi_kitaev", "jkmn"})
+_CLUSTER_ANSATZ_IDS = frozenset({"uccsd", "uccgd", "qcc", "upccgsd", "puccd"})
 
 
 def _raise_missing_backend_capability(
@@ -212,7 +213,7 @@ def validate_avas_strategy_requires_labels_and_capability(
         )
 
 
-# Drivers known to not support AVAS at config load time
+# Drivers known to not support AVAS at config load time (static preset also rejects).
 _DRIVERS_WITHOUT_AVAS = frozenset({"precomputed"})
 
 
@@ -240,12 +241,15 @@ def validate_scf_driver_registered(spec: ExperimentConfig) -> None:
 
 
 def validate_avas_strategy_at_config_load(spec: ExperimentConfig) -> None:
-    """Reject AVAS strategy for drivers known to lack AVAS support."""
+    """Reject AVAS for known-bad drivers and validate ao_labels at config load.
+
+    Capability checks use static built-in presets only; plugin drivers defer to
+    :data:`EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS` in the pipeline layer.
+    """
     if spec.active_space.strategy != "avas":
         return
     driver = str(spec.scf.driver).strip().lower()
 
-    # Check hardcoded drivers known to not support AVAS
     if driver in _DRIVERS_WITHOUT_AVAS:
         raise ConfigurationError(
             "active_space.strategy='avas' requires supports_avas_active_space_projection=True "
@@ -253,50 +257,40 @@ def validate_avas_strategy_at_config_load(spec: ExperimentConfig) -> None:
             "Driver 'precomputed' does not support AVAS projection."
         )
 
-    # Dynamically check if driver supports AVAS by querying solver capabilities
+    caps: SolverCapabilities | None = None
     try:
-        from qchem_stack.chem.solvers.registry import create_solver
+        from qchem_stack.chem.solvers.registry import static_solver_capabilities_for_driver
 
-        solver = create_solver(spec)
-        if not solver.capabilities.supports_avas_active_space_projection:
-            raise ConfigurationError(
-                "active_space.strategy='avas' requires supports_avas_active_space_projection=True "
-                f"on the selected backend (scf.driver={driver!r})."
-            )
-    except ConfigurationError:
-        # Re-raise our own validation errors
-        raise
+        caps = static_solver_capabilities_for_driver(driver)
     except ImportError:
-        # Solver registry not available, skip dynamic check
-        pass
-    except Exception:
-        # If solver creation fails (e.g., missing dependencies), skip capability check
         pass
 
-    if not spec.chemistry_extended.avas.ao_labels:
-        raise ValueError(
-            "active_space.strategy='avas' requires non-empty chemistry_extended.avas.ao_labels "
-            "(AVAS orbital projection inputs)."
-        )
+    validate_avas_strategy_requires_labels_and_capability(spec, caps=caps)
 
 
 def validate_uccsd_variational_constraints(spec: ExperimentConfig) -> None:
     quantum_spec = spec.quantum
-    if quantum_spec.variational.ansatz != "uccsd":
+    ansatz = quantum_spec.variational.ansatz
+    if ansatz not in _CLUSTER_ANSATZ_IDS:
         return
     if quantum_spec.algorithm != "vqe" and not quantum_spec.algorithm_factory:
         raise ValueError(
-            "quantum.variational.ansatz='uccsd' requires quantum.algorithm='vqe' "
-            "or an explicit quantum.algorithm_factory (plug-in must honor UCCSD semantics)."
+            f"quantum.variational.ansatz={ansatz!r} requires quantum.algorithm='vqe' "
+            "or an explicit quantum.algorithm_factory (plug-in must honor cluster semantics)."
         )
-    if (
-        resolve_fermion_qubit_mapping(spec.active_space)
-        not in _UCCSD_ALLOWED_FERMION_QUBIT_MAPPINGS
-    ):
+    mapping = resolve_fermion_qubit_mapping(spec.active_space)
+    if mapping == "hard_core_boson":
         raise ValueError(
-            "quantum.variational.ansatz='uccsd' requires active_space.mapping.fermion_qubit in "
-            "{'jordan_wigner', 'bravyi_kitaev'} (square encodings; symmetry_conserving_bravyi_kitaev is unsupported)."
+            f"quantum.variational.ansatz={ansatz!r} is incompatible with "
+            "active_space.mapping.fermion_qubit='hard_core_boson' (use hea or a boson-native ansatz)."
         )
+    if mapping not in _CLUSTER_SQUARE_FERMION_QUBIT_MAPPINGS:
+        raise ValueError(
+            f"quantum.variational.ansatz={ansatz!r} requires a square fermion→qubit encoding "
+            f"({sorted(_CLUSTER_SQUARE_FERMION_QUBIT_MAPPINGS)}); got {mapping!r}."
+        )
+    if ansatz != "uccsd":
+        return
     if (
         quantum_spec.pauli.use_protocol
         and spec.mitigation.zne.enabled

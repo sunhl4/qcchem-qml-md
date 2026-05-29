@@ -8,7 +8,7 @@ circuits to this native gate set.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 if TYPE_CHECKING:
     from qiskit import QuantumCircuit
@@ -78,4 +78,4 @@ def circuit_to_qasm3_uqc(qc: QuantumCircuit) -> str:
 
     from qiskit.qasm3 import dumps
 
-    return dumps(qc)
+    return cast("str", dumps(qc))

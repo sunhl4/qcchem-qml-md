@@ -2,11 +2,12 @@ from __future__ import annotations
 
 import importlib.util
 import sys
-from pathlib import Path
+
+from tests.helpers.paths import repo_root
 
 
 def _load_toy_module():
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     path = root / "examples" / "toy_dmrg_spin_chain.py"
     name = "qchem_examples_toy_dmrg_spin_chain"
     spec = importlib.util.spec_from_file_location(name, path)

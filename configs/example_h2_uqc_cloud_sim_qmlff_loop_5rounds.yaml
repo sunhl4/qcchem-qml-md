@@ -1,0 +1,42 @@
+# 5 轮 UQC 云仿真 / mock 在线学习：H₂ |ΔE| 目标 0.1 Ha（见 scripts/run_uqc_md_ml.py）
+# 实验: configs/example_h2_uqc_cloud_sim_md_ml.yaml 或 example_h2_uqc_mock_md_ml.yaml
+
+max_rounds: 5
+energy_tolerance_hartree: 0.1
+n_candidate_frames: 1
+add_top_k_per_round: 1
+label_energy_reference: variational
+validation_energy_reference: variational
+validation_theory_level: full_pipeline
+label_screening_theory_level: full_pipeline
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+validation_skip_initial_md_frame: false
+
+n_seed_geometries: 4
+seed_mode: bond_stretch
+seed_bond_min_bohr: 1.0
+seed_bond_max_bohr: 2.0
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_species_list: [H]
+
+n_epochs_per_round: 4
+batch_size: 1
+learning_rate: 1.0e-3
+force_weight: 10.0
+energy_normalization: none
+warm_start: true
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 8
+md_dt_fs: 0.25
+md_temperature_K: 100.0
+md_save_stride: 2
+md_seed: 0
+
+write_per_round_extxyz: true
+seed: 0

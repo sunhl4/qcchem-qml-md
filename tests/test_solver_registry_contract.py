@@ -24,6 +24,7 @@ from qchem_stack.chem.solvers.registry import (
     set_entrypoint_conflict_policy,
 )
 from qchem_stack.config import ExperimentConfig, load_experiment_config
+from tests.helpers.paths import configs_path
 from tests.helpers.solver_registry_state import reset_solver_registry_state
 
 
@@ -183,8 +184,7 @@ active_space:
 
 
 def test_create_solver_rejects_invalid_driver_id() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     cfg.scf.driver = "   "
     with pytest.raises(InvalidSolverIdError, match="non-empty"):
         create_solver(cfg)
@@ -267,8 +267,7 @@ def _reset_solver_registry_after_each_test() -> None:
 
 
 def test_example_h2_config_loads_through_registry_pyscf() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     sol = create_solver(cfg)
     assert isinstance(sol, PySCFIntegralSolver)
 

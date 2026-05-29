@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import tempfile
-from pathlib import Path
 
 import pytest
 import yaml
@@ -12,6 +11,7 @@ from qchem_stack.jobs.pipeline_jobs import enqueue_full_pipeline_run
 from qchem_stack.jobs.store import SqliteJobStore
 from qchem_stack.jobs.worker_dispatch import dispatch_job
 from qchem_stack.orchestration.run_context import RunContext
+from tests.helpers.paths import configs_dir, configs_path
 
 
 def _have_pyscf() -> bool:
@@ -25,8 +25,7 @@ def _have_pyscf() -> bool:
 
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_enqueue_full_pipeline_then_dispatch_completes() -> None:
-    root = Path(__file__).resolve().parents[1]
-    raw = yaml.safe_load((root / "configs" / "example_h2.yaml").read_text(encoding="utf-8"))
+    raw = yaml.safe_load((configs_path("example_h2.yaml")).read_text(encoding="utf-8"))
     assert isinstance(raw, dict)
     q = raw.setdefault("quantum", {})
     q.setdefault("pauli", {})["use_protocol"] = False
@@ -65,9 +64,8 @@ def test_enqueue_full_pipeline_then_dispatch_completes() -> None:
 
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_enqueue_full_pipeline_with_config_base_dir_resolves_relative_paths() -> None:
-    root = Path(__file__).resolve().parents[1]
     raw = yaml.safe_load(
-        (root / "configs" / "example_h2_geometry_file_xyz.yaml").read_text(encoding="utf-8")
+        (configs_path("example_h2_geometry_file_xyz.yaml")).read_text(encoding="utf-8")
     )
     assert isinstance(raw, dict)
     q = raw.setdefault("quantum", {})
@@ -79,7 +77,7 @@ def test_enqueue_full_pipeline_with_config_base_dir_resolves_relative_paths() ->
         h = enqueue_full_pipeline_run(
             store,
             config_yaml=yml,
-            config_base_dir=root / "configs",
+            config_base_dir=configs_dir(),
             meta_extra={"experiment_id": str(raw.get("experiment_id", ""))},
         )
         dispatch_job(store, h.job_id)

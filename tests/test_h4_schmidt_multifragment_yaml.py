@@ -2,21 +2,19 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.config import load_experiment_config
 from qchem_stack.config._experiment_validation import validate_pre_quantum_contract
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 @pytest.mark.pyscf
 @pytest.mark.slow
 def test_h4_schmidt_multifragment_yaml_pipeline() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h4_schmidt_multifragment.yaml"
+    p = configs_path("example_h4_schmidt_multifragment.yaml")
     cfg = load_experiment_config(p)
     validate_pre_quantum_contract(cfg)
     out = run_pipeline_sync(cfg, cfg_path=p)

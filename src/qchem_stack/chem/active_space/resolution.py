@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
+
 RESOLVED_ACTIVE_SPACE_META_KEY = "qchem_active_space_resolution_v1"
 
 if TYPE_CHECKING:
@@ -26,8 +28,8 @@ def patch_experiment_active_space_resolution(
         return cfg
     n_act, n_el = int(n_a), int(n_e)
     a = cfg.active_space
-    cur_n_orb = int(a.cas.n_orbitals)
-    cur_n_el = int(a.cas.n_electrons)
+    cur_n_orb = resolve_n_orbitals(a)
+    cur_n_el = resolve_n_electrons(a)
     if cur_n_orb == n_act and cur_n_el == n_el:
         return cfg
     new_cas = a.cas.model_copy(update={"n_orbitals": n_act, "n_electrons": n_el})

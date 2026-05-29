@@ -2,18 +2,16 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.orchestration.workflow import WorkflowCoordinator
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
 
 def test_workflow_coordinator_runs_and_has_sidecar() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = root / "configs" / "example_h2.yaml"
+    cfg = configs_path("example_h2.yaml")
     wf = WorkflowCoordinator(cfg, job_db=None)
     out = wf.run()
     assert "methods_sidecar" in out

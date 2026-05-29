@@ -85,17 +85,15 @@ def label_base_geometry_only(
     experiment_yaml: str | Path,
     *,
     energy_reference: EnergyReference = "variational",
+    theory_level: TheoryLevel = "full_pipeline",
     include_hf_nuclear_gradient: bool = True,
 ) -> LabelingResult:
-    """Run the pipeline on the YAML's base geometry only; return a 1-frame dataset.
-
-    Cheap entry point for "cold-start" mode of the MD-validation loop.
-    """
+    """Run the pipeline on the YAML's base geometry only; return a 1-frame dataset."""
     return label_geometries_with_pipeline(
         experiment_yaml,
         extra_coordinates_bohr=[],
         energy_reference=energy_reference,
-        theory_level="hf_scf",
+        theory_level=theory_level,
         include_hf_nuclear_gradient=include_hf_nuclear_gradient,
         failure_isolation=False,
     )

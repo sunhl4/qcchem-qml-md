@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -75,7 +75,7 @@ def build_qse_basis_from_uccsd_reference(
 def _apply_pauli_string(state: np.ndarray, n_qubits: int, qubit: int, letter: str) -> np.ndarray:
     op = QubitOperator(((qubit, letter),), 1.0)
     m = qubit_operator_to_sparse(op, n_qubits)
-    return m @ state
+    return cast("np.ndarray", m @ state)
 
 
 def build_qse_basis_from_vqe_hea(
@@ -185,18 +185,21 @@ def _vqd_objective_computable(
     pauli_grouping: str = "tensor_product",
 ) -> dict[str, Any]:
     """Objective channel (ExpectationValue analog) for VQD three-computable mode."""
-    return _vqd_three_protocol_channels(
-        prev_states,
-        g_new,
-        h_op,
-        n_qubits,
-        0.0,
-        shots_objective=shots_objective,
-        shots_overlap=0,
-        shots_weight=0,
-        rng=rng,
-        pauli_grouping=pauli_grouping,
-    )["objective"]
+    return cast(
+        "dict[str, Any]",
+        _vqd_three_protocol_channels(
+            prev_states,
+            g_new,
+            h_op,
+            n_qubits,
+            0.0,
+            shots_objective=shots_objective,
+            shots_overlap=0,
+            shots_weight=0,
+            rng=rng,
+            pauli_grouping=pauli_grouping,
+        )["objective"],
+    )
 
 
 def _vqd_overlap_computable(
@@ -209,17 +212,20 @@ def _vqd_overlap_computable(
     rng: np.random.Generator,
 ) -> dict[str, Any]:
     """Overlap channel (OverlapSquared analog) for VQD three-computable mode."""
-    return _vqd_three_protocol_channels(
-        prev_states,
-        g_new,
-        h_op,
-        n_qubits,
-        0.0,
-        shots_objective=0,
-        shots_overlap=shots_overlap,
-        shots_weight=0,
-        rng=rng,
-    )["overlap"]
+    return cast(
+        "dict[str, Any]",
+        _vqd_three_protocol_channels(
+            prev_states,
+            g_new,
+            h_op,
+            n_qubits,
+            0.0,
+            shots_objective=0,
+            shots_overlap=shots_overlap,
+            shots_weight=0,
+            rng=rng,
+        )["overlap"],
+    )
 
 
 def _vqd_weight_computable(
@@ -234,17 +240,20 @@ def _vqd_weight_computable(
     rng: np.random.Generator,
 ) -> dict[str, Any]:
     """Weight channel for VQD three-computable mode."""
-    return _vqd_three_protocol_channels(
-        prev_states,
-        g_new,
-        h_op,
-        n_qubits,
-        penalty_weight,
-        shots_objective=0,
-        shots_overlap=shots_overlap,
-        shots_weight=shots_weight,
-        rng=rng,
-    )["weight"]
+    return cast(
+        "dict[str, Any]",
+        _vqd_three_protocol_channels(
+            prev_states,
+            g_new,
+            h_op,
+            n_qubits,
+            penalty_weight,
+            shots_objective=0,
+            shots_overlap=shots_overlap,
+            shots_weight=shots_weight,
+            rng=rng,
+        )["weight"],
+    )
 
 
 def vqd_deflation_swap_test_circuit_sketch(*, n_system_qubits: int) -> dict[str, Any]:
@@ -291,15 +300,15 @@ def vqd_cross_stack_semantics_meta(
     elif overlap_mode == "deflation_circuit":
         overlap_repr = "deflation_circuit_recipe_with_circuit_ir_sketch"
     else:
-        overlap_repr = "statevector_overlap_with_tangelo_circuit_analogy_reporting"
-    tangelo_block: dict[str, Any] = {
+        overlap_repr = "statevector_overlap_with_circuit_analogy_reporting"
+    deflation_block: dict[str, Any] = {
         "schema": TANGELO_DEFLATION_ANALOGY_V1,
         "deflation_coeff_yaml": coeff,
         "penalty_schedule_resolved": list(penalty_weights_resolved),
         "selected_overlap_mode": overlap_mode,
         "open_stack_overlap_representation": overlap_repr,
-        "tangelo_deflation_circuits_analogy": (
-            "Tangelo VQESolver adds deflation via deflation_circuits + deflation_coeff "
+        "deflation_circuits_analogy": (
+            "Reference stacks add deflation via deflation_circuits + deflation_coeff "
             "on measured overlaps; this stack collapses overlaps into one classical objective."
         ),
     }
@@ -307,7 +316,7 @@ def vqd_cross_stack_semantics_meta(
         recipe: dict[str, Any] = {
             "schema": "vqd_deflation_circuit_recipe_v1",
             "note": (
-                "Tangelo deflation_circuit analogy with open-stack swap-test CircuitIR sketch; "
+                "Deflation-circuit analogy with open-stack swap-test CircuitIR sketch; "
                 "optimization still uses statevector overlap unless shot budgets are set."
             ),
             "steps": [
@@ -329,14 +338,14 @@ def vqd_cross_stack_semantics_meta(
                 )
             except ImportError:
                 pass
-        tangelo_block["deflation_circuit_recipe_v1"] = recipe
+        deflation_block["deflation_circuit_recipe_v1"] = recipe
     opt_model = (
         "three_computable_decoupled_channels"
         if optimizer_mode == "three_computable"
         else "single_objective_collapsed"
     )
     return {
-        "tangelo_deflation_analogy_v1": tangelo_block,
+        "tangelo_deflation_analogy_v1": deflation_block,
         "vqd_cross_stack_semantics_v1": {
             "schema": VQD_CROSS_STACK_SEMANTICS_V1,
             "optimization_model": opt_model,

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import math
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from openfermion import bravyi_kitaev, jordan_wigner
@@ -113,7 +113,7 @@ def nested_sceom_q_sc_eom_operator(
 ) -> QubitOperator:
     """``[S_i^\\dagger, [H, S_j]]`` for q-sc-EOM (Chemical Science, D2SC05371C / arXiv:2206.10502)."""
     comm = h * sj - sj * h
-    return si * comm - comm * si
+    return cast("QubitOperator", si * comm - comm * si)
 
 
 def default_sceom_pauli_generators(n_qubits: int, k: int) -> list[QubitOperator]:
@@ -173,6 +173,22 @@ def sceom_extended_pauli_xy_generators(n_qubits: int, max_terms: int) -> list[Qu
     return ops[:max_terms]
 
 
+def filter_sceom_generators_by_pauli_parity(
+    ops: list[QubitOperator],
+    *,
+    max_terms: int,
+) -> list[QubitOperator]:
+    """Keep generators with an even count of non-identity Pauli letters (partial symmetry filter)."""
+    kept: list[QubitOperator] = []
+    for op in ops:
+        n_pauli = sum(1 for term in op.terms for (_q, letter) in term if letter in ("X", "Y", "Z"))
+        if n_pauli % 2 == 0:
+            kept.append(op)
+    if not kept:
+        kept = [ops[0]] if ops else [QubitOperator((), 1.0)]
+    return kept[: max(1, int(max_terms))]
+
+
 def resolve_sceom_s_generators(
     *,
     strategy: str,
@@ -194,8 +210,14 @@ def resolve_sceom_s_generators(
     if s in {"pauli_xy_extended", "pauli_xy_balanced"}:
         k = max(1, int(subspace_dim))
         return sceom_extended_pauli_xy_generators(hamiltonian.n_qubits, k), "pauli_xy_extended"
+    if s in {"symmetry_filtered_partial", "symmetry_filter_partial"}:
+        k = max(1, int(subspace_dim))
+        base = sceom_extended_pauli_xy_generators(hamiltonian.n_qubits, k * 2)
+        filtered = filter_sceom_generators_by_pauli_parity(base, max_terms=k)
+        return filtered, "symmetry_filtered_partial"
     raise ValueError(
-        "Unknown sceom_generator_strategy; use legacy | fermionic_singles_mapped | pauli_xy_extended."
+        "Unknown sceom_generator_strategy; use legacy | fermionic_singles_mapped | "
+        "pauli_xy_extended | symmetry_filtered_partial."
     )
 
 

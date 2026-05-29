@@ -44,12 +44,22 @@ if limiter is not None:
         _rate_limit_exceeded_handler,  # type: ignore[arg-type]
     )
 
-# CORS middleware
-cors_origins = os.getenv("QCHEM_STACK_CORS_ORIGINS", "*").split(",")
+# CORS middleware — credentials require explicit origins (never ``*`` + credentials).
+_cors_origins_raw = os.getenv(
+    "QCHEM_STACK_CORS_ORIGINS",
+    "http://127.0.0.1:3000,http://127.0.0.1:8000,http://localhost:3000,http://localhost:8000",
+)
+cors_origins = [origin.strip() for origin in _cors_origins_raw.split(",") if origin.strip()]
+_cors_credentials_env = os.getenv("QCHEM_STACK_CORS_CREDENTIALS", "").lower() in {
+    "1",
+    "true",
+    "yes",
+}
+cors_allow_credentials = _cors_credentials_env and "*" not in cors_origins
 app.add_middleware(
     CORSMiddleware,
     allow_origins=cors_origins,
-    allow_credentials=True,
+    allow_credentials=cors_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )

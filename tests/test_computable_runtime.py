@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -19,8 +19,7 @@ from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
 
 
 def _qh():
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
@@ -50,8 +49,7 @@ def test_expectation_computable_hea_matches_vqe() -> None:
 
 
 def test_expectation_computable_uccsd_ansatz_prep() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_uccsd.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_uccsd.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,

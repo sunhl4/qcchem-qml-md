@@ -336,6 +336,10 @@
     },
     "symmetry": {
       "pyscf_symmetry": false
+    },
+    "mm_charges": {
+      "atom_indices": [],
+      "charges_e": []
     }
   },
   "classical_benchmark_enabled": false,

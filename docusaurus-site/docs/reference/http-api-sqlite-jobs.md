@@ -10,6 +10,8 @@ keywords:
 
 # HTTP API、SQLite 作业队列与可观测性
 
+> **Authoritative repo contract**: [`docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md). English summary: [`docs/QUICKSTART_HTTP_API_en.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/QUICKSTART_HTTP_API_en.md).
+
 本文是 `qchem_stack.api` 与 `qchem_stack.jobs` 的工程契约摘要，用于服务化集成与运维对接。
 
 ## 适用场景
@@ -45,8 +47,8 @@ keywords:
 |------|------|------|
 | GET | `/health` | 存活检查 |
 | GET | `/health/ready` | 就绪检查（含存储可用性） |
-| GET | `/v1/meta/product-analog` | 产品模拟面摘要 |
-| GET | `/v1/meta/capability-surface` | 能力面聚合：`schema`=`capability_surface_v1`；载荷含 `object_map`、`gaps`、`mitigation_execution_model`、`open_stack_differentiators`、`tangelo_public_mapping_alias_surface_v1`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1` |
+| GET | `/v1/meta/product-surface` | 产品面路由指针摘要 |
+| GET | `/v1/meta/capability-surface` | 能力面聚合：`schema`=`capability_surface_v2`；载荷含 `capability_map`、`gaps`、`gap_anchor_index_v1`、`mitigation_execution_model`、`open_stack_differentiators`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`、`uccsd_mapping_support_matrix_v1` |
 | GET | `/v1/meta/parity-gaps` | 仅差距列表 |
 | POST | `/v1/meta/workflow-preview` | YAML 预览五阶段与 computable 图 |
 | POST | `/v1/meta/computables-preview` | YAML 预览 computable 列表 |

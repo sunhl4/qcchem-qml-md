@@ -1,5 +1,5 @@
 # pyright: reportUnsupportedDunderAll=false
-"""Pluggable classical integral / mean-field backends (Tangelo-style ``IntegralSolver`` analog)."""
+"""Pluggable classical integral / mean-field backends."""
 
 from __future__ import annotations
 

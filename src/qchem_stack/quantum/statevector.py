@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -83,7 +83,7 @@ def hea_state(
         if entangler == "linear_cnot":
             for q in range(n_qubits - 1):
                 state = _apply_cnot(state, q, q + 1, n_qubits)
-    return state / np.linalg.norm(state)
+    return cast("np.ndarray", state / np.linalg.norm(state))
 
 
 def _apply_one_qubit_unitary(
@@ -120,7 +120,7 @@ def apply_excitation_simple(
     xi = _kron_single(n_qubits, i, "X")
     xj = _kron_single(n_qubits, j, "X")
     u = expm(1j * angle * (xi @ xj))
-    return u @ state
+    return cast("np.ndarray", u @ state)
 
 
 def _kron_single(n_qubits: int, q: int, p: str) -> np.ndarray:

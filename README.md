@@ -65,7 +65,7 @@ With local pinned venv runner, run:
 ./scripts/venv-run uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 ```
 
-`GET /health` — liveness. **`GET /health/ready`** — default SQLite usable. **`GET /v1/meta/product-surface`** — pointer bundle for dashboards. **`GET /v1/meta/parity-gaps`** — **`capability_gap_export_v1`** (product gaps from `qchem_stack.protocols.product_contract`). **`GET /v1/meta/capability-surface`** — **`capability_surface_v2`** (**`capability_map`**, **`gaps`**, **`gap_anchor_index_v1`**, mitigation + differentiators bundles, registries incl. **`operator_pool_registry_export_v1`** / **`algorithm_registry_export_v1`** / **`variational_registry_export_v1`**, **`uccsd_mapping_support_matrix_v1`**). **`POST /v1/meta/workflow-preview`** / **`POST /v1/meta/computables-preview`** — YAML‑only previews (no chemistry). **`GET /v1/meta/queue-stats`**, **`GET`/`POST /v1/runs`**, polls + slim **`GET /v1/runs/{id}/summary`**, **`GET /v1/runs/{id}/repro`** (**409** until **DONE**). Trace headers echo on POST. See [`src/qchem_stack/api/app.py`](src/qchem_stack/api/app.py) and [ENGINEERING_ARCHITECTURE §9](docs/ENGINEERING_ARCHITECTURE.md).
+`GET /health` — liveness. **`GET /health/ready`** — default SQLite usable. **`GET /v1/meta/product-surface`** — pointer bundle for dashboards. **`GET /v1/meta/parity-gaps`** — **`capability_gap_export_v1`** (product gaps from `qchem_stack.protocols.product_contract`). **`GET /v1/meta/capability-surface`** — **`capability_surface_v2`** (**`capability_map`**, **`gaps`**, **`gap_anchor_index_v1`**, mitigation + differentiators bundles, registries incl. **`operator_pool_registry_export_v1`** / **`algorithm_registry_export_v1`** / **`variational_registry_export_v1`**, **`uccsd_mapping_support_matrix_v1`**). **`POST /v1/meta/workflow-preview`** / **`POST /v1/meta/computables-preview`** — YAML‑only previews (no chemistry). **`GET /v1/meta/queue-stats`**, **`GET`/`POST /v1/runs`**, polls + slim **`GET /v1/runs/{id}/summary`**, **`GET /v1/runs/{id}/repro`** (**409** until **DONE**). Trace headers echo on POST. See [`src/qchem_stack/api/app.py`](src/qchem_stack/api/app.py), [API 安全与环境变量](docs/说明_API安全与环境变量.md) and [ENGINEERING_ARCHITECTURE §9](docs/ENGINEERING_ARCHITECTURE.md).
 
 ## Install
 
@@ -149,8 +149,8 @@ Allowed YAML combinations for the pre-quantum path are listed in
 - `qchem_stack/tensornet` — CuTensorNet *protocol* stub and optional `opt_einsum` / cupy / cuquantum import checks (`quantum.tensornet_expectation_stub`, `tensornet_contraction_engine`)
 - `qchem_stack/backends` — `BackendSpec` (`provider`: `statevector` | `qiskit` | `ionstack`), `executor_from_spec`, Qiskit / IonStack hooks, pass bundles, resource metrics
 - `qchem_stack/jobs` — SQLite job store, `nexus_analog` cost rows, optional `nexus_cloud` sidecar
-- `qchem_stack/ml` — cache, surrogate, active learning, `MLPolicy`
-- `qchem_stack/md_bridge` — `QMEFDataset`, trainer protocol, NequIP/MACE hooks
+- `qchem_stack/ml` — **toy** Ridge surrogate + observation cache (demos); production ML loop → `md_bridge`
+- `qchem_stack/md_bridge` — `QMEFDataset`, QML-FF/JAX-MD adapter, MD validation active-learning loop
 - `qchem_stack/qpe_qec_demo` — QPE variants + adapter stub toward fault-tolerant demos
 - `qchem_stack/orchestration` — YAML-driven PySCF → VQE/ADAPT → `PauliAveragingProtocol` → optional SQLite jobs
 

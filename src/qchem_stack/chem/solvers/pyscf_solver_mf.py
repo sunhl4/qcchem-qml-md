@@ -120,10 +120,10 @@ def execute_periodic_mean_field(solver: PySCFIntegralSolver) -> MolecularMeanFie
             mf.with_solvent.eps = float(solver.chemistry_extended.solvent.epsilon)
             meta["solvent"] = "ddcosmo"
             meta["ddcosmo_epsilon"] = float(solver.chemistry_extended.solvent.epsilon)
-        except Exception as e:  # noqa: BLE001
-            raise RuntimeError("ddCOSMO on this periodic mean-field object failed.") from e
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError("ddCOSMO on this periodic mean-field object failed.") from exc
     mf_p = as_pyscf_cas(mf)
-    e = float(mf_p.kernel())
+    e_tot = float(mf_p.kernel())
     mo_ev = mf_p.mo_energy
     if isinstance(mo_ev, (list, tuple)):
         ik = int(solver.chemistry_extended.pbc.active_space_kpoint_index)
@@ -131,8 +131,8 @@ def execute_periodic_mean_field(solver: PySCFIntegralSolver) -> MolecularMeanFie
     else:
         mo_e_out = np.asarray(mo_ev, dtype=float)
     return MolecularMeanFieldResult(
-        mf=wrap_mean_field_like(backend_tag="pyscf", raw_mf=mf_p, e_tot=e, mo_energy=mo_e_out),
-        e_tot=e,
+        mf=wrap_mean_field_like(backend_tag="pyscf", raw_mf=mf_p, e_tot=e_tot, mo_energy=mo_e_out),
+        e_tot=e_tot,
         mo_energy=mo_e_out,
         driver_meta=meta,
     )

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -41,8 +41,7 @@ def test_rdm_bundle_metadata_syncs_canonical_fields() -> None:
 
 
 def test_rdm_bundle_from_mean_field_matches_protocol() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,

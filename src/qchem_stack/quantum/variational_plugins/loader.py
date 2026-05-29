@@ -5,7 +5,7 @@ from __future__ import annotations
 import importlib
 import os
 from collections.abc import Callable
-from typing import Any
+from typing import Any, cast
 
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.quantum.variational_plugins.spec import (
@@ -86,7 +86,7 @@ def load_variational_runner_from_factory(spec: str) -> VariationalRunner:
             raise PipelineError(
                 f"algorithm_factory plugin {spec!r} must define run_variational(ctx)"
             )
-        return run_m  # type: ignore[return-value]
+        return cast("VariationalRunner", run_m)
 
     if callable(obj):
         try:
@@ -99,7 +99,7 @@ def load_variational_runner_from_factory(spec: str) -> VariationalRunner:
 
                 sig = inspect.signature(obj)
                 if len(sig.parameters) == 1:
-                    return obj  # type: ignore[return-value]
+                    return cast("VariationalRunner", obj)
             except (TypeError, ValueError):
                 pass
             raise PipelineError(
@@ -114,10 +114,10 @@ def load_variational_runner_from_factory(spec: str) -> VariationalRunner:
                 f"algorithm_factory {spec!r}: factory returned a class; return a runner or instance"
             )
         if callable(built):
-            return built  # type: ignore[return-value]
+            return cast("VariationalRunner", built)
         run_m = getattr(built, "run_variational", None)
         if callable(run_m):
-            return run_m  # type: ignore[return-value]
+            return cast("VariationalRunner", run_m)
         raise PipelineError(
             f"algorithm_factory {spec!r}: factory must return callable(ctx) "
             "or an object with run_variational(ctx)"

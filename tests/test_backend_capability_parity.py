@@ -6,10 +6,9 @@ this module checks runtime ``create_solver(cfg).capabilities``; presets tests co
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from qchem_stack.chem.solvers import create_solver
 from qchem_stack.config import load_experiment_config
+from tests.helpers.paths import configs_path
 
 _SHARED_PARITY_FIELDS = (
     "supports_restricted_active_space_qubit_hamiltonian",
@@ -31,8 +30,7 @@ _SHARED_PARITY_FIELDS = (
 
 
 def test_pyscf_psi4_pre_quantum_capability_parity() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     cfg.scf.driver = "pyscf"
     pyscf_caps = create_solver(cfg).capabilities
     cfg.scf.driver = "psi4"

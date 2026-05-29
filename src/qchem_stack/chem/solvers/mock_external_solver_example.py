@@ -13,6 +13,7 @@ import numpy as np
 
 from qchem_stack.chem.bridges.mean_field_like import wrap_mean_field_like
 from qchem_stack.chem.solvers.base import MolecularMeanFieldResult, SolverCapabilities
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -57,10 +58,10 @@ class MockExternalIntegralSolver:
     def run_molecular_mean_field(self) -> MolecularMeanFieldResult:
         # TODO[2]: replace this block with your backend SCF call and parse output.
         m = self._cfg.molecule
-        n_orb = max(1, int(self._cfg.active_space.cas.n_orbitals))
+        n_orb = max(1, resolve_n_orbitals(self._cfg.active_space))
         # Deterministic, finite placeholders: replace with real backend SCF values.
         e_tot = -0.5 * float(len(m.symbols)) - 0.01 * float(abs(m.charge))
-        occ = min(n_orb, max(1, self._cfg.active_space.cas.n_electrons // 2))
+        occ = min(n_orb, max(1, resolve_n_electrons(self._cfg.active_space) // 2))
         vals = np.linspace(-1.0, 0.5, n_orb, dtype=float)
         vals[:occ] -= 0.25
         return MolecularMeanFieldResult(

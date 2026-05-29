@@ -91,9 +91,7 @@ def one_electron_operator_pauli_from_rhf(
                 "compute_one_electron_operator_pauli(..., fermion_qubit_mapping='symmetry_conserving_bravyi_kitaev') "
                 "requires n_electrons."
             )
-        return symmetry_conserving_bravyi_kitaev(
-            op, n_spin_orbitals=n_spin_orbitals, n_electrons=int(n_electrons)
-        )
+        return symmetry_conserving_bravyi_kitaev(op, n_spin_orbitals, int(n_electrons))
 
     if isinstance(fop, list):
         return [_map_one(x) for x in fop]

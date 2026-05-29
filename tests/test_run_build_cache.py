@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
 from unittest.mock import patch
 
 import pytest
@@ -14,13 +13,13 @@ from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input_with_cont
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from qchem_stack.orchestration.scf_stage import run_scf_reference
+from tests.helpers.paths import configs_path
 
 
 @pytest.mark.pyscf
 def test_canonical_pack_cache_hit_on_second_build() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = run_scf_reference(cfg)
     cache = RunBuildCache()
     calls = {"n": 0}
@@ -41,9 +40,8 @@ def test_canonical_pack_cache_hit_on_second_build() -> None:
 @pytest.mark.pyscf
 def test_pipeline_exposes_build_cache_stats() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
-    out = run_pipeline_sync(cfg, cfg_path=root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
+    out = run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
     stats = out.get("pre_quantum_build_cache") or {}
     assert stats.get("schema") == "run_build_cache_v1"
     assert int(stats.get("pack_builds", 0)) >= 1
@@ -53,8 +51,7 @@ def test_pipeline_exposes_build_cache_stats() -> None:
 @pytest.mark.pyscf
 def test_pack_cache_key_defaults_match_explicit_and_changes_with_active_space() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = run_scf_reference(cfg)
 
     default_key = pack_cache_key(cfg, rhf)
@@ -78,8 +75,7 @@ def test_pack_cache_key_defaults_match_explicit_and_changes_with_active_space() 
 @pytest.mark.pyscf
 def test_pack_cache_key_changes_with_driver_meta_and_geometry() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = run_scf_reference(cfg)
     key_ref = pack_cache_key(cfg, rhf)
 

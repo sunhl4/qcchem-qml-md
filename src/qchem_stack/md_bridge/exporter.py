@@ -24,7 +24,7 @@ def export_extended_xyz(dataset: QMEFDataset, path: str | Path) -> None:
         for z, r, f in zip(
             fr.atomic_numbers,
             fr.positions_bohr,
-            fr.forces_hartree_bohr or [[0, 0, 0]] * n,
+            fr.forces_hartree_bohr if fr.forces_hartree_bohr else [[0.0, 0.0, 0.0]] * n,
             strict=False,
         ):
             sym = {1: "H", 6: "C", 7: "N", 8: "O"}.get(int(z), "X")

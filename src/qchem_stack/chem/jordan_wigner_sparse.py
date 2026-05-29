@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import itertools
+from typing import cast
 
 import numpy as np
 from openfermion import InteractionOperator, jordan_wigner
@@ -29,7 +30,7 @@ def jordan_wigner_interaction_operator_sparse(
     Same constraints as OpenFermion: expects a **real** Hermitian molecular-style operator.
     """
     if atol is None or float(atol) <= 0.0:
-        return jordan_wigner(iop)
+        return cast("QubitOperator", jordan_wigner(iop))
 
     eps = float(atol)
     n_qubits = count_qubits(iop)

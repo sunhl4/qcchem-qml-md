@@ -15,6 +15,8 @@ def main() -> int:
         root / "examples" / "tutorial_02_uccsd_pipeline.py",
         root / "examples" / "tutorial_03_qpe_zne_paths.py",
         root / "examples" / "tutorial_04_uccsd_below_scf.py",
+        root / "examples" / "tangelo_facade_demo.py",
+        root / "examples" / "example_open_stack_quantum_problem.py",
         root / "examples" / "toy_dmrg_spin_chain.py",
     ]
     for s in scripts:

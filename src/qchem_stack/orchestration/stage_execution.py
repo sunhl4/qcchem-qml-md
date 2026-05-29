@@ -90,6 +90,11 @@ def run_scf_stage(
             rhf.driver_meta.get("energy_accounting_model", "mf_e_tot_direct")
         ),
     )
+    from qchem_stack.chem.embedding.oniom import enrich_energy_components_oniom_if_configured
+
+    energy_components = enrich_energy_components_oniom_if_configured(
+        cfg, cfg.molecule.coordinates, energy_components
+    )
     classical_benchmarks: dict[str, Any] | None = None
     rdm_bundle_meta: dict[str, Any] | None = None
     rdm_correction_report: dict[str, Any] | None = None

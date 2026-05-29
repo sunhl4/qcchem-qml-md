@@ -89,3 +89,16 @@ class ChemistrySymmetrySpec(ForbidExtraBase):
         default=False,
         description="PySCF gto.M symmetry argument on molecular branch.",
     )
+
+
+class ChemistryMmChargesSpec(ForbidExtraBase):
+    """Fixed partial charges for QM/MM bookkeeping (metadata; ONIOM demo reads via layers)."""
+
+    atom_indices: list[int] = Field(
+        default_factory=list,
+        description="0-based atom indices receiving fixed MM charges.",
+    )
+    charges_e: list[float] = Field(
+        default_factory=list,
+        description="Partial charges in elementary charge units, parallel to atom_indices.",
+    )

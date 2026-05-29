@@ -2,11 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from qchem_stack.config import MitigationSpec
+from tests.helpers.paths import docs_path
 
-_DOC = Path(__file__).resolve().parents[1] / "docs" / "mitigation_PMSV_ZNE_Qermit_mapping.md"
+_DOC = docs_path("mitigation_PMSV_ZNE_Qermit_mapping.md")
 
 
 def _mitigation_yaml_paths() -> list[str]:

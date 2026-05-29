@@ -147,6 +147,32 @@ def build_spin_uccsd_fermion_generators(
     return pol.regroup_generators(ops)
 
 
+def build_spin_uccgd_fermion_generators(
+    n_spin_orbitals: int,
+    n_electrons: int,
+    *,
+    policy: ChemicallyAwareUCCPolicy | None = None,
+) -> list[FermionOperator]:
+    """UCCGD-style generators: singles plus **generalized** doubles (all i≠j, a≠b)."""
+    occ = list(range(n_electrons))
+    virt = list(range(n_electrons, n_spin_orbitals))
+    ops: list[FermionOperator] = []
+    for i in occ:
+        for a in virt:
+            ops.append(FermionOperator(((a, 1), (i, 0)), 1.0))
+    for i in occ:
+        for j in occ:
+            if i == j:
+                continue
+            for a in virt:
+                for b in virt:
+                    if a == b:
+                        continue
+                    ops.append(FermionOperator(((b, 1), (a, 1), (j, 0), (i, 0)), 1.0))
+    pol = policy or IdentityRegrouping()
+    return pol.regroup_generators(ops)
+
+
 __all__ = [
     "ChemicallyAwareUCCPolicy",
     "GreedyCommutingFermionicLayers",
@@ -154,6 +180,7 @@ __all__ = [
     "SinglesBeforeDoublesLexicographic",
     "build_spin_ucc_doubles_only_fermion_generators",
     "build_spin_ucc_singles_only_fermion_generators",
+    "build_spin_uccgd_fermion_generators",
     "build_spin_uccsd_fermion_generators",
     "count_uccsd_excitations",
 ]

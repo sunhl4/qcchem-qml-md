@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -32,9 +32,7 @@ def test_merge_canonical_headers_updates_forwarding_fields() -> None:
 
 
 def test_facade_example_h2() -> None:
-    cfg = load_experiment_config(
-        Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
-    )
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     mf = classical_mean_field_via_solver_bridge(cfg)
     md = mf.driver_meta
     assert md["canonical_classical_bridge_schema"] == "qchem_classical_mean_field_bridge_v1"
@@ -45,9 +43,7 @@ def test_facade_example_h2() -> None:
 
 
 def test_pipeline_run_scf_includes_bridge_headers() -> None:
-    cfg = load_experiment_config(
-        Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
-    )
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = run_scf_reference(cfg)
     md = rhf.driver_meta
     assert md["canonical_classical_bridge_schema"] == "qchem_classical_mean_field_bridge_v1"
@@ -55,17 +51,13 @@ def test_pipeline_run_scf_includes_bridge_headers() -> None:
 
 
 def test_molecular_system_geometry_source_cartesian() -> None:
-    cfg = load_experiment_config(
-        Path(__file__).resolve().parents[1] / "configs" / "example_h2.yaml"
-    )
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     ms = molecular_system_from_experiment(cfg)
     assert ms.meta.get("geometry_source") == "cartesian"
 
 
 def test_molecular_system_geometry_source_zmatrix() -> None:
-    cfg = load_experiment_config(
-        Path(__file__).resolve().parents[1] / "configs" / "example_h2_zmatrix_sto3g.yaml"
-    )
+    cfg = load_experiment_config(configs_path("example_h2_zmatrix_sto3g.yaml"))
     ms = molecular_system_from_experiment(cfg)
     assert ms.meta.get("geometry_source") == "zmatrix"
 

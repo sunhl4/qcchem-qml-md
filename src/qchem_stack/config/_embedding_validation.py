@@ -8,7 +8,13 @@ from typing import TYPE_CHECKING
 from qchem_stack.exceptions import ConfigurationError
 
 from .embedding_enums import DmetHamiltonianSource, ProjectionQuantumHamiltonian
-from .embedding_specs import EmbeddingDmet, EmbeddingNone, EmbeddingPlugin, EmbeddingProjection
+from .embedding_specs import (
+    EmbeddingBase,
+    EmbeddingDmet,
+    EmbeddingNone,
+    EmbeddingPlugin,
+    EmbeddingProjection,
+)
 
 if TYPE_CHECKING:
     from qchem_stack.chem.solvers.base import SolverCapabilities
@@ -30,7 +36,7 @@ def nonempty_fragment_labels_from_list(labels: list[str]) -> list[str]:
     return [label for label in labels if str(label).strip()]
 
 
-def validate_embedding_cross_fields(spec: EmbeddingSpec) -> None:
+def validate_embedding_cross_fields(spec: EmbeddingBase) -> None:
     if isinstance(spec, EmbeddingDmet):
         _validate_dmet_cross_fields(spec)
     elif isinstance(spec, EmbeddingPlugin):

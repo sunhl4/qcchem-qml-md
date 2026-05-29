@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.chem.integration.checklist import run_integration_checklist
@@ -15,6 +13,7 @@ from qchem_stack.chem.kernels.catalog import (
     list_known_kernels,
 )
 from qchem_stack.chem.solvers.custom_solver_template import CustomExternalIntegralSolver
+from tests.helpers.paths import configs_path
 
 
 def test_merge_integration_driver_meta_kernel_bindings() -> None:
@@ -55,8 +54,7 @@ def test_psi4_capabilities_include_notes() -> None:
     from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
     from qchem_stack.config import load_experiment_config
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_psi4_rhf_sto3g.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_psi4_rhf_sto3g.yaml"))
     caps = Psi4IntegralSolver.from_experiment_config(cfg).capabilities
     assert caps.supports_pbc_k_mesh is False
     assert "avas_active_space_projection" in caps.capability_notes

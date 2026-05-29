@@ -14,6 +14,7 @@ from qchem_stack.chem.kernels.spin_ucc import (
     SinglesBeforeDoublesLexicographic,
     build_spin_uccsd_fermion_generators,
 )
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.contracts.schema_ids import OPEN_GAP_CLOSURE_REFERENCE_V1
 from qchem_stack.integrations.l3_statistics_reference import energy_bootstrap_ci_stub
 from qchem_stack.integrations.nexus_optional import nexus_public_workflow_blueprint
@@ -33,8 +34,8 @@ def build_open_gap_closure_reference(cfg: ExperimentConfig) -> dict[str, Any]:
 
     Epistemic bound: **L1 / engineered reference**, never L0 binary equivalence to closed vendor stacks or Nexus.
     """
-    n_so = 2 * int(cfg.active_space.cas.n_orbitals)
-    ne = int(cfg.active_space.cas.n_electrons)
+    n_so = 2 * resolve_n_orbitals(cfg.active_space)
+    ne = resolve_n_electrons(cfg.active_space)
     base_gens = build_spin_uccsd_fermion_generators(n_so, ne)
     layers_greedy = GreedyCommutingFermionicLayers().regroup_into_layers(base_gens)
     gens_sbd = SinglesBeforeDoublesLexicographic().regroup_generators(base_gens)

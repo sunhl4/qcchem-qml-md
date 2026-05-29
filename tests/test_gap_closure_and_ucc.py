@@ -23,6 +23,7 @@ from qchem_stack.orchestration.pipeline import collect_repro_metadata
 from qchem_stack.tensornet.dense_expectation_reference import expectation_qubit_operator_dense
 from tests.embedding_nested import embedding_dmet
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path
 
 
 def test_open_gap_closure_reference_has_schemas() -> None:
@@ -72,7 +73,6 @@ def test_greedy_commuting_layers_partition_uccsd() -> None:
 def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
     """Dense UCCSD matches PySCF FCI window on Tangelo-aligned JW Hamiltonian."""
     pytest.importorskip("pyscf")
-    from pathlib import Path
 
     from qchem_stack.backends.executor_base import StatevectorHeaExecutor
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -80,8 +80,7 @@ def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,
@@ -102,7 +101,6 @@ def test_uccsd_vqe_h2_energy_between_fci_and_rhf() -> None:
 def test_uccsd_vqe_h2_bravyi_kitaev_energy_window() -> None:
     """Dense BK UCCSD reaches the same physical window as JW (ground state is encoding-invariant)."""
     pytest.importorskip("pyscf")
-    from pathlib import Path
 
     from qchem_stack.backends.executor_base import StatevectorHeaExecutor
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -110,8 +108,7 @@ def test_uccsd_vqe_h2_bravyi_kitaev_energy_window() -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     rhf = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=rhf.mf,

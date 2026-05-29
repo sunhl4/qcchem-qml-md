@@ -7,6 +7,7 @@ import pytest
 from pydantic import ValidationError
 
 from qchem_stack.config import ANGSTROM_TO_BOHR, MoleculeSpec, load_experiment_config
+from tests.helpers.paths import configs_path
 
 
 def test_coordinates_key_defaults_to_angstrom() -> None:
@@ -38,10 +39,8 @@ def test_rejects_legacy_coordinates_bohr_key() -> None:
 
 
 def test_example_h2_config_geometry_in_bohr() -> None:
-    from pathlib import Path
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     np.testing.assert_allclose(
         cfg.molecule.coordinates_in_bohr(),
         np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]], dtype=float),

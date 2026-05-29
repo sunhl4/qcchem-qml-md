@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytestmark = pytest.mark.l1_md_ml
 
@@ -21,8 +21,7 @@ def test_pipeline_attaches_qmef_ml_attachment_v1_single_geometry(_require_pyscf)
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_md_ml_qmef_attach.yaml"
+    cfg_path = configs_path("example_h2_md_ml_qmef_attach.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     repro = out["repro"]
@@ -43,8 +42,7 @@ def test_energy_reference_pauli_protocol(_require_pyscf) -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_md_ml_pauli_energy.yaml"
+    cfg_path = configs_path("example_h2_md_ml_pauli_energy.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     block = out["repro"]["qmef_ml_attachment_v1"]
@@ -56,8 +54,7 @@ def test_trajectory_hf_scf_appends_frames(_require_pyscf) -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_md_ml_trajectory_hf.yaml"
+    cfg_path = configs_path("example_h2_md_ml_trajectory_hf.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     block = out["repro"]["qmef_ml_attachment_v1"]
@@ -73,8 +70,7 @@ def test_trajectory_full_pipeline_nested_energy(_require_pyscf) -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_md_ml_trajectory_full_pipeline.yaml"
+    cfg_path = configs_path("example_h2_md_ml_trajectory_full_pipeline.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     block = out["repro"]["qmef_ml_attachment_v1"]
@@ -86,8 +82,7 @@ def test_pipeline_respects_attach_flag_off(_require_pyscf) -> None:
     from qchem_stack.config import load_experiment_config
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2_md_ml_qmef_attach.yaml"
+    cfg_path = configs_path("example_h2_md_ml_qmef_attach.yaml")
     cfg = load_experiment_config(cfg_path)
     cfg.md_ml_export.attach_single_frame_to_repro = False
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
@@ -99,8 +94,7 @@ def test_md_ml_extra_coordinates_validation() -> None:
 
     from qchem_stack.config import ExperimentConfig, load_experiment_config
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_md_ml_qmef_attach.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_md_ml_qmef_attach.yaml"))
     payload = cfg.model_dump(mode="json")
     payload["md_ml_export"]["extra_coordinates_bohr"] = [[[0.0, 0.0, 0.0]]]
     with pytest.raises(ValidationError):
@@ -112,8 +106,7 @@ def test_pauli_energy_yaml_requires_use_pauli() -> None:
 
     from qchem_stack.config import ExperimentConfig, load_experiment_config
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_md_ml_qmef_attach.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_md_ml_qmef_attach.yaml"))
     payload = cfg.model_dump(mode="json")
     payload["md_ml_export"]["attach_single_frame_to_repro"] = True
     payload["md_ml_export"]["energy_reference"] = "pauli_protocol"

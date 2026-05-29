@@ -49,6 +49,10 @@ class UQCCloudHeaExecutor:
         if self._client is not None:
             return self._client
 
+        from qchem_stack.backends.uqc_env import load_repo_dotenv
+
+        load_repo_dotenv()
+
         try:
             from uqc_client import UQC
         except ImportError as e:
@@ -135,18 +139,7 @@ class UQCCloudHeaExecutor:
         angles: np.ndarray,
         hea_depth: int,
     ) -> float:
-        """Submit HEA circuit to UQC cloud and compute expectation value.
-
-        Uses the low-level UQC client API:
-        1. Build HEA circuit via Qiskit
-        2. Transpile to native gates (rzz, rx, ry)
-        3. Add measurement and export to OpenQASM 3.0 via qiskit.qasm3.dumps()
-        4. Submit via uqc.submit_task(convert_qprog=qasm, target=..., shots=...)
-        5. Poll uqc.get_task_status() until SUCCESS/FAILURE
-        6. Parse histogram from uqc.get_task_result()
-        """
-        from qiskit import QuantumCircuit
-        from qiskit.qasm3 import dumps
+        """Submit HEA + grouped Pauli measurements to UQC (default) or legacy Z-only path."""
         from qiskit.quantum_info import Statevector
 
         from qchem_stack.backends.qiskit_executor import (
@@ -156,81 +149,25 @@ class UQCCloudHeaExecutor:
         from qchem_stack.backends.uqc_transpiler import transpile_to_uqc_native
 
         meta = self.spec.meta or {}
-
-        # Build HEA circuit using Qiskit
-        qc = hea_circuit_qiskit(n_qubits, hea_depth, np.asarray(angles, dtype=float))
-
-        # Transpile to UQC native gates (rzz, rx, ry)
-        opt_level = int(meta.get("uqc_transpile_opt_level", self.spec.uqc_transpile_opt_level))
-        qc_transpiled = transpile_to_uqc_native(qc, optimization_level=opt_level)
-
-        # Add measurement on all qubits (UQC requires explicit measure)
-        if qc_transpiled.num_clbits == 0:
-            qc_meas = QuantumCircuit(qc_transpiled.num_qubits, qc_transpiled.num_qubits)
-            qc_meas.compose(qc_transpiled, inplace=True)
-            qc_meas.barrier()
-            qc_meas.measure(range(qc_transpiled.num_qubits), range(qc_transpiled.num_qubits))
-            qc_transpiled = qc_meas
-
-        # Export to OpenQASM 3.0 using qiskit.qasm3.dumps (correct API)
-        qasm3_str = dumps(qc_transpiled)
-
-        # Validate static circuit
-        try:
-            from uqc_client import ensure_static_qasm
-
-            ensure_static_qasm(qasm3_str)
-        except ImportError:
-            pass  # validation skipped if uqc-client not installed
-        except Exception as e:
-            raise ValueError(f"Circuit failed UQC static validation: {e}") from e
-
-        # Constrain shots: UQC requires [100, 1000], multiple of 100
-        shots = int(self.spec.shots_per_circuit)
-        shots = max(100, min(1000, shots))
-        shots = ((shots + 99) // 100) * 100
-
-        # Target: "Matrix2" (real hardware), "iontrap-sim" (simulator), "qiskit-sim" (Aer)
-        target = meta.get("uqc_target", "Matrix2")
+        use_multi_basis = meta.get("uqc_multi_basis_pauli", True)
 
         try:
             client = self._get_uqc_client()
+            if use_multi_basis:
+                from qchem_stack.backends.uqc_pauli_shots import energy_estimate_grouped_uqc_shots
 
-            # Submit task
-            task_id = client.submit_task(convert_qprog=qasm3_str, target=target, shots=shots)
-            if task_id is None:
-                raise RuntimeError("UQC submit_task returned None")
-            logger.info("Submitted UQC task %s (target=%s, shots=%d)", task_id, target, shots)
-
-            # Poll until completion
-            max_wait = float(meta.get("uqc_timeout_s", 300.0))
-            poll_interval = float(meta.get("uqc_poll_interval_s", 2.0))
-            elapsed = 0.0
-            while elapsed < max_wait:
-                status = client.get_task_status(task_id)
-                logger.debug("UQC task %s status: %s (%.1fs)", task_id, status, elapsed)
-                if status == "SUCCESS":
-                    break
-                if status == "FAILURE":
-                    raise RuntimeError(f"UQC task {task_id} failed on hardware")
-                time.sleep(poll_interval)
-                elapsed += poll_interval
-            else:
-                raise TimeoutError(f"UQC task {task_id} timed out after {max_wait}s")
-
-            # Get results — returns ARTIQ-format with computational_basis_histogram
-            raw_result = client.get_task_result(task_id)
-            if raw_result is None:
-                raise RuntimeError(f"UQC task {task_id} returned no results")
-
-            # Parse histogram: result[0]["datasets"]["computational_basis_histogram"]
-            # Format: list of [index, count] pairs
-            hist_data = raw_result[0]["datasets"]["computational_basis_histogram"]
-            counts = self._artiq_histogram_to_counts(hist_data, n_qubits)
-
-            # Compute expectation value from measurement results
-            expectation = self._compute_expectation_from_counts(counts, hamiltonian, n_qubits)
-            return float(np.real(expectation))
+                return energy_estimate_grouped_uqc_shots(
+                    hamiltonian,
+                    n_qubits,
+                    hea_depth,
+                    np.asarray(angles, dtype=float),
+                    int(self.spec.shots_per_circuit),
+                    client,
+                    self.spec,
+                )
+            return self._execute_on_uqc_single_z_basis(
+                client, hamiltonian, n_qubits, angles, hea_depth, meta
+            )
 
         except Exception as e:
             logger.error("UQC execution failed: %s", e)
@@ -240,10 +177,64 @@ class UQCCloudHeaExecutor:
                     f"UQC cloud execution failed (uqc_allow_fallback=false): {e}"
                 ) from e
             logger.warning("Falling back to statevector simulation")
+            qc = hea_circuit_qiskit(n_qubits, hea_depth, np.asarray(angles, dtype=float))
+            opt_level = int(meta.get("uqc_transpile_opt_level", self.spec.uqc_transpile_opt_level))
+            qc_transpiled = transpile_to_uqc_native(qc, optimization_level=opt_level)
             sv = Statevector.from_instruction(qc_transpiled)
             op = openfermion_to_sparse_pauli_op(hamiltonian, n_qubits)
-            exp = sv.expectation_value(op)
-            return float(np.real(exp))
+            return float(np.real(sv.expectation_value(op)))
+
+    def _execute_on_uqc_single_z_basis(
+        self,
+        client: Any,
+        hamiltonian: QubitOperator,
+        n_qubits: int,
+        angles: np.ndarray,
+        hea_depth: int,
+        meta: dict[str, Any],
+    ) -> float:
+        """Legacy: one Z-basis measurement (deprecated; biased for mixed Pauli)."""
+        from qiskit import QuantumCircuit
+        from qiskit.qasm3 import dumps
+
+        from qchem_stack.backends.qiskit_executor import hea_circuit_qiskit
+        from qchem_stack.backends.uqc_transpiler import transpile_to_uqc_native
+
+        qc = hea_circuit_qiskit(n_qubits, hea_depth, np.asarray(angles, dtype=float))
+        opt_level = int(meta.get("uqc_transpile_opt_level", self.spec.uqc_transpile_opt_level))
+        qc_transpiled = transpile_to_uqc_native(qc, optimization_level=opt_level)
+        if qc_transpiled.num_clbits == 0:
+            qc_meas = QuantumCircuit(qc_transpiled.num_qubits, qc_transpiled.num_qubits)
+            qc_meas.compose(qc_transpiled, inplace=True)
+            qc_meas.barrier()
+            qc_meas.measure(range(qc_transpiled.num_qubits), range(qc_transpiled.num_qubits))
+            qc_transpiled = qc_meas
+        qasm3_str = dumps(qc_transpiled)
+        shots = max(100, min(1000, int(self.spec.shots_per_circuit)))
+        shots = ((shots + 99) // 100) * 100
+        target = meta.get("uqc_target", "Matrix2")
+        task_id = client.submit_task(convert_qprog=qasm3_str, target=target, shots=shots)
+        if task_id is None:
+            raise RuntimeError("UQC submit_task returned None")
+        max_wait = float(meta.get("uqc_timeout_s", 300.0))
+        poll_interval = float(meta.get("uqc_poll_interval_s", 2.0))
+        elapsed = 0.0
+        while elapsed < max_wait:
+            status = client.get_task_status(task_id)
+            if status == "SUCCESS":
+                break
+            if status == "FAILURE":
+                raise RuntimeError(f"UQC task {task_id} failed on hardware")
+            time.sleep(poll_interval)
+            elapsed += poll_interval
+        else:
+            raise TimeoutError(f"UQC task {task_id} timed out after {max_wait}s")
+        raw_result = client.get_task_result(task_id)
+        if raw_result is None:
+            raise RuntimeError(f"UQC task {task_id} returned no results")
+        hist_data = raw_result[0]["datasets"]["computational_basis_histogram"]
+        counts = self._artiq_histogram_to_counts(hist_data, n_qubits)
+        return float(np.real(self._compute_expectation_from_counts(counts, hamiltonian, n_qubits)))
 
     @staticmethod
     def _artiq_histogram_to_counts(hist_data: list[list], n_qubits: int) -> dict[str, int]:

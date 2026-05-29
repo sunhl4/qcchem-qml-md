@@ -12,6 +12,8 @@ FermionQubitMappingName = Literal[
     "jordan_wigner",
     "bravyi_kitaev",
     "symmetry_conserving_bravyi_kitaev",
+    "jkmn",
+    "hard_core_boson",
 ]
 
 

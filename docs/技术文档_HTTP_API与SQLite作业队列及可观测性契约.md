@@ -97,9 +97,9 @@ HTTP 异步入队常见键：
 |------|------|----------------------------|
 | GET | `/health` | 无 `schema`；体为 `{"status":"ok"}` |
 | GET | `/health/ready` | 无 `schema`；体为 `{"status":"ready","job_db_default":...}`；SQLite ping 失败 → **503** |
-| GET | `/v1/meta/capability-surface` | `capability_surface_v1`（`qchem_stack_version`、`object_map`、`gaps`、`mitigation_execution_model`、`open_stack_differentiators`、`tangelo_public_mapping_alias_surface_v1`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`） |
+| GET | `/v1/meta/capability-surface` | `capability_surface_v2`（`qchem_stack_version`、`capability_map`、`gaps`、`gap_anchor_index_v1`、`mitigation_execution_model`、`open_stack_differentiators`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`、`uccsd_mapping_support_matrix_v1`） |
 | GET | `/v1/meta/parity-gaps` | `capability_gap_export_v1`：`qchem_stack_version`、`gaps` |
-| GET | `/v1/meta/product-analog` | `product_analog_v1`（控制台用路由指针 + `emulation_notes`） |
+| GET | `/v1/meta/product-surface` | `product_surface_v1`（控制台用路由指针 + `emulation_notes`） |
 | POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`；可选 `computables_rich`） |
 | POST | `/v1/meta/computables-preview` | `computables_preview_v1`（`experiment_id`、`computables[]`、`computable_abstract` v2） |
 | GET | `/v1/meta/ml-md-bridge` | `ml_md_bridge_surface_v1`（QMEF / 导出器 / stub trainer 指针） |
@@ -120,7 +120,7 @@ HTTP 异步入队常见键：
 |------|---------------------|
 | `GET /health` | `health` |
 | `GET /health/ready` | `ready` |
-| `GET /v1/meta/product-analog` | `product_analog` |
+| `GET /v1/meta/product-surface` | `product_surface` |
 | `GET /v1/meta/capability-surface` | `capability_surface` |
 | `GET /v1/meta/parity-gaps` | `parity_gaps` |
 | `POST /v1/meta/workflow-preview` | `workflow_preview` |

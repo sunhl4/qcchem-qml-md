@@ -12,8 +12,6 @@ See ``src/qchem_stack/chem/integral_convention.py`` and ``active_space_integrals
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 from openfermion import InteractionOperator, jordan_wigner, jw_hartree_fock_state
@@ -27,11 +25,12 @@ from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfer
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import load_experiment_config
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path, repo_root
 
 pyscf = pytest.importorskip("pyscf")
 
-_ROOT = Path(__file__).resolve().parents[1]
-_CFG_H2 = _ROOT / "configs" / "example_h2.yaml"
+_ROOT = repo_root()
+_CFG_H2 = configs_path("example_h2.yaml")
 
 
 def _as_reference(rhf) -> ClassicalMeanFieldReference:

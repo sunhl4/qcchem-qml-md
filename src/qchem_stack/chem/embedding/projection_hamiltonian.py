@@ -20,6 +20,7 @@ from qchem_stack.chem.hamiltonian import (
     QubitHamiltonian,
     qubit_hamiltonian_from_spatial_chemist_integrals,
 )
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.config.embedding_helpers import require_projection
 from qchem_stack.contracts.schema_ids import PROJECTION_MULLIKEN_MO_AUDIT_V1
 from qchem_stack.exceptions import EmbeddingError
@@ -84,8 +85,8 @@ def molecular_hamiltonian_fragment_mulliken_projection(
     )
     mo = np.asarray(ao.mo_coeff_ao(), dtype=float)
     n_mo = int(mo.shape[1])
-    ne = int(cfg.active_space.cas.n_electrons)
-    ncas = int(cfg.active_space.cas.n_orbitals)
+    ne = resolve_n_electrons(cfg.active_space)
+    ncas = resolve_n_orbitals(cfg.active_space)
     if ncas > n_mo or ne > 2 * ncas or ne < 0 or ne % 2 != 0:
         raise EmbeddingError("Invalid active_space electron/orbital count for MO dimensions.")
 

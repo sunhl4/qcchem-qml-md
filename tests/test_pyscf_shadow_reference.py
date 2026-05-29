@@ -1,9 +1,9 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 from qchem_stack.chem.bridges.casci_core_count import casci_ncore_spatial
@@ -14,8 +14,7 @@ from qchem_stack.config import load_experiment_config
 
 
 def test_pyscf_shadow_imports_mo_without_rescf() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     solver = PySCFIntegralSolver.from_experiment_config(cfg)
     run = solver.run_molecular_mean_field()
     ref = ClassicalMeanFieldReference(
@@ -33,7 +32,6 @@ def test_pyscf_shadow_imports_mo_without_rescf() -> None:
 
 
 def test_casci_ncore_matches_even_electron_heuristic() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     ncore = casci_ncore_spatial(cfg, n_mo=4, n_active_electrons=2, n_active_orbitals=2)
     assert ncore == 0

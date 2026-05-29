@@ -117,6 +117,8 @@ def build_resource_estimation_preview_v1(
         "vqd_max_overlap_warn_yaml": qt.excited.vqd.max_overlap_warn,
         "sceom_generator_strategy_yaml": qt.excited.sceom.generator_strategy,
         "parity_integrations_tket_first_circuit_stats": pi.tket_first_circuit_stats,
+        "ft_resource_depth_formula_v1": "sum_twoq * native_twoq_weight + n_pauli_groups",
+        "ft_t_gate_proxy_formula_v1": "n_pauli_rotations * log2(1/epsilon)",
         "use_pauli_protocol": qt.pauli.use_protocol,
         "spam_calibration_enabled_yaml": mit.stubs.spam_calibration,
         "classical_shadows_stub_enabled_yaml": mit.stubs.classical_shadows,
@@ -140,6 +142,10 @@ def build_resource_estimation_preview_v1(
         ):
             if k in rs and rs[k] is not None:
                 base[f"resource_summary_{k}"] = rs[k]
+        if rs.get("max_depth") is not None:
+            base["ft_circuit_depth_estimate"] = rs["max_depth"]
+        if rs.get("n_qubits") is not None:
+            base["ft_circuit_width_estimate"] = rs["n_qubits"]
     rsum: dict[str, Any] = {}
     repro = pipeline_row.get("repro")
     if isinstance(repro, dict):

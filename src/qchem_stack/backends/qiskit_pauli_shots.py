@@ -204,12 +204,12 @@ def energy_estimate_grouped_qiskit_shots(
                 counts = _run_counts(
                     qc, shots=sub_shots, seed=seed, backend=backend, transpile_level=transpile_level
                 )
-                idx_to_v: dict[int, int] = {}
+                idx_to_v_term: dict[int, int] = {}
                 for bitstr, num in counts.items():
                     j = qiskit_bitstring_to_comp_index(str(bitstr), n_qubits)
-                    idx_to_v[j] = idx_to_v.get(j, 0) + int(num)
-                sshots = int(sum(idx_to_v.values())) or 1
-                p_comp: dict[int, float] = {k: v / sshots for k, v in idx_to_v.items()}
+                    idx_to_v_term[j] = idx_to_v_term.get(j, 0) + int(num)
+                sshots = int(sum(idx_to_v_term.values())) or 1
+                p_comp: dict[int, float] = {k: v / sshots for k, v in idx_to_v_term.items()}
                 ev_one = 0.0
                 e2 = 0.0
                 for bidx, p in p_comp.items():
@@ -227,7 +227,9 @@ def energy_estimate_grouped_qiskit_shots(
                             "mode": "greedy_sequential_term",
                             "pauli_term": str(t),
                             "source": "qiskit_shot_counts",
-                            "histogram_comp_index": {str(k): int(v) for k, v in idx_to_v.items()},
+                            "histogram_comp_index": {
+                                str(k): int(v) for k, v in idx_to_v_term.items()
+                            },
                         }
                     )
                 qiskit_counts_log.append(

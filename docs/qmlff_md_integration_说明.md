@@ -1,6 +1,6 @@
 # qchem-stack ↔ QML-FF ↔ JAX-MD 端到端对接说明
 
-> 本文档描述如何把本工程（`qcchem-qml-md` / `qchem_stack`）与你的另一项工程 **QML-FF**（`/Users/shl/nvidia/QML-FF`，量子等变变分电路分子力场）以及 **JAX-MD** 拼成一条主动学习闭环。本对接 **完全增量**：不动本工程任何已有公共契约（`QMFrame`、`QMEFDataset`、`ExperimentConfig`、`run_pipeline_sync`、`md_bridge.from_pipeline` 等），所有新增模块对 `qmlff` / `jax_md` 均走 soft-import。
+> 本文档描述如何把本工程（`qchem-stack` / `qchem_stack`）与你的另一项工程 **QML-FF**（`$QMLFF_ROOT`，量子等变变分电路分子力场，通常为与本仓库并列的 sibling checkout）以及 **JAX-MD** 拼成一条主动学习闭环。本对接 **完全增量**：不动本工程任何已有公共契约（`QMFrame`、`QMEFDataset`、`ExperimentConfig`、`run_pipeline_sync`、`md_bridge.from_pipeline` 等），所有新增模块对 `qmlff` / `jax_md` 均走 soft-import。
 
 > **H₂ 三阶段实践**（训练修复、QMP/经典多后端、b benchmark）见：[`h2_md_validation_phases_技术说明.md`](h2_md_validation_phases_技术说明.md)。  
 > **UQC 云平台 mock + 本闭环**（不连真机）见：[`说明_UQC_mock与分子力场在线学习.md`](说明_UQC_mock与分子力场在线学习.md)。
@@ -50,11 +50,12 @@
 
 ```bash
 # 本工程
-cd /Users/shl/nvidia/qcchem-qml-md
+cd "$QCHEM_REPO"
 pip install -e ".[chem,quantum]"        # PySCF + Qiskit 可选；H2 demo 只需 chem
 
 # 另一项工程：QML-FF（本地，editable 安装）
-pip install -e /Users/shl/nvidia/QML-FF
+export QMLFF_ROOT="${QMLFF_ROOT:-../QML-FF}"
+pip install -e "$QMLFF_ROOT"
 
 # jax-md（可选；只有走到 MD 这一步才需要）
 pip install -e ".[qmlff]"   # 等价于安装 jax-md，详见 pyproject.toml
@@ -320,6 +321,6 @@ A: 第一期只验证了非周期小分子；`MdValidationLoopConfig` 已经为 
 ## 9. 参考
 
 - 本工程 ML/MD 桥：`src/qchem_stack/md_bridge/`
-- QML-FF qchem 桥（反向）：`/Users/shl/nvidia/QML-FF/qmlff/data/qchem_bridge.py`
-- QML-FF online loop：`/Users/shl/nvidia/QML-FF/qmlff/data/qchem_online_loop.py`
+- QML-FF qchem 桥（反向）：`$QMLFF_ROOT/qmlff/data/qchem_bridge.py`
+- QML-FF online loop：`$QMLFF_ROOT/qmlff/data/qchem_online_loop.py`
 - jax-md：<https://github.com/jax-md/jax-md>

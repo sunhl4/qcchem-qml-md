@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.helpers.paths import configs_dir, configs_path
+
 pytest.importorskip("fastapi")
 import json
 
@@ -25,13 +27,11 @@ def _have_pyscf() -> bool:
 
 
 def _minimal_experiment_yaml() -> str:
-    root = Path(__file__).resolve().parents[1]
-    return (root / "configs" / "example_h2.yaml").read_text(encoding="utf-8")
+    return (configs_path("example_h2.yaml")).read_text(encoding="utf-8")
 
 
 def _geometry_file_experiment_yaml() -> str:
-    root = Path(__file__).resolve().parents[1]
-    return (root / "configs" / "example_h2_geometry_file_xyz.yaml").read_text(encoding="utf-8")
+    return (configs_path("example_h2_geometry_file_xyz.yaml")).read_text(encoding="utf-8")
 
 
 def test_post_run_async_returns_202_and_trace() -> None:
@@ -88,7 +88,6 @@ def test_post_run_async_with_config_base_dir_for_relative_geometry_paths() -> No
     with tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False) as f:
         db_path = f.name
     try:
-        root = Path(__file__).resolve().parents[1]
         client = TestClient(app)
         r = client.post(
             "/v1/runs",
@@ -96,7 +95,7 @@ def test_post_run_async_with_config_base_dir_for_relative_geometry_paths() -> No
                 "experiment_yaml": _geometry_file_experiment_yaml(),
                 "sync": False,
                 "job_db_path": db_path,
-                "config_base_dir": str(root / "configs"),
+                "config_base_dir": str(configs_dir()),
             },
         )
         assert r.status_code == 202

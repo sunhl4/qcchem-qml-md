@@ -5,6 +5,7 @@ from collections.abc import Callable
 from dataclasses import dataclass
 from importlib.metadata import EntryPoint, entry_points
 from threading import RLock
+from typing import cast
 
 from qchem_stack.backends.executor_base import (
     HamiltonianExpectationExecutor,
@@ -113,12 +114,34 @@ def _uqc_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
     return UQCCloudHeaExecutor(spec)
 
 
+def _qulacs_factory(_: BackendSpec) -> HamiltonianExpectationExecutor:
+    try:
+        import qulacs  # noqa: F401
+    except ImportError as e:  # pragma: no cover
+        raise ImportError("provider='qulacs' requires qulacs. Install: pip install qulacs") from e
+    from qchem_stack.backends.qulacs_executor import QulacsHeaExecutor
+
+    return QulacsHeaExecutor()
+
+
+def _cirq_factory(_: BackendSpec) -> HamiltonianExpectationExecutor:
+    from qchem_stack.backends.cirq_executor import CirqHeaExecutor
+
+    return CirqHeaExecutor()
+
+
+def _braket_factory(_: BackendSpec) -> HamiltonianExpectationExecutor:
+    from qchem_stack.backends.braket_executor import BraketHeaExecutor
+
+    return BraketHeaExecutor()
+
+
 def _resolve_entry_point_factory(value: object, *, source: str) -> BackendFactory:
     if callable(value):
-        return value  # type: ignore[return-value]
+        return cast("BackendFactory", value)
     ctor = getattr(value, "from_backend_spec", None)
     if callable(ctor):
-        return ctor  # type: ignore[return-value]
+        return cast("BackendFactory", ctor)
     raise ValueError(
         f"{source} must resolve to a callable factory or class exposing from_backend_spec(spec)."
     )
@@ -143,6 +166,9 @@ def _register_builtin_backends() -> None:
     _register_record("ionstack", _ionstack_factory, source="builtin", origin="ionstack_factory")
     _register_record("ion_stack", _ionstack_factory, source="builtin", origin="ionstack_factory")
     _register_record("uqc", _uqc_factory, source="builtin", origin="uqc_factory")
+    _register_record("qulacs", _qulacs_factory, source="builtin", origin="qulacs_factory")
+    _register_record("cirq", _cirq_factory, source="builtin", origin="cirq_factory")
+    _register_record("braket", _braket_factory, source="builtin", origin="braket_factory")
 
 
 def _discover_external_backends() -> None:

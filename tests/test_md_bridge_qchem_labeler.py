@@ -10,13 +10,14 @@ from pathlib import Path
 
 import pytest
 
+from tests.helpers.paths import configs_path
+
 pytestmark = [pytest.mark.l1_md_ml, pytest.mark.pyscf]
 
 pytest.importorskip("pyscf")
 
 
-_REPO_ROOT = Path(__file__).resolve().parents[1]
-_H2_YAML = _REPO_ROOT / "configs" / "example_h2.yaml"
+_H2_YAML = configs_path("example_h2.yaml")
 
 
 @pytest.fixture(scope="module")

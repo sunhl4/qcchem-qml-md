@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 from qchem_stack.chem.solvers import (
     create_solver,
     register_mock_external_solver,
@@ -9,11 +7,11 @@ from qchem_stack.chem.solvers import (
 )
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 def test_mock_external_solver_contract_check_passes() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     register_mock_external_solver()
     cfg.scf.driver = "mock_external"
     sol = create_solver(cfg)
@@ -23,8 +21,7 @@ def test_mock_external_solver_contract_check_passes() -> None:
 
 
 def test_mock_external_solver_runs_pipeline_plugin_path() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_decomposition_plugin_toy.yaml"
+    cfg_path = configs_path("example_decomposition_plugin_toy.yaml")
     cfg = load_experiment_config(cfg_path)
     register_mock_external_solver()
     cfg.scf.driver = "mock_external"

@@ -27,6 +27,7 @@ limiter: Limiter | None = Limiter(key_func=get_remote_address) if SLOWAPI_AVAILA
 # Default route limits (override in tests via monkeypatch if needed).
 RUNS_POST_LIMIT = "10/minute"
 RUNS_GET_LIMIT = "60/minute"
+RUNS_JOB_GET_LIMIT = "120/minute"
 META_POST_LIMIT = "30/minute"
 ML_MD_POST_LIMIT = "30/minute"
 

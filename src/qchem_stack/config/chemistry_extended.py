@@ -13,6 +13,7 @@ from .chemistry_extended_specs import (
     ChemistryAvasSpec,
     ChemistryBenchmarksSpec,
     ChemistryCasscfSpec,
+    ChemistryMmChargesSpec,
     ChemistryMoTransformSpec,
     ChemistryPbcSpec,
     ChemistryPostHfSpec,
@@ -32,8 +33,14 @@ class ChemistryExtendedSpec(ForbidExtraBase):
     post_hf: ChemistryPostHfSpec = Field(default_factory=ChemistryPostHfSpec)
     mo_transform: ChemistryMoTransformSpec = Field(default_factory=ChemistryMoTransformSpec)
     symmetry: ChemistrySymmetrySpec = Field(default_factory=ChemistrySymmetrySpec)
+    mm_charges: ChemistryMmChargesSpec = Field(default_factory=ChemistryMmChargesSpec)
 
     @model_validator(mode="after")
     def _validate_pbc_cell_matrix(self) -> ChemistryExtendedSpec:
         validate_pbc_mesh_and_cell(self)
+        mc = self.mm_charges
+        if (mc.atom_indices or mc.charges_e) and len(mc.atom_indices) != len(mc.charges_e):
+            raise ValueError(
+                "chemistry_extended.mm_charges.atom_indices and charges_e must have equal length"
+            )
         return self

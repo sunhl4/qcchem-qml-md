@@ -29,7 +29,7 @@
 | 场景 | `quantum.variational_ansatz` | VQD 参数化 | 基态角来源 |
 |------|-----------------------------|------------|------------|
 | 硬件高效 Ansatz | `hea`（默认） | `hea_state(angles, n_qubits, depth)`，`depth`=`quantum.vqe_depth` | 管线前置 VQE/ADAPT 输出的 `angles` |
-| 簇 UCCSD | `uccsd` | `UCCSDVQE.prepare_state` / `UCCSDTrotterVQE.prepare_state`（由 `quantum.uccsd_trotter_steps` 是否为空选择） | **必须**与前置变分阶段同维参数向量；管线传入 `ground_angles` |
+| 簇 UCCSD | `uccsd` | `UCCSDVQE.prepare_state` / `UCCSDTrotterVQE.prepare_state`（由 `quantum.variational.uccsd_trotter_steps` 是否为空选择） | **必须**与前置变分阶段同维参数向量；管线传入 `ground_angles` |
 
 **约束**：
 

@@ -220,3 +220,31 @@ def _bath_to_json(b: DMETBathState) -> dict[str, Any]:
         "meta": meta,
         "note": "Large arrays (D_ao, S_ao, fragment_atoms) omitted from JSON.",
     }
+
+
+def pyscf_density_feedback_bath_update(
+    bath: DMETBathState,
+    fragments: list[DMETFragmentResult],
+    *,
+    mf_density: Any | None = None,
+) -> DMETBathState:
+    """Chemical bath update hook: attach PySCF density-matrix metadata for v1 DMET loops."""
+    energies = [float(f.energy) for f in fragments if f.energy is not None]
+    meta = {
+        **bath.meta,
+        "fragment_energy_sum": float(sum(energies)) if energies else 0.0,
+        "pyscf_density_feedback": mf_density is not None,
+        "n_fragments_solved": len(fragments),
+    }
+    if mf_density is not None:
+        meta["density_trace"] = float(getattr(mf_density, "trace", lambda: 0.0)())
+    return replace(bath, meta=meta)
+
+
+__all__ = [
+    "DMETBathState",
+    "DMETFragmentResult",
+    "DMETSelfConsistencyLoop",
+    "OneShotEmbeddingDriver",
+    "pyscf_density_feedback_bath_update",
+]

@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -13,8 +13,7 @@ from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 
 def test_example_h2_pipeline_energy_components_schema() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_h2.yaml"
+    cfg_path = configs_path("example_h2.yaml")
     cfg = load_experiment_config(cfg_path)
     out = run_pipeline_sync(cfg, cfg_path=cfg_path)
     ec = out.get("energy_components")

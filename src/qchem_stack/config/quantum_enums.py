@@ -23,6 +23,8 @@ class OperatorPoolId(StrEnum):
     FERMIONIC_UCCSD_SINGLES_THEN_DOUBLES_BK_CONCAT = (
         "fermionic_uccsd_singles_then_doubles_bk_concat"
     )
+    FERMIONIC_GENERALIZED_DOUBLES = "fermionic_generalized_doubles"
+    FERMIONIC_SINGLES_DOUBLES_STAGGERED = "fermionic_singles_doubles_staggered"
     IQEB_QUBIT_EXCITATION = "iqeb_qubit_excitation"
     QUBIT_EXCITATION = "qubit_excitation"
     TOY_PAIR_XX = "toy_pair_xx"

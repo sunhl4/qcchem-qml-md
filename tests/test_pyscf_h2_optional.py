@@ -13,6 +13,7 @@ from qchem_stack.config import (
 from qchem_stack.qpe_qec_demo import FaultTolerantDemoAdapter
 from qchem_stack.quantum.algorithms.vqe import VQE
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path
 
 pyscf = pytest.importorskip("pyscf")
 
@@ -60,7 +61,7 @@ active_space:
     qh = build_pre_quantum_input(cfg, _as_reference(r)).qubit_hamiltonian
     assert qh.meta.get("fermion_to_qubit_map") == "jordan_wigner"
     assert qh.meta.get("integral_source") == "pyscf_casci_h2eff_compact"
-    assert qh.meta.get("integral_openfermion_bridge") == "pyscf_tangelo_openfermion_v1"
+    assert qh.meta.get("integral_openfermion_bridge") == "pyscf_spatial_openfermion_v1"
     assert qh.meta.get("n_active_electrons") == 2
     v = VQE(qh, depth=1).run(maxiter=200, seed=0)
     ad = FaultTolerantDemoAdapter()
@@ -108,7 +109,6 @@ def test_h2_active_space_symmetry_conserving_bravyi_kitaev_dimension() -> None:
 
 def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
     """Figure-asset strategy: bounded UCCSD amplitudes + L-BFGS-B stays variational vs CASCI."""
-    from pathlib import Path
 
     import numpy as np
     from pyscf import mcscf
@@ -117,8 +117,7 @@ def test_h2_uccsd_bounded_lbfgsb_near_casci_energy() -> None:
     from qchem_stack.config import backend_spec_from_config, load_experiment_config
     from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE
 
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_vqe_figure_near_casci.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_vqe_figure_near_casci.yaml"))
     r = pyscf_rhf_from_config(cfg)
     qh = build_pre_quantum_input(cfg, _as_reference(r)).qubit_hamiltonian
     exe = executor_from_spec(backend_spec_from_config(cfg))

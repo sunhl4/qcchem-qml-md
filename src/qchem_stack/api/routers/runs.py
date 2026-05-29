@@ -12,7 +12,12 @@ from qchem_stack.api.deps import (
     sqlite_job_store,
     trace_response_headers,
 )
-from qchem_stack.api.middleware import RUNS_GET_LIMIT, RUNS_POST_LIMIT, rate_limit
+from qchem_stack.api.middleware import (
+    RUNS_GET_LIMIT,
+    RUNS_JOB_GET_LIMIT,
+    RUNS_POST_LIMIT,
+    rate_limit,
+)
 from qchem_stack.api.models import RunRequest
 from qchem_stack.contracts.schema_ids import (
     JOB_EVENTS_V1,
@@ -92,21 +97,30 @@ def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JS
         config_base_dir=body.config_base_dir,
     )
     headers = trace_response_headers(rc)
+    meta_extra: dict[str, Any] = {"experiment_id": cfg.experiment_id}
+    if body.workspace_label and str(body.workspace_label).strip():
+        meta_extra["api_workspace_label"] = str(body.workspace_label).strip()[:400]
+    if body.project_slug and str(body.project_slug).strip():
+        meta_extra["api_project_slug"] = str(body.project_slug).strip()[:200]
     if body.sync:
         try:
             out = run_pipeline_sync(cfg, cfg_path=None, run_context=rc)
         except QChemStackError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
-        return JSONResponse(pipeline_result_for_job_store(out), headers=headers)
+        slim = pipeline_result_for_job_store(out)
+        if isinstance(slim.get("repro"), dict):
+            rs = slim["repro"].setdefault("run_summary", {})
+            if isinstance(rs, dict):
+                for key in ("api_workspace_label", "api_project_slug", "experiment_id"):
+                    if meta_extra.get(key) is not None:
+                        rs[key] = meta_extra[key]
+        headers["Deprecation"] = "true"
+        headers["Link"] = '</v1/runs>; rel="successor-version"'
+        return JSONResponse(slim, headers=headers)
 
-    meta_extra: dict[str, Any] = {"experiment_id": cfg.experiment_id}
     na = cfg.nexus_analog
     if na.enabled and na.project_label:
         meta_extra["nexus_analog_project_label"] = str(na.project_label)
-    if body.workspace_label and str(body.workspace_label).strip():
-        meta_extra["api_workspace_label"] = str(body.workspace_label).strip()[:400]
-    if body.project_slug and str(body.project_slug).strip():
-        meta_extra["api_project_slug"] = str(body.project_slug).strip()[:200]
 
     db = Path(body.job_db_path) if body.job_db_path else default_job_db_path()
     store = sqlite_job_store(str(db))
@@ -132,8 +146,18 @@ def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JS
     )
 
 
+@router.post("/v1/runs/sync", response_model=None, deprecated=True)
+@rate_limit(RUNS_POST_LIMIT)
+def post_run_sync(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JSONResponse:
+    """Synchronous in-process pipeline (localhost debug only). Prefer ``POST /v1/runs`` async."""
+    sync_body = body.model_copy(update={"sync": True})
+    return post_run(request, sync_body)
+
+
 @router.get("/v1/runs/{job_id}/status")
+@rate_limit(RUNS_JOB_GET_LIMIT)
 def get_run_status(
+    request: Request,
     job_id: str,
     job_db_path: str | None = Query(default=None, description="Must match enqueue DB"),
 ) -> dict[str, object]:
@@ -146,7 +170,9 @@ def get_run_status(
 
 
 @router.get("/v1/runs/{job_id}/events")
+@rate_limit(RUNS_JOB_GET_LIMIT)
 def get_run_events(
+    request: Request,
     job_id: str,
     job_db_path: str | None = Query(default=None, description="Must match enqueue DB"),
 ) -> dict[str, object]:
@@ -166,7 +192,9 @@ def get_run_events(
 
 
 @router.get("/v1/runs/{job_id}/summary")
+@rate_limit(RUNS_JOB_GET_LIMIT)
 def get_run_summary_ux(
+    request: Request,
     job_id: str,
     job_db_path: str | None = Query(default=None, description="Must match enqueue DB"),
 ) -> dict[str, object]:
@@ -181,7 +209,9 @@ def get_run_summary_ux(
 
 
 @router.get("/v1/runs/{job_id}/repro")
+@rate_limit(RUNS_JOB_GET_LIMIT)
 def get_run_repro(
+    request: Request,
     job_id: str,
     job_db_path: str | None = Query(default=None, description="Must match enqueue DB"),
 ) -> dict[str, object]:
@@ -208,7 +238,9 @@ def get_run_repro(
 
 
 @router.get("/v1/runs/{job_id}")
+@rate_limit(RUNS_JOB_GET_LIMIT)
 def get_run(
+    request: Request,
     job_id: str,
     job_db_path: str | None = Query(
         default=None, description="Must match the DB used when enqueueing"

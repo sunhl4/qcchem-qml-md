@@ -12,9 +12,9 @@ from dataclasses import dataclass, field
 from importlib.metadata import EntryPoint, entry_points
 from threading import RLock
 from types import MappingProxyType
-from typing import Literal
+from typing import Literal, cast
 
-from qchem_stack.chem.solvers.base import ChemIntegralSolver
+from qchem_stack.chem.solvers.base import ChemIntegralSolver, SolverCapabilities
 from qchem_stack.config import ExperimentConfig
 
 SolverFactory = Callable[[ExperimentConfig], ChemIntegralSolver]
@@ -159,6 +159,27 @@ def _production_capability_notes_for_builtin(solver_id: str) -> dict[str, str]:
     return dict(factory().capability_notes)
 
 
+def static_solver_capabilities_for_driver(driver: str) -> SolverCapabilities | None:
+    """Return static capability preset for built-in drivers; ``None`` for plugin-only ids."""
+    _ensure_bootstrap()
+    from qchem_stack.chem.integration.presets import (
+        capabilities_precomputed_offline,
+        capabilities_psi4_production,
+        capabilities_pyscf_production,
+    )
+
+    key = _normalize_solver_id(driver)
+    factories: dict[str, Callable[[], SolverCapabilities]] = {
+        "pyscf": capabilities_pyscf_production,
+        "psi4": capabilities_psi4_production,
+        "precomputed": capabilities_precomputed_offline,
+    }
+    factory = factories.get(key)
+    if factory is None:
+        return None
+    return factory()
+
+
 def solver_capability_notes_for_config(cfg: ExperimentConfig) -> dict[str, str]:
     """Return ``capability_notes`` for the solver selected by ``cfg.scf.driver``."""
     caps = create_solver(cfg).capabilities
@@ -178,10 +199,10 @@ def set_entrypoint_conflict_policy(policy: EntrypointConflictPolicy) -> None:
 
 def _resolve_entry_point_factory(value: object, *, source: str) -> SolverFactory:
     if callable(value):
-        return value  # type: ignore[return-value]
+        return cast("SolverFactory", value)
     maybe_ctor = getattr(value, "from_experiment_config", None)
     if callable(maybe_ctor):
-        return maybe_ctor  # type: ignore[return-value]
+        return cast("SolverFactory", maybe_ctor)
     raise SolverRegistrationError(
         f"{source} must resolve to a callable factory or class exposing from_experiment_config(cfg)."
     )

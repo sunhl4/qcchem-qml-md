@@ -15,6 +15,7 @@ from qchem_stack.chem.precomputed_bundle import (
     parse_precomputed_manifest,
     qubit_hamiltonian_from_bundle_payload,
 )
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.contracts.schema_ids import PRECOMPUTED_CONFIG_FINGERPRINT_V1
 from qchem_stack.exceptions import PipelineError
 
@@ -57,8 +58,8 @@ def precomputed_config_fingerprint_payload(cfg: ExperimentConfig) -> dict[str, A
         "multiplicity": int(cfg.molecule.multiplicity),
         "basis": str(cfg.molecule.basis),
         "active_space": {
-            "n_active_orbitals": int(cfg.active_space.cas.n_orbitals),
-            "n_active_electrons": int(cfg.active_space.cas.n_electrons),
+            "n_active_orbitals": resolve_n_orbitals(cfg.active_space),
+            "n_active_electrons": resolve_n_electrons(cfg.active_space),
             "fermion_qubit_mapping": str(cfg.active_space.mapping.fermion_qubit),
         },
     }

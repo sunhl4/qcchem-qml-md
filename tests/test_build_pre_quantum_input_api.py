@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import warnings
-from pathlib import Path
 
 import pytest
 
@@ -13,13 +12,13 @@ from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.scf_stage import run_scf_reference
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path
 
 
 @pytest.mark.pyscf
 def test_legacy_hamiltonian_helper_emits_deprecation_and_matches_build() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     result = pyscf_rhf_from_config(cfg)
     ref = ClassicalMeanFieldReference(
         mf=result.mf,
@@ -28,7 +27,7 @@ def test_legacy_hamiltonian_helper_emits_deprecation_and_matches_build() -> None
         molecular_system=result.molecular_system,
         driver_meta=dict(result.driver_meta),
     )
-    built = build_pre_quantum_input(cfg, ref, cfg_path=root / "configs" / "example_h2.yaml")
+    built = build_pre_quantum_input(cfg, ref, cfg_path=configs_path("example_h2.yaml"))
     with warnings.catch_warnings(record=True) as caught:
         warnings.simplefilter("always", DeprecationWarning)
         legacy = molecular_hamiltonian_from_classical_reference(
@@ -44,8 +43,7 @@ def test_legacy_hamiltonian_helper_emits_deprecation_and_matches_build() -> None
 
 
 def test_build_pre_quantum_input_supports_precomputed_driver() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2_precomputed_bundle.yaml"
+    p = configs_path("example_h2_precomputed_bundle.yaml")
     cfg = load_experiment_config(p)
     ref = run_scf_reference(cfg)
     built = build_pre_quantum_input(cfg, ref, cfg_path=p)

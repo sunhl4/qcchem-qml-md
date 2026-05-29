@@ -1,7 +1,6 @@
 """Stable chemistry-facing ansatz identifiers (workflow UX / plugin hooks).
 
-Open-stack counterpart to broad ansatz menus in research packages (e.g. Tangelo-style toolboxes):
-execution still lives under ``quantum.algorithms.*``; this module is the **name → docs** registry only.
+Execution lives under ``quantum.algorithms.*``; this module is the **name → docs** registry only.
 
 Outer-loop / YAML ``quantum.algorithm`` identifiers live in ``quantum.algorithm_registry``.
 Fermion→qubit mapping names live in ``chem.fermion_mapping_registry``.
@@ -54,6 +53,48 @@ def _iqeb_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
     return IQEBVQE(hamiltonian, **kwargs)
 
 
+def _uccgd_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.uccgd_vqe import UCCGDVQE
+
+    return UCCGDVQE(hamiltonian, **kwargs)
+
+
+def _qcc_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.qcc_vqe import QCCVQE
+
+    return QCCVQE(hamiltonian, **kwargs)
+
+
+def _puccd_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.puccd_vqe import PUCCDVQE
+
+    return PUCCDVQE(hamiltonian, **kwargs)
+
+
+def _upccgsd_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.upccgsd_vqe import UpCCGSDVQE
+
+    return UpCCGSDVQE(hamiltonian, **kwargs)
+
+
+def _iqcc_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.iqcc import IQCCVQE
+
+    return IQCCVQE(hamiltonian, **kwargs)
+
+
+def _qite_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.qite import QITEVQE
+
+    return QITEVQE(hamiltonian, **kwargs)
+
+
+def _vsqs_factory(hamiltonian: QubitHamiltonian, **kwargs: Any) -> Any:
+    from qchem_stack.quantum.algorithms.vsqs_vqe import VSQSVQE
+
+    return VSQSVQE(hamiltonian, **kwargs)
+
+
 ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
     "hea": AnsatzRegistryEntry(
         summary="Hardware-efficient layered rotations; depth from ``quantum.vqe.depth``.",
@@ -69,6 +110,48 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
         implementation="qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDVQE",
         factory=_uccsd_factory,
         capabilities={"jordan_wigner_only": True},
+    ),
+    "uccgd": AnsatzRegistryEntry(
+        summary="UCC with generalized doubles (JW/BK square encodings).",
+        implementation="qchem_stack.quantum.algorithms.uccgd_vqe.UCCGDVQE",
+        factory=_uccgd_factory,
+        capabilities={"jordan_wigner_only": True, "generalized_doubles": True},
+    ),
+    "qcc": AnsatzRegistryEntry(
+        summary="Quantum Coupled Cluster via fixed qubit-excitation pool exponentials.",
+        implementation="qchem_stack.quantum.algorithms.qcc_vqe.QCCVQE",
+        factory=_qcc_factory,
+        capabilities={"qubit_excitation_pool": True},
+    ),
+    "upccgsd": AnsatzRegistryEntry(
+        summary="Unitary pair coupled-cluster GSD (singles + paired doubles, JW/BK square).",
+        implementation="qchem_stack.quantum.algorithms.upccgsd_vqe.UpCCGSDVQE",
+        factory=_upccgsd_factory,
+        capabilities={"jordan_wigner_only": True, "paired_doubles": True},
+    ),
+    "puccd": AnsatzRegistryEntry(
+        summary="Pair UCCD — paired doubles only on closed-shell references.",
+        implementation="qchem_stack.quantum.algorithms.puccd_vqe.PUCCDVQE",
+        factory=_puccd_factory,
+        capabilities={"jordan_wigner_only": True, "doubles_only": True},
+    ),
+    "iqcc": AnsatzRegistryEntry(
+        summary="Imaginary-time QCC research plugin with qubit-excitation pool.",
+        implementation="qchem_stack.quantum.algorithms.iqcc.IQCCVQE",
+        factory=_iqcc_factory,
+        capabilities={"research_plugin": True},
+    ),
+    "qite": AnsatzRegistryEntry(
+        summary="Quantum imaginary-time evolution research plugin (fixed pool).",
+        implementation="qchem_stack.quantum.algorithms.qite.QITEVQE",
+        factory=_qite_factory,
+        capabilities={"research_plugin": True},
+    ),
+    "vsqs": AnsatzRegistryEntry(
+        summary="Variational Scheduled Quantum Simulation (arXiv:2003.09913).",
+        implementation="qchem_stack.quantum.algorithms.vsqs_vqe.VSQSVQE",
+        factory=_vsqs_factory,
+        capabilities={"requires_hf_reference": True, "requires_spatial_integrals_meta": True},
     ),
     "fermionic_adapt": AnsatzRegistryEntry(
         summary="Fermionic-pool ADAPT-VQE.",
@@ -102,32 +185,6 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
         implementation="qchem_stack.quantum.algorithms.uccsd_vqe.UCCSDTrotterVQE",
         factory=_uccsd_trotter_factory,
         capabilities={"jordan_wigner_only": True},
-    ),
-    "adapt_solver_tangelo_alias": AnsatzRegistryEntry(
-        summary=(
-            "Naming parity anchor vs broad solver menus (e.g. Tangelo ``ADAPTSolver`` tutorials): "
-            "still resolves to fermionic-pool ADAPT-VQE in this stack."
-        ),
-        implementation="qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
-        factory=_adapt_factory,
-    ),
-    "ucc1_tangelo_partial": AnsatzRegistryEntry(
-        summary="Partial alias: documented Tangelo UCC1 naming; execution redirects to HEA depth tuning.",
-        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
-        factory=_hea_factory,
-        capabilities={"partial_tangelo_alias": True},
-    ),
-    "qcc_tangelo_partial": AnsatzRegistryEntry(
-        summary="Partial alias: QCC naming parity; execution uses HEA until dedicated QCC ansatz lands.",
-        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
-        factory=_hea_factory,
-        capabilities={"partial_tangelo_alias": True},
-    ),
-    "vsqs_tangelo_partial": AnsatzRegistryEntry(
-        summary="Partial alias: VSQS naming parity; execution uses HEA layers.",
-        implementation="qchem_stack.quantum.algorithms.vqe.VQE",
-        factory=_hea_factory,
-        capabilities={"partial_tangelo_alias": True},
     ),
 }
 

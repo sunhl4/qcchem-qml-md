@@ -6,11 +6,11 @@ import pytest
 
 from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import ConfigurationError
+from tests.helpers.paths import configs_path
 
 
 def test_psi4_avas_config_loads_when_capability_true() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_psi4_avas.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_psi4_avas.yaml"))
     assert cfg.scf.driver == "psi4"
     assert cfg.active_space.strategy == "avas"
     assert cfg.chemistry_extended.avas.ao_labels

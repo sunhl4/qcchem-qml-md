@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import math
 from collections import Counter
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -26,7 +26,7 @@ def _single_qubit_rot_to_z_matrix(axis: str) -> np.ndarray:
         return h
     if axis == "Y":
         sdg = np.array([[1, 0], [0, -1j]], dtype=complex)
-        return h @ sdg
+        return cast("np.ndarray", h @ sdg)
     raise ValueError(axis)
 
 
@@ -196,7 +196,7 @@ def energy_estimate_grouped_shot_simulation(
         psi_r = apply_pauli_tensor_basis_to_state(psi_hea, bk, n_qubits)
         probs = np.abs(psi_r) ** 2
         probs = probs / (np.sum(probs) + 1e-30)
-        draws: list[float] = []
+        basis_draws: list[float] = []
         ctr_g: Counter[int] = Counter()
         for _ in range(shots_per_circuit):
             idx = int(rng.choice(dim, p=probs))
@@ -205,7 +205,7 @@ def energy_estimate_grouped_shot_simulation(
             val = 0.0
             for t, c in coeffs:
                 val += c * _pauli_eigenvalue_on_comp_bit(t, idx, n_qubits, bk)
-            draws.append(val)
+            basis_draws.append(val)
         if return_histograms:
             histogram_rows.append(
                 {
@@ -214,9 +214,9 @@ def energy_estimate_grouped_shot_simulation(
                     "histogram_comp_index": {str(k): int(v) for k, v in ctr_g.items()},
                 }
             )
-        group_means.append(float(np.mean(draws)))
-        if len(draws) > 1:
-            per_group_stderr_sq.append(float(np.var(draws, ddof=1)) / shots_per_circuit)
+        group_means.append(float(np.mean(basis_draws)))
+        if len(basis_draws) > 1:
+            per_group_stderr_sq.append(float(np.var(basis_draws, ddof=1)) / shots_per_circuit)
         else:
             per_group_stderr_sq.append(0.0)
         total_shots_used += shots_per_circuit

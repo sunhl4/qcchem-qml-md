@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.config import (
@@ -19,6 +17,7 @@ from qchem_stack.config.quantum_helpers import (
 )
 from qchem_stack.orchestration.pipeline import collect_repro_metadata
 from tests.embedding_nested import embedding_dmet
+from tests.helpers.paths import configs_path
 
 
 def _minimal_cfg(**quantum_overrides: object) -> ExperimentConfig:
@@ -228,7 +227,7 @@ def test_parity_integrations_disabled_skips_open_block() -> None:
 def test_parity_snapshot_projection_embedding_open_trace_from_packaged_yaml() -> None:
     from qchem_stack.config import load_experiment_config
 
-    p = Path(__file__).resolve().parents[1] / "configs" / "example_h2_projection_trace.yaml"
+    p = configs_path("example_h2_projection_trace.yaml")
     cfg = load_experiment_config(p)
     snap = collect_repro_metadata(cfg, cfg_path=p)["parity_snapshot"]
     pet = snap.get("projection_embedding_open_trace")

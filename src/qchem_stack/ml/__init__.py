@@ -1,6 +1,8 @@
-from qchem_stack.ml.active_learning import ActiveLearningLoop
-from qchem_stack.ml.cache import ObservationCache
-from qchem_stack.ml.policy import MLPolicy
-from qchem_stack.ml.surrogate import SurrogateEnergyModel
+"""Toy surrogate models for experimentation.
 
-__all__ = ["ObservationCache", "SurrogateEnergyModel", "ActiveLearningLoop", "MLPolicy"]
+Production MD/ML active-learning loops live in ``qchem_stack.md_bridge``
+(``run_md_validation_loop``, QML-FF adapter). This package provides a minimal
+Ridge surrogate and observation cache for demos only — not the main ML path.
+"""
+
+from qchem_stack.ml.active_learning import ActiveLearningLoop as ActiveLearningLoop

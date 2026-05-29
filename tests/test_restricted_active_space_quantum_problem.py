@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -18,8 +18,7 @@ from qchem_stack.tensornet.dense_expectation_reference import expectation_qubit_
 
 
 def test_restricted_active_space_problem_matches_pipeline_geometry() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     prob = restricted_active_space_quantum_problem_from_config(
         cfg,
         fermion_qubit_mapping="jordan_wigner",
@@ -40,8 +39,7 @@ def test_restricted_active_space_problem_matches_pipeline_geometry() -> None:
 
 
 def test_get_system_ao_marks_integral_representation() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     ao = pyscf_ao_system_from_config(cfg, run_hf=True)
     assert ao.driver_meta.get("integral_representation") == "ao"
     assert ao.driver_meta.get("ao_reference_kind") == "scf_object"
@@ -49,8 +47,7 @@ def test_get_system_ao_marks_integral_representation() -> None:
 
 
 def test_pyscf_symmetry_configuration_surfaces_in_problem_meta() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     cx = cfg.chemistry_extended.model_copy(update={"pyscf_symmetry": True})
     cfg2 = cfg.model_copy(update={"chemistry_extended": cx})
     prob = restricted_active_space_quantum_problem_from_config(cfg2)
@@ -58,8 +55,7 @@ def test_pyscf_symmetry_configuration_surfaces_in_problem_meta() -> None:
 
 
 def test_restricted_active_space_problem_rejects_uhf_reference() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     scf = cfg.scf.model_copy(update={"method": "UHF"})
     cfg2 = cfg.model_copy(update={"scf": scf})
     with pytest.raises(ValueError, match="RHF references only"):

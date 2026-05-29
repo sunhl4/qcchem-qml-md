@@ -97,11 +97,11 @@ quantum:
   algorithm: vqe
   algorithm_factory: null
   variational:
-    ansatz: hea
+    ansatz: uccsd
     uccsd_trotter_steps: null
   vqe:
     depth: 1
-    maxiter: 80
+    maxiter: 150
     optimizer_method: COBYLA
     initial_parameters_strategy: random_uniform
   adapt:

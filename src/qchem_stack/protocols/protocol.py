@@ -59,6 +59,8 @@ class PauliAveragingProtocol:
     executor: HamiltonianExpectationExecutor | None = None
     nexus_analog: NexusAnalogSpec | None = None
     pauli_support_max_terms: int | None = None
+    classical_shadows_enabled: bool = False
+    classical_shadows_budget_pairs: int = 256
     _phase: ProtocolPhase = field(default=ProtocolPhase.INSTANTIATE, init=False)
     _measurement_plan: PauliMeasurementPlan | None = field(default=None, init=False)
     _logical_circuits: list[CircuitIR] = field(default_factory=list, init=False)

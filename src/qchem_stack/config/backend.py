@@ -14,7 +14,15 @@ class BackendSpecConfig(ForbidExtraBase):
     """Execution backend selection and shot/noise controls."""
 
     name: str = Field(default="statevector_sim", min_length=1)
-    provider: Literal["statevector", "qiskit", "ionstack", "uqc"] = "statevector"
+    provider: Literal[
+        "statevector",
+        "qiskit",
+        "ionstack",
+        "uqc",
+        "qulacs",
+        "cirq",
+        "braket",
+    ] = "statevector"
     shots_per_circuit: int = Field(default=2048, ge=1)
     target_energy_stderr: float | None = Field(default=None, gt=0.0)
     qiskit_mode: Literal["statevector", "estimator"] = "statevector"

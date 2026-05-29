@@ -8,7 +8,7 @@ nonlinear least squares on bond lengths. No ``qmlff`` dependency.
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
@@ -94,7 +94,7 @@ class ClassicalH2MorseModel:
     @staticmethod
     def _morse_energy_ev(r_ang: np.ndarray, p: ClassicalH2MorseParams) -> np.ndarray:
         x = np.exp(-p.a_inv_ang * (r_ang - p.re_ang))
-        return p.de_ev * (1.0 - x) ** 2 - p.de_ev + p.shift_ev
+        return cast("np.ndarray", p.de_ev * (1.0 - x) ** 2 - p.de_ev + p.shift_ev)
 
     def compute_total_energy(
         self,
@@ -174,7 +174,7 @@ def train_classical_h2_on_qmef(
 
     def _predict(x: np.ndarray, r: np.ndarray) -> np.ndarray:
         de, a, re, shift = float(x[0]), float(x[1]), float(x[2]), float(x[3])
-        return de * (1.0 - np.exp(-a * (r - re))) ** 2 - de + shift
+        return cast("np.ndarray", de * (1.0 - np.exp(-a * (r - re))) ** 2 - de + shift)
 
     def _residuals(x: np.ndarray) -> np.ndarray:
         de, a, re = float(x[0]), float(x[1]), float(x[2])

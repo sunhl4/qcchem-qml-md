@@ -62,6 +62,13 @@
 
 - `scripts/check_comparative_execution_backlog.py` — 台账结构与完成证据校验脚本（在 CI/本地对 `comparative_execution_backlog.yaml` 运行）
 
+## Full P0–P3 master plan (Day181–Day450)
+
+- [`inquanto_tangelo_p0_p3_master_plan_2026Q3Q4.md`](inquanto_tangelo_p0_p3_master_plan_2026Q3Q4.md) — InQuanto/Tangelo 对标全量 WBS
+- [`day210_p0_closeout.md`](day210_p0_closeout.md) — Phase D (P0) 封板
+- [`day450_p3_closeout.md`](day450_p3_closeout.md) — Phase H (P3) 封板
+- `comparative_execution_backlog.yaml` Phase **D–H** — 全部 `done`（2026-05-28）
+
 ### Day91-Day97 templates
 
 - `day91_template_2026Q3.md`

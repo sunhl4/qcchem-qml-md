@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.chem.embedding.hamiltonian_semantics import pre_quantum_hamiltonian_semantics
@@ -14,11 +12,11 @@ from qchem_stack.chem.pre_quantum_path import (
 )
 from qchem_stack.config import ExperimentConfig, load_experiment_config
 from tests.embedding_nested import embedding_dmet
+from tests.helpers.paths import configs_path
 
 
 def _cfg(**embedding: object) -> ExperimentConfig:
-    root = Path(__file__).resolve().parents[1]
-    base = load_experiment_config(root / "configs" / "example_h2.yaml")
+    base = load_experiment_config(configs_path("example_h2.yaml"))
     if not embedding:
         return base
     return base.model_copy(update={"embedding": embedding_dmet(**embedding)})
@@ -34,14 +32,12 @@ def test_resolve_canonical_default_h2() -> None:
 
 
 def test_resolve_precomputed_driver() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_precomputed_bundle.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_precomputed_bundle.yaml"))
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.PRECOMPUTED_BUNDLE
 
 
 def test_resolve_embedding_plugin() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_decomposition_plugin_toy.yaml")
+    cfg = load_experiment_config(configs_path("example_decomposition_plugin_toy.yaml"))
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.EMBEDDING_PLUGIN
 
 
@@ -54,8 +50,7 @@ def test_resolve_schmidt_atomic_production() -> None:
 
 
 def test_resolve_projection_fragment_mulliken_mo() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h4_projection_mulliken.yaml")
+    cfg = load_experiment_config(configs_path("example_h4_projection_mulliken.yaml"))
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.PROJECTION_FRAGMENT_MULLIKEN_MO
 
 
@@ -69,8 +64,7 @@ def test_schmidt_takes_priority_over_projection_mode() -> None:
 
 
 def test_plugin_takes_priority_over_canonical() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_decomposition_plugin_toy.yaml")
+    cfg = load_experiment_config(configs_path("example_decomposition_plugin_toy.yaml"))
     assert resolve_pre_quantum_path(cfg) == PreQuantumPath.EMBEDDING_PLUGIN
 
 
@@ -88,8 +82,7 @@ def test_plugin_takes_priority_over_canonical() -> None:
     ],
 )
 def test_semantics_branch_matches_resolve(yaml_name: str, expected: PreQuantumPath) -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / yaml_name)
+    cfg = load_experiment_config(configs_path(yaml_name))
     sem = pre_quantum_hamiltonian_semantics(cfg)
     assert sem["hamiltonian_branch"] == expected.value
     assert sem["hamiltonian_branch"] == resolve_pre_quantum_path(cfg).value

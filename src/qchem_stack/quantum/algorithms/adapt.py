@@ -85,7 +85,7 @@ class FermionicAdaptVQE(AlgorithmBase):
             st = hea_state(hea_x, self.n_qubits, self.hea_depth)
             for pool_idx, th in exc:
                 st = expm(-1j * float(th) * pool_mats[pool_idx]) @ st
-            return st / np.linalg.norm(st)
+            return cast("np.ndarray", st / np.linalg.norm(st))
 
         def energy_fn(hea_x: np.ndarray, exc: list[tuple[int, float]]) -> float:
             st = build_state(hea_x, exc)
@@ -169,6 +169,7 @@ class FermionicAdaptVQE(AlgorithmBase):
                 "pool_size": len(self.pool),
                 "gradient_mode": "commutator",
                 "tetris_style": self.tetris_style,
+                "grad_tol_used": float(grad_tol),
             },
         )
         self._set_report(

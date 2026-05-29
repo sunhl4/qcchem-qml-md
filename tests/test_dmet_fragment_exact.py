@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pyscf = pytest.importorskip("pyscf")
 
@@ -14,8 +14,7 @@ from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 @pytest.mark.slow
 def test_h4_dmet_multifragment_exact_shared_yaml() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h4_dmet_fragment_exact_small.yaml"
+    p = configs_path("example_h4_dmet_fragment_exact_small.yaml")
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     led = out["dmet_fragment_solve"]

@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 @pytest.mark.psi4
 def test_psi4_h2_pipeline_pre_quantum_summary() -> None:
     psi4 = pytest.importorskip("psi4")
     _ = psi4
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2_psi4_rhf_sto3g.yaml"
+    p = configs_path("example_h2_psi4_rhf_sto3g.yaml")
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     pqi = out["pre_quantum_input"]
@@ -27,8 +25,7 @@ def test_psi4_h2_pipeline_pre_quantum_summary() -> None:
 @pytest.mark.psi4
 def test_psi4_schmidt_dmet_pipeline_summary() -> None:
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2_psi4_schmidt_dmet.yaml"
+    p = configs_path("example_h2_psi4_schmidt_dmet.yaml")
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     pqi = out["pre_quantum_input"]
@@ -47,8 +44,7 @@ def test_psi4_schmidt_dmet_pipeline_summary() -> None:
 @pytest.mark.psi4
 def test_psi4_projection_mulliken_pipeline_summary() -> None:
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2_psi4_projection_mulliken.yaml"
+    p = configs_path("example_h2_psi4_projection_mulliken.yaml")
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     pqi = out["pre_quantum_input"]

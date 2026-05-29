@@ -2,8 +2,6 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 from qchem_stack.config import (
     ActiveSpaceSpec,
     ExperimentConfig,
@@ -15,6 +13,7 @@ from qchem_stack.protocols.computable import (
     assert_computable_workflow_graph_roundtrip,
     list_computables_for_config,
 )
+from tests.helpers.paths import repo_root
 
 
 def test_qpe_pipeline_integration_adds_qpe_computable() -> None:
@@ -76,7 +75,7 @@ def test_list_computables_names() -> None:
 
 
 def test_computable_workflow_graph_roundtrip_example_configs() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     for rel in (
         "configs/example_h2.yaml",
         "configs/qpe_dual_track_demo.yaml",

@@ -4,14 +4,15 @@ from __future__ import annotations
 
 import subprocess
 import sys
-from pathlib import Path
 
 import pytest
+
+from tests.helpers.paths import repo_root
 
 
 @pytest.mark.no_pyscf
 def test_precomputed_lane_without_pyscf_import() -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     script = f"""
 import importlib.abc
 import sys

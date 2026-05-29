@@ -1,7 +1,5 @@
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
 
@@ -15,6 +13,7 @@ from qchem_stack.config import load_experiment_config
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from tests.fixtures.classical_reference import pyscf_rhf_from_config
+from tests.helpers.paths import configs_path
 
 
 class _MockChemSolver:
@@ -40,8 +39,7 @@ class _MockChemSolver:
 
 
 def test_pipeline_rejects_backend_without_canonical_active_space_pack() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2.yaml"
+    p = configs_path("example_h2.yaml")
     cfg = load_experiment_config(p)
     from qchem_stack.orchestration.scf_stage import run_scf_reference
 
@@ -53,8 +51,7 @@ def test_pipeline_rejects_backend_without_canonical_active_space_pack() -> None:
 
 
 def test_plugin_mode_bypasses_backend_active_space_gate() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_decomposition_plugin_toy.yaml"
+    p = configs_path("example_decomposition_plugin_toy.yaml")
     cfg = load_experiment_config(p)
     rhf = pyscf_rhf_from_config(cfg)
     cfg.scf.driver = "psi4"
@@ -67,8 +64,7 @@ def test_plugin_mode_bypasses_backend_active_space_gate() -> None:
 
 
 def test_schmidt_path_rejects_backend_without_schmidt_capability() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2.yaml"
+    p = configs_path("example_h2.yaml")
     cfg = load_experiment_config(p)
     rhf = pyscf_rhf_from_config(cfg)
     register_solver("mockchem", _MockChemSolver)
@@ -78,8 +74,7 @@ def test_schmidt_path_rejects_backend_without_schmidt_capability() -> None:
 
 
 def test_projection_fragment_mulliken_rejects_backend_without_capability() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h4_projection_mulliken.yaml"
+    p = configs_path("example_h4_projection_mulliken.yaml")
     cfg = load_experiment_config(p)
     rhf = pyscf_rhf_from_config(cfg)
     register_solver("mockchem", _MockChemSolver)
@@ -89,8 +84,7 @@ def test_projection_fragment_mulliken_rejects_backend_without_capability() -> No
 
 
 def test_mockchem_canonical_pack_capability_missing() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2.yaml"
+    p = configs_path("example_h2.yaml")
     cfg = load_experiment_config(p)
     register_solver("mockchem", _MockChemSolver)
     cfg.scf.driver = "mockchem"

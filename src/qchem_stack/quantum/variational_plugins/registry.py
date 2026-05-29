@@ -90,11 +90,32 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "capabilities": {"supports_operator_pool": True, "supports_outer_rounds": True},
     },
     "sa_vqe": {
-        "summary": "Minimal state-averaged VQE with overlap penalty (Tangelo SA-VQE partial).",
+        "summary": "Minimal state-averaged VQE with overlap penalty (SA-VQE).",
         "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sa_vqe_branch",
         "materialization_implementation": "qchem_stack.quantum.algorithms.sa_vqe.SAVQE",
         "materialization_result_schema": "algorithm_sa_vqe_report_v1",
         "capabilities": {"supports_state_averaging_penalty": True},
+    },
+    "qpe_kitaev": {
+        "summary": "Kitaev-style dense-spectrum QPE on the active-space Hamiltonian (main config tree).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_qpe_kitaev",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.qpe.AlgorithmKitaevQPE",
+        "materialization_result_schema": "algorithm_kitaev_qpe_report_v1",
+        "capabilities": {"supports_phase_estimation": True},
+    },
+    "qpe_deterministic": {
+        "summary": "Deterministic dense-spectrum QPE estimator (main config tree).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_qpe_deterministic",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.qpe.AlgorithmDeterministicQPE",
+        "materialization_result_schema": "algorithm_deterministic_qpe_report_v1",
+        "capabilities": {"supports_phase_estimation": True},
+    },
+    "qpe_info_theory": {
+        "summary": "Information-theory QPE wrapper with Gaussian posterior summary (main config tree).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_qpe_info_theory",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.qpe.AlgorithmInfoTheoryQPE",
+        "materialization_result_schema": "algorithm_info_theory_qpe_report_v1",
+        "capabilities": {"supports_phase_estimation": True},
     },
 }
 
@@ -122,6 +143,18 @@ def _model_factory_from_plugin_id(pid: str) -> Callable[..., Any] | None:
         from qchem_stack.quantum.algorithms.sa_vqe import SAVQE
 
         return lambda hamiltonian, **kwargs: SAVQE(hamiltonian, **kwargs)
+    if pid == "qpe_kitaev":
+        from qchem_stack.quantum.algorithms.qpe import AlgorithmKitaevQPE
+
+        return lambda hamiltonian, **kwargs: AlgorithmKitaevQPE(hamiltonian, **kwargs)
+    if pid == "qpe_deterministic":
+        from qchem_stack.quantum.algorithms.qpe import AlgorithmDeterministicQPE
+
+        return lambda hamiltonian, **kwargs: AlgorithmDeterministicQPE(hamiltonian, **kwargs)
+    if pid == "qpe_info_theory":
+        from qchem_stack.quantum.algorithms.qpe import AlgorithmInfoTheoryQPE
+
+        return lambda hamiltonian, **kwargs: AlgorithmInfoTheoryQPE(hamiltonian, **kwargs)
     return None
 
 

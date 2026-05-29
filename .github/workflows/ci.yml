@@ -25,6 +25,8 @@ jobs:
         run: ruff check src/qchem_stack tests scripts examples
       - name: Ruff format (check only)
         run: ruff format --check src/qchem_stack tests scripts examples
+      - name: Import layer boundaries
+        run: python scripts/check_import_layers.py
 
   typecheck-config:
     needs: lint
@@ -87,7 +89,14 @@ jobs:
       - name: Strict repro JSON API
         run: python -c "from qchem_stack.repro.export import repro_json_dumps; repro_json_dumps({'ok': True})"
       - name: Pytest
-        run: pytest tests -q --tb=short
+        run: pytest tests -q --tb=short -m "not slow and not perf"
+      - name: Upload coverage report
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: htmlcov-py312
+          path: htmlcov/
+          if-no-files-found: warn
       - name: Examples tutorials smoke
         run: python examples/run_all_smoke.py
       - name: L1 excited regression (marker)
@@ -103,7 +112,9 @@ jobs:
       - name: Smoke orchestration precomputed lane (no PySCF)
         run: python scripts/smoke_pipeline.py --precomputed-only
       - name: Smoke orchestration (PySCF)
-        run: python scripts/smoke_pipeline.py
+        run: |
+          python -c "import pyscf"
+          QCHEM_SMOKE_REQUIRE_PYSCF=1 python scripts/smoke_pipeline.py
       - name: Smoke orchestration VQD path (PySCF)
         run: python scripts/smoke_pipeline.py --excited-only
       - name: Smoke orchestration IQEB (PySCF)
@@ -117,6 +128,19 @@ jobs:
           python scripts/export_parity_criteria_table.py configs/example_h2.yaml | python -c "import json,sys;d=json.load(sys.stdin);assert d.get('parity_export_schema_version')=='3';c=d['computable_abstract'];assert c.get('schema')=='qchem_computable_abstract_v2';assert isinstance(d.get('capability_gap_categories'),list);assert d.get('embedding',{}).get('mode')=='none'"
       - name: Parity export multi-config L1 gate (check_parity_export_sample)
         run: python scripts/check_parity_export_sample.py
+      - name: Benchmark dashboard artifact (L3 + MD/ML AL)
+        run: |
+          echo '{"algorithm_benchmark_bundle_v1":{"schema":"algorithm_benchmark_bundle_v1","rows":[]}}' > /tmp/l3_empty.json
+          python scripts/benchmark_dashboard/generate.py \
+            --input /tmp/l3_empty.json \
+            --md-summary results/uqc_cloud_sim_md_ml_2rounds/md_validation_summary.json \
+            --output /tmp/benchmark_dashboard.html
+      - name: Upload benchmark dashboard HTML
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-dashboard-html
+          path: /tmp/benchmark_dashboard.html
+          if-no-files-found: error
       - name: Pytket bridge (optional extra)
         run: pytest tests/test_pytket_bridge.py -q --tb=short
       - name: Smoke Qiskit Pauli shots (optional extra)
@@ -126,10 +150,31 @@ jobs:
       - name: QPE dual-track demo (no PySCF)
         run: python scripts/run_qpe_track_demo.py
 
+  test-nightly:
+    needs: lint
+    runs-on: ubuntu-latest
+    if: github.event_name == 'schedule' || contains(github.event.head_commit.message, '[nightly]')
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+      - name: Slow and perf tests
+        run: pytest tests -q --tb=short -m "slow or perf"
+      - name: L3 benchmarks (optional gate)
+        env:
+          QCHEM_RUN_L3: "1"
+        run: pytest -m l3 -q --tb=short
+
   test-psi4:
     needs: lint
     runs-on: ubuntu-latest
-    continue-on-error: true
     steps:
       - uses: actions/checkout@v4
       - name: Set up Python

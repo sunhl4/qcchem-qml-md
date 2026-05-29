@@ -59,7 +59,10 @@ def qse_h_s_via_computable(
     ctx = EvaluationContext(angles=np.zeros(0, dtype=float), rng=rng)
     out = comp.evaluate(ctx)
     records = out.meta.get("transition_records") or []
-    return out.value["H"], out.value["S"], list(records)
+    value = out.value
+    if not isinstance(value, dict):
+        raise TypeError("QSEMatricesComputable.evaluate must return a dict value payload.")
+    return value["H"], value["S"], list(records)
 
 
 def s_condition_number(s_mat: np.ndarray) -> float:

@@ -2,10 +2,10 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import numpy as np
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -21,8 +21,7 @@ from qchem_stack.tensornet.dense_expectation_reference import expectation_qubit_
 
 
 def test_restricted_active_space_quantum_problem_from_config() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     prob = restricted_active_space_quantum_problem_from_config(cfg)
     assert prob.compact_mo_operator.n_active_orbitals == 2
     assert prob.qubit_hamiltonian.n_qubits == 4
@@ -35,16 +34,14 @@ def test_restricted_active_space_quantum_problem_from_config() -> None:
 
 
 def test_pyscf_ao_system_from_config() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     ao = pyscf_ao_system_from_config(cfg, run_hf=True)
     assert ao.driver_meta.get("integral_representation") == "ao"
     assert ao.e_tot is not None
 
 
 def test_pyscf_ao_system_without_scf() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2.yaml")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
     ao = pyscf_ao_system_without_scf(cfg)
     assert ao.driver_meta.get("ao_run_hf") is False
     assert ao.e_tot is None

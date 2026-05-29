@@ -12,13 +12,14 @@ from qchem_stack.chem.embedding.projection_hamiltonian import (
 from qchem_stack.config import ExperimentConfig, load_experiment_config
 from qchem_stack.orchestration.scf_stage import run_scf_reference
 from tests.embedding_nested import embedding_projection
+from tests.helpers.paths import configs_path, repo_root
 
 # Soft thresholds aligned with canonical-pack parity (see test_psi4_pyscf_h2_canonical_parity.py).
 PSI4_PYSCF_H2_PROJECTION_IDENTITY_ATOL = 5e-3
 
 
 def _h2_projection_cfg(root: Path, *, driver: str) -> ExperimentConfig:
-    base = load_experiment_config(root / "configs" / "example_h2.yaml")
+    base = load_experiment_config(configs_path("example_h2.yaml"))
     return base.model_copy(
         update={
             "scf": base.scf.model_copy(update={"driver": driver}),
@@ -42,7 +43,7 @@ def _identity_coefficient(qh: object) -> float:
 def test_psi4_pyscf_h2_projection_mulliken_near_parity() -> None:
     pytest.importorskip("pyscf")
     pytest.importorskip("psi4")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     cfg_py = _h2_projection_cfg(root, driver="pyscf")
     cfg_psi = _h2_projection_cfg(root, driver="psi4")
     ref_py = run_scf_reference(cfg_py)

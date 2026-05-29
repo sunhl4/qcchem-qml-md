@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import math
 import os
-from pathlib import Path
 
 import pytest
 
@@ -13,6 +12,7 @@ from qchem_stack.integrations.l3_algorithm_benchmark import (
     algorithm_benchmark_bundle_v1,
     merged_experiment_benchmark_v1,
 )
+from tests.helpers.paths import repo_root
 
 pytestmark = [pytest.mark.l3]
 
@@ -24,7 +24,7 @@ def test_l3_representative_algorithm_yamls_sync_pipeline() -> None:
             "Set QCHEM_RUN_L3=1 to run L3 numerical benchmarks (see docs/public_parity_matrix.md 附录 B §7)"
         )
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     for rel in L3_PYTEST_YAMLS:
         assert (root / rel).is_file(), f"missing L3 representative config: {rel}"
 

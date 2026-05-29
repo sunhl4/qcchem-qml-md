@@ -9,6 +9,7 @@ import numpy as np
 from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.bridges.pyscf_shadow_reference import build_pyscf_rhf_shadow
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.contracts.schema_ids import INTEGRAL_CROSSCHECK_CASCI_V1
 
 if TYPE_CHECKING:
@@ -29,8 +30,8 @@ def run_integral_crosscheck_casci_v1(
             "status": "skipped",
             "reason": "primary_backend_is_pyscf",
         }
-    na = int(cfg.active_space.cas.n_orbitals)
-    ne = int(cfg.active_space.cas.n_electrons)
+    na = resolve_n_orbitals(cfg.active_space)
+    ne = resolve_n_electrons(cfg.active_space)
     try:
         shadow_ref = ClassicalMeanFieldReference(
             mf=build_pyscf_rhf_shadow(cfg, reference, run_scf_if_needed=False),

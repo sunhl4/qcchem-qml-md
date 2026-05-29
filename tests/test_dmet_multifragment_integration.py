@@ -2,20 +2,18 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.embedding_strategies import run_dmet_fragment_solve_if_requested
+from tests.helpers.paths import configs_path
 
 
 def test_dmet_multifragment_shared_hamiltonian_ledger_shape() -> None:
     pytest.importorskip("pyscf")
     from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h4_dmet_fragment_exact_small.yaml"
+    p = configs_path("example_h4_dmet_fragment_exact_small.yaml")
     if not p.is_file():
         pytest.skip("example_h4_dmet_fragment_exact_small.yaml missing")
     cfg = load_experiment_config(p)

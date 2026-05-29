@@ -36,9 +36,12 @@ def apply_quantum_and_demo_run_summary_fields(
     if q.algorithm in ("adapt", "tetris_adapt"):
         sm["adapt_pool_id_yaml"] = variational_yaml["adapt_pool_id_yaml"]
         sm["adapt_max_iter_yaml"] = variational_yaml["adapt_max_iter_yaml"]
+        sm["adapt_grad_tol_yaml"] = variational_yaml["adapt_grad_tol_yaml"]
         am = out.get("adapt_meta")
         if isinstance(am, dict) and "total_gradient_evals" in am:
             sm["adapt_total_gradient_evals"] = am["total_gradient_evals"]
+        if isinstance(am, dict) and am.get("grad_tol_used") is not None:
+            sm["adapt_grad_tol_used"] = float(am["grad_tol_used"])
         if isinstance(am, dict):
             steps = am.get("adapt_steps")
             if isinstance(steps, list):
@@ -49,11 +52,14 @@ def apply_quantum_and_demo_run_summary_fields(
     elif q.algorithm == "iqeb":
         sm["iqeb_pool_id_yaml"] = variational_yaml["iqeb_pool_id_yaml"]
         sm["iqeb_max_rounds_yaml"] = variational_yaml["iqeb_max_rounds_yaml"]
+        sm["iqeb_pool_id_resolved"] = str(variational_yaml["iqeb_pool_id_yaml"])
         im = out.get("iqeb_meta")
         if isinstance(im, dict) and im.get("rounds") is not None:
             sm["iqeb_outer_rounds_recorded"] = int(im["rounds"])
-        if out.get("iqeb_selected_pauli_strings") is not None:
-            sm["iqeb_selected_pauli_count"] = len(out["iqeb_selected_pauli_strings"])
+        selected = out.get("iqeb_selected_pauli_strings")
+        if selected is not None:
+            sm["iqeb_selected_pauli_count"] = len(selected)
+            sm["iqeb_selected_pauli_strings_head"] = list(selected[:8])
         if "nfev" in out:
             sm["iqeb_final_inner_vqe_nfev"] = out["nfev"]
         sm["iqeb_implementation_path"] = "qchem_stack.quantum.algorithms.iqeb.IQEBVQE"
@@ -97,6 +103,10 @@ def apply_quantum_and_demo_run_summary_fields(
             sm["protocol_energy_stderr"] = pc["energy_stderr"]
         if isinstance(pc.get("pmsv_report"), dict):
             sm["protocol_pmsv_report"] = pc["pmsv_report"]
+        if pc.get("classical_shadows_expectation") is not None:
+            sm["protocol_classical_shadows_expectation"] = pc["classical_shadows_expectation"]
+        if pc.get("classical_shadows_runtime"):
+            sm["protocol_classical_shadows_runtime"] = pc["classical_shadows_runtime"]
     vqd = out.get("vqd")
     excited_yaml = quantum_excited_run_summary_yaml_fields(cfg)
     if isinstance(vqd, dict):

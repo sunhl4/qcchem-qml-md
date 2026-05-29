@@ -39,7 +39,7 @@
 - Nexus 分布式 ProtocolList / 云 batch scheduler
 - 完整 QSCEOM 对称性 filter + InQuanto DataFrame parity
 - BK/SCBK UCCSD Pauli 电路自动包装
-- Tangelo 全套 BuiltInAnsatz（`ucc1`/`qcc`/`vsqs` 为 registry `partial` 别名）
+- Tangelo 全套 BuiltInAnsatz：**executable**：HEA、UCCSD、**UCCGD**、**QCC**、**UpCCGSD**、**pUCCD**；**partial 别名**：VSQS→HEA；**研究插件**：iQCC、QITE；**`n/a`**：JKMN/HCB 映射（见 `fermion_mapping_registry`）
 
 ## Parity 导出新键
 

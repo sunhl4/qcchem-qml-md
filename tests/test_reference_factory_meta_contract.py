@@ -2,9 +2,9 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
@@ -85,8 +85,7 @@ active_space:
 
 
 def test_driver_meta_contract_pbc_rhf() -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg = load_experiment_config(root / "configs" / "example_h2_pbc_gamma.yaml")
+    cfg = load_experiment_config(configs_path("example_h2_pbc_gamma.yaml"))
     ref = classical_mean_field_reference_from_config(cfg)
     meta = ref.driver_meta
     assert _required_meta_keys() <= set(meta.keys())

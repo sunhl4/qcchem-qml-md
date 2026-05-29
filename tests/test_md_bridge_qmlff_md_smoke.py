@@ -9,6 +9,8 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
+from tests.helpers.paths import configs_path
+
 pytestmark = pytest.mark.l1_md_ml
 
 pytest.importorskip("qmlff")
@@ -139,15 +141,12 @@ def test_full_md_validation_loop_runs_one_round_on_h2(tmp_path):
     """Cheap end-to-end loop on H2 — depends on PySCF as well as QML-FF/jax-md."""
     pytest.importorskip("pyscf")
 
-    from pathlib import Path
-
     from qchem_stack.md_bridge import (
         MdValidationLoopConfig,
         run_md_validation_loop,
     )
 
-    repo_root = Path(__file__).resolve().parents[1]
-    yaml_path = repo_root / "configs" / "example_h2.yaml"
+    yaml_path = configs_path("example_h2.yaml")
     if not yaml_path.is_file():
         pytest.skip(f"missing {yaml_path}")
 

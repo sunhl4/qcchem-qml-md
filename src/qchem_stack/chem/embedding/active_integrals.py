@@ -6,6 +6,8 @@ from typing import TYPE_CHECKING
 
 import numpy as np
 
+from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
+
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.config import ExperimentConfig
@@ -18,8 +20,8 @@ def casci_spatial_integrals_on_mo_coeff(
 ) -> tuple[float, np.ndarray, np.ndarray]:
     """Return ``(constant, h1_active, h2_chemist)`` for permuted MO coefficients."""
     tag = reference.backend_tag()
-    ncas = int(cfg.active_space.cas.n_orbitals)
-    nelec = int(cfg.active_space.cas.n_electrons)
+    ncas = resolve_n_orbitals(cfg.active_space)
+    nelec = resolve_n_electrons(cfg.active_space)
 
     if tag == "pyscf":
         from pyscf import ao2mo, mcscf

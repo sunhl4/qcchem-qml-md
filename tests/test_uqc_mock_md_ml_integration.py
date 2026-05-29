@@ -2,15 +2,15 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
+
+from tests.helpers.paths import configs_path, repo_root
 
 pytestmark = [pytest.mark.l1_md_ml, pytest.mark.uqc_mock]
 
-ROOT = Path(__file__).resolve().parents[1]
-EXP_YAML = ROOT / "configs" / "example_h2_uqc_mock_md_ml.yaml"
-LOOP_YAML = ROOT / "configs" / "example_h2_uqc_mock_qmlff_loop.yaml"
+ROOT = repo_root()
+EXP_YAML = configs_path("example_h2_uqc_mock_md_ml.yaml")
+LOOP_YAML = configs_path("example_h2_uqc_mock_qmlff_loop.yaml")
 
 
 @pytest.fixture
@@ -75,3 +75,23 @@ def test_md_validation_loop_one_round_uqc_mock_labeling(_require_pyscf) -> None:
     assert summary["rounds"]
     assert summary["rounds"][0]["n_md_frames_sampled"] >= 1
     assert summary["n_total_frames"] >= 1
+    assert "accuracy_threshold_hartree" in summary
+    assert summary["accuracy_threshold_hartree"] == pytest.approx(loop_cfg.energy_tolerance_hartree)
+
+
+def test_md_validation_summary_accuracy_threshold_explicit() -> None:
+    from qchem_stack.md_bridge.md_loop_config import MdValidationLoopConfig
+    from qchem_stack.md_bridge.md_loop_summary import build_md_validation_summary
+
+    loop_cfg = MdValidationLoopConfig(max_rounds=1, energy_tolerance_hartree=1.0)
+    summary = build_md_validation_summary(
+        experiment_yaml=EXP_YAML,
+        output_dir=ROOT / "results" / "uqc_mock_md_ml_test",
+        config=loop_cfg,
+        n_total_frames=1,
+        round_logs=[],
+        converged=False,
+        species_list=["H"],
+        accuracy_threshold_hartree=0.1,
+    )
+    assert summary["accuracy_threshold_hartree"] == pytest.approx(0.1)

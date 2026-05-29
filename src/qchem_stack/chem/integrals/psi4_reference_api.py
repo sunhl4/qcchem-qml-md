@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 import numpy as np
 
@@ -58,9 +58,12 @@ def psi4_hcore_ao(wfn: Any) -> np.ndarray:
     if hasattr(mints, "ao_kinetic") and hasattr(mints, "ao_potential"):
         t = np.asarray(mints.ao_kinetic(), dtype=float)
         v = np.asarray(mints.ao_potential(), dtype=float)
-        return t + v
+        return cast("np.ndarray", t + v)
     if hasattr(mints, "T") and hasattr(mints, "V"):
-        return np.asarray(mints.T(), dtype=float) + np.asarray(mints.V(), dtype=float)
+        return cast(
+            "np.ndarray",
+            np.asarray(mints.T(), dtype=float) + np.asarray(mints.V(), dtype=float),
+        )
     raise AttributeError("Psi4 MintsHelper lacks ao_kinetic/ao_potential and T/V.")
 
 

@@ -15,6 +15,19 @@ python scripts/create_solver_adapter_scaffold.py my_backend --with-demo-register
 python scripts/register_my_backend_demo.py
 ```
 
+## 0) 多后端 Profile（变分 / UQC 云）
+
+无需改 YAML 即可切换 **UQC 真云、mock、Cirq、Braket** 等：
+
+```bash
+python scripts/run_uqc_md_ml.py --list-backend-profiles
+python scripts/run_uqc_md_ml.py --backend-profile uqc_cloud   # 公司 UQC 内网（需 token）
+python scripts/run_uqc_md_ml.py --backend-profile uqc_mock    # CI / 离线
+python scripts/run_uqc_md_ml.py --backend-profile cirq
+```
+
+实现：`src/qchem_stack/backends/profiles.py`；注册表：`registered_backend_provider_ids()`。
+
 ## 1) 模板与最小实现
 
 - 模板：`src/qchem_stack/chem/solvers/custom_solver_template.py`

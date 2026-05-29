@@ -6,6 +6,8 @@ import subprocess
 import sys
 from pathlib import Path
 
+from tests.helpers.paths import repo_root
+
 
 def _subprocess_env(root: Path) -> dict[str, str]:
     env = dict(os.environ)
@@ -14,7 +16,7 @@ def _subprocess_env(root: Path) -> dict[str, str]:
 
 
 def _load_scaffold_module():
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     script = root / "scripts" / "create_solver_adapter_scaffold.py"
     spec = importlib.util.spec_from_file_location("_scs", script)
     assert spec and spec.loader
@@ -32,7 +34,7 @@ def test_package_import_for_solver_file_strips_src() -> None:
 
 
 def test_create_solver_adapter_scaffold_writes_template(tmp_path: Path) -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     script = root / "scripts" / "create_solver_adapter_scaffold.py"
     out = tmp_path / "demo_backend_solver.py"
     cp = subprocess.run(
@@ -52,7 +54,7 @@ def test_create_solver_adapter_scaffold_writes_template(tmp_path: Path) -> None:
 
 
 def test_create_solver_adapter_scaffold_rejects_invalid_backend_id(tmp_path: Path) -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     script = root / "scripts" / "create_solver_adapter_scaffold.py"
     out = tmp_path / "x.py"
     cp = subprocess.run(
@@ -67,7 +69,7 @@ def test_create_solver_adapter_scaffold_rejects_invalid_backend_id(tmp_path: Pat
 
 
 def test_create_solver_adapter_scaffold_with_demo_register(tmp_path: Path) -> None:
-    root = Path(__file__).resolve().parents[1]
+    root = repo_root()
     script = root / "scripts" / "create_solver_adapter_scaffold.py"
     solver = tmp_path / "solver_scaffold_xyz_solver.py"
     demo = tmp_path / "run_register_scaffold_xyz.py"

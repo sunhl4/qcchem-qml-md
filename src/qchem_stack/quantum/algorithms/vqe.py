@@ -60,6 +60,7 @@ class VQE(AlgorithmBase):
         *,
         protocol_objective: Any | None = None,
         protocol_gradient: Any | None = None,
+        **kwargs: Any,
     ) -> VQE:
         from qchem_stack.protocols.computable import ExpectationValue, ProtocolRunner
 

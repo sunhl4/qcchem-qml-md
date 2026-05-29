@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Any, Protocol, runtime_checkable
+from typing import Any, Protocol, cast, runtime_checkable
 
 import numpy as np
 
@@ -58,8 +58,10 @@ class PySCFMeanFieldLike(GenericMeanFieldLike):
     def rdm1_ao(self) -> np.ndarray:
         dm = self._raw.make_rdm1()
         if isinstance(dm, (tuple, list)):
-            return np.asarray(dm[0], dtype=float) + np.asarray(dm[1], dtype=float)
-        return np.asarray(dm, dtype=float)
+            return cast(
+                "np.ndarray", np.asarray(dm[0], dtype=float) + np.asarray(dm[1], dtype=float)
+            )
+        return cast("np.ndarray", np.asarray(dm, dtype=float))
 
     def make_rdm1(self) -> np.ndarray:
         return self.rdm1_ao()
@@ -75,13 +77,13 @@ class Psi4MeanFieldLike(GenericMeanFieldLike):
         return Psi4AOBasisView(_wfn=self._raw)
 
     def overlap_ao(self) -> np.ndarray:
-        return self._ao_view().overlap_ao()
+        return cast("np.ndarray", self._ao_view().overlap_ao())
 
     def get_ovlp(self) -> np.ndarray:
         return self.overlap_ao()
 
     def make_rdm1(self) -> np.ndarray:
-        return self._ao_view().make_rdm1_ao()
+        return cast("np.ndarray", self._ao_view().make_rdm1_ao())
 
 
 def unwrap_mean_field_raw(mf: Any) -> Any:

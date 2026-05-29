@@ -13,8 +13,8 @@
 
 ```bash
 conda activate qmlff-py311
-cd /Users/shl/nvidia/qcchem-qml-md && pip install -e .
-cd /Users/shl/nvidia/QML-FF && pip install -e .
+cd "$QCHEM_REPO" && pip install -e ".[dev]"
+cd "$QMLFF_ROOT" && pip install -e .
 export QCHEM_STACK_PYTHON=/Users/shl/anaconda3/envs/qmlff-py311/bin/python
 ```
 
@@ -252,7 +252,7 @@ python examples/qmlff_force_field_benchmark.py \
 ```bash
 conda activate qmlff-py311
 export QCHEM_STACK_PYTHON=/Users/shl/anaconda3/envs/qmlff-py311/bin/python
-cd /Users/shl/nvidia/qcchem-qml-md
+cd "$QCHEM_REPO"
 
 # ① 经典 Morse — 验证 AL 闭环
 python examples/qmlff_md_pipeline_demo.py \

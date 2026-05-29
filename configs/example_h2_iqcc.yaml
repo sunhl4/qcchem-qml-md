@@ -1,0 +1,239 @@
+active_space:
+  cas:
+    n_electrons: 2
+    n_orbitals: 2
+  jw:
+    coeff_atol: null
+    prefer_restricted_spatial: false
+  manual:
+    frozen_orbitals: []
+    n_electrons: null
+    n_orbitals: null
+  mapping:
+    fermion_qubit: jordan_wigner
+  strategy: cas
+backend:
+  ionstack_endpoint: null
+  meta: {}
+  name: statevector_sim
+  provider: statevector
+  qiskit_mode: statevector
+  shots_per_circuit: 2048
+  target_energy_stderr: null
+chemistry_extended:
+  avas:
+    ao_labels: []
+    canonicalize: true
+    minao: minao
+    ncore: 0
+    openshell_option: 2
+    threshold: 0.2
+    with_iao: false
+  benchmarks:
+    backend: auto
+    enabled: false
+  casscf:
+    orbital_optimization_audit: false
+    orbital_optimization_for_integrals: false
+  mo_transform:
+    hook: ''
+    kwargs: {}
+  pbc:
+    active_space_kpoint_index: 0
+    cell_vectors_bohr: null
+    kpoint_mesh:
+    - 1
+    - 1
+    - 1
+  post_hf:
+    integral_crosscheck: none
+    rdm_correction_method: none
+  solvent:
+    epsilon: 78.3553
+    model: none
+  symmetry:
+    pyscf_symmetry: false
+compiler:
+  compiler_passes: []
+  native_twoq: CX
+  optimization_level: 1
+  preoptimize_passes: []
+embedding:
+  classical_reference_method: null
+  embedding_input_representation: mo
+  mode: none
+  n_scf_cycles_embedding: null
+  oniom_layers_v1: []
+experiment_id: h2_sto3g_iqcc_001
+extra: {}
+md_ml_export:
+  attach_single_frame_to_repro: false
+  energy_reference: variational
+  include_hf_nuclear_gradient: false
+  trajectory:
+    extra_coordinates_bohr: []
+    theory_level: hf_scf
+mitigation:
+  execution_class: unspecified
+  pmsv:
+    enabled: false
+    extra: {}
+    report_extension: default
+    retention_rate: 1.0
+    stabilizers: []
+  stubs:
+    classical_shadows: false
+    classical_shadows_budget_pairs: 256
+    pec_literature: false
+    spam_calibration: false
+  zne:
+    enabled: false
+    mode: scalar_stub
+    scales:
+    - 1.0
+    - 1.5
+    - 2.0
+molecule:
+  basis: sto-3g
+  charge: 0
+  coordinate_unit: bohr
+  coordinates:
+  - - 0.0
+    - 0.0
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 1.4
+  ecp: null
+  multiplicity: 1
+  symbols:
+  - H
+  - H
+  zmatrix: null
+nexus_analog:
+  enabled: false
+  project_label: default
+  unit_per_circuit: 1.0
+  unit_per_depth: 0.001
+  unit_per_shot: 0.0001
+nexus_cloud:
+  api_key_env: NEXUS_API_KEY
+  base_url: ''
+  mode: 'off'
+  project_slug: ''
+  timeout_s: 30.0
+parity_integrations:
+  dmet_stub_one_shot_ledger: true
+  enabled: true
+  gap_closure_reference_bundle: true
+  include_computables_rich_in_repro: false
+  open_qermit_reference: true
+  qnexus_probe: true
+  resource_estimation_preview: false
+  tensornet_closure_reference: true
+  tket_first_circuit_stats: true
+  uccsd_excitation_reference: true
+quantum:
+  adapt:
+    max_iter: 4
+    pool_id: fermionic_uccsd
+  algorithm: vqe
+  algorithm_factory: null
+  demos:
+    qpe:
+      demo_track_n_bits: 4
+      pipeline_integration: false
+      three_pack:
+        after_variational: false
+        deterministic_rounds: 4
+        info_samples: 32
+        kitaev_bits: 6
+        time: 1.0
+      track_after_variational: false
+    vqs:
+      dt: 0.05
+      mode: mclachlan_real_time
+      n_times: 6
+      pipeline_integration: false
+      rhs_mode: linear_damping
+      tangent_fd_epsilon: 5.0e-05
+      track_after_variational: false
+  excited:
+    qse:
+      after_variational: false
+      max_basis: null
+      shot_mode: exact
+      shots_per_ij_term: 512
+      shots_per_matrix_element: 4096
+      subspace_dim: 4
+    sceom:
+      after_variational: false
+      generator_strategy: legacy
+      shots_per_matrix_element: 0
+      subspace_dim: 4
+    vqd:
+      after_variational: false
+      cobyla_maxiter: 150
+      init_noise_scale: 0.15
+      init_strategy: legacy
+      max_overlap_warn: 0.05
+      n_states: 2
+      optimizer_method: COBYLA
+      overlap_exponent: 1.0
+      overlap_mode: statevector_overlap
+      penalty_weight: 5.0
+      penalty_weights: null
+      shots_objective: 0
+      shots_overlap: 0
+      shots_weight: 0
+  graph:
+    extra_edges: []
+    remove_edges: []
+  iqeb:
+    energy_tolerance: 1.0e-08
+    max_rounds: 2
+    n_grads: 3
+    pool_id: iqeb_qubit_excitation
+  pauli:
+    grouping: tensor_product
+    record_histograms: false
+    run_qiskit_shots: false
+    run_sampled: false
+    support_max_terms: null
+    use_protocol: false
+  tensornet:
+    contraction_engine: stub
+    expectation_stub: false
+  variational:
+    ansatz: iqcc
+    uccsd_trotter_steps: null
+  vqe:
+    depth: 1
+    initial_parameters_strategy: random_uniform
+    maxiter: 400
+    optimizer_method: COBYLA
+random_seed: 42
+scf:
+  driver: pyscf
+  method: RHF
+  precomputed:
+    bundle_path: null
+  psi4:
+    chkfile: null
+    density_fit: false
+    density_fit_auxbasis: null
+    diis_space_dimension: null
+    init_guess: null
+    level_shift: null
+    max_cycle: null
+    use_newton: false
+  pyscf:
+    chkfile: null
+    density_fit: false
+    density_fit_auxbasis: null
+    diis_space_dimension: null
+    init_guess: null
+    level_shift: null
+    max_cycle: null
+    use_newton: false
+schema_version: '2'

@@ -2,14 +2,13 @@
 
 from __future__ import annotations
 
-from pathlib import Path
-
 import pytest
 from pydantic import ValidationError
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
 from qchem_stack.exceptions import ConfigurationError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.paths import configs_path
 
 
 def test_experiment_validation_rejects_avas_without_labels() -> None:
@@ -87,14 +86,19 @@ def test_experiment_validation_rejects_avas_on_driver_without_capability() -> No
         "quantum": {"algorithm": "vqe", "vqe": {"depth": 1, "maxiter": 5}},
         "embedding": {"mode": "none"},
     }
+    cfg = ExperimentConfig.from_yaml_dict(raw)
+    from qchem_stack.config._experiment_validation import (
+        validate_avas_strategy_requires_labels_and_capability,
+    )
+
+    caps = _MockChemSolver(cfg).capabilities
     with pytest.raises(ConfigurationError, match="supports_avas_active_space_projection"):
-        ExperimentConfig.from_yaml_dict(raw)
+        validate_avas_strategy_requires_labels_and_capability(cfg, caps=caps)
 
 
 def test_pipeline_h2_avas_sets_resolution_and_executes_projection() -> None:
     pytest.importorskip("pyscf")
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_h2_avas.yaml"
+    p = configs_path("example_h2_avas.yaml")
     cfg = load_experiment_config(p)
     out = run_pipeline_sync(cfg, cfg_path=p)
     hm = out.get("hamiltonian_meta") or {}

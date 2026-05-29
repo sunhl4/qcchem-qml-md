@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 import numpy as np
 from scipy.linalg import expm
@@ -122,11 +122,11 @@ def _pauli_rotation_elementary_ops_qiskit(
             ops.append({"name": "X", "qubits": [logical(phys[0])], "params": {}})
         elif name == "cx":
             ops.append({"name": "CX", "qubits": [logical(phys[0]), logical(phys[1])], "params": {}})
-        elif name == "rz":
+        elif name == "rz" and params:
             ops.append(
                 {"name": "RZ", "qubits": [logical(phys[0])], "params": {"theta": float(params[0])}}
             )
-        elif name == "rx":
+        elif name == "rx" and params:
             ops.append(
                 {"name": "RX", "qubits": [logical(phys[0])], "params": {"theta": float(params[0])}}
             )
@@ -243,7 +243,7 @@ def apply_pauli_rotation_statevector(
     """Apply ``exp(-i phi/2 P)`` to ``state``."""
     p = pauli_matrix(pauli_string)
     u = expm(-0.5j * float(phi) * p)
-    return u @ state
+    return cast("np.ndarray", u @ state)
 
 
 def apply_cluster_expm_statevector(
@@ -257,7 +257,7 @@ def apply_cluster_expm_statevector(
     nrm = float(np.linalg.norm(out))
     if nrm < 1e-14:
         raise ValueError("UCCSD Pauli cluster layer collapsed state to zero norm.")
-    return out / nrm
+    return cast("np.ndarray", out / nrm)
 
 
 __all__ = [

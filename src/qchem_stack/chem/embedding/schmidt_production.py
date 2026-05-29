@@ -14,7 +14,7 @@ density-fed spectral bath + FCI-driven mixing).
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 from scipy.linalg import eigh
@@ -67,12 +67,12 @@ def _orthonormalize_columns(C: np.ndarray, S: np.ndarray) -> np.ndarray:
         raise SchmidtProductionError(
             "reduced overlap matrix for column orthonormalization is singular"
         )
-    return C @ v @ np.diag(1.0 / np.sqrt(w)) @ v.T
+    return cast("np.ndarray", C @ v @ np.diag(1.0 / np.sqrt(w)) @ v.T)
 
 
 def _s_projector(C: np.ndarray, S: np.ndarray) -> np.ndarray:
     """``P`` such that ``P @ C_frag = C_frag`` (``S``-metric projector onto span(C))."""
-    return C @ C.T @ S
+    return cast("np.ndarray", C @ C.T @ S)
 
 
 def build_schmidt_impurity_integrals(

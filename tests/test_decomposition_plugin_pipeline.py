@@ -7,6 +7,8 @@ from pathlib import Path
 
 import pytest
 
+from tests.helpers.paths import configs_path
+
 pyscf = pytest.importorskip("pyscf")
 
 from qchem_stack.chem.embedding.decomposition_plugin import (
@@ -17,8 +19,7 @@ from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
 
 def test_decomposition_plugin_toy_yaml_runs() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_decomposition_plugin_toy.yaml"
+    p = configs_path("example_decomposition_plugin_toy.yaml")
     cfg = load_experiment_config(p)
     assert cfg.embedding.mode == "plugin"
     out = run_pipeline_sync(cfg, cfg_path=p)
@@ -41,8 +42,7 @@ def test_decomposition_plugin_toy_yaml_runs() -> None:
 
 
 def test_decomposition_plugin_two_fragment_yaml_exposes_fragment_summary() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_decomposition_plugin_two_fragment.yaml"
+    p = configs_path("example_decomposition_plugin_two_fragment.yaml")
     cfg = load_experiment_config(p)
     assert cfg.embedding.mode == "plugin"
     out = run_pipeline_sync(cfg, cfg_path=p)
@@ -65,8 +65,7 @@ def test_decomposition_plugin_two_fragment_yaml_exposes_fragment_summary() -> No
 
 
 def test_decomposition_plugin_contract_yaml_carries_fragment_energy_terms() -> None:
-    root = Path(__file__).resolve().parents[1]
-    p = root / "configs" / "example_decomposition_plugin_contract.yaml"
+    p = configs_path("example_decomposition_plugin_contract.yaml")
     cfg = load_experiment_config(p)
     assert cfg.embedding.mode == "plugin"
     out = run_pipeline_sync(cfg, cfg_path=p)
@@ -82,8 +81,7 @@ def test_decomposition_plugin_contract_yaml_carries_fragment_energy_terms() -> N
 
 
 def test_decomposition_plugin_rejects_missing_primary_fragment(tmp_path: Path) -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_decomposition_plugin_toy.yaml"
+    cfg_path = configs_path("example_decomposition_plugin_toy.yaml")
     cfg = load_experiment_config(cfg_path)
     bad_payload = {
         "schema": "decomposition_plugin_toy_v1",
@@ -116,8 +114,7 @@ def test_decomposition_plugin_rejects_missing_primary_fragment(tmp_path: Path) -
 def test_decomposition_plugin_rejects_invalid_secondary_fragment_pauli_shape(
     tmp_path: Path,
 ) -> None:
-    root = Path(__file__).resolve().parents[1]
-    cfg_path = root / "configs" / "example_decomposition_plugin_toy.yaml"
+    cfg_path = configs_path("example_decomposition_plugin_toy.yaml")
     cfg = load_experiment_config(cfg_path)
     bad_payload = {
         "schema": "decomposition_plugin_toy_v1",

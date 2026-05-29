@@ -11,6 +11,13 @@ keywords:
 
 此页用于记录文档站与产品文档的持续迭代。
 
+## 2026-05-28
+
+- 新增 UQC backend、MD/ML 主动学习、Psi4 后端、configs 目录页
+- 同步 HTTP API 文档至 `product-surface` / `capability_surface_v2`
+- 新增 parity gap implementation plan 节选页
+- 仓库侧：P0–P3 优化（模块拆分、UQC 单元测试、CI 硬化、迁移指南）
+
 ## 2026-04-30
 
 - 新建 Docusaurus 版本文档站

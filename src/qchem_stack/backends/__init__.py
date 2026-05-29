@@ -19,6 +19,12 @@ from qchem_stack.backends.pauli_measure_expand import (
     build_synthesized_pauli_shot_circuit,
     hea_operations,
 )
+from qchem_stack.backends.profiles import (
+    apply_backend_profile,
+    backend_profile_catalog_v1,
+    get_backend_profile,
+    list_backend_profile_ids,
+)
 from qchem_stack.backends.qiskit_executor import (
     QiskitPrimitivesHeaExecutor,
     QiskitStatevectorHeaExecutor,
@@ -49,6 +55,10 @@ __all__ = [
     "executor_from_spec",
     "register_backend_provider",
     "registered_backend_provider_ids",
+    "apply_backend_profile",
+    "backend_profile_catalog_v1",
+    "get_backend_profile",
+    "list_backend_profile_ids",
     "QiskitStatevectorHeaExecutor",
     "QiskitPrimitivesHeaExecutor",
     "IonStackHeaExecutor",
