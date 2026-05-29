@@ -18,7 +18,7 @@ from qchem_stack.protocols.protocol_run import run_energy_estimation
 from qchem_stack.protocols.secure_serialization import secure_dumps_protocol, secure_loads_protocol
 
 if TYPE_CHECKING:
-    from openfermion.ops import QubitOperator
+    from openfermion.ops.operators.qubit_operator import QubitOperator
 
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan

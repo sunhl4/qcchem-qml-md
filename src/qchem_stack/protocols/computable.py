@@ -35,7 +35,7 @@ from qchem_stack.config.quantum_helpers import (
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 if TYPE_CHECKING:
-    from openfermion.ops import QubitOperator
+    from openfermion.ops.operators.qubit_operator import QubitOperator
 
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.config import ExperimentConfig

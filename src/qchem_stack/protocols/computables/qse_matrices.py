@@ -15,7 +15,7 @@ from qchem_stack.quantum.qse_transition import (
 )
 
 if TYPE_CHECKING:
-    from openfermion.ops import QubitOperator
+    from openfermion.ops.operators.qubit_operator import QubitOperator
 
 
 @dataclass

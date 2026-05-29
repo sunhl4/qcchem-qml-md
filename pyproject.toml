@@ -130,3 +130,18 @@ include = ["src/qchem_stack"]
 typeCheckingMode = "basic"
 reportMissingImports = false
 
+# Tighten "untyped def" posture (pyright equivalent of mypy disallow_untyped_defs)
+# on the orchestration / config / protocols packages first: every function in
+# these layers must annotate its parameters.
+[[tool.pyright.executionEnvironments]]
+root = "src/qchem_stack/config"
+reportMissingParameterType = "error"
+
+[[tool.pyright.executionEnvironments]]
+root = "src/qchem_stack/protocols"
+reportMissingParameterType = "error"
+
+[[tool.pyright.executionEnvironments]]
+root = "src/qchem_stack/orchestration"
+reportMissingParameterType = "error"
+

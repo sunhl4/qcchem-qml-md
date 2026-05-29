@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, cast
 
+import numpy as np
+
 from qchem_stack.chem.energy_components import build_energy_components_v1
 from qchem_stack.config import ExperimentConfig  # noqa: TC001 — runtime helper
 from qchem_stack.config._experiment_validation import (
@@ -91,8 +93,9 @@ def run_scf_stage(
     )
     from qchem_stack.chem.embedding.oniom import enrich_energy_components_oniom_if_configured
 
+    coords_bohr = np.asarray(cfg.molecule.coordinates, dtype=float)
     energy_components = enrich_energy_components_oniom_if_configured(
-        cfg, cfg.molecule.coordinates, energy_components
+        cfg, coords_bohr, energy_components
     )
     classical_benchmarks: dict[str, Any] | None = None
     rdm_bundle_meta: dict[str, Any] | None = None

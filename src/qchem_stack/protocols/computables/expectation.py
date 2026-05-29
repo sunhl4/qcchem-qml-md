@@ -12,7 +12,7 @@ from qchem_stack.protocols.computables.base import EvaluationContext, Evaluation
 from qchem_stack.quantum.statevector import expectation_qubit_operator
 
 if TYPE_CHECKING:
-    from openfermion.ops import QubitOperator
+    from openfermion.ops.operators.qubit_operator import QubitOperator
 
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
 

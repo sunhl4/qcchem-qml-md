@@ -18,6 +18,7 @@ from qchem_stack.backends.qiskit_executor import (
 )
 from qchem_stack.backends.spec import BackendSpec
 from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
+from qchem_stack.exceptions import ConfigurationError
 
 BackendFactory = Callable[[BackendSpec], HamiltonianExpectationExecutor]
 _ENTRY_POINT_GROUP = "qchem_stack.backends_executors"
@@ -37,9 +38,9 @@ class BackendRegistrationRecord:
 def _normalize_provider(provider: str) -> str:
     key = str(provider).strip().lower()
     if not key:
-        raise ValueError("backend provider must be non-empty.")
+        raise ConfigurationError("backend provider must be non-empty.")
     if any(ch.isspace() for ch in key):
-        raise ValueError(f"backend provider must not contain whitespace: {provider!r}")
+        raise ConfigurationError(f"backend provider must not contain whitespace: {provider!r}")
     return key
 
 
@@ -51,13 +52,13 @@ def register_backend_provider(
 ) -> None:
     key = _normalize_provider(provider)
     if not callable(factory):
-        raise ValueError(f"backend provider {provider!r} factory must be callable.")
+        raise ConfigurationError(f"backend provider {provider!r} factory must be callable.")
     with _BOOTSTRAP_LOCK:
         current = _REGISTRY.get(key)
         if current is not None and current.factory is factory:
             return
         if current is not None and not overwrite:
-            raise ValueError(
+            raise ConfigurationError(
                 f"backend provider {provider!r} already registered from {current.source} "
                 f"({current.origin}); set overwrite=True to replace it."
             )
@@ -142,7 +143,7 @@ def _resolve_entry_point_factory(value: object, *, source: str) -> BackendFactor
     ctor = getattr(value, "from_backend_spec", None)
     if callable(ctor):
         return cast("BackendFactory", ctor)
-    raise ValueError(
+    raise ConfigurationError(
         f"{source} must resolve to a callable factory or class exposing from_backend_spec(spec)."
     )
 
@@ -210,7 +211,7 @@ def executor_from_spec(spec: BackendSpec) -> HamiltonianExpectationExecutor:
     provider = _normalize_provider(spec.provider)
     rec = _REGISTRY.get(provider)
     if rec is None:
-        raise ValueError(
+        raise ConfigurationError(
             f"Unknown backend provider: {spec.provider!r}. "
             f"Registered providers: {sorted(_REGISTRY)}."
         )

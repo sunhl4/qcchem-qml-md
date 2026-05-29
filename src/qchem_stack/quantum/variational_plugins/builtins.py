@@ -2,7 +2,12 @@
 
 from __future__ import annotations
 
+from typing import TYPE_CHECKING, Any
+
 import numpy as np
+
+if TYPE_CHECKING:
+    from collections.abc import Callable
 
 from qchem_stack.config.quantum_helpers import (
     resolve_adapt_grad_tol,
@@ -47,19 +52,19 @@ from qchem_stack.quantum.variational_plugins.spec import (
 )
 
 
-def _vqe_outcome(result: object, algorithm_report: object) -> VariationalStageOutcome:
+def _vqe_outcome(result: Any, algorithm_report: dict[str, Any] | None) -> VariationalStageOutcome:
     """Build the common ``VariationalStageOutcome`` shared by VQE-family ansätze.
 
     All standard runners report ``algorithm="vqe"`` with ``nfev`` / ``vqe_meta``
     drawn from the run result; only the attached ``algorithm_report`` differs.
     """
     return VariationalStageOutcome(
-        energy=float(result.energy),  # type: ignore[attr-defined]
-        angles=np.asarray(result.angles, dtype=float),  # type: ignore[attr-defined]
+        energy=float(result.energy),
+        angles=np.asarray(result.angles, dtype=float),
         algo_meta={
             "algorithm": "vqe",
-            "nfev": result.nfev,  # type: ignore[attr-defined]
-            "vqe_meta": result.meta,  # type: ignore[attr-defined]
+            "nfev": result.nfev,
+            "vqe_meta": result.meta,
         },
         algorithm_report=algorithm_report,
     )
@@ -67,7 +72,7 @@ def _vqe_outcome(result: object, algorithm_report: object) -> VariationalStageOu
 
 # Ansätze whose runner is ``Class(qh, executor=exe).run(maxiter=, seed=)`` with a
 # dedicated ``*_algorithm_report_v1`` builder and the standard outcome shape.
-_STANDARD_VQE_ANSATZE: dict[str, tuple[type, object]] = {
+_STANDARD_VQE_ANSATZE: dict[str, tuple[type, Callable[[Any], dict[str, Any]]]] = {
     "uccgd": (UCCGDVQE, uccgd_algorithm_report_v1),
     "qcc": (QCCVQE, qcc_algorithm_report_v1),
     "upccgsd": (UpCCGSDVQE, upccgsd_algorithm_report_v1),
@@ -95,7 +100,7 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
     if standard is not None:
         cls, report_fn = standard
         result = cls(qh, executor=exe).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return _vqe_outcome(result, report_fn(result))  # type: ignore[operator]
+        return _vqe_outcome(result, report_fn(result))
 
     if ansatz == "iqcc":
         ir = IQCCVQE(qh, executor=exe).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)

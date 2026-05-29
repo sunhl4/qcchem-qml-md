@@ -4,25 +4,30 @@ from __future__ import annotations
 
 import os
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from fastapi import Request  # noqa: TC002 — runtime middleware dispatch
 from starlette.middleware.base import BaseHTTPMiddleware
 from starlette.responses import JSONResponse, Response
 
-try:
+if TYPE_CHECKING:
     from slowapi import Limiter
+
+try:
+    from slowapi import Limiter as _LimiterCls
     from slowapi.util import get_remote_address
 
     SLOWAPI_AVAILABLE = True
 except ImportError:
     SLOWAPI_AVAILABLE = False
-    Limiter = None  # type: ignore[misc, assignment]
+    _LimiterCls = None
 
 _F = TypeVar("_F", bound=Callable[..., Any])
 
 # Shared limiter singleton — routers import this for @limiter.limit decorators.
-limiter: Limiter | None = Limiter(key_func=get_remote_address) if SLOWAPI_AVAILABLE else None
+limiter: Limiter | None = None
+if SLOWAPI_AVAILABLE and _LimiterCls is not None:
+    limiter = _LimiterCls(key_func=get_remote_address)
 
 # Default route limits (override in tests via monkeypatch if needed).
 RUNS_POST_LIMIT = "10/minute"

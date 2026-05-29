@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -25,6 +25,7 @@ if TYPE_CHECKING:
     from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.config import ExperimentConfig
+    from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import DecompositionMode
 
 
 def ansatz_prep_for_job(
@@ -38,7 +39,7 @@ def ansatz_prep_for_job(
     from qchem_stack.config.quantum_helpers import resolve_iqeb_pool_id
 
     ansatz = resolve_variational_ansatz(cfg)
-    decomp = resolve_uccsd_decomposition_mode(cfg)  # type: ignore[arg-type]
+    decomp = cast("DecompositionMode", resolve_uccsd_decomposition_mode(cfg))
     if ansatz == "qcc":
         return AnsatzPrepSpec.qcc(
             hamiltonian=qh,

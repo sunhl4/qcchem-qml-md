@@ -97,7 +97,9 @@ def _submit_uqc_circuit(
     except ImportError:
         pass
     except Exception as e:
-        raise ValueError(f"Circuit failed UQC static validation: {e}") from e
+        from qchem_stack.exceptions import PipelineError
+
+        raise PipelineError(f"Circuit failed UQC static validation: {e}") from e
 
     shots = _round_uqc_shots(shots)
     task_id = client.submit_task(convert_qprog=qasm3_str, target=target, shots=shots)

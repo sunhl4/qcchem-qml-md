@@ -8,6 +8,8 @@ from typing import TYPE_CHECKING, Any, Literal
 
 import yaml
 
+from qchem_stack.exceptions import ConfigurationError
+
 if TYPE_CHECKING:
     from qchem_stack.md_bridge.qchem_labeler import EnergyReference, TheoryLevel
 
@@ -158,7 +160,7 @@ class MdValidationLoopConfig:
             raise FileNotFoundError(f"MD validation loop YAML not found: {p}")
         raw = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
         if not isinstance(raw, dict):
-            raise ValueError(f"YAML at {p} must be a mapping; got {type(raw).__name__}")
+            raise ConfigurationError(f"YAML at {p} must be a mapping; got {type(raw).__name__}")
         # Filter to known fields so future YAMLs with extra keys don't crash.
         valid = set(cls.__dataclass_fields__.keys())
         clean = {k: v for k, v in raw.items() if k in valid}

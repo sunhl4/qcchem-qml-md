@@ -15,7 +15,7 @@ from typing import TYPE_CHECKING
 from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
 
 if TYPE_CHECKING:
-    from openfermion.ops import QubitOperator
+    from openfermion.ops.operators.qubit_operator import QubitOperator
 
 __all__ = [
     "assert_evaluate_compatible",

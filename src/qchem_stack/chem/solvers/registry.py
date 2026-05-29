@@ -191,7 +191,9 @@ def set_entrypoint_conflict_policy(policy: EntrypointConflictPolicy) -> None:
     global _ENTRYPOINT_CONFLICT_POLICY
     with _BOOTSTRAP_LOCK:
         if policy not in (ENTRYPOINT_CONFLICT_WARN, ENTRYPOINT_CONFLICT_STRICT):
-            raise ValueError(
+            from qchem_stack.exceptions import ConfigurationError
+
+            raise ConfigurationError(
                 f"Unknown entrypoint conflict policy {policy!r}; expected 'warn' or 'strict'."
             )
         _ENTRYPOINT_CONFLICT_POLICY = policy

@@ -214,14 +214,11 @@ def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     excitation_energies = (
         list(comp_value.get("excitation_energies") or []) if isinstance(comp_value, dict) else []
     )
-    sceom_res = type("_SceomOut", (), {})()
-    sceom_res.energies = excitation_energies
-    sceom_res.meta = sceom_meta
     return ExcitedStageOutcome(
         bundle_key="sceom",
         bundle={
             "schema": EXCITED_SCEOM_BUNDLE_V1,
-            "energies": sceom_res.energies,
+            "energies": excitation_energies,
             "meta": sceom_meta,
         },
     )
