@@ -22,6 +22,7 @@ from __future__ import annotations
 from qchem_stack.md_bridge.qmlff_builders import (
     ForceFieldBackend,
     QmlffModelHandle,
+    _require_qmlff,
     atomic_number_to_symbol,
     build_force_field_handle,
     build_qmlff_model_angle,
@@ -48,6 +49,7 @@ from qchem_stack.md_bridge.qmlff_training import (
 __all__ = [
     "ForceFieldBackend",
     "QmlffModelHandle",
+    "_require_qmlff",
     "JaxMdTrajectory",
     "build_force_field_handle",
     "build_qmlff_model_from_preset",
