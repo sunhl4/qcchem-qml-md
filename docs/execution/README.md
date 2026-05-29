@@ -6,38 +6,26 @@
 
 **工程深度总览（维度 × WBS × 闸门）**：以 `docs/execution/comparative_execution_rd_plan_strict_2026Q3Q4.md` 与仓库根目录 `CONTRIBUTING.md` 为入口（历史独立 roadmap 文档已合并/下线）。
 
-## Day logs
+## Day logs (archived)
 
-- `day01_gap_inventory_2026Q2.md`
-- `day02_export_keys_audit_2026Q2.md`
-- `day03_resource_preview_consistency_2026Q2.md`
-- `day04_resource_preview_docs_sync_2026Q2.md`
-- `day05_sample_coverage_and_stability_2026Q2.md`
-- `day06_regression_and_naming_2026Q2.md`
-- `day07_week1_closeout_2026Q2.md`
-- `day08_p2w2_plugin_slice_2026Q2.md`
-- `day09_plugin_schema_validation_2026Q2.md`
-- `day10_plugin_pipeline_chain_2026Q2.md`
-- `day12_plugin_export_contract_alignment_2026Q2.md`
+Historical day-by-day execution evidence lives under **`archive/`** (moved from this directory to reduce root sprawl). Examples:
 
-## Milestones
+- `archive/day01_gap_inventory_2026Q2.md`
+- `archive/day02_export_keys_audit_2026Q2.md` … through `archive/day12_plugin_export_contract_alignment_2026Q2.md`
 
-- `day25_w2_milestone_closeout_2026Q2.md`
-- `day45_w3_w4_stage_report_2026Q2.md`
-- `day65_w5_w6_stage_report_2026Q2.md`
-- `day80_w7_pre_signoff_2026Q2.md`
-- `day90_final_closeout_2026Q2.md`
-- `day090_tangelo_calendar_closeout.md` — Tangelo gap 日历（Day1–Day90）封板签字与闸门对照
-- `month1_baseline_signoff_2026Q2.md`
-- `week1_regression_report_2026Q2.md`
+## Milestones (archived)
+
+- `archive/day25_w2_milestone_closeout_2026Q2.md` … `archive/day90_final_closeout_2026Q2.md`
+- `archive/day090_tangelo_calendar_closeout.md` — Tangelo gap 日历（Day1–Day90）封板
+- `archive/month1_baseline_signoff_2026Q2.md`, `archive/week1_regression_report_2026Q2.md`
 
 ## Tangelo / Vendor platform gap calendar (Day1–Day90)
 
-- `day001_day090_tangelo_gap_calendar.md` — 三个月逐日台账（差距收口 + Tangelo 设计参考），含周闸门与 Day90 封板指针。
+- `archive/day001_day090_tangelo_gap_calendar.md`
 
 ## Unified classical chemistry interface (Day1–Day90)
 
-- `day001_day090_unified_chemistry_interface_calendar.md` — **统一 `ChemIntegralSolver` 入口、多程序适配、下游与 PySCF 解耦** 的 90 天逐日日历（与 `docs/统一经典化学接口_ChemIntegralSolver与下游无关性.md` 配套）。
+- `archive/day001_day090_unified_chemistry_interface_calendar.md`
 - `unified_chem_driver_audit_notes.md` — `scf.driver` / PySCF 在编排层出现点的审计台账。
 - `unified_chem_capabilities_matrix.md` — embedding/hamiltonian 分支与 `SolverCapabilities` 对照矩阵。
 - `dual_classical_ingress_acceptance_checklist_2026Q2.md` — 双线路经典输入（在线结构文件 + 离线 bundle）统一 `PreQuantumInput` 验收勾选表。

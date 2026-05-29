@@ -84,6 +84,23 @@ SAMPLE_CONFIGS_REL = (
     "configs/example_mg_lanl2dz_ecp_rhf.yaml",
     "configs/example_mg_lanl2dz_ecp_density_fit.yaml",
     "configs/example_hbr_zmatrix_lanl2dz_ecp_density_fit.yaml",
+    # P4 algorithm YAMLs (parity export config-only gate)
+    "configs/example_h2_puccd.yaml",
+    "configs/example_h2_puccd_pauli_protocol.yaml",
+    "configs/example_h2_upccgsd.yaml",
+    "configs/example_h2_upccgsd_pauli_protocol.yaml",
+    "configs/example_h2_iqcc.yaml",
+    "configs/example_h2_qite.yaml",
+    "configs/example_h2_vsqs.yaml",
+    "configs/example_h2_jkmn.yaml",
+    "configs/example_h2_hcb.yaml",
+    "configs/example_h2_qcc_pauli_protocol.yaml",
+    "configs/example_h2_adapt_staggered_pool.yaml",
+    "configs/example_h2_qpe_deterministic.yaml",
+    "configs/example_h2_qpe_info_theory.yaml",
+    "configs/example_h2_sceom_symmetry_filtered.yaml",
+    "configs/example_h4_adapt_qse_benchmark.yaml",
+    "configs/example_h2_md_ml_trajectory_full_pipeline.yaml",
 )
 
 
