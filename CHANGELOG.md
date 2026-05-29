@@ -17,6 +17,16 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ## [Unreleased]
 
+### Deprecated (removal timelines — no runtime break this release)
+
+| Surface | Status | Planned removal |
+|---------|--------|-----------------|
+| `chem.drivers.PySCFDriver` (`chem/drivers/pyscf_driver.py`) | Deprecated; use `ChemIntegralSolver` + `scf.driver` registry | **v0.5.0** (target 2026 Q3) |
+| `qchem_stack.ml` (Ridge surrogate toy) | Non-production; use `md_bridge` for MD/ML loops | **v0.5.0** |
+| `qchem_stack.integrations.*` re-export shims (DMET, UCC reference, Schmidt sidecars) | Compatibility aliases; import from `chem` / `quantum` instead | **v0.6.0** |
+
+See `docs/迁移指南_PySCFDriver到ChemIntegralSolver.md` for the PySCF driver migration path.
+
 ### Added
 
 - **Docs**: UQC/MD-ML/Psi4 Docusaurus pages; `configs/README.md`, `configs/_template.yaml`; `docs/迁移指南_PySCFDriver到ChemIntegralSolver.md`; `docs/说明_mitigation配置.md`, `docs/说明_md_ml_export配置.md`; `docs/QUICKSTART_HTTP_API_en.md`; `docs/算法面广度_Vendor platform_Tangelo对照索引.md` alias; `docusaurus-site/docs/parity/gap-implementation-plan.md`.
