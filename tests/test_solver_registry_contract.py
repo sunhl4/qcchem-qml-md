@@ -191,7 +191,9 @@ def test_create_solver_rejects_invalid_driver_id() -> None:
 
 
 def test_set_entrypoint_conflict_policy_rejects_unknown_value() -> None:
-    with pytest.raises(ValueError, match="Unknown entrypoint conflict policy"):
+    from qchem_stack.exceptions import ConfigurationError
+
+    with pytest.raises(ConfigurationError, match="Unknown entrypoint conflict policy"):
         set_entrypoint_conflict_policy("panic")  # type: ignore[arg-type]
 
 

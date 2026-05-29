@@ -6,6 +6,8 @@ Open orchestration for quantum-chemistry workloads: **chemistry definition → e
 
 ## Documentation map
 
+**Engineering index**: [`docs/README.md`](docs/README.md) (taxonomy, sync policy, execution archive).
+
 **Roadmap vs external literature（按需阅读）**：[竞争定位](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) · [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md) · [差距与实施计划](docs/public_parity_matrix.md)。**方法与矩阵草稿**：[parity](docs/public_parity_matrix.md)。
 
 **Epistemic boundary:** this repo is **independent open-source**. It does not claim binary parity with any vendor closed‑source bundle; narrative docs may cite public papers and manuals for terminology only.
