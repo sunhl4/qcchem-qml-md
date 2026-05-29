@@ -61,6 +61,10 @@ psi.*.clean
 deck_build.*
 package-lock.json
 
+# Agent / session logs (transient)
+tasks_*.csv
+.ferrmion.log
+
 # Jupyter
 .ipynb_checkpoints/
 

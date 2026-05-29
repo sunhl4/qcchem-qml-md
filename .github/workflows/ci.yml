@@ -133,7 +133,7 @@ jobs:
           echo '{"algorithm_benchmark_bundle_v1":{"schema":"algorithm_benchmark_bundle_v1","rows":[]}}' > /tmp/l3_empty.json
           python scripts/benchmark_dashboard/generate.py \
             --input /tmp/l3_empty.json \
-            --md-summary results/uqc_cloud_sim_md_ml_2rounds/md_validation_summary.json \
+            --md-summary tests/fixtures/md_validation_summary.json \
             --output /tmp/benchmark_dashboard.html
       - name: Upload benchmark dashboard HTML
         uses: actions/upload-artifact@v4
