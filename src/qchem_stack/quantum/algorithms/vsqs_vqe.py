@@ -10,7 +10,7 @@ from openfermion.ops import FermionOperator, QubitOperator
 from scipy.linalg import expm
 from scipy.optimize import minimize
 
-from qchem_stack.chem.hamiltonian_mapping import _fermion_operator_to_qubits
+from qchem_stack.chem.hamiltonian_mapping import fermion_operator_to_qubits
 from qchem_stack.quantum.statevector import expectation_qubit_operator, qubit_operator_to_sparse
 
 if TYPE_CHECKING:
@@ -87,7 +87,7 @@ def build_vsqs_h_init(
         n_active_mos=n_mos,
         n_active_occupied=n_electrons // 2,
     )
-    return _fermion_operator_to_qubits(
+    return fermion_operator_to_qubits(
         hf,
         map_name,  # type: ignore[arg-type]
         n_spin_orbitals=n_spin,

@@ -50,6 +50,26 @@ def _fermion_operator_to_qubits(
     raise ValueError(f"Unknown fermion_qubit_mapping: {mapping!r}")
 
 
+def fermion_operator_to_qubits(
+    fermion_op: Any,
+    mapping: FermionQubitMappingName,
+    *,
+    n_spin_orbitals: int,
+    n_active_fermions: int,
+) -> QubitOperator:
+    """Public chem-layer entry point for fermion -> qubit mapping (JW / BK / SCBK / JKMN).
+
+    Stable wrapper around the internal mapping helper so that other layers
+    (e.g. ``quantum``) do not have to import a private underscore symbol.
+    """
+    return _fermion_operator_to_qubits(
+        fermion_op,
+        mapping,
+        n_spin_orbitals=n_spin_orbitals,
+        n_active_fermions=n_active_fermions,
+    )
+
+
 def _interaction_operator_to_qubits(
     mol_op: InteractionOperator,
     mapping: FermionQubitMappingName,

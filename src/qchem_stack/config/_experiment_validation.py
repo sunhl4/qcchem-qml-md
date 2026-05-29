@@ -322,10 +322,34 @@ EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS = (
 )
 
 
+def validate_experiment_for_run(
+    spec: ExperimentConfig,
+    *,
+    caps: SolverCapabilities,
+) -> None:
+    """Single full-validation entry point for an actual run (pipeline / API / CLI).
+
+    Runs the config-load registry (:data:`EXPERIMENT_CROSS_VALIDATORS`, idempotent
+    pure checks) *and* the capability-dependent registry
+    (:data:`EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS`) against live
+    :class:`SolverCapabilities`.
+
+    Callers that only ``load_experiment_config`` get the base registry via Pydantic
+    ``model_validate`` but **skip** the cap-dependent rules (PBC k-mesh, AVAS
+    labels + capability, backend capability). Routing every run through this helper
+    ensures those rules are never silently skipped.
+    """
+    for validator in EXPERIMENT_CROSS_VALIDATORS:
+        validator(spec)
+    for validator in EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS:
+        validator(spec, caps=caps)
+
+
 __all__ = [
     "EXPERIMENT_CROSS_VALIDATORS",
     "EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS",
     "preprocess_precomputed_bundle_path",
     "preprocess_top_level_yaml_dict",
+    "validate_experiment_for_run",
     "validate_pre_quantum_contract",
 ]

@@ -226,6 +226,53 @@ def trajectory_time_lookup(trajectory: JaxMdTrajectory):
     return _lookup
 
 
+def _select_upgrade_dataset(
+    *,
+    cfg: MdValidationLoopConfig,
+    records: list[FrameValidationRecord],
+    candidate_geoms: list[Any],
+    val_theory: TheoryLevel,
+    val_energy_ref: EnergyReference,
+    screen_result: LabelingResult,
+    exp_yaml: Path,
+) -> QMEFDataset:
+    """Pick the top-K worst frames and produce their high-fidelity training labels.
+
+    When the screening label already matches the target theory/reference we reuse
+    the screening frames; otherwise we re-label the selected geometries at the
+    higher-fidelity level. Returns an empty dataset when nothing is selected.
+    """
+    upgrade_records = sorted(records, key=lambda r: r.abs_delta_hartree, reverse=True)[
+        : max(0, int(cfg.add_top_k_per_round))
+    ]
+    upgrade_geoms = [candidate_geoms[r.frame_index] for r in upgrade_records]
+    if not upgrade_geoms:
+        return QMEFDataset(frames=[])
+
+    if cfg.label_top_theory_level == val_theory and (
+        cfg.label_energy_reference == val_energy_ref or cfg.validation_energy_reference is not None
+    ):
+        return QMEFDataset(
+            frames=[
+                screen_result.dataset.frames[1 + r.frame_index]
+                for r in upgrade_records
+                if (1 + r.frame_index) < len(screen_result.dataset.frames)
+            ]
+        )
+
+    top_result = label_geometries_with_pipeline(
+        exp_yaml,
+        extra_coordinates_bohr=upgrade_geoms,
+        energy_reference=cfg.label_energy_reference,
+        theory_level=cfg.label_top_theory_level,
+        include_hf_nuclear_gradient=cfg.include_hf_nuclear_gradient,
+        failure_isolation=True,
+    )
+    # Strip the duplicated base frame returned by labeling.
+    top_extras = top_result.dataset.frames[1:] if top_result.dataset.frames else []
+    return QMEFDataset(frames=top_extras)
+
+
 def run_validation_round(
     *,
     round_i: int,
@@ -344,36 +391,15 @@ def run_validation_round(
 
     # Choose top-K geometries to upgrade to the higher-fidelity label
     # (or just use the screening labels when label_top_theory_level matches).
-    upgrade_records = sorted(records, key=lambda r: r.abs_delta_hartree, reverse=True)[
-        : max(0, int(cfg.add_top_k_per_round))
-    ]
-    upgrade_geoms = [candidate_geoms[r.frame_index] for r in upgrade_records]
-
-    upgrade_dataset: QMEFDataset = QMEFDataset(frames=[])
-    if upgrade_geoms:
-        if cfg.label_top_theory_level == val_theory and (
-            cfg.label_energy_reference == val_energy_ref
-            or cfg.validation_energy_reference is not None
-        ):
-            upgrade_dataset = QMEFDataset(
-                frames=[
-                    screen_result.dataset.frames[1 + r.frame_index]
-                    for r in upgrade_records
-                    if (1 + r.frame_index) < len(screen_result.dataset.frames)
-                ]
-            )
-        else:
-            top_result = label_geometries_with_pipeline(
-                exp_yaml,
-                extra_coordinates_bohr=upgrade_geoms,
-                energy_reference=cfg.label_energy_reference,
-                theory_level=cfg.label_top_theory_level,
-                include_hf_nuclear_gradient=cfg.include_hf_nuclear_gradient,
-                failure_isolation=True,
-            )
-            # Strip the duplicated base frame returned by labeling.
-            top_extras = top_result.dataset.frames[1:] if top_result.dataset.frames else []
-            upgrade_dataset = QMEFDataset(frames=top_extras)
+    upgrade_dataset = _select_upgrade_dataset(
+        cfg=cfg,
+        records=records,
+        candidate_geoms=candidate_geoms,
+        val_theory=val_theory,
+        val_energy_ref=val_energy_ref,
+        screen_result=screen_result,
+        exp_yaml=exp_yaml,
+    )
 
     if upgrade_dataset.frames:
         dataset = merge_qmef_datasets(dataset, upgrade_dataset, dedupe_decimals=cfg.dedupe_decimals)

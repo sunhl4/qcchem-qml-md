@@ -25,21 +25,71 @@ def _module_level_imports(path: Path) -> list[str]:
     return names
 
 
-def test_chem_layer_has_no_quantum_or_integrations_module_imports() -> None:
+def _all_imports(path: Path) -> list[str]:
+    """Every imported module name, including lazy/function-scope imports (ast.walk).
+
+    This mirrors ``scripts/check_import_layers.py`` so the test is as strict as
+    the CI gate and cannot be bypassed by deferring an import into a function body.
+    """
+    tree = ast.parse(path.read_text(encoding="utf-8"))
+    names: list[str] = []
+    for node in ast.walk(tree):
+        if isinstance(node, ast.Import):
+            for alias in node.names:
+                names.append(alias.name)
+        elif isinstance(node, ast.ImportFrom) and node.module:
+            names.append(node.module)
+    return names
+
+
+# Files allowed to import ``qchem_stack.integrations`` *lazily* (function scope
+# only). These are deliberate plugin bridges (DMET fragment solvers / Schmidt
+# per-fragment VQE) that would otherwise create a chem -> integrations -> chem
+# import cycle. Any new lazy integrations import must be added here consciously.
+_CHEM_LAZY_INTEGRATIONS_ALLOWLIST = {
+    "src/qchem_stack/chem/embedding/fragment_solvers/registry.py",
+    "src/qchem_stack/chem/embedding/__init__.py",
+    "src/qchem_stack/chem/embedding/schmidt_variational_sidecar.py",
+}
+
+
+def test_chem_layer_never_imports_quantum_or_orchestration() -> None:
+    """chem must not import quantum or orchestration anywhere, even lazily."""
     root = repo_root()
-    forbidden_prefixes = (
-        "qchem_stack.quantum",
-        "qchem_stack.integrations",
-        "qchem_stack.orchestration",
-    )
+    forbidden_prefixes = ("qchem_stack.quantum", "qchem_stack.orchestration")
     violations: list[str] = []
     for path in _chem_python_files():
         rel = path.relative_to(root)
-        for mod in _module_level_imports(path):
+        for mod in _all_imports(path):
             if mod.startswith(forbidden_prefixes):
                 violations.append(f"{rel}: import {mod}")
-    assert not violations, "module-scope imports violate chem layer boundaries:\n" + "\n".join(
+    assert not violations, "chem imports quantum/orchestration (forbidden):\n" + "\n".join(
         violations
+    )
+
+
+def test_chem_layer_integrations_imports_only_in_documented_allowlist() -> None:
+    """integrations imports in chem are forbidden except documented lazy bridges."""
+    root = repo_root()
+    module_scope_violations: list[str] = []
+    undocumented_lazy: list[str] = []
+    for path in _chem_python_files():
+        rel = path.relative_to(root).as_posix()
+        module_level = {m for m in _module_level_imports(path)}
+        all_mods = _all_imports(path)
+        for mod in all_mods:
+            if not mod.startswith("qchem_stack.integrations"):
+                continue
+            if mod in module_level:
+                module_scope_violations.append(f"{rel}: module-scope import {mod}")
+            elif rel not in _CHEM_LAZY_INTEGRATIONS_ALLOWLIST:
+                undocumented_lazy.append(f"{rel}: lazy import {mod}")
+    assert not module_scope_violations, (
+        "chem must not import integrations at module scope:\n" + "\n".join(module_scope_violations)
+    )
+    assert not undocumented_lazy, (
+        "new lazy chem -> integrations import; add to allowlist if intentional:\n"
+        + "\n".join(undocumented_lazy)
     )
 
 

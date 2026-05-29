@@ -13,10 +13,11 @@ def _quantum_python_files() -> list[Path]:
     return sorted(root.rglob("*.py"))
 
 
-def _module_level_imports(path: Path) -> list[str]:
+def _all_imports(path: Path) -> list[str]:
+    """Every imported module name, including lazy/function-scope imports (ast.walk)."""
     tree = ast.parse(path.read_text(encoding="utf-8"))
     names: list[str] = []
-    for node in tree.body:
+    for node in ast.walk(tree):
         if isinstance(node, ast.Import):
             for alias in node.names:
                 names.append(alias.name)
@@ -25,18 +26,17 @@ def _module_level_imports(path: Path) -> list[str]:
     return names
 
 
-def test_quantum_layer_has_no_orchestration_module_imports() -> None:
+def test_quantum_layer_never_imports_orchestration_or_integrations() -> None:
+    """quantum must not import orchestration or integrations anywhere, even lazily."""
     root = repo_root()
-    forbidden_prefixes = ("qchem_stack.orchestration",)
+    forbidden_prefixes = ("qchem_stack.orchestration", "qchem_stack.integrations")
     violations: list[str] = []
     for path in _quantum_python_files():
         rel = path.relative_to(root)
-        for mod in _module_level_imports(path):
+        for mod in _all_imports(path):
             if mod.startswith(forbidden_prefixes):
                 violations.append(f"{rel}: import {mod}")
-    assert not violations, "module-scope imports violate quantum layer boundaries:\n" + "\n".join(
-        violations
-    )
+    assert not violations, "imports violate quantum layer boundaries:\n" + "\n".join(violations)
 
 
 def test_quantum_directory_has_no_pyscf_imports() -> None:

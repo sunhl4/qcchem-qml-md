@@ -47,11 +47,40 @@ from qchem_stack.quantum.variational_plugins.spec import (
 )
 
 
+def _vqe_outcome(result: object, algorithm_report: object) -> VariationalStageOutcome:
+    """Build the common ``VariationalStageOutcome`` shared by VQE-family ansätze.
+
+    All standard runners report ``algorithm="vqe"`` with ``nfev`` / ``vqe_meta``
+    drawn from the run result; only the attached ``algorithm_report`` differs.
+    """
+    return VariationalStageOutcome(
+        energy=float(result.energy),  # type: ignore[attr-defined]
+        angles=np.asarray(result.angles, dtype=float),  # type: ignore[attr-defined]
+        algo_meta={
+            "algorithm": "vqe",
+            "nfev": result.nfev,  # type: ignore[attr-defined]
+            "vqe_meta": result.meta,  # type: ignore[attr-defined]
+        },
+        algorithm_report=algorithm_report,
+    )
+
+
+# Ansätze whose runner is ``Class(qh, executor=exe).run(maxiter=, seed=)`` with a
+# dedicated ``*_algorithm_report_v1`` builder and the standard outcome shape.
+_STANDARD_VQE_ANSATZE: dict[str, tuple[type, object]] = {
+    "uccgd": (UCCGDVQE, uccgd_algorithm_report_v1),
+    "qcc": (QCCVQE, qcc_algorithm_report_v1),
+    "upccgsd": (UpCCGSDVQE, upccgsd_algorithm_report_v1),
+    "puccd": (PUCCDVQE, puccd_algorithm_report_v1),
+}
+
+
 def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
     cfg = ctx.cfg
     qh = ctx.resolved_hamiltonian()
     exe = ctx.executor
     ansatz = resolve_variational_ansatz(cfg)
+
     if ansatz == "uccsd":
         ur = run_uccsd_vqe_from_config(
             qh,
@@ -60,56 +89,19 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
             seed=ctx.seed,
             trotter_steps=resolve_uccsd_trotter_steps(cfg),
         )
-        return VariationalStageOutcome(
-            energy=float(ur.energy),
-            angles=np.asarray(ur.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": ur.nfev, "vqe_meta": ur.meta},
-            algorithm_report=uccsd_algorithm_report_v1(ur),
-        )
-    if ansatz == "uccgd":
-        ucc = UCCGDVQE(qh, executor=exe)
-        ur = ucc.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return VariationalStageOutcome(
-            energy=float(ur.energy),
-            angles=np.asarray(ur.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": ur.nfev, "vqe_meta": ur.meta},
-            algorithm_report=uccgd_algorithm_report_v1(ur),
-        )
-    if ansatz == "qcc":
-        qcc = QCCVQE(qh, executor=exe)
-        qr = qcc.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return VariationalStageOutcome(
-            energy=float(qr.energy),
-            angles=np.asarray(qr.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": qr.nfev, "vqe_meta": qr.meta},
-            algorithm_report=qcc_algorithm_report_v1(qr),
-        )
-    if ansatz == "upccgsd":
-        up = UpCCGSDVQE(qh, executor=exe)
-        ur = up.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return VariationalStageOutcome(
-            energy=float(ur.energy),
-            angles=np.asarray(ur.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": ur.nfev, "vqe_meta": ur.meta},
-            algorithm_report=upccgsd_algorithm_report_v1(ur),
-        )
-    if ansatz == "puccd":
-        pu = PUCCDVQE(qh, executor=exe)
-        ur = pu.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return VariationalStageOutcome(
-            energy=float(ur.energy),
-            angles=np.asarray(ur.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": ur.nfev, "vqe_meta": ur.meta},
-            algorithm_report=puccd_algorithm_report_v1(ur),
-        )
+        return _vqe_outcome(ur, uccsd_algorithm_report_v1(ur))
+
+    standard = _STANDARD_VQE_ANSATZE.get(ansatz)
+    if standard is not None:
+        cls, report_fn = standard
+        result = cls(qh, executor=exe).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
+        return _vqe_outcome(result, report_fn(result))  # type: ignore[operator]
+
     if ansatz == "iqcc":
-        iqcc = IQCCVQE(qh, executor=exe)
-        ir = iqcc.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return VariationalStageOutcome(
-            energy=float(ir.energy),
-            angles=np.asarray(ir.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": ir.nfev, "vqe_meta": ir.meta},
-            algorithm_report={
+        ir = IQCCVQE(qh, executor=exe).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
+        return _vqe_outcome(
+            ir,
+            {
                 "schema": "algorithm_iqcc_report_v1",
                 "algorithm": "vqe",
                 "variational_ansatz": "iqcc",
@@ -119,8 +111,7 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
             },
         )
     if ansatz == "qite":
-        qite = QITEVQE(qh, executor=exe)
-        qr = qite.run(seed=ctx.seed)
+        qr = QITEVQE(qh, executor=exe).run(seed=ctx.seed)
         return VariationalStageOutcome(
             energy=float(qr.energy),
             angles=np.asarray(qr.angles, dtype=float),
@@ -135,20 +126,14 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
             },
         )
     if ansatz == "vsqs":
-        vsqs = VSQSVQE(
+        vr = VSQSVQE(
             qh,
             intervals=resolve_vsqs_intervals(cfg),
             time=resolve_vsqs_time(cfg),
             trotter_order=resolve_vsqs_trotter_order(cfg),
             executor=exe,
-        )
-        vr = vsqs.run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return VariationalStageOutcome(
-            energy=float(vr.energy),
-            angles=np.asarray(vr.angles, dtype=float),
-            algo_meta={"algorithm": "vqe", "nfev": vr.nfev, "vqe_meta": vr.meta},
-            algorithm_report=vsqs_algorithm_report_v1(vr),
-        )
+        ).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
+        return _vqe_outcome(vr, vsqs_algorithm_report_v1(vr))
 
     depth = resolve_vqe_depth(cfg)
     init = (
@@ -167,12 +152,7 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
         initial_parameters=init,
         seed=ctx.seed,
     )
-    return VariationalStageOutcome(
-        energy=float(vr.energy),
-        angles=np.asarray(vr.angles, dtype=float),
-        algo_meta={"algorithm": "vqe", "nfev": vr.nfev, "vqe_meta": vr.meta},
-        algorithm_report=vqe.generate_report(),
-    )
+    return _vqe_outcome(vr, vqe.generate_report())
 
 
 def run_adapt_family(ctx: VariationalRunContext) -> VariationalStageOutcome:

@@ -61,6 +61,7 @@ __all__ = [
     "classical_mean_field_reference_from_config",
     "classical_mean_field_via_solver_bridge",
     "create_solver",
+    "fermion_operator_to_qubits",
     "fork_driver_meta",
     "jordan_wigner_interaction_operator_sparse",
     "molecular_system_from_experiment",
@@ -111,6 +112,10 @@ _LAZY_ATTRS: dict[str, tuple[str, str]] = {
     "create_solver": (
         "qchem_stack.chem.solvers.registry",
         "create_solver",
+    ),
+    "fermion_operator_to_qubits": (
+        "qchem_stack.chem.hamiltonian_mapping",
+        "fermion_operator_to_qubits",
     ),
     "fork_driver_meta": (
         "qchem_stack.chem.bridges.driver_meta",

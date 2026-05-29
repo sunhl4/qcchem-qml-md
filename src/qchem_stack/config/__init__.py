@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from ._constants import ANGSTROM_TO_BOHR, MD_ML_MAX_EXTRA_GEOMETRIES
 from ._embedding_validation import SCHMIDT_DMET_MAX_CYCLES_LIMIT
-from ._experiment_validation import validate_pre_quantum_contract
+from ._experiment_validation import validate_experiment_for_run, validate_pre_quantum_contract
 from ._pre_quantum_path import PreQuantumPath, resolve_pre_quantum_path
 from .active_space import ActiveSpaceSpec
 from .active_space_helpers import (
@@ -111,6 +111,7 @@ __all__ = [
     "resolve_scf_density_fit",
     "resolve_scf_max_cycle",
     "trajectory_theory_level",
+    "validate_experiment_for_run",
     "validate_pre_quantum_contract",
     "zne_enabled",
 ]

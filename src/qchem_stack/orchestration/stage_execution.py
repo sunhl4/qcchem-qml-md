@@ -6,7 +6,7 @@ from typing import TYPE_CHECKING, Any, cast
 from qchem_stack.chem.energy_components import build_energy_components_v1
 from qchem_stack.config import ExperimentConfig  # noqa: TC001 — runtime helper
 from qchem_stack.config._experiment_validation import (
-    EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS,
+    validate_experiment_for_run,
 )
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.stages import (
@@ -70,8 +70,7 @@ def run_scf_stage(
 ) -> ScfStageArtifacts:
     precomputed_mode = context.is_precomputed_driver_fn(cfg)
     solver_caps = context.solver_capabilities_fn(cfg)
-    for validator in EXPERIMENT_CROSS_VALIDATORS_WITH_CAPS:
-        validator(cfg, caps=solver_caps)
+    validate_experiment_for_run(cfg, caps=solver_caps)
     rhf = context.run_scf_fn(cfg)
     if not precomputed_mode:
         cfg = context.refine_active_space_fn(cfg, rhf)

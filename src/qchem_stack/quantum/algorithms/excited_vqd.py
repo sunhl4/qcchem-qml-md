@@ -195,6 +195,91 @@ class VQD:
             "(use COBYLA, L-BFGS-B, Nelder-Mead)."
         )
 
+    def _prepare_ground_level(
+        self,
+        *,
+        exe: HamiltonianExpectationExecutor,
+        seed: int,
+        reused_ground: bool,
+        ground_angles: np.ndarray | None,
+        ground_energy: float | None,
+        n_param: int,
+    ) -> tuple[np.ndarray, list[float], np.ndarray]:
+        """Prepare level-0 state: reuse the pipeline ground state or run an inner VQE.
+
+        Returns the prepared statevector, the running energy list (seeded with the
+        ground energy) and the level-0 angle vector.
+        """
+        if self.prepare_state is not None and not reused_ground:
+            raise ValueError(
+                "VQD with a custom prepare_state (e.g. UCCSD) requires ground_angles from the "
+                "prior variational stage."
+            )
+        if reused_ground:
+            ga = np.asarray(ground_angles, dtype=float).ravel()
+            if ga.size != n_param:
+                raise ValueError(
+                    f"ground_angles length {ga.size} != expected variational parameters {n_param}"
+                )
+            g0 = self._prep(ga)
+            e0 = (
+                float(ground_energy)
+                if ground_energy is not None
+                else float(
+                    exe.expectation_state(g0, self.hamiltonian.operator, self.hamiltonian.n_qubits)
+                )
+            )
+            return g0, [e0], ga
+        v0 = VQE(self.hamiltonian, depth=self.depth, executor=exe).run(seed=seed)
+        g0 = hea_state(v0.angles, self.hamiltonian.n_qubits, self.depth)
+        return g0, [v0.energy], np.asarray(v0.angles, dtype=float)
+
+    def _build_excited_result_meta(
+        self,
+        *,
+        penalties: list[float],
+        vqd_channels: list[dict[str, Any]],
+        opt_trace: list[dict[str, Any]],
+        warnings: list[str],
+        reused_ground: bool,
+        shots_objective: int,
+        shots_overlap: int,
+        shots_weight: int,
+    ) -> dict[str, Any]:
+        """Assemble the multi-state VQD result meta (channels, optimizer + semantics)."""
+        result_meta: dict[str, Any] = {
+            "orthogonal_weight": self.penalty_weight,
+            "vqd_penalty_weights_resolved": penalties,
+            "reference": "Quantum 3, 156 (2019)",
+            "vqd_channels": vqd_channels,
+            "implementation_note": "three_protocol_reporting_objective_overlap_weight",
+            "shots_objective": shots_objective,
+            "shots_overlap": shots_overlap,
+            "shots_weight": shots_weight,
+            "reused_pipeline_ground": reused_ground,
+            "overlap_exponent_yaml": float(self.overlap_exponent),
+            "cobyla_maxiter_yaml": int(self.cobyla_maxiter),
+            "vqd_optimizer_method": self.optimizer_method,
+            "vqd_optimizer_mode": self.optimizer_mode,
+            "vqd_optimizer_trace": opt_trace if self.optimizer_mode == "three_computable" else [],
+            "vqd_init_strategy_yaml": self.init_strategy,
+            "vqd_init_noise_scale_yaml": float(self.init_noise_scale),
+            "vqd_overlap_mode_yaml": self.overlap_mode,
+            "vqd_variety_yaml": "uccsd" if self.prepare_state else "hea",
+        }
+        if warnings:
+            result_meta["vqd_warnings"] = warnings
+        result_meta.update(
+            vqd_cross_stack_semantics_meta(
+                penalty_weight=self.penalty_weight,
+                penalty_weights_resolved=penalties,
+                overlap_mode=self.overlap_mode,
+                optimizer_mode=self.optimizer_mode,
+                n_system_qubits=int(self.hamiltonian.n_qubits),
+            )
+        )
+        return result_meta
+
     def run(
         self,
         seed: int = 0,
@@ -216,33 +301,14 @@ class VQD:
         penalties = self._resolve_penalties()
         reused_ground = ground_angles is not None
 
-        if self.prepare_state is not None and not reused_ground:
-            raise ValueError(
-                "VQD with a custom prepare_state (e.g. UCCSD) requires ground_angles from the "
-                "prior variational stage."
-            )
-
-        if reused_ground:
-            ga = np.asarray(ground_angles, dtype=float).ravel()
-            if ga.size != n_param:
-                raise ValueError(
-                    f"ground_angles length {ga.size} != expected variational parameters {n_param}"
-                )
-            g0 = self._prep(ga)
-            e0 = (
-                float(ground_energy)
-                if ground_energy is not None
-                else float(
-                    exe.expectation_state(g0, self.hamiltonian.operator, self.hamiltonian.n_qubits)
-                )
-            )
-            energies = [e0]
-            v0_angles = ga
-        else:
-            v0 = VQE(self.hamiltonian, depth=self.depth, executor=exe).run(seed=seed)
-            g0 = hea_state(v0.angles, self.hamiltonian.n_qubits, self.depth)
-            energies = [v0.energy]
-            v0_angles = np.asarray(v0.angles, dtype=float)
+        g0, energies, v0_angles = self._prepare_ground_level(
+            exe=exe,
+            seed=seed,
+            reused_ground=reused_ground,
+            ground_angles=ground_angles,
+            ground_energy=ground_energy,
+            n_param=n_param,
+        )
 
         if self.n_states < 2:
             meta = {
@@ -391,35 +457,14 @@ class VQD:
             )
             prev_states.append(g_new)
 
-        result_meta: dict[str, Any] = {
-            "orthogonal_weight": self.penalty_weight,
-            "vqd_penalty_weights_resolved": penalties,
-            "reference": "Quantum 3, 156 (2019)",
-            "vqd_channels": vqd_channels,
-            "implementation_note": "three_protocol_reporting_objective_overlap_weight",
-            "shots_objective": shots_objective,
-            "shots_overlap": shots_overlap,
-            "shots_weight": shots_weight,
-            "reused_pipeline_ground": reused_ground,
-            "overlap_exponent_yaml": float(self.overlap_exponent),
-            "cobyla_maxiter_yaml": int(self.cobyla_maxiter),
-            "vqd_optimizer_method": self.optimizer_method,
-            "vqd_optimizer_mode": self.optimizer_mode,
-            "vqd_optimizer_trace": opt_trace if self.optimizer_mode == "three_computable" else [],
-            "vqd_init_strategy_yaml": self.init_strategy,
-            "vqd_init_noise_scale_yaml": float(self.init_noise_scale),
-            "vqd_overlap_mode_yaml": self.overlap_mode,
-            "vqd_variety_yaml": "uccsd" if self.prepare_state else "hea",
-        }
-        if warnings:
-            result_meta["vqd_warnings"] = warnings
-        result_meta.update(
-            vqd_cross_stack_semantics_meta(
-                penalty_weight=self.penalty_weight,
-                penalty_weights_resolved=penalties,
-                overlap_mode=self.overlap_mode,
-                optimizer_mode=self.optimizer_mode,
-                n_system_qubits=int(self.hamiltonian.n_qubits),
-            )
+        result_meta = self._build_excited_result_meta(
+            penalties=penalties,
+            vqd_channels=vqd_channels,
+            opt_trace=opt_trace,
+            warnings=warnings,
+            reused_ground=reused_ground,
+            shots_objective=shots_objective,
+            shots_overlap=shots_overlap,
+            shots_weight=shots_weight,
         )
         return VQDResult(energies=energies, meta=result_meta)
