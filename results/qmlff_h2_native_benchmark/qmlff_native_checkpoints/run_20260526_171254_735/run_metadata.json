@@ -1,0 +1,10 @@
+{
+  "units": {},
+  "energy_norm_params": {
+    "method": "subtract_mean",
+    "mean": -29.803485314685314
+  },
+  "species_list": [
+    "H"
+  ]
+}

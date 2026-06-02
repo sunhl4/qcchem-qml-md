@@ -1,0 +1,413 @@
+{
+  "experiment_yaml": "/home/sunhl/projects/qchem_qml_md/configs/example_h2_uqc_mock_md_ml.yaml",
+  "output_dir": "/home/sunhl/projects/qchem_qml_md/results/uqc_cloud_sim_md_ml_optimized",
+  "config": {
+    "max_rounds": 5,
+    "force_field_backend": "qmlff_preset",
+    "qmlff_preset": "atomic_amplitude",
+    "qmlff_builder_overrides": null,
+    "qmp_h2_overrides": null,
+    "qmlff_species_list": [
+      "H"
+    ],
+    "n_seed_geometries": 4,
+    "seed_mode": "bond_stretch",
+    "seed_jitter_bohr": 0.08,
+    "seed_bond_min_bohr": 1.0,
+    "seed_bond_max_bohr": 2.0,
+    "n_epochs_per_round": 2,
+    "batch_size": 1,
+    "learning_rate": 0.001,
+    "force_weight": 1.0,
+    "lr_scheduler": "constant",
+    "warm_start": true,
+    "warm_start_params_only": true,
+    "energy_normalization": "subtract_mean",
+    "grad_clip": 1.0,
+    "qmlff_checkpoint_save_freq": 0,
+    "md_ensemble": "nvt_langevin",
+    "md_n_steps": 8,
+    "md_dt_fs": 0.25,
+    "md_temperature_K": 100.0,
+    "md_save_stride": 2,
+    "md_seed": 0,
+    "md_gamma_ps_inv": 0.1,
+    "md_tau_fs": 100.0,
+    "md_init_frame": "base",
+    "cutoff_ang": null,
+    "max_neighbors": 32,
+    "n_candidate_frames": 2,
+    "energy_tolerance_hartree": 0.1,
+    "add_top_k_per_round": 1,
+    "label_energy_reference": "variational",
+    "validation_energy_reference": "variational",
+    "validation_theory_level": "full_pipeline",
+    "label_screening_theory_level": "full_pipeline",
+    "label_top_theory_level": "full_pipeline",
+    "include_hf_nuclear_gradient": true,
+    "dedupe_decimals": 4,
+    "validation_skip_initial_md_frame": false,
+    "write_per_round_extxyz": true,
+    "seed": 0
+  },
+  "accuracy_threshold_hartree": 0.1,
+  "validation_energy_shift_hartree": -1.1086925605330262,
+  "n_total_frames": 6,
+  "species_list": [
+    "H"
+  ],
+  "force_field_backend": "qmlff_preset",
+  "qmlff_preset": "atomic_amplitude",
+  "max_abs_delta_hartree": 0.13713226213757435,
+  "science_kpi_met": false,
+  "rounds": [
+    {
+      "round_index": 1,
+      "n_train_before": 1,
+      "n_train_after": 2,
+      "n_md_frames_sampled": 2,
+      "max_abs_delta_hartree": 0.7508664945731456,
+      "mean_abs_delta_hartree": 0.74793,
+      "converged": false,
+      "training_metrics": {
+        "n_epochs": 2,
+        "batch_size": 1,
+        "learning_rate": 0.001,
+        "force_weight": 1.0,
+        "lr_scheduler": "constant",
+        "grad_clip": 1.0,
+        "checkpoint_save_freq": 0,
+        "energy_normalization": "subtract_mean",
+        "backend": "qmlff_preset",
+        "n_train_frames": 1,
+        "energy_norm_params": {
+          "method": "subtract_mean",
+          "mean": -20.55185174118382
+        },
+        "final_metrics": {
+          "epoch": 1.0,
+          "energy_weight": 1.0,
+          "force_weight": 1.0,
+          "force_mode_train": "autodiff",
+          "force_mode_eval": "autodiff",
+          "loss": 30.064809799194336,
+          "energy_mae": 5.110621213912964,
+          "force_rmse": 2.45,
+          "energy_mae_per_atom_norm": 5.110621213912964,
+          "energy_mae_per_structure_norm": 10.221242427825928,
+          "energy_mae_per_atom_phys": 5.110620975494385,
+          "energy_mae_per_structure_phys": 8.5,
+          "force_rmse_components": 1.7564947009086609,
+          "force_mae_components": 1.157070979475975,
+          "energy_loss": 26.118459701538086,
+          "force_loss": 3.9463507533073425,
+          "consistency_loss": 0.0,
+          "hessian_loss": 0.0,
+          "symmetry_reg_loss": 0.0
+        }
+      },
+      "frames": [
+        {
+          "frame_index": 0,
+          "time_ps": 0.00075,
+          "energy_qml_hartree": -0.38572834887314555,
+          "energy_qchem_hartree": -1.1307218543,
+          "delta_hartree": 0.7449935054268544,
+          "abs_delta_hartree": 0.7449935054268544,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        },
+        {
+          "frame_index": 1,
+          "time_ps": 0.0022500000000000003,
+          "energy_qml_hartree": -0.3738327012268545,
+          "energy_qchem_hartree": -1.1246991958,
+          "delta_hartree": 0.7508664945731456,
+          "abs_delta_hartree": 0.7508664945731456,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "round_index": 2,
+      "n_train_before": 2,
+      "n_train_after": 3,
+      "n_md_frames_sampled": 2,
+      "max_abs_delta_hartree": 0.38182672021474895,
+      "mean_abs_delta_hartree": 0.36896407029474726,
+      "converged": false,
+      "training_metrics": {
+        "n_epochs": 2,
+        "batch_size": 1,
+        "learning_rate": 0.001,
+        "force_weight": 1.0,
+        "lr_scheduler": "constant",
+        "grad_clip": 1.0,
+        "checkpoint_save_freq": 0,
+        "energy_normalization": "subtract_mean",
+        "backend": "qmlff_preset",
+        "n_train_frames": 2,
+        "energy_norm_params": {
+          "method": "subtract_mean",
+          "mean": -20.55185174118382
+        },
+        "final_metrics": {
+          "epoch": 1.0,
+          "energy_weight": 1.0,
+          "force_weight": 1.0,
+          "force_mode_train": "autodiff",
+          "force_mode_eval": "autodiff",
+          "loss": 30.064809799194336,
+          "energy_mae": 5.110621213912964,
+          "force_rmse": 1.7564947009086609,
+          "energy_mae_per_atom_norm": 5.110621213912964,
+          "energy_mae_per_structure_norm": 10.221242427825928,
+          "energy_mae_per_atom_phys": 5.110620975494385,
+          "energy_mae_per_structure_phys": 10.22124195098877,
+          "force_rmse_components": 1.7564947009086609,
+          "force_mae_components": 1.157070979475975,
+          "energy_loss": 26.118459701538086,
+          "force_loss": 3.9463507533073425,
+          "consistency_loss": 0.0,
+          "hessian_loss": 0.0,
+          "symmetry_reg_loss": 0.0
+        }
+      },
+      "frames": [
+        {
+          "frame_index": 0,
+          "time_ps": 0.00075,
+          "energy_qml_hartree": -0.754199085784521,
+          "energy_qchem_hartree": -1.1103005061592666,
+          "delta_hartree": 0.35610142037474557,
+          "abs_delta_hartree": 0.35610142037474557,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        },
+        {
+          "frame_index": 1,
+          "time_ps": 0.0022500000000000003,
+          "energy_qml_hartree": -0.7550272394090112,
+          "energy_qchem_hartree": -1.1368539596237601,
+          "delta_hartree": 0.38182672021474895,
+          "abs_delta_hartree": 0.38182672021474895,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "round_index": 3,
+      "n_train_before": 3,
+      "n_train_after": 4,
+      "n_md_frames_sampled": 2,
+      "max_abs_delta_hartree": 0.2534694799566348,
+      "mean_abs_delta_hartree": 0.2419159058807629,
+      "converged": false,
+      "training_metrics": {
+        "n_epochs": 2,
+        "batch_size": 1,
+        "learning_rate": 0.001,
+        "force_weight": 1.0,
+        "lr_scheduler": "constant",
+        "grad_clip": 1.0,
+        "checkpoint_save_freq": 0,
+        "energy_normalization": "subtract_mean",
+        "backend": "qmlff_preset",
+        "n_train_frames": 3,
+        "energy_norm_params": {
+          "method": "subtract_mean",
+          "mean": -24.013025227656872
+        },
+        "final_metrics": {
+          "epoch": 1.0,
+          "energy_weight": 1.0,
+          "force_weight": 1.0,
+          "force_mode_train": "autodiff",
+          "force_mode_eval": "autodiff",
+          "loss": 26.477127075195312,
+          "energy_mae": 4.560744841893514,
+          "force_rmse": 1.5611335039138794,
+          "energy_mae_per_atom_norm": 4.560744841893514,
+          "energy_mae_per_structure_norm": 9.121489683787027,
+          "energy_mae_per_atom_phys": 4.560744444529216,
+          "energy_mae_per_structure_phys": 9.121488889058432,
+          "force_rmse_components": 1.5611335039138794,
+          "force_mae_components": 1.0927990476290386,
+          "energy_loss": 23.40894381205241,
+          "force_loss": 3.0681826869646707,
+          "consistency_loss": 0.0,
+          "hessian_loss": 0.0,
+          "symmetry_reg_loss": 0.0
+        }
+      },
+      "frames": [
+        {
+          "frame_index": 0,
+          "time_ps": 0.00075,
+          "energy_qml_hartree": -0.8829983987277883,
+          "energy_qchem_hartree": -1.1364678786844231,
+          "delta_hartree": 0.2534694799566348,
+          "abs_delta_hartree": 0.2534694799566348,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        },
+        {
+          "frame_index": 1,
+          "time_ps": 0.0022500000000000003,
+          "energy_qml_hartree": -0.8831699311187599,
+          "energy_qchem_hartree": -1.1135322629236508,
+          "delta_hartree": 0.23036233180489096,
+          "abs_delta_hartree": 0.23036233180489096,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "round_index": 4,
+      "n_train_before": 4,
+      "n_train_after": 5,
+      "n_md_frames_sampled": 2,
+      "max_abs_delta_hartree": 0.18936971040651684,
+      "mean_abs_delta_hartree": 0.09791215780479645,
+      "converged": false,
+      "training_metrics": {
+        "n_epochs": 2,
+        "batch_size": 1,
+        "learning_rate": 0.001,
+        "force_weight": 1.0,
+        "lr_scheduler": "constant",
+        "grad_clip": 1.0,
+        "checkpoint_save_freq": 0,
+        "energy_normalization": "subtract_mean",
+        "backend": "qmlff_preset",
+        "n_train_frames": 4,
+        "energy_norm_params": {
+          "method": "subtract_mean",
+          "mean": -25.740985521502772
+        },
+        "final_metrics": {
+          "epoch": 1.0,
+          "energy_weight": 1.0,
+          "force_weight": 1.0,
+          "force_mode_train": "autodiff",
+          "force_mode_eval": "autodiff",
+          "loss": 22.032231211662292,
+          "energy_mae": 3.846652925014496,
+          "force_rmse": 1.223898097872734,
+          "energy_mae_per_atom_norm": 3.846652925014496,
+          "energy_mae_per_structure_norm": 7.693305850028992,
+          "energy_mae_per_atom_phys": 3.846652626991272,
+          "energy_mae_per_structure_phys": 7.693305253982544,
+          "force_rmse_components": 1.223898097872734,
+          "force_mae_components": 0.8661272153258324,
+          "energy_loss": 19.788474082946777,
+          "force_loss": 2.2437569703906775,
+          "consistency_loss": 0.0,
+          "hessian_loss": 0.0,
+          "symmetry_reg_loss": 0.0
+        }
+      },
+      "frames": [
+        {
+          "frame_index": 0,
+          "time_ps": 0.00075,
+          "energy_qml_hartree": -0.9469664711399992,
+          "energy_qchem_hartree": -1.136336181546516,
+          "delta_hartree": 0.18936971040651684,
+          "abs_delta_hartree": 0.18936971040651684,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        },
+        {
+          "frame_index": 1,
+          "time_ps": 0.0022500000000000003,
+          "energy_qml_hartree": -0.9470935963900127,
+          "energy_qchem_hartree": -0.9406389911869366,
+          "delta_hartree": -0.006454605203076058,
+          "abs_delta_hartree": 0.006454605203076058,
+          "converged": true,
+          "theory_level": "full_pipeline"
+        }
+      ],
+      "failures": []
+    },
+    {
+      "round_index": 5,
+      "n_train_before": 5,
+      "n_train_after": 6,
+      "n_md_frames_sampled": 2,
+      "max_abs_delta_hartree": 0.13713226213757435,
+      "mean_abs_delta_hartree": 0.12083620555575703,
+      "converged": false,
+      "training_metrics": {
+        "n_epochs": 2,
+        "batch_size": 1,
+        "learning_rate": 0.001,
+        "force_weight": 1.0,
+        "lr_scheduler": "constant",
+        "grad_clip": 1.0,
+        "checkpoint_save_freq": 0,
+        "energy_normalization": "subtract_mean",
+        "backend": "qmlff_preset",
+        "n_train_frames": 5,
+        "energy_norm_params": {
+          "method": "subtract_mean",
+          "mean": -26.777044965472896
+        },
+        "final_metrics": {
+          "epoch": 1.0,
+          "energy_weight": 1.0,
+          "force_weight": 1.0,
+          "force_mode_train": "autodiff",
+          "force_mode_eval": "autodiff",
+          "loss": 19.04965944290161,
+          "energy_mae": 3.272959017753601,
+          "force_rmse": 1.2447678864002227,
+          "energy_mae_per_atom_norm": 3.272959017753601,
+          "energy_mae_per_structure_norm": 6.545918035507202,
+          "energy_mae_per_atom_phys": 3.2729589462280275,
+          "energy_mae_per_structure_phys": 6.545917892456055,
+          "force_rmse_components": 1.2447678864002227,
+          "force_mae_components": 0.9117441356182099,
+          "energy_loss": 16.92447018623352,
+          "force_loss": 2.125189666450024,
+          "consistency_loss": 0.0,
+          "hessian_loss": 0.0,
+          "symmetry_reg_loss": 0.0
+        }
+      },
+      "frames": [
+        {
+          "frame_index": 0,
+          "time_ps": 0.00075,
+          "energy_qml_hartree": -0.9873945002860327,
+          "energy_qchem_hartree": -1.0919346492599724,
+          "delta_hartree": 0.1045401489739397,
+          "abs_delta_hartree": 0.1045401489739397,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        },
+        {
+          "frame_index": 1,
+          "time_ps": 0.0022500000000000003,
+          "energy_qml_hartree": -0.985081694074037,
+          "energy_qchem_hartree": -1.1222139562116114,
+          "delta_hartree": 0.13713226213757435,
+          "abs_delta_hartree": 0.13713226213757435,
+          "converged": false,
+          "theory_level": "full_pipeline"
+        }
+      ],
+      "failures": []
+    }
+  ],
+  "converged": false,
+  "restored_from": "validation_round_2..5 + run.log round 1 metrics",
+  "restored_note": "Round 1 JSON was overwritten by a later 1-round mock rerun on 2026-05-28 20:27."
+}

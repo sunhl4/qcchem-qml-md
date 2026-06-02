@@ -1,0 +1,155 @@
+{
+  "experiment": "example_h2_uqc_cloud_sim_md_ml",
+  "n_qubits": 4,
+  "n_pauli_terms": 15,
+  "n_pauli_groups": null,
+  "measurement_path": "uqc_like_single_z_circuit",
+  "shots_tested": [
+    100,
+    500,
+    1000
+  ],
+  "fixed_angle_noise_sweep": {
+    "reference_angles": [
+      1.721316619099806,
+      -0.38403808930179695,
+      2.2531371815723604,
+      1.2400999002927886,
+      -2.5498589250729733,
+      2.988423371570267,
+      1.6407891386670412,
+      1.7973950398246918
+    ],
+    "exact_energy_hartree": -0.08233929910278884,
+    "100": {
+      "shots_per_circuit": 100,
+      "n_repeats": 10,
+      "mean_energy_hartree": -0.055577671634388134,
+      "std_energy_hartree": 0.07049054988187464,
+      "mean_abs_error_hartree": 0.07061369262154463,
+      "max_abs_error_hartree": 0.11363461746738548,
+      "samples_hartree": [
+        -0.14499736125490437,
+        -0.1562801871516101,
+        0.03129531836459665,
+        0.010195975893573605,
+        0.01638026996897724,
+        -0.14508396606336285,
+        -0.045174373978577265,
+        -0.014113995356939102,
+        -0.10225600770699765,
+        -0.005742389058637519
+      ]
+    },
+    "500": {
+      "shots_per_circuit": 500,
+      "n_repeats": 10,
+      "mean_energy_hartree": -0.043497166703111975,
+      "std_energy_hartree": 0.015864942814878435,
+      "mean_abs_error_hartree": 0.03884213239967686,
+      "max_abs_error_hartree": 0.07011860944984175,
+      "samples_hartree": [
+        -0.04619121426160448,
+        -0.06211110793735316,
+        -0.03320685615079861,
+        -0.04995898906947922,
+        -0.050896851823965486,
+        -0.026045031370379213,
+        -0.06173464937021307,
+        -0.0334641619234805,
+        -0.012220689652947089,
+        -0.059142115470898884
+      ]
+    },
+    "1000": {
+      "shots_per_circuit": 1000,
+      "n_repeats": 10,
+      "mean_energy_hartree": -0.038306963732811346,
+      "std_energy_hartree": 0.017074563506611216,
+      "mean_abs_error_hartree": 0.044032335369977485,
+      "max_abs_error_hartree": 0.06801800913641182,
+      "samples_hartree": [
+        -0.01493628281639783,
+        -0.07740887078548014,
+        -0.036835399871627976,
+        -0.03772737647468848,
+        -0.03761355422248345,
+        -0.01432128996637702,
+        -0.028642619127274827,
+        -0.04848544316096207,
+        -0.045785161817656225,
+        -0.041313639085165464
+      ]
+    }
+  },
+  "vqe_trials_sweep": {
+    "vqe_depth": 1,
+    "vqe_maxiter": 5,
+    "fci_reference_hartree": -1.1372759436170443,
+    "100": {
+      "shots_per_circuit": 100,
+      "n_trials": 1,
+      "mean_final_energy_hartree": -0.28757772753742494,
+      "std_final_energy_hartree": 0.0,
+      "total_shots_per_trial_approx": 1000,
+      "trials": [
+        {
+          "trial": 0,
+          "energy_hartree": -0.28757772753742494,
+          "nfev": 10,
+          "n_uqc_like_calls": 10,
+          "error_vs_fci_hartree": 0.8496982160796194
+        }
+      ]
+    },
+    "500": {
+      "shots_per_circuit": 500,
+      "n_trials": 1,
+      "mean_final_energy_hartree": -0.26859778789306227,
+      "std_final_energy_hartree": 0.0,
+      "total_shots_per_trial_approx": 5000,
+      "trials": [
+        {
+          "trial": 0,
+          "energy_hartree": -0.26859778789306227,
+          "nfev": 10,
+          "n_uqc_like_calls": 10,
+          "error_vs_fci_hartree": 0.868678155723982
+        }
+      ]
+    },
+    "1000": {
+      "shots_per_circuit": 1000,
+      "n_trials": 1,
+      "mean_final_energy_hartree": -0.2548673011284455,
+      "std_final_energy_hartree": 0.0,
+      "total_shots_per_trial_approx": 10000,
+      "trials": [
+        {
+          "trial": 0,
+          "energy_hartree": -0.2548673011284455,
+          "nfev": 10,
+          "n_uqc_like_calls": 10,
+          "error_vs_fci_hartree": 0.8824086424885988
+        }
+      ]
+    }
+  },
+  "uqc_cloud_single_eval": {
+    "100": {
+      "shots_per_circuit": 100,
+      "energy_hartree": 0.07944732397032375,
+      "error_vs_exact_hartree": 0.1617866230731126
+    },
+    "500": {
+      "shots_per_circuit": 500,
+      "energy_hartree": 0.0162826490072273,
+      "error_vs_exact_hartree": 0.09862194811001614
+    },
+    "1000": {
+      "shots_per_circuit": 1000,
+      "energy_hartree": -0.03009253802306129,
+      "error_vs_exact_hartree": 0.05224676107972755
+    }
+  }
+}

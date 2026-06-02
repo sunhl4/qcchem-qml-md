@@ -1,0 +1,88 @@
+{
+  "run_dir": "/Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735",
+  "model_type": "quantum",
+  "units": {},
+  "model_config": {
+    "n_qubits": 5,
+    "n_layers": 4,
+    "circuit_type": "standard",
+    "measurement_type": "weighted",
+    "per_atom_energy": false
+  },
+  "qnn_init": {
+    "param_init": null,
+    "param_init_scale": null,
+    "param_init_depth_scale": null,
+    "param_init_seed": null
+  },
+  "long_range": {
+    "enabled": false,
+    "coulomb_enabled": true,
+    "dispersion_enabled": true
+  },
+  "training_settings": {
+    "force_mode_train": null,
+    "force_mode_eval": null,
+    "force_fd_eps": 0.001
+  },
+  "n_parameters": 47,
+  "params_file": "/Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/final.npz",
+  "train_last": {
+    "epoch": 79,
+    "energy_weight": 1.0,
+    "force_weight": 100.0,
+    "force_mode_train": "autodiff",
+    "force_mode_eval": "autodiff",
+    "loss": 52.777435514662,
+    "energy_mae": 0.48675662995730007,
+    "force_rmse": 1.0329305922302108,
+    "energy_mae_per_atom_norm": 0.48675662995730007,
+    "energy_mae_per_structure_norm": 0.9735132599146001,
+    "energy_mae_per_atom_phys": 0.4867566139609726,
+    "energy_mae_per_structure_phys": 0.9735132279219452,
+    "force_rmse_components": 1.0329305922302108,
+    "force_mae_components": 0.8486853057305174,
+    "energy_loss": 0.46753247040841317,
+    "force_loss": 0.5230990433030658,
+    "consistency_loss": 0.0,
+    "hessian_loss": 0.0,
+    "symmetry_reg_loss": 0.0
+  },
+  "val_last": null,
+  "accuracy": {
+    "train": {
+      "energy_mae_per_atom_norm": 0.48675662995730007,
+      "energy_mae_per_structure_norm": 0.9735132599146001,
+      "energy_mae_per_atom_phys": 0.4867566139609726,
+      "energy_mae_per_structure_phys": 0.9735132279219452,
+      "force_rmse_components": 1.0329305922302108,
+      "force_mae_components": 0.8486853057305174,
+      "loss": 52.777435514662
+    },
+    "val": null
+  },
+  "best_val_loss": Infinity,
+  "symmetry": null,
+  "conservative": null,
+  "long_range_sanity": null,
+  "split_indices": {},
+  "speed": null,
+  "scaling": null,
+  "env_versions": {
+    "python": "3.11.14 | packaged by conda-forge | (main, Oct 22 2025, 22:56:31) [Clang 19.1.7 ]",
+    "platform": "macOS-14.2.1-arm64-arm-64bit",
+    "packages": {
+      "jax": "0.4.30",
+      "jaxlib": "0.4.30",
+      "pennylane": "0.40.0",
+      "e3nn_jax": "0.20.8",
+      "optax": "0.2.5",
+      "numpy": "1.26.4",
+      "scipy": "1.17.1",
+      "flax": "0.10.4",
+      "chex": "0.1.90",
+      "jraph": "0.0.6.dev0",
+      "jax_md": "0.2.8"
+    }
+  }
+}

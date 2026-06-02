@@ -1,0 +1,56 @@
+{
+  "train_history": [
+    {
+      "epoch": 0,
+      "energy_weight": 1.0,
+      "force_weight": 1.0,
+      "force_mode_train": "autodiff",
+      "force_mode_eval": "autodiff",
+      "loss": 22.072722911834717,
+      "energy_mae": 3.8491196632385254,
+      "force_rmse": 1.2340628504753113,
+      "energy_mae_per_atom_norm": 3.8491196632385254,
+      "energy_mae_per_structure_norm": 7.698239326477051,
+      "energy_mae_per_atom_phys": 3.849119544029236,
+      "energy_mae_per_structure_phys": 7.698239088058472,
+      "force_rmse_components": 1.2340628504753113,
+      "force_mae_components": 0.8731173984706402,
+      "energy_loss": 19.791449666023254,
+      "force_loss": 2.2812729068100452,
+      "consistency_loss": 0.0,
+      "hessian_loss": 0.0,
+      "symmetry_reg_loss": 0.0
+    },
+    {
+      "epoch": 1,
+      "energy_weight": 1.0,
+      "force_weight": 1.0,
+      "force_mode_train": "autodiff",
+      "force_mode_eval": "autodiff",
+      "loss": 22.032231211662292,
+      "energy_mae": 3.846652925014496,
+      "force_rmse": 1.223898097872734,
+      "energy_mae_per_atom_norm": 3.846652925014496,
+      "energy_mae_per_structure_norm": 7.693305850028992,
+      "energy_mae_per_atom_phys": 3.846652626991272,
+      "energy_mae_per_structure_phys": 7.693305253982544,
+      "force_rmse_components": 1.223898097872734,
+      "force_mae_components": 0.8661272153258324,
+      "energy_loss": 19.788474082946777,
+      "force_loss": 2.2437569703906775,
+      "consistency_loss": 0.0,
+      "hessian_loss": 0.0,
+      "symmetry_reg_loss": 0.0
+    }
+  ],
+  "val_history": [],
+  "best_val_loss": Infinity,
+  "total_time": 21.596042156219482,
+  "config": {
+    "n_epochs": 2,
+    "batch_size": 1,
+    "learning_rate": 0.001,
+    "energy_weight": 1.0,
+    "force_weight": 1.0
+  }
+}

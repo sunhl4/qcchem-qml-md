@@ -1,0 +1,17 @@
+{
+  "python": "3.11.14 | packaged by conda-forge | (main, Oct 22 2025, 22:56:31) [Clang 19.1.7 ]",
+  "platform": "macOS-14.2.1-arm64-arm-64bit",
+  "packages": {
+    "jax": "0.4.30",
+    "jaxlib": "0.4.30",
+    "pennylane": "0.40.0",
+    "e3nn_jax": "0.20.8",
+    "optax": "0.2.5",
+    "numpy": "1.26.4",
+    "scipy": "1.17.1",
+    "flax": "0.10.4",
+    "chex": "0.1.90",
+    "jraph": "0.0.6.dev0",
+    "jax_md": "0.2.8"
+  }
+}

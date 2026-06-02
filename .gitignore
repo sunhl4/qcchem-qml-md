@@ -51,8 +51,7 @@ docusaurus-site/.docusaurus/
 *.db
 timer.dat
 
-# Run outputs
-results/
+# Run outputs (results/ is tracked for reference MD/ML runs)
 artifacts/
 
 # Root-level artifacts (should not be committed)

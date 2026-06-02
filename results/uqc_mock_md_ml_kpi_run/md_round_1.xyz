@@ -1,0 +1,8 @@
+2
+frame=0 time_ps=0.000000 energy_hartree=-0.0014125180 Properties=species:S:1:pos_bohr:R:3
+H -0.04291664 -0.01013581 -0.02617820
+H 0.04640119 -0.00294077 1.42709723
+2
+frame=1 time_ps=0.000500 energy_hartree=-0.0013109071 Properties=species:S:1:pos_bohr:R:3
+H -0.10012861 -0.06046469 -0.11243286
+H 0.11406054 -0.02327376 1.43432590

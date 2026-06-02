@@ -1,0 +1,101 @@
+[2026-05-26 17:12:52,889] jax._src.xla_bridge - INFO - Unable to initialize backend 'cuda': 
+[2026-05-26 17:12:52,889] jax._src.xla_bridge - INFO - Unable to initialize backend 'rocm': module 'jaxlib.xla_extension' has no attribute 'GpuAllocatorConfig'
+[2026-05-26 17:12:52,891] jax._src.xla_bridge - INFO - Unable to initialize backend 'tpu': INTERNAL: Failed to open libtpu.so: dlopen(libtpu.so, 0x0001): tried: 'libtpu.so' (no such file), '/System/Volumes/Preboot/Cryptexes/OSlibtpu.so' (no such file), '/Users/shl/anaconda3/envs/qmlff-py311/bin/../lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache), 'libtpu.so' (no such file), '/usr/local/lib/libtpu.so' (no such file), '/usr/lib/libtpu.so' (no such file, not in dyld cache)
+Configuration:
+data:
+  energy_normalization: subtract_mean
+  test_path: data/H2/test.extxyz
+  test_ratio: 0.1
+  train_path: data/H2/train.extxyz
+  train_ratio: 0.8
+  val_path: data/H2/val.extxyz
+  val_ratio: 0.1
+descriptor:
+  n_angular_basis: 8
+  n_radial_basis: 20
+model:
+  circuit_type: standard
+  cutoff: 6.0
+  entanglement: circular
+  measurement_type: weighted
+  n_layers: 4
+  n_qubits: 5
+  species_list:
+  - H
+  type: quantum
+neighbor_list:
+  use_jaxmd: false
+  use_neighbor_list: false
+quantum:
+  device: default.qubit
+  interface: jax
+  shots: null
+training:
+  adaptive_weighting: false
+  batch_size: 4
+  checkpoint_dir: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints
+  early_stopping: false
+  energy_loss_type: mse
+  energy_weight: 1.0
+  force_loss_type: huber
+  force_weight: 100.0
+  grad_clip: 1.0
+  learning_rate: 0.001
+  lr_scheduler: constant
+  n_epochs: 80
+  optimizer: adam
+  per_atom_energy: true
+  validation_freq: 10
+  weight_decay: 1.0e-05
+
+New DFT dataset handler failed (qmlff.data.dft_dataset.DFTDataset() got multiple values for keyword argument 'shuffle'), falling back to original method
+[2026-05-26 17:12:54,478] qmlff.data.dft_loader - INFO - Loaded 143 structures from data/H2/train.extxyz
+Training samples: 143
+
+Species: ['H']
+Training samples: 143
+[2026-05-26 17:12:54,530] qmlff.core.descriptors.atomic - INFO - AtomicDescriptor initialized: feature_dim=36, quantum_dim=64 (2^6)
+[2026-05-26 17:12:54,639] qmlff.models.qnn_force_field - INFO - QNN param init: identity (scale=0.01, depth_scale=0.1, seed=42)
+UnifiedQMLForceField initialized:
+  Model type: quantum
+  Qubits: 5, Layers: 4
+  Cutoff: 6.0 Å
+  Neighbor list: False
+[2026-05-26 17:12:54,751] qmlff.training.trainer - WARNING - train data: Structure 0: median bond length 0.504 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,751] qmlff.training.trainer - WARNING - train data: Structure 1: median bond length 0.505 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,751] qmlff.training.trainer - WARNING - train data: Structure 2: median bond length 0.527 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 3: median bond length 0.551 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 4: median bond length 0.627 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 5: median bond length 0.654 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 6: median bond length 0.712 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 7: median bond length 0.736 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 8: median bond length 0.739 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Structure 9: median bond length 0.892 Å < 0.9 Å — coordinates may still be in Bohr (use qchem_bridge or convert_qchem_hartree_bohr_extxyz_to_qmlff).
+[2026-05-26 17:12:54,752] qmlff.training.trainer - WARNING - train data: Energy scale small (max |E|=2.690 eV) — values may be Hartree, not eV.
+
+Starting training...
+Starting training for 80 epochs
+Training samples: 143
+Epoch 10/80 | Loss: 128.951453 | E_MAE: 0.6444 | F_RMSE: 1.9794 | Time: 61.13s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_10.npz
+Epoch 20/80 | Loss: 91.095679 | E_MAE: 0.5861 | F_RMSE: 1.5207 | Time: 60.00s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_20.npz
+Epoch 30/80 | Loss: 74.179041 | E_MAE: 0.6531 | F_RMSE: 1.3170 | Time: 61.09s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_30.npz
+Epoch 40/80 | Loss: 64.124663 | E_MAE: 0.6495 | F_RMSE: 1.1921 | Time: 61.45s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_40.npz
+Epoch 50/80 | Loss: 58.898909 | E_MAE: 0.5742 | F_RMSE: 1.1160 | Time: 64.13s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_50.npz
+Epoch 60/80 | Loss: 56.528918 | E_MAE: 0.5120 | F_RMSE: 1.0824 | Time: 44.61s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_60.npz
+Epoch 70/80 | Loss: 54.567556 | E_MAE: 0.4984 | F_RMSE: 1.0566 | Time: 44.44s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_70.npz
+Epoch 80/80 | Loss: 52.777436 | E_MAE: 0.4868 | F_RMSE: 1.0329 | Time: 806.35s
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/epoch_80.npz
+Training completed in 166.47 minutes
+Checkpoint saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/final.npz
+Training history saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/training_history.json
+Benchmark saved: /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/benchmark.json
+
+Training complete! Results saved to /Users/shl/nvidia/qcchem-qml-md/results/qmlff_h2_native_benchmark/qmlff_native_checkpoints/run_20260526_171254_735/results.json
+Best validation loss: inf
