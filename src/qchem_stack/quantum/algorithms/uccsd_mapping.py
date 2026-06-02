@@ -7,6 +7,8 @@ import openfermion as of
 from openfermion import bravyi_kitaev, get_sparse_operator, jordan_wigner
 from openfermion.ops import FermionOperator, QubitOperator
 
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
+
 
 def occupied_string_creation_op(n_electrons: int) -> FermionOperator:
     op = FermionOperator(())
@@ -69,7 +71,7 @@ def reference_state_dense(*, mapping: str, n_spin_orbitals: int, n_electrons: in
     else:
         raise ValueError(f"Unsupported fermion_to_qubit_map for reference state: {mapping!r}")
     nrm = float(np.linalg.norm(v))
-    if nrm < 1e-14:
+    if nrm < NUMERICAL_TOLERANCE:
         raise ValueError("UCCSD reference state has zero norm.")
     return v / nrm
 

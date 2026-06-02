@@ -15,6 +15,8 @@ from pydantic import ValidationError
 from qchem_stack.config import ExperimentConfig
 from qchem_stack.jobs.store import SqliteJobStore
 
+MAX_EXPERIMENT_YAML_BYTES = 512 * 1024
+
 if TYPE_CHECKING:
     from qchem_stack.orchestration.run_context import RunContext
 
@@ -26,8 +28,38 @@ def default_job_db_path() -> Path:
     return Path(tempfile.gettempdir()) / "qchem_api_jobs.sqlite"
 
 
+def _get_allowed_db_dir() -> Path:
+    """Return the allowed directory for SQLite database paths.
+
+    Uses QCHEM_STACK_DB_DIR if set, otherwise falls back to the parent of
+    QCHEM_JOB_DB (if set), otherwise tempdir.
+    """
+    explicit = os.environ.get("QCHEM_STACK_DB_DIR")
+    if explicit:
+        return Path(explicit).resolve()
+    job_db = os.environ.get("QCHEM_JOB_DB")
+    if job_db:
+        return Path(job_db).resolve().parent
+    return Path(tempfile.gettempdir()).resolve()
+
+
+def validate_db_path(raw: str) -> Path:
+    """Validate and resolve a user-supplied SQLite path against the allowlist directory.
+
+    Raises HTTPException 403 if the resolved path is outside the allowed directory.
+    """
+    allowed_dir = _get_allowed_db_dir()
+    resolved = Path(raw).resolve()
+    if not str(resolved).startswith(str(allowed_dir)):
+        raise HTTPException(
+            status_code=403,
+            detail=f"Database path outside allowed directory: {allowed_dir}",
+        )
+    return resolved
+
+
 def sqlite_job_store(job_db_path: str | None = None) -> SqliteJobStore:
-    db = Path(job_db_path) if job_db_path else default_job_db_path()
+    db = validate_db_path(job_db_path) if job_db_path else default_job_db_path()
     return SqliteJobStore(db)
 
 
@@ -36,6 +68,12 @@ def experiment_config_from_request_yaml(
     *,
     config_base_dir: str | None = None,
 ) -> ExperimentConfig:
+    encoded = experiment_yaml.encode("utf-8")
+    if len(encoded) > MAX_EXPERIMENT_YAML_BYTES:
+        raise HTTPException(
+            status_code=413,
+            detail=f"experiment_yaml exceeds {MAX_EXPERIMENT_YAML_BYTES} bytes",
+        )
     try:
         raw = yaml.safe_load(experiment_yaml)
     except yaml.YAMLError as exc:

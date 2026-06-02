@@ -4,6 +4,8 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from qchem_stack.quantum.algorithms.tolerances import CELL_LINEAR_DEPENDENCE_TOLERANCE
+
 if TYPE_CHECKING:
     from .chemistry_extended import ChemistryExtendedSpec
 
@@ -27,5 +29,5 @@ def validate_pbc_mesh_and_cell(spec: ChemistryExtendedSpec) -> None:
     import numpy as np
 
     matrix = np.asarray(cell, dtype=float)
-    if abs(float(np.linalg.det(matrix))) < 1e-12:
+    if abs(float(np.linalg.det(matrix))) < CELL_LINEAR_DEPENDENCE_TOLERANCE:
         raise ValueError("chemistry_extended.pbc.cell_vectors_bohr must be non-singular.")

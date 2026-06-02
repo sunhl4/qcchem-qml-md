@@ -2,6 +2,9 @@
 
 from __future__ import annotations
 
+import json
+import logging
+import os
 import time
 import uuid
 from dataclasses import dataclass
@@ -67,23 +70,58 @@ class PipelineStageTimer:
         self._t0 = time.perf_counter()
         self._last = self._t0
         self._stages: list[dict[str, Any]] = []
+        self._trace_memory = os.getenv("QCHEM_PIPELINE_PROFILE_MEM", "").lower() in {
+            "1",
+            "true",
+            "yes",
+        }
+        if self._trace_memory:
+            import tracemalloc
+
+            if not tracemalloc.is_tracing():
+                tracemalloc.start()
 
     def mark(self, stage: str) -> None:
+        peak_memory_kb: float | None = None
+        if self._trace_memory:
+            import tracemalloc
+
+            _current, peak = tracemalloc.get_traced_memory()
+            peak_memory_kb = round(float(peak) / 1024.0, 2)
         now = time.perf_counter()
         duration_ms = (now - self._last) * 1000.0
-        self._stages.append({"stage": stage, "duration_ms": round(float(duration_ms), 3)})
+        row: dict[str, Any] = {
+            "stage": stage,
+            "duration_ms": round(float(duration_ms), 3),
+        }
+        if peak_memory_kb is not None:
+            row["peak_memory_kb"] = peak_memory_kb
+        self._stages.append(row)
         self._last = now
 
     def to_profile_dict(self) -> dict[str, Any]:
         total_ms = (self._last - self._t0) * 1000.0
-        return {
+        out: dict[str, Any] = {
             "schema": PIPELINE_PROFILE_V1,
             "stages": list(self._stages),
             "total_wall_ms": round(float(total_ms), 3),
         }
+        if self._trace_memory:
+            out["memory_tracing_enabled"] = True
+        return out
 
     def slowest(self) -> tuple[str | None, float]:
         if not self._stages:
             return None, 0.0
         row = max(self._stages, key=lambda r: float(r["duration_ms"]))
         return str(row["stage"]), float(row["duration_ms"])
+
+
+def emit_pipeline_stage_json_log(stage: str, *, trace_id: str | None = None) -> None:
+    """Emit one JSON line per stage when ``QCHEM_STACK_JSON_LOG=1``."""
+    if os.getenv("QCHEM_STACK_JSON_LOG", "").lower() not in {"1", "true", "yes"}:
+        return
+    payload: dict[str, Any] = {"event": "pipeline_stage", "stage": stage}
+    if trace_id:
+        payload["trace_id"] = trace_id
+    logging.getLogger("qchem_stack.pipeline.json").info(json.dumps(payload, sort_keys=True))

@@ -18,7 +18,52 @@ def hard_core_boson_from_spatial(
     h1: np.ndarray,
     h2: np.ndarray,
 ) -> BosonOperator:
-    """Build a hard-core bosonic Hamiltonian from spatial MO integrals."""
+    """Build a hard-core bosonic Hamiltonian from spatial MO integrals.
+
+    Maps a fermionic Hamiltonian in spatial orbital basis to hard-core bosons,
+    where each spatial orbital represents a pair of electrons (spin-up and spin-down).
+    The mapping is exact for closed-shell systems with strong pairing.
+
+    Args:
+        constant: Constant energy shift (e.g., nuclear repulsion, core energy).
+        h1: One-electron integrals in spatial MO basis, shape (n, n).
+            Should be the spatial part of the Fock matrix or core Hamiltonian.
+        h2: Two-electron integrals in spatial MO basis, shape (n, n, n, n).
+            **Convention**: Chemist's notation (pq|rs) = <pr|qs>, where the integral is:
+            integral phi_p(r1) phi_r(r1) (1/r12) phi_q(r2) phi_s(r2) dr1 dr2
+            These should be spatial integrals (not spin-orbital integrals).
+            The factor of 2.0 applied internally accounts for spin degeneracy in
+            closed-shell systems (both alpha-alpha and beta-beta contributions).
+
+    Returns:
+        BosonOperator: Hard-core boson Hamiltonian. The bosonic creation/annihilation
+        operators b_i, b_i create/destroy electron pairs on spatial orbital i.
+
+    Notes:
+        The resulting Hamiltonian has the form:
+        H = constant + sum_i eps_i b_i b_i + sum_{i!=j} t_{ij} b_i b_j
+            + sum_{i!=j} V_{ij} b_i b_i b_j b_j
+
+        where:
+        - eps_i = 2*h1[i,i] + 2*(ii|ii) (diagonal energy with spin factor)
+        - t_{ij} = 2*(ii|jj) (pair hopping, Coulomb-like)
+        - V_{ij} = 4*(ij|ji) - 2*(ij|ij) (density-density, exchange-dominated)
+
+        The factors of 2 arise from spin summation (alpha-alpha + beta-beta for
+        diagonal terms, alpha-alpha + beta-beta + alpha-beta + beta-alpha for
+        off-diagonal terms).
+
+    Example:
+        >>> import numpy as np
+        >>> h1 = np.array([[-1.0, 0.1], [0.1, -0.8]])
+        >>> h2 = np.zeros((2, 2, 2, 2))
+        >>> h2[0, 0, 0, 0] = 0.5  # (00|00)
+        >>> h2[1, 1, 1, 1] = 0.4  # (11|11)
+        >>> h2[0, 0, 1, 1] = 0.3  # (00|11)
+        >>> h2[0, 1, 1, 0] = 0.2  # (01|10)
+        >>> h2[0, 1, 0, 1] = 0.15 # (01|01)
+        >>> boson_op = hard_core_boson_from_spatial(0.0, h1, h2)
+    """
     one_e = np.asarray(h1, dtype=float)
     two_e = np.asarray(h2, dtype=float) * 2.0
     n_modes = int(one_e.shape[0])

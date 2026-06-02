@@ -28,7 +28,6 @@ pip install -e ".[dev]"
 | 命令 | 作用 |
 |------|------|
 | `qchem-jobs-worker` | 轮询 SQLite 作业库，消费 `QUEUED` 作业 |
-| `qchem-pipeline-worker` | 与 `qchem-jobs-worker` 等价入口 |
 
 典型用法：
 

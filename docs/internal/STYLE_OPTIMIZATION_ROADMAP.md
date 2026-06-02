@@ -36,6 +36,7 @@ Tracker for the qchem-stack code style program. Do not duplicate the full plan h
 | P14 | full `src/qchem_stack` pyright gate + excited_stages_types import fix | done | CI `pyright src/qchem_stack`; pyproject include unified |
 | P15-config | config helpers/validation split, property shim removal, migration strict, SCF nested driver blocks, canonical active_space | done | `mitigation_helpers`, `scf_helpers`, codemods, `CONFIG_REVIEW_P15.md` |
 | P16-config | docs sync (SCF nested), mitigation validation wired, repro helper dedupe, SCF dump tests, public helper exports | done | `说明_scf配置.md`, `CONFIG_REVIEW_P16.md` |
+| P17 | P0–P3 optimization (no large-file splits); protocol v2 JSON; coverage 80% | done | Large files ≤550 lines **watch-only** (no split mandate) |
 
 ## PR log
 
@@ -52,6 +53,8 @@ Regenerate after each major phase:
 ```
 
 Target at P4 end: zero files >500 lines under `src/qchem_stack`; orchestration reads `quantum` via helpers only.
+
+**P17 (current):** files up to ~550 lines are acceptable; use `scripts/code_health_baseline.py` as watch-only telemetry, not a split gate.
 
 ## Large-file watch (chem)
 

@@ -1,8 +1,26 @@
+"""Qiskit HEA executor with OpenFermion qubit ordering.
+
+**Qubit Index Convention**:
+OpenFermion uses tensor-product ordering where qubit index ``q`` corresponds to tensor axis ``q``.
+Qiskit uses little-endian convention where qubit 0 is the least significant bit (rightmost).
+This executor maps OpenFermion qubit ``q`` to Qiskit wire ``n_qubits - 1 - q`` to maintain
+consistency with the statevector reference implementation in :mod:`qchem_stack.quantum.statevector`.
+
+The mapping is applied in:
+- :func:`hea_circuit_qiskit`: rotation and CNOT gates use ``w(q) = n_qubits - 1 - q``
+- :func:`openfermion_to_sparse_pauli_op`: Pauli labels are built with MSB-first ordering
+
+This ensures that expectation values match the NumPy reference within numerical precision.
+"""
+
 from __future__ import annotations
 
+import logging
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
+
+logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from openfermion.ops import QubitOperator
@@ -110,8 +128,8 @@ class QiskitPrimitivesHeaExecutor:
             if ev is not None:
                 return float(np.real(ev))
             return float(np.real(np.asarray(pub.data.evs)))  # type: ignore[attr-defined]
-        except Exception:
-            pass
+        except (ImportError, AttributeError, TypeError) as exc:
+            logger.debug("StatevectorEstimator failed, falling back to legacy Estimator: %s", exc)
 
         from qiskit.primitives import Estimator  # type: ignore[attr-defined]
 

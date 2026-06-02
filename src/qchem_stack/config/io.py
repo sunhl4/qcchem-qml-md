@@ -5,15 +5,19 @@ User-facing overview (plain language): ``docs/说明_实验配置加载_io.md``.
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping
 from pathlib import Path
-from typing import TYPE_CHECKING, cast
+from typing import TYPE_CHECKING, Any, cast
 
 import yaml
 
 from qchem_stack.exceptions import ConfigurationError
 
 from .experiment import ExperimentConfig
+from .migrations import SCHEMA_VERSION_CURRENT, get_schema_version, migrate_config
+
+_config_io_log = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
     from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
@@ -37,8 +41,18 @@ def load_experiment_config(
         raise ConfigurationError(f"Invalid YAML in {p}: {exc}") from exc
     if not isinstance(raw, Mapping):
         raise ConfigurationError(f"Config must be a mapping: {p}")
+    raw_dict: dict[str, Any] = dict(raw)
+    version = get_schema_version(raw_dict)
+    if version != SCHEMA_VERSION_CURRENT:
+        _config_io_log.info(
+            "Migrating experiment config %s from schema v%s to v%s",
+            p,
+            version,
+            SCHEMA_VERSION_CURRENT,
+        )
+        raw_dict = migrate_config(raw_dict, from_version=version, to_version=SCHEMA_VERSION_CURRENT)
     return ExperimentConfig.from_yaml_dict(
-        raw,
+        raw_dict,
         geometry_files_base_dir=p.parent,
         strict_top_level_keys=strict_top_level_keys,
     )

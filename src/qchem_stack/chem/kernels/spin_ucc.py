@@ -10,6 +10,8 @@ from typing import Any, Protocol, runtime_checkable
 
 from openfermion.ops import FermionOperator
 
+from qchem_stack.quantum.algorithms.tolerances import SPIN_UCC_COMMUTATOR_TOLERANCE
+
 
 @runtime_checkable
 class ChemicallyAwareUCCPolicy(Protocol):
@@ -53,7 +55,7 @@ class GreedyCommutingFermionicLayers:
     Flattened order is layer-by-layer; Trotter depth lower bound proxy = number of layers.
     """
 
-    tol: float = 1e-9
+    tol: float = SPIN_UCC_COMMUTATOR_TOLERANCE
 
     def _commutes(self, a: FermionOperator, b: FermionOperator) -> bool:
         from openfermion import commutator

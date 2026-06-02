@@ -4,13 +4,16 @@ from __future__ import annotations
 
 import hashlib
 import json
+import pickle
 from dataclasses import dataclass, field
+from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from qchem_stack.config.active_space_helpers import resolve_n_electrons, resolve_n_orbitals
 from qchem_stack.contracts.schema_ids import RUN_BUILD_CACHE_V1
+from qchem_stack.repro.export import repro_dict_for_strict_json
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -29,8 +32,9 @@ def _driver_meta_digest(ref: ClassicalMeanFieldReference) -> str:
     data = dict(ref.driver_meta or {})
     for key in ("kernel_bindings", "integral_crosscheck_casci_v1"):
         data.pop(key, None)
+    safe = repro_dict_for_strict_json(data, _path="driver_meta")
     canonical = json.dumps(
-        data, sort_keys=True, separators=(",", ":"), ensure_ascii=True, default=str
+        safe, sort_keys=True, separators=(",", ":"), ensure_ascii=True, allow_nan=False
     )
     return hashlib.sha256(canonical.encode("utf-8")).hexdigest()[:16]
 
@@ -121,6 +125,35 @@ class RunBuildCache:
     packs: dict[str, CanonicalActiveSpaceIntegralPack] = field(default_factory=dict)
     pack_hits: int = 0
     pack_builds: int = 0
+    pack_spills: int = 0
+    spill_dir: Path | None = field(default=None)
+
+    def __post_init__(self) -> None:
+        if self.spill_dir is None:
+            raw = __import__("os").environ.get("QCHEM_RUN_BUILD_CACHE_SPILL_DIR", "").strip()
+            if raw:
+                self.spill_dir = Path(raw)
+                self.spill_dir.mkdir(parents=True, exist_ok=True)
+
+    def _spill_path(self, key: str) -> Path | None:
+        if self.spill_dir is None:
+            return None
+        return self.spill_dir / f"{key}.pkl"
+
+    def _load_spilled(self, key: str) -> CanonicalActiveSpaceIntegralPack | None:
+        path = self._spill_path(key)
+        if path is None or not path.is_file():
+            return None
+        with path.open("rb") as fh:
+            return pickle.load(fh)
+
+    def _spill_pack(self, key: str, pack: CanonicalActiveSpaceIntegralPack) -> None:
+        path = self._spill_path(key)
+        if path is None:
+            return
+        with path.open("wb") as fh:
+            pickle.dump(pack, fh, protocol=pickle.HIGHEST_PROTOCOL)
+        self.pack_spills += 1
 
     def get_or_build_pack(
         self,
@@ -130,7 +163,16 @@ class RunBuildCache:
         if key in self.packs:
             self.pack_hits += 1
             return self.packs[key]
+        spilled = self._load_spilled(key)
+        if spilled is not None:
+            self.packs[key] = spilled
+            self.pack_hits += 1
+            return spilled
         pack = builder()
+        max_packs = int(__import__("os").environ.get("QCHEM_RUN_BUILD_CACHE_MAX_PACKS", "0") or "0")
+        if max_packs > 0 and len(self.packs) >= max_packs:
+            oldest_key = next(iter(self.packs))
+            self._spill_pack(oldest_key, self.packs.pop(oldest_key))
         self.packs[key] = pack
         self.pack_builds += 1
         return pack
@@ -141,4 +183,6 @@ class RunBuildCache:
             "pack_count": len(self.packs),
             "pack_hits": int(self.pack_hits),
             "pack_builds": int(self.pack_builds),
+            "pack_spills": int(self.pack_spills),
+            "spill_dir": str(self.spill_dir) if self.spill_dir else None,
         }

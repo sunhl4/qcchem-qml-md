@@ -1,0 +1,5 @@
+# Optional pins for UQC cloud profile: pip install -c constraints/uqc.txt -e ".[chem,uqc]"
+
+qiskit>=2.0,<3
+qiskit-aer>=0.13
+uqc-client>=0.1

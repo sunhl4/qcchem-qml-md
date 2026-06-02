@@ -6,6 +6,7 @@ import pytest
 
 from qchem_stack.chem.bridges.driver_meta import fork_driver_meta, readonly_driver_meta
 from qchem_stack.config import ExperimentConfig
+from tests.helpers.h2_yaml import h2_yaml_dict
 
 
 def test_fork_driver_meta_is_mutable_copy() -> None:
@@ -25,26 +26,14 @@ def test_classical_mean_field_reference_from_config_h2() -> None:
     )
 
     cfg = ExperimentConfig.from_yaml_dict(
-        {
-            "schema_version": "2",
-            "experiment_id": "ref_factory_h2",
-            "random_seed": 1,
-            "molecule": {
-                "symbols": ["H", "H"],
-                "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-                "coordinate_unit": "bohr",
-                "charge": 0,
-                "multiplicity": 1,
-                "basis": "sto-3g",
+        h2_yaml_dict(
+            experiment_id="ref_factory_h2",
+            quantum={
+                "algorithm": "vqe",
+                "vqe": {"depth": 1, "maxiter": 5},
+                "pauli": {"use_protocol": False},
             },
-            "active_space": {
-                "strategy": "cas",
-                "cas": {"n_orbitals": 2, "n_electrons": 2},
-            },
-            "scf": {"driver": "pyscf", "method": "RHF"},
-            "embedding": {"mode": "none"},
-            "quantum": {"algorithm": "vqe", "vqe": {"depth": 1, "maxiter": 5}},
-        }
+        )
     )
     ref = classical_mean_field_reference_from_config(cfg)
     assert ref.backend_tag() == "pyscf"

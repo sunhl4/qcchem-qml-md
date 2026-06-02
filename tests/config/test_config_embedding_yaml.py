@@ -9,14 +9,11 @@ from pydantic import ValidationError
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
 from qchem_stack.exceptions import ConfigurationError
+from tests.helpers.h2_yaml import h2_yaml_dict
 from tests.helpers.paths import configs_path
 
 _CAS = {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
-_MOLECULE = {
-    "symbols": ["H", "H"],
-    "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-    "coordinate_unit": "bohr",
-}
+_MOLECULE = h2_yaml_dict()["molecule"]
 
 
 def test_example_h2_yaml_has_embedding_none() -> None:

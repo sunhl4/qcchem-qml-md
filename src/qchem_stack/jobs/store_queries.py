@@ -2,19 +2,45 @@
 
 from __future__ import annotations
 
+import re
 from typing import Any
 
 from .store_schema import JobListItem, JobStoreSqlProtocol, meta_top_str
 from .store_sql import JSON_SCAN_CAP, rows_to_list_items
+
+# JSON path keys must be simple identifiers (alphanumeric + underscore) to prevent SQL injection
+_JSON_PATH_KEY_PATTERN = re.compile(r"^[a-zA-Z_][a-zA-Z0-9_]*$")
+
+
+def _validate_json_path_key(key: str) -> str:
+    """Validate that a JSON path key is safe for SQL interpolation.
+
+    Args:
+        key: The key to validate
+
+    Returns:
+        The validated key
+
+    Raises:
+        ValueError: If the key contains unsafe characters
+    """
+    if not _JSON_PATH_KEY_PATTERN.match(key):
+        raise ValueError(
+            f"Invalid JSON path key: {key!r}. Keys must match pattern: ^[a-zA-Z_][a-zA-Z0-9_]*$"
+        )
+    return key
 
 
 class JobStoreQueriesMixin:
     """List/filter jobs and status histograms."""
 
     def count_by_status(self: JobStoreSqlProtocol) -> dict[str, int]:
-        con = self._connect()
-        rows = con.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status").fetchall()
-        con.close()
+        con, is_temp = self._get_connection()
+        try:
+            rows = con.execute("SELECT status, COUNT(*) FROM jobs GROUP BY status").fetchall()
+        finally:
+            if is_temp:
+                con.close()
         return {str(st): int(n) for st, n in rows}
 
     def list_jobs(
@@ -50,7 +76,7 @@ class JobStoreQueriesMixin:
             meta_eq.append(("api_project_slug", api_project_slug))
 
         where_base = f"WHERE {' AND '.join(clauses)}" if clauses else ""
-        con = self._connect()
+        con, is_temp = self._get_connection()
         try:
             if not meta_eq:
                 sql = (
@@ -60,6 +86,9 @@ class JobStoreQueriesMixin:
                 rows = con.execute(sql, [*params, lim, off]).fetchall()
                 return list(rows_to_list_items(rows))
 
+            # Validate all JSON path keys to prevent SQL injection
+            for k, _ in meta_eq:
+                _validate_json_path_key(k)
             json_parts = [f"json_extract(meta, '$.{k}') = ?" for k, _ in meta_eq]
             exp_clauses = [*clauses, *json_parts]
             exp_params = [*params, *[v for _, v in meta_eq]]
@@ -85,4 +114,5 @@ class JobStoreQueriesMixin:
                 filtered = [r for r in scanned if _row_matches(r)]
                 return list(rows_to_list_items(filtered[off : off + lim]))
         finally:
-            con.close()
+            if is_temp:
+                con.close()

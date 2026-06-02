@@ -1,0 +1,8 @@
+# pip-audit allowlist for transitive advisories we cannot fix immediately.
+# Direct dependency CVEs must be resolved or upgraded — do not add direct deps here.
+#
+# Usage: pip-audit --skip-editable --desc on --ignore-vuln <ID>
+
+[pip-audit]
+# Example (uncomment when needed):
+# ignore-vuln = ["PYSEC-2024-0000"]

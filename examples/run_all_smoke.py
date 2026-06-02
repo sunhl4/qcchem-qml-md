@@ -18,6 +18,7 @@ def main() -> int:
         root / "examples" / "tangelo_facade_demo.py",
         root / "examples" / "example_open_stack_quantum_problem.py",
         root / "examples" / "toy_dmrg_spin_chain.py",
+        root / "examples" / "tutorial_07_md_classical_h2_only.py",
     ]
     for s in scripts:
         if s.name == "toy_dmrg_spin_chain.py":

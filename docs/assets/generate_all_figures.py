@@ -21,11 +21,10 @@ import math
 import textwrap
 from pathlib import Path
 
-import numpy as np
-
-import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
-from matplotlib.patches import FancyBboxPatch, Circle, Ellipse
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.patches import Circle, Ellipse, FancyBboxPatch
 
 # ─── Typography：正文 PT_DOC=14；插图 PT_FIG=16（嵌入后视觉对齐正文） ──
 PT_DOC = 14.0             # Word / MD 四号（仅作注释对照；FS_* 不用此值）

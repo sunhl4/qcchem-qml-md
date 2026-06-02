@@ -19,7 +19,7 @@ export QCHEM_STACK_PYTHON=/path/to/python
 |------|------|
 | **契约 / capability 导出** | 产品与 HTTP 控制台同源模块 **`qchem_stack.protocols.product_contract`**（ gap 列表、capability_map、parity export 的稳定键常量等）；workflow 预览 **`qchem_stack.integrations.workflow_preview`**。布局见 [Product contracts and workflow-preview](#product-contracts-and-workflow-preview-stable-imports)。矩阵与路线图仍按需维护（见 [public_parity_matrix.md §5](docs/public_parity_matrix.md)）。 |
 | **度量与台账** | 月度更新 [与Vendor platform… — 附录 B](docs/public_parity_matrix.md) §3；主表 yes/partial/n/a 可用 `python scripts/count_parity_matrix_main_tables.py` 对照手填。 |
-| **签字合并 gate** | 合并前：`ruff check src/qchem_stack tests scripts examples`、`ruff format --check`（同上路径）、`pytest`、`python scripts/check_parity_export_sample.py`；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
+| **签字合并 gate** | 合并前：`ruff check src/qchem_stack tests scripts examples`、`ruff format --check`（同上路径）、`pytest`、`python scripts/check_parity_export_sample.py`、`python scripts/check_comparative_execution_backlog.py`；CI **`security-audit`** 对 `pip install -e ".[dev]"` 运行 `pip-audit`（传递依赖见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
 
 ## Lint
 
@@ -48,6 +48,18 @@ Optional [pre-commit](https://pre-commit.com) hooks (same paths as CI). The **`p
 
 Uses `.pre-commit-config.yaml` at the repo root.
 
+## Install profiles (pip extras)
+
+| Goal | Install | Notes |
+|------|---------|--------|
+| Core CI / unit tests | `pip install -e ".[dev]"` | No PySCF: `python scripts/smoke_pipeline.py --precomputed-only` |
+| Classical chemistry | `pip install -e ".[chem]"` | PySCF smoke: `scripts/smoke_pipeline.py` |
+| Qiskit Pauli shots | `pip install -e ".[quantum]"` | `scripts/smoke_pipeline.py --qiskit-shots` |
+| HTTP API | `pip install -e ".[api]"` | Set `QCHEM_STACK_API_KEY` in production |
+| MD/ML full chain | editable sibling **QML-FF** + `pip install -e ".[qmlff]"` | Without QML-FF use `force_field_backend: classical_h2` in MD loop YAML |
+
+**Onboarding (three paths):** [docusaurus-site/docs/guide/onboarding-three-paths.md](docusaurus-site/docs/guide/onboarding-three-paths.md) · [tutorial index](docusaurus-site/docs/tutorial/tutorial-index-three-paths.md).
+
 ## Tests
 
 From the repo root:
@@ -68,7 +80,20 @@ Targeted markers (see `pyproject.toml`): `-m l1_excited`, `-m l1_md_ml`, `-m l3`
 
 ### CI markers (PR 必跑)
 
-`.github/workflows/ci.yml` 在完整 `pytest tests` 之后还会跑 **`pytest -m l1_excited`** 与 **`pytest -m l1_md_ml`**（非「仅本地可选」）。激发态/VQD/QSE/SCEOM 等回归以 `l1_excited` 为准；`md_bridge` 与 MD/ML 契约以 `l1_md_ml` 为准（长板字段与 `repro` 对齐清单见 [与Vendor platform能力差距与实施计划 — 附录 B §6](docs/public_parity_matrix.md#y1-residual-partial-sla-template) 表末行）。
+主矩阵命令为 **`pytest tests -m "not slow and not perf"`**（见 `.github/workflows/ci.yml`）。其中已包含带 **`l1_excited`** 与 **`l1_md_ml`** marker 的用例，无需在 PR 上单独再跑一遍（除非本地调试：`pytest -m l1_excited` / `pytest -m l1_md_ml`）。激发态/VQD/QSE/SCEOM 回归以 `l1_excited` 为准；`md_bridge` 与 MD/ML 契约以 `l1_md_ml` 为准（长板字段与 `repro` 对齐清单见 [与Vendor platform能力差距与实施计划 — 附录 B §6](docs/public_parity_matrix.md#y1-residual-partial-sla-template) 表末行）。
+
+**Lint job** 另跑 `python scripts/check_comparative_execution_backlog.py`（与上文「签字合并 gate」一致）。
+
+### Test pyramid
+
+| Tier | When | Command |
+|------|------|---------|
+| **PR (required)** | Every push/PR | `pytest tests -m "not slow and not perf"` |
+| **PR extras (3.12)** | CI only | smoke scripts, `check_parity_export_sample.py`, API tests |
+| **Nightly** | schedule / `[nightly]` | `pytest -m "slow or perf"`; `QCHEM_RUN_L3=1 pytest -m l3` |
+| **Local optional** | Before release | `pytest -m psi4`, `pytest -m l1_md_ml`, `pytest -m uqc_mock`; DMET exact: `pytest -m slow tests/test_dmet_fragment_exact.py` |
+
+Markers: `slow`, `perf`, `l3`, `l1_excited`, `l1_md_ml`, `pyscf`, `psi4`, `uqc_mock` — see `pyproject.toml`.
 
 **Parity / `computables_rich`（可选 repro）**：`parity_integrations.include_computables_rich_in_repro: true` 时的 workflow-preview 对齐见 `tests/test_workflow_preview_repro_alignment.py`；FastAPI 侧 `POST /v1/meta/workflow-preview` 烟测见 `tests/test_api_runs.py`（需 `pip install -e ".[api]"`，CI 已装）。
 
@@ -130,7 +155,7 @@ Config-only Methods alignment (no PySCF run):
 
 After intentional contract changes to **`product_gap_categories()`**, **`PARITY_EXPORT_V3_STABLE_KEYS`** (see `qchem_stack.protocols.product_contract`), or export columns (e.g. **`geometry_source`**), regenerate `tests/fixtures/parity_export_example_h2_config_only.json` from `configs/example_h2.yaml` and normalize `source_config` to `configs/example_h2.yaml` if the exporter emits OS-specific separators.
 
-新增「判据表导出」相关 `configs/*.yaml` 时，请同步扩展 `scripts/check_parity_export_sample.py` 中的 `SAMPLE_CONFIGS_REL`（见 [与Vendor platform能力差距与实施计划 — 附录 E](docs/public_parity_matrix.md) 原 §5 队列项 12）。
+新增「判据表导出」相关 `configs/*.yaml`（ExperimentConfig 形态）时，**无需**再手工维护 `SAMPLE_CONFIGS_REL`：`scripts/check_parity_export_sample.py` 会自动发现 `configs/*.yaml` 中全部 experiment 配置并跑 config-only export 门控。MdValidationLoop 形态的 YAML 由同脚本末尾的 `MdValidationLoopConfig.from_yaml` 校验。
 
 ### 算符池与 L3 基准（ADAPT / IQEB）
 
@@ -191,6 +216,13 @@ Reference implementation: [`examples/solver_plugin_entrypoint_demo/`](examples/s
 | 6 | Open PR with README snippet + test or smoke note | CI `lint` + `test` green |
 
 Variational or shot backends use `BackendSpec` / backend registry — not the SCF entry-point group above.
+
+## Release checklist (v0.3.0+)
+
+1. Bump `[project].version` in `pyproject.toml` and `CHANGELOG.md`.
+2. Align `src/qchem_stack/api/app.py` OpenAPI version with package version.
+3. Run merge gates: ruff, pytest, `check_parity_export_sample.py`, `check_comparative_execution_backlog.py`.
+4. See [`docs/engineering/api_stability_policy.md`](docs/engineering/api_stability_policy.md).
 
 ## Examples / tutorials
 

@@ -6,6 +6,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import numpy as np
 
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
+from qchem_stack.quantum.algorithms.tolerances import FLOAT_PRECISION_TINY, OPTIMIZATION_TOLERANCE
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 if TYPE_CHECKING:
@@ -69,7 +70,7 @@ class AlgorithmVQS(AlgorithmBase):
             hea_state(theta, self.hamiltonian.n_qubits, depth).ravel(), dtype=np.complex128
         )
         nrm = float(np.linalg.norm(st))
-        if nrm < 1e-15:
+        if nrm < FLOAT_PRECISION_TINY:
             raise ValueError("HEA state has zero norm in VQS tangent construction.")
         return st / nrm
 
@@ -96,7 +97,7 @@ class AlgorithmVQS(AlgorithmBase):
         n = theta.size
         M = np.zeros((n, n), dtype=float)
         rhs = np.zeros(n, dtype=float)
-        ridge = 1e-9
+        ridge = OPTIMIZATION_TOLERANCE
         imag_flow = self.mode == "imag"
         for i in range(n):
             for j in range(n):

@@ -4,13 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import TYPE_CHECKING, Any, cast
+from dataclasses import dataclass
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 import yaml
 
 from qchem_stack.contracts.schema_ids import QMEF_ML_ATTACHMENT_V1
 from qchem_stack.exceptions import PipelineError
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
+from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
 if TYPE_CHECKING:
     from pathlib import Path
@@ -18,7 +20,57 @@ if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
     from qchem_stack.config import ExperimentConfig
-    from qchem_stack.orchestration.pipeline_result import PipelineResultV1
+
+
+PipelineOut = PipelineResultV1 | dict[str, Any]
+
+
+class QmefFramePayload(TypedDict, total=False):
+    atomic_numbers: list[int]
+    positions_bohr: list[list[float]]
+    energy_hartree: float
+    forces_hartree_bohr: list[list[float]]
+    charge: int
+    multiplicity: int
+    box: list[float] | None
+    method_tag: str
+    active_space_hash: str
+    protocol_hash: str
+    repro_config_sha256_prefix: str
+    backend_noise_tag: str
+
+
+class QmefDatasetPayload(TypedDict):
+    frames: list[QmefFramePayload]
+    provenance_yaml: str
+
+
+class QmefFrameMeta(TypedDict):
+    index: int
+    coordinates_source: str
+    energy_theory: str
+    energy_reference_mode: str
+    forces_theory: str
+
+
+class QmefMlAttachmentReproBlock(TypedDict):
+    schema: str
+    epistemic_bound: str
+    frame_meta: list[QmefFrameMeta]
+    dataset: QmefDatasetPayload
+
+
+@dataclass(frozen=True)
+class QmefAttachmentContext:
+    """Typed ingress for QMEF attachment from a completed pipeline row."""
+
+    cfg: ExperimentConfig
+    out: PipelineOut
+    cfg_path: Path | None = None
+
+
+def _as_out_dict(out: PipelineOut) -> dict[str, Any]:
+    return cast("dict[str, Any]", out)
 
 
 def _is_periodic_rhf(rhf: PySCFRHFResult) -> bool:
@@ -61,7 +113,9 @@ def _hf_nuclear_forces_neg_gradient_hartree_bohr(
             return None
         arr = -np.asarray(g.kernel(), dtype=float)
         return cast("list[list[float]]", arr.tolist())
-    except Exception:
+    except (np.linalg.LinAlgError, ValueError, TypeError) as exc:
+        _log = __import__("logging").getLogger(__name__)
+        _log.warning("kernel matrix computation failed, returning None: %s", exc)
         return None
 
 
@@ -72,8 +126,8 @@ def _active_space_digest(cfg: ExperimentConfig) -> str:
     return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
 
 
-def _protocol_hash_prefix(out: dict[str, Any]) -> str:
-    repro = out.get("repro")
+def _protocol_hash_prefix(out: PipelineOut) -> str:
+    repro = _as_out_dict(out).get("repro")
     if not isinstance(repro, dict):
         return ""
     snap = repro.get("parity_snapshot")
@@ -83,8 +137,8 @@ def _protocol_hash_prefix(out: dict[str, Any]) -> str:
     return str(sig)[:48] if isinstance(sig, str) else ""
 
 
-def _config_sha_prefix(out: dict[str, Any]) -> str:
-    repro = out.get("repro")
+def _config_sha_prefix(out: PipelineOut) -> str:
+    repro = _as_out_dict(out).get("repro")
     if not isinstance(repro, dict):
         return ""
     return str(repro.get("config_sha256_prefix") or "")
@@ -94,25 +148,24 @@ def _normalize_coords(coords: list[list[float]]) -> list[list[float]]:
     return [[float(x), float(y), float(z)] for x, y, z in coords]
 
 
-def _energy_hartree_from_pipeline_out(
-    cfg: ExperimentConfig, out: PipelineResultV1 | dict[str, Any]
-) -> float:
+def _energy_hartree_from_pipeline_out(cfg: ExperimentConfig, out: PipelineOut) -> float:
+    out_d = _as_out_dict(out)
     ref = cfg.md_ml_export.energy_reference
     if ref == "scf":
-        scf = out.get("scf_energy")
+        scf = out_d.get("scf_energy")
         if scf is None:
             raise PipelineError(
                 "md_ml_export.energy_reference='scf' requires scf_energy on pipeline output."
             )
         return float(scf)
     if ref == "pauli_protocol":
-        if "energy_pauli_protocol" not in out:
+        if "energy_pauli_protocol" not in out_d:
             raise PipelineError(
                 "md_ml_export.energy_reference='pauli_protocol' requires a completed Pauli stage "
                 "(missing energy_pauli_protocol on pipeline output)."
             )
-        return float(out["energy_pauli_protocol"])
-    energy_var = out.get("energy_after_variational")
+        return float(out_d["energy_pauli_protocol"])
+    energy_var = out_d.get("energy_after_variational")
     if energy_var is None:
         raise PipelineError("md_ml_export requires energy_after_variational on pipeline output.")
     return float(energy_var)
@@ -146,7 +199,7 @@ def _as_pyscf_rhf(reference: ClassicalMeanFieldReference) -> PySCFRHFResult:
 
 def _qmframe_from_rhf(
     cfg: ExperimentConfig,
-    out: dict[str, Any],
+    out: PipelineOut,
     rhf: PySCFRHFResult,
     coords: list[list[float]],
     *,
@@ -175,7 +228,7 @@ def _qmframe_from_rhf(
     )
 
 
-def _primary_qmframe(cfg: ExperimentConfig, out: dict[str, Any], rhf: PySCFRHFResult) -> QMFrame:
+def _primary_qmframe(cfg: ExperimentConfig, out: PipelineOut, rhf: PySCFRHFResult) -> QMFrame:
     energy = _energy_hartree_from_pipeline_out(cfg, out)
     positions = _normalize_coords(cfg.molecule.coordinates_in_bohr().tolist())
     tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.mapping.fermion_qubit}"
@@ -184,7 +237,7 @@ def _primary_qmframe(cfg: ExperimentConfig, out: dict[str, Any], rhf: PySCFRHFRe
 
 def _extra_frame_hf_scf(
     cfg: ExperimentConfig,
-    out: dict[str, Any],
+    out: PipelineOut,
     coords: list[list[float]],
     *,
     index: int,
@@ -203,7 +256,7 @@ def _extra_frame_hf_scf(
 
 def _extra_frame_full_pipeline(
     cfg: ExperimentConfig,
-    primary_out: dict[str, Any],
+    primary_out: PipelineOut,
     coords: list[list[float]],
     *,
     index: int,
@@ -249,11 +302,11 @@ def _extra_frame_full_pipeline(
 
 def build_qmef_ml_attachment_repro_block(
     cfg: ExperimentConfig,
-    out: dict[str, Any],
+    out: PipelineOut,
     reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
-) -> dict[str, Any]:
+) -> QmefMlAttachmentReproBlock:
     """
     Canonical ``repro.qmef_ml_attachment_v1`` — one **primary** frame from the finished pipeline plus optional
     **extra** geometries (HF-SCF-only or full nested pipelines per ``md_ml_export.trajectory_theory_level``).
@@ -261,7 +314,7 @@ def build_qmef_ml_attachment_repro_block(
     spec = cfg.md_ml_export
     rhf = _as_pyscf_rhf(reference)
     frames: list[QMFrame] = [_primary_qmframe(cfg, out, rhf)]
-    frame_meta: list[dict[str, Any]] = [
+    frame_meta: list[QmefFrameMeta] = [
         {
             "index": 0,
             "coordinates_source": "molecule.coordinates_bohr",
@@ -322,22 +375,37 @@ def build_qmef_ml_attachment_repro_block(
         "schema": QMEF_ML_ATTACHMENT_V1,
         "epistemic_bound": epistemic,
         "frame_meta": frame_meta,
-        "dataset": ds.model_dump(mode="json"),
+        "dataset": cast("QmefDatasetPayload", ds.model_dump(mode="json")),
     }
+
+
+def build_qmef_ml_attachment_from_context(
+    ctx: QmefAttachmentContext,
+    reference: ClassicalMeanFieldReference,
+) -> QmefMlAttachmentReproBlock:
+    """Build QMEF attachment from a :class:`QmefAttachmentContext`."""
+    return build_qmef_ml_attachment_repro_block(ctx.cfg, ctx.out, reference, cfg_path=ctx.cfg_path)
 
 
 def build_qmef_dataset_single_frame_repro_block(
     cfg: ExperimentConfig,
-    out: dict[str, Any],
+    out: PipelineOut,
     reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
-) -> dict[str, Any]:
+) -> QmefMlAttachmentReproBlock:
     """Backward-compatible name — delegates to :func:`build_qmef_ml_attachment_repro_block`."""
     return build_qmef_ml_attachment_repro_block(cfg, out, reference, cfg_path=cfg_path)
 
 
 __all__ = [
+    "PipelineOut",
+    "QmefAttachmentContext",
+    "QmefDatasetPayload",
+    "QmefFrameMeta",
+    "QmefFramePayload",
+    "QmefMlAttachmentReproBlock",
     "build_qmef_dataset_single_frame_repro_block",
+    "build_qmef_ml_attachment_from_context",
     "build_qmef_ml_attachment_repro_block",
 ]

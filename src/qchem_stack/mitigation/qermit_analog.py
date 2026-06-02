@@ -1,6 +1,21 @@
 """
 Qermit *style* mitigation **DAG** report (open stack — not Quantinuum Qermit).
 
+.. warning:: STUB IMPLEMENTATION
+    This module generates audit/traceability reports for mitigation workflows.
+    It does NOT implement actual quantum error mitigation algorithms.
+
+    Purpose:
+    - Provides JSON-serializable DAG representation for workflow visualization
+    - Enables auditability and reproducibility tracking
+    - Documents mitigation intent and execution order
+
+    For actual mitigation, see the corresponding implementation modules:
+    - qchem_stack.mitigation.pmsv (TOY)
+    - qchem_stack.mitigation.zne (TOY)
+    - qchem_stack.mitigation.spam (TOY)
+    - qchem_stack.mitigation.classical_shadows (STUB)
+
 Vendor documentation describes :mod:`Qermit` task graphs; we emit nodes + edges + a topological
 walk order for auditability (no closed-source Qermit execution).
 """

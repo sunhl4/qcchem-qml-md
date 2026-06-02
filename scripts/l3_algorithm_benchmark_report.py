@@ -40,18 +40,21 @@ def main() -> None:
     args = ap.parse_args()
     rels = list(args.configs) if args.configs else []
     if not rels:
-        from qchem_stack.integrations.l3_algorithm_benchmark import DEFAULT_BENCHMARK_YAMLS
+        from qchem_stack.quantum.l3_algorithm_benchmark import DEFAULT_BENCHMARK_YAMLS
 
         rels = list(DEFAULT_BENCHMARK_YAMLS)
 
     sys.path.insert(0, str(_ROOT / "src"))
-    from qchem_stack.integrations.l3_algorithm_benchmark import (
+    from qchem_stack.quantum.l3_algorithm_benchmark import (
         algorithm_benchmark_bundle_v1,
         merged_experiment_benchmark_v1,
     )
 
     bundle = algorithm_benchmark_bundle_v1(repo_root=_ROOT, config_rels=rels)
-    out_obj: dict = {"algorithm_benchmark_bundle_v1": bundle}
+    out_obj: dict = {
+        "bundle_schema_version": "1",
+        "algorithm_benchmark_bundle_v1": bundle,
+    }
     if args.merged:
         out_obj["merged_experiment_benchmark_v1"] = merged_experiment_benchmark_v1(bundle)
     json.dump(out_obj, sys.stdout, indent=2)

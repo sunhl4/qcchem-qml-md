@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
-from qchem_stack.integrations.l3_algorithm_benchmark import (
+from qchem_stack.quantum.l3_algorithm_benchmark import (
     DEFAULT_BENCHMARK_YAMLS,
     algorithm_benchmark_bundle_v1,
     merged_experiment_benchmark_v1,

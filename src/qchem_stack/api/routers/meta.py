@@ -1,15 +1,17 @@
 from __future__ import annotations
 
-from pathlib import Path
+import hashlib
 from typing import Annotated
 
-from fastapi import APIRouter, Body, HTTPException, Query, Request
+from fastapi import APIRouter, Body, HTTPException, Query, Request, Response
 
 from qchem_stack.api.deps import (
     default_job_db_path,
     experiment_config_from_request_yaml,
     sqlite_job_store,
+    validate_db_path,
 )
+from qchem_stack.api.json_safe import api_json_dumps
 from qchem_stack.api.middleware import META_POST_LIMIT, rate_limit
 from qchem_stack.api.models import YamlPreviewBody
 from qchem_stack.contracts.schema_ids import (
@@ -19,8 +21,8 @@ from qchem_stack.contracts.schema_ids import (
     PRODUCT_SURFACE_V1,
     QUEUE_STATS_V1,
 )
-from qchem_stack.integrations.workflow_preview import workflow_preview_payload
 from qchem_stack.protocols.computable import computables_export_dict, list_computables_for_config
+from qchem_stack.protocols.workflow_preview import workflow_preview_payload
 
 router = APIRouter(tags=["meta", "product"])
 
@@ -46,7 +48,7 @@ def product_surface() -> dict[str, object]:
 
 
 @router.get("/v1/meta/capability-surface")
-def capability_surface() -> dict[str, object]:
+def capability_surface(request: Request) -> dict[str, object]:
     from qchem_stack import __version__
     from qchem_stack.protocols.product_contract import (
         ansatz_protocol_matrix_v1,
@@ -69,7 +71,7 @@ def capability_surface() -> dict[str, object]:
             status_code=500,
             detail={"message": "invalid product_gap_categories contract", "errors": errs},
         )
-    return {
+    payload: dict[str, object] = {
         "schema": CAPABILITY_SURFACE_V2,
         "qchem_stack_version": __version__,
         "capability_map": product_capability_map_for_docs(),
@@ -84,6 +86,16 @@ def capability_surface() -> dict[str, object]:
         "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
         "ansatz_protocol_matrix_v1": ansatz_protocol_matrix_v1(),
     }
+    body = api_json_dumps(payload, sort_keys=True)
+    etag = hashlib.sha256(body.encode("utf-8")).hexdigest()[:32]
+    if_none = request.headers.get("if-none-match", "").strip().strip('"')
+    if if_none == etag:
+        return Response(status_code=304, headers={"ETag": f'"{etag}"'})
+    return Response(
+        content=body,
+        media_type="application/json",
+        headers={"ETag": f'"{etag}"'},
+    )
 
 
 @router.get("/v1/meta/parity-gaps")
@@ -139,7 +151,7 @@ def queue_stats(
         default=None, description="SQLite path; default QCHEM_JOB_DB or temp"
     ),
 ) -> dict[str, object]:
-    db = Path(job_db_path) if job_db_path else default_job_db_path()
+    db = validate_db_path(job_db_path) if job_db_path else default_job_db_path()
     store = sqlite_job_store(str(db))
     return {
         "schema": QUEUE_STATS_V1,

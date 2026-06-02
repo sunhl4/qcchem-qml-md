@@ -1,4 +1,16 @@
-"""Minimal classical-shadows Pauli expectation (local random Pauli snapshots)."""
+"""Minimal classical-shadows Pauli expectation (local random Pauli snapshots).
+
+.. warning:: TOY/STUB IMPLEMENTATION
+    This module provides a minimal implementation of classical shadows for
+    demonstration and research purposes. It is NOT suitable for production
+    quantum computing workloads.
+
+    Limitations:
+    - Uses statevector simulation instead of actual quantum measurements
+    - No support for derandomization or adaptive measurement strategies
+    - Limited to small qubit counts due to statevector memory requirements
+    - No integration with hardware-specific noise models
+"""
 
 from __future__ import annotations
 
@@ -7,6 +19,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from qchem_stack.backends.pauli_shot_sim import _single_qubit_rot_to_z_matrix
+from qchem_stack.quantum.algorithms.tolerances import PROBABILITY_FLOOR
 from qchem_stack.quantum.statevector import _apply_one_qubit_unitary
 
 if TYPE_CHECKING:
@@ -32,7 +45,7 @@ def _rotate_to_pauli_basis(state: np.ndarray, basis: list[str], n_qubits: int) -
 
 def _sample_z_outcomes(state: np.ndarray, n_qubits: int, rng: np.random.Generator) -> list[int]:
     probs = np.abs(state) ** 2
-    probs = probs / max(float(probs.sum()), 1e-30)
+    probs = probs / max(float(probs.sum()), PROBABILITY_FLOOR)
     idx = int(rng.choice(len(probs), p=probs))
     return [(idx >> q) & 1 for q in range(n_qubits)]
 
@@ -72,6 +85,7 @@ def classical_shadows_hamiltonian_expectation(
     Estimate ⟨H⟩ with local random-Pauli classical shadows (Huang et al. style estimator).
 
     Uses a fixed ``seed`` for reproducibility; intended for small active spaces in tests.
+    Implements median-of-means for robust estimation against outliers.
     """
     rng = np.random.default_rng(int(seed))
     terms = list(hamiltonian.terms.items())
@@ -82,10 +96,30 @@ def classical_shadows_hamiltonian_expectation(
         rotated = _rotate_to_pauli_basis(state, basis, n_qubits)
         bits = _sample_z_outcomes(rotated, n_qubits, rng)
         estimates.append(_snapshot_hamiltonian_value(bits, basis, terms, n_qubits=n_qubits))
+
+    # Median-of-means: split into k batches, compute batch means, take median
+    if not estimates:
+        expectation = 0.0
+    else:
+        n_batches = max(1, int(len(estimates) ** 0.5))  # sqrt(n) batches
+        batch_size = len(estimates) // n_batches
+        if batch_size == 0:
+            # Not enough samples for batching, use simple mean
+            expectation = float(np.mean(estimates))
+        else:
+            batch_means = []
+            for i in range(n_batches):
+                start = i * batch_size
+                end = start + batch_size if i < n_batches - 1 else len(estimates)
+                batch = estimates[start:end]
+                if batch:
+                    batch_means.append(float(np.mean(batch)))
+            expectation = float(np.median(batch_means)) if batch_means else 0.0
+
     return {
-        "expectation": float(np.mean(estimates)) if estimates else 0.0,
+        "expectation": expectation,
         "budget_pairs": int(budget_pairs),
         "seed": int(seed),
         "n_qubits": int(n_qubits),
-        "estimator": "local_random_pauli_classical_shadows_v1",
+        "estimator": "local_random_pauli_classical_shadows_median_of_means_v1",
     }

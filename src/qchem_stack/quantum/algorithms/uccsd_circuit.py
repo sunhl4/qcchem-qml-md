@@ -13,6 +13,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from qchem_stack.backends.spec import CircuitIR
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 from qchem_stack.quantum.algorithms.uccsd_mapping import reference_state_dense
 from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import (
     DecompositionMode,
@@ -87,7 +88,7 @@ def _project_jw_sector(psi: np.ndarray, *, n_electrons: int, n_qubits: int) -> n
     for i in jw_number_indices(n_electrons, n_qubits):
         out[i] = psi[i]
     nrm = float(np.linalg.norm(out))
-    if nrm < 1e-14:
+    if nrm < NUMERICAL_TOLERANCE:
         raise ValueError("JW sector projection collapsed to zero norm.")
     return out / nrm
 
@@ -108,7 +109,7 @@ def uccsd_prepare_statevector(
         for th, mat in zip(ang, ctx.antiherm_mats, strict=True):
             psi = expm(float(th * inv) * mat) @ psi
             nrm = float(np.linalg.norm(psi))
-            if nrm < 1e-14:
+            if nrm < NUMERICAL_TOLERANCE:
                 raise ValueError("UCCSD circuit state collapsed to zero norm.")
             psi = psi / nrm
     if ctx.mapping == "jordan_wigner":

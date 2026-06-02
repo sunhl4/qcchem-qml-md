@@ -289,7 +289,26 @@ gantt
 
 ---
 
-## 7. 风险登记
+## 7. 工程卓越 WBS（Unified P0–P3，Phase M）
+
+> **台账**：[`comparative_execution_backlog.yaml`](comparative_execution_backlog.yaml) **Phase M**（`M-P0-E*` … `M-P3-A`）。Phase **I** 已用于 P4-A ansatz，工程线使用 **M** 避免 ID 冲突。
+
+| 子阶段 | ID 前缀 | 核心交付 |
+|--------|---------|----------|
+| P0-E 安装/安全 | `M-P0-E*` | Install profiles、Qiskit 2.x 对齐、`pip-audit` `[dev]` 面、QUICKSTART §0 |
+| P0-A 封板 | `M-P0-A` | gap CI 闸门、`day210_p0_closeout.md` |
+| P1-E MD/ML + 类型 + 文档 | `M-P1-E*` | `energy_reference.py`、双 delta、TypedDict 热点、config 文档拆分 |
+| P1-A residual | `M-P1-A` | Qulacs executor、DMET 自洽 trace |
+| P2-E 对等/API | `M-P2-E*` | Psi4 E2E smoke、JSON log、meta ETag、`partial_to_l1_playbook` |
+| P2-A 深度 | `M-P2-A` | QPE 主配置、云 AL 能量目标 |
+| P3-E 产品化 | `M-P3-E*` | v0.3.0 对齐、docs IA、`RunBuildCache` spill、L3 dashboard nightly |
+| P3-A 教程 | `M-P3-A` | 6 notebooks、`/parity/gaps`、三路径导航 |
+
+**退出标准**：见统一计划 P0–P3 各阶段；Phase M 封板写入 `docs/execution/day540_p3_engineering_closeout.md`。
+
+---
+
+## 8. 风险登记
 
 | 风险 | 影响 | 缓解 |
 |------|------|------|
@@ -301,7 +320,7 @@ gantt
 
 ---
 
-## 8. 刻意排除（全计划 non-goals）
+## 9. 刻意排除（全计划 non-goals）
 
 以下 **不立项**；若 issue 提出，指向 [`docs/product/non_goals.md`](../product/non_goals.md)（P3-10 创建）：
 
@@ -313,7 +332,7 @@ gantt
 
 ---
 
-## 9. 与现有文档映射
+## 10. 与现有文档映射
 
 | 文档 | 关系 |
 |------|------|
@@ -325,7 +344,7 @@ gantt
 
 ---
 
-## 10. 立即开始的 5 个动作（本周）
+## 11. 立即开始的 5 个动作（本周）
 
 1. 运行 `python scripts/check_comparative_execution_backlog.py` 确认 Phase A–C 仍绿  
 2. 创建 `tests/conftest.py`（**P0-01**）  

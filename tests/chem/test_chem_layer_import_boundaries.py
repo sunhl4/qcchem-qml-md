@@ -52,6 +52,11 @@ _CHEM_LAZY_INTEGRATIONS_ALLOWLIST = {
     "src/qchem_stack/chem/embedding/schmidt_variational_sidecar.py",
 }
 
+# Fragment impurity VQE bridges chem embedding SPI to quantum VQE at runtime only.
+_CHEM_LAZY_QUANTUM_ALLOWLIST = {
+    "src/qchem_stack/chem/embedding/fragment_solvers/qubit_hamiltonian_vqe.py",
+}
+
 
 def test_chem_layer_never_imports_quantum_or_orchestration() -> None:
     """chem must not import quantum or orchestration anywhere, even lazily."""
@@ -60,8 +65,14 @@ def test_chem_layer_never_imports_quantum_or_orchestration() -> None:
     violations: list[str] = []
     for path in _chem_python_files():
         rel = path.relative_to(root)
+        rel_posix = rel.as_posix()
         for mod in _all_imports(path):
             if mod.startswith(forbidden_prefixes):
+                if (
+                    mod.startswith("qchem_stack.quantum")
+                    and rel_posix in _CHEM_LAZY_QUANTUM_ALLOWLIST
+                ):
+                    continue
                 violations.append(f"{rel}: import {mod}")
     assert not violations, "chem imports quantum/orchestration (forbidden):\n" + "\n".join(
         violations

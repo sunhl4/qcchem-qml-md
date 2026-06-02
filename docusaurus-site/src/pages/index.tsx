@@ -9,6 +9,27 @@ import Heading from '@theme/Heading';
 
 import styles from './index.module.css';
 
+const threePathCards = [
+  {
+    title: 'Quickstart（管线直觉）',
+    description: '15 分钟跑通 H₂ VQE + repro 导出。',
+    to: '/tutorial/quickstart',
+    command: 'python scripts/smoke_pipeline.py',
+  },
+  {
+    title: 'Async HTTP（作业类比）',
+    description: 'submit → poll → summary/repro 三步联调。',
+    to: '/tutorial/async-run-via-http',
+    command: 'curl POST /v1/runs …',
+  },
+  {
+    title: 'Parity export（Methods 对齐）',
+    description: '导出 parity 表并对拍 repro 键契约。',
+    to: '/tutorial/read-repro-keys',
+    command: 'python scripts/check_parity_export_sample.py',
+  },
+];
+
 const quickCards = [
   {
     title: '产品能力',
@@ -190,6 +211,27 @@ export default function Home(): ReactNode {
               <p className={styles.sectionSubtitle}>
                 按使用路径组织：先上手，再深入架构与接口，再做工程规划。
               </p>
+            </div>
+            <div className={styles.threePathSection}>
+              <div className={styles.sectionHeader}>
+                <span className={styles.sectionKicker}>New users</span>
+                <Heading as="h2" className={styles.sectionTitle}>
+                  三条上手路径（P3-01）
+                </Heading>
+                <p className={styles.sectionSubtitle}>
+                  与 <Link to="/tutorial/tutorial-index-three-paths">教程索引</Link> 和仓库{' '}
+                  <code>examples/README.md</code> 并列维护。
+                </p>
+              </div>
+              <div className={styles.threePathGrid}>
+                {threePathCards.map((item) => (
+                  <Link key={item.title} className={styles.threePathCard} to={item.to}>
+                    <h3>{item.title}</h3>
+                    <p>{item.description}</p>
+                    <code className={styles.threePathCommand}>{item.command}</code>
+                  </Link>
+                ))}
+              </div>
             </div>
             <div className={styles.quickGrid}>
               {quickCards.map((item) => (

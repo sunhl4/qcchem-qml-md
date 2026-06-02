@@ -14,6 +14,10 @@ from qchem_stack.contracts.schema_ids import (
     TANGELO_DEFLATION_ANALOGY_V1,
     VQD_CROSS_STACK_SEMANTICS_V1,
 )
+from qchem_stack.quantum.algorithms.tolerances import (
+    FLOAT_PRECISION_TINY,
+    ORTHOGONALIZATION_TOLERANCE,
+)
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 if TYPE_CHECKING:
@@ -22,7 +26,9 @@ if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
-def _gram_schmidt(vectors: list[np.ndarray], *, eps: float = 1e-10) -> list[np.ndarray]:
+def _gram_schmidt(
+    vectors: list[np.ndarray], *, eps: float = ORTHOGONALIZATION_TOLERANCE
+) -> list[np.ndarray]:
     out: list[np.ndarray] = []
     for v in vectors:
         w = np.asarray(v, dtype=complex).copy()
@@ -48,7 +54,7 @@ def build_qse_basis_from_uccsd_reference(
     from qchem_stack.quantum.algorithms.uccsd_mapping import map_fermion_generator
 
     ref = np.asarray(prepare_state(np.asarray(angles, dtype=float)), dtype=complex).ravel()
-    ref = ref / (np.linalg.norm(ref) + 1e-15)
+    ref = ref / (np.linalg.norm(ref) + FLOAT_PRECISION_TINY)
     raw = [ref]
     n_qubits = hamiltonian.n_qubits
     pool = expansion_pool.strip().lower()
@@ -88,7 +94,7 @@ def build_qse_basis_from_vqe_hea(
     """Microscopic subspace: |psi0>, X_q|psi0> (raw then orthonormalized). McClean-style pool (toy)."""
     g = hea_state(angles, n_qubits, depth)
     g = np.asarray(g, dtype=complex).ravel()
-    g = g / (np.linalg.norm(g) + 1e-15)
+    g = g / (np.linalg.norm(g) + FLOAT_PRECISION_TINY)
     raw = [g]
     for q in range(n_qubits):
         raw.append(_apply_pauli_string(g, n_qubits, q, "X"))
@@ -129,7 +135,7 @@ def _vqd_three_protocol_channels(
 ) -> dict[str, Any]:
     """Three-channel reporting model: Hamiltonian expectation, overlap(s), deflation weight (product)."""
     g_new = np.asarray(g_new, dtype=complex).ravel()
-    g_new = g_new / (np.linalg.norm(g_new) + 1e-15)
+    g_new = g_new / (np.linalg.norm(g_new) + FLOAT_PRECISION_TINY)
     h_dense = qubit_operator_to_sparse(h_op, n_qubits)
     e_ex = float(np.real(np.vdot(g_new, h_dense @ g_new)))
     obj: dict[str, Any] = {

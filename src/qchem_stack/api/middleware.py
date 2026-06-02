@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import hmac
 import os
 from collections.abc import Callable
 from typing import TYPE_CHECKING, Any, TypeVar
@@ -85,8 +86,8 @@ class AuthenticationMiddleware(BaseHTTPMiddleware):
     def _default_token_validator(token: str) -> bool:
         expected = os.environ.get("QCHEM_STACK_API_KEY")
         if not expected:
-            return True
-        return token == expected
+            return False
+        return hmac.compare_digest(token, expected)
 
 
 def create_limiter() -> Limiter | None:

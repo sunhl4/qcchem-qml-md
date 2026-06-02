@@ -1,5 +1,7 @@
 # `qchem_stack.config` 模块说明
 
+> **快速索引：** [`reference/config_field_index.md`](reference/config_field_index.md) · [`reference/config_recipes.md`](reference/config_recipes.md) · [`reference/config_migration.md`](reference/config_migration.md)
+
 | 属性 | 值 |
 |------|-----|
 | **文档类型** | 模块说明（给贡献者和集成开发者看） |
@@ -203,6 +205,10 @@ cfg = load_experiment_config("configs/example_h4_schmidt_multifragment.yaml")
 assert cfg.schema_version == "2"
 assert cfg.experiment_id == "h4_schmidt_multifragment_demo"
 ```
+
+**加载时自动迁移：** 若 YAML 无 `schema_version` 或为 legacy flat 键（`quantum_algorithm`、`scf_driver` 等），
+`load_experiment_config` 会在校验前调用 `migrate_config` 升到当前 schema（默认 v2），并写 INFO 日志。
+幂等：已是 v2 的文件不会改写磁盘，仅内存中解析为 `ExperimentConfig`。
 
 #### `dump_experiment_config`
 
@@ -483,262 +489,26 @@ validate_pre_quantum_contract(cfg)  # 进 pre-quantum 前手动调用
 
 下面每节说明：**怎么选分支（判别键）**、**子块结构**、**关键字段**、**谁在用**。完整字段表请看对应的 `docs/说明_*.md`。
 
-### 8.1 `molecule` — 分子怎么定义
-
-**源码：** `molecule.py`  
-**详细说明：** [说明_molecule配置与自旋多重度.md](说明_molecule配置与自旋多重度.md)
-
-| 字段 | 类型 | 默认 | 说明 |
-|------|------|------|------|
-| `symbols` | `list[str]` | — | 元素符号 |
-| `coordinates` | `list[list[float]] \| None` | `None` | Cartesian 坐标；单位看 `coordinate_unit` |
-| `zmatrix` | `str \| None` | `None` | Z-matrix 文本；和 `coordinates` 二选一 |
-| `coordinate_unit` | `"angstrom" \| "bohr"` | `"angstrom"` | 坐标单位 |
-| `charge` | `int` | `0` | 总电荷 |
-| `multiplicity` | `int` | `1` | 自旋多重度 2S+1 |
-| `basis` | `str` | `"sto-3g"` | 基组 |
-| `ecp` | `str \| dict \| None` | `None` | 有效核芯势 |
-
-**常用代码：**
-
-```python
-coords_bohr = cfg.molecule.coordinates_in_bohr()  # np.ndarray, shape (n_atom, 3)
-```
-
-**也可以引用外置文件（加载时自动展开）：**
-
-```yaml
-molecule:
-  geometry_file: "structures/h2.xyz"
-  geometry_file_format: xyz   # 可选，默认按后缀猜
-  coordinate_unit: angstrom
-```
-
-**谁在用：** 所有需要原子坐标的阶段；embedding 原子索引校验等。
-
----
-
-### 8.2 `scf` — 经典自洽场怎么算
-
-**源码：** `scf.py`, `scf_specs.py`, `scf_enums.py`  
-**详细说明：** [说明_scf配置.md](说明_scf配置.md)
-
-| 字段 | 类型 | 默认 | 说明 |
-|------|------|------|------|
-| `driver` | `str` | `"pyscf"` | `pyscf` / `psi4` / `precomputed` / 插件 |
-| `method` | `"RHF" \| "ROHF" \| "UHF"` | `"RHF"` | 自旋处理方式 |
-| `pyscf` | `ScfPyscfSpec` | 默认工厂 | driver=pyscf 时用 |
-| `psi4` | `ScfPsi4Spec` | 默认工厂 | driver=psi4 时用 |
-| `precomputed` | `ScfPrecomputedSpec` | 默认工厂 | driver=precomputed 时用 |
-
-**pyscf / psi4 子块常见字段：**
-
-| 字段 | 说明 |
-|------|------|
-| `max_cycle` | SCF 最多迭代几轮 |
-| `chkfile` | 检查点文件路径 |
-| `init_guess` | 初猜方式 |
-| `level_shift` | level shift |
-| `use_newton` | 是否用 Newton SCF |
-| `diis_space_dimension` | DIIS 空间维数 |
-| `density_fit` | 是否 density fitting |
-| `density_fit_auxbasis` | 辅助基组 |
-
-**precomputed 子块：**
-
-| 字段 | 说明 |
-|------|------|
-| `bundle_path` | 预先算好的经典参考 bundle（JSON）路径 |
-
-**谁在用：** `orchestration/scf_stage.py`、`chem/solvers/registry.py` 等。
-
----
-
-### 8.3 `active_space` — 活性空间选多大
-
-**源码：** `active_space.py`, `active_space_specs.py`, `active_space_mapping_specs.py`  
-**详细说明：** [说明_active_space配置.md](说明_active_space配置.md)
-
-**用 `strategy` 选分支：** `manual` | `cas` | `avas_stub` | `avas`
-
-```yaml
-active_space:
-  strategy: cas
-  mapping:
-    fermion_qubit: jordan_wigner
-  cas:
-    n_orbitals: 4
-    n_electrons: 4
-```
-
-**读轨道/电子数请用 helpers，别自己 if/else：**
-
-```python
-from qchem_stack.config import resolve_n_orbitals, resolve_n_electrons, resolve_fermion_qubit_mapping
-
-n_orb = resolve_n_orbitals(cfg.active_space)
-n_el = resolve_n_electrons(cfg.active_space)
-mapping = resolve_fermion_qubit_mapping(cfg.active_space)
-```
-
-**谁在用：** SCF 后的活性空间处理、pre-quantum 积分、qubit 映射。
-
----
-
-### 8.4 `embedding` — 嵌入 / 分片怎么搞
-
-**源码：** `embedding.py`, `embedding_specs.py`, `embedding_enums.py`  
-**详细说明：** [说明_embedding配置.md](说明_embedding配置.md)
-
-**用 `mode` 选分支：** `none` | `dmet` | `projection` | `plugin`
-
-#### 8.4.1 各 mode 共有字段（`EmbeddingBase`）
-
-| 字段 | 说明 |
-|------|------|
-| `embedding_input_representation` | 输入用 MO / AO / Lowdin 正交 AO |
-| `n_scf_cycles_embedding` | 嵌入 SCF 循环数 |
-| `classical_reference_method` | 经典参考方法标签 |
-| `oniom_layers_v1` | ONIOM 层 sidecar |
-
-#### 8.4.2 `mode: dmet`
-
-| 子块 | 关键字段 |
-|------|----------|
-| `dmet.fragment_labels` | fragment 名字 |
-| `dmet.hamiltonian_source` | 哈密顿量从哪来（含 Schmidt 生产路径） |
-| `dmet.schmidt.*` | Schmidt：原子索引、多 fragment、bath 轨道数、DMET 循环等 |
-| `dmet.fragment_solver.*` | fragment 上跑 ED 还是 VQE |
-
-**Schmidt 常用字段（`dmet.schmidt`）：**
-
-| 字段 | 说明 |
-|------|------|
-| `fragment_atom_indices` | 单 fragment 的原子编号 |
-| `multi_fragment_atom_groups` | 多 fragment 分组 |
-| `multi_primary_fragment_index` | 主 fragment 是第几个 |
-| `n_bath_spatial` | bath 空间轨道数 |
-| `dmet_max_cycles` | DMET 外循环（≤ `SCHMIDT_DMET_MAX_CYCLES_LIMIT`） |
-| `run_vqe_on_all_fragments` | 是否每个 fragment 都跑 VQE |
-| `per_fragment_vqe_maxiter` | 覆盖全局 `quantum.vqe.maxiter` |
-
-#### 8.4.3 `mode: projection`
-
-| 字段 | 说明 |
-|------|------|
-| `projection.low_level` / `high_level` | 低/高水平方法 |
-| `projection.quantum_hamiltonian` | 量子哈密顿量作用范围 |
-| `projection.fragment_atom_indices` | 投影涉及的原子 |
-
-#### 8.4.4 `mode: plugin`
-
-| 字段 | 说明 |
-|------|------|
-| `plugin.name` | 插件名 |
-| `plugin.json_path` | 可选 JSON 配置 |
-
-**谁在用：** pre-quantum 建哈密顿量、embedding_workflow 阶段等。
-
----
-
-### 8.5 `quantum` — 量子计算阶段怎么配
-
-**源码：** `quantum.py`, `quantum_specs.py`  
-**详细说明：** [说明_quantum配置.md](说明_quantum配置.md)
-
-**顶层：**
-
-| 字段 | 默认 | 说明 |
-|------|------|------|
-| `algorithm` | `"vqe"` | 内置算法 id 或 factory 标签 |
-| `algorithm_factory` | `None` | 自定义 runner，格式 `module:callable` |
-
-**主要子块：**
-
-| 子块 | 干什么 | 常见字段 |
-|------|--------|----------|
-| `variational` | 选 ansatz | `ansatz`, `uccsd_trotter_steps` |
-| `vqe` | VQE 超参 | `depth`, `maxiter`, `optimizer_method` |
-| `adapt` | ADAPT | `max_iter`, `pool_id` |
-| `iqeb` | IQEB | `pool_id`, `n_grads`, `max_rounds` |
-| `pauli` | Pauli 协议 | `use_protocol`, `grouping`, `run_sampled` |
-| `excited.*` | 激发态（VQD/QSE/SCEOM） | `after_variational`, 各方法参数 |
-| `demos.*` | QPE/VQS 演示 sidecar | |
-| `tensornet` | Tensor network stub | |
-| `graph` | workflow preview 图边 | |
-
-**谁在用：** 变分阶段、激发态阶段、Pauli 协议与收尾、复现字段导出。
-
----
-
-### 8.6 `chemistry_extended` — 溶剂、周期边界等扩展选项
-
-**源码：** `chemistry_extended.py`, `chemistry_extended_specs.py`
-
-| 子块 | 关键字段 | 用在哪 |
-|------|----------|--------|
-| `solvent` | `model`, `epsilon` | 溶剂化 SCF |
-| `pbc` | `cell_vectors_bohr`, `kpoint_mesh` | 周期体系 |
-| `avas` | `ao_labels`, `threshold` | AVAS 活性空间 |
-| `casscf` | 轨道优化相关 hook | CASSCF |
-| `benchmarks` | `enabled`, `backend` | 经典 post-HF 对照 |
-| `post_hf` | 积分交叉检验 / RDM | |
-| `mo_transform` | MO 变换 hook | |
-| `symmetry` | PySCF 对称性 | |
-
----
-
-### 8.7 `backend` — 量子计算跑在哪
-
-| 字段 | 默认 | 说明 |
-|------|------|------|
-| `name` | `"statevector_sim"` | 后端实例名 |
-| `provider` | `"statevector"` | statevector / qiskit / ionstack |
-| `shots_per_circuit` | `2048` | 每条线路 shot 数 |
-| `target_energy_stderr` | `None` | 目标能量标准误 |
-| `qiskit_mode` | `"statevector"` | Qiskit 模式 |
-| `ionstack_endpoint` | `None` | IonStack 地址 |
-| `meta` | `{}` | 调试元数据 |
-
----
-
-### 8.8 `compiler` — 线路怎么编译
-
-| 字段 | 默认 | 说明 |
-|------|------|------|
-| `optimization_level` | `1` | 优化等级 0–3 |
-| `native_twoq` | `"CX"` | 原生双量子门 |
-| `preoptimize_passes` | `[]` | 化学/ansatz 相关 pass |
-| `compiler_passes` | `[]` | 目标后端 pass |
-
----
-
-### 8.9 `mitigation` — 误差缓解
-
-| 字段 | 说明 |
-|------|------|
-| `execution_class` | 执行方式分类 |
-| `zne.enabled` / `zne.mode` / `zne.scales` | 零噪声外推 |
-| `pmsv.enabled` | 后选择（开了必须有 `stabilizers`） |
-| `stubs.*` | 各类 stub |
-
-**谁在用：** `orchestration/protocol_finalize_stage`。
-
----
-
-### 8.10 集成类 sidecar（不影响核心化学计算）
-
-#### `nexus_analog` / `nexus_cloud`
-
-本地资源账本、可选云提交；不参与核心计算。
-
-#### `parity_integrations`
-
-控制复现快照里要附带哪些 parity sidecar。
-
-#### `md_ml_export`
-
-管线结束后附加 MD/ML 相关数据（单帧、轨迹、能量参考等）。
+各 section 的详细配置参考已拆分为独立文档：
+
+| Section | 文档 | 用途 |
+|---------|------|------|
+| **8.1** | [config_reference_molecule.md](config_reference_molecule.md) | 分子定义：元素、坐标、基组 |
+| **8.2** | [config_reference_scf.md](config_reference_scf.md) | 经典自洽场：PySCF/Psi4/precomputed |
+| **8.3** | [config_reference_active_space.md](config_reference_active_space.md) | 活性空间：轨道数、电子数、映射 |
+| **8.4** | [config_reference_embedding.md](config_reference_embedding.md) | 嵌入/分片：DMET、Schmidt、投影 |
+| **8.5** | [config_reference_quantum.md](config_reference_quantum.md) | 量子计算：VQE、ADAPT、激发态 |
+| **8.6** | [config_reference_chemistry_extended.md](config_reference_chemistry_extended.md) | 扩展选项：溶剂、周期边界、AVAS |
+| **8.7** | [config_reference_backend.md](config_reference_backend.md) | 后端配置：模拟器、真机 |
+| **8.8** | [config_reference_compiler.md](config_reference_compiler.md) | 线路编译：优化等级、pass |
+| **8.9** | [config_reference_mitigation.md](config_reference_mitigation.md) | 误差缓解：ZNE、PMSV、stub |
+| **8.10** | [config_reference_sidecars.md](config_reference_sidecars.md) | 集成 sidecar：Nexus、MD/ML |
+
+**使用建议：**
+
+- **快速查阅**：从上表点击对应 section 文档
+- **深入理解**：各文档链接到的 `说明_*.md` 提供更完整的字段表和 YAML 示例
+- **代码实现**：参考 `src/qchem_stack/config/` 下的对应文件
 
 ---
 

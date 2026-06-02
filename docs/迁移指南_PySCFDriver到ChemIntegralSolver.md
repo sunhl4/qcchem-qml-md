@@ -1,5 +1,7 @@
 # PySCFDriver → ChemIntegralSolver 迁移指南
 
+> **Status (v0.6.0):** `PySCFDriver` and `chem/drivers/pyscf_driver*.py` have been **removed**. Use the paths below exclusively.
+
 本文档帮助从 legacy `PySCFDriver` 迁移到统一经典化学接口 `ChemIntegralSolver` + bridge 交换层。
 
 ## 推荐路径（新代码）
@@ -39,8 +41,8 @@ out = run_pipeline_sync(cfg, cfg_path=Path("configs/example_h2.yaml"))
 
 ## Deprecation 时间线
 
-- **当前**：`PySCFDriver` 构造时发出 `DeprecationWarning`；公共 re-export 保留兼容。
-- **目标**：下一 minor 版本在 CHANGELOG 标注 removal window；major 版本移除 monolithic driver facade。
+- **v0.6.0（当前）**：`PySCFDriver` 已移除；`chem.drivers` 仅保留 `PySCFRHFResult` 类型别名。
+- 历史版本曾发出 `DeprecationWarning`；见 CHANGELOG `[0.6.0]` Removed 条目。
 
 ## 相关文档
 

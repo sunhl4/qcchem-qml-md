@@ -77,7 +77,7 @@
 ## 4. 差异化（相对闭源产品）
 
 - **编译 / TKET（`compiler_pass_bundle`）**：**默认**管线以 `CompilerSpec` + 自研 `CircuitIR` 为主，**不**要求安装 TKET；**可选** `pytket` 且开启 `parity_integrations.tket_first_circuit_stats` 时，才写入 `parity_snapshot.tket_first_compiled_circuit_probe`（Pauli 协议已编译出 `CircuitIR` 时）。Ion 阱专有 routing 与 Vendor platform 私有 pass 包 **不对齐**。叙事与字段见 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md) §2–4。
-- **可复现**：YAML、`protocol_hash`、job 元数据、版本写入 `orchestration` 流水线；`JobHandle.protocol_hash` 与 SQLite `jobs` 表对账，详见 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md) §6。
+- **可复现**：YAML、`protocol_hash`、job 元数据、版本写入 `orchestration` 流水线；`JobHandle.protocol_hash` 与 SQLite `jobs` 表对账，详见 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md) §6。Job 协议 blob 默认 **HMAC 签名 pickle v1**（见 [engineering/protocol_pickle_migration.md](engineering/protocol_pickle_migration.md)）；可选 **`QCHEM_PROTOCOL_BLOB_V2=1`** 写 **HMAC 签名 JSON v2**（读路径双兼容，见 [engineering/protocol_serialization_v2_rfc.md](engineering/protocol_serialization_v2_rfc.md)）。
 - **多后端**：`BackendSpec`（statevector / qiskit / ionstack mock）。
 - **资源指标双轨**（与 Vendor platform「resource estimation / TKET」叙事对齐，**非** 伪造云计价）：`spec.circuit_resource_row` 自研深度；可选 `pytket` 时 `enrich_row_with_pytket` 增加 `pytket_depth` 等，见同技术文档 §2–4。
 - **MD / ML**：`md_bridge/contracts.py` 与 `QMEFDataset` 长板。

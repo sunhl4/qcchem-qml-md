@@ -101,7 +101,7 @@ def run_cutensornet_expectation_stub(
     if be == "cuquantum_if_available":
         try:
             import cuquantum  # type: ignore[import-not-found]  # noqa: F401
-        except Exception:
+        except ImportError:
             subscripts, ops, _chi = _demo_triangle_closed_path()
             import opt_einsum as oe
 

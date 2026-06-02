@@ -54,7 +54,7 @@
 | `VQESolver` + `backend_options` | `quantum.algorithm=vqe` + `backend` / `factory` | 后端见 `BackendSpec`；无 Tangelo `linq` 同名，但 Qiskit/Aer/statevector 等价路径可用 |
 | ADAPT / IQEB 求解器 | `quantum.algorithm` ∈ `{adapt, iqeb}` | 见 §1 registry |
 | QPE / DMET / problem decomposition notebooks | `qpe_qec_demo`、`embedding`、`configs/example_*` | 分解插件玩具：`embedding.mode: plugin` |
-| PySCF / Psi4 驱动 | 主路径 `scf.driver: pyscf` | Psi4 未接；parity 矩阵标 `partial` |
+| PySCF / Psi4 驱动 | 主路径 `scf.driver: pyscf` | Psi4 **已接**（`scf.driver: psi4`）；RHF→CASCI 见 parity 矩阵 §3 **`yes`**；部分高级步骤仍委托 PySCF |
 | 激发态 / 采样高级教程 | `quantum.*_after_variational`、Pauli 协议 | 见 `public_parity_matrix.md` §2 |
 
 **迁移提示**：从 Tangelo notebook 迁到本栈时，优先选 `examples/tangelo_facade_demo.py` 指向的 **封装 YAML**，再渐进改成自定义 YAML（保持 Pydantic 校验）。

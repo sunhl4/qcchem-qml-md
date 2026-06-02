@@ -11,6 +11,7 @@ from qchem_stack.md_bridge.qmlff_builders import (
     QmlffModelHandle,
     _require_qmlff,
 )
+from qchem_stack.quantum.algorithms.tolerances import DEFAULT_LEARNING_RATE
 
 if TYPE_CHECKING:
     from qchem_stack.md_bridge.schema import QMEFDataset
@@ -54,7 +55,7 @@ def train_force_field_on_qmef(
     *,
     n_epochs: int = 5,
     batch_size: int = 1,
-    learning_rate: float = 1e-3,
+    learning_rate: float = DEFAULT_LEARNING_RATE,
     force_weight: float = 100.0,
     lr_scheduler: str = "constant",
     checkpoint_dir: str | Path = "checkpoints/qmlff_md_bridge",
@@ -97,7 +98,7 @@ def train_qmlff_on_qmef(
     *,
     n_epochs: int = 5,
     batch_size: int = 1,
-    learning_rate: float = 1e-3,
+    learning_rate: float = DEFAULT_LEARNING_RATE,
     force_weight: float = 100.0,
     lr_scheduler: str = "constant",
     checkpoint_dir: str | Path = "checkpoints/qmlff_md_bridge",

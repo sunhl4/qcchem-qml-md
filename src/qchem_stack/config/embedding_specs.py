@@ -6,6 +6,11 @@ from typing import Any, Literal
 
 from pydantic import Field, field_validator, model_validator
 
+from qchem_stack.quantum.algorithms.tolerances import (
+    PROJECTION_EMBEDDING_THRESHOLD,
+    RIDGE_REGULARIZATION,
+)
+
 from ._base import ForbidExtraBase
 from ._validation import strip_optional_text
 from .embedding_enums import (
@@ -40,7 +45,7 @@ class SchmidtEmbeddingSpec(ForbidExtraBase):
     fci_reference_max_spatial_orbitals: int = 8
     dmet_max_cycles: int = Field(default=1, ge=1, le=256)
     dmet_mixing_alpha: float = Field(default=0.35, gt=0.0, le=1.0)
-    dmet_convergence_tol: float = Field(default=1e-3, gt=0.0)
+    dmet_convergence_tol: float = Field(default=RIDGE_REGULARIZATION, gt=0.0)
     run_vqe_on_all_fragments: bool = False
     per_fragment_vqe_maxiter: int | None = Field(default=None, ge=1, le=500_000)
     bath_sidecar_json_path: str | None = None
@@ -76,7 +81,7 @@ class DmetEmbeddingSpec(ForbidExtraBase):
 class ProjectionEmbeddingSpec(ForbidExtraBase):
     low_level: str = "HF"
     high_level: str = "CAS"
-    threshold: float = Field(default=1e-8, gt=0)
+    threshold: float = Field(default=PROJECTION_EMBEDDING_THRESHOLD, gt=0)
     quantum_hamiltonian: ProjectionQuantumHamiltonian = (
         ProjectionQuantumHamiltonian.GLOBAL_ACTIVE_SPACE
     )

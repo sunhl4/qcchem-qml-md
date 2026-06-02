@@ -1,0 +1,13 @@
+# Minimal profile overlay — merge with a base experiment YAML.
+schema_version: "2"
+experiment_id: minimal_h2_profile
+scf:
+  driver: precomputed
+  method: RHF
+  precomputed:
+    bundle_path: configs/precomputed_classical_reference_h2.json
+quantum:
+  pauli:
+    use_protocol: false
+embedding:
+  mode: none

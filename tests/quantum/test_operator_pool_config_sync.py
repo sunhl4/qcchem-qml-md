@@ -10,6 +10,7 @@ from qchem_stack.quantum.operator_pool_registry import (
     is_registered_operator_pool_id,
     list_registered_operator_pool_ids,
 )
+from tests.helpers.h2_yaml import h2_yaml_dict
 
 
 def test_operator_pool_id_enum_values_are_registered() -> None:
@@ -45,17 +46,12 @@ def test_quantum_spec_accepts_alias_pool_id() -> None:
 
 def test_experiment_config_roundtrip_with_canonical_pool_ids() -> None:
     cfg = ExperimentConfig.model_validate(
-        {
-            "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
-            "active_space": {
-                "strategy": "cas",
-                "cas": {"n_orbitals": 2, "n_electrons": 2},
-            },
-            "quantum": {
+        h2_yaml_dict(
+            molecule={"coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            quantum={
                 "algorithm": "adapt",
                 "adapt": {"pool_id": "fermionic_uccsd_singles"},
             },
-        }
+        )
     )
     assert cfg.quantum.adapt.pool_id == OperatorPoolId.FERMIONIC_UCCSD_SINGLES

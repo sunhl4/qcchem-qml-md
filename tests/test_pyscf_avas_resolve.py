@@ -8,27 +8,18 @@ from pydantic import ValidationError
 from qchem_stack.config import ExperimentConfig, load_experiment_config
 from qchem_stack.exceptions import ConfigurationError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.h2_yaml import h2_yaml_dict
 from tests.helpers.paths import configs_path
 
 
 def test_experiment_validation_rejects_avas_without_labels() -> None:
-    raw = {
-        "schema_version": "2",
-        "experiment_id": "bad_avas",
-        "random_seed": 0,
-        "molecule": {
-            "symbols": ["H", "H"],
-            "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-            "coordinate_unit": "bohr",
-            "charge": 0,
-            "multiplicity": 1,
-            "basis": "sto-3g",
-        },
-        "scf": {"driver": "pyscf", "method": "RHF"},
-        "active_space": {"strategy": "avas", "ncas": 2, "nelecas": 2},
-        "chemistry_extended": {"avas_ao_labels": []},
-        "quantum": {"use_pauli_protocol": False},
-    }
+    raw = h2_yaml_dict(
+        experiment_id="bad_avas",
+        random_seed=0,
+        active_space={"strategy": "avas", "ncas": 2, "nelecas": 2},
+        chemistry_extended={"avas_ao_labels": []},
+        quantum={"pauli": {"use_protocol": False}},
+    )
     from qchem_stack.exceptions import ConfigurationError
 
     with pytest.raises((ValidationError, ConfigurationError), match="avas.ao_labels"):
@@ -68,24 +59,18 @@ def test_experiment_validation_rejects_avas_on_driver_without_capability() -> No
             )
 
     register_solver("mockchem", _MockChemSolver)
-    raw = {
-        "schema_version": "2",
-        "experiment_id": "bad_avas_driver",
-        "random_seed": 0,
-        "molecule": {
-            "symbols": ["H", "H"],
-            "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-            "coordinate_unit": "bohr",
-            "charge": 0,
-            "multiplicity": 1,
-            "basis": "sto-3g",
+    raw = h2_yaml_dict(
+        experiment_id="bad_avas_driver",
+        random_seed=0,
+        scf={"driver": "mockchem", "method": "RHF"},
+        active_space={"strategy": "avas", "cas": {"n_orbitals": 2, "n_electrons": 2}},
+        chemistry_extended={"avas": {"ao_labels": ["H 1s"]}},
+        quantum={
+            "algorithm": "vqe",
+            "vqe": {"depth": 1, "maxiter": 5},
+            "pauli": {"use_protocol": False},
         },
-        "scf": {"driver": "mockchem", "method": "RHF"},
-        "active_space": {"strategy": "avas", "cas": {"n_orbitals": 2, "n_electrons": 2}},
-        "chemistry_extended": {"avas": {"ao_labels": ["H 1s"]}},
-        "quantum": {"algorithm": "vqe", "vqe": {"depth": 1, "maxiter": 5}},
-        "embedding": {"mode": "none"},
-    }
+    )
     cfg = ExperimentConfig.from_yaml_dict(raw)
     from qchem_stack.config._experiment_validation import (
         validate_avas_strategy_requires_labels_and_capability,

@@ -7,6 +7,8 @@ from typing import Any, cast
 
 import numpy as np
 
+from qchem_stack.quantum.algorithms.tolerances import LOWDIN_SINGULARITY_TOLERANCE
+
 
 @dataclass(frozen=True)
 class LowdinTensors:
@@ -32,7 +34,7 @@ def build_lowdin_tensors(
     hcore: np.ndarray,
     rdm1_ao: np.ndarray,
     *,
-    singular_tol: float = 1e-12,
+    singular_tol: float = LOWDIN_SINGULARITY_TOLERANCE,
 ) -> LowdinTensors:
     """Build ``C_low``, one-electron, and density matrices in the Löwdin basis."""
     s = np.asarray(overlap, dtype=float)

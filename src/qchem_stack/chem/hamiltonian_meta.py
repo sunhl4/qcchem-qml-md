@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, Literal
 from qchem_stack.chem.bridges.driver_meta import fork_driver_meta
 from qchem_stack.chem.pauli_term_codec import canonical_pauli_string_from_term
 from qchem_stack.contracts.schema_ids import PYSCF_SPATIAL_OPENFERMION_BRIDGE_V1
+from qchem_stack.quantum.algorithms.tolerances import IMAGINARY_PART_TOLERANCE
 
 if TYPE_CHECKING:
     from openfermion.ops import QubitOperator
@@ -161,7 +162,7 @@ def hamiltonian_fingerprint_from_qubit_operator(
     ):
         label = canonical_pauli_string_from_term(term) if term else "I"
         z = complex(coeff)
-        if abs(z.imag) <= 1e-14:
+        if abs(z.imag) <= IMAGINARY_PART_TOLERANCE:
             rows.append((label, f"{z.real:.16g}"))
         else:
             rows.append((label, f"{z.real:.16g}{z.imag:+.16g}j"))

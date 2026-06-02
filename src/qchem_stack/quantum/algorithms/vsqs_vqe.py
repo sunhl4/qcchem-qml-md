@@ -11,6 +11,10 @@ from scipy.linalg import expm
 from scipy.optimize import minimize
 
 from qchem_stack.chem.hamiltonian_mapping import fermion_operator_to_qubits
+from qchem_stack.quantum.algorithms.tolerances import (
+    FLOAT_PRECISION_TINY,
+    NUMERICAL_TOLERANCE,
+)
 from qchem_stack.quantum.statevector import expectation_qubit_operator, qubit_operator_to_sparse
 
 if TYPE_CHECKING:
@@ -103,18 +107,18 @@ def _apply_trotterized_pauli_sum(
     n_qubits: int,
     trotter_order: int,
 ) -> np.ndarray:
-    if abs(float(angle)) < 1e-15 or not terms:
+    if abs(float(angle)) < FLOAT_PRECISION_TINY or not terms:
         return state
     order = terms if int(trotter_order) == 1 else terms + list(reversed(terms))
     psi = state
     pref = -1.0j * float(angle)
     for term, coeff in order:
-        if abs(coeff) < 1e-15:
+        if abs(coeff) < FLOAT_PRECISION_TINY:
             continue
         mat = qubit_operator_to_sparse(QubitOperator(term, 1.0), n_qubits) * complex(coeff)
         psi = expm(pref * mat) @ psi
         nrm = float(np.linalg.norm(psi))
-        if nrm < 1e-14:
+        if nrm < NUMERICAL_TOLERANCE:
             raise ValueError("VSQS Trotter layer collapsed state to zero norm.")
         psi = psi / nrm
     return psi

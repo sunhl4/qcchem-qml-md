@@ -4,9 +4,10 @@ from __future__ import annotations
 
 from qchem_stack.config import ExperimentConfig
 from qchem_stack.config.mitigation_specs import MitigationZneSpec
+from tests.helpers.h2_yaml import h2_yaml_dict
 
 _CAS = {"strategy": "cas", "cas": {"n_orbitals": 2, "n_electrons": 2}}
-_MOLECULE = {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]}
+_MOLECULE = h2_yaml_dict()["molecule"] | {"coordinates": [[0, 0, 0], [0, 0, 0.74]]}
 
 
 def test_zne_default_scales_are_positive() -> None:

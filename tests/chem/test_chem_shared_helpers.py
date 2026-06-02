@@ -8,6 +8,7 @@ from qchem_stack.chem.bridges.lowdin import build_lowdin_tensors, coalesce_spin_
 from qchem_stack.chem.molecular_system_config import molecular_system_from_experiment
 from qchem_stack.chem.solvers._active_space_common import resolve_active_space_spec
 from qchem_stack.config import ExperimentConfig
+from tests.helpers.h2_yaml import h2_yaml_dict
 
 
 def test_resolve_active_space_spec_aliases() -> None:
@@ -21,26 +22,14 @@ def test_resolve_active_space_spec_aliases() -> None:
 
 def test_molecular_system_from_experiment_geometry_source() -> None:
     cfg = ExperimentConfig.from_yaml_dict(
-        {
-            "schema_version": "2",
-            "experiment_id": "chem_shared_helpers",
-            "random_seed": 1,
-            "molecule": {
-                "symbols": ["H", "H"],
-                "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-                "coordinate_unit": "bohr",
-                "charge": 0,
-                "multiplicity": 1,
-                "basis": "sto-3g",
+        h2_yaml_dict(
+            experiment_id="chem_shared_helpers",
+            quantum={
+                "algorithm": "vqe",
+                "vqe": {"depth": 1, "maxiter": 5},
+                "pauli": {"use_protocol": False},
             },
-            "active_space": {
-                "strategy": "cas",
-                "cas": {"n_orbitals": 2, "n_electrons": 2},
-            },
-            "scf": {"driver": "pyscf", "method": "RHF"},
-            "embedding": {"mode": "none"},
-            "quantum": {"algorithm": "vqe", "vqe": {"depth": 1, "maxiter": 5}},
-        }
+        )
     )
     ms = molecular_system_from_experiment(cfg)
     assert ms.meta["geometry_source"] == "cartesian"

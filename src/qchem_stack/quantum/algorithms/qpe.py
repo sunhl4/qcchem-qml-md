@@ -7,6 +7,7 @@ import numpy as np
 from scipy.linalg import eigvalsh
 
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
+from qchem_stack.quantum.algorithms.tolerances import SHOT_NOISE_FLOOR
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
 
 if TYPE_CHECKING:
@@ -122,7 +123,7 @@ class AlgorithmInfoTheoryQPE(AlgorithmBase):
         w = np.sort(np.real(eigvalsh(mat)))
         e0 = float(w[0])
         phi = float(((-e0 * self.time) / (2.0 * np.pi)) % 1.0)
-        sigma = float(max(1e-6, 1.0 / np.sqrt(max(1, self.n_samples))))
+        sigma = float(max(SHOT_NOISE_FLOOR, 1.0 / np.sqrt(max(1, self.n_samples))))
         phi_s = (phi + sigma * rng.normal(size=max(1, self.n_samples))) % 1.0
         mu = float(np.mean(phi_s))
         sd = float(np.std(phi_s))

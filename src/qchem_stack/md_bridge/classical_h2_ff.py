@@ -12,14 +12,16 @@ from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np
 
+from qchem_stack.md_bridge.constants import (
+    _BOHR_TO_ANGSTROM,
+    _HARTREE_TO_EV,
+    MORSE_LOWER_DE,
+)
+
 if TYPE_CHECKING:
     from collections.abc import Sequence
 
     from qchem_stack.md_bridge.schema import QMEFDataset
-
-_BOHR_TO_ANGSTROM = 0.529177210903
-_HARTREE_TO_EV = 27.211386245988
-_HARTREE_BOHR_TO_EV_ANG = _HARTREE_TO_EV / _BOHR_TO_ANGSTROM
 
 
 def _bond_length_ang(positions_bohr: np.ndarray) -> float:
@@ -107,9 +109,14 @@ class ClassicalH2MorseModel:
         import jax.numpy as jnp
 
         p = ClassicalH2MorseParams(**(params or self.get_parameters()))
-        pos = np.asarray(positions, dtype=np.float64)
-        r = float(np.linalg.norm(pos[1] - pos[0]))
-        e = float(self._morse_energy_ev(np.array(r), p))
+        pos = jnp.asarray(positions, dtype=jnp.float32)
+        r = jnp.linalg.norm(pos[1] - pos[0])
+        de = jnp.asarray(p.de_ev, dtype=jnp.float32)
+        a = jnp.asarray(p.a_inv_ang, dtype=jnp.float32)
+        re = jnp.asarray(p.re_ang, dtype=jnp.float32)
+        shift = jnp.asarray(p.shift_ev, dtype=jnp.float32)
+        x = jnp.exp(-a * (r - re))
+        e = de * (1.0 - x) ** 2 - de + shift
         return jnp.asarray(e, dtype=jnp.float32)
 
     def compute_forces(
@@ -189,7 +196,7 @@ def train_classical_h2_on_qmef(
         res = least_squares(
             _residuals,
             x0,
-            bounds=([1e-4, 0.05, 0.3, -500.0], [50.0, 10.0, 3.0, 50.0]),
+            bounds=([MORSE_LOWER_DE, 0.05, 0.3, -500.0], [50.0, 10.0, 3.0, 50.0]),
         )
         de, a, re, shift = [float(v) for v in res.x]
     except ImportError:

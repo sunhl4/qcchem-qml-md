@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from pathlib import Path
+import asyncio
 from typing import Annotated, Any
 
 from fastapi import APIRouter, Body, HTTPException, Query, Request
@@ -11,6 +11,7 @@ from qchem_stack.api.deps import (
     experiment_config_from_request_yaml,
     sqlite_job_store,
     trace_response_headers,
+    validate_db_path,
 )
 from qchem_stack.api.middleware import (
     RUNS_GET_LIMIT,
@@ -27,12 +28,12 @@ from qchem_stack.contracts.schema_ids import (
     RUN_REPRO_ONLY_V1,
 )
 from qchem_stack.exceptions import QChemStackError
-from qchem_stack.integrations.workflow_preview import slim_product_summary_from_pipeline_result
 from qchem_stack.jobs.pipeline_jobs import enqueue_full_pipeline_run
 from qchem_stack.jobs.pipeline_runner import pipeline_result_for_job_store
 from qchem_stack.jobs.store import JobStatus
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from qchem_stack.orchestration.run_context import RunContext
+from qchem_stack.protocols.workflow_preview import slim_product_summary_from_pipeline_result
 
 router = APIRouter(tags=["runs"])
 
@@ -68,7 +69,7 @@ def list_runs(
             status_code=400,
             detail=f"invalid status {status!r}; use one of {[s.value for s in JobStatus]}",
         )
-    db = Path(job_db_path) if job_db_path else default_job_db_path()
+    db = validate_db_path(job_db_path) if job_db_path else default_job_db_path()
     store = sqlite_job_store(str(db))
     jobs = store.list_jobs(
         status=status,
@@ -90,7 +91,7 @@ def list_runs(
 
 @router.post("/v1/runs", response_model=None)
 @rate_limit(RUNS_POST_LIMIT)
-def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JSONResponse:
+async def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JSONResponse:
     rc = RunContext.from_headers({str(k): str(v) for k, v in request.headers.items()})
     cfg = experiment_config_from_request_yaml(
         body.experiment_yaml,
@@ -104,7 +105,7 @@ def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JS
         meta_extra["api_project_slug"] = str(body.project_slug).strip()[:200]
     if body.sync:
         try:
-            out = run_pipeline_sync(cfg, cfg_path=None, run_context=rc)
+            out = await asyncio.to_thread(run_pipeline_sync, cfg, None, rc)
         except QChemStackError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         slim = pipeline_result_for_job_store(out)
@@ -122,7 +123,7 @@ def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JS
     if na.enabled and na.project_label:
         meta_extra["nexus_analog_project_label"] = str(na.project_label)
 
-    db = Path(body.job_db_path) if body.job_db_path else default_job_db_path()
+    db = validate_db_path(body.job_db_path) if body.job_db_path else default_job_db_path()
     store = sqlite_job_store(str(db))
     handle = enqueue_full_pipeline_run(
         store,
@@ -144,14 +145,6 @@ def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JS
         status_code=202,
         headers=headers,
     )
-
-
-@router.post("/v1/runs/sync", response_model=None, deprecated=True)
-@rate_limit(RUNS_POST_LIMIT)
-def post_run_sync(request: Request, body: Annotated[RunRequest, Body()]) -> dict | JSONResponse:
-    """Synchronous in-process pipeline (localhost debug only). Prefer ``POST /v1/runs`` async."""
-    sync_body = body.model_copy(update={"sync": True})
-    return post_run(request, sync_body)
 
 
 @router.get("/v1/runs/{job_id}/status")

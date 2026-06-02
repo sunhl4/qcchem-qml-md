@@ -4,11 +4,10 @@ Generate publication-quality scientific figures for quantum chemistry presentati
 Style: Clean, professional, suitable for TOC (Table of Contents) graphics in journals.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib.patches import Circle, FancyBboxPatch, Ellipse, Polygon, Arc
-from matplotlib.collections import PatchCollection
 import matplotlib.patheffects as path_effects
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.patches import Circle, Ellipse, FancyBboxPatch, Polygon
 
 # Set publication style
 plt.rcParams['font.family'] = 'sans-serif'

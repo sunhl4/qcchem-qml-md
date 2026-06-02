@@ -75,3 +75,12 @@ def write_experiment_yaml(path: Path, data: dict[str, Any]) -> Path:
 
 def write_h2_pipeline_yaml(path: Path, **overrides: Any) -> Path:
     return write_experiment_yaml(path, h2_pipeline_dict(**overrides))
+
+
+# Aliases for callers that prefer explicit naming in the plan / docs.
+h2_yaml_with = h2_yaml_dict
+
+
+def write_h2_config(path: Path, **overrides: Any) -> Path:
+    """Write a minimal H2 experiment YAML (not the full pipeline defaults)."""
+    return write_experiment_yaml(path, h2_yaml_dict(**overrides))

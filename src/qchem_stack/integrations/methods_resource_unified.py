@@ -2,12 +2,20 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypedDict
 
 from qchem_stack.contracts.schema_ids import METHODS_RESOURCE_UNIFIED_V1
 
 
-def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> dict[str, Any]:
+class MethodsResourceUnifiedV1(TypedDict, total=False):
+    schema: str
+    resource_summary: dict[str, int | float | bool | None]
+    qpe_demo_track_compact: dict[str, object]
+    tket_probe_schema: str | None
+    classical_benchmark_active: bool
+
+
+def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> MethodsResourceUnifiedV1:
     """
     Merge ``resource_summary``, optional ``qpe_demo_track``, parity TKET probe, optional
     classical benchmark summary (when ``chemistry_extended.benchmarks.enabled``), and a

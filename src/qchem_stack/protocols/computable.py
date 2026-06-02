@@ -32,6 +32,7 @@ from qchem_stack.config.quantum_helpers import (
     resolve_vqe_depth,
     vqs_track_requested,
 )
+from qchem_stack.quantum.algorithms.tolerances import FINITE_DIFFERENCE_STEP
 from qchem_stack.quantum.statevector import hea_state, qubit_operator_to_sparse
 
 if TYPE_CHECKING:
@@ -116,7 +117,7 @@ class ExpectationValueDerivative:
 
     expression: ExpectationValue
     parameter_index: int
-    step: float = 1e-4
+    step: float = FINITE_DIFFERENCE_STEP
 
     def evaluate(self, parameters: np.ndarray) -> float:
         p = np.asarray(parameters, dtype=float).copy()
@@ -341,15 +342,26 @@ def assert_computable_workflow_graph_roundtrip(cfg: ExperimentConfig) -> None:
     """``computable_graph_v2`` ↔ :func:`refs_from_computable_graph_v2` matches :func:`list_computables_for_config`.
 
     L1 / wave-F: guarantees workflow-preview DAG nodes round-trip to the same ref list (order + payloads).
+
+    Raises:
+        ValueError: If roundtrip validation fails (length mismatch or content mismatch).
     """
-    from qchem_stack.integrations.workflow_preview import computable_graph_v2
+    from qchem_stack.protocols.workflow_preview import computable_graph_v2
 
     refs = list_computables_for_config(cfg)
     graph = computable_graph_v2(refs, cfg)
     back = refs_from_computable_graph_v2(graph)
-    assert len(back) == len(refs), (refs, back)
+
+    if len(back) != len(refs):
+        raise ValueError(
+            f"Computable workflow graph roundtrip failed: length mismatch (refs={len(refs)}, back={len(back)})"
+        )
+
     for a, b in zip(refs, back, strict=True):
-        assert a.name == b.name and a.kind == b.kind and a.details == b.details, (a, b)
+        if a.name != b.name or a.kind != b.kind or a.details != b.details:
+            raise ValueError(
+                f"Computable workflow graph roundtrip failed: content mismatch (ref={a}, back={b})"
+            )
 
 
 def computables_export_dict(

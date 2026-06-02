@@ -38,6 +38,25 @@ class LocalMitigationJobQueue:
         self._completed.append(job)
         return [job]
 
+    async def drain_all(self, handler, *, concurrency: int = 1) -> list[MitigationJob]:
+        """Drain pending jobs with bounded concurrency (local in-process only)."""
+        if concurrency < 1:
+            raise ValueError("concurrency must be >= 1")
+        done: list[MitigationJob] = []
+        while self._pending:
+            batch = []
+            for _ in range(min(concurrency, len(self._pending))):
+                batch.append(self._pending.popleft())
+            for job in batch:
+                job.status = "running"
+            results = await asyncio.gather(*[asyncio.to_thread(handler, j.payload) for j in batch])
+            for job, result in zip(batch, results, strict=True):
+                job.status = "done"
+                job.result = result
+                self._completed.append(job)
+                done.append(job)
+        return done
+
     def stats(self) -> dict[str, int]:
         return {
             "pending": len(self._pending),

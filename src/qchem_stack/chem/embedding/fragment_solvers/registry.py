@@ -35,7 +35,9 @@ def resolve_fragment_solver(
 ) -> FragmentSolverProtocol:
     """Return a fragment solver instance for DMET embedding stages."""
     from qchem_stack.chem.embedding.dmet import QubitHamiltonianFragmentSolverExact
-    from qchem_stack.integrations.dmet_fragment_solvers import QubitHamiltonianFragmentSolverVQE
+    from qchem_stack.chem.embedding.fragment_solvers.qubit_hamiltonian_vqe import (
+        QubitHamiltonianFragmentSolverVQE,
+    )
 
     if use_exact:
         return QubitHamiltonianFragmentSolverExact(max_qubits=int(exact_max_qubits))
@@ -61,7 +63,9 @@ def resolve_fragment_solver(
 
 
 def _register_builtins() -> None:
-    from qchem_stack.integrations.dmet_fragment_solvers import QubitHamiltonianFragmentSolverVQE
+    from qchem_stack.chem.embedding.fragment_solvers.qubit_hamiltonian_vqe import (
+        QubitHamiltonianFragmentSolverVQE,
+    )
 
     register_fragment_solver(
         "vqe_default",

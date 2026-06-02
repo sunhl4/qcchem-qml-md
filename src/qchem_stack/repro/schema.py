@@ -22,6 +22,29 @@ if TYPE_CHECKING:
     from collections.abc import Mapping
 
 
+class ProtocolCountsV1(TypedDict, total=False):
+    expectation_source: str
+    energy_stderr_model: str
+    zne_mode: str
+    zne_energies: list[float]
+    zne_circuit_fold_fallback_reason: str
+    expectation: float
+    energy_stderr: float
+
+
+class ResourceSummaryV1(TypedDict, total=False):
+    n_circuits: int
+    n_qubits: int
+    sum_shots: int
+    max_depth: int
+    n_pauli_terms: int
+    n_pauli_groups: int
+    pauli_averaging_protocol_ran: bool
+    excited_shots_upper_bound: int
+    sum_shots_total_with_excited_upper_bound: int
+    excited_shot_accounting: dict[str, object]
+
+
 class ParitySnapshotV1(TypedDict, total=False):
     quantum_algorithm: str
     fermion_qubit_mapping: str
@@ -31,6 +54,12 @@ class ParitySnapshotV1(TypedDict, total=False):
     pre_quantum_handoff_v1: dict[str, object]
     pipeline_profile: PipelineProfileV1
     workflow_preview_v1: WorkflowPreviewReproV1
+    zne_qiskit_unification_v1: dict[str, object]
+    dmet_self_consistency_loop: dict[str, object]
+    tensornet_engine_resolved: str
+    tensornet_fallback_reason: str
+    mitigation_pec_literature_stub_v1: dict[str, object]
+    tket_first_compiled_circuit_probe: dict[str, object]
 
 
 class PipelineProfileV1(TypedDict):
@@ -54,6 +83,12 @@ class RunSummaryV1(TypedDict, total=False):
     pauli_protocol_expectation_path: str
     pipeline_total_wall_ms: float
     pipeline_slowest_stage: str
+    protocol_total_shots_budget: int
+    protocol_n_measurement_circuits: int
+    protocol_energy_stderr: float
+    protocol_expectation_source: str
+    protocol_zne_mode: str
+    mitigation_pec_literature_stub_v1: dict[str, object]
 
 
 class PreQuantumHandoffV1(TypedDict, total=False):

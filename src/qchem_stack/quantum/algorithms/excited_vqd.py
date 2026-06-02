@@ -8,6 +8,7 @@ from typing import TYPE_CHECKING, Any, cast
 import numpy as np
 from scipy.optimize import minimize
 
+from qchem_stack.quantum.algorithms.tolerances import FLOAT_PRECISION_TINY
 from qchem_stack.quantum.algorithms.vqe import VQE
 from qchem_stack.quantum.statevector import hea_state
 
@@ -108,7 +109,7 @@ class VQD:
         else:
             g = hea_state(xv, self.hamiltonian.n_qubits, self.depth)
         g = np.asarray(g, dtype=complex).ravel()
-        return cast("np.ndarray", g / (np.linalg.norm(g) + 1e-15))
+        return cast("np.ndarray", g / (np.linalg.norm(g) + FLOAT_PRECISION_TINY))
 
     def _resolve_penalties(self) -> list[float]:
         n_exc = max(0, self.n_states - 1)
@@ -326,7 +327,7 @@ class VQD:
             return VQDResult(energies=energies, meta=meta)
 
         lam0 = penalties[0] if penalties else self.penalty_weight
-        prev_states: list[np.ndarray] = [g0 / (np.linalg.norm(g0) + 1e-15)]
+        prev_states: list[np.ndarray] = [g0 / (np.linalg.norm(g0) + FLOAT_PRECISION_TINY)]
         g0n = prev_states[0]
         vqd_channels: list[dict[str, Any]] = [
             {

@@ -1,6 +1,17 @@
 """
 Executable **linear** mitigation schedule (open stack — not Quantinuum Qermit).
 
+.. warning:: TOY/STUB IMPLEMENTATION
+    This module provides stub implementations of quantum error mitigation
+    techniques for demonstration and testing purposes only. It is NOT suitable
+    for production quantum computing workloads.
+
+    Limitations:
+    - PMSV: Simplified stderr inflation model (not physically accurate)
+    - ZNE: Uses toy linear scaling (not realistic noise models)
+    - SPAM: Hardcoded assignment matrices (not calibrated to hardware)
+    - Classical shadows: Identity stub (no actual randomized measurements)
+
 Consumes the same YAML flags as :func:`qchem_stack.mitigation.qermit_analog.build_qermit_style_mitigation_report`
 and applies toy PMSV (stderr inflation) + ZNE (``zne_scale_energy`` curve) to a scalar energy.
 """
@@ -13,6 +24,7 @@ import numpy as np
 
 from qchem_stack.contracts.schema_ids import QERMIT_RUNTIME_V1
 from qchem_stack.mitigation.zne import zne_scale_energy
+from qchem_stack.quantum.algorithms.tolerances import RETENTION_RATE_MINIMUM
 
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig
@@ -135,7 +147,7 @@ def execute_mitigation_dag(
 
     if m.pmsv.enabled:
         rr = float(m.pmsv.retention_rate)
-        rr = max(min(rr, 1.0), 1e-9)
+        rr = max(min(rr, 1.0), RETENTION_RATE_MINIMUM)
         # Toy: effective stderr widens when post-selection keeps fewer shots
         se2 = None if se is None else float(se / (rr**0.5))
         trace.append(

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -118,7 +119,19 @@ def get_backend_profile(profile_id: str) -> BackendProfile:
 
 
 def apply_backend_profile(cfg: ExperimentConfig, profile_id: str) -> BackendProfile:
-    """Mutate ``cfg.backend`` in place to match ``profile_id``."""
+    """Mutate ``cfg.backend`` in place to match ``profile_id``.
+
+    .. deprecated::
+        This function mutates the config object in place, which can lead to
+        unexpected side effects. Use :func:`apply_backend_profile_immutable`
+        instead, which returns a new config object.
+    """
+    warnings.warn(
+        "apply_backend_profile() mutates config in place and is deprecated. "
+        "Use apply_backend_profile_immutable() instead, which returns a new config object.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
     prof = get_backend_profile(profile_id)
     b = cfg.backend
     b.name = prof.name
@@ -136,6 +149,59 @@ def apply_backend_profile(cfg: ExperimentConfig, profile_id: str) -> BackendProf
         meta.update(prof.meta)
         b.meta = meta
     return prof
+
+
+def apply_backend_profile_immutable(
+    cfg: ExperimentConfig, profile_id: str
+) -> tuple[ExperimentConfig, BackendProfile]:
+    """Return a new config with backend fields updated to match ``profile_id``.
+
+    This is the preferred, immutable variant of :func:`apply_backend_profile`.
+    Instead of mutating the config in place, it returns a new config object
+    using Pydantic's ``model_copy(update=...)`` pattern.
+
+    Args:
+        cfg: Original experiment configuration (not mutated).
+        profile_id: Backend profile identifier (e.g., "uqc_cloud", "statevector").
+
+    Returns:
+        Tuple of (new_config, profile) where new_config is a copy with updated
+        backend fields and profile is the applied BackendProfile object.
+
+    Example:
+        >>> cfg, profile = apply_backend_profile_immutable(cfg, "uqc_mock")
+        >>> assert cfg.backend.provider == "uqc"
+        >>> assert profile.profile_id == "uqc_mock"
+    """
+    prof = get_backend_profile(profile_id)
+
+    # Build update dict for backend fields
+    backend_updates: dict[str, Any] = {
+        "name": prof.name,
+        "provider": prof.provider,
+        "qiskit_mode": prof.qiskit_mode,
+    }
+
+    # Handle UQC-specific fields
+    if prof.uqc_mode is not None:
+        backend_updates["uqc_mode"] = prof.uqc_mode
+        meta = dict(cfg.backend.meta)
+        meta["uqc_mode"] = prof.uqc_mode
+        if prof.meta:
+            meta.update(prof.meta)
+        backend_updates["meta"] = meta
+    elif prof.meta:
+        meta = dict(cfg.backend.meta)
+        meta.update(prof.meta)
+        backend_updates["meta"] = meta
+
+    # Create new backend config using Pydantic model_copy
+    new_backend = cfg.backend.model_copy(update=backend_updates)
+
+    # Create new experiment config with updated backend
+    new_cfg = cfg.model_copy(update={"backend": new_backend})
+
+    return new_cfg, prof
 
 
 def backend_profile_catalog_v1() -> dict[str, Any]:

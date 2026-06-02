@@ -18,13 +18,20 @@ from qchem_stack.config.quantum_helpers import (
     resolve_vqe_maxiter,
     vqs_track_requested,
 )
+from tests.helpers.h2_yaml import h2_yaml_dict
+
+_H2_MOLECULE = h2_yaml_dict()["molecule"] | {"coordinates": [[0, 0, 0], [0, 0, 0.74]]}
+
+
+def _h2_experiment(**overrides) -> ExperimentConfig:
+    return ExperimentConfig.model_validate(h2_yaml_dict(**overrides))
 
 
 def test_resolve_vqe_maxiter_from_nested_quantum() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -39,7 +46,7 @@ def test_pauli_protocol_enabled() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -54,7 +61,7 @@ def test_excited_vqd_after_variational_default_false() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -72,7 +79,7 @@ def test_quantum_repro_core_fields_includes_algorithm() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -89,7 +96,7 @@ def test_qpe_demo_track_requested_helper() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -105,7 +112,7 @@ def test_resolve_uccsd_trotter_steps_none_by_default() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -119,7 +126,7 @@ def test_pauli_run_helpers() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -148,7 +155,7 @@ def test_quantum_repro_sidecar_fields_includes_sceom() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -167,7 +174,7 @@ def test_classify_pauli_expectation_path_for_config() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -188,7 +195,7 @@ def test_classify_pauli_expectation_path_for_config() -> None:
     cfg2 = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -200,7 +207,7 @@ def test_classify_pauli_expectation_path_for_config() -> None:
     cfg3 = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -215,7 +222,7 @@ def test_quantum_excited_run_summary_yaml_fields() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -243,7 +250,7 @@ def test_quantum_variational_run_summary_yaml_fields() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -278,7 +285,7 @@ def test_excited_plugin_params_helpers() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},
@@ -307,7 +314,7 @@ def test_qpe_three_pack_requested_helper() -> None:
     cfg = ExperimentConfig.model_validate(
         {
             "experiment_id": "t",
-            "molecule": {"symbols": ["H", "H"], "coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+            "molecule": _H2_MOLECULE,
             "active_space": {
                 "strategy": "cas",
                 "cas": {"n_orbitals": 2, "n_electrons": 2},

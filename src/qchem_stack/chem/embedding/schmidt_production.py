@@ -29,6 +29,10 @@ from qchem_stack.chem.embedding.schmidt_production_model import (
 from qchem_stack.contracts.schema_ids import (
     SCHMIDT_IMPURITY_INTEGRALS_V1,
 )
+from qchem_stack.quantum.algorithms.tolerances import (
+    SCHMIDT_ORTHONORMALITY_TOLERANCE,
+    SCHMIDT_SINGULARITY_TOLERANCE,
+)
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -63,7 +67,7 @@ def _fragment_ao_indices(mol: Any, atom_indices: list[int]) -> list[int]:
 def _orthonormalize_columns(C: np.ndarray, S: np.ndarray) -> np.ndarray:
     M = C.T @ S @ C
     w, v = eigh(M)
-    if np.min(w) < 1e-12:
+    if np.min(w) < SCHMIDT_SINGULARITY_TOLERANCE:
         raise SchmidtProductionError(
             "reduced overlap matrix for column orthonormalization is singular"
         )
@@ -152,7 +156,7 @@ def build_schmidt_impurity_integrals(
 
     metric = C_imp.T @ S @ C_imp
     res = float(np.max(np.abs(metric - np.eye(n_imp))))
-    if res > 1e-8:
+    if res > SCHMIDT_ORTHONORMALITY_TOLERANCE:
         raise SchmidtProductionError(
             f"impurity MO block not S-orthonormal within tolerance (residual={res})"
         )

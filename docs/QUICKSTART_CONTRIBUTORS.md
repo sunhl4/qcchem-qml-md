@@ -3,6 +3,33 @@
 Shortest path from a YAML experiment to understanding pipeline output. For full architecture see
 [`docs/ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md).
 
+**Role-based onboarding:** [Three paths](../docusaurus-site/docs/guide/onboarding-three-paths.md) · [Tutorial index](../docusaurus-site/docs/tutorial/tutorial-index-three-paths.md).
+
+## 0. Fifteen-minute path (no PySCF required)
+
+**Fastest bootstrap** (creates `.venv`, installs `[dev]`, runs precomputed smoke):
+
+```bash
+cd qchem_qml_md
+./scripts/bootstrap_dev.sh
+export QCHEM_STACK_PYTHON="$(pwd)/.venv/bin/python"
+```
+
+Manual steps if you prefer:
+
+1. **Environment** — pick an install profile from [README Install](../README.md#install-profiles-pip-extras) (`[dev]` for maintainers).
+2. **Interpreter** — `export QCHEM_STACK_PYTHON=/path/to/python` or rely on repo `.venv` via [`scripts/venv-run`](../scripts/venv-run).
+3. **Smoke without PySCF** — precomputed lane only:
+
+```bash
+cd qchem_qml_md
+pip install -e ".[dev]"
+./scripts/venv-run python scripts/smoke_pipeline.py --precomputed-only
+```
+
+4. **Architecture** — read [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md) §1 (layer model).
+5. **Full chemistry smoke** (needs PySCF): `./scripts/venv-run python scripts/smoke_pipeline.py`
+
 ## 1. Install and smoke
 
 ```bash
@@ -124,3 +151,14 @@ Variational sidecars that call `quantum.*` live under `qchem_stack.integrations`
 ```
 
 See [`CONTRIBUTING.md`](../CONTRIBUTING.md) for merge gates and optional markers.
+
+## Test pyramid
+
+| Tier | When | Command |
+|------|------|---------|
+| **PR (required)** | Every push/PR | `pytest tests -m "not slow and not perf"` |
+| **PR extras (3.12)** | CI only | smoke scripts, `check_parity_export_sample.py`, API tests |
+| **Nightly** | schedule / `[nightly]` | `pytest -m "slow or perf"`; `QCHEM_RUN_L3=1 pytest -m l3` |
+| **Local optional** | Before release | `pytest -m psi4`, `pytest -m l1_md_ml`, `pytest -m uqc_mock` |
+
+Markers: `slow`, `perf`, `l3`, `l1_excited`, `l1_md_ml`, `pyscf`, `psi4`, `uqc_mock` — see `pyproject.toml`.

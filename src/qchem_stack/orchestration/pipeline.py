@@ -20,8 +20,10 @@ Stage map (``run_pipeline_sync``)
 
 from __future__ import annotations
 
+import asyncio
 import hashlib
 import logging
+from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from typing import TYPE_CHECKING, Any, cast
 
@@ -48,13 +50,17 @@ from qchem_stack.contracts.schema_ids import (
     PRE_QUANTUM_BRANCH_REGISTRY_V1,
 )
 from qchem_stack.jobs.store import SqliteJobStore
-from qchem_stack.orchestration import repro_snapshot
 from qchem_stack.orchestration.embedding_workflow_stage import (
     apply_embedding_workflow_stage,
 )
 from qchem_stack.orchestration.excited_stages import (
     run_excited_stages,
 )
+from qchem_stack.orchestration.pipeline_event_hooks import (
+    emit_stage_event,
+    trace_id_from_run_context,
+)
+from qchem_stack.orchestration.pipeline_events import PipelineEvents
 from qchem_stack.orchestration.pipeline_result import PipelineResultV1, tag_pipeline_result
 from qchem_stack.orchestration.precomputed_stage import (
     is_precomputed_driver,
@@ -69,11 +75,16 @@ from qchem_stack.orchestration.protocol_finalize_stage import (
 from qchem_stack.orchestration.repro_metadata import (
     collect_repro_metadata_impl as _collect_repro_metadata_impl,
 )
+from qchem_stack.orchestration.repro_snapshot import repro_quantum_snapshot
 from qchem_stack.orchestration.repro_summary import (
     attach_run_summary,
     classical_benchmark_summary,
 )
-from qchem_stack.orchestration.run_context import PipelineStageTimer, RunContext
+from qchem_stack.orchestration.run_context import (
+    PipelineStageTimer,
+    RunContext,
+    emit_pipeline_stage_json_log,
+)
 from qchem_stack.orchestration.scf_stage import (
     embedding_input_system_payload,
     refine_mean_field_for_active_space,
@@ -105,7 +116,7 @@ def collect_repro_metadata(
 ) -> dict[str, Any]:
     return _collect_repro_metadata_impl(
         cfg,
-        parity_snapshot_fn=repro_snapshot.repro_quantum_snapshot,
+        parity_snapshot_fn=repro_quantum_snapshot,
         cfg_path=cfg_path,
         qh=qh,
     )
@@ -204,13 +215,26 @@ def run_pipeline_sync(
     q = cfg.quantum
     profile = PipelineStageTimer()
     build_cache = RunBuildCache()
+    trace_id = trace_id_from_run_context(run_context)
+
+    emit_stage_event(
+        PipelineEvents.PIPELINE_STARTED,
+        stage="pipeline",
+        trace_id=trace_id,
+        data={"experiment_id": cfg.experiment_id},
+    )
 
     def _emit(stage: str) -> None:
+        emit_pipeline_stage_json_log(
+            stage,
+            trace_id=run_context.trace_id if run_context is not None else None,
+        )
         if job_timeline_emit is not None:
             job_timeline_emit(
                 {"kind": "pipeline_stage", "stage": stage, "status": "RUNNING"},
             )
 
+    emit_stage_event(PipelineEvents.SCF_STARTED, stage="scf", trace_id=trace_id)
     scf_stage = run_scf_stage(
         cfg,
         profile=profile,
@@ -226,6 +250,13 @@ def run_pipeline_sync(
     )
     cfg = scf_stage.cfg
     rhf = scf_stage.rhf
+    emit_stage_event(
+        PipelineEvents.SCF_COMPLETED,
+        stage="scf",
+        trace_id=trace_id,
+        data={"scf_energy": float(rhf.e_tot)},
+    )
+    emit_stage_event(PipelineEvents.PRE_QUANTUM_STARTED, stage="pre_quantum", trace_id=trace_id)
     pre_q_stage = build_pre_quantum_stage(
         cfg,
         rhf,
@@ -255,6 +286,12 @@ def run_pipeline_sync(
     if hamiltonian_out is not None:
         hamiltonian_out.clear()
         hamiltonian_out.append(qh)
+    emit_stage_event(
+        PipelineEvents.PRE_QUANTUM_COMPLETED,
+        stage="pre_quantum",
+        trace_id=trace_id,
+        data={"n_qubits": int(qh.n_qubits)},
+    )
     repro = collect_repro_metadata(cfg, cfg_path, qh)
     if run_context is not None:
         repro["run_context"] = run_context.to_repro_dict()
@@ -262,6 +299,7 @@ def run_pipeline_sync(
     exe = executor_from_spec(bspec)
     bundle = compiler_pass_bundle_from_config(cfg)
 
+    emit_stage_event(PipelineEvents.VARIATIONAL_STARTED, stage="variational", trace_id=trace_id)
     vctx = VariationalRunContext(
         cfg=cfg,
         hamiltonian=qh,
@@ -276,6 +314,12 @@ def run_pipeline_sync(
 
     profile.mark("variational_done")
     _emit("variational_done")
+    emit_stage_event(
+        PipelineEvents.VARIATIONAL_COMPLETED,
+        stage="variational",
+        trace_id=trace_id,
+        data={"energy_au": float(energy_pre), "algorithm": str(q.algorithm)},
+    )
 
     _pipeline_log.info(
         "pipeline variational_done experiment_id=%s algorithm=%s E_var_au=%.10f",
@@ -302,6 +346,11 @@ def run_pipeline_sync(
         build_cache=build_cache,
     )
     _patch_repro_parity_snapshot(out)
+    emit_stage_event(
+        PipelineEvents.EMBEDDING_WORKFLOW_STARTED,
+        stage="embedding_workflow",
+        trace_id=trace_id,
+    )
     apply_embedding_workflow_stage(
         cfg,
         out=out,
@@ -314,6 +363,12 @@ def run_pipeline_sync(
         profile=profile,
         emit=_emit,
     )
+    emit_stage_event(
+        PipelineEvents.EMBEDDING_WORKFLOW_COMPLETED,
+        stage="embedding_workflow",
+        trace_id=trace_id,
+    )
+    emit_stage_event(PipelineEvents.EXCITED_STARTED, stage="excited", trace_id=trace_id)
     excited_rs = run_excited_stages(
         cfg,
         qh=qh,
@@ -325,8 +380,14 @@ def run_pipeline_sync(
         emit=_emit,
         pre_quantum_input=pre_q_input,
     )
+    emit_stage_event(PipelineEvents.EXCITED_COMPLETED, stage="excited", trace_id=trace_id)
 
-    return tag_pipeline_result(
+    emit_stage_event(
+        PipelineEvents.PROTOCOL_FINALIZE_STARTED,
+        stage="protocol_finalize",
+        trace_id=trace_id,
+    )
+    result = tag_pipeline_result(
         run_protocol_and_finalize_stage(
             cfg,
             out=out,
@@ -342,6 +403,18 @@ def run_pipeline_sync(
             emit=_emit,
         )
     )
+    emit_stage_event(
+        PipelineEvents.PROTOCOL_FINALIZE_COMPLETED,
+        stage="protocol_finalize",
+        trace_id=trace_id,
+    )
+    emit_stage_event(
+        PipelineEvents.PIPELINE_COMPLETED,
+        stage="pipeline",
+        trace_id=trace_id,
+        data={"experiment_id": cfg.experiment_id},
+    )
+    return result
 
 
 def run_pipeline_from_config(
@@ -385,3 +458,105 @@ def run_pipeline_from_config(
         sync["job_result"] = store.result(handle.job_id)
     attach_run_summary(cast("dict[str, Any]", sync), cfg)
     return tag_pipeline_result(sync)
+
+
+async def run_pipeline_async(
+    cfg_path: str | Path,
+    *,
+    job_db: Path | None = None,
+    enqueue_only: bool = False,
+    run_context: RunContext | None = None,
+    executor: ThreadPoolExecutor | None = None,
+) -> PipelineResultV1:
+    """Async wrapper for :func:`run_pipeline_from_config`.
+
+    This runs the synchronous pipeline in a thread pool executor, allowing
+    concurrent execution without blocking the event loop. Useful for:
+    - FastAPI async endpoints
+    - Batch processing multiple configurations
+    - Integration with async job queues
+
+    Parameters
+    ----------
+    cfg_path
+        Path to the YAML configuration file.
+    job_db
+        Optional path to SQLite database for job persistence.
+    enqueue_only
+        If True, enqueue the job but don't execute it immediately.
+    run_context
+        Optional run context for distributed execution.
+    executor
+        Optional thread pool executor. If None, uses the default executor.
+
+    Returns
+    -------
+    PipelineResultV1
+        Pipeline execution results.
+
+    Examples
+    --------
+    >>> import asyncio
+    >>> result = asyncio.run(run_pipeline_async("configs/example_h2.yaml"))
+    >>> print(result["energy_after_variational"])
+
+    Notes
+    -----
+    This is a simple async wrapper. For true async-native execution (with
+    async backends and job stores), see the roadmap in the documentation.
+    """
+    loop = asyncio.get_event_loop()
+    return await loop.run_in_executor(
+        executor,
+        lambda: run_pipeline_from_config(
+            cfg_path,
+            job_db=job_db,
+            enqueue_only=enqueue_only,
+            run_context=run_context,
+        ),
+    )
+
+
+async def run_pipeline_batch_async(
+    cfg_paths: list[str | Path],
+    *,
+    job_db: Path | None = None,
+    max_workers: int | None = None,
+) -> list[PipelineResultV1]:
+    """Run multiple pipelines concurrently in async mode.
+
+    Parameters
+    ----------
+    cfg_paths
+        List of configuration file paths to process.
+    job_db
+        Optional shared SQLite database for all jobs.
+    max_workers
+        Maximum number of concurrent pipelines. If None, uses CPU count.
+
+    Returns
+    -------
+    list[PipelineResultV1]
+        List of results in the same order as cfg_paths.
+
+    Examples
+    --------
+    >>> import asyncio
+    >>> configs = ["configs/example_h2.yaml", "configs/example_lih.yaml"]
+    >>> results = asyncio.run(run_pipeline_batch_async(configs, max_workers=2))
+    >>> for r in results:
+    ...     print(r["energy_after_variational"])
+
+    Notes
+    -----
+    Each pipeline runs in its own thread. Be mindful of memory usage when
+    processing large batches of configurations.
+    """
+    executor = ThreadPoolExecutor(max_workers=max_workers)
+    try:
+        tasks = [
+            run_pipeline_async(cfg_path, job_db=job_db, executor=executor) for cfg_path in cfg_paths
+        ]
+        return await asyncio.gather(*tasks)
+    finally:
+        executor.shutdown(wait=True)

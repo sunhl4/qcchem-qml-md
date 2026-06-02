@@ -70,12 +70,26 @@ def build_md_validation_summary(
     if round_logs:
         tm = round_logs[-1].training_metrics or {}
         last_shift = tm.get("validation_energy_shift_hartree")
+    raw_deltas = [
+        float(fr.abs_delta_hartree_raw)
+        for log in round_logs
+        for fr in log.frames
+        if fr.abs_delta_hartree_raw == fr.abs_delta_hartree_raw
+    ]
+    max_abs_delta_raw = max(raw_deltas) if raw_deltas else float("nan")
+    energy_ref = (
+        round_logs[-1].frames[0].energy_reference_used
+        if round_logs and round_logs[-1].frames
+        else (config.validation_energy_reference or config.label_energy_reference)
+    )
     return {
         "experiment_yaml": str(experiment_yaml.resolve()),
         "output_dir": str(output_dir.resolve()),
         "config": asdict(config),
         "accuracy_threshold_hartree": threshold,
         "max_abs_delta_hartree": global_max_abs,
+        "max_abs_delta_hartree_raw": max_abs_delta_raw,
+        "validation_energy_reference": energy_ref,
         "validation_energy_shift_hartree": last_shift,
         "science_kpi_met": science_kpi_met,
         "n_total_frames": n_total_frames,

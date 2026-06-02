@@ -17,7 +17,6 @@ from qchem_stack.backends.qiskit_executor import (
     QiskitStatevectorHeaExecutor,
 )
 from qchem_stack.backends.spec import BackendSpec
-from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
 from qchem_stack.exceptions import ConfigurationError
 
 BackendFactory = Callable[[BackendSpec], HamiltonianExpectationExecutor]
@@ -111,10 +110,6 @@ def _ionstack_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
     return IonStackHeaExecutor(spec)
 
 
-def _uqc_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
-    return UQCCloudHeaExecutor(spec)
-
-
 def _qulacs_factory(_: BackendSpec) -> HamiltonianExpectationExecutor:
     try:
         import qulacs  # noqa: F401
@@ -166,7 +161,6 @@ def _register_builtin_backends() -> None:
     _register_record("qiskit", _qiskit_factory, source="builtin", origin="qiskit_factory")
     _register_record("ionstack", _ionstack_factory, source="builtin", origin="ionstack_factory")
     _register_record("ion_stack", _ionstack_factory, source="builtin", origin="ionstack_factory")
-    _register_record("uqc", _uqc_factory, source="builtin", origin="uqc_factory")
     _register_record("qulacs", _qulacs_factory, source="builtin", origin="qulacs_factory")
     _register_record("cirq", _cirq_factory, source="builtin", origin="cirq_factory")
     _register_record("braket", _braket_factory, source="builtin", origin="braket_factory")
@@ -209,7 +203,8 @@ def executor_from_spec(spec: BackendSpec) -> HamiltonianExpectationExecutor:
     """Select simulator / device API from ``BackendSpec``."""
     _ensure_bootstrap()
     provider = _normalize_provider(spec.provider)
-    rec = _REGISTRY.get(provider)
+    with _BOOTSTRAP_LOCK:
+        rec = _REGISTRY.get(provider)
     if rec is None:
         raise ConfigurationError(
             f"Unknown backend provider: {spec.provider!r}. "

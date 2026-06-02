@@ -9,6 +9,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from qchem_stack.backends.spec import CircuitIR
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 from qchem_stack.quantum.algorithms.uccsd_mapping import reference_state_dense
 from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import (
     DecompositionMode,
@@ -79,7 +80,7 @@ def qcc_prepare_statevector(angles: np.ndarray, ctx: QCCCircuitContext) -> np.nd
     for th, mat in zip(ang, ctx.cluster_mats, strict=True):
         psi = expm(float(th) * mat) @ psi
         nrm = float(np.linalg.norm(psi))
-        if nrm < 1e-14:
+        if nrm < NUMERICAL_TOLERANCE:
             raise ValueError("QCC circuit state collapsed to zero norm.")
         psi = psi / nrm
     return psi

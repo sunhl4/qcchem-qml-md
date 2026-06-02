@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
+from qchem_stack.chem.embedding.dmet_self_consistent import OneShotEmbeddingDriver
 from qchem_stack.config.embedding_enums import DmetHamiltonianSource, EmbeddingMode
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels, require_dmet
 from qchem_stack.config.quantum_helpers import (
@@ -18,7 +19,6 @@ from qchem_stack.contracts.schema_ids import (
     TKET_STATS_SKIPPED_V1,
     ZNE_QISKIT_UNIFICATION_V1,
 )
-from qchem_stack.integrations.dmet_self_consistent import OneShotEmbeddingDriver
 
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig

@@ -6,6 +6,7 @@ from typing import Any
 import numpy as np
 
 from qchem_stack.contracts.schema_ids import BAYESIAN_QPE_STUB_MAP_V1
+from qchem_stack.quantum.algorithms.tolerances import CONVERGENCE_TOLERANCE
 
 
 @dataclass
@@ -20,7 +21,7 @@ class BayesianQPEStub:
         logp = np.zeros_like(phis)
         for y, beta in measurements:
             p = np.cos(phis * beta + y * np.pi) ** 2
-            logp += np.log(np.maximum(p, 1e-12))
+            logp += np.log(np.maximum(p, CONVERGENCE_TOLERANCE))
         idx = int(np.argmax(logp))
         return {
             "schema": BAYESIAN_QPE_STUB_MAP_V1,

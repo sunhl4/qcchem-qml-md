@@ -57,6 +57,17 @@ def test_render_html_includes_rows_and_merged_summary() -> None:
     assert "42.5" in html_doc
 
 
+def test_render_html_includes_pipeline_profile_section() -> None:
+    mod = _load_generate_module()
+    profile = {
+        "schema": "pipeline_profile_v1",
+        "stages": [{"stage": "scf_done", "duration_ms": 12.3, "peak_memory_kb": 1024}],
+    }
+    html_doc = mod.render_html({}, pipeline_profile=profile)
+    assert "Pipeline profile" in html_doc
+    assert "scf_done" in html_doc
+
+
 def test_load_report_json_from_stdin(tmp_path: Path) -> None:
     mod = _load_generate_module()
     payload = {

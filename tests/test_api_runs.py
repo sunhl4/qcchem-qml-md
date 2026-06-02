@@ -201,6 +201,26 @@ def test_capability_surface_matches_product_contract() -> None:
     assert body == expected
 
 
+def test_capability_surface_etag_not_modified() -> None:
+    client = TestClient(app)
+    r1 = client.get("/v1/meta/capability-surface")
+    assert r1.status_code == 200
+    etag = r1.headers.get("etag", "").strip('"')
+    assert etag
+    r2 = client.get("/v1/meta/capability-surface", headers={"If-None-Match": f'"{etag}"'})
+    assert r2.status_code == 304
+
+
+def test_capability_surface_body_is_strict_json() -> None:
+    """ETag body must serialize without ``default=str`` (RFC-compliant JSON)."""
+    client = TestClient(app)
+    r = client.get("/v1/meta/capability-surface")
+    assert r.status_code == 200
+    parsed = json.loads(r.text)
+    assert parsed.get("schema") == "capability_surface_v2"
+    assert r.headers.get("content-type", "").startswith("application/json")
+
+
 def test_post_project_slug_meta_and_list_filter() -> None:
     with tempfile.NamedTemporaryFile(suffix=".sqlite", delete=False) as f:
         db_path = f.name

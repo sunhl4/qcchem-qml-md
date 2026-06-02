@@ -5,8 +5,11 @@ from __future__ import annotations
 import numpy as np
 import pytest
 
-from qchem_stack.ml.active_learning import ActiveLearningLoop, max_std_proxy
-from qchem_stack.ml.surrogate import SurrogateEnergyModel
+from qchem_stack.md_bridge.active_learning import (
+    ActiveLearningLoop,
+    SurrogateEnergyModel,
+    max_std_proxy,
+)
 
 pytestmark = pytest.mark.l1_md_ml
 

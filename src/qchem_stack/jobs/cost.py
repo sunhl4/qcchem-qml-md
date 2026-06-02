@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from qchem_stack.quantum.algorithms.tolerances import UNIT_PER_DEPTH, UNIT_PER_SHOT
+
 
 @dataclass
 class CostEstimate:
@@ -16,8 +18,8 @@ class CostEstimate:
     def from_resource_rows(
         rows: list[dict],
         unit_per_circuit: float = 1.0,
-        unit_per_shot: float = 1e-4,
-        unit_per_depth: float = 1e-3,
+        unit_per_shot: float = UNIT_PER_SHOT,
+        unit_per_depth: float = UNIT_PER_DEPTH,
     ) -> CostEstimate:
         nc = len(rows)
         shots = sum(int(r.get("total_shots", 0)) for r in rows)

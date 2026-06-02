@@ -64,6 +64,31 @@ def test_pipeline_profile_v1_and_run_summary_slowest() -> None:
 
 
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
+def test_pipeline_profile_memory_tracing_optional(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("QCHEM_PIPELINE_PROFILE_MEM", "1")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
+    out = run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
+    prof = out["repro"].get("pipeline_profile")
+    assert isinstance(prof, dict)
+    assert prof.get("memory_tracing_enabled") is True
+    stages = prof.get("stages") or []
+    assert stages and "peak_memory_kb" in stages[-1]
+
+
+@pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
+def test_json_structured_log_emits_on_stage(
+    monkeypatch: pytest.MonkeyPatch, caplog: pytest.LogCaptureFixture
+) -> None:
+    import logging
+
+    monkeypatch.setenv("QCHEM_STACK_JSON_LOG", "1")
+    caplog.set_level(logging.INFO, logger="qchem_stack.pipeline.json")
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
+    run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
+    assert any("pipeline_stage" in r.message for r in caplog.records)
+
+
+@pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")
 def test_job_timeline_emit_collects_pipeline_stages() -> None:
     cfg = load_experiment_config(configs_path("example_h2.yaml"))
     received: list[dict] = []

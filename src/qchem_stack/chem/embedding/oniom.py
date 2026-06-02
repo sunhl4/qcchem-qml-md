@@ -12,6 +12,7 @@ from typing import TYPE_CHECKING, Any
 import numpy as np
 
 from qchem_stack.contracts.schema_ids import ENERGY_COMPONENTS_V1, ONIOM_TOY_V1
+from qchem_stack.quantum.algorithms.tolerances import ONIOM_BOND_LENGTH_TOLERANCE
 
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig
@@ -65,7 +66,7 @@ def classical_mm_pair_energy_au(
     for i, ai in enumerate(mm_atom_indices):
         for bi in mm_atom_indices[i + 1 :]:
             r = float(np.linalg.norm(coords[bi] - coords[ai]))
-            if r < 1e-8:
+            if r < ONIOM_BOND_LENGTH_TOLERANCE:
                 continue
             # Soft repulsion: grows as 1/r^2 (arbitrary classical MM stub).
             e_mm += float(scale_au) / (r * r)

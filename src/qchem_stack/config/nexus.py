@@ -6,6 +6,8 @@ from typing import Literal
 
 from pydantic import Field, field_validator
 
+from qchem_stack.quantum.algorithms.tolerances import UNIT_PER_DEPTH, UNIT_PER_SHOT
+
 from ._base import ForbidExtraBase
 from ._validation import strip_required_text
 
@@ -14,8 +16,8 @@ class NexusAnalogSpec(ForbidExtraBase):
     enabled: bool = False
     project_label: str = Field(default="default", min_length=1)
     unit_per_circuit: float = Field(default=1.0, ge=0.0)
-    unit_per_shot: float = Field(default=1e-4, ge=0.0)
-    unit_per_depth: float = Field(default=1e-3, ge=0.0)
+    unit_per_shot: float = Field(default=UNIT_PER_SHOT, ge=0.0)
+    unit_per_depth: float = Field(default=UNIT_PER_DEPTH, ge=0.0)
 
     @field_validator("project_label")
     @classmethod

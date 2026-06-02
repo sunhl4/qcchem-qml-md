@@ -8,6 +8,10 @@ import numpy as np
 
 from qchem_stack.chem.hamiltonian import QubitHamiltonian
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
+from qchem_stack.quantum.algorithms.tolerances import (
+    IQEB_ENERGY_TOLERANCE,
+    IQEB_POOL_COEFF_SCALE,
+)
 from qchem_stack.quantum.algorithms.vqe import VQE, VQEResult
 from qchem_stack.quantum.operator_pool_registry import build_registered_operator_pool
 from qchem_stack.quantum.statevector import expectation_qubit_operator, hea_state
@@ -32,7 +36,7 @@ class IQEBVQE(AlgorithmBase):
         hamiltonian: QubitHamiltonian,
         max_rounds: int = 2,
         n_grads: int = 3,
-        energy_tolerance: float = 1e-8,
+        energy_tolerance: float = IQEB_ENERGY_TOLERANCE,
         pool_id: str = "iqeb_qubit_excitation",
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> None:
@@ -90,9 +94,12 @@ class IQEBVQE(AlgorithmBase):
             selected_indices.append(int(best_idx))
             tag = f"pool_{best_idx}_round{r}"
             selected.append(tag)
-            h += 1e-4 * self.pool[best_idx]
+            h += IQEB_POOL_COEFF_SCALE * self.pool[best_idx]
             prev_energy = float(last.energy)
-        assert last is not None
+
+        if last is None:
+            raise RuntimeError("IQEB optimization failed: no successful VQE rounds completed")
+
         out = IQEBResult(
             energy=last.energy,
             selected_pauli_strings=selected,

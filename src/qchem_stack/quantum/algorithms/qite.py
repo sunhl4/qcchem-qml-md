@@ -9,6 +9,7 @@ import numpy as np
 from scipy.linalg import expm
 
 from qchem_stack.quantum.algorithms.base import AlgorithmBase
+from qchem_stack.quantum.algorithms.tolerances import QITE_GRAD_TOLERANCE
 from qchem_stack.quantum.algorithms.uccsd_mapping import reference_state_dense
 from qchem_stack.quantum.operator_pool_registry import build_registered_operator_pool
 from qchem_stack.quantum.statevector import expectation_qubit_operator, qubit_operator_to_sparse
@@ -78,7 +79,7 @@ class QITEVQE(AlgorithmBase):
                 psi = mat @ st
                 grads.append(float(np.real(np.vdot(st, h_mat @ psi))))
             g = np.asarray(grads, dtype=float)
-            if float(np.linalg.norm(g)) < 1e-8:
+            if float(np.linalg.norm(g)) < QITE_GRAD_TOLERANCE:
                 break
             angles -= float(dt) * g
             st = self._apply_pool(ref, angles)

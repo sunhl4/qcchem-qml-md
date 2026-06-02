@@ -200,6 +200,8 @@ def test_resource_estimation_preview_v1_config_only_export() -> None:
     assert rev.get("zne_enabled_yaml") is False
     assert rev.get("pmsv_enabled_yaml") is False
     assert rev.get("pauli_protocol_expectation_path_yaml") == "exact_executor"
+    assert "compiler_pass_bundle_yaml" in rev
+    assert rev.get("tket_probe_requested") is True
 
 
 def test_registry_and_mdml_blocks_in_config_only_export() -> None:

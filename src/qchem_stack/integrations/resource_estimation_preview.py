@@ -123,6 +123,9 @@ def build_resource_estimation_preview_v1(
         "spam_calibration_enabled_yaml": mit.stubs.spam_calibration,
         "classical_shadows_stub_enabled_yaml": mit.stubs.classical_shadows,
         "classical_shadows_budget_pairs_yaml": int(mit.stubs.classical_shadows_budget_pairs),
+        "compiler_pass_bundle_yaml": list(cfg.compiler.compiler_passes),
+        "compiler_preoptimize_passes_yaml": list(cfg.compiler.preoptimize_passes),
+        "tket_probe_requested": pi.tket_first_circuit_stats,
     }
     if not pipeline_row:
         return base
@@ -146,6 +149,16 @@ def build_resource_estimation_preview_v1(
             base["ft_circuit_depth_estimate"] = rs["max_depth"]
         if rs.get("n_qubits") is not None:
             base["ft_circuit_width_estimate"] = rs["n_qubits"]
+        max_depth = rs.get("max_depth")
+        sum_twoq = rs.get("sum_twoq")
+        if max_depth is not None:
+            twoq = int(sum_twoq) if sum_twoq is not None else 0
+            base["ft_two_qubit_depth_proxy"] = int(max_depth) * max(1, twoq)
+        if rs.get("n_pauli_groups") is not None:
+            base["ft_measurement_rounds_proxy"] = int(rs["n_pauli_groups"])
+        excited_acct = rs.get("excited_shot_accounting")
+        if isinstance(excited_acct, dict) and excited_acct:
+            base["excited_shot_budget_breakdown"] = dict(excited_acct)
     rsum: dict[str, Any] = {}
     repro = pipeline_row.get("repro")
     if isinstance(repro, dict):

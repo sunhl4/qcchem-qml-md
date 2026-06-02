@@ -134,3 +134,14 @@ def build_stub_mean_field_result(*, n_mo: int = 1) -> MolecularMeanFieldResult:
         mo_energy=np.zeros(n, dtype=float),
         driver_meta=meta,
     )
+
+
+def register_custom_external_template_solver(*, overwrite: bool = True) -> None:
+    """Register template backend id ``custom_external_template`` for docs/CI parity export."""
+    from qchem_stack.chem.solvers.registry import register_solver
+
+    register_solver(
+        "custom_external_template",
+        CustomExternalIntegralSolver.from_experiment_config,
+        overwrite=overwrite,
+    )

@@ -4,6 +4,8 @@ from typing import Any, Literal
 
 import numpy as np
 
+from qchem_stack.quantum.algorithms.tolerances import MO_COEFFICIENT_TOLERANCE
+
 
 def _spatial_one_body_to_fermion_operator(h1_spatial: np.ndarray) -> Any:
     from openfermion import FermionOperator
@@ -14,7 +16,7 @@ def _spatial_one_body_to_fermion_operator(h1_spatial: np.ndarray) -> Any:
     for p in range(n):
         for q in range(n):
             c = float(h1[p, q])
-            if abs(c) < 1e-14:
+            if abs(c) < MO_COEFFICIENT_TOLERANCE:
                 continue
             out += FermionOperator(((2 * p, 1), (2 * q, 0)), c)
             out += FermionOperator(((2 * p + 1, 1), (2 * q + 1, 0)), c)

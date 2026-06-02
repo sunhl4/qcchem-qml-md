@@ -9,6 +9,7 @@ from typing import TYPE_CHECKING, Any, Literal
 import yaml
 
 from qchem_stack.exceptions import ConfigurationError
+from qchem_stack.quantum.algorithms.tolerances import DEFAULT_LEARNING_RATE
 
 if TYPE_CHECKING:
     from qchem_stack.md_bridge.qchem_labeler import EnergyReference, TheoryLevel
@@ -111,7 +112,7 @@ class MdValidationLoopConfig:
     # QML-FF training
     n_epochs_per_round: int = 3
     batch_size: int = 1
-    learning_rate: float = 1e-3
+    learning_rate: float = DEFAULT_LEARNING_RATE
     force_weight: float = 100.0
     lr_scheduler: str = "constant"
     warm_start: bool = False
@@ -179,6 +180,9 @@ class FrameValidationRecord:
     abs_delta_hartree: float
     converged: bool
     theory_level: str
+    energy_reference_used: str = "variational"
+    delta_hartree_raw: float = float("nan")
+    abs_delta_hartree_raw: float = float("nan")
 
 
 @dataclass

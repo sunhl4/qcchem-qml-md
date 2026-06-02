@@ -1,0 +1,19 @@
+# Legacy flat schema (no schema_version) for migration tests.
+experiment_id: v1_flat_minimal
+random_seed: 1
+molecule:
+  symbols: [H, H]
+  coordinates:
+    - [0.0, 0.0, 0.0]
+    - [0.0, 0.0, 1.4]
+  coordinate_unit: bohr
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf_driver: pyscf
+scf_method: RHF
+active_space_strategy: manual
+active_space_n_orbitals: 2
+active_space_n_electrons: 2
+quantum_algorithm: vqe
+backend_provider: statevector

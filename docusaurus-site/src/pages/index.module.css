@@ -232,6 +232,60 @@
   margin: 0 auto 1.5rem;
 }
 
+.threePathSection {
+  margin-bottom: 1.4rem;
+}
+
+.threePathGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+.threePathCard {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  border: 1px solid rgba(20, 99, 143, 0.18);
+  border-radius: 18px;
+  padding: 1.15rem 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(20, 99, 143, 0.06), rgba(123, 209, 255, 0.04)),
+    rgba(255, 255, 255, 0.82);
+  box-shadow: 0 14px 40px rgba(9, 24, 44, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.threePathCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 18px 44px rgba(9, 24, 44, 0.13);
+  border-color: var(--ifm-color-primary-light);
+}
+
+.threePathCard h3 {
+  margin: 0 0 0.35rem;
+  font-size: 1.05rem;
+}
+
+.threePathCard p {
+  margin: 0 0 0.65rem;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.93rem;
+  line-height: 1.45;
+}
+
+.threePathCommand {
+  display: block;
+  font-size: 0.78rem;
+  padding: 0.45rem 0.55rem;
+  border-radius: 10px;
+  background: rgba(10, 22, 38, 0.92);
+  color: #d6f7ff;
+  overflow-x: auto;
+  white-space: nowrap;
+}
+
 .quickGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -240,6 +294,10 @@
 }
 
 @media screen and (max-width: 996px) {
+  .threePathGrid {
+    grid-template-columns: 1fr;
+  }
+
   .quickGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -433,6 +491,12 @@
   border-color: rgba(135, 157, 184, 0.28);
 }
 
+:global([data-theme='dark']) .threePathCard {
+  background: linear-gradient(180deg, rgba(35, 45, 59, 0.78), rgba(28, 35, 46, 0.9));
+  border-color: rgba(62, 166, 222, 0.35);
+}
+
+:global([data-theme='dark']) .threePathCard p,
 :global([data-theme='dark']) .quickCard p,
 :global([data-theme='dark']) .metricLabel,
 :global([data-theme='dark']) .pathwayCard p,

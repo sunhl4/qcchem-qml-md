@@ -7,6 +7,12 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.md_bridge.constants import (
+    _BOHR_TO_ANGSTROM,
+    _HARTREE_BOHR_TO_EV_ANG,
+    _HARTREE_TO_EV,
+    FS_TO_PS,
+)
 from qchem_stack.md_bridge.qmlff_builders import (
     QmlffModelHandle,
     _require_qmlff,
@@ -18,10 +24,6 @@ from qchem_stack.md_bridge.qmlff_training import (
 
 if TYPE_CHECKING:
     from collections.abc import Sequence
-
-_BOHR_TO_ANGSTROM = 0.529177210903
-_HARTREE_TO_EV = 27.211386245988
-_HARTREE_BOHR_TO_EV_ANG = _HARTREE_TO_EV / _BOHR_TO_ANGSTROM
 
 
 def _require_jax_md() -> Any:
@@ -237,7 +239,7 @@ def run_jaxmd_trajectory(
     temps_K = np.asarray(result.get("temperatures", np.zeros_like(energies_ev)), dtype=np.float64)
 
     n_frames = traj_ang.shape[0]
-    times_ps = [float(i) * float(save_stride) * float(dt_fs) * 1e-3 for i in range(n_frames)]
+    times_ps = [float(i) * float(save_stride) * float(dt_fs) * FS_TO_PS for i in range(n_frames)]
 
     return JaxMdTrajectory(
         positions_bohr=[

@@ -39,7 +39,7 @@ def main() -> None:
         restricted_active_space_quantum_problem_from_config,
     )
     from qchem_stack.config import backend_spec_from_config, load_experiment_config
-    from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDTrotterVQE, UCCSDVQE
+    from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
 
     cfg_path = ROOT / CFG_REL
     cfg = load_experiment_config(cfg_path)

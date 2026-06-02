@@ -6,21 +6,15 @@ import pytest
 from pydantic import ValidationError
 
 from qchem_stack.config import ExperimentConfig
+from tests.helpers.h2_yaml import h2_yaml_dict
 
 
 def _minimal_h2_raw(*, driver: str = "pyscf") -> dict[str, object]:
-    return {
-        "experiment_id": "scf-driver-gate",
-        "molecule": {
-            "symbols": ["H", "H"],
-            "coordinates": [[0, 0, 0], [0, 0, 0.74]],
-        },
-        "active_space": {
-            "strategy": "cas",
-            "cas": {"n_orbitals": 2, "n_electrons": 2},
-        },
-        "scf": {"driver": driver, "method": "RHF"},
-    }
+    return h2_yaml_dict(
+        experiment_id="scf-driver-gate",
+        molecule={"coordinates": [[0, 0, 0], [0, 0, 0.74]]},
+        scf={"driver": driver, "method": "RHF"},
+    )
 
 
 def test_unknown_scf_driver_rejected_at_load() -> None:

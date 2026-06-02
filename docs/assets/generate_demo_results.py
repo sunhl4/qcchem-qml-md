@@ -4,10 +4,9 @@ Generate demo result visualization figures showing actual pipeline outputs.
 Style: Clean scientific plots showing convergence, energy comparisons, etc.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch, Rectangle
-import matplotlib.patheffects as path_effects
+import numpy as np
+from matplotlib.patches import FancyBboxPatch
 
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans']

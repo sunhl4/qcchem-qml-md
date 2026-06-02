@@ -91,6 +91,8 @@ def test_md_validation_loop_three_rounds_mock_labeler(tmp_path: Path) -> None:
         validation_skip_initial_md_frame=True,
         label_screening_theory_level="hf_scf",
         label_top_theory_level="hf_scf",
+        label_energy_reference="scf",
+        validation_energy_reference="scf",
         md_n_steps=6,
         md_save_stride=3,
         n_epochs_per_round=1,
@@ -136,3 +138,63 @@ def test_md_validation_loop_three_rounds_mock_labeler(tmp_path: Path) -> None:
         assert int(r.get("n_md_frames_sampled") or 0) >= 1
     assert summary["n_total_frames"] >= 3
     assert (out_dir / "md_validation_summary.json").is_file()
+
+
+def test_md_validation_loop_five_rounds_mock_labeler(tmp_path: Path) -> None:
+    from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
+
+    exp_yaml = configs_path("example_h2.yaml")
+    loop_cfg = MdValidationLoopConfig(
+        max_rounds=5,
+        force_field_backend="classical_h2",
+        energy_tolerance_hartree=0.001,
+        n_candidate_frames=1,
+        add_top_k_per_round=1,
+        validation_skip_initial_md_frame=True,
+        label_screening_theory_level="hf_scf",
+        label_top_theory_level="hf_scf",
+        label_energy_reference="scf",
+        validation_energy_reference="scf",
+        md_n_steps=6,
+        md_save_stride=3,
+        n_epochs_per_round=1,
+        write_per_round_extxyz=False,
+    )
+    out_dir = tmp_path / "md_five_round_mock"
+
+    with (
+        patch(
+            "qchem_stack.md_bridge.md_validation_loop.label_base_geometry_only",
+            side_effect=_mock_label_base,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.label_geometries_with_pipeline",
+            side_effect=_mock_label_geometries,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.run_jaxmd_trajectory",
+            side_effect=_mock_jaxmd_trajectory,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            side_effect=_mock_predict_energy,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            side_effect=_mock_qmef_frame,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.compute_training_energy_shift_hartree",
+            return_value=0.0,
+        ),
+    ):
+        summary = run_md_validation_loop(
+            exp_yaml,
+            config=loop_cfg,
+            output_dir=out_dir,
+        )
+
+    assert len(summary["rounds"]) == 5
+    assert "science_kpi_met" in summary
+    assert "max_abs_delta_hartree" in summary
+    assert summary["n_total_frames"] >= 5

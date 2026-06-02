@@ -17,9 +17,17 @@ When changing parity export keys or pre-quantum allowed combos, update the repo 
 
 ### Reference (day-to-day engineering)
 
+- **Split config reference:** [`reference/config_field_index.md`](reference/config_field_index.md), [`reference/config_recipes.md`](reference/config_recipes.md), [`reference/config_migration.md`](reference/config_migration.md)
 - [`说明_config模块技术参考手册.md`](说明_config模块技术参考手册.md), [`config_字段索引.md`](config_字段索引.md), [`config_校验分层约定.md`](config_校验分层约定.md)
 - [`说明_quantum配置.md`](说明_quantum配置.md), [`chem_模块风格约定.md`](chem_模块风格约定.md), [`quantum_模块风格约定.md`](quantum_模块风格约定.md)
 - [`pre_quantum_yaml_matrix.md`](pre_quantum_yaml_matrix.md)
+
+### Engineering / product
+
+- [`engineering/api_stability_policy.md`](engineering/api_stability_policy.md), [`engineering/partial_to_l1_playbook.md`](engineering/partial_to_l1_playbook.md), [`engineering/pypi_release.md`](engineering/pypi_release.md)
+- [`engineering/protocol_pickle_migration.md`](engineering/protocol_pickle_migration.md), [`engineering/protocol_serialization_v2_rfc.md`](engineering/protocol_serialization_v2_rfc.md)
+- Generated config tables: [`generated/`](generated/) (`scripts/generate_config_reference_snippets.py`)
+- [`product/non_goals.md`](product/non_goals.md)
 
 ### Contracts (stable interfaces)
 
@@ -31,13 +39,15 @@ When changing parity export keys or pre-quantum allowed combos, update the repo 
 
 ### Onboarding
 
+- User index: [`user/README.md`](user/README.md)
 - [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md)
 - [`QUICKSTART_HTTP_API_en.md`](QUICKSTART_HTTP_API_en.md)
 - [`说明_config入门_通俗导读.md`](说明_config入门_通俗导读.md)
 - [`学习路线图_框架理论到源码阅读顺序.md`](学习路线图_框架理论到源码阅读顺序.md)
 
-### Competitive / 对标 (historical — not runtime dependencies)
+### Research / 对标 (historical — not runtime dependencies)
 
+- Index: [`research/README.md`](research/README.md)
 - [`竞争定位与路线图_对标Quantinuum产品与技术路线.md`](竞争定位与路线图_对标Quantinuum产品与技术路线.md)
 - [`工程记忆_Quantinuum对标与数据流技术文档.md`](工程记忆_Quantinuum对标与数据流技术文档.md)
 - [`public_parity_matrix.md`](public_parity_matrix.md) (also used as engineering contract)
@@ -46,7 +56,7 @@ When changing parity export keys or pre-quantum allowed combos, update the repo 
 ### Execution archive
 
 - Active plans: [`execution/comparative_execution_rd_plan_strict_2026Q3Q4.md`](execution/comparative_execution_rd_plan_strict_2026Q3Q4.md), [`execution/comparative_execution_backlog.yaml`](execution/comparative_execution_backlog.yaml)
-- Day-by-day evidence logs: [`execution/archive/`](execution/archive/) (see [`execution/README.md`](execution/README.md))
+- Day-by-day evidence logs: [`execution/archive/`](execution/archive/) **and** duplicate working copies at [`execution/*.md`](execution/) (same content; archive is canonical for long-term storage)
 
 ### Internal (maintainer notes)
 

@@ -120,42 +120,42 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
 }
 
 
+_MODEL_FACTORY_MAP: Final[dict[str, tuple[str, str, dict[str, Any]]]] = {
+    "vqe": ("qchem_stack.quantum.algorithms.vqe", "VQE", {}),
+    "adapt": ("qchem_stack.quantum.algorithms.adapt", "FermionicAdaptVQE", {}),
+    "tetris_adapt": (
+        "qchem_stack.quantum.algorithms.adapt",
+        "FermionicAdaptVQE",
+        {"tetris_style": True},
+    ),
+    "iqeb": ("qchem_stack.quantum.algorithms.iqeb", "IQEBVQE", {}),
+    "sa_vqe": ("qchem_stack.quantum.algorithms.sa_vqe", "SAVQE", {}),
+    "qpe_kitaev": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmKitaevQPE", {}),
+    "qpe_deterministic": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmDeterministicQPE", {}),
+    "qpe_info_theory": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmInfoTheoryQPE", {}),
+}
+
+
 def _model_factory_from_plugin_id(pid: str) -> Callable[..., Any] | None:
-    if pid == "vqe":
-        from qchem_stack.quantum.algorithms.vqe import VQE
+    """Get a model factory callable for a given plugin ID.
 
-        return lambda hamiltonian, **kwargs: VQE(hamiltonian, **kwargs)
-    if pid == "adapt":
-        from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
+    Returns a callable that instantiates the algorithm class, or None if the plugin ID
+    is not recognized. Uses lazy imports to avoid circular dependencies.
+    """
+    if pid not in _MODEL_FACTORY_MAP:
+        return None
 
-        return lambda hamiltonian, **kwargs: FermionicAdaptVQE(hamiltonian, **kwargs)
-    if pid == "tetris_adapt":
-        from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
+    module_name, class_name, default_kwargs = _MODEL_FACTORY_MAP[pid]
 
-        return lambda hamiltonian, **kwargs: FermionicAdaptVQE(
-            hamiltonian, tetris_style=True, **kwargs
-        )
-    if pid == "iqeb":
-        from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
+    def factory(hamiltonian: Any, **kwargs: Any) -> Any:
+        import importlib
 
-        return lambda hamiltonian, **kwargs: IQEBVQE(hamiltonian, **kwargs)
-    if pid == "sa_vqe":
-        from qchem_stack.quantum.algorithms.sa_vqe import SAVQE
+        module = importlib.import_module(module_name)
+        cls = getattr(module, class_name)
+        merged_kwargs = {**default_kwargs, **kwargs}
+        return cls(hamiltonian, **merged_kwargs)
 
-        return lambda hamiltonian, **kwargs: SAVQE(hamiltonian, **kwargs)
-    if pid == "qpe_kitaev":
-        from qchem_stack.quantum.algorithms.qpe import AlgorithmKitaevQPE
-
-        return lambda hamiltonian, **kwargs: AlgorithmKitaevQPE(hamiltonian, **kwargs)
-    if pid == "qpe_deterministic":
-        from qchem_stack.quantum.algorithms.qpe import AlgorithmDeterministicQPE
-
-        return lambda hamiltonian, **kwargs: AlgorithmDeterministicQPE(hamiltonian, **kwargs)
-    if pid == "qpe_info_theory":
-        from qchem_stack.quantum.algorithms.qpe import AlgorithmInfoTheoryQPE
-
-        return lambda hamiltonian, **kwargs: AlgorithmInfoTheoryQPE(hamiltonian, **kwargs)
-    return None
+    return factory
 
 
 def _initial_registry() -> dict[str, VariationalPluginRecord]:

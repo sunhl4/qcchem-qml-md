@@ -22,6 +22,17 @@ if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
+from qchem_stack.quantum.algorithms.tolerances import ADAPT_GRAD_TOLERANCE
+
+# Default configuration constants
+DEFAULT_MAX_OPS = 4
+DEFAULT_HEA_DEPTH = 1
+DEFAULT_GRAD_TOL = ADAPT_GRAD_TOLERANCE
+DEFAULT_SEED = 0
+TETRIS_MAX_OPERATORS_PER_ROUND = 4
+COBYLA_MAXITER = 80
+
+
 @dataclass
 class AdaptResult:
     energy: float
@@ -41,8 +52,8 @@ class FermionicAdaptVQE(AlgorithmBase):
         hamiltonian: QubitHamiltonian,
         pool: list[QubitOperator] | None = None,
         pool_id: str = "fermionic_uccsd",
-        max_ops: int = 4,
-        hea_depth: int = 1,
+        max_ops: int = DEFAULT_MAX_OPS,
+        hea_depth: int = DEFAULT_HEA_DEPTH,
         tetris_style: bool = False,
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> None:
@@ -69,8 +80,8 @@ class FermionicAdaptVQE(AlgorithmBase):
 
     def run(
         self,
-        grad_tol: float = 1e-2,
-        seed: int = 0,
+        grad_tol: float = DEFAULT_GRAD_TOL,
+        seed: int = DEFAULT_SEED,
         executor: HamiltonianExpectationExecutor | None = None,
     ) -> AdaptResult:
         self._ensure_built()
@@ -135,7 +146,7 @@ class FermionicAdaptVQE(AlgorithmBase):
                         continue
                     selected_this_round.append(idx)
                     used_qubits |= term_qubits
-                    if len(selected_this_round) >= 4:
+                    if len(selected_this_round) >= TETRIS_MAX_OPERATORS_PER_ROUND:
                         break
 
             round_sel = tuple(selected_this_round)
@@ -149,7 +160,7 @@ class FermionicAdaptVQE(AlgorithmBase):
                 return energy_fn(hea_x, trial)
 
             x0 = np.concatenate([hea_angles, np.zeros(len(selected_this_round), dtype=float)])
-            res = minimize(full_obj, x0, method="COBYLA", options={"maxiter": 80})
+            res = minimize(full_obj, x0, method="COBYLA", options={"maxiter": COBYLA_MAXITER})
             hea_angles = np.asarray(res.x[:n_hea], dtype=float)
             for k, idx in enumerate(selected_this_round):
                 layers.append((idx, float(res.x[n_hea + k])))

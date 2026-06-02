@@ -45,8 +45,8 @@ def ml_md_bridge_surface_v1() -> dict[str, Any]:
             "mace_config_stub": "qchem_stack.md_bridge.hooks.write_mace_yaml_stub",
         },
         "surrogate_active_learning": {
-            "ridge_energy_surrogate": "qchem_stack.ml.surrogate.SurrogateEnergyModel",
-            "discrete_pool_loop": "qchem_stack.ml.active_learning.ActiveLearningLoop",
+            "ridge_energy_surrogate": "qchem_stack.md_bridge.active_learning.SurrogateEnergyModel",
+            "discrete_pool_loop": "qchem_stack.md_bridge.active_learning.ActiveLearningLoop",
         },
         "http_routes": {
             "surface": "GET /v1/meta/ml-md-bridge",

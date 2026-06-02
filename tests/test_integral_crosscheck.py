@@ -10,28 +10,16 @@ from qchem_stack.chem.restricted_integral_operator import (
     RestrictedActiveSpaceIntegralOperatorCompact,
 )
 from qchem_stack.config import ExperimentConfig
+from tests.helpers.h2_yaml import h2_yaml_dict
 
 
 def _minimal_cfg() -> ExperimentConfig:
     return ExperimentConfig.model_validate(
-        {
-            "schema_version": "2",
-            "experiment_id": "xchk",
-            "random_seed": 0,
-            "molecule": {
-                "symbols": ["H", "H"],
-                "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-                "coordinate_unit": "bohr",
-                "charge": 0,
-                "multiplicity": 1,
-                "basis": "sto-3g",
-            },
-            "scf": {"driver": "psi4", "method": "RHF"},
-            "active_space": {
-                "strategy": "cas",
-                "cas": {"n_orbitals": 2, "n_electrons": 2},
-            },
-            "backend": {
+        h2_yaml_dict(
+            experiment_id="xchk",
+            random_seed=0,
+            scf={"driver": "psi4", "method": "RHF"},
+            backend={
                 "name": "statevector_sim",
                 "provider": "statevector",
                 "shots_per_circuit": 1,
@@ -39,20 +27,16 @@ def _minimal_cfg() -> ExperimentConfig:
                 "ionstack_endpoint": None,
                 "meta": {},
             },
-            "mitigation": {
-                "zne": {"enabled": False},
-                "pmsv": {"enabled": False},
-            },
-            "compiler": {"optimization_level": 0},
-            "quantum": {
+            mitigation={"zne": {"enabled": False}, "pmsv": {"enabled": False}},
+            compiler={"optimization_level": 0},
+            quantum={
                 "algorithm": "vqe",
                 "variational": {"ansatz": "uccsd"},
                 "pauli": {"use_protocol": False},
                 "vqe": {"maxiter": 1},
             },
-            "embedding": {"mode": "none"},
-            "chemistry_extended": {"post_hf": {"integral_crosscheck": "pyscf_casci"}},
-        }
+            chemistry_extended={"post_hf": {"integral_crosscheck": "pyscf_casci"}},
+        )
     )
 
 

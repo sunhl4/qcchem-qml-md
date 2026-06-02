@@ -108,6 +108,15 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
         "status": "reference",
     },
     {
+        "id": "uccsd_scbk_trotter_circuit",
+        "release_anchor": "docs/技术文档_UCCSD_JW与BK_SCBK电路边界.md",
+        "open_stack_surface": (
+            "UCCSD product-formula Trotter circuits are supported for JW and BK only; "
+            "SCBK UCCSD Trotter remains n/a (HEA+SCBK and mapping registry document the boundary)."
+        ),
+        "status": "n/a",
+    },
+    {
         "id": "driver_surface_breadth",
         "release_anchor": "product_capability_matrix.md#driver-surface",
         "open_stack_surface": "PySCF-focused surface with ddCOSMO and PBC variants; broader driver matrix is partial.",

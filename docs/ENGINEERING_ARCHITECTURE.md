@@ -103,7 +103,7 @@ Gateway services should map these to HTTP/status codes and structured logs witho
 ## 8. Observability (`run_context`, `pipeline_profile`)
 
 - **`repro["run_context"]`** — `schema: run_context_v1`, `trace_id` (UUID or propagated), optional `client_request_id`. Pass `run_context=` into `run_pipeline_sync` / `run_pipeline_from_config`, or build via `RunContext.from_headers(...)` (`traceparent` → trace id, then `X-Trace-ID`, then new UUID; `X-Request-ID` → `client_request_id`).
-- **`repro["pipeline_profile"]`** — `schema: pipeline_profile_v1`, `stages` (per-segment `duration_ms` between successive `mark` calls), `total_wall_ms`. Final segment **`finalize_repro`** covers parity snapshot / run-summary attachment overhead before the profile dict is written. Summaries also appear in `run_summary` (`pipeline_total_wall_ms`, `pipeline_slowest_stage`, etc.).
+- **`repro["pipeline_profile"]`** — `schema: pipeline_profile_v1`, `stages` (per-segment `duration_ms` between successive `mark` calls), `total_wall_ms`. Optional `peak_memory_kb` per stage when `QCHEM_PIPELINE_PROFILE_MEM=1`. Final segment **`finalize_repro`** covers parity snapshot / run-summary attachment overhead before the profile dict is written. Summaries also appear in `run_summary` (`pipeline_total_wall_ms`, `pipeline_slowest_stage`, etc.).
 
 ## 9. HTTP API (optional extra)
 

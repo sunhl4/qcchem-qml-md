@@ -19,17 +19,22 @@ _log = logging.getLogger(__name__)
 if TYPE_CHECKING:
     from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
-# Default HMAC key - in production, this should be set via environment variable
-# QCHEM_PROTOCOL_HMAC_KEY or configured through application settings
-_DEFAULT_HMAC_KEY = b"qchem-stack-protocol-serialization-key-v1"
-
 
 def _get_hmac_key() -> bytes:
-    """Get HMAC key from environment or use default."""
+    """Get HMAC key from environment variable.
+
+    Raises:
+        ConfigurationError: If QCHEM_PROTOCOL_HMAC_KEY is not set.
+    """
     key_str = os.environ.get("QCHEM_PROTOCOL_HMAC_KEY")
-    if key_str:
-        return key_str.encode("utf-8")
-    return _DEFAULT_HMAC_KEY
+    if not key_str:
+        from qchem_stack.exceptions import ConfigurationError
+
+        raise ConfigurationError(
+            "QCHEM_PROTOCOL_HMAC_KEY environment variable is required for protocol serialization. "
+            "Set this to a 32+ byte random key for production use."
+        )
+    return key_str.encode("utf-8")
 
 
 def secure_dumps(obj: Any) -> bytes:
@@ -43,7 +48,7 @@ def secure_dumps(obj: Any) -> bytes:
     Returns:
         Bytes containing HMAC signature followed by pickle data
     """
-    data = pickle.dumps(obj)
+    data = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
     key = _get_hmac_key()
     signature = hmac.new(key, data, hashlib.sha256).digest()
     return signature + data
@@ -99,6 +104,14 @@ def secure_loads(data: bytes, expected_type: type | None = None) -> Any:
             return _finalize_loaded(pickle.loads(payload), expected_type)
 
     if _looks_like_pickle_payload(data):
+        # Security: reject legacy unsigned pickles by default
+        _allow_legacy = os.environ.get("QCHEM_ALLOW_LEGACY_PICKLE", "").lower()
+        if _allow_legacy not in {"1", "true", "yes"}:
+            raise ValueError(
+                "Loading legacy unsigned pickle payloads is disabled by default for security. "
+                "To enable for migration, set QCHEM_ALLOW_LEGACY_PICKLE=1 and re-save via "
+                "PauliAveragingProtocol.dumps() to upgrade to HMAC-signed format."
+            )
         warnings.warn(
             "Loading legacy unsigned protocol pickle blob; re-save via "
             "PauliAveragingProtocol.dumps() to upgrade to HMAC-signed format.",
@@ -114,13 +127,39 @@ def secure_loads(data: bytes, expected_type: type | None = None) -> Any:
     raise ValueError("Data too short to contain valid HMAC signature or legacy pickle payload")
 
 
+def _protocol_blob_v2_enabled() -> bool:
+    return os.environ.get("QCHEM_PROTOCOL_BLOB_V2", "").lower() in {"1", "true", "yes"}
+
+
+def _signed_payload(data: bytes) -> bytes:
+    key = _get_hmac_key()
+    signature = hmac.new(key, data, hashlib.sha256).digest()
+    return signature + data
+
+
 def secure_dumps_protocol(proto: PauliAveragingProtocol) -> bytes:
-    """Serialize PauliAveragingProtocol with HMAC signature."""
+    """Serialize PauliAveragingProtocol with HMAC signature (pickle v1 or JSON v2)."""
+    if _protocol_blob_v2_enabled():
+        from qchem_stack.protocols.protocol_v2_document import protocol_v2_dumps
+
+        return _signed_payload(protocol_v2_dumps(proto))
     return secure_dumps(proto)
 
 
 def secure_loads_protocol(data: bytes) -> PauliAveragingProtocol:
-    """Deserialize PauliAveragingProtocol with HMAC signature verification."""
+    """Deserialize PauliAveragingProtocol (HMAC JSON v2 or signed/legacy pickle v1)."""
     from qchem_stack.protocols.protocol import PauliAveragingProtocol
+    from qchem_stack.protocols.protocol_v2_document import (
+        is_protocol_v2_json_payload,
+        protocol_v2_loads,
+    )
+
+    if len(data) >= 32:
+        valid, payload = _hmac_signature_valid(data)
+        if valid and is_protocol_v2_json_payload(payload):
+            return protocol_v2_loads(payload)
+
+    if is_protocol_v2_json_payload(data):
+        return protocol_v2_loads(data)
 
     return cast("PauliAveragingProtocol", secure_loads(data, expected_type=PauliAveragingProtocol))

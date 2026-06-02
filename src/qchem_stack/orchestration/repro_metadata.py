@@ -55,7 +55,7 @@ def collect_repro_metadata_impl(
     qh: QubitHamiltonian | None = None,
 ) -> dict[str, Any]:
     """Hashes and versions for job/publication reproducibility."""
-    from qchem_stack.integrations.workflow_preview import (
+    from qchem_stack.protocols.workflow_preview import (
         workflow_preview_payload,
         workflow_preview_qpe_track_slice_v1,
         workflow_preview_variational_execution_slice_v1,

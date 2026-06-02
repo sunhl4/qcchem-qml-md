@@ -32,6 +32,7 @@ from qchem_stack.contracts.schema_ids import (
     ALGORITHM_UCCSD_REPORT_V1,
     UCCSD_MAPPING_SUPPORT_MATRIX_V1,
 )
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 from qchem_stack.quantum.algorithms.uccsd_mapping import (
     antihermitian_cluster_matrices,
     reference_state_dense,
@@ -123,7 +124,7 @@ class UCCSDVQE:
         for i in jw_number_indices(self._n_e, self.n_qubits):
             out[i] = psi[i]
         nrm = float(np.linalg.norm(out))
-        if nrm < 1e-14:
+        if nrm < NUMERICAL_TOLERANCE:
             return self._reference_state()
         return out / nrm
 
@@ -132,7 +133,7 @@ class UCCSDVQE:
         if self._fermion_mapping == "jordan_wigner":
             return self._project_jw_fixed_electron_sector(psi)
         nrm = float(np.linalg.norm(psi))
-        if nrm < 1e-14:
+        if nrm < NUMERICAL_TOLERANCE:
             raise ValueError("UCCSD state collapsed to zero norm after propagation.")
         return psi / nrm
 
@@ -141,7 +142,7 @@ class UCCSDVQE:
         for th, a in zip(angles, self._antiherm_mats, strict=False):
             psi = expm(float(th) * a) @ psi
             nrm = float(np.linalg.norm(psi))
-            if nrm < 1e-14:
+            if nrm < NUMERICAL_TOLERANCE:
                 raise ValueError("UCCSD state collapsed to zero norm.")
             psi = psi / nrm
         return self._post_propagation_state(psi)
@@ -274,7 +275,7 @@ class UCCSDTrotterVQE(UCCSDVQE):
             for th, a in zip(angles, self._antiherm_mats, strict=True):
                 psi = expm(float(th * inv) * a) @ psi
                 nrm = float(np.linalg.norm(psi))
-                if nrm < 1e-14:
+                if nrm < NUMERICAL_TOLERANCE:
                     raise ValueError("UCCSD Trotter state collapsed to zero norm.")
                 psi = psi / nrm
         return self._post_propagation_state(psi)

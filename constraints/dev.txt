@@ -1,0 +1,6 @@
+# Optional pins for maintainer profile: pip install -c constraints/dev.txt -e ".[dev]"
+# Regenerate after major dependency bumps; CI uses pyproject.toml ranges by default.
+
+qiskit>=2.0,<3
+qiskit-aer>=0.13
+pyscf>=2.4

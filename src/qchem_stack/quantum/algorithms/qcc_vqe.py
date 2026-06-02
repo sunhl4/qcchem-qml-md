@@ -10,6 +10,7 @@ from scipy.linalg import expm
 from scipy.optimize import minimize
 
 from qchem_stack.contracts.schema_ids import ALGORITHM_UCCSD_REPORT_V1
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 from qchem_stack.quantum.operator_pool_registry import build_registered_operator_pool
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
 
@@ -66,7 +67,7 @@ class QCCVQE:
         for th, mat in zip(angles, self._cluster_mats, strict=False):
             psi = expm(float(th) * mat) @ psi
             nrm = float(np.linalg.norm(psi))
-            if nrm < 1e-14:
+            if nrm < NUMERICAL_TOLERANCE:
                 raise ValueError("QCC state collapsed to zero norm.")
             psi = psi / nrm
         return psi

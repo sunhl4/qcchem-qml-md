@@ -1,0 +1,26 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_system"
+
+[project]
+name = "qchem-stack-uqc"
+version = "0.1.0"
+description = "UQC Cloud Platform backend for qchem-stack"
+requires-python = ">=3.10"
+license = {text = "Apache-2.0"}
+authors = [{name = "QChem Stack Team"}]
+dependencies = [
+    "qchem-stack>=0.1.0",
+    "uqc-client>=0.1.3",
+    "qiskit>=1.0.0",
+    "numpy>=1.24.0",
+]
+
+[project.entry-points."qchem_stack.backends"]
+uqc = "qchem_stack_uqc:UQCCloudHeaExecutor"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-dir]
+"" = "src"

@@ -46,22 +46,41 @@ if TYPE_CHECKING:
     from .molecule import MoleculeSpec
 
 
-class ExperimentConfig(BaseModel):
-    """Validated experiment contract spanning chemistry, backend, and algorithm specs."""
+class CoreExperimentConfig(BaseModel):
+    """Essential experiment configuration with the 6 core fields.
+
+    This provides a minimal configuration surface for users who only need
+    the essential fields: experiment identity, molecular system, active space,
+    and the three main execution layers (SCF, quantum, backend).
+
+    For full configuration with all optional features (embedding, mitigation,
+    extended chemistry, etc.), use :class:`ExperimentConfig` which inherits
+    from this class.
+    """
+
+    experiment_id: str
+    molecule: MoleculeSpec
+    active_space: ActiveSpaceSpec
+    scf: SCFSpec = Field(default_factory=SCFSpec)
+    quantum: QuantumSpec = Field(default_factory=QuantumSpec)
+    backend: BackendSpecConfig = Field(default_factory=BackendSpecConfig)
+
+
+class ExperimentConfig(CoreExperimentConfig):
+    """Validated experiment contract spanning chemistry, backend, and algorithm specs.
+
+    Inherits from :class:`CoreExperimentConfig` and adds 11 optional fields for
+    advanced features: embedding, mitigation, extended chemistry, cloud integrations,
+    and more.
+    """
 
     schema_version: str = Field(
         default="2",
         description='Experiment schema generation; nested YAML requires "2".',
     )
-    experiment_id: str
     random_seed: int = 0
-    molecule: MoleculeSpec
-    scf: SCFSpec = Field(default_factory=SCFSpec)
-    active_space: ActiveSpaceSpec
-    backend: BackendSpecConfig = Field(default_factory=BackendSpecConfig)
     mitigation: MitigationSpec = Field(default_factory=MitigationSpec)
     compiler: CompilerSpec = Field(default_factory=CompilerSpec)
-    quantum: QuantumSpec = Field(default_factory=QuantumSpec)
     embedding: EmbeddingSpec = Field(default_factory=EmbeddingNone)
     chemistry_extended: ChemistryExtendedSpec = Field(default_factory=ChemistryExtendedSpec)
     nexus_analog: NexusAnalogSpec = Field(default_factory=NexusAnalogSpec)

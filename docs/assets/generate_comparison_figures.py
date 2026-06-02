@@ -4,11 +4,9 @@ Generate visual comparison figures for three platforms: commercial stack, Tangel
 Style: Infographic-style comparison charts.
 """
 
-import numpy as np
 import matplotlib.pyplot as plt
-from matplotlib.patches import FancyBboxPatch, Circle, Rectangle, FancyArrowPatch
-from matplotlib.collections import PatchCollection
-import matplotlib.patheffects as path_effects
+import numpy as np
+from matplotlib.patches import FancyBboxPatch
 
 plt.rcParams['font.family'] = 'sans-serif'
 plt.rcParams['font.sans-serif'] = ['Arial', 'DejaVu Sans']

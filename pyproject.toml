@@ -4,13 +4,25 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "qchem-stack"
-version = "0.1.0"
+version = "0.6.0"
 description = "Quantum chemistry orchestration: classical downfolding, protocols, ML fusion, MD bridge"
-# Intentionally no readme= path: setuptools reads it as UTF-8; copies on /mnt/d (Windows) may be GBK
-# and break pip install -e. Full prose remains in repository README.md.
+readme = "README_PYPI.md"
+# Full prose remains in repository README.md (may use non-ASCII on some filesystems).
 requires-python = ">=3.10"
 license = { text = "Apache-2.0" }
 authors = [{ name = "Yaozheng" }]
+keywords = ["quantum-chemistry", "vqe", "workflow", "reproducibility"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: Apache Software License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Scientific/Engineering :: Chemistry",
+    "Topic :: Scientific/Engineering :: Physics",
+]
 dependencies = [
     "numpy>=1.24",
     "opt-einsum>=3.3",
@@ -21,9 +33,16 @@ dependencies = [
     "pandas>=2.0",
 ]
 
+[project.urls]
+Homepage = "https://github.com/sunhl4/qcchem-qml-md"
+Repository = "https://github.com/sunhl4/qcchem-qml-md"
+Documentation = "https://github.com/sunhl4/qcchem-qml-md/tree/main/docs"
+"Release process" = "https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/engineering/pypi_release.md"
+
 [project.optional-dependencies]
 chem = ["pyscf>=2.4"]
-quantum = ["qiskit>=1.0", "qiskit-aer>=0.13"]
+# Qiskit 2.x is required for both quantum and uqc extras ([all]/[dev] resolve consistently).
+quantum = ["qiskit>=2.0", "qiskit-aer>=0.13"]
 pytket = ["pytket>=1.25"]
 nexus = ["qnexus>=0.4"]
 uqc = ["uqc-client>=0.1", "qiskit>=2.0", "qiskit-aer>=0.13"]
@@ -35,12 +54,11 @@ api = ["fastapi>=0.100", "uvicorn[standard]>=0.23", "slowapi>=0.1.9"]
 # qmlff is meant to live alongside this repo as a sibling editable install.
 qmlff = ["jax-md>=0.2"]
 all = ["qchem-stack[chem,quantum,pytket,nexus,uqc]"]
-dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.3", "pre-commit>=3.8", "pyright>=1.1"]
+dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.3", "pre-commit>=3.8", "pyright>=1.1", "hypothesis>=6.0", "nbmake>=1.4", "pip-tools>=7.0"]
 examples_viz = ["matplotlib>=3.7"]
 
 [project.scripts]
 qchem-jobs-worker = "qchem_stack.jobs.worker:main"
-qchem-pipeline-worker = "qchem_stack.jobs.worker:main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
@@ -53,7 +71,7 @@ addopts = [
     "--cov=src/qchem_stack",
     "--cov-report=term-missing",
     "--cov-report=html",
-    "--cov-fail-under=75",
+    "--cov-fail-under=80",
 ]
 markers = [
     "l3: optional deep numerical benchmarks (QCHEM_RUN_L3=1)",
@@ -85,7 +103,7 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
 ]
-fail_under = 75
+fail_under = 80
 show_missing = true
 skip_covered = false
 
@@ -111,7 +129,7 @@ select = [
   "UP",
 ]
 ignore = []
-extend-select = ["TCH", "B", "SIM"]
+extend-select = ["TCH", "B", "SIM", "B905"]
 
 [tool.ruff.lint.isort]
 known-first-party = ["qchem_stack"]
@@ -124,6 +142,8 @@ known-first-party = ["qchem_stack"]
 "src/qchem_stack/api/**" = ["TCH001"]
 "src/qchem_stack/chem/drivers/pyscf_driver.py" = ["E402"]
 "src/qchem_stack/chem/embedding/schmidt_production.py" = ["E402"]
+"src/qchem_stack/__init__.py" = ["E402"]
+"src/qchem_stack/orchestration/pipeline_events.py" = ["TCH003"]
 
 [tool.pyright]
 include = ["src/qchem_stack"]

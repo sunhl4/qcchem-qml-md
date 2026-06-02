@@ -77,7 +77,7 @@ def scf_energy_with_wavefunction(
                 mo_e = np.real(np.diagonal(mo.T @ np.asarray(wfn.H().np, dtype=float) @ mo)).astype(
                     float
                 )
-        except Exception:
+        except (np.linalg.LinAlgError, ValueError, TypeError):  # noqa: BLE001
             mo_e = np.real(np.diagonal(mo.T @ np.asarray(wfn.H().np, dtype=float) @ mo)).astype(
                 float
             )

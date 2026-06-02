@@ -148,6 +148,7 @@ def build_frame_records(
     label_theory_level: str,
     trajectory: JaxMdTrajectory,
     energy_shift_hartree: float = 0.0,
+    energy_reference_used: str = "variational",
 ) -> tuple[list[FrameValidationRecord], dict[int, dict[str, Any]]]:
     """Build per-MD-frame |ΔE| records and a JSON-friendly debug mapping."""
     # Map from index-in-candidate_geoms to QMEF frame coming back from labeling.
@@ -181,8 +182,12 @@ def build_frame_records(
             e_ref = float("nan")
             delta = float("nan")
             abs_delta = float("inf")
+            delta_raw = float("nan")
+            abs_delta_raw = float("inf")
         else:
             e_ref = float(qchem_frame.energy_hartree)
+            delta_raw = float(e_qml) - e_ref
+            abs_delta_raw = abs(delta_raw)
             e_qml_cal = float(e_qml) + float(energy_shift_hartree)
             delta = e_qml_cal - e_ref
             abs_delta = abs(delta)
@@ -195,6 +200,9 @@ def build_frame_records(
             abs_delta_hartree=float(abs_delta),
             converged=bool(abs_delta < tolerance_hartree),
             theory_level=str(label_theory_level),
+            energy_reference_used=str(energy_reference_used),
+            delta_hartree_raw=float(delta_raw),
+            abs_delta_hartree_raw=float(abs_delta_raw),
         )
         records.append(rec)
         debug[i] = {
@@ -382,6 +390,7 @@ def run_validation_round(
         label_theory_level=val_theory,
         trajectory=trajectory,
         energy_shift_hartree=energy_shift,
+        energy_reference_used=val_energy_ref,
     )
 
     # If all converged → stop.

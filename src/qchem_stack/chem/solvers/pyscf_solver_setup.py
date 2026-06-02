@@ -156,7 +156,8 @@ def build_mean_field_factory(
 
 def make_pbc_cell(solver: PySCFIntegralSolver, gto_pbc: Any) -> Any:
     pbc = solver.chemistry_extended.pbc.cell_vectors_bohr
-    assert pbc is not None
+    if pbc is None:
+        raise ValueError("PBC cell vectors not configured")
     a = np.asarray(pbc, dtype=float)
     return gto_pbc.M(
         atom=atom_block(solver),

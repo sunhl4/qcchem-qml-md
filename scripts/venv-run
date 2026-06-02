@@ -4,7 +4,16 @@ set -euo pipefail
 # Default Python for this workspace. Override anytime, e.g.:
 #   export QCHEM_STACK_PYTHON=/path/to/python
 #   ./scripts/venv-run pytest tests -q
-default_python=${QCHEM_STACK_PYTHON:-$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo "")}
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+REPO_VENV_PYTHON="$ROOT/.venv/bin/python"
+
+if [[ -n "${QCHEM_STACK_PYTHON:-}" ]]; then
+  default_python="$QCHEM_STACK_PYTHON"
+elif [[ -x "$REPO_VENV_PYTHON" ]]; then
+  default_python="$REPO_VENV_PYTHON"
+else
+  default_python="$(command -v python3 2>/dev/null || command -v python 2>/dev/null || echo "")"
+fi
 
 VENV_PYTHON="$default_python"
 

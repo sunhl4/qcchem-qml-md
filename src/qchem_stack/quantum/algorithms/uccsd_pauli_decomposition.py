@@ -7,6 +7,11 @@ from typing import Any, Literal, cast
 import numpy as np
 from scipy.linalg import expm
 
+from qchem_stack.quantum.algorithms.tolerances import (
+    CONVERGENCE_TOLERANCE,
+    FLOAT_PRECISION_TINY,
+    NUMERICAL_TOLERANCE,
+)
 from qchem_stack.quantum.statevector import _kron_n, _pauli_char_to_mat
 
 DecompositionMode = Literal["pauli", "unitary"]
@@ -30,7 +35,7 @@ def decompose_antihermitian_to_pauli_terms(
     antiherm: np.ndarray,
     n_qubits: int,
     *,
-    coeff_tol: float = 1e-12,
+    coeff_tol: float = CONVERGENCE_TOLERANCE,
 ) -> list[tuple[str, complex]]:
     """Expand anti-Hermitian ``A`` as ``sum_k c_k P_k`` with Hermitian Pauli strings ``P_k``."""
     dim = 2**n_qubits
@@ -83,7 +88,7 @@ def pauli_rotation_elementary_ops(
     n = len(pauli_string)
     try:
         return _pauli_rotation_elementary_ops_qiskit(pauli_string, phi, n_qubits=n)
-    except Exception:
+    except (ImportError, RuntimeError, ValueError):
         return _pauli_rotation_elementary_ops_manual(pauli_string, phi)
 
 
@@ -97,7 +102,7 @@ def _pauli_rotation_elementary_ops_qiskit(
     from qiskit.circuit.library import PauliEvolutionGate
     from qiskit.quantum_info import Pauli
 
-    if abs(float(phi)) < 1e-15:
+    if abs(float(phi)) < FLOAT_PRECISION_TINY:
         return []
     n = int(n_qubits)
 
@@ -223,7 +228,7 @@ def cluster_layer_ops(
     ops: list[dict[str, Any]] = []
     for ps, coeff in terms:
         phi = pauli_rotation_angle_from_cluster(angle, coeff)
-        if abs(phi) < 1e-15:
+        if abs(phi) < FLOAT_PRECISION_TINY:
             continue
         for op in pauli_rotation_ops(ps, phi, emit_mode=emit_mode):
             tagged = dict(op)
@@ -255,7 +260,7 @@ def apply_cluster_expm_statevector(
     u = cluster_expm_via_pauli_product(antiherm, angle, n_qubits)
     out = u @ state
     nrm = float(np.linalg.norm(out))
-    if nrm < 1e-14:
+    if nrm < NUMERICAL_TOLERANCE:
         raise ValueError("UCCSD Pauli cluster layer collapsed state to zero norm.")
     return cast("np.ndarray", out / nrm)
 

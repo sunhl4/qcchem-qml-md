@@ -1,0 +1,9 @@
+# Research profile overlay — rich parity preview sidecars on top of a base H2 YAML.
+schema_version: "2"
+experiment_id: research_h2_profile
+parity_integrations:
+  resource_estimation_preview: true
+  include_computables_rich_in_repro: true
+quantum:
+  pauli:
+    use_protocol: true

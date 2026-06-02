@@ -83,7 +83,7 @@ HTTP 异步入队常见键：
 
 ## 4. Worker：`dispatch_job`
 
-- `qchem-jobs-worker` / `qchem-pipeline-worker`：`drain_one_queued` → `jobs/worker_dispatch.dispatch_job`。
+- `qchem-jobs-worker`：`drain_one_queued` → `jobs/worker_dispatch.dispatch_job`。
 - `full_pipeline` → `run_full_pipeline_job` → `pipeline_result_for_job_store` → `complete`。
 - 结果白名单含 **`nexus_analog_ledger`**、缓解/张量网/QPE 侧车等键（与同步管线对齐）；与 [pipeline 侧挂接](工程记忆_Quantinuum对标与数据流技术文档.md)一致。
 

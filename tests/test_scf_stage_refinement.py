@@ -14,30 +14,23 @@ from qchem_stack.orchestration.scf_stage import (
     refine_mean_field_for_active_space,
     run_scf_reference,
 )
+from tests.helpers.h2_yaml import h2_yaml_dict
 from tests.helpers.solver_registry_state import reset_solver_registry_state
 
 
 def _minimal_h2_cfg(*, strategy: str = "cas") -> ExperimentConfig:
-    raw: dict = {
-        "schema_version": "2",
-        "experiment_id": "scf_stage_refinement",
-        "random_seed": 1,
-        "molecule": {
-            "symbols": ["H", "H"],
-            "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.4]],
-            "coordinate_unit": "bohr",
-            "charge": 0,
-            "multiplicity": 1,
-            "basis": "sto-3g",
-        },
-        "active_space": {
+    raw = h2_yaml_dict(
+        experiment_id="scf_stage_refinement",
+        active_space={
             "strategy": strategy,
             "cas": {"n_orbitals": 2, "n_electrons": 2},
         },
-        "scf": {"driver": "pyscf", "method": "RHF"},
-        "embedding": {"mode": "none"},
-        "quantum": {"algorithm": "vqe", "vqe": {"depth": 1, "maxiter": 5}},
-    }
+        quantum={
+            "algorithm": "vqe",
+            "vqe": {"depth": 1, "maxiter": 5},
+            "pauli": {"use_protocol": False},
+        },
+    )
     if strategy == "avas":
         raw["chemistry_extended"] = {"avas": {"ao_labels": ["H 1s"]}}
     return ExperimentConfig.from_yaml_dict(raw)

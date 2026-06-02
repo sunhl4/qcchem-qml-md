@@ -44,7 +44,24 @@ quantum:
     run_qiskit_shots: false
 
 mitigation:
-  pmsv_enabled: false
-  zne_enabled: false
+  execution_class: unspecified
+  zne:
+    enabled: false
+    mode: scalar_stub
+    scales:
+    - 1.0
+    - 1.5
+    - 2.0
+  pmsv:
+    enabled: false
+    stabilizers: []
+    retention_rate: 1.0
+    report_extension: default
+    extra: {}
+  stubs:
+    spam_calibration: false
+    pec_literature: false
+    classical_shadows: false
+    classical_shadows_budget_pairs: 256
 
 # Optional: md_ml_export, nexus_analog, chemistry_extended — see docs/config_字段索引.md

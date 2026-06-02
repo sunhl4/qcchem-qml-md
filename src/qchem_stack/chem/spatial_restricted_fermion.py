@@ -38,34 +38,38 @@ def restricted_spatial_integrals_to_fermion_operator(
     if h2a.shape != (norb, norb, norb, norb):
         raise ValueError("h2 must be (norb, norb, norb, norb)")
 
-    fo = FermionOperator()
+    # Build terms as dict to avoid slow incremental += (which is O(terms) per add)
+    terms: dict[tuple, float] = {}
+
+    # One-body terms - vectorized using numpy
+    h1_mask = np.abs(h1a) > atol
+    p_idx, q_idx = np.where(h1_mask)
+    for p, q in zip(p_idx, q_idx, strict=False):
+        c = float(h1a[p, q])
+        terms[((2 * p, 1), (2 * q, 0))] = terms.get(((2 * p, 1), (2 * q, 0)), 0.0) + c
+        terms[((2 * p + 1, 1), (2 * q + 1, 0))] = (
+            terms.get(((2 * p + 1, 1), (2 * q + 1, 0)), 0.0) + c
+        )
+
+    # Two-body terms - vectorized: only iterate over non-zero elements
+    h2_mask = np.abs(h2a) > atol
+    nonzero_indices = np.argwhere(h2_mask)
+    for p, q, r, s in nonzero_indices:
+        coeff = 0.5 * float(h2a[p, q, r, s])
+        # αααα
+        t1 = ((2 * p, 1), (2 * q, 1), (2 * r, 0), (2 * s, 0))
+        terms[t1] = terms.get(t1, 0.0) + coeff
+        # ββββ
+        t2 = ((2 * p + 1, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s + 1, 0))
+        terms[t2] = terms.get(t2, 0.0) + coeff
+        # αβαβ
+        t3 = ((2 * p, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s, 0))
+        terms[t3] = terms.get(t3, 0.0) + coeff
+        # βαβα
+        t4 = ((2 * p + 1, 1), (2 * q, 1), (2 * r, 0), (2 * s + 1, 0))
+        terms[t4] = terms.get(t4, 0.0) + coeff
+
+    # Construct FermionOperator from dict (much faster than incremental +=)
+    fo = FermionOperator(terms)
     fo += FermionOperator((), float(constant))
-
-    for p in range(norb):
-        for q in range(norb):
-            c = float(h1a[p, q])
-            if abs(c) <= atol:
-                continue
-            fo += FermionOperator(((2 * p, 1), (2 * q, 0)), c)
-            fo += FermionOperator(((2 * p + 1, 1), (2 * q + 1, 0)), c)
-
-    for p in range(norb):
-        for q in range(norb):
-            for r in range(norb):
-                for s in range(norb):
-                    v = float(h2a[p, q, r, s])
-                    if abs(v) <= atol:
-                        continue
-                    coeff = 0.5 * v
-                    fo += FermionOperator(((2 * p, 1), (2 * q, 1), (2 * r, 0), (2 * s, 0)), coeff)
-                    fo += FermionOperator(
-                        ((2 * p + 1, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s + 1, 0)),
-                        coeff,
-                    )
-                    fo += FermionOperator(
-                        ((2 * p, 1), (2 * q + 1, 1), (2 * r + 1, 0), (2 * s, 0)), coeff
-                    )
-                    fo += FermionOperator(
-                        ((2 * p + 1, 1), (2 * q, 1), (2 * r, 0), (2 * s + 1, 0)), coeff
-                    )
     return fo

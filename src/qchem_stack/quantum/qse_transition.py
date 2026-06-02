@@ -18,6 +18,7 @@ from qchem_stack.backends.pauli_shot_sim import (
     _pauli_eigenvalue_on_comp_bit,
     apply_pauli_tensor_basis_to_state,
 )
+from qchem_stack.quantum.algorithms.tolerances import PROBABILITY_FLOOR
 from qchem_stack.quantum.statevector import qubit_operator_to_sparse
 
 
@@ -90,7 +91,7 @@ def estimate_transition_pauli_amplitude_grouped_shots(
     dim = len(psi_r)
     p = np.abs(psi_r) ** 2
     psum = float(np.sum(p))
-    if psum < 1e-30:
+    if psum < PROBABILITY_FLOOR:
         return 0j
     p = p / psum
     n_sh = max(1, int(shots))
@@ -98,7 +99,7 @@ def estimate_transition_pauli_amplitude_grouped_shots(
     for _ in range(n_sh):
         b = int(rng.choice(dim, p=p))
         pb = float(p[b])
-        if pb < 1e-30:
+        if pb < PROBABILITY_FLOOR:
             continue
         z = _pauli_eigenvalue_on_comp_bit(pauli_term, b, n_qubits, bk)
         acc += z * np.conj(psi_l[b]) * psi_r[b] / pb

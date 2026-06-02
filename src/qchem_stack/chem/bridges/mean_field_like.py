@@ -40,6 +40,42 @@ class GenericMeanFieldLike:
         return self._raw
 
     def __getattr__(self, name: str) -> Any:
+        # Whitelist of attributes that may be accessed through the raw backend
+        # This prevents accidental access to unintended attributes while maintaining
+        # compatibility with legitimate backend-specific extensions
+        _allowed_passthrough = frozenset(
+            {
+                "mol",
+                "get_ovlp",
+                "get_hcore",
+                "get_fock",
+                "make_rdm1",
+                "make_rdm2",
+                "mo_coeff",
+                "mo_energy",
+                "mo_occ",
+                "e_tot",
+                "converged",
+                "with_df",
+                "with_x2c",
+                "with_solvent",  # PySCF extensions
+                "wfn",
+                "molecule",
+                "basis",
+                "options",  # Psi4 extensions
+            }
+        )
+
+        if name not in _allowed_passthrough:
+            import logging
+
+            logger = logging.getLogger(__name__)
+            logger.warning(
+                "GenericMeanFieldLike: accessing undefined attribute '%s' from raw backend. "
+                "This may indicate a type error. Consider adding an explicit method.",
+                name,
+            )
+
         return getattr(self._raw, name)
 
 

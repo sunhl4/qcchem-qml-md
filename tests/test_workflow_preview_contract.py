@@ -10,13 +10,6 @@ from qchem_stack.config import (
     MoleculeSpec,
     QuantumSpec,
 )
-from qchem_stack.integrations.workflow_preview import (
-    computable_graph_v1,
-    computable_graph_v2,
-    protocol_stages_preview_v1,
-    slim_product_summary_from_pipeline_result,
-    workflow_preview_payload,
-)
 from qchem_stack.protocols.computable import (
     ComputableRef,
     ComputableSpec,
@@ -24,6 +17,13 @@ from qchem_stack.protocols.computable import (
     list_computables_for_config,
     refs_from_computable_graph_v2,
     specs_from_computable_graph_v2,
+)
+from qchem_stack.protocols.workflow_preview import (
+    computable_graph_v1,
+    computable_graph_v2,
+    protocol_stages_preview_v1,
+    slim_product_summary_from_pipeline_result,
+    workflow_preview_payload,
 )
 
 

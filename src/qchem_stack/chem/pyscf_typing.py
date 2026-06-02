@@ -7,6 +7,7 @@ from typing import Any, cast
 import numpy as np
 
 from qchem_stack.chem.bridges.mean_field_like import MeanFieldLike, unwrap_mean_field_raw
+from qchem_stack.quantum.algorithms.tolerances import MO_IMAG_TOLERANCE
 
 # PySCF mean-field / MCSCF objects (attribute surface varies by build).
 PyscfMeanField = Any
@@ -27,7 +28,7 @@ def as_complex_array(value: object) -> np.ndarray:
     return np.asarray(value, dtype=np.complex128)
 
 
-def max_abs_imag(arr: object, *, tol: float = 1e-7) -> float:
+def max_abs_imag(arr: object, *, tol: float = MO_IMAG_TOLERANCE) -> float:
     arr_a = as_complex_array(arr)
     return float(np.max(np.abs(np.imag(arr_a))))
 

@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from qchem_stack.chem.rdm_bundle import RDMBundle
-from qchem_stack.integrations.rdm_corrections import (
+from qchem_stack.chem.kernels.rdm_corrections import (
     build_rdm_correction_readiness,
     run_rdm_correction,
 )
+from qchem_stack.chem.rdm_bundle import RDMBundle
 
 
 def test_readiness_reads_psi4_nevpt2_block() -> None:

@@ -29,6 +29,7 @@ from qchem_stack.chem.hamiltonian import (
     qubit_hamiltonian_from_compact_restricted_active_space,
 )
 from qchem_stack.contracts.schema_ids import RESTRICTED_ACTIVE_SPACE_QUANTUM_PROBLEM_V1
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -153,7 +154,7 @@ def build_restricted_active_space_quantum_problem(
         dtype=np.complex128,
     ).ravel()
     nrm = float(np.linalg.norm(psi))
-    if nrm < 1e-14:
+    if nrm < NUMERICAL_TOLERANCE:
         raise ValueError("JW Hartree–Fock state has zero norm.")
     psi = psi / nrm
     meta: dict[str, Any] = {

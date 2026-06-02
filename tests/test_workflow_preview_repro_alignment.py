@@ -7,11 +7,11 @@ import pytest
 pyscf = pytest.importorskip("pyscf")
 
 from qchem_stack.config import load_experiment_config
-from qchem_stack.integrations.workflow_preview import (
+from qchem_stack.orchestration.pipeline import collect_repro_metadata, run_pipeline_sync
+from qchem_stack.protocols.workflow_preview import (
     slim_product_summary_from_pipeline_result,
     workflow_preview_payload,
 )
-from qchem_stack.orchestration.pipeline import collect_repro_metadata, run_pipeline_sync
 from tests.helpers.paths import configs_path
 
 _WORKFLOW_PREVIEW_GOLDEN_YAMLS = (

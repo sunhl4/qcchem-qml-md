@@ -9,6 +9,10 @@ from typing import TYPE_CHECKING, Any, cast
 import numpy as np
 
 from qchem_stack.backends.pauli_measure_expand import deserialize_basis_key
+from qchem_stack.quantum.algorithms.tolerances import (
+    PROJECTION_NORM_TOLERANCE,
+    STATE_NORMALIZATION_FLOOR,
+)
 from qchem_stack.quantum.statevector import _apply_one_qubit_unitary, _pauli_char_to_mat
 
 if TYPE_CHECKING:
@@ -115,12 +119,12 @@ def _joint_projective_commuting_group_samples(
             outcome = 1 if float(rng.random()) < (1.0 + exp_val) / 2.0 else -1
             projected = st + float(outcome) * p_st
             norm = float(np.linalg.norm(projected))
-            if norm <= 1e-14:
+            if norm <= PROJECTION_NORM_TOLERANCE:
                 # Numerical guard for probabilities rounded to exactly zero.
                 projected = st - float(outcome) * p_st
                 norm = float(np.linalg.norm(projected))
                 outcome *= -1
-            st = projected / (norm + 1e-30)
+            st = projected / (norm + STATE_NORMALIZATION_FLOOR)
             outcomes.append(outcome)
             val += c * float(outcome)
         draws.append(val)
@@ -195,7 +199,7 @@ def energy_estimate_grouped_shot_simulation(
 
         psi_r = apply_pauli_tensor_basis_to_state(psi_hea, bk, n_qubits)
         probs = np.abs(psi_r) ** 2
-        probs = probs / (np.sum(probs) + 1e-30)
+        probs = probs / (np.sum(probs) + STATE_NORMALIZATION_FLOOR)
         basis_draws: list[float] = []
         ctr_g: Counter[int] = Counter()
         for _ in range(shots_per_circuit):

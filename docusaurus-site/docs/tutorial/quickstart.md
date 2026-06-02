@@ -20,12 +20,14 @@ keywords:
 
 ## 1. 安装
 
+安装配置见仓库 [README — Install profiles](https://github.com/)（`core` / `chemistry` / `qiskit-sim` / `uqc-cloud` / `maintainer`）。
+
 ```bash
 cd qchem_qml_md
 pip install -e ".[dev]"
 ```
 
-可选：`pip install -e ".[all]"` 安装 PySCF、Qiskit、pytket 等扩展。
+维护者全量：`[dev]`。仅经典化学：`pip install -e ".[chem]"`。无 PySCF 烟测：`python scripts/smoke_pipeline.py --precomputed-only`。
 
 ## 2. 跑最小端到端（YAML）
 

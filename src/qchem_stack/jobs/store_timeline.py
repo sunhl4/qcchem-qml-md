@@ -17,33 +17,38 @@ class JobStoreTimelineMixin:
     def append_timeline_event(
         self: JobStoreSqlProtocol, job_id: str, event: dict[str, Any]
     ) -> None:
-        con = self._connect()
-        row = con.execute("SELECT timeline_json FROM jobs WHERE job_id=?", (job_id,)).fetchone()
-        if row is None:
-            con.close()
-            raise KeyError(job_id)
-        events = load_timeline_events(row[0])
-        entry = dict(event)
-        if "t" not in entry:
-            entry["t"] = time.time()
-        events.append(entry)
-        con.execute(
-            "UPDATE jobs SET timeline_json=? WHERE job_id=?",
-            (dump_timeline_events(events), job_id),
-        )
-        con.commit()
-        con.close()
+        con, is_temp = self._get_connection()
+        try:
+            row = con.execute("SELECT timeline_json FROM jobs WHERE job_id=?", (job_id,)).fetchone()
+            if row is None:
+                raise KeyError(job_id)
+            events = load_timeline_events(row[0])
+            entry = dict(event)
+            if "t" not in entry:
+                entry["t"] = time.time()
+            events.append(entry)
+            con.execute(
+                "UPDATE jobs SET timeline_json=? WHERE job_id=?",
+                (dump_timeline_events(events), job_id),
+            )
+            con.commit()
+        finally:
+            if is_temp:
+                con.close()
 
     def append_timeline(self: JobStoreSqlProtocol, job_id: str, kind: str, status: str) -> None:
         self.append_timeline_event(job_id, {"kind": kind, "status": status})
 
     def get_job_timeline_events(self: JobStoreSqlProtocol, job_id: str) -> JobTimelineResponse:
-        con = self._connect()
-        row = con.execute(
-            "SELECT timeline_json, created, updated, status FROM jobs WHERE job_id=?",
-            (job_id,),
-        ).fetchone()
-        con.close()
+        con, is_temp = self._get_connection()
+        try:
+            row = con.execute(
+                "SELECT timeline_json, created, updated, status FROM jobs WHERE job_id=?",
+                (job_id,),
+            ).fetchone()
+        finally:
+            if is_temp:
+                con.close()
         if row is None:
             raise KeyError(job_id)
         raw, created, updated, status = row

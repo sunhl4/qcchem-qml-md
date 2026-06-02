@@ -3,13 +3,50 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, cast
+
+import numpy as np
 
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
-from qchem_stack.ml.active_learning import ActiveLearningLoop, max_std_proxy
+from qchem_stack.quantum.algorithms.tolerances import RIDGE_REGULARIZATION
 
 if TYPE_CHECKING:
-    from collections.abc import Sequence
+    from collections.abc import Callable, Sequence
+
+
+@dataclass
+class ActiveLearningLoop:
+    """Pick next geometry index by max predicted uncertainty (toy on discrete pool)."""
+
+    pool_features: np.ndarray
+    acquisition: Callable[[np.ndarray, SurrogateEnergyModel], int]
+
+    def next_index(self, model: SurrogateEnergyModel) -> int:
+        return int(self.acquisition(self.pool_features, model))
+
+
+@dataclass
+class SurrogateEnergyModel:
+    """Ridge-style linear surrogate on scalar features (test / API stub only)."""
+
+    weights: np.ndarray | None = None
+
+    def fit(self, X: np.ndarray, y: np.ndarray, lam: float = RIDGE_REGULARIZATION) -> None:
+        x = np.c_[np.ones(len(X)), X]
+        d = x.shape[1]
+        self.weights = np.linalg.solve(x.T @ x + lam * np.eye(d), x.T @ y)
+
+    def predict(self, X: np.ndarray) -> np.ndarray:
+        if self.weights is None:
+            raise RuntimeError("call fit first")
+        x = np.c_[np.ones(len(X)), X]
+        return cast("np.ndarray", x @ self.weights)
+
+
+def max_std_proxy(X: np.ndarray, model: SurrogateEnergyModel) -> int:
+    """Use deviation from mean prediction as exploration proxy."""
+    preds = model.predict(X)
+    return int(np.argmax(np.abs(preds - preds.mean())))
 
 
 @dataclass(frozen=True)
@@ -60,6 +97,7 @@ def mock_labeling_result(
 __all__ = [
     "ActiveLearningLoop",
     "MockLabelingSpec",
+    "SurrogateEnergyModel",
     "max_std_proxy",
     "mock_labeling_result",
 ]

@@ -1,0 +1,10 @@
+# Production profile overlay — protocol-on defaults with resource preview.
+schema_version: "2"
+experiment_id: production_h2_profile
+parity_integrations:
+  resource_estimation_preview: true
+quantum:
+  pauli:
+    use_protocol: true
+repro:
+  attach_workflow_preview: true

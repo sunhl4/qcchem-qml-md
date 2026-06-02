@@ -30,6 +30,23 @@ Mock 模式无需 API token，使用 statevector 回退。真机/云模拟需 `U
 - `qchem_stack.backends.uqc_transpiler` — rzz/rx/ry 原生门集
 - `qchem_stack.backends.uqc_pauli_measurement` — 比特串 → 能量
 
+## ZNE 能量后处理（可选）
+
+云模拟/硬件 shot 能量可在 executor 层启用 open-stack ZNE 外推（与 `mitigation.zne` 语义对齐的 stub 曲线）：
+
+```yaml
+backend:
+  provider: uqc
+  meta:
+    uqc_mitigation:
+      zne:
+        enabled: true
+        scales: [1.0, 1.5, 2.0]
+        mode: energy_stub   # circuit_scale_fold triggers per-scale UQC submissions (HEA depth fold)
+```
+
+实现：`qchem_stack.backends.uqc_zne_fold.run_uqc_zne_circuit_fold`（真提交多 scale）；`energy_stub` 走 `uqc_mitigation.apply_uqc_zne_mitigation`。trace 在 `UQCCloudHeaExecutor._last_mitigation_trace`，`protocol_counts` 在 `_last_protocol_counts`。
+
 ## 测试
 
 ```bash

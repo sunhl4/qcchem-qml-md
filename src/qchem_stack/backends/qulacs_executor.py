@@ -1,3 +1,19 @@
+"""Qulacs HEA executor with OpenFermion qubit ordering.
+
+**Qubit Index Convention**:
+OpenFermion uses tensor-product ordering where qubit index ``q`` corresponds to tensor axis ``q``.
+Qulacs uses little-endian convention where qubit 0 is the least significant bit (rightmost),
+similar to Qiskit. This executor maps OpenFermion qubit ``q`` to Qulacs wire ``n_qubits - 1 - q``
+to maintain consistency with the statevector reference implementation.
+
+The mapping is applied in:
+- :func:`hea_circuit_qulacs`: rotation and CNOT gates use ``w(q) = n_qubits - 1 - q``
+- :func:`_openfermion_to_qulacs_observable`: Pauli operators use ``wire(idx) = n_qubits - 1 - idx``
+
+Note: The executor builds circuits using the NumPy statevector reference (:func:`hea_state`)
+and loads the result into Qulacs, bypassing the native Qulacs circuit builder for consistency.
+"""
+
 from __future__ import annotations
 
 from typing import TYPE_CHECKING, Any

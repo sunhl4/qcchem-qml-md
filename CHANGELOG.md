@@ -15,20 +15,65 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - **MD/ML**: `science_kpi_met` / `max_abs_delta_hartree` in validation summary; 5-round AL test path.
 - **Ecosystem**: `examples/tutorial_06_http_client.py`; bilingual examples index; optional notebook CI script; v0.3.0 parity doc sync (Phase I–L backlog).
 
-## [Unreleased]
-
-### Deprecated (removal timelines — no runtime break this release)
-
-| Surface | Status | Planned removal |
-|---------|--------|-----------------|
-| `chem.drivers.PySCFDriver` (`chem/drivers/pyscf_driver.py`) | Deprecated; use `ChemIntegralSolver` + `scf.driver` registry | **v0.5.0** (target 2026 Q3) |
-| `qchem_stack.ml` (Ridge surrogate toy) | Non-production; use `md_bridge` for MD/ML loops | **v0.5.0** |
-| `qchem_stack.integrations.*` re-export shims (DMET, UCC reference, Schmidt sidecars) | Compatibility aliases; import from `chem` / `quantum` instead | **v0.6.0** |
-
-See `docs/迁移指南_PySCFDriver到ChemIntegralSolver.md` for the PySCF driver migration path.
+## [0.6.0] - 2026-05-29
 
 ### Added
 
+- **`config/experiment_profiles.py`** and `configs/profiles/{minimal,research,production}_h2.yaml`.
+- **`LocalMitigationJobQueue.drain_all`** for in-process async mitigation batches.
+- Pipeline profile rendering in benchmark dashboard (`--pipeline-profile`).
+- Doc tier policy, doc link CI, API YAML body size limit (512 KiB), expanded `README_PYPI.md`.
+- `examples/tutorial_07_md_classical_h2_only.py` (no QML-FF dependency).
+
+### Changed
+
+- ML ridge/discrete-pool stubs moved to **`md_bridge.active_learning`**.
+- **`QubitHamiltonianFragmentSolverVQE`** under **`chem.embedding.fragment_solvers`**.
+- RDM correction glue imports from **`chem.kernels.rdm_corrections`** (not integrations shim).
+
+### Removed
+
+- **`PySCFDriver`** (`chem/drivers/pyscf_driver.py`).
+- **`qchem_stack.ml`** package.
+- Integrations shims: `schmidt_dmet_self_consistent`, `ucc_reference`, `dmet_fragment_solvers`, `integrations/rdm_corrections`.
+- **`POST /v1/runs/sync`** route; use `POST /v1/runs` + poll.
+- Duplicate **`qchem-pipeline-worker`** console script (use `qchem-jobs-worker`).
+
+## [0.4.1] - 2026-05-29
+
+### Added
+
+- Cross-backend `get_integrals` parity tests; `uccsd_scbk_trotter_circuit` product-contract gap row.
+
+## [0.4.0] - 2026-05-29
+
+### Added
+
+- **`tests/orchestration/test_stage_execution.py`**: mocked SCF / pre-quantum stage unit tests.
+- **`scripts/check_coverage_thresholds.py`**: per-package coverage gates (CI Python 3.12).
+- Extended jobs concurrency and 5-round MD/ML regression tests.
+
+## [0.3.1] - 2026-05-29
+
+### Added
+
+- **`scripts/bootstrap_dev.sh`**: one-command `.venv` + `[dev]` install + precomputed smoke.
+- **`tests/helpers/h2_yaml.py`**: `h2_yaml_with` / `write_h2_config`; broader test DRY adoption.
+- **`tests/orchestration/test_orchestration_packaged_configs.py`**: split packaged YAML smokes.
+
+### Changed
+
+- **`scripts/venv-run`**: prefers repo `.venv/bin/python` when `QCHEM_STACK_PYTHON` is unset.
+
+## [Unreleased]
+
+### Notes
+
+- See **[0.6.0]** for breaking removals (PySCFDriver, `ml/`, integrations shims, sync route).
+
+- **UQC**: `circuit_scale_fold` multi-scale cloud submissions (`uqc_zne_fold.py`); ZNE `energy_stub` post-processing.
+- **PyPI**: `README_PYPI.md`, `docs/engineering/pypi_release.md`, `.github/workflows/publish-pypi.yml` (OIDC).
+- **Types**: `QmefFramePayload`, `QmefDatasetPayload` in `md_bridge.from_pipeline`.
 - **Docs**: UQC/MD-ML/Psi4 Docusaurus pages; `configs/README.md`, `configs/_template.yaml`; `docs/迁移指南_PySCFDriver到ChemIntegralSolver.md`; `docs/说明_mitigation配置.md`, `docs/说明_md_ml_export配置.md`; `docs/QUICKSTART_HTTP_API_en.md`; `docs/算法面广度_Vendor platform_Tangelo对照索引.md` alias; `docusaurus-site/docs/parity/gap-implementation-plan.md`.
 - **Tests**: `tests/test_uqc_backend_units.py`, `tests/test_protocol_counts_and_build_cache.py`; shared `tests/helpers/h2_yaml.py`; `l1_excited` markers on excited plugin tests.
 - **Scripts**: `scripts/check_import_layers.py`; CI import-layer + coverage artifact + nightly job scaffold.
@@ -36,6 +81,7 @@ See `docs/迁移指南_PySCFDriver到ChemIntegralSolver.md` for the PySCF driver
 
 ### Changed
 
+- **CI**: Docusaurus `npm audit --audit-level=high` is blocking; `serialize-javascript` override.
 - **Refactor**: Split `quantum_helpers`, `product_contract`, `qmlff_adapter`, `md_validation_loop`, `embedding_strategies` into submodules with re-export shims.
 - **CI**: Default pytest excludes `slow` and `perf`; Psi4 job blocking; smoke pipeline `QCHEM_SMOKE_REQUIRE_PYSCF=1` in CI.
 - **API**: Default CORS origins `127.0.0.1:3000/8000` (override via `QCHEM_STACK_CORS_ORIGINS`).

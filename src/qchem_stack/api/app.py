@@ -14,12 +14,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
+from qchem_stack import __version__
 from qchem_stack.api.middleware import AuthenticationMiddleware, limiter
 from qchem_stack.api.routers import health, meta, ml_md, runs
 
 app = FastAPI(
     title="qchem-stack",
-    version="0.1.0",
+    version=__version__,
     description="Local API + SQLite queue for product workflows and reproducibility metadata.",
     openapi_tags=[
         {"name": "health", "description": "Liveness and readiness probes."},
@@ -67,6 +68,12 @@ app.add_middleware(
 # Authentication middleware (only enabled when API key is configured)
 if os.getenv("QCHEM_STACK_API_KEY"):
     app.add_middleware(AuthenticationMiddleware)
+else:
+    import logging as _logging
+
+    _logging.getLogger(__name__).warning(
+        "QCHEM_STACK_API_KEY not set - API is running without authentication"
+    )
 
 app.include_router(health.router)
 app.include_router(meta.router)

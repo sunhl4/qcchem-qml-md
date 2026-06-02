@@ -285,6 +285,21 @@ def _register_builtin_solvers() -> None:
             ),
             overwrite=False,
         )
+    from qchem_stack.chem.solvers.custom_solver_template import (
+        CustomExternalIntegralSolver,
+    )
+
+    if "custom_external_template" not in _REGISTRY:
+        _register_solver_record(
+            "custom_external_template",
+            CustomExternalIntegralSolver.from_experiment_config,
+            source="builtin",
+            provider=(
+                "qchem_stack.chem.solvers.custom_solver_template:"
+                "CustomExternalIntegralSolver.from_experiment_config"
+            ),
+            overwrite=False,
+        )
 
 
 def _ensure_bootstrap() -> None:

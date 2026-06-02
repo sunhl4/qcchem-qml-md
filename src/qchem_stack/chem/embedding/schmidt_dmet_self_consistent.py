@@ -41,6 +41,7 @@ from qchem_stack.contracts.schema_ids import (
     SCHMIDT_DMET_DENSITY_FEEDBACK_V1,
     SCHMIDT_DMET_MULTIFRAGMENT_DENSITY_FEEDBACK_V1,
 )
+from qchem_stack.quantum.algorithms.tolerances import DMET_TRACE_TOLERANCE
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -110,7 +111,7 @@ def _sequential_schmidt_density_mix(
     d_sym = 0.5 * (d_raw + d_raw.T)
     d_new = (1.0 - alpha) * D + alpha * d_sym
     tr = float(np.trace(S @ d_new))
-    if tr > 1e-14:
+    if tr > DMET_TRACE_TOLERANCE:
         d_new = d_new * (float(nel) / tr)
     return replace(
         bath,
@@ -182,7 +183,7 @@ def run_schmidt_density_feedback_cycles(
         d_sym = 0.5 * (d_raw + d_raw.T)
         d_new = (1.0 - float(mixing_alpha)) * D + float(mixing_alpha) * d_sym
         tr = float(np.trace(S @ d_new))
-        if tr > 1e-14:
+        if tr > DMET_TRACE_TOLERANCE:
             d_new = d_new * (float(nel) / tr)
         D = d_new
 

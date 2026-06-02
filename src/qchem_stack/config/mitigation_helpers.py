@@ -57,6 +57,20 @@ def classical_shadows_budget_pairs(spec: MitigationSpec) -> int:
     return int(spec.stubs.classical_shadows_budget_pairs)
 
 
+def build_mitigation_pec_literature_stub_v1() -> dict[str, object]:
+    """Literature-aligned PEC placeholder (no quasi-probability execution)."""
+    from qchem_stack.contracts.schema_ids import MITIGATION_PEC_LITERATURE_STUB_V1
+
+    return {
+        "schema": MITIGATION_PEC_LITERATURE_STUB_V1,
+        "status": "literature_stub_only",
+        "epistemic_bound": (
+            "Open-stack registry hook for PEC/quasi-probability narratives; "
+            "not MitRes/MitEx and not numerical PEC sampling."
+        ),
+    }
+
+
 def mitigation_repro_core_fields(cfg: ExperimentConfig) -> dict[str, object]:
     """Stable repro snapshot keys derived from mitigation config."""
     m = cfg.mitigation
@@ -69,4 +83,9 @@ def mitigation_repro_core_fields(cfg: ExperimentConfig) -> dict[str, object]:
         "mitigation_execution_class": m.execution_class,
         "mitigation_zne_scales": [float(x) for x in zne_scales(m)],
         **({"mitigation_zne_mode": zne_mode(m)} if zne_enabled(m) else {}),
+        **(
+            {"mitigation_pec_literature_stub_v1": build_mitigation_pec_literature_stub_v1()}
+            if pec_literature_stub_enabled(m)
+            else {}
+        ),
     }

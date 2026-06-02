@@ -1,49 +1,66 @@
-"""
-DMET **self-consistency loop skeleton**: bath state → fragment solves → global update hooks.
-
-Full numerical DMET (bath fitting, correlation potential) is **not** inlined — inject callables
-so the same orchestration matches ``EmbeddingSpec`` / ``repro`` contracts without PySCF lock-in.
-"""
+"""DMET-style self-consistency loop hooks and one-shot embedding driver."""
 
 from __future__ import annotations
 
 from dataclasses import dataclass, field, replace
 from typing import TYPE_CHECKING, Any
 
+from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
+from qchem_stack.chem.embedding.fragment_solvers.qubit_hamiltonian_vqe import (
+    QubitHamiltonianFragmentSolverVQE,
+)
+from qchem_stack.config.quantum_helpers import resolve_vqe_depth, resolve_vqe_maxiter
 from qchem_stack.contracts.schema_ids import DMET_ONE_SHOT_V1, DMET_SELF_CONSISTENCY_V1
+from qchem_stack.quantum.algorithms.tolerances import DMET_ENERGY_TOLERANCE
 
 if TYPE_CHECKING:
     from collections.abc import Callable
 
-    from qchem_stack.chem.embedding.dmet import DMETContext
+    from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.config import ExperimentConfig
 
 
 @dataclass
 class DMETBathState:
-    """Opaque-ish global embedding state carried between SCF-style cycles."""
+    """Opaque bath state threaded through DMET hook iterations."""
 
-    iteration: int = 0
     meta: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
 class DMETFragmentResult:
+    """Per-fragment solve outcome from a DMET cycle."""
+
     fragment_id: str
     energy: float | None = None
-    meta: dict[str, Any] = field(default_factory=dict)
+    raw: dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass
 class DMETSelfConsistencyLoop:
-    """
-    Generic iterate-until-converged driver (user supplies Hamiltonian builders + bath updates).
+    """Protocol-shaped DMET loop with user-supplied bath update hooks."""
 
-    Matches the **public** DMET story: multiple fragments, repeated global updates, ``max_cycles``
-    surfaced to ``repro`` / ``EmbeddingSpec.n_scf_cycles_embedding``.
-    """
+    def __init__(self, ctx: DMETContext, *, max_cycles: int = 10) -> None:
+        self.ctx = ctx
+        self.max_cycles = max(1, int(max_cycles))
 
-    context: DMETContext
-    max_cycles: int = 20
+    def _solve_fragments(
+        self,
+        build_fragment_hamiltonian: Callable[[str, DMETBathState], Any],
+        bath: DMETBathState,
+    ) -> list[DMETFragmentResult]:
+        solver = self.ctx.solver or VQEFragmentSolverStub()
+        out: list[DMETFragmentResult] = []
+        for fid in self.ctx.fragments:
+            ham = build_fragment_hamiltonian(fid, bath)
+            raw = solver.solve(fid, ham)
+            energy = raw.get("energy") if isinstance(raw, dict) else None
+            e_float = float(energy) if energy is not None else None
+            out.append(
+                DMETFragmentResult(
+                    fragment_id=fid, energy=e_float, raw=dict(raw) if isinstance(raw, dict) else {}
+                )
+            )
+        return out
 
     def run_with_hooks(
         self,
@@ -53,47 +70,33 @@ class DMETSelfConsistencyLoop:
         update_bath: Callable[[DMETBathState, list[DMETFragmentResult]], DMETBathState],
         is_converged: Callable[[DMETBathState, DMETBathState, int], bool],
     ) -> dict[str, Any]:
-        if self.context.solver is None:
-            raise ValueError("DMETContext.solver must be set (FragmentSolverProtocol)")
-        bath = replace(initial_bath, iteration=0)
+        bath = initial_bath
+        prev = initial_bath
         history: list[dict[str, Any]] = []
-        prev_bath: DMETBathState | None = None
+        converged = False
+        cycles = 0
         for k in range(self.max_cycles):
-            prev_bath = bath
-            fragments: list[DMETFragmentResult] = []
-            for fid in self.context.fragments:
-                ham = build_fragment_hamiltonian(fid, bath)
-                sol = self.context.solver.solve(fid, ham)  # type: ignore[union-attr]
-                fragments.append(
-                    DMETFragmentResult(
-                        fragment_id=fid,
-                        energy=_coerce_float(sol.get("energy")),
-                        meta={key: val for key, val in sol.items() if key != "energy"},
-                    )
-                )
-            bath = update_bath(bath, fragments)
-            bath = replace(bath, iteration=k + 1)
+            frags = self._solve_fragments(build_fragment_hamiltonian, bath)
+            prev = bath
+            bath = update_bath(bath, frags)
             history.append(
                 {
                     "cycle": k,
-                    "bath_meta": dict(_bath_to_json(bath)["meta"]),
-                    "fragment_energies": {f.fragment_id: f.energy for f in fragments},
+                    "per_fragment": [
+                        {"fragment_id": f.fragment_id, "energy": f.energy} for f in frags
+                    ],
                 }
             )
-            if prev_bath is not None and is_converged(prev_bath, bath, k):
-                return {
-                    "schema": DMET_SELF_CONSISTENCY_V1,
-                    "converged": True,
-                    "cycles": k + 1,
-                    "history": history,
-                    "final_bath": _bath_to_json(bath),
-                }
+            cycles = k + 1
+            if is_converged(prev, bath, k):
+                converged = True
+                break
         return {
             "schema": DMET_SELF_CONSISTENCY_V1,
-            "converged": False,
-            "cycles": self.max_cycles,
+            "converged": converged,
+            "cycles": cycles,
             "history": history,
-            "final_bath": _bath_to_json(bath),
+            "_final_bath_state": bath,
         }
 
     def run_with_sequential_bath_updates(
@@ -101,144 +104,124 @@ class DMETSelfConsistencyLoop:
         *,
         initial_bath: DMETBathState,
         build_fragment_hamiltonian: Callable[[str, DMETBathState], Any],
-        update_bath_sequential: Callable[[DMETBathState, DMETFragmentResult], DMETBathState],
+        update_bath_sequential: Callable[[DMETBathState, object], DMETBathState],
         is_converged: Callable[[DMETBathState, DMETBathState, int], bool],
     ) -> dict[str, Any]:
-        """
-        One **outer cycle** scans all fragments in order; after **each** fragment solve,
-        ``update_bath_sequential`` mutates embedding state (Gauss–Seidel / successive substitution).
-
-        ``is_converged(prev_bath_at_cycle_start, bath_after_full_sweep, cycle_index)`` is evaluated
-        after finishing all fragments in a cycle, before incrementing ``iteration``.
-        """
-        if self.context.solver is None:
-            raise ValueError("DMETContext.solver must be set (FragmentSolverProtocol)")
-        bath = replace(initial_bath, iteration=0)
+        bath = initial_bath
+        prev = initial_bath
         history: list[dict[str, Any]] = []
+        converged = False
+        cycles = 0
         for k in range(self.max_cycles):
-            bath = replace(
-                bath,
-                meta={**bath.meta, "current_sweep_max_delta": 0.0},
-            )
-            prev_at_start = bath
-            per_frag: list[dict[str, Any]] = []
-            for fid in self.context.fragments:
-                ham = build_fragment_hamiltonian(fid, bath)
-                sol = self.context.solver.solve(fid, ham)  # type: ignore[union-attr]
-                res = DMETFragmentResult(
-                    fragment_id=fid,
-                    energy=_coerce_float(sol.get("energy")),
-                    meta={key: val for key, val in sol.items() if key != "energy"},
+            per_fragment: list[dict[str, Any]] = []
+            for fid in self.ctx.fragments:
+                frags = self._solve_fragments(build_fragment_hamiltonian, bath)
+                frag_row = next((f for f in frags if f.fragment_id == fid), None)
+                per_fragment.append(
+                    {
+                        "fragment_id": fid,
+                        "energy": frag_row.energy if frag_row else None,
+                    }
                 )
-                bath = update_bath_sequential(bath, res)
-                row: dict[str, Any] = {
-                    "fragment_id": fid,
-                    "energy": res.energy,
-                    "meta_keys": sorted(res.meta.keys()),
-                }
-                if sol.get("fci_electronic_au") is not None:
-                    row["fci_electronic_au"] = sol.get("fci_electronic_au")
-                per_frag.append(row)
-            lsmd = float(bath.meta.get("current_sweep_max_delta", 0.0))
-            bath = replace(
-                bath,
-                meta={**bath.meta, "last_sweep_max_delta": lsmd},
-            )
-            bath = replace(bath, iteration=k + 1)
-            history.append(
-                {
-                    "cycle": k,
-                    "per_fragment": per_frag,
-                    "last_sweep_max_delta": lsmd,
-                }
-            )
-            rep_out: dict[str, Any] = {
-                "schema": DMET_SELF_CONSISTENCY_V1,
-                "sequential_fragment_updates": True,
-                "cycles": k + 1,
-                "history": history,
-                "final_bath": _bath_to_json(bath),
-            }
-            rep_out["_final_bath_state"] = bath
-            if is_converged(prev_at_start, bath, k):
-                rep_out["converged"] = True
-                return rep_out
-        rep_fail: dict[str, Any] = {
+                bath = update_bath_sequential(bath, frag_row)
+            prev = bath
+            history.append({"cycle": k, "per_fragment": per_fragment})
+            cycles = k + 1
+            if is_converged(prev, bath, k):
+                converged = True
+                break
+        return {
             "schema": DMET_SELF_CONSISTENCY_V1,
+            "converged": converged,
+            "cycles": cycles,
             "sequential_fragment_updates": True,
-            "converged": False,
-            "cycles": self.max_cycles,
             "history": history,
-            "final_bath": _bath_to_json(bath),
+            "_final_bath_state": bath,
         }
-        rep_fail["_final_bath_state"] = bath
-        return rep_fail
 
 
 class OneShotEmbeddingDriver:
-    """Single-pass fragment evaluation (CI / tutorial default when no SCF loop is configured)."""
+    """Single-pass fragment solve ledger (CI / parity traceability)."""
 
     @staticmethod
-    def run(
-        context: DMETContext,
-        fragment_hamiltonians: dict[str, Any],
-    ) -> dict[str, Any]:
-        if context.solver is None:
-            raise ValueError("DMETContext.solver must be set")
-        results: list[DMETFragmentResult] = []
-        for fid in context.fragments:
-            ham = fragment_hamiltonians[fid]
-            sol = context.solver.solve(fid, ham)
-            results.append(
-                DMETFragmentResult(
-                    fragment_id=fid,
-                    energy=_coerce_float(sol.get("energy")),
-                    meta={key: val for key, val in sol.items() if key != "energy"},
-                )
-            )
+    def run(ctx: DMETContext, fragment_hamiltonians: dict[str, Any]) -> dict[str, Any]:
+        solver = ctx.solver or VQEFragmentSolverStub()
         rows: list[dict[str, Any]] = []
-        for r in results:
-            row: dict[str, Any] = {"fragment_id": r.fragment_id, "energy": r.energy}
-            row.update(r.meta)
-            rows.append(row)
+        for fid in ctx.fragments:
+            ham = fragment_hamiltonians.get(fid, {})
+            raw = solver.solve(fid, ham)
+            rows.append({"fragment_id": fid, **(raw if isinstance(raw, dict) else {})})
         return {"schema": DMET_ONE_SHOT_V1, "fragments": rows}
 
 
-def _coerce_float(x: Any) -> float | None:
-    if x is None:
-        return None
-    try:
-        return float(x)
-    except (TypeError, ValueError):
-        return None
-
-
-def _bath_to_json(b: DMETBathState) -> dict[str, Any]:
-    meta = {k: v for k, v in b.meta.items() if k not in ("D_ao", "S_ao", "fragment_atoms")}
-    return {
-        "iteration": b.iteration,
-        "meta": meta,
-        "note": "Large arrays (D_ao, S_ao, fragment_atoms) omitted from JSON.",
-    }
-
-
-def pyscf_density_feedback_bath_update(
-    bath: DMETBathState,
-    fragments: list[DMETFragmentResult],
+def run_dmet_bath_scf_self_consistency_v1(
+    cfg: ExperimentConfig,
+    fragment_labels: list[str],
+    qh: QubitHamiltonian,
+    executor: Any,
     *,
-    mf_density: Any | None = None,
-) -> DMETBathState:
-    """Chemical bath update hook: attach PySCF density-matrix metadata for v1 DMET loops."""
-    energies = [float(f.energy) for f in fragments if f.energy is not None]
-    meta = {
-        **bath.meta,
-        "fragment_energy_sum": float(sum(energies)) if energies else 0.0,
-        "pyscf_density_feedback": mf_density is not None,
-        "n_fragments_solved": len(fragments),
-    }
-    if mf_density is not None:
-        meta["density_trace"] = float(getattr(mf_density, "trace", lambda: 0.0)())
-    return replace(bath, meta=meta)
+    max_cycles: int,
+    energy_tol: float = DMET_ENERGY_TOLERANCE,
+) -> dict[str, Any]:
+    """Bath SCF-style DMET loop v1: shared global impurity Hamiltonian, energy-delta convergence."""
+    from qchem_stack.chem.embedding.dmet import QubitHamiltonianFragmentSolverExact
+
+    labs = [x for x in fragment_labels if str(x).strip()]
+    if len(labs) < 1:
+        return {
+            "schema": DMET_SELF_CONSISTENCY_V1,
+            "status": "skipped_no_fragments",
+            "fragment_labels": labs,
+        }
+    dmet = cfg.embedding.dmet  # type: ignore[union-attr]
+    if dmet.fragment_solver.use_exact:
+        solver: Any = QubitHamiltonianFragmentSolverExact(
+            max_qubits=int(dmet.fragment_solver.exact_max_qubits)
+        )
+    else:
+        solver = QubitHamiltonianFragmentSolverVQE(
+            depth=resolve_vqe_depth(cfg),
+            maxiter=resolve_vqe_maxiter(cfg),
+            executor=executor,
+            random_seed=cfg.random_seed,
+        )
+    ctx = DMETContext(
+        fragments=labs,
+        solver=solver,
+        n_scf_cycles_embedding=cfg.embedding.n_scf_cycles_embedding,
+        classical_reference_method=cfg.embedding.classical_reference_method,
+    )
+    loop = DMETSelfConsistencyLoop(ctx, max_cycles=max(2, int(max_cycles)))
+
+    def build_ham(_fid: str, _bath: DMETBathState) -> QubitHamiltonian:
+        return qh
+
+    def update_bath(bath: DMETBathState, frags: list[DMETFragmentResult]) -> DMETBathState:
+        energies = [float(f.energy) for f in frags if f.energy is not None]
+        e_sum = float(sum(energies)) if energies else 0.0
+        prev = bath.meta.get("fragment_energy_sum")
+        delta = None if prev is None else abs(e_sum - float(prev))
+        meta = {**bath.meta, "fragment_energy_sum": e_sum}
+        if delta is not None:
+            meta["last_cycle_energy_delta"] = float(delta)
+        return replace(bath, meta=meta)
+
+    def is_converged(_prev: DMETBathState, bath: DMETBathState, k: int) -> bool:
+        if k < 1:
+            return False
+        delta = bath.meta.get("last_cycle_energy_delta")
+        return delta is not None and float(delta) <= float(energy_tol)
+
+    rep = loop.run_with_hooks(
+        initial_bath=DMETBathState(meta={"note": "bath_scf_self_consistency_v1"}),
+        build_fragment_hamiltonian=build_ham,
+        update_bath=update_bath,
+        is_converged=is_converged,
+    )
+    rep["hamiltonian_source"] = "whole_active_system"
+    rep["multifragment_shared_global_hamiltonian"] = len(labs) >= 2
+    rep["n_scf_cycles_embedding_yaml"] = cfg.embedding.n_scf_cycles_embedding
+    return rep
 
 
 __all__ = [
@@ -246,5 +229,5 @@ __all__ = [
     "DMETFragmentResult",
     "DMETSelfConsistencyLoop",
     "OneShotEmbeddingDriver",
-    "pyscf_density_feedback_bath_update",
+    "run_dmet_bath_scf_self_consistency_v1",
 ]

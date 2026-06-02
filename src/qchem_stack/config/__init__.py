@@ -1,5 +1,23 @@
 """Experiment configuration models and YAML I/O.
 
+This module provides the complete configuration API for qchem-stack experiments.
+For better organization, the API is split into two submodules:
+
+**User-facing API** (:mod:`qchem_stack.config._public_api`):
+    Primary configuration classes and I/O functions for application code::
+
+        from qchem_stack.config import ExperimentConfig, load_experiment_config
+
+    See :mod:`qchem_stack.config._public_api` for the full list of user-facing exports.
+
+**Internal API** (:mod:`qchem_stack.config._internal_api`):
+    Validation, conversion, and helper functions used by the orchestration layer
+    and job system. Application code should typically not import from here::
+
+        from qchem_stack.config._internal_api import validate_experiment_for_run
+
+    See :mod:`qchem_stack.config._internal_api` for the full list of internal exports.
+
 **Errors**
 
 - ``pydantic.ValidationError``: invalid field values, cross-field constraints, or bad types when
@@ -16,6 +34,7 @@ Layout: submodules by area (:mod:`molecule`, :mod:`geometry_files`, :mod:`scf`, 
 
 from __future__ import annotations
 
+# Re-export everything for backward compatibility
 from ._constants import ANGSTROM_TO_BOHR, MD_ML_MAX_EXTRA_GEOMETRIES
 from ._embedding_validation import SCHMIDT_DMET_MAX_CYCLES_LIMIT
 from ._experiment_validation import validate_experiment_for_run, validate_pre_quantum_contract
@@ -31,7 +50,7 @@ from .chemistry_extended import ChemistryExtendedSpec
 from .chemistry_extended_helpers import avas_ao_labels, pbc_cell_vectors_bohr
 from .compiler import CompilerSpec
 from .embedding import EmbeddingSpec
-from .experiment import ExperimentConfig
+from .experiment import CoreExperimentConfig, ExperimentConfig
 from .geometry_files import (
     load_cartesian_geometry_file,
     merge_molecule_dict_from_geometry_file,
@@ -72,6 +91,7 @@ __all__ = [
     "CompilerSpec",
     "ComputableGraphEdgeDecl",
     "ComputableGraphEdgeRemove",
+    "CoreExperimentConfig",
     "MD_ML_MAX_EXTRA_GEOMETRIES",
     "OperatorPoolId",
     "EmbeddingSpec",

@@ -4,6 +4,15 @@ Open orchestration for quantum-chemistry workloads: **chemistry definition → e
 
 **Product maintenance:** [CONTRIBUTING.md](CONTRIBUTING.md) · [docs/ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md). Competitive research narratives are referenced below as **historical docs** — they inform UX and backlog but are **not** runtime dependencies.
 
+**Quick run (needs PySCF + `[chem]`):**
+
+```python
+from qchem_stack.orchestration.pipeline import run_pipeline_from_config
+run_pipeline_from_config("configs/example_h2.yaml")
+```
+
+**Onboarding (pick one path):** [Three paths guide](docusaurus-site/docs/guide/onboarding-three-paths.md) · [Tutorial index](docusaurus-site/docs/tutorial/tutorial-index-three-paths.md) · [Contributor quick start](docs/QUICKSTART_CONTRIBUTORS.md). Full doc index: [`docs/README.md`](docs/README.md).
+
 ## Documentation map
 
 **Engineering index**: [`docs/README.md`](docs/README.md) (taxonomy, sync policy, execution archive).
@@ -45,8 +54,6 @@ High‑level textbook / tutorial narratives often mention “drivers → algorit
 
 ## End-to-end orchestration (YAML)
 
-After `pip install -e ".[dev]"` (includes PySCF):
-
 ```python
 from pathlib import Path
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config
@@ -55,40 +62,11 @@ out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqli
 # out contains scf_energy, energy_after_variational, energy_pauli_protocol, resource_summary, repro, job_result
 ```
 
-For **Methods‑style exports** (`computable_abstract_v2`, `hamiltonian_meta`), use `WorkflowCoordinator` (`qchem_stack.orchestration.WorkflowCoordinator`): it wraps `run_pipeline_from_config` and sets `out["methods_sidecar"]`. A packaged tutorial chain lives at `configs/tutorial_chain_h2.yaml` (YAML id is historical—the pipeline is vanilla `qchem_stack`).
-
-CI runs `python scripts/smoke_pipeline.py` then `python scripts/smoke_pipeline.py --excited-only` (`configs/example_h2_excited_smoke.yaml`, VQD without Pauli protocol), **`--iqeb`** (H2 IQEB), **`--projection-trace`** (projection L1 YAML), and marker subsets **`pytest -m l1_excited`** / **`pytest -m l1_md_ml`**. Locally, `python scripts/smoke_pipeline.py --excited` runs both packaged YAMLs in one go. Optional **L3** numerical gate: `QCHEM_RUN_L3=1 pytest -m l3` (see `tests/test_l3_benchmark_smoke.py`, `integrations/l3_algorithm_benchmark.py`).
+For **Methods‑style exports** (`computable_abstract_v2`, `hamiltonian_meta`), use `WorkflowCoordinator` (`qchem_stack.orchestration.WorkflowCoordinator`): it wraps `run_pipeline_from_config` and sets `out["methods_sidecar"]`.
 
 ### Optional HTTP API (`fastapi`)
 
-With local pinned venv runner, run:
-
-```bash
-./scripts/venv-run uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
-```
-
-`GET /health` — liveness. **`GET /health/ready`** — default SQLite usable. **`GET /v1/meta/product-surface`** — pointer bundle for dashboards. **`GET /v1/meta/parity-gaps`** — **`capability_gap_export_v1`** (product gaps from `qchem_stack.protocols.product_contract`). **`GET /v1/meta/capability-surface`** — **`capability_surface_v2`** (**`capability_map`**, **`gaps`**, **`gap_anchor_index_v1`**, mitigation + differentiators bundles, registries incl. **`operator_pool_registry_export_v1`** / **`algorithm_registry_export_v1`** / **`variational_registry_export_v1`**, **`uccsd_mapping_support_matrix_v1`**). **`POST /v1/meta/workflow-preview`** / **`POST /v1/meta/computables-preview`** — YAML‑only previews (no chemistry). **`GET /v1/meta/queue-stats`**, **`GET`/`POST /v1/runs`**, polls + slim **`GET /v1/runs/{id}/summary`**, **`GET /v1/runs/{id}/repro`** (**409** until **DONE**). Trace headers echo on POST. See [`src/qchem_stack/api/app.py`](src/qchem_stack/api/app.py), [API 安全与环境变量](docs/说明_API安全与环境变量.md) and [ENGINEERING_ARCHITECTURE §9](docs/ENGINEERING_ARCHITECTURE.md).
-
-## Install
-
-```bash
-cd qchem_qml_md
-pip install -e ".[dev]"
-```
-
-Local development commands use [`scripts/venv-run`](scripts/venv-run): it prepends the directory of the chosen interpreter to `PATH` and runs your command. **`QCHEM_STACK_PYTHON`** selects the interpreter when set; otherwise the default in `scripts/venv-run` applies (repo maintainers set this to their `conda base` or `.venv` Python).
-
-PySCF, Qiskit, and **pytket** (TKET bridge for resource stats) are optional extras: `pip install -e ".[all]"` includes all declared extras, or `pip install -e ".[pytket]"` alone.
-
-## Lint and tests (CI parity)
-
-```bash
-./scripts/venv-run ruff check src/qchem_stack tests scripts examples
-./scripts/venv-run ruff format --check src/qchem_stack tests scripts examples
-./scripts/venv-run pytest tests -q --tb=short
-```
-
-Smoke scripts and marker subsets mirror [.github/workflows/ci.yml](.github/workflows/ci.yml) (**`lint`** job runs Ruff; **`test`** is the Python matrix and smoke steps). See [CONTRIBUTING.md](CONTRIBUTING.md) for merge gates, optional markers, and optional **pre-commit** (the `pre-commit` CLI ships with **`pip install -e ".[dev]"`**; same Ruff paths as CI).
+`GET /health` — liveness. **`GET /health/ready`** — default SQLite usable. **`GET /v1/meta/product-surface`** — pointer bundle for dashboards. **`GET /v1/meta/parity-gaps`** — **`capability_gap_export_v1`**. **`GET /v1/meta/capability-surface`** — **`capability_surface_v2`**. **`POST /v1/meta/workflow-preview`** / **`POST /v1/meta/computables-preview`** — YAML‑only previews (no chemistry). See [`src/qchem_stack/api/app.py`](src/qchem_stack/api/app.py) for full API reference.
 
 ## Quick start
 

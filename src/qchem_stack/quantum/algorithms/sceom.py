@@ -19,6 +19,7 @@ from qchem_stack.backends.pauli_grouping import build_measurement_plan
 from qchem_stack.backends.pauli_shot_sim import energy_estimate_grouped_shot_simulation
 from qchem_stack.chem.kernels.spin_ucc import build_spin_ucc_singles_only_fermion_generators
 from qchem_stack.quantum.algorithms.excited import qse_matrices_hs
+from qchem_stack.quantum.algorithms.tolerances import CONVERGENCE_TOLERANCE, FLOAT_PRECISION_TINY
 from qchem_stack.quantum.statevector import (
     expectation_qubit_operator,
     hea_state,
@@ -236,7 +237,7 @@ def run_sceom_nested_commutator(
     """Build ``M_{ij} = \\langle\\psi|[S_i^\\dagger,[H,S_j]]|\\psi\\rangle`` and diagonalize (``V\\approx I`` toy)."""
     n = hamiltonian.n_qubits
     ref = np.asarray(reference_state, dtype=complex).ravel()
-    ref = ref / (np.linalg.norm(ref) + 1e-15)
+    ref = ref / (np.linalg.norm(ref) + FLOAT_PRECISION_TINY)
     k_target = subspace_dim or 4
     s_ops = s_generators or default_sceom_pauli_generators(n, k_target)
     k = len(s_ops)
@@ -306,13 +307,14 @@ def run_sceom_nested_commutator(
         if sc_round < rounds and k > 0:
             vec = np.real(evecs[:, 0])
             delta = np.zeros_like(ref, dtype=complex)
-            for coeff, sop in zip(vec, s_ops, strict=False):
+            for coeff, sop in zip(vec, s_ops, strict=True):
                 delta += float(coeff) * (qubit_operator_to_sparse(sop, n) @ ref)
             nrm = float(np.linalg.norm(delta))
-            if nrm > 1e-12:
+            if nrm > CONVERGENCE_TOLERANCE:
                 ref = delta / nrm
 
-    assert final_evals is not None and final_m is not None
+    if final_evals is None or final_m is None:
+        raise RuntimeError("SCEOM optimization failed: no valid M-matrix computed")
     evals = final_evals
     m_mat = final_m
     sceom_analysis = [

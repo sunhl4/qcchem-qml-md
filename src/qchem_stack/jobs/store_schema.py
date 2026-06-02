@@ -16,6 +16,7 @@ class JobStatus(str, Enum):
     RUNNING = "RUNNING"
     DONE = "DONE"
     FAILED = "FAILED"
+    TIMED_OUT = "TIMED_OUT"
 
 
 DEFAULT_JOB_KIND = "pauli_protocol"

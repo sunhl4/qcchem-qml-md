@@ -130,7 +130,7 @@ def run_scf_stage(
         )
     if cfg.chemistry_extended.post_hf.rdm_correction_method != "none":
         from qchem_stack.chem.kernels.dispatch import run_nevpt2_casci
-        from qchem_stack.integrations.rdm_corrections import (
+        from qchem_stack.chem.kernels.rdm_corrections import (
             build_rdm_correction_readiness,
             rdm_bundle_from_mean_field,
             run_rdm_correction,

@@ -11,6 +11,10 @@ from qchem_stack.chem.pyscf_typing import (
     as_real_array,
     max_abs_imag,
 )
+from qchem_stack.quantum.algorithms.tolerances import (
+    ACTIVE_SPACE_IMAG_TOLERANCE,
+    ACTIVE_SPACE_IMAG_WARNING,
+)
 
 
 def _unwrap_mean_field_handle(rhf: Any) -> PyscfMeanField:
@@ -51,7 +55,7 @@ def active_space_casci_raw_blocks(
         if ik >= len(moc):
             ik = 0
         mo = as_complex_array(moc[ik])
-        if max_abs_imag(mo, tol=1e-10) < 1e-10:
+        if max_abs_imag(mo, tol=ACTIVE_SPACE_IMAG_TOLERANCE) < ACTIVE_SPACE_IMAG_TOLERANCE:
             mo = as_real_array(mo)
     n_mo = int(mo.shape[1])
     if n_active_orbitals > n_mo:
@@ -71,7 +75,7 @@ def active_space_casci_raw_blocks(
     h1a = np.asarray(h1, dtype=complex)
     h2a = np.asarray(h2, dtype=complex)
     for label, arr in (("h1", h1a), ("h2", h2a)):
-        if max_abs_imag(arr) > 1e-7:
+        if max_abs_imag(arr) > ACTIVE_SPACE_IMAG_WARNING:
             raise ValueError(
                 f"Active space {label} has non-trivial imaginary part; use Gamma (mesh [1,1,1]) or a real k-point."
             )

@@ -9,6 +9,7 @@ import numpy as np  # noqa: TC002
 from openfermion.ops import QubitOperator  # noqa: TC002
 from scipy.linalg import eigh
 
+from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 from qchem_stack.quantum.qse_transition import (
     build_qse_transition_schedule,
     solve_qse_ghep,
@@ -67,7 +68,7 @@ def qse_h_s_via_computable(
 
 def s_condition_number(s_mat: np.ndarray) -> float:
     svals = np.linalg.svd(np.real(s_mat), compute_uv=False)
-    return float(svals[0] / max(1e-14, svals[-1])) if svals.size else float("inf")
+    return float(svals[0] / max(NUMERICAL_TOLERANCE, svals[-1])) if svals.size else float("inf")
 
 
 def excitation_energies_dense(

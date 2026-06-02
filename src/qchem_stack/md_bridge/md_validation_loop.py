@@ -36,6 +36,11 @@ from typing import Any
 
 import numpy as np
 
+from qchem_stack.config import load_experiment_config
+from qchem_stack.md_bridge.energy_reference import (
+    prepare_loop_config,
+    validate_loop_energy_consistency,
+)
 from qchem_stack.md_bridge.exporter import export_extended_xyz
 from qchem_stack.md_bridge.md_loop_config import (
     Ensemble,
@@ -103,8 +108,10 @@ def run_md_validation_loop(
         :class:`qchem_stack.exceptions.PipelineError`: when the cold-start
             qchem labeling fails (no recovery possible).
     """
-    cfg = config or MdValidationLoopConfig()
+    cfg = prepare_loop_config(config or MdValidationLoopConfig())
     exp_yaml = Path(experiment_yaml)
+    experiment_cfg = load_experiment_config(exp_yaml)
+    validate_loop_energy_consistency(cfg, experiment_cfg, strict=True)
     out = Path(output_dir)
     out.mkdir(parents=True, exist_ok=True)
 

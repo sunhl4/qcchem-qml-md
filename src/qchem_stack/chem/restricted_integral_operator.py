@@ -12,6 +12,7 @@ from openfermion.chem.molecular_data import spinorb_from_spatial
 
 from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
 from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
+from qchem_stack.quantum.algorithms.tolerances import CUTOFF_ABS_INTEGRAL
 
 if TYPE_CHECKING:
     from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
@@ -21,7 +22,7 @@ def interaction_operator_to_dataframe(
     op: InteractionOperator,
     *,
     max_spinorb_two_body: int | None = 8000,
-    cutoff_abs: float = 1e-14,
+    cutoff_abs: float = CUTOFF_ABS_INTEGRAL,
 ) -> pd.DataFrame:
     """Tabular view (spin-orbital sectors) analogous to chemistry-tutorial ``df()`` previews."""
     rows: list[dict[str, Any]] = [
@@ -126,7 +127,7 @@ class RestrictedActiveSpaceIntegralOperatorCompact:
         self,
         *,
         max_two_body: int | None = 10_000,
-        cutoff_abs: float = 1e-14,
+        cutoff_abs: float = CUTOFF_ABS_INTEGRAL,
     ) -> pd.DataFrame:
         """Spatial-MO integral table (scalar / ``h1`` / ``h2`` sectors)."""
         rows: list[dict[str, Any]] = [

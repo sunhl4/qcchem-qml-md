@@ -18,6 +18,8 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
+from qchem_stack.quantum.algorithms.tolerances import PROJECTION_EMBEDDING_THRESHOLD
+
 
 @dataclass
 class ProjectionEmbeddingConfig:
@@ -25,4 +27,4 @@ class ProjectionEmbeddingConfig:
 
     low_level: str = "HF"
     high_level: str = "CAS"
-    threshold: float = 1e-8
+    threshold: float = PROJECTION_EMBEDDING_THRESHOLD

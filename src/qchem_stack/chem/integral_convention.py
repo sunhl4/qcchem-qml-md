@@ -27,17 +27,33 @@ def restore_packed_mo_eri_chemist(packed: np.ndarray, norb: int) -> np.ndarray:
             f"h2 packed array must have shape ({npair}, {npair}) for norb={norb}; got {x.shape}"
         )
     out = np.zeros((norb, norb, norb, norb), dtype=float)
-    for i in range(norb):
-        for j in range(i + 1):
-            ij = i * (i + 1) // 2 + j
-            for k in range(norb):
-                for el in range(k + 1):
-                    kl = k * (k + 1) // 2 + el
-                    val = float(x[ij, kl])
-                    out[i, j, k, el] = val
-                    out[j, i, k, el] = val
-                    out[i, j, el, k] = val
-                    out[j, i, el, k] = val
+    # Build index arrays for the upper-triangle packed pairs
+    idx_i, idx_j = np.triu_indices(norb)
+    # Map each (i,j) pair to its packed row index
+    ij = idx_i * (idx_i + 1) // 2 + idx_j
+    n_pairs = len(ij)
+
+    # Fully vectorized: create all (ab, cd) combinations and use advanced indexing
+    # ab_indices: [0, 0, 0, ..., 1, 1, 1, ..., n_pairs-1]  (length: n_pairs^2)
+    # cd_indices: [0, 1, 2, ..., 0, 1, 2, ..., 0, 1, 2, ...]  (length: n_pairs^2)
+    ab_indices = np.repeat(np.arange(n_pairs), n_pairs)
+    cd_indices = np.tile(np.arange(n_pairs), n_pairs)
+
+    # Extract all values from packed matrix at once
+    values = x[ij[ab_indices], ij[cd_indices]]
+
+    # Get the orbital indices for all combinations
+    i_all = idx_i[ab_indices]
+    j_all = idx_j[ab_indices]
+    k_all = idx_i[cd_indices]
+    l_all = idx_j[cd_indices]
+
+    # Assign to all 4 symmetry copies using advanced indexing
+    out[i_all, j_all, k_all, l_all] = values
+    out[j_all, i_all, k_all, l_all] = values
+    out[i_all, j_all, l_all, k_all] = values
+    out[j_all, i_all, l_all, k_all] = values
+
     return out
 
 

@@ -93,7 +93,7 @@ quantum:
   algorithm_factory: null
   variational:
     ansatz: uccgd
-    uccgd_trotter_steps: null
+    uccsd_trotter_steps: null
   vqe:
     depth: 1
     maxiter: 400
@@ -101,7 +101,7 @@ quantum:
     initial_parameters_strategy: random_uniform
   adapt:
     max_iter: 4
-    pool_id: fermionic_uccgd
+    pool_id: fermionic_uccsd
   iqeb:
     pool_id: iqeb_qubit_excitation
     n_grads: 3
@@ -223,7 +223,7 @@ parity_integrations:
   qnexus_probe: true
   open_qermit_reference: true
   tensornet_closure_reference: true
-  uccgd_excitation_reference: true
+  uccsd_excitation_reference: true
   tket_first_circuit_stats: true
   dmet_stub_one_shot_ledger: true
   gap_closure_reference_bundle: true

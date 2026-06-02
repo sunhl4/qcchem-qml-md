@@ -77,6 +77,130 @@ def test_uqc_pauli_measurement_parity_and_expectation() -> None:
     assert compute_hamiltonian_expectation_from_counts({}, h, 2) == pytest.approx(0.5)
 
 
+def test_apply_uqc_zne_mitigation_disabled() -> None:
+    from qchem_stack.backends.uqc_mitigation import apply_uqc_zne_mitigation
+
+    e, trace = apply_uqc_zne_mitigation(0.5, {})
+    assert e == pytest.approx(0.5)
+    assert trace is None
+
+
+def test_apply_uqc_zne_mitigation_extrapolates() -> None:
+    from qchem_stack.backends.uqc_mitigation import apply_uqc_zne_mitigation
+
+    meta = {"uqc_mitigation": {"zne": {"enabled": True, "scales": [1.0, 2.0]}}}
+    e, trace = apply_uqc_zne_mitigation(1.0, meta)
+    assert trace is not None
+    assert trace["zne_extrapolated_energy"] != 1.0
+    assert e == pytest.approx(trace["zne_extrapolated_energy"])
+
+
+def test_uqc_executor_zne_mitigation_trace_on_mock_client() -> None:
+    pytest.importorskip("qiskit")
+    from qchem_stack.backends.spec import BackendSpec
+    from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
+
+    mock_client = MagicMock()
+    mock_client.submit_task.return_value = "task-1"
+    mock_client.get_task_status.return_value = "SUCCESS"
+    mock_client.get_task_result.return_value = [
+        {"datasets": {"computational_basis_histogram": [[0, 100]]}}
+    ]
+
+    spec = BackendSpec(
+        name="uqc-zne",
+        provider="uqc",
+        shots_per_circuit=200,
+        meta={
+            "uqc_token": "test-token",
+            "uqc_target": "iontrap-sim",
+            "uqc_mitigation": {"zne": {"enabled": True, "scales": [1.0, 1.5, 2.0]}},
+        },
+    )
+    ex = UQCCloudHeaExecutor(spec)
+    ex._client = mock_client
+
+    h = QubitOperator("Z0", 1.0)
+    angles = np.array([0.1, 0.2])
+    with patch("uqc_client.ensure_static_qasm"):
+        e = ex._execute_on_uqc(h, 1, angles, 1)
+    assert isinstance(e, float)
+    assert ex._last_mitigation_trace is not None
+    assert "zne_extrapolated_energy" in ex._last_mitigation_trace
+
+
+def test_uqc_executor_zne_circuit_fold_mock_mode() -> None:
+    from qchem_stack.backends.spec import BackendSpec
+    from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
+
+    spec = BackendSpec(
+        name="uqc-fold-mock",
+        provider="uqc",
+        shots_per_circuit=100,
+        uqc_mode="mock",
+        meta={
+            "uqc_mitigation": {
+                "zne": {
+                    "enabled": True,
+                    "mode": "circuit_scale_fold",
+                    "scales": [1.0, 2.0],
+                }
+            }
+        },
+    )
+    ex = UQCCloudHeaExecutor(spec)
+    h = QubitOperator("Z0", 1.0)
+    angles = np.zeros(2)
+    e = ex.expectation_hea(h, 1, angles, 1)
+    assert isinstance(e, float)
+    assert ex._last_mitigation_trace is not None
+    assert ex._last_mitigation_trace["zne_mode"] == "circuit_scale_fold"
+    assert len(ex._last_mitigation_trace["zne_energies"]) == 2
+    assert ex._last_protocol_counts is not None
+    assert ex._last_protocol_counts["zne_mode"] == "circuit_scale_fold"
+
+
+def test_uqc_executor_zne_circuit_fold_cloud_submits_per_scale() -> None:
+    pytest.importorskip("qiskit")
+    from qchem_stack.backends.spec import BackendSpec
+    from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
+
+    mock_client = MagicMock()
+    mock_client.submit_task.return_value = "task-1"
+    mock_client.get_task_status.return_value = "SUCCESS"
+    mock_client.get_task_result.return_value = [
+        {"datasets": {"computational_basis_histogram": [[0, 100]]}}
+    ]
+
+    spec = BackendSpec(
+        name="uqc-fold-cloud",
+        provider="uqc",
+        shots_per_circuit=200,
+        meta={
+            "uqc_token": "test-token",
+            "uqc_target": "iontrap-sim",
+            "uqc_mitigation": {
+                "zne": {
+                    "enabled": True,
+                    "mode": "circuit_scale_fold",
+                    "scales": [1.0, 1.5, 2.0],
+                }
+            },
+        },
+    )
+    ex = UQCCloudHeaExecutor(spec)
+    ex._client = mock_client
+
+    h = QubitOperator("Z0", 1.0)
+    angles = np.array([0.1, 0.2])
+    with patch("uqc_client.ensure_static_qasm"):
+        e = ex._execute_on_uqc(h, 1, angles, 1)
+    assert isinstance(e, float)
+    assert mock_client.submit_task.call_count == 3
+    assert ex._last_protocol_counts is not None
+    assert len(ex._last_protocol_counts["zne_curve"]) == 3
+
+
 def test_uqc_executor_mock_mode() -> None:
     from qchem_stack.backends.spec import BackendSpec
     from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor

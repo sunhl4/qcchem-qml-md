@@ -79,15 +79,52 @@ def render_md_al_section(summary: dict[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def render_html(report: dict[str, Any], *, md_summary: dict[str, Any] | None = None) -> str:
+def render_pipeline_profile_section(profile: dict[str, Any]) -> str:
+    """Render per-stage ``pipeline_profile_v1`` timings."""
+    stages = profile.get("stages") or []
+    if not isinstance(stages, list) or not stages:
+        return ""
+    lines = [
+        "<h2>Pipeline profile</h2>",
+        "<table><thead><tr><th>stage</th><th>duration_ms</th><th>peak_memory_kb</th>"
+        "</tr></thead><tbody>",
+    ]
+    for st in stages:
+        if not isinstance(st, dict):
+            continue
+        lines.append(
+            "<tr>"
+            f"<td>{html.escape(str(st.get('stage', '')))}</td>"
+            f"<td>{html.escape(_fmt_float(st.get('duration_ms')))}</td>"
+            f"<td>{html.escape(str(st.get('peak_memory_kb', '')))}</td>"
+            "</tr>"
+        )
+    lines.append("</tbody></table>")
+    return "\n".join(lines)
+
+
+def render_html(
+    report: dict[str, Any],
+    *,
+    md_summary: dict[str, Any] | None = None,
+    pipeline_profile: dict[str, Any] | None = None,
+    git_sha: str | None = None,
+    qchem_stack_version: str | None = None,
+) -> str:
     rows = _bundle_rows(report)
     merged = _merged_summary(report)
     bundle = report.get("algorithm_benchmark_bundle_v1")
-    schema = bundle.get("schema") if isinstance(bundle, dict) else None
+    if not isinstance(bundle, dict):
+        raise ValueError("report must contain algorithm_benchmark_bundle_v1 object")
+    schema = bundle.get("schema")
+    if schema != "algorithm_benchmark_bundle_v1":
+        raise ValueError(f"unexpected bundle schema: {schema!r}")
 
     summary_bits: list[str] = []
-    if schema:
-        summary_bits.append(f"schema: {html.escape(str(schema))}")
+    bsv = report.get("bundle_schema_version")
+    if bsv is not None:
+        summary_bits.append(f"bundle_schema_version: {html.escape(str(bsv))}")
+    summary_bits.append(f"schema: {html.escape(str(schema))}")
     summary_bits.append(f"rows: {len(rows)}")
     if merged:
         summary_bits.append(f"n_configs: {merged.get('n_configs')}")
@@ -146,6 +183,13 @@ def render_html(report: dict[str, Any], *, md_summary: dict[str, Any] | None = N
             algo_section = "\n".join(algo_lines)
 
     md_section = render_md_al_section(md_summary) if md_summary else ""
+    profile_section = render_pipeline_profile_section(pipeline_profile) if pipeline_profile else ""
+    footer_bits: list[str] = []
+    if qchem_stack_version:
+        footer_bits.append(f"qchem_stack_version={html.escape(qchem_stack_version)}")
+    if git_sha:
+        footer_bits.append(f"git_sha={html.escape(git_sha)}")
+    footer = f'<p class="summary">{" · ".join(footer_bits)}</p>' if footer_bits else ""
 
     return f"""<!DOCTYPE html>
 <html lang="en">
@@ -171,7 +215,9 @@ def render_html(report: dict[str, Any], *, md_summary: dict[str, Any] | None = N
     </tbody>
   </table>
   {algo_section}
+  {profile_section}
   {md_section}
+  {footer}
 </body>
 </html>
 """
@@ -189,12 +235,18 @@ def _fmt_float(value: Any) -> str:
 def main() -> None:
     ap = argparse.ArgumentParser(description="Render L3 benchmark JSON as static HTML.")
     ap.add_argument("--input", type=Path, help="L3 JSON file (default: stdin)")
+    ap.add_argument("--output", type=Path, help="Write HTML to this path (default: stdout)")
     ap.add_argument(
         "--md-summary",
         type=Path,
         help="Optional md_validation_summary.json for MD/ML AL section (C-10)",
     )
-    ap.add_argument("--output", type=Path, help="HTML output path (default: stdout)")
+    ap.add_argument(
+        "--pipeline-profile",
+        type=Path,
+        help="Optional pipeline_profile_v1 JSON (or repro excerpt with pipeline_profile key)",
+    )
+    ap.add_argument("--git-sha", default="", help="Git commit SHA for HTML footer")
     args = ap.parse_args()
 
     if args.input is not None:
@@ -216,7 +268,24 @@ def main() -> None:
     md_summary = None
     if args.md_summary is not None:
         md_summary = json.loads(args.md_summary.read_text(encoding="utf-8"))
-    html_doc = render_html(report, md_summary=md_summary)
+    pipeline_profile = None
+    if args.pipeline_profile is not None:
+        raw_profile = json.loads(args.pipeline_profile.read_text(encoding="utf-8"))
+        if isinstance(raw_profile, dict) and "pipeline_profile" in raw_profile:
+            pipeline_profile = raw_profile["pipeline_profile"]
+        elif isinstance(raw_profile, dict):
+            pipeline_profile = raw_profile
+    try:
+        from qchem_stack import __version__ as _qver
+    except ImportError:
+        _qver = "unknown"
+    html_doc = render_html(
+        report,
+        md_summary=md_summary,
+        pipeline_profile=pipeline_profile,
+        git_sha=args.git_sha or None,
+        qchem_stack_version=_qver,
+    )
     if args.output:
         args.output.write_text(html_doc, encoding="utf-8")
     else:

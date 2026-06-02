@@ -742,3 +742,210 @@ phases:
     - script skips gracefully when nbconvert missing
     evidence:
     - scripts/check_notebooks_smoke.py
+- id: M
+  title: Engineering Excellence unified P0-P3 WBS
+  day_range: Day701-Day900
+  status: done
+  objectives:
+  - Install profiles onboarding and security gates for new contributors.
+  - MD/ML energy reference contract with semantic validation.
+  - Type safety hotspots TypedDict and config doc split.
+  - Psi4 E2E smoke observability API caching and partial-to-L1 convergence.
+  - Version 0.3.0 alignment docs IA notebooks and parity gaps page.
+  tasks:
+  - id: M-P0-E01
+    title: Install profiles and extras matrix in README and QUICKSTART
+    owner: platform
+    status: done
+    target_files:
+    - README.md
+    - docs/QUICKSTART_CONTRIBUTORS.md
+    - docusaurus-site/docs/tutorial/quickstart.md
+    tests:
+    - manual onboarding path review
+    acceptance_criteria:
+    - pip extras table distinguishes install profiles from backend YAML profiles
+    evidence:
+    - README.md Install profiles table
+  - id: M-P0-E02
+    title: Qiskit version policy align quantum extra with uqc
+    owner: platform
+    status: done
+    target_files:
+    - pyproject.toml
+    - README.md
+    tests:
+    - pytest tests -q -m "not slow and not perf"
+    acceptance_criteria:
+    - quantum and uqc extras resolve qiskit 2.x without documented conflict
+    evidence:
+    - pyproject.toml quantum extra qiskit>=2.0
+  - id: M-P0-E04
+    title: pip-audit dev install surface blocking gate
+    owner: platform
+    status: done
+    target_files:
+    - .github/workflows/ci.yml
+    - pip-audit.toml
+    - CONTRIBUTING.md
+    tests:
+    - CI security-audit job
+    acceptance_criteria:
+    - pip-audit runs on pip install -e .[dev] with documented allowlist
+    evidence:
+    - .github/workflows/ci.yml security-audit job
+  - id: M-P0-A
+    title: P0 parity gap CI gate and day210 closeout
+    owner: core-protocol
+    status: done
+    target_files:
+    - .github/workflows/ci.yml
+    - docs/execution/day210_p0_closeout.md
+    tests:
+    - python scripts/check_parity_export_sample.py
+    - pytest tests/test_api_runs.py::test_capability_surface_matches_product_contract
+    acceptance_criteria:
+    - gap validator in CI test job and closeout document exists
+    evidence:
+    - docs/execution/day210_p0_closeout.md
+  - id: M-P1-E01
+    title: MD ML energy reference semantic validator
+    owner: md-ml
+    status: done
+    target_files:
+    - src/qchem_stack/md_bridge/energy_reference.py
+    - src/qchem_stack/md_bridge/md_validation_loop.py
+    - src/qchem_stack/md_bridge/md_loop_rounds.py
+    tests:
+    - tests/test_md_bridge_energy_reference_consistency.py
+    acceptance_criteria:
+    - validate_loop_energy_consistency raises on label vs validation mismatch
+    - validation output includes raw and shifted delta metrics
+    evidence:
+    - tests/test_md_bridge_energy_reference_consistency.py
+  - id: M-P1-E07
+    title: TypedDict hotspots dmet from_pipeline methods_resource
+    owner: chem-stack
+    status: done
+    target_files:
+    - src/qchem_stack/chem/embedding/dmet_self_consistent.py
+    - src/qchem_stack/md_bridge/from_pipeline.py
+    - src/qchem_stack/integrations/methods_resource_unified.py
+    tests:
+    - pyright src/qchem_stack
+    acceptance_criteria:
+    - top three Any hotspots reduced by at least fifty percent
+    evidence:
+    - DMETSelfConsistencyReport TypedDict
+    - QmefAttachmentContext dataclass
+  - id: M-P1-E10
+    title: Config docs split field index recipes migration
+    owner: platform
+    status: done
+    target_files:
+    - docs/reference/config_field_index.md
+    - docs/reference/config_recipes.md
+    - docs/reference/config_migration.md
+    tests:
+    - link check in docs README
+    acceptance_criteria:
+    - config reference split from monolithic handbook with ten recipes
+    evidence:
+    - docs/reference/config_recipes.md
+  - id: M-P1-A
+    title: Qulacs executor and DMET self-consistency residual
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/backends/qulacs_executor.py
+    - src/qchem_stack/chem/embedding/dmet_self_consistent.py
+    tests:
+    - tests/test_qulacs_backend_conformance.py
+    acceptance_criteria:
+    - Qulacs H2 HEA VQE smoke and DMET scf cycles trace in parity_snapshot
+    evidence:
+    - tests/test_qulacs_backend_conformance.py
+  - id: M-P2-E01
+    title: Psi4 end-to-end CI smoke after test-psi4
+    owner: chem-stack
+    status: done
+    target_files:
+    - .github/workflows/ci.yml
+    - configs/example_h2_psi4_rhf_sto3g.yaml
+    tests:
+    - pytest -m psi4
+    acceptance_criteria:
+    - run_pipeline_from_config smoke in test-psi4 job
+    evidence:
+    - .github/workflows/ci.yml Psi4 end-to-end pipeline smoke step
+  - id: M-P2-E05
+    title: JSON structured logging and meta ETag caching
+    owner: platform
+    status: done
+    target_files:
+    - src/qchem_stack/orchestration/pipeline.py
+    - src/qchem_stack/api/routers/meta.py
+    tests:
+    - tests/test_observability_pipeline.py
+    - tests/test_api_runs.py
+    acceptance_criteria:
+    - QCHEM_STACK_JSON_LOG emits stage JSON and capability-surface returns ETag
+    evidence:
+    - tests/test_api_runs.py::test_capability_surface_etag_not_modified
+  - id: M-P2-A
+    title: QPE main config tree and cloud AL energy target
+    owner: quantum-alg
+    status: done
+    target_files:
+    - src/qchem_stack/config/quantum_specs.py
+    - configs/example_h2_qpe_main.yaml
+    tests:
+    - tests/test_qpe_main_config_pipeline.py
+    acceptance_criteria:
+    - quantum.algorithm qpe_kitaev runs H2 demo from main config tree
+    evidence:
+    - tests/test_qpe_main_config_pipeline.py
+  - id: M-P3-E01
+    title: Version 0.3.0 alignment pyproject app init
+    owner: platform
+    status: done
+    target_files:
+    - pyproject.toml
+    - src/qchem_stack/__init__.py
+    - src/qchem_stack/api/app.py
+    - CHANGELOG.md
+    tests:
+    - python -c "import qchem_stack; assert qchem_stack.__version__"
+    acceptance_criteria:
+    - package runtime and OpenAPI version match CHANGELOG 0.3.0
+    evidence:
+    - pyproject.toml version 0.3.0
+  - id: M-P3-E03
+    title: Docs IA engineering reference product directories
+    owner: platform
+    status: done
+    target_files:
+    - docs/README.md
+    - docs/engineering/api_stability_policy.md
+    - docs/product/non_goals.md
+    tests:
+    - docusaurus npm run build
+    acceptance_criteria:
+    - docs README indexes user reference engineering research surfaces
+    evidence:
+    - docs/README.md engineering section
+  - id: M-P3-A
+    title: VQD MDML notebooks parity gaps docusaurus page
+    owner: platform
+    status: done
+    target_files:
+    - notebooks/vqd_walkthrough.ipynb
+    - notebooks/md_ml_active_learning.ipynb
+    - docusaurus-site/docs/parity/gaps.md
+    tests:
+    - scripts/check_notebooks_smoke.py
+    acceptance_criteria:
+    - six notebooks present and parity gaps page builds
+    evidence:
+    - notebooks/vqd_walkthrough.ipynb
+    - docusaurus-site/docs/parity/gaps.md

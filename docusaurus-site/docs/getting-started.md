@@ -20,7 +20,7 @@ keywords:
 
 | 你的目标 | 建议入口 |
 |---|---|
-| 先跑通结果 | [15 分钟上手](./tutorial/quickstart) |
+| 先跑通结果 | [15 分钟上手](./tutorial/quickstart) 或 [三条路径索引](./tutorial/tutorial-index-three-paths) |
 | 先理解配置怎么组织 | [工作流与 YAML 概览](./tutorial/workflow) |
 | 我是维护者，要看全局结构 | [指南总览（P1-P4）](./guide/) |
 | 我要接 HTTP / 队列 | [命令行与脚本](./reference/cli-and-scripts) + [HTTP API](./reference/http-api-sqlite-jobs) |

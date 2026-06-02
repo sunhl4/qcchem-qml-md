@@ -8,15 +8,15 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.chem.embedding.dmet import DMETContext
+from qchem_stack.chem.embedding.dmet_self_consistent import (
+    OneShotEmbeddingDriver,
+    run_dmet_bath_scf_self_consistency_v1,
+)
 from qchem_stack.config.embedding_enums import DmetHamiltonianSource
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels
 from qchem_stack.config.quantum_helpers import resolve_vqe_depth, resolve_vqe_maxiter
 from qchem_stack.contracts.schema_ids import ONIOM_TOY_V1
 from qchem_stack.exceptions import PipelineError
-from qchem_stack.integrations.dmet_self_consistent import (
-    OneShotEmbeddingDriver,
-    run_dmet_bath_scf_self_consistency_v1,
-)
 from qchem_stack.integrations.schmidt_per_fragment_vqe import run_schmidt_per_fragment_vqe
 
 if TYPE_CHECKING:
@@ -134,7 +134,7 @@ class DmetStrategy:
             wf["impurity_solver_used"] = (
                 "qchem_stack.chem.embedding.dmet.QubitHamiltonianFragmentSolverExact"
                 if dmet.fragment_solver.use_exact
-                else "qchem_stack.integrations.dmet_fragment_solvers.QubitHamiltonianFragmentSolverVQE"
+                else "qchem_stack.chem.embedding.fragment_solvers.qubit_hamiltonian_vqe.QubitHamiltonianFragmentSolverVQE"
             )
             if dmet.multifragment_one_shot_shared_hamiltonian:
                 wf["multifragment_one_shot_shared_hamiltonian"] = True

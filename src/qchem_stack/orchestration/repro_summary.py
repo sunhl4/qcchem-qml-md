@@ -246,6 +246,13 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         sm["mitigation_graph_report_present"] = True
     if out.get("mitigation_dag_execution"):
         sm["mitigation_dag_execution_present"] = True
+    from qchem_stack.config.mitigation_helpers import (
+        build_mitigation_pec_literature_stub_v1,
+        pec_literature_stub_enabled,
+    )
+
+    if pec_literature_stub_enabled(cfg.mitigation):
+        sm["mitigation_pec_literature_stub_v1"] = build_mitigation_pec_literature_stub_v1()
     if isinstance(out.get("nexus_cloud_repro"), dict):
         sm["nexus_cloud_repro"] = out["nexus_cloud_repro"]
     psnap = repro.get("parity_snapshot")

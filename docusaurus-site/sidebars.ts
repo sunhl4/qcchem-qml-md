@@ -67,6 +67,8 @@ const sidebars: SidebarsConfig = {
         'reference/parity-contract-import-paths',
         'reference/configs-catalog',
         'parity/gap-implementation-plan',
+        'parity/gaps',
+        'parity/public-matrix',
         'reference/cli-http',
       ],
     },

@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
 from qchem_stack.config import ExperimentConfig, load_experiment_config
-from qchem_stack.integrations.workflow_preview import workflow_preview_payload
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config
 from qchem_stack.protocols.computable import computables_export_dict
+from qchem_stack.protocols.workflow_preview import workflow_preview_payload
 
 if TYPE_CHECKING:
     from qchem_stack.orchestration.pipeline_result import PipelineResultV1

@@ -13,6 +13,7 @@ from qchem_stack.backends.pauli_measure_expand import basis_change_operations
 from qchem_stack.backends.pauli_shot_sim import apply_pauli_tensor_basis_to_state
 from qchem_stack.backends.qiskit_pauli_shots import qiskit_bitstring_to_comp_index
 from qchem_stack.backends.uccsd_circuit_qiskit import _amplitudes_openfermion_to_qiskit, _wire
+from qchem_stack.quantum.algorithms.tolerances import PROBABILITY_FLOOR
 from qchem_stack.quantum.qse_transition import _basis_key_for_term
 
 
@@ -57,13 +58,13 @@ def estimate_transition_pauli_amplitude_qiskit_shots(
 
     p = np.abs(psi_r) ** 2
     psum = float(np.sum(p))
-    if psum < 1e-30:
+    if psum < PROBABILITY_FLOOR:
         return 0j
     p = p / psum
     for bitstr, cnt in counts.items():
         b = qiskit_bitstring_to_comp_index(bitstr, n)
         pb = float(p[b])
-        if pb < 1e-30:
+        if pb < PROBABILITY_FLOOR:
             continue
         z = _pauli_eigenvalue_on_comp_bit(pauli_term, b, n, bk)
         acc += (cnt / total) * z * np.conj(psi_l[b]) * psi_r[b] / pb

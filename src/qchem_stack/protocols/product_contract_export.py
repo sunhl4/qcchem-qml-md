@@ -94,8 +94,9 @@ def mitigation_execution_model_public() -> dict[str, Any]:
             "open_stack": "mitigation/qermit_analog.py JSON graph + optional mitigation_dag_execution trace on pipeline result",
         },
         "async_batch_execution": {
-            "open_stack": "not_implemented_distributed_mitigation_batch_scheduler",
-            "note": "Local SQLite jobs run whole experiments; mitigation executes inline in pipeline runs.",
+            "open_stack": "jobs/mitigation_queue.py LocalMitigationJobQueue.drain_all",
+            "status": "implemented_local_inprocess",
+            "note": "In-process asyncio FIFO queue; not a distributed Nexus MitEx scheduler.",
         },
         "epistemic_bound": "Open-stack execution model only.",
     }

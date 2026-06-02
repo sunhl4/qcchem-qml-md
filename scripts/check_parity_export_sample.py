@@ -1,13 +1,15 @@
 #!/usr/bin/env python3
 """Smoke-check parity export JSON (config-only) for L1 regression.
 
-Runs ``export_parity_criteria_table`` (config-only) on ``SAMPLE_CONFIGS_REL`` and asserts
-stable keys + ``release_anchor`` on every gap row.
+Runs ``export_parity_criteria_table`` (config-only) on **every** ``configs/*.yaml``
+that validates as :class:`~qchem_stack.config.ExperimentConfig` (``schema_version: 2``
+with a ``molecule`` block). Also loads MD validation-loop YAMLs (``max_rounds`` +
+``force_field_backend``) via :class:`~qchem_stack.md_bridge.md_loop_config.MdValidationLoopConfig`.
 
 Does not require PySCF or a pipeline results file.
 
-When adding parity-driven ``configs/*.yaml``, extend ``SAMPLE_CONFIGS_REL`` so CI keeps
-schema coverage.
+When adding a new **experiment** YAML under ``configs/``, it is picked up automatically;
+no manual ``SAMPLE_CONFIGS_REL`` edit is required.
 """
 
 from __future__ import annotations
@@ -18,90 +20,43 @@ import subprocess
 import sys
 from pathlib import Path
 
-# M2-style sampling: VQE + ADAPT + excited + IQEB + projection + Pauli shot-path YAMLs (config-only export).
-SAMPLE_CONFIGS_REL = (
-    "configs/example_h2.yaml",
-    # Second backend (`scf.driver=psi4`): registry + capabilities snapshot in export (no PySCF required).
-    "configs/example_h2_psi4_rhf_sto3g.yaml",
-    "configs/example_h2_psi4_schmidt_dmet.yaml",
-    "configs/example_h2_psi4_avas.yaml",
-    "configs/example_h2_psi4_projection_mulliken.yaml",
-    "configs/example_h2_precomputed_bundle.yaml",
-    "configs/example_h2_excited_smoke.yaml",
-    "configs/example_h2_iqeb.yaml",
-    "configs/example_h2_adapt_singles_pool.yaml",
-    "configs/example_h2_adapt_doubles_pool.yaml",
-    "configs/example_h2_iqeb_fermionic_doubles_pool.yaml",
-    "configs/example_h2_iqeb_qubit_excitation_alias.yaml",
-    "configs/example_h2_adapt_uccsd_jw_alias.yaml",
-    "configs/example_h2_projection_trace.yaml",
-    "configs/example_h4_projection_mulliken.yaml",
-    "configs/example_h2_sampled.yaml",
-    "configs/example_h2_qiskit_shots.yaml",
-    "configs/example_h2_uccsd.yaml",
-    "configs/example_h2_uccsd_trotter.yaml",
-    "configs/example_h2_vqd_uccsd.yaml",
-    "configs/example_h2_uccsd_bk.yaml",
-    "configs/example_h2_uccsd_pauli_protocol.yaml",
-    "configs/example_h2_uccsd_qse_pauli_qiskit.yaml",
-    "configs/example_h2_uccgd.yaml",
-    "configs/example_h2_qcc.yaml",
-    "configs/example_h2_scbk_hea.yaml",
-    "configs/example_h4_dmet_self_consistent.yaml",
-    "configs/example_h2_qpe_main.yaml",
-    "configs/example_oniom_qm_mm_demo.yaml",
-    "configs/example_h2_zne_qiskit_fold.yaml",
-    "configs/example_h2_vqd_uccsd_three_computable.yaml",
-    "configs/example_h2_sa_vqe.yaml",
-    "configs/example_h2_vqd_deflation_circuit.yaml",
-    "configs/example_h2_zne_circuit_fold.yaml",
-    "configs/qpe_dual_track_demo.yaml",
-    "configs/example_decomposition_plugin_toy.yaml",
-    "configs/example_decomposition_plugin_two_fragment.yaml",
-    "configs/example_h2_pbc_gamma.yaml",
-    "configs/example_oniom_toy.yaml",
-    "configs/example_h4_dmet_fragment_exact_small.yaml",
-    "configs/example_h4_schmidt_multifragment.yaml",
-    "configs/example_h2_qpe_track.yaml",
-    "configs/example_h2_vqs_track.yaml",
-    "configs/example_h2_qpe_track_parity_integrations.yaml",
-    "configs/example_h2_casscf_audit.yaml",
-    "configs/example_h2_embedding_parity.yaml",
-    "configs/example_h2_md_ml_trajectory_hf.yaml",
-    "configs/example_h2_echo_variational_plugin.yaml",
-    "configs/example_h2o_sto3g_cas44.yaml",
-    "configs/example_n2_sto3g_cas44.yaml",
-    "configs/example_fe_sto3g_helike_rhf_cas22.yaml",
-    "configs/example_h2_oo_vqe.yaml",
-    "configs/example_h2_qpe_zne_pauli.yaml",
-    "configs/example_h2_avas_casscf_workflow.yaml",
-    "configs/example_h2_classical_shadows_stub.yaml",
-    "configs/example_decomposition_plugin_contract.yaml",
-    # Geometry / SCF extensions (parity_export molecule + scf surfaces; config-only)
-    "configs/example_h2_sto3g_density_fit.yaml",
-    "configs/example_h2_zmatrix_sto3g.yaml",
-    "configs/example_h2_zmatrix_sto3g_density_fit.yaml",
-    "configs/example_mg_lanl2dz_ecp_rhf.yaml",
-    "configs/example_mg_lanl2dz_ecp_density_fit.yaml",
-    "configs/example_hbr_zmatrix_lanl2dz_ecp_density_fit.yaml",
-    # P4 algorithm YAMLs (parity export config-only gate)
-    "configs/example_h2_puccd.yaml",
-    "configs/example_h2_puccd_pauli_protocol.yaml",
-    "configs/example_h2_upccgsd.yaml",
-    "configs/example_h2_upccgsd_pauli_protocol.yaml",
-    "configs/example_h2_iqcc.yaml",
-    "configs/example_h2_qite.yaml",
-    "configs/example_h2_vsqs.yaml",
-    "configs/example_h2_jkmn.yaml",
-    "configs/example_h2_hcb.yaml",
-    "configs/example_h2_qcc_pauli_protocol.yaml",
-    "configs/example_h2_adapt_staggered_pool.yaml",
-    "configs/example_h2_qpe_deterministic.yaml",
-    "configs/example_h2_qpe_info_theory.yaml",
-    "configs/example_h2_sceom_symmetry_filtered.yaml",
-    "configs/example_h4_adapt_qse_benchmark.yaml",
-    "configs/example_h2_md_ml_trajectory_full_pipeline.yaml",
-)
+import yaml
+
+
+def _discover_experiment_config_paths(configs_dir: Path) -> tuple[str, ...]:
+    """All ``configs/*.yaml`` files that are ExperimentConfig-shaped (schema v2 + molecule)."""
+    rels: list[str] = []
+    for path in sorted(configs_dir.glob("*.yaml")):
+        raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if (
+            isinstance(raw, dict)
+            and raw.get("schema_version") == "2"
+            and isinstance(raw.get("molecule"), dict)
+        ):
+            rels.append(f"configs/{path.name}")
+    return tuple(rels)
+
+
+def _discover_md_loop_config_paths(configs_dir: Path) -> tuple[str, ...]:
+    """All ``configs/*.yaml`` files that are MdValidationLoopConfig-shaped."""
+    rels: list[str] = []
+    for path in sorted(configs_dir.glob("*.yaml")):
+        raw = yaml.safe_load(path.read_text(encoding="utf-8")) or {}
+        if (
+            isinstance(raw, dict)
+            and "max_rounds" in raw
+            and "force_field_backend" in raw
+            and "molecule" not in raw
+        ):
+            rels.append(f"configs/{path.name}")
+    return tuple(rels)
+
+
+# Backward-compatible alias: full auto-discovered experiment config list at import time.
+# Tests and docs may reference this name; it is rebuilt from disk on each import.
+_ROOT = Path(__file__).resolve().parents[1]
+SAMPLE_CONFIGS_REL = _discover_experiment_config_paths(_ROOT / "configs")
+MD_LOOP_CONFIGS_REL = _discover_md_loop_config_paths(_ROOT / "configs")
 
 
 def _run_export(root: Path, cfg_rel: str, env: dict[str, str]) -> tuple[int, dict]:
@@ -119,11 +74,11 @@ def _run_export(root: Path, cfg_rel: str, env: dict[str, str]) -> tuple[int, dic
     return 0, json.loads(proc.stdout)
 
 
-def _sample_configs_unique_or_raise() -> tuple[str, ...]:
+def _sample_configs_unique_or_raise(samples: tuple[str, ...]) -> tuple[str, ...]:
     seen: set[str] = set()
     deduped: list[str] = []
     duplicated: list[str] = []
-    for cfg in SAMPLE_CONFIGS_REL:
+    for cfg in samples:
         if cfg in seen:
             duplicated.append(cfg)
             continue
@@ -131,8 +86,30 @@ def _sample_configs_unique_or_raise() -> tuple[str, ...]:
         deduped.append(cfg)
     if duplicated:
         d = ", ".join(sorted(set(duplicated)))
-        raise ValueError(f"SAMPLE_CONFIGS_REL has duplicated entries: {d}")
+        raise ValueError(f"config list has duplicated entries: {d}")
     return tuple(deduped)
+
+
+def _register_template_solvers_for_export() -> None:
+    from qchem_stack.chem.solvers.custom_solver_template import (
+        register_custom_external_template_solver,
+    )
+
+    register_custom_external_template_solver(overwrite=True)
+
+
+def _check_md_loop_configs(root: Path) -> int:
+    from qchem_stack.md_bridge.md_loop_config import MdValidationLoopConfig
+
+    md_samples = _sample_configs_unique_or_raise(MD_LOOP_CONFIGS_REL)
+    for cfg_rel in md_samples:
+        path = root / cfg_rel
+        try:
+            MdValidationLoopConfig.from_yaml(path)
+        except Exception as exc:
+            sys.stderr.write(f"md loop config failed for {cfg_rel}: {exc}\n")
+            return 1
+    return 0
 
 
 def main() -> int:
@@ -142,11 +119,16 @@ def main() -> int:
         sys.path.insert(0, str(src))
     from qchem_stack.protocols.product_contract import PARITY_EXPORT_V3_STABLE_KEYS
 
+    _register_template_solvers_for_export()
+
     env = {**os.environ, "PYTHONPATH": f"{src}" + os.pathsep + os.environ.get("PYTHONPATH", "")}
     try:
-        samples = _sample_configs_unique_or_raise()
+        samples = _sample_configs_unique_or_raise(SAMPLE_CONFIGS_REL)
     except ValueError as e:
         sys.stderr.write(str(e) + "\n")
+        return 1
+    if not samples:
+        sys.stderr.write("no experiment configs discovered under configs/\n")
         return 1
     for cfg_rel in samples:
         code, data = _run_export(root, cfg_rel, env)
@@ -168,7 +150,7 @@ def main() -> int:
             if not isinstance(g, dict) or not g.get("release_anchor"):
                 sys.stderr.write(f"{cfg_rel}: gap row missing release_anchor\n")
                 return 1
-    return 0
+    return _check_md_loop_configs(root)
 
 
 if __name__ == "__main__":
