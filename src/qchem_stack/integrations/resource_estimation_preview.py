@@ -86,6 +86,10 @@ def build_resource_estimation_preview_v1(
         "zne_enabled_yaml": mit.zne.enabled,
         "mitigation_zne_mode_yaml": mit.zne.mode,
         "mitigation_zne_scales_yaml": [float(x) for x in mit.zne.scales],
+        "mitigation_zne_scale_count_yaml": len(mit.zne.scales),
+        "mitigation_zne_richardson_order_yaml": max(0, len(mit.zne.scales) - 1)
+        if mit.zne.enabled
+        else 0,
         "pmsv_enabled_yaml": mit.pmsv.enabled,
         "run_sampled_pauli_protocol_yaml": qt.pauli.run_sampled,
         "run_qiskit_shots_pauli_protocol_yaml": qt.pauli.run_qiskit_shots,
@@ -156,6 +160,14 @@ def build_resource_estimation_preview_v1(
             base["ft_two_qubit_depth_proxy"] = int(max_depth) * max(1, twoq)
         if rs.get("n_pauli_groups") is not None:
             base["ft_measurement_rounds_proxy"] = int(rs["n_pauli_groups"])
+        sum_shots = rs.get("sum_shots")
+        if sum_shots is not None:
+            base["ft_total_measurement_shots_proxy"] = int(sum_shots)
+        n_groups = rs.get("n_pauli_groups")
+        if sum_shots is not None and n_groups is not None and int(n_groups) > 0:
+            base["ft_shots_per_circuit_effective_proxy"] = int(sum_shots) // int(n_groups)
+        if max_depth is not None and rs.get("n_qubits") is not None:
+            base["ft_t_gate_count_proxy"] = int(max_depth) * int(rs["n_qubits"])
         excited_acct = rs.get("excited_shot_accounting")
         if isinstance(excited_acct, dict) and excited_acct:
             base["excited_shot_budget_breakdown"] = dict(excited_acct)

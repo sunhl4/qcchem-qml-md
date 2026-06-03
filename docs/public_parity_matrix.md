@@ -8,6 +8,8 @@
 
 **差距清单 + 分阶段计划（维护稿）**：与本文件同源的引擎读字段见 `product_gap_categories()` / `GET /v1/meta/capability-surface`。
 
+<!-- Machine-readable gap table: docs/generated/parity_gap_snippet.md (run scripts/generate_parity_gap_snippet.py) -->
+
 **边界（必读）**：把「公开叙事 + 可检证」做到底是 **L1**；**完全复现闭源商业包在内部默认值、全部 driver 组合与商业运行时细节**属于 **L0**，在无源码与许可下**不可作为工程承诺**。见 [工程记忆 §0](工程记忆_Quantinuum对标与数据流技术文档.md)。
 
 **图例**：`yes` 已实现 / `partial` 部分或 API 形态不同 / `no` 未实现 / `n/a` 刻意不做或非公开范围

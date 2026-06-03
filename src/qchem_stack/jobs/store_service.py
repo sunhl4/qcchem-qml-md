@@ -78,7 +78,12 @@ class SqliteJobStore(
                 set_startup_pragmas(self._conn)
         return self
 
-    def __exit__(self, exc_type, exc_val, exc_tb):
+    def __exit__(
+        self,
+        exc_type: type[BaseException] | None,
+        exc_val: BaseException | None,
+        exc_tb: object | None,
+    ) -> bool:
         """Exit context manager - close persistent connection."""
         self.close()
         return False

@@ -26,12 +26,12 @@ from qchem_stack.chem.embedding.schmidt_production_model import (
     SchmidtImpurityModel,
     SchmidtProductionError,
 )
-from qchem_stack.contracts.schema_ids import (
-    SCHMIDT_IMPURITY_INTEGRALS_V1,
-)
-from qchem_stack.quantum.algorithms.tolerances import (
+from qchem_stack.chem.tolerances import (
     SCHMIDT_ORTHONORMALITY_TOLERANCE,
     SCHMIDT_SINGULARITY_TOLERANCE,
+)
+from qchem_stack.contracts.schema_ids import (
+    SCHMIDT_IMPURITY_INTEGRALS_V1,
 )
 
 if TYPE_CHECKING:

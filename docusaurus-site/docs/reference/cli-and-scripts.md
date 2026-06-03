@@ -5,6 +5,8 @@ description: 安装后可用的控制台命令与仓库 scripts/ 常用入口。
 
 # 命令行与脚本
 
+仓库根目录 [`scripts/README.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/scripts/README.md) 按类别索引全部 `scripts/` 入口（CI、smoke、文档同步、parity 导出、UQC/MD、benchmark 等）。
+
 本文聚焦日常高频命令。参数细节以仓库 `README.md`、`pyproject.toml` 与脚本 docstring 为准。
 
 ## 适用场景
@@ -27,15 +29,19 @@ pip install -e ".[dev]"
 
 | 命令 | 作用 |
 |------|------|
+| `qchem-run` | 从 YAML 跑同步管线（可选 `--job-db` 入队 Pauli 作业） |
+| `qchem-export-parity` | 导出 parity / Methods 判据 JSON（需 editable 安装以访问 `scripts/`） |
 | `qchem-jobs-worker` | 轮询 SQLite 作业库，消费 `QUEUED` 作业 |
 
 典型用法：
 
 ```bash
+qchem-run configs/example_h2.yaml
+qchem-export-parity configs/example_h2.yaml > parity.json
 qchem-jobs-worker --db ./jobs.sqlite --sleep 0.5
 ```
 
-常见参数：`--db`、`--sleep`、`--max-retries`。
+`qchem-run` 可选：`--job-db`、`--json-summary`。Worker 常见参数：`--db`、`--sleep`、`--max-retries`。
 
 ## 本地 HTTP 服务
 

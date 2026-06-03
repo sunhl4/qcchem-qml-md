@@ -7,7 +7,7 @@ from typing import Any, cast
 
 import numpy as np
 
-from qchem_stack.quantum.algorithms.tolerances import LOWDIN_SINGULARITY_TOLERANCE
+from qchem_stack.chem.tolerances import LOWDIN_SINGULARITY_TOLERANCE
 
 
 @dataclass(frozen=True)

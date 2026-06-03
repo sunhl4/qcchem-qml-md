@@ -4,6 +4,10 @@
 
 Canonical backlog: `comparative_execution_backlog.yaml`. Historical copies under `archive/` are read-only.
 
+**Day templates** (planning stubs) live under [`archive/templates/`](archive/templates/) — not active execution evidence.
+
+**Active closeout / plans:** `day90_final_closeout_2026Q2.md`, `day91_next_phase_plan_2026Q3.md`, `comparative_execution_rd_plan_strict_2026Q3Q4.md`.
+
 | Phase | Title | Status |
 |-------|-------|--------|
 | `A` | Baseline freeze and quick closure | done |
@@ -19,3 +23,4 @@ Canonical backlog: `comparative_execution_backlog.yaml`. Historical copies under
 | `K` | P4-C embedding and MD ML science KPI | done |
 | `L` | P4-D ecosystem and v0.3.0 closeout | done |
 | `M` | Engineering Excellence unified P0-P3 WBS | done |
+| `N` | P0-P4 verification residual closure and product UX | done |

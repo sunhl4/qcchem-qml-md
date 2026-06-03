@@ -19,11 +19,24 @@ if TYPE_CHECKING:
     from qchem_stack.repro.schema import ParitySnapshotV1, PipelineProfileV1, RunSummaryV1
 
 
+class PipelineRunSummaryAttachmentV1(TypedDict, total=False):
+    """Subset of keys commonly written by :func:`~qchem_stack.orchestration.repro_summary.attach_run_summary`."""
+
+    stages_completed: list[str]
+    scf_energy: float
+    energy_pauli_protocol: float
+    quantum_algorithm: str
+    quantum_algorithm_yaml: str
+    pauli_protocol_expectation_path: str
+    pipeline_total_wall_ms: float
+    pipeline_slowest_stage: str
+
+
 class PipelineReproV1(TypedDict, total=False):
     """``out['repro']`` block written during sync pipeline runs."""
 
     parity_snapshot: ParitySnapshotV1
-    run_summary: RunSummaryV1
+    run_summary: RunSummaryV1 | PipelineRunSummaryAttachmentV1
     run_context: dict[str, object]
     pipeline_profile: PipelineProfileV1
     environment: dict[str, object]
@@ -132,6 +145,7 @@ def tag_pipeline_result(payload: PipelineResultV1 | dict[str, Any]) -> PipelineR
 
 __all__ = [
     "PIPELINE_RESULT_CORE_KEYS",
+    "PipelineRunSummaryAttachmentV1",
     "PipelineJobEnqueueV1",
     "PipelinePreQuantumSummaryV1",
     "PipelineReproV1",

@@ -54,12 +54,26 @@ High‑level textbook / tutorial narratives often mention “drivers → algorit
 
 ## End-to-end orchestration (YAML)
 
+```bash
+# After pip install -e ".[chem]" (or .[dev])
+qchem-run configs/example_h2.yaml
+qchem-export-parity configs/example_h2.yaml > parity_table.json
+```
+
 ```python
 from pathlib import Path
 from qchem_stack.orchestration.pipeline import run_pipeline_from_config
 
 out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqlite"))
 # out contains scf_energy, energy_after_variational, energy_pauli_protocol, resource_summary, repro, job_result
+```
+
+### Docker (worker + API)
+
+```bash
+docker compose build
+docker compose up -d   # slim image: qchem-worker + qchem-api on :8000
+# Full extras (uqc, nexus, pytket): docker build --target full -t qchem-stack:full .
 ```
 
 For **Methods‑style exports** (`computable_abstract_v2`, `hamiltonian_meta`), use `WorkflowCoordinator` (`qchem_stack.orchestration.WorkflowCoordinator`): it wraps `run_pipeline_from_config` and sets `out["methods_sidecar"]`.
@@ -129,8 +143,7 @@ Allowed YAML combinations for the pre-quantum path are listed in
 - `qchem_stack/tensornet` — CuTensorNet *protocol* stub and optional `opt_einsum` / cupy / cuquantum import checks (`quantum.tensornet_expectation_stub`, `tensornet_contraction_engine`)
 - `qchem_stack/backends` — `BackendSpec` (`provider`: `statevector` | `qiskit` | `ionstack`), `executor_from_spec`, Qiskit / IonStack hooks, pass bundles, resource metrics
 - `qchem_stack/jobs` — SQLite job store, `nexus_analog` cost rows, optional `nexus_cloud` sidecar
-- `qchem_stack/ml` — **toy** Ridge surrogate + observation cache (demos); production ML loop → `md_bridge`
-- `qchem_stack/md_bridge` — `QMEFDataset`, QML-FF/JAX-MD adapter, MD validation active-learning loop
+- `qchem_stack/md_bridge` — `QMEFDataset`, QML-FF/JAX-MD adapter, MD validation active-learning loop (ML demos and training loops; former `qchem_stack.ml` stub removed)
 - `qchem_stack/qpe_qec_demo` — QPE variants + adapter stub toward fault-tolerant demos
 - `qchem_stack/orchestration` — YAML-driven PySCF → VQE/ADAPT → `PauliAveragingProtocol` → optional SQLite jobs
 

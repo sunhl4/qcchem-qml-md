@@ -1,0 +1,17 @@
+name: qchem-stack-binder
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - pip:
+      - numpy>=1.24
+      - scipy>=1.11
+      - pydantic>=2.5
+      - PyYAML>=6.0
+      - openfermion>=1.5
+      - pandas>=2.0
+      - pyscf>=2.4
+      - qiskit>=2.0
+      - qiskit-aer>=0.13
+      - -e .

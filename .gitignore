@@ -51,7 +51,9 @@ docusaurus-site/.docusaurus/
 *.db
 timer.dat
 
-# Run outputs (results/ is tracked for reference MD/ML runs)
+# Run outputs (local only; see results/README.md)
+results/*
+!results/README.md
 artifacts/
 
 # Root-level artifacts (should not be committed)

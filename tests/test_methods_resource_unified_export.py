@@ -204,6 +204,29 @@ def test_resource_estimation_preview_v1_config_only_export() -> None:
     assert rev.get("tket_probe_requested") is True
 
 
+def test_resource_estimation_preview_depth_proxies_from_results() -> None:
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.integrations.resource_estimation_preview import (
+        build_resource_estimation_preview_v1,
+    )
+
+    cfg = load_experiment_config(configs_path("example_h2.yaml"))
+    row = {
+        "resource_summary": {
+            "sum_shots": 4096,
+            "n_pauli_groups": 4,
+            "max_depth": 12,
+            "n_qubits": 4,
+            "sum_twoq": 8,
+        },
+        "repro": {"run_summary": {}},
+    }
+    prev = build_resource_estimation_preview_v1(cfg=cfg, pipeline_row=row)
+    assert prev.get("ft_total_measurement_shots_proxy") == 4096
+    assert prev.get("ft_shots_per_circuit_effective_proxy") == 1024
+    assert prev.get("ft_t_gate_count_proxy") == 48
+
+
 def test_registry_and_mdml_blocks_in_config_only_export() -> None:
     env = {
         **os.environ,

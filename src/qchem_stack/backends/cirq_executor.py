@@ -74,7 +74,17 @@ def _pauli_expectation_cirq(
         if not obs_ops:
             continue
         op = obs_ops[0] if len(obs_ops) == 1 else cirq.PauliString(obs_ops)
-        exp = float(result.expectation_values([op])[0])
+        if hasattr(result, "expectation_values"):
+            exp = float(result.expectation_values([op])[0])
+        else:
+            exp = float(
+                np.real(
+                    op.expectation_from_state_vector(
+                        result.final_state_vector,
+                        result.qubit_map,
+                    )
+                )
+            )
         total += c * exp
     return float(total)
 

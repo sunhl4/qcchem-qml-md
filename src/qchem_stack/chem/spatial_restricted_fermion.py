@@ -46,15 +46,18 @@ def restricted_spatial_integrals_to_fermion_operator(
     p_idx, q_idx = np.where(h1_mask)
     for p, q in zip(p_idx, q_idx, strict=False):
         c = float(h1a[p, q])
-        terms[((2 * p, 1), (2 * q, 0))] = terms.get(((2 * p, 1), (2 * q, 0)), 0.0) + c
-        terms[((2 * p + 1, 1), (2 * q + 1, 0))] = (
-            terms.get(((2 * p + 1, 1), (2 * q + 1, 0)), 0.0) + c
+        terms[((int(2 * p), 1), (int(2 * q), 0))] = (
+            terms.get(((int(2 * p), 1), (int(2 * q), 0)), 0.0) + c
+        )
+        terms[((int(2 * p + 1), 1), (int(2 * q + 1), 0))] = (
+            terms.get(((int(2 * p + 1), 1), (int(2 * q + 1), 0)), 0.0) + c
         )
 
     # Two-body terms - vectorized: only iterate over non-zero elements
     h2_mask = np.abs(h2a) > atol
     nonzero_indices = np.argwhere(h2_mask)
     for p, q, r, s in nonzero_indices:
+        p, q, r, s = int(p), int(q), int(r), int(s)
         coeff = 0.5 * float(h2a[p, q, r, s])
         # αααα
         t1 = ((2 * p, 1), (2 * q, 1), (2 * r, 0), (2 * s, 0))
@@ -69,7 +72,11 @@ def restricted_spatial_integrals_to_fermion_operator(
         t4 = ((2 * p + 1, 1), (2 * q, 1), (2 * r, 0), (2 * s + 1, 0))
         terms[t4] = terms.get(t4, 0.0) + coeff
 
-    # Construct FermionOperator from dict (much faster than incremental +=)
-    fo = FermionOperator(terms)
-    fo += FermionOperator((), float(constant))
+    # OpenFermion >=1.7 rejects dict bulk construction for multi-term ladders; build
+    # term-by-term (still avoids O(n^2) SymbolicOperator += on growing dicts).
+    fo = FermionOperator()
+    for term_tuple, coeff in terms.items():
+        fo += FermionOperator(term_tuple, coeff)
+    if abs(float(constant)) > atol:
+        fo += FermionOperator((), float(constant))
     return fo

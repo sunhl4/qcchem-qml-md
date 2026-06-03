@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import sqlite3
 import time
 import traceback
 from collections.abc import Callable
@@ -52,6 +53,8 @@ def process_job_with_retry(
         store.mark_running(job_id)
     try:
         runner(store, job_id)
+    except sqlite3.Error:
+        raise
     except Exception as e:
         msg = f"{type(e).__name__}: {e}\n{traceback.format_exc()}"
         con = store._connect()

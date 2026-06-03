@@ -949,3 +949,131 @@ phases:
     evidence:
     - notebooks/vqd_walkthrough.ipynb
     - docusaurus-site/docs/parity/gaps.md
+- id: N
+  title: P0-P4 verification residual closure and product UX
+  day_range: Sprint0-PhaseN
+  status: done
+  objectives:
+  - Regression audit for Phases D-L deliverables.
+  - Close high-ROI partial gaps and onboarding UX (SDK, config picker, Binder).
+  tasks:
+  - id: N-001
+    title: Sprint0 regression audit document
+    owner: core-protocol
+    status: done
+    target_files:
+    - docs/execution/sprint0_p0_p4_regression_audit.md
+    tests:
+    - python scripts/check_comparative_execution_backlog.py
+    acceptance_criteria:
+    - audit records S0 gate results and fix list
+    evidence:
+    - docs/execution/sprint0_p0_p4_regression_audit.md
+  - id: N-002
+    title: Config scenario picker and qchem-run --list-scenarios
+    owner: platform
+    status: done
+    target_files:
+    - src/qchem_stack/config/scenarios.py
+    - src/qchem_stack/cli.py
+    - scripts/generate_config_picker.py
+    - docs/generated/config_picker.md
+    tests:
+    - tests/test_cli.py
+    acceptance_criteria:
+    - eight scenarios documented and CLI lists them
+    evidence:
+    - src/qchem_stack/config/scenarios.py
+    - docs/generated/config_picker.md
+  - id: N-003
+    title: SDK facade expansion
+    owner: platform
+    status: done
+    target_files:
+    - src/qchem_stack/sdk/__init__.py
+    - docusaurus-site/docs/reference/python-sdk.md
+    tests:
+    - import qchem_stack.sdk
+    acceptance_criteria:
+    - workflow_preview_payload and list_scenarios_text exported
+    evidence:
+    - src/qchem_stack/sdk/__init__.py
+  - id: N-004
+    title: Backend mapping conformance matrix
+    owner: quantum-alg
+    status: done
+    target_files:
+    - tests/test_backend_mapping_conformance_matrix.py
+    tests:
+    - tests/test_backend_mapping_conformance_matrix.py
+    acceptance_criteria:
+    - at least twelve backend times mapping combinations parametrized
+    evidence:
+    - tests/test_backend_mapping_conformance_matrix.py
+  - id: N-005
+    title: Resource estimation preview depth proxies
+    owner: core-protocol
+    status: done
+    target_files:
+    - src/qchem_stack/integrations/resource_estimation_preview.py
+    tests:
+    - tests/test_methods_resource_unified_export.py
+    acceptance_criteria:
+    - ft_total_measurement_shots_proxy emitted when resource_summary present
+    evidence:
+    - src/qchem_stack/integrations/resource_estimation_preview.py
+  - id: N-006
+    title: OpenFermion 1.7 spatial fermion fix and UQC shims
+    owner: chem-stack
+    status: done
+    target_files:
+    - src/qchem_stack/chem/spatial_restricted_fermion.py
+    - src/qchem_stack/backends/uqc_executor.py
+    - packages/qchem-stack-uqc/pyproject.toml
+    tests:
+    - tests/test_scbk_mapping_edge_cases.py
+    - tests/test_uqc_backend_units.py
+    acceptance_criteria:
+    - SCBK edge cases and UQC mock executor import succeed
+    evidence:
+    - src/qchem_stack/chem/spatial_restricted_fermion.py
+  - id: N-007
+    title: Binder environment and PyPI README expansion
+    owner: platform
+    status: done
+    target_files:
+    - binder/environment.yml
+    - README_PYPI.md
+    tests:
+    - manual binder path review
+    acceptance_criteria:
+    - binder env installs chem+quantum stack for H2 VQE
+    evidence:
+    - binder/environment.yml
+  - id: N-008
+    title: Mitigation queue drain E2E and driver gap caveat
+    owner: mitigation
+    status: done
+    target_files:
+    - tests/jobs/test_mitigation_queue_drain.py
+    - src/qchem_stack/protocols/product_contract_gaps.py
+    tests:
+    - tests/jobs/test_mitigation_queue_drain.py
+    acceptance_criteria:
+    - drain_all completes two jobs with trace payload
+    evidence:
+    - tests/jobs/test_mitigation_queue_drain.py
+  - id: N-009
+    title: Phase N closeout and CHANGELOG 0.6.0 alignment
+    owner: platform
+    status: done
+    target_files:
+    - docs/execution/day910_phase_n_closeout.md
+    - CHANGELOG.md
+    tests:
+    - python scripts/check_comparative_execution_backlog.py
+    acceptance_criteria:
+    - closeout documents Path A user test template and version alignment
+    evidence:
+    - docs/execution/day910_phase_n_closeout.md
+    - CHANGELOG.md

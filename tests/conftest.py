@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+import sys
 from pathlib import Path
 from typing import TYPE_CHECKING, Any
 
@@ -10,6 +11,11 @@ import pytest
 
 from tests.helpers.h2_yaml import H2_STO3G_FCI_ENERGY, h2_pipeline_dict, h2_yaml_dict
 from tests.helpers.solver_registry_state import reset_solver_registry_state
+
+# Optional UQC plugin package (packages/qchem-stack-uqc) for backend shim imports.
+_uqc_src = Path(__file__).resolve().parents[1] / "packages" / "qchem-stack-uqc" / "src"
+if _uqc_src.is_dir() and str(_uqc_src) not in sys.path:
+    sys.path.insert(0, str(_uqc_src))
 
 # Full-suite API tests enqueue/list runs frequently; disable route rate limits unless
 # a test explicitly opts in (see tests/test_api_rate_limiting.py).

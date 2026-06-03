@@ -30,7 +30,7 @@ These modules are covered by contract tests (`tests/test_workflow_preview_contra
 
 | Module | Role | Epistemic note |
 |--------|------|----------------|
-| `dmet_self_consistent.py` | Re-export shim → `chem.embedding.dmet_self_consistent` | Open architecture; not full literature DMET |
+| `dmet_self_consistent.py` | **Deprecated** re-export shim → `chem.embedding.dmet_self_consistent` | Do not add new shims; import from `chem.embedding` |
 | `schmidt_dmet_self_consistent.py` | Re-export shim → `chem.embedding.schmidt_dmet_self_consistent` | Production-shaped; see embedding YAML |
 | `dmet_multifragment_toy.py` | Uniform multifragment toy sweep | **Toy** — smoke only |
 | `gap_closure_bundle.py` | Gap-closure reference bundle | Parity / Methods narrative |

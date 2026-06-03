@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 import numpy as np
 
-from qchem_stack.quantum.algorithms.tolerances import MO_COEFFICIENT_TOLERANCE
+from qchem_stack.chem.tolerances import MO_COEFFICIENT_TOLERANCE
 
 
 def _spatial_one_body_to_fermion_operator(h1_spatial: np.ndarray) -> Any:

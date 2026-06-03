@@ -19,7 +19,13 @@ export QCHEM_STACK_PYTHON=/path/to/python
 |------|------|
 | **契约 / capability 导出** | 产品与 HTTP 控制台同源模块 **`qchem_stack.protocols.product_contract`**（ gap 列表、capability_map、parity export 的稳定键常量等）；workflow 预览 **`qchem_stack.integrations.workflow_preview`**。布局见 [Product contracts and workflow-preview](#product-contracts-and-workflow-preview-stable-imports)。矩阵与路线图仍按需维护（见 [public_parity_matrix.md §5](docs/public_parity_matrix.md)）。 |
 | **度量与台账** | 月度更新 [与Vendor platform… — 附录 B](docs/public_parity_matrix.md) §3；主表 yes/partial/n/a 可用 `python scripts/count_parity_matrix_main_tables.py` 对照手填。 |
-| **签字合并 gate** | 合并前：`ruff check src/qchem_stack tests scripts examples`、`ruff format --check`（同上路径）、`pytest`、`python scripts/check_parity_export_sample.py`、`python scripts/check_comparative_execution_backlog.py`；CI **`security-audit`** 对 `pip install -e ".[dev]"` 运行 `pip-audit`（传递依赖见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
+| **签字合并 gate** | 合并前：`ruff check src/qchem_stack tests scripts examples`、`ruff format --check`（同上路径）、`pytest`、`python scripts/check_parity_export_sample.py`、`python scripts/check_comparative_execution_backlog.py`；或一键：`./scripts/release_precheck.sh`（见 [`scripts/README.md`](scripts/README.md)）；CI **`security-audit`** 对 `pip install -e ".[dev]"` 运行 `pip-audit`（传递依赖见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
+
+### 发版前
+
+1. `./scripts/release_precheck.sh`（pytest + coverage 阈值 + parity + import/doc 链）
+2. `python scripts/generate_configs_catalog.py` 并提交 `docs/generated/configs_catalog_snippet.md` 与 `docusaurus-site/docs/reference/configs-catalog-body.md`
+3. 大改动建议拆 PR：**docs** / **orchestration** / **tests** / **ci** 分开发，便于 review 与 bisect
 
 ## Lint
 
@@ -47,6 +53,17 @@ Optional [pre-commit](https://pre-commit.com) hooks (same paths as CI). The **`p
 ```
 
 Uses `.pre-commit-config.yaml` at the repo root.
+
+## Nightly / L3 benchmarks
+
+Optional deep algorithm benchmarks (seven representative configs):
+
+```bash
+QCHEM_RUN_L3=1 pytest -m l3 -q --tb=short
+python scripts/l3_algorithm_benchmark_report.py --output /tmp/l3_benchmark.json
+```
+
+CI runs this in the **`test-nightly`** scheduled job (see `.github/workflows/ci.yml`).
 
 ## Install profiles (pip extras)
 
@@ -129,6 +146,16 @@ For PySCF-related refactors, keep module boundaries stable:
 - Keep `src/qchem_stack/chem/drivers/pyscf_driver.py` focused on compatibility facade and workflow orchestration.
 
 If you add new helper logic, prefer the new modules first and keep legacy import paths compatible where practical.
+
+## Adding repro / parity_snapshot fields
+
+When you add or rename keys that appear in **`repro`**, **`repro.parity_snapshot`**, or **`repro.run_summary`**, work through this checklist before merging:
+
+1. **Orchestration** — set the value in [`src/qchem_stack/orchestration/repro_summary.py`](src/qchem_stack/orchestration/repro_summary.py) and/or [`repro_snapshot.py`](src/qchem_stack/orchestration/repro_snapshot.py) (or the stage that owns the key; see [`docs/engineering/pipeline_stage_ownership.md`](docs/engineering/pipeline_stage_ownership.md)).
+2. **Export stable keys** — if the field must appear in config-only parity export, add it to **`PARITY_EXPORT_V3_STABLE_KEYS`** in [`src/qchem_stack/protocols/product_contract.py`](src/qchem_stack/protocols/product_contract.py).
+3. **Export scripts** — extend [`scripts/export_parity_criteria_table.py`](scripts/export_parity_criteria_table.py) and ensure [`scripts/check_parity_export_sample.py`](scripts/check_parity_export_sample.py) still passes (auto-discovers `configs/*.yaml`).
+4. **Tests** — add or extend a focused test (pattern: [`tests/test_workflow_preview_repro_alignment.py`](tests/test_workflow_preview_repro_alignment.py)); for export-only keys, refresh [`tests/fixtures/parity_export_example_h2_config_only.json`](tests/fixtures/parity_export_example_h2_config_only.json) when intentional.
+5. **Docs** — if user-visible, note the key in [`docs/ENGINEERING_ARCHITECTURE.md`](docs/ENGINEERING_ARCHITECTURE.md) or the relevant contract doc; run doc sync scripts if the key affects generated tables.
 
 ## Product contracts and workflow-preview (stable imports)
 

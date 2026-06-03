@@ -52,23 +52,31 @@ def pauli_string(draw, max_qubits=4):
     used_qubits = set()
 
     for _ in range(n_qubits):
-        qubit = draw(qubit_index.filter(lambda q: q not in used_qubits))
+        qubit = draw(
+            st.integers(min_value=0, max_value=max_qubits - 1).filter(
+                lambda q: q not in used_qubits
+            )
+        )
         used_qubits.add(qubit)
         pauli = draw(pauli_chars)
         if pauli != "I":  # Skip identity terms
             terms.append(f"{pauli}{qubit}")
 
-    return " ".join(terms) if terms else "I0"
+    if not terms:
+        q = draw(st.integers(min_value=0, max_value=max_qubits - 1))
+        terms = [f"Z{q}"]
+
+    return " ".join(terms)
 
 
 @st.composite
-def qubit_operator(draw, max_terms=5):
+def qubit_operator(draw, max_terms=5, max_qubits=4):
     """Generate a random QubitOperator with multiple terms."""
     n_terms = draw(st.integers(min_value=1, max_value=max_terms))
     op = QubitOperator()
 
     for _ in range(n_terms):
-        pauli_str = draw(pauli_string())
+        pauli_str = draw(pauli_string(max_qubits=max_qubits))
         coeff = draw(coefficient)
         op += QubitOperator(pauli_str, coeff)
 
@@ -113,7 +121,7 @@ def zne_scales(draw, min_scales=3, max_scales=6):
 
 
 @settings(max_examples=50, deadline=None)
-@given(op=qubit_operator(max_terms=3), params=hea_parameters(n_qubits=2, depth=1))
+@given(op=qubit_operator(max_terms=3, max_qubits=2), params=hea_parameters(n_qubits=2, depth=1))
 def test_statevector_executor_consistency(op, params):
     """Verify StatevectorHeaExecutor produces consistent results across calls."""
     executor = StatevectorHeaExecutor()
@@ -127,7 +135,7 @@ def test_statevector_executor_consistency(op, params):
 
 
 @settings(max_examples=50, deadline=None)
-@given(op=qubit_operator(max_terms=3), params=hea_parameters(n_qubits=2, depth=1))
+@given(op=qubit_operator(max_terms=3, max_qubits=2), params=hea_parameters(n_qubits=2, depth=1))
 def test_executor_parameter_sensitivity_bounded(op, params):
     """Verify small parameter changes produce bounded energy changes."""
     executor = StatevectorHeaExecutor()
@@ -280,7 +288,7 @@ def test_zne_model_selection(scales):
 
 
 @settings(max_examples=20, deadline=None)
-@given(op=qubit_operator(max_terms=3), params=hea_parameters(n_qubits=2, depth=1))
+@given(op=qubit_operator(max_terms=3, max_qubits=2), params=hea_parameters(n_qubits=2, depth=1))
 def test_zne_with_executor(op, params):
     """Verify ZNE workflow with executor produces reasonable results."""
     executor = StatevectorHeaExecutor()

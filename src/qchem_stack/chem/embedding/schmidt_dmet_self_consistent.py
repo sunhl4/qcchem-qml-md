@@ -37,11 +37,11 @@ from qchem_stack.chem.embedding.schmidt_production import (
     build_schmidt_impurity_integrals,
     fci_impurity_spatial_ground,
 )
+from qchem_stack.chem.tolerances import DMET_TRACE_TOLERANCE
 from qchem_stack.contracts.schema_ids import (
     SCHMIDT_DMET_DENSITY_FEEDBACK_V1,
     SCHMIDT_DMET_MULTIFRAGMENT_DENSITY_FEEDBACK_V1,
 )
-from qchem_stack.quantum.algorithms.tolerances import DMET_TRACE_TOLERANCE
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
@@ -100,8 +100,8 @@ def _sequential_schmidt_density_mix(
     D = np.asarray(bath.meta["D_ao"], dtype=float)
     S = np.asarray(bath.meta["S_ao"], dtype=float)
     nel = int(bath.meta["n_electron"])
-    dm1 = np.asarray(result.meta["dm1_impurity_spatial"], dtype=float)
-    C = np.asarray(result.meta["C_imp_ao"], dtype=float)
+    dm1 = np.asarray(result.raw["dm1_impurity_spatial"], dtype=float)
+    C = np.asarray(result.raw["C_imp_ao"], dtype=float)
     gamma = C.T @ S @ D @ S @ C
     delta_fro = float(np.linalg.norm(dm1 - gamma))
     cur = float(bath.meta.get("current_sweep_max_delta", 0.0))

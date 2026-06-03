@@ -12,7 +12,7 @@ from openfermion.chem.molecular_data import spinorb_from_spatial
 
 from qchem_stack.chem.integral_convention import spatial_mo_eri_pyscf_to_openfermion_mo_ordering
 from qchem_stack.chem.integrals.pyscf_active_space import active_space_casci_raw_blocks
-from qchem_stack.quantum.algorithms.tolerances import CUTOFF_ABS_INTEGRAL
+from qchem_stack.chem.tolerances import CUTOFF_ABS_INTEGRAL
 
 if TYPE_CHECKING:
     from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult

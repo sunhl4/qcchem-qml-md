@@ -82,10 +82,21 @@ def test_json_structured_log_emits_on_stage(
     import logging
 
     monkeypatch.setenv("QCHEM_STACK_JSON_LOG", "1")
-    caplog.set_level(logging.INFO, logger="qchem_stack.pipeline.json")
     cfg = load_experiment_config(configs_path("example_h2.yaml"))
-    run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
-    assert any("pipeline_stage" in r.message for r in caplog.records)
+    captured: list[str] = []
+
+    class _CaptureHandler(logging.Handler):
+        def emit(self, record: logging.LogRecord) -> None:
+            captured.append(record.getMessage())
+
+    json_logger = logging.getLogger("qchem_stack.pipeline.json")
+    handler = _CaptureHandler()
+    json_logger.addHandler(handler)
+    try:
+        run_pipeline_sync(cfg, cfg_path=configs_path("example_h2.yaml"))
+    finally:
+        json_logger.removeHandler(handler)
+    assert any("pipeline_stage" in msg for msg in captured)
 
 
 @pytest.mark.skipif(not _have_pyscf(), reason="PySCF not installed")

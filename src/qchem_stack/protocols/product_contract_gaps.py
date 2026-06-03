@@ -119,7 +119,10 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
     {
         "id": "driver_surface_breadth",
         "release_anchor": "product_capability_matrix.md#driver-surface",
-        "open_stack_surface": "PySCF-focused surface with ddCOSMO and PBC variants; broader driver matrix is partial.",
+        "open_stack_surface": (
+            "PySCF and Psi4 via ChemIntegralSolver registry; mock external solver demo; "
+            "ORCA/Gaussian intentionally out of scope (see docs/product/non_goals.md)."
+        ),
         "status": "partial",
     },
     {

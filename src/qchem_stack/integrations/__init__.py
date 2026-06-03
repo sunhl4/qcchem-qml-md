@@ -24,6 +24,13 @@ from qchem_stack.chem.kernels.spin_ucc import (
     build_spin_uccsd_fermion_generators,
     count_uccsd_excitations,
 )
+from qchem_stack.integrations.l3_algorithm_benchmark import (
+    DEFAULT_BENCHMARK_YAMLS,
+    L3_PYTEST_YAMLS,
+)
+from qchem_stack.integrations.l3_algorithm_benchmark import (
+    algorithm_benchmark_bundle_v1 as build_l3_algorithm_benchmark_bundle,
+)
 from qchem_stack.integrations.nexus_optional import probe_qnexus_installation
 from qchem_stack.integrations.qermit_reference import qermit_capability_matrix
 from qchem_stack.integrations.tensornet_closure import tensornet_closure_strategy
@@ -41,13 +48,6 @@ from qchem_stack.protocols.workflow_preview_graph import (
     computable_graph_v1,
     computable_graph_v2,
     protocol_stages_preview_v1,
-)
-from qchem_stack.quantum.l3_algorithm_benchmark import (
-    DEFAULT_BENCHMARK_YAMLS,
-    L3_PYTEST_YAMLS,
-)
-from qchem_stack.quantum.l3_algorithm_benchmark import (
-    algorithm_benchmark_bundle_v1 as build_l3_algorithm_benchmark_bundle,
 )
 
 __all__ = [

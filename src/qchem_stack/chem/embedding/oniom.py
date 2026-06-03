@@ -11,8 +11,8 @@ from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
+from qchem_stack.chem.tolerances import ONIOM_BOND_LENGTH_TOLERANCE
 from qchem_stack.contracts.schema_ids import ENERGY_COMPONENTS_V1, ONIOM_TOY_V1
-from qchem_stack.quantum.algorithms.tolerances import ONIOM_BOND_LENGTH_TOLERANCE
 
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig

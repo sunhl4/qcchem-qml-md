@@ -1,0 +1,10 @@
+{
+  "schema": "precomputed_fragment_input_v1",
+  "status": "input_only",
+  "system": "h4_linear_chain_stub",
+  "fragments": [
+    {"id": "f0", "n_electrons": 2, "energy_hartree": -1.12},
+    {"id": "f1", "n_electrons": 2, "energy_hartree": -1.11}
+  ],
+  "notes": "MI-FNO plugin hook demo; not a full incremental solver."
+}

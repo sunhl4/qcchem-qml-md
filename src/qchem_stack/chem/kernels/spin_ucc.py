@@ -10,7 +10,7 @@ from typing import Any, Protocol, runtime_checkable
 
 from openfermion.ops import FermionOperator
 
-from qchem_stack.quantum.algorithms.tolerances import SPIN_UCC_COMMUTATOR_TOLERANCE
+from qchem_stack.chem.tolerances import SPIN_UCC_COMMUTATOR_TOLERANCE
 
 
 @runtime_checkable

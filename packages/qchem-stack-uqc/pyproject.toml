@@ -1,6 +1,6 @@
 [build-system]
 requires = ["setuptools>=61.0"]
-build-backend = "setuptools.build_system"
+build-backend = "setuptools.build_meta"
 
 [project]
 name = "qchem-stack-uqc"
@@ -16,8 +16,8 @@ dependencies = [
     "numpy>=1.24.0",
 ]
 
-[project.entry-points."qchem_stack.backends"]
-uqc = "qchem_stack_uqc:UQCCloudHeaExecutor"
+[project.entry-points."qchem_stack.backends_executors"]
+uqc = "qchem_stack_uqc.uqc_executor:UQCCloudHeaExecutor"
 
 [tool.setuptools.packages.find]
 where = ["src"]

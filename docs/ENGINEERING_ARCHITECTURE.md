@@ -4,6 +4,8 @@ This document anchors **qchem‑stack internals**: layering, HTTP contracts wher
 
 ## 1. Layer model
 
+Pipeline stage ownership (which module writes `out` / `repro` keys): [`engineering/pipeline_stage_ownership.md`](engineering/pipeline_stage_ownership.md).
+
 | Layer | Packages / modules | Responsibility |
 |--------|-------------------|----------------|
 | **Domain config** | `qchem_stack.config` | Pydantic `ExperimentConfig` — single source of truth for YAML, validation, cost guards. |

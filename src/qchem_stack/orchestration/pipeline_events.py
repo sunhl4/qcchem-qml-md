@@ -220,22 +220,13 @@ class EventBus:
         # Sort all handlers by priority
         handlers_to_execute.sort(key=lambda r: r.priority.value)
 
-        # Execute handlers
-        handlers_to_remove: list[tuple[str, _HandlerRegistration]] = []
+        from qchem_stack.orchestration.pipeline_event_dispatch import dispatch_event_handlers
 
-        for registration in handlers_to_execute:
-            try:
-                registration.handler(event)
-                if registration.once:
-                    # Mark for removal
-                    for pattern in [event.name, *self._wildcard_handlers.keys()]:
-                        if pattern in self._handlers or pattern in self._wildcard_handlers:
-                            handlers_to_remove.append((pattern, registration))
-            except Exception as e:
-                _logger.error(
-                    f"Event handler failed for event '{event.name}': {e}",
-                    exc_info=True,
-                )
+        handlers_to_remove = dispatch_event_handlers(
+            event,
+            handlers_to_execute,
+            wildcard_patterns=list(self._wildcard_handlers.keys()),
+        )
 
         # Remove one-time handlers
         for pattern, registration in handlers_to_remove:

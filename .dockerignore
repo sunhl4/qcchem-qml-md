@@ -31,11 +31,12 @@ htmlcov/
 *.swo
 *~
 
-# Documentation
+# Documentation (large; not needed in runtime image)
 docs/
+docusaurus-site/
 *.md
-LICENSE
-.gitignore
+!README.md
+!README_PYPI.md
 
 # Examples and tests
 examples/
@@ -47,8 +48,9 @@ build/
 dist/
 *.whl
 
-# Data
+# Local data and run outputs
 data/
+results/
 *.sqlite
 *.db
 *.log
@@ -56,7 +58,6 @@ data/
 # Temporary files
 *.tmp
 *.bak
-*.swp
 .DS_Store
 Thumbs.db
 
@@ -68,4 +69,8 @@ docker-compose.yml
 # CI/CD
 .github/
 .gitlab-ci.yml
-.travis.yml
+
+# Agent / session artifacts
+opus4.8-test.md
+tasks_*.csv
+.ferrmion.log

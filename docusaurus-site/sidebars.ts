@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
         'guide/onboarding-three-paths',
         'guide/overview',
         'guide/chemistry-and-embedding',
+        'guide/dual-classical-ingress',
         'guide/avas-casscf-workflow',
         'guide/backend-adapter-quickstart',
         'guide/program-construction',
@@ -43,7 +44,9 @@ const sidebars: SidebarsConfig = {
       label: '教程',
       items: [
         'tutorial/index',
+        'tutorial/tutorial-index-three-paths',
         'tutorial/quickstart',
+        'tutorial/decomposition-plugin-minimal',
         'tutorial/workflow',
         'tutorial/async-run-via-http',
         'tutorial/read-repro-keys',
@@ -52,6 +55,7 @@ const sidebars: SidebarsConfig = {
         'tutorial/zne-qiskit-repro',
         'tutorial/projection-embedding-deep-dive',
         'tutorial/case-study-h2-family',
+        'tutorial/casscf-audit-workflow',
         'tutorial/md-ml-active-learning',
       ],
     },
@@ -60,6 +64,7 @@ const sidebars: SidebarsConfig = {
       label: '参考',
       items: [
         'reference/cli-and-scripts',
+        'reference/openapi',
         'reference/http-api-sqlite-jobs',
         'reference/circuitir-tket-jobs',
         'reference/qiskit-shot-counts',

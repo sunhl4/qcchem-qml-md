@@ -1,0 +1,26 @@
+{
+  "top_level": [
+    "algorithm",
+    "algorithm_report",
+    "angles",
+    "embedding_workflow",
+    "energy_after_variational",
+    "energy_components",
+    "energy_pauli_protocol",
+    "hamiltonian_meta",
+    "pre_quantum_build_cache",
+    "pre_quantum_input",
+    "protocol_counts",
+    "repro",
+    "resource_rows",
+    "resource_summary",
+    "scf_energy"
+  ],
+  "repro": [
+    "config_sha256_prefix",
+    "embedding_workflow",
+    "parity_snapshot",
+    "run_summary",
+    "workflow_preview_v1"
+  ]
+}

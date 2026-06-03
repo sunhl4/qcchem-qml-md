@@ -14,4 +14,4 @@ def test_sample_configs_include_vqd_uccsd_and_are_unique() -> None:
     assert "configs/example_h2_vqd_uccsd.yaml" in sample_configs
     assert len(sample_configs) == len(set(sample_configs))
     assert len(sample_configs) >= 96
-    assert len(md_loop_configs) == 8
+    assert len(md_loop_configs) == 9

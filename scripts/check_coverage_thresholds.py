@@ -16,9 +16,13 @@ THRESHOLDS: dict[str, int] = {
     "src/qchem_stack/repro": 85,
     "src/qchem_stack/protocols": 80,
     "src/qchem_stack/orchestration": 75,
+    "src/qchem_stack/quantum": 70,
+    "src/qchem_stack/backends": 70,
+    "src/qchem_stack/chem": 70,
     "src/qchem_stack/chem/kernels": 70,
     "src/qchem_stack/jobs": 70,
     "src/qchem_stack/md_bridge": 65,
+    "src/qchem_stack/mitigation": 65,
 }
 
 _ROW = re.compile(

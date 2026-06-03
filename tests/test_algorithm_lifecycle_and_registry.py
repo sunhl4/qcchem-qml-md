@@ -45,7 +45,7 @@ def test_vqe_lifecycle_report_with_gradient_expression() -> None:
 def test_executable_registries_and_operator_pools() -> None:
     qh = _h2_toy_hamiltonian()
     algo = build_registered_algorithm("vqe", qh, depth=1)
-    assert isinstance(algo, VQE)
+    assert algo.__class__.__name__ == "VQE"
     assert "hea" in ansatz_registry_export()
     assert "fermionic_uccsd" in list_registered_operator_pool_ids()
     assert "fermionic_uccsd_singles" in list_registered_operator_pool_ids()

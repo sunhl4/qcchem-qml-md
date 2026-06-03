@@ -4,6 +4,48 @@ All notable changes to this project are documented in this file.
 
 The format is based on **Keep a Changelog**, and this project adheres to **Semantic Versioning** intent for the Python package (`pyproject.toml`).
 
+## [0.6.0] - 2026-06-03
+
+### Added
+
+- **P0–P4 verification wave**: config scenario picker (`qchem_stack.config.scenarios`, `qchem-run --list-scenarios`), expanded SDK facade, Binder environment, backend×mapping conformance matrix tests.
+- UQC backend compatibility shims under `qchem_stack.backends.uqc_*` (optional `packages/qchem-stack-uqc` plugin).
+- Mitigation queue `drain_all` E2E test; resource estimation preview depth proxies (`ft_total_measurement_shots_proxy`, `ft_t_gate_count_proxy`).
+- Docusaurus: CASSCF audit workflow page; expanded PyPI README.
+
+### Fixed
+
+- OpenFermion 1.7+ compatibility in `spatial_restricted_fermion` (term-by-term construction, int indices).
+
+### Changed
+
+- `driver_surface_breadth` gap caveat documents ORCA/Gaussian non-goals explicitly.
+
+## [Unreleased]
+
+### Added
+
+- Console scripts **`qchem-run`** and **`qchem-export-parity`**; stable integrator facade **`qchem_stack.sdk`**.
+- Docker **slim** / **full** build targets; **`python -m qchem_stack.api`** entry for Compose.
+- CI **`contract-gate`** job and **`test-cross-platform`** (main/schedule); PR matrix Ubuntu-only with **pytest-xdist**.
+- Scripts: `generate_parity_gap_snippet.py`, `check_config_combo_matrix.py`; generated `docs/generated/parity_gap_snippet.md`.
+- Resource estimation preview fields: `mitigation_zne_scale_count_yaml`, `mitigation_zne_richardson_order_yaml`.
+
+### Changed
+
+- **`results/`** removed from git tracking (local outputs only; see `results/README.md`).
+- Per-package coverage floors: **quantum/backends/chem 70%**, **mitigation 65%**.
+- Pyright **`reportMissingParameterType`** for **`backends`** and **`jobs`** packages.
+- Execution closeout docs archived under **`docs/execution/archive/2026Q2/`**.
+
+### Deprecated
+
+- **`qchem_stack.integrations.dmet_self_consistent`** import path (use **`chem.embedding.dmet_self_consistent`**); removal **v0.8.0** (see `docs/engineering/api_stability_policy.md`).
+
+### Removed
+
+- Root **`opus4.8-test.md`** agent session artifact.
+
 ## [0.3.0] - 2026-05-28
 
 ### Added (P4 competitor gap closure)

@@ -18,7 +18,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-from qchem_stack.quantum.algorithms.tolerances import PROJECTION_EMBEDDING_THRESHOLD
+from qchem_stack.chem.tolerances import PROJECTION_EMBEDDING_THRESHOLD
 
 
 @dataclass

@@ -54,10 +54,12 @@ api = ["fastapi>=0.100", "uvicorn[standard]>=0.23", "slowapi>=0.1.9"]
 # qmlff is meant to live alongside this repo as a sibling editable install.
 qmlff = ["jax-md>=0.2"]
 all = ["qchem-stack[chem,quantum,pytket,nexus,uqc]"]
-dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "ruff>=0.3", "pre-commit>=3.8", "pyright>=1.1", "hypothesis>=6.0", "nbmake>=1.4", "pip-tools>=7.0"]
+dev = ["qchem-stack[all,api]", "pytest>=7.4", "pytest-cov>=4.1", "pytest-xdist>=3.5", "ruff>=0.3", "pre-commit>=3.8", "pyright>=1.1", "hypothesis>=6.0", "nbmake>=1.4", "pip-tools>=7.0"]
 examples_viz = ["matplotlib>=3.7"]
 
 [project.scripts]
+qchem-run = "qchem_stack.cli:main_run"
+qchem-export-parity = "qchem_stack.cli:main_export_parity"
 qchem-jobs-worker = "qchem_stack.jobs.worker:main"
 
 [tool.setuptools.packages.find]
@@ -144,6 +146,11 @@ known-first-party = ["qchem_stack"]
 "src/qchem_stack/chem/embedding/schmidt_production.py" = ["E402"]
 "src/qchem_stack/__init__.py" = ["E402"]
 "src/qchem_stack/orchestration/pipeline_events.py" = ["TCH003"]
+"src/qchem_stack/orchestration/pipeline_assembly.py" = ["TCH001"]
+"src/qchem_stack/orchestration/pipeline_sync_runner.py" = ["TCH001", "TCH003"]
+"src/qchem_stack/orchestration/pipeline_sync_context.py" = ["TCH001"]
+"src/qchem_stack/orchestration/pipeline_stage_runners.py" = ["TCH001"]
+"src/qchem_stack/orchestration/stage_registry.py" = ["TCH001", "TCH003"]
 
 [tool.pyright]
 include = ["src/qchem_stack"]
@@ -163,5 +170,13 @@ reportMissingParameterType = "error"
 
 [[tool.pyright.executionEnvironments]]
 root = "src/qchem_stack/orchestration"
+reportMissingParameterType = "error"
+
+[[tool.pyright.executionEnvironments]]
+root = "src/qchem_stack/backends"
+reportMissingParameterType = "error"
+
+[[tool.pyright.executionEnvironments]]
+root = "src/qchem_stack/jobs"
 reportMissingParameterType = "error"
 

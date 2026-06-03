@@ -7,7 +7,7 @@ import os
 
 import pytest
 
-from qchem_stack.quantum.l3_algorithm_benchmark import (
+from qchem_stack.integrations.l3_algorithm_benchmark import (
     L3_PYTEST_YAMLS,
     algorithm_benchmark_bundle_v1,
     merged_experiment_benchmark_v1,

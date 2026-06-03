@@ -9,9 +9,9 @@ from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
 from qchem_stack.chem.embedding.fragment_solvers.qubit_hamiltonian_vqe import (
     QubitHamiltonianFragmentSolverVQE,
 )
+from qchem_stack.chem.tolerances import DMET_ENERGY_TOLERANCE
 from qchem_stack.config.quantum_helpers import resolve_vqe_depth, resolve_vqe_maxiter
 from qchem_stack.contracts.schema_ids import DMET_ONE_SHOT_V1, DMET_SELF_CONSISTENCY_V1
-from qchem_stack.quantum.algorithms.tolerances import DMET_ENERGY_TOLERANCE
 
 if TYPE_CHECKING:
     from collections.abc import Callable

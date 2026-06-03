@@ -105,7 +105,12 @@ async def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dic
         meta_extra["api_project_slug"] = str(body.project_slug).strip()[:200]
     if body.sync:
         try:
-            out = await asyncio.to_thread(run_pipeline_sync, cfg, None, rc)
+            out = await asyncio.to_thread(
+                run_pipeline_sync,
+                cfg,
+                cfg_path=None,
+                run_context=rc,
+            )
         except QChemStackError as exc:
             raise HTTPException(status_code=422, detail=str(exc)) from exc
         slim = pipeline_result_for_job_store(out)

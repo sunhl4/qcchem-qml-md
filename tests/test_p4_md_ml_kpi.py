@@ -178,3 +178,96 @@ def test_md_validation_runs_five_rounds_when_below_loop_tolerance(tmp_path: Path
         )
 
     assert len(summary["rounds"]) == 5
+
+
+def test_h4_md_validation_meets_kpi_with_mock_labeler(tmp_path: Path) -> None:
+    """Second-system (H4) MD/ML KPI path with mocked qchem labeling (P2-R04)."""
+    from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
+
+    exp_yaml = configs_path("example_h4_schmidt_multifragment.yaml")
+    loop_cfg = MdValidationLoopConfig(
+        max_rounds=2,
+        force_field_backend="qmlff_preset",
+        energy_tolerance_hartree=0.15,
+        energy_normalization="none",
+        n_candidate_frames=1,
+        add_top_k_per_round=1,
+        label_energy_reference="scf",
+        validation_energy_reference="scf",
+        validation_theory_level="hf_scf",
+        label_top_theory_level="hf_scf",
+        md_n_steps=4,
+        md_save_stride=2,
+        n_epochs_per_round=1,
+        write_per_round_extxyz=False,
+        n_seed_geometries=0,
+    )
+
+    def _mock_build_handle(species_list, **kwargs):
+        from types import SimpleNamespace
+
+        del kwargs
+        return SimpleNamespace(
+            backend="mock",
+            species_list=list(species_list),
+            params={},
+            train_meta={},
+        )
+
+    def _mock_train(handle, dataset, **kwargs):
+        del dataset, kwargs
+        return handle
+
+    def _mock_label_h4(experiment_yaml, **kwargs):
+        from qchem_stack.md_bridge.active_learning import mock_labeling_result
+
+        del experiment_yaml, kwargs
+        zs = [1, 1, 1, 1]
+        base = [[0.0, 0.0, float(i * 1.4)] for i in range(4)]
+        return mock_labeling_result(zs, base, [base])
+
+    with (
+        patch(
+            "qchem_stack.md_bridge.md_validation_loop.label_base_geometry_only",
+            side_effect=_mock_label_h4,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.label_geometries_with_pipeline",
+            side_effect=lambda experiment_yaml, extra_coordinates_bohr, **kw: _mock_label_h4(
+                experiment_yaml, **kw
+            ),
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.run_jaxmd_trajectory",
+            side_effect=_mock_traj,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            side_effect=_mock_predict,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            side_effect=lambda handle, **kw: {
+                "energy_hartree": -1.12,
+                "positions_bohr": kw.get("positions_bohr"),
+                "atomic_numbers": kw.get("atomic_numbers"),
+            },
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_validation_loop.build_force_field_handle",
+            side_effect=_mock_build_handle,
+        ),
+        patch(
+            "qchem_stack.md_bridge.md_loop_rounds.train_force_field_on_qmef",
+            side_effect=_mock_train,
+        ),
+    ):
+        summary = run_md_validation_loop(
+            exp_yaml,
+            config=loop_cfg,
+            output_dir=tmp_path / "h4_md",
+            accuracy_threshold_hartree=0.15,
+        )
+
+    assert summary["science_kpi_met"] is True
+    assert summary["max_abs_delta_hartree"] < summary["accuracy_threshold_hartree"]

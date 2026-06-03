@@ -45,7 +45,7 @@ def test_classical_shadows_pipeline_stub_trace() -> None:
     runtime = out.get("classical_shadows_computable_runtime")
     assert isinstance(runtime, dict)
     meta = runtime.get("computable_meta") or {}
-    assert meta.get("estimator") == "local_random_pauli_classical_shadows_v1"
+    assert meta.get("estimator") == "local_random_pauli_classical_shadows_median_of_means_v1"
     dex = out.get("mitigation_dag_execution")
     assert isinstance(dex, dict)
     cs_nodes = [

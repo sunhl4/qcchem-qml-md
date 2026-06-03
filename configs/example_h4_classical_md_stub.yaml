@@ -1,0 +1,46 @@
+# H4 linear chain — classical Morse MD loop stub (second system beyond H2).
+#
+# Uses mock-friendly HF labeling via example_h4_schmidt_multifragment.yaml.
+# Pair with: python examples/qmlff_md_pipeline_demo.py \
+#   --experiment configs/example_h4_schmidt_multifragment.yaml \
+#   --loop configs/example_h4_classical_md_stub.yaml
+
+max_rounds: 2
+energy_tolerance_hartree: 0.15
+n_candidate_frames: 2
+add_top_k_per_round: 1
+label_energy_reference: scf
+label_screening_theory_level: hf_scf
+label_top_theory_level: hf_scf
+validation_energy_reference: scf
+validation_theory_level: hf_scf
+include_hf_nuclear_gradient: false
+dedupe_decimals: 3
+
+n_seed_geometries: 4
+seed_mode: jitter
+seed_jitter_bohr: 0.05
+
+force_field_backend: classical_h2
+qmlff_species_list: [H]
+
+n_epochs_per_round: 1
+batch_size: 1
+learning_rate: 1.0e-3
+lr_scheduler: constant
+force_weight: 1.0
+warm_start: true
+warm_start_params_only: true
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 40
+md_dt_fs: 0.5
+md_temperature_K: 300.0
+md_save_stride: 10
+md_seed: 42
+md_gamma_ps_inv: 0.1
+md_tau_fs: 100.0
+
+write_per_round_extxyz: false
+seed: 42

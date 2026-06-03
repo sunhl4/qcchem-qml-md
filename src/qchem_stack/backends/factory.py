@@ -132,6 +132,19 @@ def _braket_factory(_: BackendSpec) -> HamiltonianExpectationExecutor:
     return BraketHeaExecutor()
 
 
+def _uqc_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
+    try:
+        import qchem_stack_uqc  # noqa: F401
+    except ImportError as e:
+        raise ImportError(
+            "provider='uqc' requires qchem-stack-uqc. "
+            "Install: pip install -e packages/qchem-stack-uqc"
+        ) from e
+    from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
+
+    return UQCCloudHeaExecutor(spec)
+
+
 def _resolve_entry_point_factory(value: object, *, source: str) -> BackendFactory:
     if callable(value):
         return cast("BackendFactory", value)
@@ -164,6 +177,12 @@ def _register_builtin_backends() -> None:
     _register_record("qulacs", _qulacs_factory, source="builtin", origin="qulacs_factory")
     _register_record("cirq", _cirq_factory, source="builtin", origin="cirq_factory")
     _register_record("braket", _braket_factory, source="builtin", origin="braket_factory")
+    try:
+        import qchem_stack_uqc  # noqa: F401
+
+        _register_record("uqc", _uqc_factory, source="builtin", origin="uqc_factory")
+    except ImportError:
+        pass
 
 
 def _discover_external_backends() -> None:

@@ -71,11 +71,10 @@ jobs:
 
   test:
     needs: lint
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
         python-version: ["3.10", "3.11", "3.12"]
     steps:
       - uses: actions/checkout@v4
@@ -89,91 +88,101 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]"
-      - name: Pre-quantum docs sync check
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
-        run: |
-          python scripts/sync_pre_quantum_docs.py
-          git diff --exit-code docs/pre_quantum_yaml_matrix.md "docs/技术文档_双线路经典输入与统一PreQuantumInput契约.md"
-      - name: Config reference snippets sync
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
-        run: |
-          python scripts/generate_config_reference_snippets.py
-          git diff --exit-code docs/generated/
       - name: Strict repro JSON API
         run: |
           python -c "from qchem_stack.repro.export import repro_json_dumps; repro_json_dumps({'ok': True})"
-      - name: Product gap categories validator
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
-        run: |
-          python -c "from qchem_stack.protocols.product_contract import validate_product_gap_categories; errs=validate_product_gap_categories(); assert not errs, errs"
       - name: Pytest
-        run: pytest tests -q --tb=short -m "not slow and not perf"
+        run: pytest tests -q --tb=short -m "not slow and not perf" -n 2
       - name: Backend statevector conformance (PR smoke)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
+        if: matrix.python-version == '3.12'
         run: pytest tests/backends/test_p4_backend_conformance.py -k statevector -q --tb=short
+      - name: Backend output contract (statevector + qiskit)
+        if: matrix.python-version == '3.12'
+        run: |
+          pip install -e ".[quantum]"
+          pytest tests/backends/test_backend_output_contract.py -q --tb=short
       - name: Upload coverage report
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
+        if: matrix.python-version == '3.12'
         uses: actions/upload-artifact@v4
         with:
           name: htmlcov-py312
           path: htmlcov/
           if-no-files-found: warn
-      # The main Pytest step above already runs the l1_excited and l1_md_ml
-      # markers (they are not slow/perf), so dedicated marker reruns are
-      # redundant and have been removed. The remaining heavy smokes and
-      # optional extras run only on 3.12 Ubuntu to keep the matrix cheap; 3.10/3.11
-      # provide cross-version coverage via the core unit-test run.
+      - name: Per-package coverage thresholds
+        if: matrix.python-version == '3.12'
+        run: python scripts/check_coverage_thresholds.py
       - name: Check examples importable (syntax and import validation)
         run: python scripts/check_examples_importable.py
+
+  contract-gate:
+    needs: lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev,api,quantum]"
+      - name: Pre-quantum docs sync check
+        run: |
+          python scripts/sync_pre_quantum_docs.py
+          git diff --exit-code docs/pre_quantum_yaml_matrix.md "docs/技术文档_双线路经典输入与统一PreQuantumInput契约.md"
+      - name: Config reference snippets sync
+        run: |
+          python scripts/generate_config_reference_snippets.py
+          git diff --exit-code docs/generated/
+      - name: Configs catalog snippet sync
+        run: |
+          python scripts/generate_configs_catalog.py
+          git diff --exit-code docs/generated/configs_catalog_snippet.md
+          git diff --exit-code docusaurus-site/docs/reference/configs-catalog-body.md
+      - name: Parity gap snippet sync
+        run: |
+          python scripts/generate_parity_gap_snippet.py
+          git diff --exit-code docs/generated/parity_gap_snippet.md
+      - name: Config combo matrix gate
+        run: python scripts/check_config_combo_matrix.py
+      - name: Product gap categories validator
+        run: |
+          python -c "from qchem_stack.protocols.product_contract import validate_product_gap_categories; errs=validate_product_gap_categories(); assert not errs, errs"
       - name: Check dependency constraints freshness
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: |
           pip install pip-tools
           python scripts/check_constraints_freshness.py
       - name: Examples tutorials smoke
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python examples/run_all_smoke.py
       - name: Validate notebooks (nbmake)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
-        run: |
-          pytest --nbmake notebooks/ --nbmake-timeout=120 -v
+        run: pytest --nbmake notebooks/ --nbmake-timeout=120 -v
       - name: UQC mock + MD/ML pipeline (no hardware, not slow)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: pytest tests/test_uqc_mock_md_ml_integration.py -m "uqc_mock and not slow" -q --tb=short
       - name: HTTP API optional extra (FastAPI)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
-        run: |
-          pip install -e ".[api]"
-          pytest tests/test_api_runs.py -q --tb=short
+        run: pytest tests/test_api_runs.py -q --tb=short
       - name: Smoke orchestration precomputed lane (no PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/smoke_pipeline.py --precomputed-only
       - name: Smoke orchestration (PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: |
           python -c "import pyscf"
           QCHEM_SMOKE_REQUIRE_PYSCF=1 python scripts/smoke_pipeline.py
       - name: Smoke orchestration VQD path (PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/smoke_pipeline.py --excited-only
       - name: Smoke orchestration IQEB (PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/smoke_pipeline.py --iqeb
       - name: Smoke projection L1 trace (PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/smoke_pipeline.py --projection-trace
       - name: Parity criteria export (no PySCF run)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/export_parity_criteria_table.py configs/example_h2.yaml
       - name: Parity export schema v3 stable keys
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: |
           python scripts/export_parity_criteria_table.py configs/example_h2.yaml | python -c "import json,sys;d=json.load(sys.stdin);assert d.get('parity_export_schema_version')=='3';c=d['computable_abstract'];assert c.get('schema')=='qchem_computable_abstract_v2';assert isinstance(d.get('capability_gap_categories'),list);assert d.get('embedding',{}).get('mode')=='none'"
       - name: Parity export multi-config L1 gate (check_parity_export_sample)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/check_parity_export_sample.py
       - name: Benchmark dashboard artifact (L3 + MD/ML AL + pipeline profile)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: |
           echo '{"bundle_schema_version":"1","algorithm_benchmark_bundle_v1":{"schema":"algorithm_benchmark_bundle_v1","rows":[]}}' > /tmp/l3_empty.json
           echo '{"schema":"pipeline_profile_v1","stages":[{"stage":"scf_done","duration_ms":1.0,"peak_memory_kb":512}]}' > /tmp/pipeline_profile.json
@@ -184,24 +193,43 @@ jobs:
             --git-sha "${{ github.sha }}" \
             --output /tmp/benchmark_dashboard.html
       - name: Upload benchmark dashboard HTML
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         uses: actions/upload-artifact@v4
         with:
           name: benchmark-dashboard-html
           path: /tmp/benchmark_dashboard.html
           if-no-files-found: error
       - name: Pytket bridge (optional extra)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: pytest tests/test_pytket_bridge.py -q --tb=short
       - name: Smoke Qiskit Pauli shots (optional extra)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/smoke_pipeline.py --qiskit-shots
       - name: Smoke sampled Pauli protocol (PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/smoke_pipeline.py --sampled
       - name: QPE dual-track demo (no PySCF)
-        if: matrix.python-version == '3.12' && matrix.os == 'ubuntu-latest'
         run: python scripts/run_qpe_track_demo.py
+
+  test-cross-platform:
+    needs: lint
+    runs-on: ${{ matrix.os }}
+    if: github.event_name == 'schedule' || github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [macos-latest, windows-latest]
+        python-version: ["3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+      - name: Pytest (cross-platform smoke)
+        run: pytest tests -q --tb=short -m "not slow and not perf"
 
   test-nightly:
     needs: lint

@@ -11,7 +11,7 @@ from qchem_stack.chem.pyscf_typing import (
     as_real_array,
     max_abs_imag,
 )
-from qchem_stack.quantum.algorithms.tolerances import (
+from qchem_stack.chem.tolerances import (
     ACTIVE_SPACE_IMAG_TOLERANCE,
     ACTIVE_SPACE_IMAG_WARNING,
 )

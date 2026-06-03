@@ -28,8 +28,8 @@ from qchem_stack.chem.hamiltonian import (
     qubit_hamiltonian_from_active_space_fermionic_operator,
     qubit_hamiltonian_from_compact_restricted_active_space,
 )
+from qchem_stack.chem.tolerances import NUMERICAL_TOLERANCE
 from qchem_stack.contracts.schema_ids import RESTRICTED_ACTIVE_SPACE_QUANTUM_PROBLEM_V1
-from qchem_stack.quantum.algorithms.tolerances import NUMERICAL_TOLERANCE
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference

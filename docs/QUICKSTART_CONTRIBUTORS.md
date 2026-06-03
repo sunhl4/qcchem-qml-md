@@ -62,7 +62,7 @@ print(out["repro"]["run_summary"]["stages_completed"])
 Async job lane (SQLite):
 
 ```python
-from qchem_stack.orchestration.pipeline import run_pipeline_from_config
+from qchem_stack.sdk import run_pipeline_from_config  # or: qchem_stack.orchestration.pipeline
 
 out = run_pipeline_from_config("configs/example_h2.yaml", job_db=Path("jobs.sqlite"))
 # out["job"], out.get("job_result"), out["repro"]["run_summary"]

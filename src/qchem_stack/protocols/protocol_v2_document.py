@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import json
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, Any, TypedDict, cast
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -16,6 +16,28 @@ if TYPE_CHECKING:
 
 
 PROTOCOL_BLOB_VERSION_V2 = 2
+
+
+class ProtocolBlobDocumentV2(TypedDict, total=False):
+    """JSON document shape for :func:`protocol_to_v2_document` / v2 job blobs."""
+
+    protocol_blob_version: int
+    hamiltonian: dict[str, Any]
+    n_qubits: int
+    backend_spec: dict[str, Any]
+    pass_bundle: dict[str, Any]
+    pmsv: dict[str, Any] | None
+    zne_scales: list[float] | None
+    zne_mode: str
+    hea_depth: int
+    angles: list[float]
+    measurement_grouping: str
+    run_sampled: bool
+    run_qiskit_shots: bool
+    record_histograms: bool
+    pauli_support_max_terms: int | None
+    classical_shadows_enabled: bool
+    classical_shadows_budget_pairs: int
 
 
 def _serialize_qubit_operator(op: QubitOperator) -> dict[str, Any]:
@@ -115,10 +137,10 @@ def _pmsv_from_dict(doc: dict[str, Any] | None) -> PMSVConfig | None:
     )
 
 
-def protocol_to_v2_document(proto: PauliAveragingProtocol) -> dict[str, Any]:
+def protocol_to_v2_document(proto: PauliAveragingProtocol) -> ProtocolBlobDocumentV2:
     """Build a JSON-serializable protocol document (schema version 2)."""
     angles = np.asarray(proto.angles, dtype=float)
-    doc: dict[str, Any] = {
+    doc: ProtocolBlobDocumentV2 = {
         "protocol_blob_version": PROTOCOL_BLOB_VERSION_V2,
         "hamiltonian": _serialize_qubit_operator(proto.hamiltonian),
         "n_qubits": int(proto.n_qubits),
@@ -140,7 +162,9 @@ def protocol_to_v2_document(proto: PauliAveragingProtocol) -> dict[str, Any]:
     return doc
 
 
-def protocol_from_v2_document(doc: dict[str, Any]) -> PauliAveragingProtocol:
+def protocol_from_v2_document(
+    doc: ProtocolBlobDocumentV2 | dict[str, Any],
+) -> PauliAveragingProtocol:
     """Reconstruct ``PauliAveragingProtocol`` from a v2 JSON document."""
     if int(doc.get("protocol_blob_version", 0)) != PROTOCOL_BLOB_VERSION_V2:
         raise ValueError(
@@ -199,6 +223,7 @@ def is_protocol_v2_json_payload(payload: bytes) -> bool:
 
 __all__ = [
     "PROTOCOL_BLOB_VERSION_V2",
+    "ProtocolBlobDocumentV2",
     "is_protocol_v2_json_payload",
     "protocol_from_v2_document",
     "protocol_to_v2_document",

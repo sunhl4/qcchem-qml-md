@@ -7,7 +7,7 @@ from typing import Any, cast
 import numpy as np
 
 from qchem_stack.chem.bridges.mean_field_like import MeanFieldLike, unwrap_mean_field_raw
-from qchem_stack.quantum.algorithms.tolerances import MO_IMAG_TOLERANCE
+from qchem_stack.chem.tolerances import MO_IMAG_TOLERANCE
 
 # PySCF mean-field / MCSCF objects (attribute surface varies by build).
 PyscfMeanField = Any

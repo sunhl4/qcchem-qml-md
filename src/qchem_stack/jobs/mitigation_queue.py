@@ -4,8 +4,11 @@ from __future__ import annotations
 
 import asyncio
 from collections import deque
+from collections.abc import Callable
 from dataclasses import dataclass, field
 from typing import Any
+
+MitigationHandler = Callable[[dict[str, Any]], dict[str, Any]]
 
 
 @dataclass
@@ -28,7 +31,7 @@ class LocalMitigationJobQueue:
         self._pending.append(job)
         return job
 
-    async def drain_once(self, handler) -> list[MitigationJob]:
+    async def drain_once(self, handler: MitigationHandler) -> list[MitigationJob]:
         if not self._pending:
             return []
         job = self._pending.popleft()
@@ -38,7 +41,9 @@ class LocalMitigationJobQueue:
         self._completed.append(job)
         return [job]
 
-    async def drain_all(self, handler, *, concurrency: int = 1) -> list[MitigationJob]:
+    async def drain_all(
+        self, handler: MitigationHandler, *, concurrency: int = 1
+    ) -> list[MitigationJob]:
         """Drain pending jobs with bounded concurrency (local in-process only)."""
         if concurrency < 1:
             raise ValueError("concurrency must be >= 1")

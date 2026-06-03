@@ -213,6 +213,16 @@ def _truncate_pauli_support_for_export(out: dict, *, max_pauli: int | None) -> N
 
 
 def main() -> None:
+    root = Path(__file__).resolve().parents[1]
+    src = root / "src"
+    if str(src) not in sys.path:
+        sys.path.insert(0, str(src))
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
+    from scripts.parity_export_solvers import register_parity_export_solvers
+
+    register_parity_export_solvers()
+
     ap = argparse.ArgumentParser(description="Export parity / falsifiability table fields.")
     ap.add_argument("config", type=Path, help="Experiment YAML path")
     ap.add_argument("--results", type=Path, default=None, help="Optional JSON with pipeline output")

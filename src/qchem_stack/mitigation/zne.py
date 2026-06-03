@@ -174,8 +174,13 @@ def exponential_extrapolation(
     try:
         popt, pcov = curve_fit(exp_model, x, y, p0=[y[-1], y[0] - y[-1], 0.1], maxfev=5000)
         extrapolated = float(popt[0] + popt[1])
-        uncertainty = float(np.sqrt(pcov[0, 0] + pcov[1, 1] + 2 * pcov[0, 1]))
-    except RuntimeError:
+        var_sum = float(pcov[0, 0] + pcov[1, 1] + 2 * pcov[0, 1])
+        uncertainty = (
+            float(np.sqrt(max(var_sum, 0.0))) if np.isfinite(var_sum) else float(np.std(y))
+        )
+        if not np.isfinite(uncertainty):
+            extrapolated, uncertainty = linear_extrapolation(energies, scales)
+    except (RuntimeError, ValueError):
         logger.warning("Exponential fit failed to converge, falling back to linear")
         extrapolated, uncertainty = linear_extrapolation(energies, scales)
 
@@ -213,7 +218,11 @@ def polynomial_extrapolation(
     x = np.asarray(scales, dtype=float) - 1.0
     y = np.asarray(energies, dtype=float)
 
-    coeffs, cov = np.polyfit(x, y, deg=order, cov=True)
+    if len(energies) > order + 1:
+        coeffs, cov = np.polyfit(x, y, deg=order, cov=True)
+    else:
+        coeffs = np.polyfit(x, y, deg=order)
+        cov = None
     extrapolated = float(coeffs[-1])
     uncertainty = float(np.sqrt(cov[-1, -1])) if cov is not None else 0.0
 

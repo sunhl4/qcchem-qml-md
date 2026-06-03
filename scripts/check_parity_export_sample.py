@@ -90,12 +90,14 @@ def _sample_configs_unique_or_raise(samples: tuple[str, ...]) -> tuple[str, ...]
     return tuple(deduped)
 
 
-def _register_template_solvers_for_export() -> None:
-    from qchem_stack.chem.solvers.custom_solver_template import (
-        register_custom_external_template_solver,
-    )
+def _register_parity_export_solvers() -> None:
+    from scripts.parity_export_solvers import register_parity_export_solvers
 
-    register_custom_external_template_solver(overwrite=True)
+    register_parity_export_solvers()
+
+
+# Backward-compatible alias for tests/docs.
+_register_template_solvers_for_export = _register_parity_export_solvers
 
 
 def _check_md_loop_configs(root: Path) -> int:
@@ -115,11 +117,13 @@ def _check_md_loop_configs(root: Path) -> int:
 def main() -> int:
     root = Path(__file__).resolve().parents[1]
     src = root / "src"
+    if str(root) not in sys.path:
+        sys.path.insert(0, str(root))
     if str(src) not in sys.path:
         sys.path.insert(0, str(src))
     from qchem_stack.protocols.product_contract import PARITY_EXPORT_V3_STABLE_KEYS
 
-    _register_template_solvers_for_export()
+    _register_parity_export_solvers()
 
     env = {**os.environ, "PYTHONPATH": f"{src}" + os.pathsep + os.environ.get("PYTHONPATH", "")}
     try:

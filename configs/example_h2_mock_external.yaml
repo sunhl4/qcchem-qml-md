@@ -25,6 +25,7 @@ active_space:
     n_electrons: null
 quantum:
   algorithm: vqe
-  use_pauli_protocol: false
+  pauli:
+    use_protocol: false
 backend:
   provider: statevector

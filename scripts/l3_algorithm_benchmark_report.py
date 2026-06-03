@@ -40,12 +40,12 @@ def main() -> None:
     args = ap.parse_args()
     rels = list(args.configs) if args.configs else []
     if not rels:
-        from qchem_stack.quantum.l3_algorithm_benchmark import DEFAULT_BENCHMARK_YAMLS
+        from qchem_stack.integrations.l3_algorithm_benchmark import DEFAULT_BENCHMARK_YAMLS
 
         rels = list(DEFAULT_BENCHMARK_YAMLS)
 
     sys.path.insert(0, str(_ROOT / "src"))
-    from qchem_stack.quantum.l3_algorithm_benchmark import (
+    from qchem_stack.integrations.l3_algorithm_benchmark import (
         algorithm_benchmark_bundle_v1,
         merged_experiment_benchmark_v1,
     )

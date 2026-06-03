@@ -63,7 +63,10 @@ def test_render_html_includes_pipeline_profile_section() -> None:
         "schema": "pipeline_profile_v1",
         "stages": [{"stage": "scf_done", "duration_ms": 12.3, "peak_memory_kb": 1024}],
     }
-    html_doc = mod.render_html({}, pipeline_profile=profile)
+    html_doc = mod.render_html(
+        {"algorithm_benchmark_bundle_v1": {"schema": "algorithm_benchmark_bundle_v1", "rows": []}},
+        pipeline_profile=profile,
+    )
     assert "Pipeline profile" in html_doc
     assert "scf_done" in html_doc
 

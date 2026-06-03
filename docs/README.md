@@ -2,6 +2,24 @@
 
 This directory is the **engineering and contract** documentation for `qchem-stack`. User-facing tutorials and onboarding live in [`docusaurus-site/`](../docusaurus-site/) (build with `cd docusaurus-site && npm install && npm start`).
 
+## Reader paths
+
+| Audience | Start here |
+|----------|------------|
+| **L1 — Users** | [`docusaurus-site/`](../docusaurus-site/), [`README.md`](../README.md), [`configs/README.md`](../configs/README.md) |
+| **L2 — Integrators** | [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md), [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md), HTTP contract docs under `技术文档_HTTP_API*.md` |
+| **L3 — Maintainers** | [`public_parity_matrix.md`](public_parity_matrix.md), active plans under [`execution/`](execution/) (archived closeouts: [`execution/archive/2026Q2/`](execution/archive/2026Q2/)) |
+
+Tier policy: [`engineering/doc_tier_policy.md`](engineering/doc_tier_policy.md).
+
+## New contributors (start here)
+
+1. [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md) — YAML → pipeline → `repro`
+2. [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md) — layering and invariants
+3. [`engineering/pipeline_stage_ownership.md`](engineering/pipeline_stage_ownership.md) — stage → output keys
+4. [`backends.md`](backends.md) — `BackendSpec` providers and extras
+5. [`public_parity_matrix.md`](public_parity_matrix.md) — capability gaps (L1 contract)
+
 ## Documentation sync policy
 
 | Surface | Role | Source of truth |
