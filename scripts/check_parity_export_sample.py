@@ -91,7 +91,7 @@ def _sample_configs_unique_or_raise(samples: tuple[str, ...]) -> tuple[str, ...]
 
 
 def _register_parity_export_solvers() -> None:
-    from scripts.parity_export_solvers import register_parity_export_solvers
+    from qchem_stack.protocols.parity_criteria_export import register_parity_export_solvers
 
     register_parity_export_solvers()
 

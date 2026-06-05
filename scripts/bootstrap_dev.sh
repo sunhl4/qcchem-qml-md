@@ -1,17 +1,15 @@
 #!/usr/bin/env bash
+# Create .venv and install qchem-stack with dev extras (CI-parity local setup).
 set -euo pipefail
-
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
-
-if [[ ! -d .venv ]]; then
-  python3 -m venv .venv
+PY="${QCHEM_STACK_PYTHON:-python3}"
+if ! command -v "$PY" >/dev/null 2>&1; then
+  echo "error: Python not found: $PY" >&2
+  echo "hint: export QCHEM_STACK_PYTHON=/path/to/python3.10+" >&2
+  exit 1
 fi
-
-.venv/bin/python -m pip install -U pip
+"$PY" -m venv .venv
+.venv/bin/pip install -U pip
 .venv/bin/pip install -e ".[dev]"
-
-export QCHEM_STACK_PYTHON="$ROOT/.venv/bin/python"
-"$ROOT/scripts/venv-run" python "$ROOT/scripts/smoke_pipeline.py" --precomputed-only
-
-echo "Bootstrap OK. Use: export QCHEM_STACK_PYTHON=$ROOT/.venv/bin/python"
+echo "Done. Run: ./scripts/venv-run pytest tests -q --tb=short"

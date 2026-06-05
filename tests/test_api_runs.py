@@ -124,11 +124,33 @@ def test_post_run_sync_returns_job_result_schema_and_json() -> None:
     assert r.headers.get("x-trace-id")
 
 
+def test_v1_routes_expose_api_contract_version_1_0() -> None:
+    client = TestClient(app)
+    for method, url, kwargs in (
+        ("GET", "/v1/meta/product-surface", {}),
+        ("GET", "/v1/meta/capability-surface", {}),
+        ("GET", "/v1/meta/parity-gaps", {}),
+        ("GET", "/v1/meta/ml-md-bridge", {}),
+        (
+            "POST",
+            "/v1/meta/workflow-preview",
+            {"json": {"experiment_yaml": _minimal_experiment_yaml()}},
+        ),
+    ):
+        if method == "GET":
+            r = client.get(url, **kwargs)
+        else:
+            r = client.post(url, **kwargs)
+        assert r.status_code == 200, (method, url, r.text)
+        assert r.json().get("api_contract_version") == "1.0"
+
+
 def test_product_surface_and_workflow_preview() -> None:
     client = TestClient(app)
     pa = client.get("/v1/meta/product-surface")
     assert pa.status_code == 200
     assert pa.json().get("schema") == "product_surface_v1"
+    assert pa.json().get("api_contract_version") == "1.0"
     w = client.post(
         "/v1/meta/workflow-preview", json={"experiment_yaml": _minimal_experiment_yaml()}
     )
@@ -184,6 +206,7 @@ def test_capability_surface_matches_product_contract() -> None:
     assert r.status_code == 200
     body = r.json()
     expected = {
+        "api_contract_version": "1.0",
         "schema": "capability_surface_v2",
         "qchem_stack_version": __version__,
         "capability_map": product_capability_map_for_docs(),

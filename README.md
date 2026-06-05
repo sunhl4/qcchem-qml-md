@@ -97,8 +97,7 @@ print(pqi["hamiltonian_fingerprint"], pqi["n_qubits"])
 
 Programmatic Hamiltonian build (library callers): use
 `qchem_stack.chem.pre_quantum_build.build_pre_quantum_input(cfg, reference, cfg_path=...)`.
-The legacy `molecular_hamiltonian_from_classical_reference` remains but emits a
-`DeprecationWarning`; prefer the YAML pipeline or `build_pre_quantum_input`.
+Prefer the YAML pipeline or `build_pre_quantum_input` for Hamiltonian construction (removed in v0.8.0: `molecular_hamiltonian_from_classical_reference`).
 
 Allowed YAML combinations for the pre-quantum path are listed in
 [docs/pre_quantum_yaml_matrix.md](docs/pre_quantum_yaml_matrix.md).

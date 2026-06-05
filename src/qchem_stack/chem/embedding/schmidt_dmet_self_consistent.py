@@ -220,7 +220,7 @@ def run_schmidt_multifragment_density_cycles(
 ) -> tuple[SchmidtImpurityModel, dict[str, Any], np.ndarray]:
     """
     **Multi-fragment** Gauss–Seidel on global ``D``, implemented with
-    :class:`~qchem_stack.integrations.dmet_self_consistent.DMETSelfConsistencyLoop`.
+    :class:`~qchem_stack.chem.embedding.dmet_self_consistent.DMETSelfConsistencyLoop`.
 
     After outer cycles, rebuild the **primary** impurity model from final ``D``.
     """

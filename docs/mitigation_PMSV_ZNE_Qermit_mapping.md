@@ -15,7 +15,8 @@
 ### ZNE 端到端（开放栈 L1）
 
 1. **YAML**：`mitigation.zne_enabled: true` 与 `mitigation.zne_scales`（浮点列表）定义标度序列；与 `MitigationSpec` 校验一致。
-2. **运行时**：Pauli / 协议阶段在启用 ZNE 时把标度写入 `repro.parity_snapshot.mitigation_zne_scales`（及相关的 `mitigation_execution_class` 口径），供 Methods 与 `scripts/export_parity_criteria_table.py` 同源导出。
+2. **运行时**：Pauli / 协议阶段在启用 ZNE 时把标度写入 `repro.parity_snapshot.mitigation_zne_scales`（及相关的 `mitigation_execution_class` 口径），供 Methods 与 `export_parity_criteria_table` 同源导出。
+3. **导出块**：`resource_estimation_preview_v1.mitigation_zne_variants_v1` 列出 `modes_supported` 与 YAML `mitigation.zne.mode` / `zne.scales`（非闭源 Qermit 运行时）。
 3. **与 PMSV**：二者可独立开关；`protocol_counts` / PMSV report 块见上表「PMSV」行。全链**不**等价 Qermit 闭源外推器 — 仅保证机读字段与 errmit **公开**多标度叙事可对读。
 4. **回归**：矩阵 `partial` 行须引用本文 + **`product_gap_categories()`**（**`id=mitigation_batch_scheduler`**）并与 **`GET /v1/meta/capability-surface`** 载荷中的 **`mitigation_execution_model`** 一致。
 

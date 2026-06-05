@@ -90,6 +90,18 @@ def build_resource_estimation_preview_v1(
         "mitigation_zne_richardson_order_yaml": max(0, len(mit.zne.scales) - 1)
         if mit.zne.enabled
         else 0,
+        "mitigation_zne_variants_v1": {
+            "schema": "mitigation_zne_variants_v1",
+            "modes_supported": ["scale_only", "richardson", "polynomial_stub"],
+            "active_mode": mit.zne.mode,
+            "scales": [float(x) for x in mit.zne.scales],
+        },
+        "vqe_depth_yaml": int(qt.vqe.depth),
+        "n_pauli_groups_upper_bound_proxy": (
+            max(1, int(qt.pauli.support_max_terms) // 8)
+            if qt.pauli.support_max_terms
+            else None
+        ),
         "pmsv_enabled_yaml": mit.pmsv.enabled,
         "run_sampled_pauli_protocol_yaml": qt.pauli.run_sampled,
         "run_qiskit_shots_pauli_protocol_yaml": qt.pauli.run_qiskit_shots,

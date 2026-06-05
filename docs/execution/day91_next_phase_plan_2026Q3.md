@@ -1,5 +1,7 @@
 # Day91+ Next Phase Plan (2026Q3)
 
+**Note:** Package **1.0.0** release criteria are tracked in [`../engineering/v1_0_acceptance.md`](../engineering/v1_0_acceptance.md). Day121+ backlog continues below.
+
 角色：承接 2026Q2 Day12–Day90 收口后的下一阶段执行计划（P2 深化）。
 
 ## 目标

@@ -36,7 +36,9 @@ Snapshot for regression tracking. Regenerate with `python scripts/code_health_ba
 
 | Package prefix | Threshold |
 |----------------|-----------|
-| `src/qchem_stack/chem` | 65% (raise toward 70% next phase) |
+| `src/qchem_stack/chem` | 70% |
+| `src/qchem_stack/jobs` | 75% |
+| `src/qchem_stack/md_bridge` | 62% (70% with `[qmlff]` + `pytest -m l1_md_ml`) |
 
 ## Related
 

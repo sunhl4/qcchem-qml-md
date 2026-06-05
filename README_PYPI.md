@@ -1,7 +1,10 @@
 # qchem-stack
 
-Quantum chemistry orchestration: classical downfolding, variational protocols,
-reproducible `repro` export, and optional MD bridge.
+**Stable 1.0** open orchestration for quantum chemistry: YAML pipelines, strict
+`repro` JSON, Methods-style parity export, and optional MD bridge.
+
+Non-goals (no commercial cloud parity): see the repository
+`docs/product/non_goals.md`.
 
 ## Quick start
 

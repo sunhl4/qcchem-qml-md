@@ -33,17 +33,20 @@ def _export_with_results(cfg_rel: str, results_path: Path) -> dict:
 
 
 def test_methods_resource_preview_in_config_only_export() -> None:
-    import importlib.util
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.protocols.parity_criteria_export import table_from_config
 
-    ep_path = scripts_path("export_parity_criteria_table.py")
-    spec = importlib.util.spec_from_file_location("export_parity_criteria_table", ep_path)
-    mod = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(mod)
-    d = mod._table_from_config(configs_path("qpe_dual_track_demo.yaml"))
+    cfg_path = configs_path("qpe_dual_track_demo.yaml")
+    d = table_from_config(cfg_path)
     prev = d.get("methods_resource_preview_v1")
     assert isinstance(prev, dict)
     assert prev.get("schema") == "methods_resource_preview_v1"
+    cfg = load_experiment_config(cfg_path)
+    if cfg.parity_integrations.resource_estimation_preview:
+        res = d.get("resource_estimation_preview_v1")
+        assert isinstance(res, dict)
+        zne_v = res.get("mitigation_zne_variants_v1")
+        assert isinstance(zne_v, dict) and zne_v.get("schema") == "mitigation_zne_variants_v1"
     assert prev.get("qpe_pipeline_integration") is True
     assert prev.get("qpe_demo_track_n_bits") == 4
     wq = d.get("workflow_preview_qpe_track_v1")
@@ -52,17 +55,12 @@ def test_methods_resource_preview_in_config_only_export() -> None:
 
 
 def test_methods_resource_preview_includes_vqs_flags() -> None:
-    import importlib.util
+    from qchem_stack.protocols.parity_criteria_export import table_from_config
 
     p_yaml = configs_path("example_h2_vqs_track.yaml")
     if not p_yaml.is_file():
         pytest.skip("example_h2_vqs_track.yaml missing")
-    ep_path = scripts_path("export_parity_criteria_table.py")
-    spec = importlib.util.spec_from_file_location("export_parity_criteria_table", ep_path)
-    mod = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(mod)
-    d = mod._table_from_config(p_yaml)
+    d = table_from_config(p_yaml)
     prev = d.get("methods_resource_preview_v1")
     assert isinstance(prev, dict)
     assert prev.get("vqs_pipeline_integration") is True

@@ -40,7 +40,7 @@ scf:
     density_fit: false
     density_fit_auxbasis: null
   precomputed:
-    bundle_path: /home/sunhl/projects/qchem_qml_md/configs/precomputed_classical_reference_h2.json
+    bundle_path: precomputed_classical_reference_h2.json
 active_space:
   strategy: cas
   mapping:

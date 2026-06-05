@@ -1,0 +1,4 @@
+{
+  "perf_wall_seconds": 0.0,
+  "note": "Placeholder; nightly test-nightly job updates via scripts/check_perf_regression.py"
+}

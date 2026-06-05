@@ -2,27 +2,15 @@
 
 from __future__ import annotations
 
-import importlib.util
-
 from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.excited_stages import build_excited_resource_summary_for_export
-from tests.helpers.paths import configs_path, repo_root
-
-
-def _load_export_script():
-    root = repo_root()
-    path = root / "scripts" / "export_parity_criteria_table.py"
-    spec = importlib.util.spec_from_file_location("export_parity_criteria_table", path)
-    mod = importlib.util.module_from_spec(spec)
-    assert spec.loader is not None
-    spec.loader.exec_module(mod)
-    return mod
+from qchem_stack.protocols.parity_criteria_export import table_from_config
+from tests.helpers.paths import configs_path
 
 
 def test_table_from_config_has_v3_fields() -> None:
-    ep = _load_export_script()
     p = configs_path("example_h2.yaml")
-    d = ep._table_from_config(p)
+    d = table_from_config(p)
     assert d.get("parity_export_schema_version") == "3"
     assert d["computable_abstract"]["schema"] == "qchem_computable_abstract_v2"
     assert d["computable_abstract"].get("support_set_exported_from_protocol") is False

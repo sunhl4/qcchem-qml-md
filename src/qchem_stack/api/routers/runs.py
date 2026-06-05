@@ -6,6 +6,7 @@ from typing import Annotated, Any
 from fastapi import APIRouter, Body, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 
+from qchem_stack.api.contract import with_api_contract
 from qchem_stack.api.deps import (
     default_job_db_path,
     experiment_config_from_request_yaml,
@@ -80,13 +81,13 @@ def list_runs(
         limit=limit,
         offset=offset,
     )
-    return {
+    return with_api_contract({
         "schema": JOB_LIST_V1,
         "job_db": str(db.resolve()),
         "limit": limit,
         "offset": offset,
         "jobs": jobs,
-    }
+    })
 
 
 @router.post("/v1/runs", response_model=None)
@@ -122,7 +123,7 @@ async def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dic
                         rs[key] = meta_extra[key]
         headers["Deprecation"] = "true"
         headers["Link"] = '</v1/runs>; rel="successor-version"'
-        return JSONResponse(slim, headers=headers)
+        return JSONResponse(with_api_contract(slim), headers=headers)
 
     na = cfg.nexus_analog
     if na.enabled and na.project_label:
@@ -138,7 +139,7 @@ async def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dic
         meta_extra=meta_extra,
     )
     return JSONResponse(
-        {
+        with_api_contract({
             "schema": RUN_ENQUEUE_RESPONSE_V1,
             "job_id": handle.job_id,
             "experiment_id": cfg.experiment_id,
@@ -146,7 +147,7 @@ async def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dic
             "client_request_id": rc.client_request_id,
             "status": "QUEUED",
             "job_db": str(db.resolve()),
-        },
+        }),
         status_code=202,
         headers=headers,
     )
@@ -164,7 +165,7 @@ def get_run_status(
         summary = store.get_job_public_summary(job_id)
     except KeyError as e:
         raise HTTPException(status_code=404, detail=f"job not found: {e}") from e
-    return {"schema": JOB_STATUS_V1, **summary}
+    return with_api_contract({"schema": JOB_STATUS_V1, **summary})
 
 
 @router.get("/v1/runs/{job_id}/events")
@@ -181,12 +182,12 @@ def get_run_events(
         raise HTTPException(status_code=404, detail=f"job not found: {e}") from e
     events_raw = tl.get("events") or []
     events: list[dict[str, object]] = [dict(e) for e in events_raw if isinstance(e, dict)]
-    return {
+    return with_api_contract({
         "schema": JOB_EVENTS_V1,
         "job_id": job_id,
         "note": str(tl.get("source", "")),
         "events": events,
-    }
+    })
 
 
 @router.get("/v1/runs/{job_id}/summary")
@@ -203,7 +204,7 @@ def get_run_summary_ux(
         raise HTTPException(status_code=404, detail=f"job not found: {e}") from e
     slim = slim_product_summary_from_pipeline_result(row)
     slim["job_id"] = job_id
-    return slim
+    return with_api_contract(slim)
 
 
 @router.get("/v1/runs/{job_id}/repro")
@@ -227,12 +228,12 @@ def get_run_repro(
     repro = row.get("repro")
     if not isinstance(repro, dict):
         raise HTTPException(status_code=404, detail="result has no repro block")
-    return {
+    return with_api_contract({
         "schema": RUN_REPRO_ONLY_V1,
         "job_id": job_id,
         "job_kind": row.get("job_kind"),
         "repro": repro,
-    }
+    })
 
 
 @router.get("/v1/runs/{job_id}")
@@ -246,6 +247,6 @@ def get_run(
 ) -> dict:
     store = sqlite_job_store(job_db_path)
     try:
-        return store.result(job_id)
+        return with_api_contract(store.result(job_id))
     except KeyError as e:
         raise HTTPException(status_code=404, detail=f"job not found: {e}") from e

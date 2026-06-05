@@ -10,3 +10,13 @@
 | SQLite 路径不可用 | 503 | `GET /health/ready`（就绪探针） |
 
 **网关建议**：将 `qchem_stack.exceptions` 中类型映射到结构化 JSON（见 `ENGINEERING_ARCHITECTURE.md` §3），避免前端字符串匹配 traceback。
+
+| `qchem_stack.exceptions` | HTTP | 说明 |
+|--------------------------|------|------|
+| `ConfigurationError` | 400 / 422 | 配置或环境变量无效 |
+| `PipelineError` | 422 / 500 | 编排前置条件失败 |
+| `EmbeddingError` | 422 | 嵌入 / Schmidt 约束 |
+| `ReproExportError` | 500 | strict JSON 导出失败 |
+| `QChemStackError`（其它子类） | 500 | 未分类领域错误 |
+
+**CLI**：`qchem-run` 对 `PipelineError` 返回 exit code **1**；其它未捕获异常同样返回 **1**（日志含类型名）。

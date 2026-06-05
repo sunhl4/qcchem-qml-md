@@ -30,26 +30,6 @@ if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig
 
 
-def mulliken_mo_populations_on_atoms(
-    mf: Any,
-    mo: np.ndarray,
-    atom_indices: list[int],
-) -> np.ndarray:
-    """Legacy PySCF-mf entry point; prefer :func:`ao_fragment.mulliken_mo_populations_on_atoms`."""
-    import warnings
-
-    warnings.warn(
-        "qchem_stack.chem.embedding.projection_hamiltonian.mulliken_mo_populations_on_atoms "
-        "is deprecated; use qchem_stack.chem.embedding.ao_fragment.mulliken_mo_populations_on_atoms "
-        "with an AOBasisView instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    from qchem_stack.chem.bridges.ao_basis_view import PySCFAOBasisView
-
-    return _mulliken_on_ao(PySCFAOBasisView(_mf=mf), mo, atom_indices)
-
-
 def select_active_mo_indices(
     weights: np.ndarray,
     n_active: int,

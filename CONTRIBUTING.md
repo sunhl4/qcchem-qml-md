@@ -6,10 +6,18 @@
 
 ## Local Python environment (default)
 
-[`scripts/venv-run`](scripts/venv-run) runs commands with the Python chosen by **`QCHEM_STACK_PYTHON`** (if set), otherwise the default interpreter path at the top of that script (repo default: maintainer `conda base` / workstation path). Example override:
+**Recommended first-time setup:**
 
 ```bash
-export QCHEM_STACK_PYTHON=/path/to/python
+./scripts/bootstrap_dev.sh
+export QCHEM_STACK_PYTHON="$(pwd)/.venv/bin/python"
+./scripts/venv-run pytest tests -q --tb=short -m "not slow and not perf"
+```
+
+[`scripts/venv-run`](scripts/venv-run) runs commands with **`QCHEM_STACK_PYTHON`** when set, otherwise **`.venv/bin/python`** if present, else `python3` on `PATH`:
+
+```bash
+export QCHEM_STACK_PYTHON=/path/to/python   # optional override
 ./scripts/venv-run pytest tests -q --tb=short
 ```
 
@@ -19,13 +27,15 @@ export QCHEM_STACK_PYTHON=/path/to/python
 |------|------|
 | **契约 / capability 导出** | 产品与 HTTP 控制台同源模块 **`qchem_stack.protocols.product_contract`**（ gap 列表、capability_map、parity export 的稳定键常量等）；workflow 预览 **`qchem_stack.integrations.workflow_preview`**。布局见 [Product contracts and workflow-preview](#product-contracts-and-workflow-preview-stable-imports)。矩阵与路线图仍按需维护（见 [public_parity_matrix.md §5](docs/public_parity_matrix.md)）。 |
 | **度量与台账** | 月度更新 [与Vendor platform… — 附录 B](docs/public_parity_matrix.md) §3；主表 yes/partial/n/a 可用 `python scripts/count_parity_matrix_main_tables.py` 对照手填。 |
-| **签字合并 gate** | 合并前：`ruff check src/qchem_stack tests scripts examples`、`ruff format --check`（同上路径）、`pytest`、`python scripts/check_parity_export_sample.py`、`python scripts/check_comparative_execution_backlog.py`；或一键：`./scripts/release_precheck.sh`（见 [`scripts/README.md`](scripts/README.md)）；CI **`security-audit`** 对 `pip install -e ".[dev]"` 运行 `pip-audit`（传递依赖见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
+| **签字合并 gate** | 合并前：`ruff check` / `ruff format --check` / `pytest` / `check_parity_export_sample` / `check_comparative_execution_backlog`；或一键：**`./scripts/release_precheck.sh`**（PR 可用 **`--quick`** 跳过 Docusaurus build，见 [`scripts/README.md`](scripts/README.md)）；CI **`security-audit`** 对 `pip install -e ".[dev]"` 运行 `pip-audit`（传递依赖见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
 
 ### 发版前
 
-1. `./scripts/release_precheck.sh`（pytest + coverage 阈值 + parity + import/doc 链）
-2. `python scripts/generate_configs_catalog.py` 并提交 `docs/generated/configs_catalog_snippet.md` 与 `docusaurus-site/docs/reference/configs-catalog-body.md`
-3. 大改动建议拆 PR：**docs** / **orchestration** / **tests** / **ci** 分开发，便于 review 与 bisect
+1. `./scripts/release_precheck.sh`（pytest + coverage 阈值 + parity + OpenAPI snapshot + import/doc 链）
+2. Major releases: complete [`docs/engineering/v1_0_acceptance.md`](docs/engineering/v1_0_acceptance.md); integrators read [`migration_v0_8_to_v1_0.md`](docs/engineering/migration_v0_8_to_v1_0.md)
+3. Optional full gate: `QCHEM_RELEASE_FULL=1 ./scripts/release_precheck.sh`（L3 benchmarks when PySCF installed）
+4. `python scripts/generate_configs_catalog.py` 并提交 `docs/generated/configs_catalog_snippet.md` 与 `docusaurus-site/docs/reference/configs-catalog-body.md`
+5. 大改动建议拆 PR：**docs** / **orchestration** / **tests** / **ci** 分开发，便于 review 与 bisect
 
 ## Lint
 

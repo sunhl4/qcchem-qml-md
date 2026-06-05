@@ -6,7 +6,11 @@ from tests.helpers.paths import configs_path
 
 
 def test_sdk_export_parity_table_config_only() -> None:
+    from qchem_stack.protocols import parity_criteria_export
     from qchem_stack.sdk import export_parity_table
+
+    # Wheel-safe: no subprocess / repo scripts/ tree required.
+    assert not hasattr(parity_criteria_export, "_repo_root")
 
     table = export_parity_table(configs_path("example_h2.yaml"))
     assert table.get("parity_export_schema_version") == "3"

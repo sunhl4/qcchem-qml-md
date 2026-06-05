@@ -1,6 +1,7 @@
 # qchem-stack local stack: worker + optional API (slim image).
 # Build: docker compose build
 # HMAC: set QCHEM_PROTOCOL_HMAC_KEY in production (never use the dev default).
+# Protocol blobs default to JSON v2 (QCHEM_PROTOCOL_BLOB_V2=1); set 0 only for legacy pickle write.
 
 services:
   qchem-worker:

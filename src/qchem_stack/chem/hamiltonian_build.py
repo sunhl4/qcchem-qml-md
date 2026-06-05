@@ -115,47 +115,6 @@ def molecular_hamiltonian_from_canonical_active_space_pack(
     )
 
 
-def molecular_hamiltonian_from_classical_reference(
-    reference: ClassicalMeanFieldReference,
-    n_active_orbitals: int,
-    n_active_electrons: int,
-    *,
-    fermion_qubit_mapping: FermionQubitMappingName = "jordan_wigner",
-    prefer_restricted_spatial_fermion_for_jordan_wigner: bool = False,
-    jordan_wigner_coeff_atol: float | None = None,
-) -> QubitHamiltonian:
-    """Build active-space molecular Hamiltonian from backend-agnostic mean-field reference.
-
-    .. deprecated::
-        Prefer :func:`qchem_stack.chem.pre_quantum_build.build_pre_quantum_input` or
-        :func:`qchem_stack.orchestration.pipeline.run_pipeline_from_config` for full
-        ``PreQuantumInput`` / repro metadata.
-    """
-
-    warnings.warn(
-        "molecular_hamiltonian_from_classical_reference is deprecated; use "
-        "qchem_stack.chem.pre_quantum_build.build_pre_quantum_input or the YAML pipeline.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    from qchem_stack.chem.bridges.canonical_integral_pack import CanonicalActiveSpaceIntegralPack
-
-    pack = CanonicalActiveSpaceIntegralPack.from_classical_reference(
-        reference,
-        n_active_orbitals=n_active_orbitals,
-        n_active_electrons=n_active_electrons,
-    )
-    return molecular_hamiltonian_from_canonical_active_space_pack(
-        pack,
-        n_active_orbitals=n_active_orbitals,
-        n_active_electrons=n_active_electrons,
-        fermion_qubit_mapping=fermion_qubit_mapping,
-        prefer_restricted_spatial_fermion_for_jordan_wigner=prefer_restricted_spatial_fermion_for_jordan_wigner,
-        jordan_wigner_coeff_atol=jordan_wigner_coeff_atol,
-        classical_reference_for_meta=reference,
-    )
-
-
 def fermionic_active_space_interaction_operator_from_classical_reference(
     reference: ClassicalMeanFieldReference,
     *,
@@ -312,7 +271,6 @@ __all__ = [
     "fermionic_active_space_interaction_operator_from_canonical_pack",
     "fermionic_active_space_interaction_operator_from_classical_reference",
     "molecular_hamiltonian_from_canonical_active_space_pack",
-    "molecular_hamiltonian_from_classical_reference",
     "qubit_hamiltonian_from_active_space_fermionic_operator",
     "qubit_hamiltonian_from_compact_restricted_active_space",
     "qubit_hamiltonian_from_spatial_chemist_integrals",

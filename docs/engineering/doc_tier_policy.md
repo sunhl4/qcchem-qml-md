@@ -26,7 +26,9 @@ Do not extend Tier 2 files for new features; add Tier 1 docs or CHANGELOG instea
 | Path | Role |
 |------|------|
 | `竞争定位*.md`, `工程记忆*.md` | Competitive positioning and narrative |
+| `qwen三模型评测*.md`, `组会汇报_*.md` | Research / presentation (non-runtime) |
 | [`internal/`](../internal/) | Maintainer audits and research notes |
+| [`research/README.md`](../research/README.md) | Index for Tier 3 docs |
 
 These inform backlog and UX but are **not** runtime dependencies. Code must not import from Tier 3 paths.
 

@@ -128,7 +128,8 @@ def secure_loads(data: bytes, expected_type: type | None = None) -> Any:
 
 
 def _protocol_blob_v2_enabled() -> bool:
-    return os.environ.get("QCHEM_PROTOCOL_BLOB_V2", "").lower() in {"1", "true", "yes"}
+    raw = os.environ.get("QCHEM_PROTOCOL_BLOB_V2", "1")
+    return str(raw).lower() not in {"0", "false", "no", "off"}
 
 
 def _signed_payload(data: bytes) -> bytes:

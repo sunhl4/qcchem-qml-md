@@ -20,7 +20,7 @@ from qchem_stack.backends.pauli_measure_expand import (
     hea_operations,
 )
 from qchem_stack.backends.profiles import (
-    apply_backend_profile,
+    apply_backend_profile_immutable,
     backend_profile_catalog_v1,
     get_backend_profile,
     list_backend_profile_ids,
@@ -54,7 +54,7 @@ __all__ = [
     "executor_from_spec",
     "register_backend_provider",
     "registered_backend_provider_ids",
-    "apply_backend_profile",
+    "apply_backend_profile_immutable",
     "backend_profile_catalog_v1",
     "get_backend_profile",
     "list_backend_profile_ids",

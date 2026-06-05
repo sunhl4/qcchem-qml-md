@@ -10,19 +10,6 @@ from pathlib import Path
 from qchem_stack.exceptions import PipelineError
 
 
-def _repo_root() -> Path:
-    """Repository root (contains ``scripts/``), for export helper in editable installs."""
-    here = Path(__file__).resolve().parent
-    for candidate in (here.parent.parent, here.parent):
-        if (candidate / "scripts" / "export_parity_criteria_table.py").is_file():
-            return candidate
-    raise SystemExit(
-        "qchem-export-parity: scripts/export_parity_criteria_table.py not found. "
-        "Use an editable install from the repository root, or run:\n"
-        "  python scripts/export_parity_criteria_table.py <config.yaml>"
-    )
-
-
 def main_run(argv: list[str] | None = None) -> int:
     """Run the YAML pipeline (``qchem-run``)."""
     ap = argparse.ArgumentParser(description="Run qchem-stack pipeline from experiment YAML.")
@@ -94,17 +81,26 @@ def main_run(argv: list[str] | None = None) -> int:
 
 def main_export_parity(argv: list[str] | None = None) -> int:
     """Export parity / Methods table JSON (``qchem-export-parity``)."""
-    root = _repo_root()
-    if str(root) not in sys.path:
-        sys.path.insert(0, str(root))
-    src = root / "src"
-    if str(src) not in sys.path:
-        sys.path.insert(0, str(src))
-    from scripts.export_parity_criteria_table import main as export_main
+    ap = argparse.ArgumentParser(description="Export parity / falsifiability table fields.")
+    ap.add_argument("config", type=Path, help="Experiment YAML path")
+    ap.add_argument("--results", type=Path, default=None, help="Optional JSON with pipeline output")
+    ap.add_argument(
+        "--max-pauli-export",
+        type=int,
+        default=None,
+        metavar="N",
+        help="Cap exported hamiltonian_pauli_strings mirror list length when using --results",
+    )
+    args = ap.parse_args(argv)
+    from qchem_stack.protocols.parity_criteria_export import export_parity_criteria_table
 
-    if argv is not None:
-        sys.argv = ["qchem-export-parity", *argv]
-    export_main()
+    out = export_parity_criteria_table(
+        args.config,
+        results_path=args.results,
+        max_pauli_export=args.max_pauli_export,
+    )
+    json.dump(out, sys.stdout, indent=2, sort_keys=False)
+    sys.stdout.write("\n")
     return 0
 
 

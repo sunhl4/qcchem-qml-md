@@ -15,12 +15,12 @@ def load_experiment_with_backend_profile(
     experiment_yaml: Path,
     profile_id: str,
 ) -> tuple[ExperimentConfig, BackendProfile, Path]:
-    """Load config and apply ``profile_id``; write resolved YAML beside caller output if needed."""
-    from qchem_stack.backends.profiles import apply_backend_profile
+    """Load config and apply ``profile_id`` (immutable backend update)."""
+    from qchem_stack.backends.profiles import apply_backend_profile_immutable
     from qchem_stack.config import load_experiment_config
 
     cfg = load_experiment_config(experiment_yaml)
-    prof = apply_backend_profile(cfg, profile_id)
+    cfg, prof = apply_backend_profile_immutable(cfg, profile_id)
     return cfg, prof, experiment_yaml
 
 

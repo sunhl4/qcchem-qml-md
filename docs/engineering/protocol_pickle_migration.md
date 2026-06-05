@@ -27,7 +27,8 @@ and the HMAC key as sensitive. Do not expose the worker API without authenticati
 
 ## Protocol v2 (JSON)
 
-Set ``QCHEM_PROTOCOL_BLOB_V2=1`` on workers to **write** HMAC-signed JSON blobs
+Workers **default** to HMAC-signed JSON blobs (``QCHEM_PROTOCOL_BLOB_V2`` defaults to ``1``).
+Set ``QCHEM_PROTOCOL_BLOB_V2=0`` only to **write** legacy pickle v1
 (``protocol_blob_version: 2``). Readers accept v2 JSON or legacy v1 pickle via
 ``PauliAveragingProtocol.loads()`` / ``secure_loads_protocol``. See
 [protocol_serialization_v2_rfc.md](protocol_serialization_v2_rfc.md).

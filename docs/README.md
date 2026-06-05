@@ -2,6 +2,14 @@
 
 This directory is the **engineering and contract** documentation for `qchem-stack`. User-facing tutorials and onboarding live in [`docusaurus-site/`](../docusaurus-site/) (build with `cd docusaurus-site && npm install && npm start`).
 
+> **Documentation zones (read the right tier)**
+>
+> | Zone | Start here | Not runtime API |
+> |------|------------|-----------------|
+> | **Product (3 must-read)** | [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md) · [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md) · [`public_parity_matrix.md`](public_parity_matrix.md) | — |
+> | **Reference (on demand)** | [`reference/config_field_index.md`](reference/config_field_index.md) · config `说明_*.md` | — |
+> | **Non-runtime** | [`research/README.md`](research/README.md) · [`execution/archive/`](execution/archive/) · [`internal/`](internal/) | Competitive research, day calendars, audits |
+
 ## Reader paths
 
 | Audience | Start here |
@@ -42,7 +50,7 @@ When changing parity export keys or pre-quantum allowed combos, update the repo 
 
 ### Engineering / product
 
-- [`engineering/api_stability_policy.md`](engineering/api_stability_policy.md), [`engineering/partial_to_l1_playbook.md`](engineering/partial_to_l1_playbook.md), [`engineering/pypi_release.md`](engineering/pypi_release.md)
+- [`engineering/api_stability_policy.md`](engineering/api_stability_policy.md), [`engineering/v1_0_acceptance.md`](engineering/v1_0_acceptance.md), [`engineering/migration_v0_8_to_v1_0.md`](engineering/migration_v0_8_to_v1_0.md), [`engineering/partial_to_l1_playbook.md`](engineering/partial_to_l1_playbook.md), [`engineering/pypi_release.md`](engineering/pypi_release.md)
 - [`engineering/protocol_pickle_migration.md`](engineering/protocol_pickle_migration.md), [`engineering/protocol_serialization_v2_rfc.md`](engineering/protocol_serialization_v2_rfc.md)
 - Generated config tables: [`generated/`](generated/) (`scripts/generate_config_reference_snippets.py`)
 - [`product/non_goals.md`](product/non_goals.md)

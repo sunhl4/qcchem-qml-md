@@ -12,6 +12,7 @@ from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 if TYPE_CHECKING:
+    from qchem_stack.config import NexusAnalogSpec
     from qchem_stack.mitigation.pmsv import PMSVConfig
 
 
@@ -38,6 +39,7 @@ class ProtocolBlobDocumentV2(TypedDict, total=False):
     pauli_support_max_terms: int | None
     classical_shadows_enabled: bool
     classical_shadows_budget_pairs: int
+    nexus_analog: dict[str, Any] | None
 
 
 def _serialize_qubit_operator(op: QubitOperator) -> dict[str, Any]:
@@ -126,6 +128,20 @@ def _pmsv_to_dict(pmsv: PMSVConfig | None) -> dict[str, Any] | None:
     }
 
 
+def _nexus_analog_to_dict(na: NexusAnalogSpec | None) -> dict[str, Any] | None:
+    if na is None:
+        return None
+    return na.model_dump()
+
+
+def _nexus_analog_from_dict(doc: dict[str, Any] | None) -> NexusAnalogSpec | None:
+    if not doc:
+        return None
+    from qchem_stack.config import NexusAnalogSpec
+
+    return NexusAnalogSpec.model_validate(doc)
+
+
 def _pmsv_from_dict(doc: dict[str, Any] | None) -> PMSVConfig | None:
     if not doc:
         return None
@@ -158,6 +174,7 @@ def protocol_to_v2_document(proto: PauliAveragingProtocol) -> ProtocolBlobDocume
         "pauli_support_max_terms": proto.pauli_support_max_terms,
         "classical_shadows_enabled": bool(proto.classical_shadows_enabled),
         "classical_shadows_budget_pairs": int(proto.classical_shadows_budget_pairs),
+        "nexus_analog": _nexus_analog_to_dict(proto.nexus_analog),
     }
     return doc
 
@@ -190,6 +207,7 @@ def protocol_from_v2_document(
         pauli_support_max_terms=doc.get("pauli_support_max_terms"),
         classical_shadows_enabled=bool(doc.get("classical_shadows_enabled", False)),
         classical_shadows_budget_pairs=int(doc.get("classical_shadows_budget_pairs", 256)),
+        nexus_analog=_nexus_analog_from_dict(cast("dict[str, Any] | None", doc.get("nexus_analog"))),
     )
 
 

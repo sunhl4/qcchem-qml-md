@@ -20,7 +20,7 @@ PRODUCT_CAPABILITY_MAP: dict[str, str] = {
     "JobRuntime": "qchem_stack.jobs.store.SqliteJobStore + qchem_stack.jobs.nexus_analog",
     "MitigationPipeline": "qchem_stack.mitigation.qermit_analog + qchem_stack.mitigation.qermit_runtime",
     "ChemistryDrivers": "qchem_stack.chem.solvers + qchem_stack.chem.bridges (legacy: chem.drivers)",
-    "EmbeddingFlow": "qchem_stack.chem.embedding + qchem_stack.integrations.dmet_self_consistent",
+    "EmbeddingFlow": "qchem_stack.chem.embedding + qchem_stack.chem.embedding.dmet_self_consistent",
     "MLMDBridge": "qchem_stack.md_bridge",
 }
 

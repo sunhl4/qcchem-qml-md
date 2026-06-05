@@ -49,7 +49,6 @@ def _all_imports(path: Path) -> list[str]:
 _CHEM_LAZY_INTEGRATIONS_ALLOWLIST = {
     "src/qchem_stack/chem/embedding/fragment_solvers/registry.py",
     "src/qchem_stack/chem/embedding/__init__.py",
-    "src/qchem_stack/chem/embedding/schmidt_variational_sidecar.py",
 }
 
 # Fragment impurity VQE bridges chem embedding SPI to quantum VQE at runtime only.

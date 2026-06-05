@@ -12,6 +12,7 @@ from qchem_stack.backends.spec import BackendSpec
 from qchem_stack.protocols.protocol import PauliAveragingProtocol
 from qchem_stack.protocols.secure_serialization import (
     secure_dumps,
+    secure_dumps_protocol,
     secure_loads,
     secure_loads_protocol,
 )
@@ -82,13 +83,27 @@ def test_secure_loads_protocol_rejects_non_allowlisted_pickle() -> None:
         del os.environ["QCHEM_ALLOW_LEGACY_PICKLE"]
 
 
-def test_secure_v2_roundtrip_when_env_enabled() -> None:
+def test_secure_v2_roundtrip_default_on() -> None:
+    import json
     import os
 
     proto = _minimal_protocol()
-    os.environ["QCHEM_PROTOCOL_BLOB_V2"] = "1"
+    os.environ.pop("QCHEM_PROTOCOL_BLOB_V2", None)
+    blob = secure_dumps_protocol(proto)
+    payload = blob[32:]
+    doc = json.loads(payload.decode("utf-8"))
+    assert doc.get("protocol_blob_version") == 2
+    loaded = secure_loads_protocol(blob)
+    assert loaded.n_qubits == proto.n_qubits
+
+
+def test_secure_v2_opt_out_with_env_zero() -> None:
+    import os
+
+    proto = _minimal_protocol()
+    os.environ["QCHEM_PROTOCOL_BLOB_V2"] = "0"
     try:
-        blob = secure_dumps(proto)
+        blob = secure_dumps_protocol(proto)
         loaded = secure_loads_protocol(blob)
         assert loaded.n_qubits == proto.n_qubits
     finally:

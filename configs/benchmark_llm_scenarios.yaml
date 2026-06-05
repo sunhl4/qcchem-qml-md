@@ -1,0 +1,95 @@
+# LLM benchmark prompts for quantum-algorithm-engineer evaluation.
+# Used by: scripts/benchmark_qwen_triple.py
+schema_version: '1'
+
+providers:
+  dashscope:
+    base_url: https://dashscope.aliyuncs.com/compatible-mode/v1
+    api_key_env: DASHSCOPE_API_KEY
+  openai_compat:
+    base_url: https://api.openai.com/v1
+    api_key_env: OPENAI_API_KEY
+
+models:
+  flash:
+    provider: dashscope
+    model_id: qwen-flash
+    label: qwen-flash
+  coder:
+    provider: dashscope
+    model_id: qwen3-coder-next
+    label: qwen3-coder-next
+  max:
+    provider: dashscope
+    model_id: qwen3.7-max
+    label: qwen3.7-max
+  gpt55:
+    provider: openai_compat
+    # Override via BENCHMARK_GPT_MODEL or --gpt-model if your endpoint uses another id.
+    model_id: gpt-5
+    label: GPT 5.5
+    optional: true
+    scenarios:
+      - S3_architecture
+
+scenarios:
+  S1_daily:
+    title: 轻量日常：概念解释与沟通
+    boundary_model: qwen-flash
+    system: |
+      你是量子计算算法工程师助手。回答要准确、简洁，面向已懂线性代数与量子力学基础的同事。
+    user: |
+      请用中文向合作算法工程师解释下面概念，总字数 180–220 字，分 3 条 bullet，不要代码：
+
+      主题：Jordan-Wigner 映射如何把费米子算符映射到 qubit 算符。
+
+      必须覆盖：
+      1) 为什么需要映射（量子硬件只原生支持 Pauli 门）
+      2) 映射后哈密顿量项的形式变化（字符串/局域性）
+      3) 一个实际代价（如链式 JW 的非局域性或 qubit 数）
+
+      禁止编造不存在的定理名称。
+
+  S2_coding:
+    title: 日常编程：可运行 Python 实现
+    boundary_model: qwen3-coder-next
+    system: |
+      你是资深 Python 量子算法工程师。只输出一个完整 Python 代码块，使用 typing，函数带 docstring，不要依赖外部库（numpy 可用）。
+    user: |
+      实现函数 `select_adapt_candidates(pool, gradient_scores, k, max_qubits)`：
+
+      - `pool`: list[tuple[str, tuple[int, ...]]]`，元素为 (算符名字, 涉及 qubit 索引)
+      - `gradient_scores`: dict[str, float]`，算符名 → |梯度|
+      - `k`: 本轮最多选几个算符
+      - `max_qubits`: 电路宽度上限
+
+      规则（按顺序）：
+      1) 只保留 gradient_scores 中存在且 score > 1e-8 的 pool 项
+      2) 按 score 降序
+      3) 若多个算符涉及 qubit 的并集超过 max_qubits，跳过该算符继续向下选
+      4) 选满 k 个或 pool 耗尽即停止
+      5) 返回 list[str]（算符名）
+
+      附带 3 个 assert 自测（写在 if __name__ == "__main__" 块），不要其他解释文字。
+
+  S3_architecture:
+    title: 复杂推理：架构与资源权衡
+    boundary_model: qwen3.7-max
+    system: |
+      你是量子-经典混合工作流架构师。输出结构化中文 memo，结论必须可执行，区分「推荐 / 条件推荐 / 不推荐」。
+    user: |
+      背景：你在维护 `qchem_stack` 流水线，分子 H4（4 电子/active 4 qubit 量级），目标：
+      (1) 基态能量 (2) 前 2 个激发态能量 (3) 在 NISQ 上可落地的 shot budget 上界。
+
+      现有模块：UCCSD-VQE、FermionicAdaptVQE、VQD、QSE（fermionic singles basis）、SCEOM sidecar。
+      约束：单实验总 shots 上界 5×10^5；允许 statevector 做开发对照，生产路径必须 shot-based。
+
+      请输出 memo（中文，800–1200 字），必须包含：
+      A. 推荐 pipeline 拓扑（文字流程图即可）
+      B. 三档方案对比表：{方案名, 预期精度, shots 量级, 实现复杂度, 主要风险}
+         至少包含：UCCSD-VQE only / Adapt-VQE + VQD / Adapt-VQE + QSE(gaussian_h)
+      C. 若 Adapt 与 UCCSD 二选一，给出决策树（≥3 个分支条件）
+      D. 明确「不推荐」的组合及原因（≥2 条）
+      E. 给算法工程师的 5 条验证实验（可测指标 + 通过阈值）
+
+      不要泛泛而谈 NISQ；必须绑定上述模块名与 shots 约束。

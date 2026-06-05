@@ -9,8 +9,6 @@ import pytest
 
 from tests.helpers.paths import configs_path
 
-pytestmark = pytest.mark.l1_md_ml
-
 pytest.importorskip("jax_md")
 
 
@@ -140,6 +138,7 @@ def test_md_validation_loop_three_rounds_mock_labeler(tmp_path: Path) -> None:
     assert (out_dir / "md_validation_summary.json").is_file()
 
 
+@pytest.mark.l1_md_ml
 def test_md_validation_loop_five_rounds_mock_labeler(tmp_path: Path) -> None:
     from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
 

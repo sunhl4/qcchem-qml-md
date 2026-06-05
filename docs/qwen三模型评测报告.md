@@ -96,6 +96,8 @@ qubits = [q for q in pool[filtered_sorted.index(name)][1]]
 | **3.7-max** |        ✅**明确否决 VQD**        | **约束最严** | **Adapt+QSE 主路径，~3×10⁵ shots** |
 | **GPT 5.5** | ✅**预算分层管理** | **约束严格 + 验证闭环** | **Adapt+QSE 主路径，增加 bootstrap / FCI / 对称性验证** |
 
+**GPT 5.5 完整原始输出（归档）**：[`artifacts/qwen_benchmark/gpt55_s3_architecture.md`](../artifacts/qwen_benchmark/gpt55_s3_architecture.md)（JSON：[`gpt55_s3_architecture.json`](../artifacts/qwen_benchmark/gpt55_s3_architecture.json)）
+
 #### S3 最终判定：qwen3.7-max vs GPT 5.5
 
 | 维度 | qwen3.7-max | GPT 5.5 | 胜者 |

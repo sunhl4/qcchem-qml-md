@@ -80,18 +80,6 @@ def build_pre_quantum_input(
     return pre_q
 
 
-def hamiltonian(cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference) -> QubitHamiltonian:
-    import warnings
-
-    warnings.warn(
-        "qchem_stack.chem.pre_quantum_build.hamiltonian is deprecated; "
-        "use build_pre_quantum_input(cfg, rhf).qubit_hamiltonian instead.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    return build_pre_quantum_input(cfg, rhf).qubit_hamiltonian
-
-
 # Backward-compatible alias used by orchestration and tests.
 hamiltonian_with_schmidt_context = build_pre_quantum_input_with_context
 

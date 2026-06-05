@@ -1,0 +1,1104 @@
+{
+  "components": {
+    "schemas": {
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "QMEFTrainerStubFitBody": {
+        "properties": {
+          "hyperparams": {
+            "additionalProperties": true,
+            "description": "Forwarded into StubTorchMLIPTrainer.fit meta",
+            "title": "Hyperparams",
+            "type": "object"
+          },
+          "qmef": {
+            "additionalProperties": true,
+            "description": "Validated QMEFDataset JSON",
+            "title": "Qmef",
+            "type": "object"
+          }
+        },
+        "required": [
+          "qmef"
+        ],
+        "title": "QMEFTrainerStubFitBody",
+        "type": "object"
+      },
+      "QMEFValidateBody": {
+        "properties": {
+          "qmef": {
+            "additionalProperties": true,
+            "description": "JSON object matching QMEFDataset (frames + optional provenance_yaml)",
+            "title": "Qmef",
+            "type": "object"
+          }
+        },
+        "required": [
+          "qmef"
+        ],
+        "title": "QMEFValidateBody",
+        "type": "object"
+      },
+      "RunRequest": {
+        "properties": {
+          "config_base_dir": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional base directory for resolving relative geometry_file/precomputed paths in experiment_yaml",
+            "title": "Config Base Dir"
+          },
+          "experiment_yaml": {
+            "description": "Full experiment YAML (same as CLI configs)",
+            "title": "Experiment Yaml",
+            "type": "string"
+          },
+          "job_db_path": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "SQLite path for queued jobs; default from QCHEM_JOB_DB or temp",
+            "title": "Job Db Path"
+          },
+          "project_slug": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional Nexus/organization project slug stored in meta (api_project_slug); pairs with workspace for listing",
+            "title": "Project Slug"
+          },
+          "sync": {
+            "default": false,
+            "description": "If true, run in-process and return full_pipeline_job_result_v1 (JSON-safe slim dict, same as async DONE payload)",
+            "title": "Sync",
+            "type": "boolean"
+          },
+          "workspace_label": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Optional Nexus-style project/workspace string stored in job meta (api_workspace_label)",
+            "title": "Workspace Label"
+          }
+        },
+        "required": [
+          "experiment_yaml"
+        ],
+        "title": "RunRequest",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "YamlPreviewBody": {
+        "properties": {
+          "experiment_yaml": {
+            "description": "YAML to validate; returns computable list without running chemistry",
+            "title": "Experiment Yaml",
+            "type": "string"
+          },
+          "include_computables_rich": {
+            "default": false,
+            "description": "Optional parallel field: adds computables_rich (schema computables_rich_v1) without removing computable_abstract",
+            "title": "Include Computables Rich",
+            "type": "boolean"
+          }
+        },
+        "required": [
+          "experiment_yaml"
+        ],
+        "title": "YamlPreviewBody",
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "description": "Local API + SQLite queue for product workflows and reproducibility metadata.",
+    "title": "qchem-stack",
+    "version": "1.0.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Health",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/health/ready": {
+      "get": {
+        "operationId": "ready_health_ready_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Ready Health Ready Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ready",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/v1/meta/capability-surface": {
+      "get": {
+        "operationId": "capability_surface_v1_meta_capability_surface_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Capability Surface V1 Meta Capability Surface Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Capability Surface",
+        "tags": [
+          "meta",
+          "product"
+        ]
+      }
+    },
+    "/v1/meta/computables-preview": {
+      "post": {
+        "operationId": "computables_preview_v1_meta_computables_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/YamlPreviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Computables Preview V1 Meta Computables Preview Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Computables Preview",
+        "tags": [
+          "meta",
+          "product"
+        ]
+      }
+    },
+    "/v1/meta/ml-md-bridge": {
+      "get": {
+        "operationId": "ml_md_bridge_meta_v1_meta_ml_md_bridge_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Ml Md Bridge Meta V1 Meta Ml Md Bridge Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Ml Md Bridge Meta",
+        "tags": [
+          "ml_md"
+        ]
+      }
+    },
+    "/v1/meta/ml-md-trainer-stub-fit": {
+      "post": {
+        "operationId": "ml_md_trainer_stub_fit_v1_meta_ml_md_trainer_stub_fit_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QMEFTrainerStubFitBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Ml Md Trainer Stub Fit V1 Meta Ml Md Trainer Stub Fit Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Ml Md Trainer Stub Fit",
+        "tags": [
+          "ml_md"
+        ]
+      }
+    },
+    "/v1/meta/parity-gaps": {
+      "get": {
+        "operationId": "parity_gaps_v1_meta_parity_gaps_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Parity Gaps V1 Meta Parity Gaps Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Parity Gaps",
+        "tags": [
+          "meta",
+          "product"
+        ]
+      }
+    },
+    "/v1/meta/product-surface": {
+      "get": {
+        "operationId": "product_surface_v1_meta_product_surface_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Product Surface V1 Meta Product Surface Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "Product Surface",
+        "tags": [
+          "meta",
+          "product",
+          "product"
+        ]
+      }
+    },
+    "/v1/meta/qmef-validate": {
+      "post": {
+        "operationId": "qmef_validate_v1_meta_qmef_validate_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/QMEFValidateBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Qmef Validate V1 Meta Qmef Validate Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Qmef Validate",
+        "tags": [
+          "ml_md"
+        ]
+      }
+    },
+    "/v1/meta/queue-stats": {
+      "get": {
+        "operationId": "queue_stats_v1_meta_queue_stats_get",
+        "parameters": [
+          {
+            "description": "SQLite path; default QCHEM_JOB_DB or temp",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "SQLite path; default QCHEM_JOB_DB or temp",
+              "title": "Job Db Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Queue Stats V1 Meta Queue Stats Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Queue Stats",
+        "tags": [
+          "meta",
+          "product"
+        ]
+      }
+    },
+    "/v1/meta/workflow-preview": {
+      "post": {
+        "operationId": "workflow_preview_v1_meta_workflow_preview_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/YamlPreviewBody"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Workflow Preview V1 Meta Workflow Preview Post",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Workflow Preview",
+        "tags": [
+          "meta",
+          "product",
+          "product"
+        ]
+      }
+    },
+    "/v1/runs": {
+      "get": {
+        "operationId": "list_runs_v1_runs_get",
+        "parameters": [
+          {
+            "description": "SQLite path; default QCHEM_JOB_DB or temp",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "SQLite path; default QCHEM_JOB_DB or temp",
+              "title": "Job Db Path"
+            }
+          },
+          {
+            "description": "Filter: QUEUED, RUNNING, DONE, FAILED",
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter: QUEUED, RUNNING, DONE, FAILED",
+              "title": "Status"
+            }
+          },
+          {
+            "description": "Filter e.g. full_pipeline, pauli_protocol",
+            "in": "query",
+            "name": "job_kind",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter e.g. full_pipeline, pauli_protocol",
+              "title": "Job Kind"
+            }
+          },
+          {
+            "description": "Filter jobs whose store meta JSON contains this experiment_id",
+            "in": "query",
+            "name": "experiment_id",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter jobs whose store meta JSON contains this experiment_id",
+              "title": "Experiment Id"
+            }
+          },
+          {
+            "description": "Filter by meta.api_workspace_label (POST workspace_label)",
+            "in": "query",
+            "name": "api_workspace_label",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by meta.api_workspace_label (POST workspace_label)",
+              "title": "Api Workspace Label"
+            }
+          },
+          {
+            "description": "Filter by meta.api_project_slug (POST project_slug)",
+            "in": "query",
+            "name": "api_project_slug",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Filter by meta.api_project_slug (POST project_slug)",
+              "title": "Api Project Slug"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 50,
+              "maximum": 500,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          },
+          {
+            "description": "Skip N newest rows (pagination)",
+            "in": "query",
+            "name": "offset",
+            "required": false,
+            "schema": {
+              "default": 0,
+              "description": "Skip N newest rows (pagination)",
+              "maximum": 10000,
+              "minimum": 0,
+              "title": "Offset",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response List Runs V1 Runs Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "List Runs",
+        "tags": [
+          "runs"
+        ]
+      },
+      "post": {
+        "operationId": "post_run_v1_runs_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RunRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Post Run",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{job_id}": {
+      "get": {
+        "operationId": "get_run_v1_runs__job_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Must match the DB used when enqueueing",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must match the DB used when enqueueing",
+              "title": "Job Db Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Run V1 Runs  Job Id  Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Run",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{job_id}/events": {
+      "get": {
+        "operationId": "get_run_events_v1_runs__job_id__events_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Must match enqueue DB",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must match enqueue DB",
+              "title": "Job Db Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Run Events V1 Runs  Job Id  Events Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Run Events",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{job_id}/repro": {
+      "get": {
+        "operationId": "get_run_repro_v1_runs__job_id__repro_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Must match enqueue DB",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must match enqueue DB",
+              "title": "Job Db Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Run Repro V1 Runs  Job Id  Repro Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Run Repro",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{job_id}/status": {
+      "get": {
+        "operationId": "get_run_status_v1_runs__job_id__status_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Must match enqueue DB",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must match enqueue DB",
+              "title": "Job Db Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Run Status V1 Runs  Job Id  Status Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Run Status",
+        "tags": [
+          "runs"
+        ]
+      }
+    },
+    "/v1/runs/{job_id}/summary": {
+      "get": {
+        "operationId": "get_run_summary_ux_v1_runs__job_id__summary_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "job_id",
+            "required": true,
+            "schema": {
+              "title": "Job Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "Must match enqueue DB",
+            "in": "query",
+            "name": "job_db_path",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "Must match enqueue DB",
+              "title": "Job Db Path"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": true,
+                  "title": "Response Get Run Summary Ux V1 Runs  Job Id  Summary Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "summary": "Get Run Summary Ux",
+        "tags": [
+          "runs"
+        ]
+      }
+    }
+  },
+  "tags": [
+    {
+      "description": "Liveness and readiness probes.",
+      "name": "health"
+    },
+    {
+      "description": "Product / parity metadata for dashboards.",
+      "name": "meta"
+    },
+    {
+      "description": "Workflow stages and computable graph previews for product UX.",
+      "name": "product"
+    },
+    {
+      "description": "QMEFDataset validation + MLIP stub hooks (training exports live client-side).",
+      "name": "ml_md"
+    },
+    {
+      "description": "Submit experiments and poll SQLite-backed jobs.",
+      "name": "runs"
+    }
+  ]
+}

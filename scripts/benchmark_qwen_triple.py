@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run 3-scenario × 3-model Qwen benchmark for quantum algorithm engineer evaluation."""
+"""Run LLM benchmark for quantum algorithm engineer evaluation (Qwen + optional GPT)."""
 
 from __future__ import annotations
 
@@ -12,78 +12,49 @@ import urllib.request
 from dataclasses import asdict, dataclass
 from datetime import datetime, timezone
 from pathlib import Path
+from typing import Any
 
-DEFAULT_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
-MODELS = {
-    "flash": "qwen-flash",
-    "coder": "qwen3-coder-next",
-    "max": "qwen3.7-max",
-}
+import yaml
 
-SCENARIOS = {
+ROOT = Path(__file__).resolve().parents[1]
+DEFAULT_CONFIG = ROOT / "configs" / "benchmark_llm_scenarios.yaml"
+DEFAULT_DASHSCOPE_BASE_URL = "https://dashscope.aliyuncs.com/compatible-mode/v1"
+DEFAULT_OPENAI_BASE_URL = "https://api.openai.com/v1"
+
+# Fallback if config file is missing (keeps script usable in minimal checkouts).
+_FALLBACK_SCENARIOS: dict[str, dict[str, str]] = {
     "S1_daily": {
         "title": "轻量日常：概念解释与沟通",
         "boundary_model": "qwen-flash",
         "system": (
             "你是量子计算算法工程师助手。回答要准确、简洁，面向已懂线性代数与量子力学基础的同事。"
         ),
-        "user": """请用中文向合作算法工程师解释下面概念，总字数 180–220 字，分 3 条 bullet，不要代码：
-
-主题：Jordan-Wigner 映射如何把费米子算符映射到 qubit 算符。
-
-必须覆盖：
-1) 为什么需要映射（量子硬件只原生支持 Pauli 门）
-2) 映射后哈密顿量项的形式变化（字符串/局域性）
-3) 一个实际代价（如链式 JW 的非局域性或 qubit 数）
-
-禁止编造不存在的定理名称。""",
+        "user": (
+            "请用中文向合作算法工程师解释 Jordan-Wigner 映射（180–220 字，3 条 bullet，不要代码）。"
+        ),
     },
     "S2_coding": {
         "title": "日常编程：可运行 Python 实现",
         "boundary_model": "qwen3-coder-next",
-        "system": (
-            "你是资深 Python 量子算法工程师。只输出一个完整 Python 代码块，"
-            "使用 typing，函数带 docstring，不要依赖外部库（numpy 可用）。"
-        ),
-        "user": """实现函数 `select_adapt_candidates(pool, gradient_scores, k, max_qubits)`：
-
-- `pool`: list[tuple[str, tuple[int, ...]]]`，元素为 (算符名字, 涉及 qubit 索引)
-- `gradient_scores`: dict[str, float]`，算符名 → |梯度|
-- `k`: 本轮最多选几个算符
-- `max_qubits`: 电路宽度上限
-
-规则（按顺序）：
-1) 只保留 gradient_scores 中存在且 score > 1e-8 的 pool 项
-2) 按 score 降序
-3) 若多个算符涉及 qubit 的并集超过 max_qubits，跳过该算符继续向下选
-4) 选满 k 个或 pool 耗尽即停止
-5) 返回 list[str]（算符名）
-
-附带 3 个 assert 自测（写在 if __name__ == "__main__" 块），不要其他解释文字。""",
+        "system": "你是资深 Python 量子算法工程师。只输出一个完整 Python 代码块。",
+        "user": "实现 `select_adapt_candidates(pool, gradient_scores, k, max_qubits)` 并附 3 个 assert。",
     },
     "S3_architecture": {
         "title": "复杂推理：架构与资源权衡",
         "boundary_model": "qwen3.7-max",
-        "system": (
-            "你是量子-经典混合工作流架构师。输出结构化中文 memo，"
-            "结论必须可执行，区分「推荐 / 条件推荐 / 不推荐」。"
-        ),
-        "user": """背景：你在维护 `qchem_stack` 流水线，分子 H4（4 电子/active 4 qubit 量级），目标：
-(1) 基态能量 (2) 前 2 个激发态能量 (3) 在 NISQ 上可落地的 shot budget 上界。
-
-现有模块：UCCSD-VQE、FermionicAdaptVQE、VQD、QSE（fermionic singles basis）、SCEOM sidecar。
-约束：单实验总 shots 上界 5×10^5；允许 statevector 做开发对照，生产路径必须 shot-based。
-
-请输出 memo（中文，800–1200 字），必须包含：
-A. 推荐 pipeline 拓扑（文字流程图即可）
-B. 三档方案对比表：{方案名, 预期精度, shots 量级, 实现复杂度, 主要风险}
-   至少包含：UCCSD-VQE only / Adapt-VQE + VQD / Adapt-VQE + QSE(gaussian_h)
-C. 若 Adapt 与 UCCSD 二选一，给出决策树（≥3 个分支条件）
-D. 明确「不推荐」的组合及原因（≥2 条）
-E. 给算法工程师的 5 条验证实验（可测指标 + 通过阈值）
-
-不要泛泛而谈 NISQ；必须绑定上述模块名与 shots 约束。""",
+        "system": "你是量子-经典混合工作流架构师。输出结构化中文 memo。",
+        "user": "H4 激发态流水线 memo（A–E），shots ≤ 5×10^5。",
     },
+}
+
+_FALLBACK_MODELS: dict[str, dict[str, Any]] = {
+    "flash": {"provider": "dashscope", "model_id": "qwen-flash", "label": "qwen-flash"},
+    "coder": {
+        "provider": "dashscope",
+        "model_id": "qwen3-coder-next",
+        "label": "qwen3-coder-next",
+    },
+    "max": {"provider": "dashscope", "model_id": "qwen3.7-max", "label": "qwen3.7-max"},
 }
 
 
@@ -98,6 +69,35 @@ class RunResult:
     total_tokens: int
     content: str
     error: str | None = None
+
+
+def load_benchmark_config(path: Path) -> tuple[dict[str, Any], dict[str, dict[str, str]]]:
+    if not path.is_file():
+        return _FALLBACK_MODELS, _FALLBACK_SCENARIOS
+    data = yaml.safe_load(path.read_text(encoding="utf-8"))
+    models = data.get("models") or _FALLBACK_MODELS
+    scenarios = data.get("scenarios") or _FALLBACK_SCENARIOS
+    return models, scenarios
+
+
+def provider_credentials(
+    providers: dict[str, Any],
+    provider_name: str,
+    *,
+    dashscope_api_key: str | None,
+    openai_api_key: str | None,
+    dashscope_base_url: str,
+    openai_base_url: str,
+) -> tuple[str, str]:
+    spec = providers.get(provider_name) or {}
+    env_name = spec.get("api_key_env") or ""
+    if provider_name == "dashscope":
+        api_key = dashscope_api_key or os.environ.get(env_name or "DASHSCOPE_API_KEY") or ""
+        base_url = dashscope_base_url or spec.get("base_url") or DEFAULT_DASHSCOPE_BASE_URL
+    else:
+        api_key = openai_api_key or os.environ.get(env_name or "OPENAI_API_KEY") or ""
+        base_url = openai_base_url or spec.get("base_url") or DEFAULT_OPENAI_BASE_URL
+    return base_url, api_key
 
 
 def chat_completion(
@@ -136,10 +136,76 @@ def chat_completion(
     return content, usage, elapsed
 
 
-def run_benchmark(api_key: str, base_url: str, timeout: int) -> list[RunResult]:
+def select_models(
+    all_models: dict[str, Any],
+    *,
+    with_gpt55: bool,
+) -> dict[str, Any]:
+    selected: dict[str, Any] = {}
+    for key, spec in all_models.items():
+        if spec.get("optional") and not with_gpt55:
+            continue
+        selected[key] = spec
+    return selected
+
+
+def run_benchmark(
+    models: dict[str, Any],
+    scenarios: dict[str, dict[str, str]],
+    providers: dict[str, Any],
+    *,
+    dashscope_api_key: str | None,
+    openai_api_key: str | None,
+    dashscope_base_url: str,
+    openai_base_url: str,
+    gpt_model_id: str | None,
+    timeout: int,
+) -> list[RunResult]:
     results: list[RunResult] = []
-    for scenario_id, spec in SCENARIOS.items():
-        for model_key, model_id in MODELS.items():
+    creds_cache: dict[str, tuple[str, str]] = {}
+
+    for scenario_id, spec in scenarios.items():
+        for model_key, model_spec in models.items():
+            allowed = model_spec.get("scenarios")
+            if allowed and scenario_id not in allowed:
+                continue
+
+            provider_name = model_spec.get("provider", "dashscope")
+            if provider_name not in creds_cache:
+                base_url, api_key = provider_credentials(
+                    providers,
+                    provider_name,
+                    dashscope_api_key=dashscope_api_key,
+                    openai_api_key=openai_api_key,
+                    dashscope_base_url=dashscope_base_url,
+                    openai_base_url=openai_base_url,
+                )
+                creds_cache[provider_name] = (base_url, api_key)
+            else:
+                base_url, api_key = creds_cache[provider_name]
+
+            model_id = model_spec.get("model_id", model_key)
+            if model_key == "gpt55" and gpt_model_id:
+                model_id = gpt_model_id
+            display_id = model_spec.get("label") or model_id
+
+            if not api_key:
+                env_hint = (providers.get(provider_name) or {}).get("api_key_env", "API_KEY")
+                results.append(
+                    RunResult(
+                        scenario_id=scenario_id,
+                        model_key=model_key,
+                        model_id=display_id,
+                        latency_s=0.0,
+                        prompt_tokens=0,
+                        completion_tokens=0,
+                        total_tokens=0,
+                        content="",
+                        error=f"Missing API key for {provider_name} (set {env_hint})",
+                    )
+                )
+                continue
+
             try:
                 content, usage, elapsed = chat_completion(
                     base_url,
@@ -153,7 +219,7 @@ def run_benchmark(api_key: str, base_url: str, timeout: int) -> list[RunResult]:
                     RunResult(
                         scenario_id=scenario_id,
                         model_key=model_key,
-                        model_id=model_id,
+                        model_id=display_id,
                         latency_s=round(elapsed, 2),
                         prompt_tokens=int(usage.get("prompt_tokens") or 0),
                         completion_tokens=int(usage.get("completion_tokens") or 0),
@@ -167,7 +233,7 @@ def run_benchmark(api_key: str, base_url: str, timeout: int) -> list[RunResult]:
                     RunResult(
                         scenario_id=scenario_id,
                         model_key=model_key,
-                        model_id=model_id,
+                        model_id=display_id,
                         latency_s=0.0,
                         prompt_tokens=0,
                         completion_tokens=0,
@@ -181,7 +247,7 @@ def run_benchmark(api_key: str, base_url: str, timeout: int) -> list[RunResult]:
                     RunResult(
                         scenario_id=scenario_id,
                         model_key=model_key,
-                        model_id=model_id,
+                        model_id=display_id,
                         latency_s=0.0,
                         prompt_tokens=0,
                         completion_tokens=0,
@@ -193,19 +259,26 @@ def run_benchmark(api_key: str, base_url: str, timeout: int) -> list[RunResult]:
     return results
 
 
-def write_outputs(results: list[RunResult], out_dir: Path) -> None:
+def write_outputs(
+    results: list[RunResult],
+    out_dir: Path,
+    *,
+    scenarios: dict[str, dict[str, str]],
+    prefix: str,
+) -> None:
     out_dir.mkdir(parents=True, exist_ok=True)
     stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
-    json_path = out_dir / f"qwen_benchmark_{stamp}.json"
-    md_path = out_dir / f"qwen_benchmark_{stamp}.md"
+    json_path = out_dir / f"{prefix}_{stamp}.json"
+    md_path = out_dir / f"{prefix}_{stamp}.md"
 
     json_path.write_text(
         json.dumps([asdict(r) for r in results], ensure_ascii=False, indent=2),
         encoding="utf-8",
     )
 
+    title = "LLM 评测原始结果" if prefix != "qwen_benchmark" else "千问三模型评测原始结果"
     lines = [
-        "# 千问三模型评测原始结果",
+        f"# {title}",
         "",
         f"生成时间（UTC）：{stamp}",
         "",
@@ -221,7 +294,7 @@ def write_outputs(results: list[RunResult], out_dir: Path) -> None:
             f"{r.prompt_tokens} | {r.completion_tokens} | {status} |"
         )
 
-    for scenario_id in SCENARIOS:
+    for scenario_id in scenarios:
         lines.extend(["", f"## {scenario_id}", ""])
         for r in results:
             if r.scenario_id != scenario_id:
@@ -240,9 +313,31 @@ def write_outputs(results: list[RunResult], out_dir: Path) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument(
+        "--config",
+        type=Path,
+        default=DEFAULT_CONFIG,
+        help="YAML with providers, models, and scenario prompts",
+    )
     parser.add_argument("--api-key", default=os.environ.get("DASHSCOPE_API_KEY"))
     parser.add_argument(
-        "--base-url", default=os.environ.get("DASHSCOPE_BASE_URL", DEFAULT_BASE_URL)
+        "--base-url",
+        default=os.environ.get("DASHSCOPE_BASE_URL", DEFAULT_DASHSCOPE_BASE_URL),
+    )
+    parser.add_argument("--openai-api-key", default=os.environ.get("OPENAI_API_KEY"))
+    parser.add_argument(
+        "--openai-base-url",
+        default=os.environ.get("OPENAI_BASE_URL", DEFAULT_OPENAI_BASE_URL),
+    )
+    parser.add_argument(
+        "--gpt-model",
+        default=os.environ.get("BENCHMARK_GPT_MODEL"),
+        help="API model id when using --with-gpt55 (default from config or gpt-5)",
+    )
+    parser.add_argument(
+        "--with-gpt55",
+        action="store_true",
+        help="Also run optional GPT model on configured scenarios (default: S3 only)",
     )
     parser.add_argument("--timeout", type=int, default=120)
     parser.add_argument(
@@ -251,12 +346,40 @@ def main() -> int:
         default=Path("artifacts/qwen_benchmark"),
     )
     args = parser.parse_args()
-    if not args.api_key:
+
+    config_data: dict[str, Any] = {}
+    if args.config.is_file():
+        config_data = yaml.safe_load(args.config.read_text(encoding="utf-8")) or {}
+
+    models, scenarios = load_benchmark_config(args.config)
+    providers = config_data.get("providers") or {}
+    active_models = select_models(models, with_gpt55=args.with_gpt55)
+
+    needs_dashscope = any(
+        m.get("provider", "dashscope") == "dashscope" for m in active_models.values()
+    )
+    if needs_dashscope and not args.api_key:
         print("Set DASHSCOPE_API_KEY or pass --api-key", flush=True)
         return 2
 
-    results = run_benchmark(args.api_key, args.base_url, args.timeout)
-    write_outputs(results, args.out_dir)
+    gpt_model_id = args.gpt_model
+    if args.with_gpt55 and not gpt_model_id:
+        gpt_spec = models.get("gpt55") or {}
+        gpt_model_id = gpt_spec.get("model_id", "gpt-5")
+
+    results = run_benchmark(
+        active_models,
+        scenarios,
+        providers,
+        dashscope_api_key=args.api_key,
+        openai_api_key=args.openai_api_key,
+        dashscope_base_url=args.base_url,
+        openai_base_url=args.openai_base_url,
+        gpt_model_id=gpt_model_id,
+        timeout=args.timeout,
+    )
+    prefix = "llm_benchmark" if args.with_gpt55 else "qwen_benchmark"
+    write_outputs(results, args.out_dir, scenarios=scenarios, prefix=prefix)
     return 0
 
 

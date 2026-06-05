@@ -24,10 +24,11 @@ keywords:
 
 ```bash
 cd qchem_qml_md
-pip install -e ".[dev]"
+./scripts/bootstrap_dev.sh
+export QCHEM_STACK_PYTHON="$(pwd)/.venv/bin/python"
 ```
 
-维护者全量：`[dev]`。仅经典化学：`pip install -e ".[chem]"`。无 PySCF 烟测：`python scripts/smoke_pipeline.py --precomputed-only`。
+或手动：`pip install -e ".[dev]"`。仅经典化学：`pip install -e ".[chem]"`。无 PySCF 烟测：`python scripts/smoke_pipeline.py --precomputed-only`。
 
 ## 2. 跑最小端到端（YAML）
 

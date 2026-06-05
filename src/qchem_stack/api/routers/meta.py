@@ -5,6 +5,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Body, HTTPException, Query, Request, Response
 
+from qchem_stack.api.contract import with_api_contract
 from qchem_stack.api.deps import (
     default_job_db_path,
     experiment_config_from_request_yaml,
@@ -31,7 +32,7 @@ router = APIRouter(tags=["meta", "product"])
 def product_surface() -> dict[str, object]:
     from qchem_stack import __version__
 
-    return {
+    return with_api_contract({
         "schema": PRODUCT_SURFACE_V1,
         "qchem_stack_version": __version__,
         "capability_notes": [
@@ -44,7 +45,7 @@ def product_surface() -> dict[str, object]:
         "gap_export": "/v1/meta/parity-gaps",
         "capability_surface": "/v1/meta/capability-surface",
         "ml_md_bridge": "/v1/meta/ml-md-bridge",
-    }
+    })
 
 
 @router.get("/v1/meta/capability-surface")
@@ -71,7 +72,7 @@ def capability_surface(request: Request) -> dict[str, object]:
             status_code=500,
             detail={"message": "invalid product_gap_categories contract", "errors": errs},
         )
-    payload: dict[str, object] = {
+    payload: dict[str, object] = with_api_contract({
         "schema": CAPABILITY_SURFACE_V2,
         "qchem_stack_version": __version__,
         "capability_map": product_capability_map_for_docs(),
@@ -85,7 +86,7 @@ def capability_surface(request: Request) -> dict[str, object]:
         "excited_registry_export_v1": excited_registry_export(),
         "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
         "ansatz_protocol_matrix_v1": ansatz_protocol_matrix_v1(),
-    }
+    })
     body = api_json_dumps(payload, sort_keys=True)
     etag = hashlib.sha256(body.encode("utf-8")).hexdigest()[:32]
     if_none = request.headers.get("if-none-match", "").strip().strip('"')
@@ -113,12 +114,12 @@ def parity_gaps() -> dict[str, object]:
             status_code=500,
             detail={"message": "invalid product_gap_categories contract", "errors": errs},
         )
-    return {
+    return with_api_contract({
         "schema": CAPABILITY_GAP_EXPORT_V1,
         "qchem_stack_version": __version__,
         "gaps": product_gap_categories(),
         "gap_anchor_index_v1": product_gap_anchor_index_v1(),
-    }
+    })
 
 
 @router.post("/v1/meta/workflow-preview", tags=["product"])
@@ -127,7 +128,9 @@ def workflow_preview(
     request: Request, body: Annotated[YamlPreviewBody, Body()]
 ) -> dict[str, object]:
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
-    return workflow_preview_payload(cfg, include_computables_rich=body.include_computables_rich)
+    return with_api_contract(
+        workflow_preview_payload(cfg, include_computables_rich=body.include_computables_rich)
+    )
 
 
 @router.post("/v1/meta/computables-preview")
@@ -137,12 +140,12 @@ def computables_preview(
 ) -> dict[str, object]:
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
     refs = list_computables_for_config(cfg)
-    return {
+    return with_api_contract({
         "schema": COMPUTABLES_PREVIEW_V1,
         "experiment_id": cfg.experiment_id,
         "computables": [{"name": r.name, "kind": r.kind, "details": r.details} for r in refs],
         "computable_abstract": computables_export_dict(cfg, protocol_counts=None),
-    }
+    })
 
 
 @router.get("/v1/meta/queue-stats")
@@ -153,8 +156,8 @@ def queue_stats(
 ) -> dict[str, object]:
     db = validate_db_path(job_db_path) if job_db_path else default_job_db_path()
     store = sqlite_job_store(str(db))
-    return {
+    return with_api_contract({
         "schema": QUEUE_STATS_V1,
         "job_db": str(store.path.resolve()),
         "counts": store.count_by_status(),
-    }
+    })

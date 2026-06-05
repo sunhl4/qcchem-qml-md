@@ -78,10 +78,10 @@ def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig)
         snap["dmet_open_loop_architecture"] = {
             "schema": DMET_OPEN_ARCHITECTURE_V1,
             "self_consistency_loop_class": (
-                "qchem_stack.integrations.dmet_self_consistent.DMETSelfConsistencyLoop"
+                "qchem_stack.chem.embedding.dmet_self_consistent.DMETSelfConsistencyLoop"
             ),
             "one_shot_driver_class": (
-                "qchem_stack.integrations.dmet_self_consistent.OneShotEmbeddingDriver"
+                "qchem_stack.chem.embedding.dmet_self_consistent.OneShotEmbeddingDriver"
             ),
             "fragment_solver_hook": "qchem_stack.chem.embedding.dmet.FragmentSolverProtocol",
             "scf_cycles_yaml": cfg.embedding.n_scf_cycles_embedding,

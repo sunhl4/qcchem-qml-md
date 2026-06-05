@@ -17,7 +17,7 @@ from qchem_stack.integrations import (
     qermit_capability_matrix,
     tensornet_closure_strategy,
 )
-from qchem_stack.integrations.dmet_self_consistent import DMETBathState, DMETSelfConsistencyLoop
+from qchem_stack.chem.embedding.dmet_self_consistent import DMETBathState, DMETSelfConsistencyLoop
 from qchem_stack.integrations.tket_fullchain import (
     TketCompileMode,
     circuit_ir_to_tket_stats_or_none,

@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import warnings
 from dataclasses import dataclass
 from typing import TYPE_CHECKING, Any, Literal
 
@@ -118,45 +117,12 @@ def get_backend_profile(profile_id: str) -> BackendProfile:
     return prof
 
 
-def apply_backend_profile(cfg: ExperimentConfig, profile_id: str) -> BackendProfile:
-    """Mutate ``cfg.backend`` in place to match ``profile_id``.
-
-    .. deprecated::
-        This function mutates the config object in place, which can lead to
-        unexpected side effects. Use :func:`apply_backend_profile_immutable`
-        instead, which returns a new config object.
-    """
-    warnings.warn(
-        "apply_backend_profile() mutates config in place and is deprecated. "
-        "Use apply_backend_profile_immutable() instead, which returns a new config object.",
-        DeprecationWarning,
-        stacklevel=2,
-    )
-    prof = get_backend_profile(profile_id)
-    b = cfg.backend
-    b.name = prof.name
-    b.provider = prof.provider  # type: ignore[assignment]
-    b.qiskit_mode = prof.qiskit_mode
-    if prof.uqc_mode is not None:
-        b.uqc_mode = prof.uqc_mode
-        meta = dict(b.meta)
-        meta["uqc_mode"] = prof.uqc_mode
-        if prof.meta:
-            meta.update(prof.meta)
-        b.meta = meta
-    elif prof.meta:
-        meta = dict(b.meta)
-        meta.update(prof.meta)
-        b.meta = meta
-    return prof
-
-
 def apply_backend_profile_immutable(
     cfg: ExperimentConfig, profile_id: str
 ) -> tuple[ExperimentConfig, BackendProfile]:
     """Return a new config with backend fields updated to match ``profile_id``.
 
-    This is the preferred, immutable variant of :func:`apply_backend_profile`.
+    Apply a named backend profile and return an updated config copy.
     Instead of mutating the config in place, it returns a new config object
     using Pydantic's ``model_copy(update=...)`` pattern.
 

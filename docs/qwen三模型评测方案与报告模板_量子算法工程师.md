@@ -134,13 +134,19 @@ E. 给算法工程师的 5 条验证实验（可测指标 + 通过阈值）
 # 1. 设置 API Key（华北2 按量计费示例）
 export DASHSCOPE_API_KEY="sk-xxx"
 
-# 2. 跑 3 场景 × 3 模型 = 9 次调用
-cd /home/sunhl/projects/qchem_qml_md
+# 2. 跑 3 场景 × 3 模型 = 9 次调用（Prompt 见 configs/benchmark_llm_scenarios.yaml）
 python scripts/benchmark_qwen_triple.py
 
 # 3. 结果输出到 artifacts/qwen_benchmark/
 #    - qwen_benchmark_<timestamp>.json  （机器可读）
 #    - qwen_benchmark_<timestamp>.md    （原始回答汇总）
+
+# 可选：S3 第四对照 GPT（OpenAI 兼容 API）
+export OPENAI_API_KEY="sk-xxx"
+python scripts/benchmark_qwen_triple.py --with-gpt55
+
+# GPT 5.5 Cursor 归档（无需 API）：
+#    artifacts/qwen_benchmark/gpt55_s3_architecture.md
 ```
 
 **API 参数建议：** `temperature=0.3`（已在脚本中），每个场景记录 latency 与 token 用量。

@@ -1,0 +1,46 @@
+[importlinter]
+root_packages =
+    qchem_stack
+
+[importlinter:contract:chem-no-orchestration]
+name = chem must not import orchestration
+type = forbidden
+source_modules =
+    qchem_stack.chem
+forbidden_modules =
+    qchem_stack.orchestration
+
+[importlinter:contract:quantum-no-orchestration]
+name = quantum must not import orchestration
+type = forbidden
+source_modules =
+    qchem_stack.quantum
+forbidden_modules =
+    qchem_stack.orchestration
+
+[importlinter:contract:protocols-no-orchestration]
+name = protocols must not import orchestration
+type = forbidden
+source_modules =
+    qchem_stack.protocols
+forbidden_modules =
+    qchem_stack.orchestration
+ignore_imports =
+    qchem_stack.protocols.parity_criteria_export -> qchem_stack.orchestration.excited_stages
+    qchem_stack.protocols.parity_criteria_export -> qchem_stack.md_bridge
+
+[importlinter:contract:chem-no-jobs]
+name = chem must not import jobs
+type = forbidden
+source_modules =
+    qchem_stack.chem
+forbidden_modules =
+    qchem_stack.jobs
+
+[importlinter:contract:quantum-no-jobs]
+name = quantum must not import jobs
+type = forbidden
+source_modules =
+    qchem_stack.quantum
+forbidden_modules =
+    qchem_stack.jobs

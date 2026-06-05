@@ -21,30 +21,59 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 - `driver_surface_breadth` gap caveat documents ORCA/Gaussian non-goals explicitly.
 
-## [Unreleased]
+## [0.8.0] - 2026-06-04
 
-### Added
+### Removed (breaking)
 
-- Console scripts **`qchem-run`** and **`qchem-export-parity`**; stable integrator facade **`qchem_stack.sdk`**.
-- Docker **slim** / **full** build targets; **`python -m qchem_stack.api`** entry for Compose.
-- CI **`contract-gate`** job and **`test-cross-platform`** (main/schedule); PR matrix Ubuntu-only with **pytest-xdist**.
-- Scripts: `generate_parity_gap_snippet.py`, `check_config_combo_matrix.py`; generated `docs/generated/parity_gap_snippet.md`.
-- Resource estimation preview fields: `mitigation_zne_scale_count_yaml`, `mitigation_zne_richardson_order_yaml`.
+- **`molecular_hamiltonian_from_classical_reference`** — use **`build_pre_quantum_input`** / YAML pipeline.
+- **`apply_backend_profile()`** — use **`apply_backend_profile_immutable()`**.
+- **`qchem_stack.integrations.dmet_self_consistent`** shim — import from **`qchem_stack.chem.embedding.dmet_self_consistent`**.
 
 ### Changed
 
-- **`results/`** removed from git tracking (local outputs only; see `results/README.md`).
-- Per-package coverage floors: **quantum/backends/chem 70%**, **mitigation 65%**.
-- Pyright **`reportMissingParameterType`** for **`backends`** and **`jobs`** packages.
-- Execution closeout docs archived under **`docs/execution/archive/2026Q2/`**.
+- Protocol job writes default to **JSON blob v2** when `QCHEM_PROTOCOL_BLOB_V2` is unset (opt-out with `0`/`false`).
+- Pyright **`reportMissingParameterType=error`** for **`src/qchem_stack/quantum/algorithms`**.
 
-### Deprecated
+## [0.7.0] - 2026-06-04
 
-- **`qchem_stack.integrations.dmet_self_consistent`** import path (use **`chem.embedding.dmet_self_consistent`**); removal **v0.8.0** (see `docs/engineering/api_stability_policy.md`).
+### Added
 
-### Removed
+- In-package parity export API: **`qchem_stack.protocols.parity_criteria_export.export_parity_criteria_table`** (wheel-safe; no repo `scripts/` dependency).
+- **`scripts/bootstrap_dev.sh`** for one-shot `.venv` + `pip install -e ".[dev]"`.
+- CI **`contract-gate`** split into **`contract-docs`**, **`contract-smoke`**, **`contract-integration`** (parallel).
+- Chem coverage gate raised to **70%**; extra adapter/bundle edge tests.
 
-- Root **`opus4.8-test.md`** agent session artifact.
+### Changed
+
+- **`qchem_stack.sdk.export_parity_table`** and **`qchem-export-parity`** call the in-package exporter (no subprocess).
+- **`scripts/venv-run`** / CONTRIBUTING: prefer `.venv` bootstrap path.
+- Docs index: explicit Product / Reference / Non-runtime zones.
+
+## [1.0.0] - 2026-06-04
+
+### Added
+
+- **Stable integrator facade** [`qchem_stack.sdk`](src/qchem_stack/sdk/__init__.py): pipeline, parity export, workflow preview, repro helpers.
+- Console scripts **`qchem-run`** and **`qchem-export-parity`**; wheel-safe **`export_parity_criteria_table`** in-package.
+- HTTP **`api_contract_version": "1.0"`** on all `/v1/*` routes; OpenAPI snapshot gate (`docs/generated/openapi_snapshot.json`).
+- Docs: [`docs/engineering/v1_0_acceptance.md`](docs/engineering/v1_0_acceptance.md), [`migration_v0_8_to_v1_0.md`](docs/engineering/migration_v0_8_to_v1_0.md).
+- CI: import-linter contracts (protocols/chem/quantum layer boundaries); `QCHEM_RELEASE_FULL=1` optional L3 in `release_precheck.sh`.
+- Jobs/md_bridge test expansion; coverage floors **jobs 75%**, **md_bridge 70%**.
+
+### Changed
+
+- PyPI classifier **Production/Stable**; package version **1.0.0**.
+- **`results/`** local-only (see `results/README.md`).
+- Per-package coverage floors and pyright tightening on **backends** / **jobs**.
+- Execution closeout docs under **`docs/execution/archive/2026Q2/`**.
+
+### Removed (breaking since v0.8 / v1.0)
+
+- **`qchem_stack.chem.embedding.schmidt_variational_sidecar`** — use **`integrations.schmidt_per_fragment_vqe`**.
+- **`molecular_hamiltonian_from_pyscf`** — use **`build_pre_quantum_input`** / YAML pipeline.
+- **`qchem_stack.chem.pre_quantum_build.hamiltonian`** alias — use **`build_pre_quantum_input(...).qubit_hamiltonian`**.
+- **`projection_hamiltonian.mulliken_mo_populations_on_atoms`** (PySCF-mf shim) — use **`chem.embedding.ao_fragment.mulliken_mo_populations_on_atoms`** with **`AOBasisView`**.
+- Root **`opus4.8-test.md`** agent session artifact (0.8 cycle).
 
 ## [0.3.0] - 2026-05-28
 

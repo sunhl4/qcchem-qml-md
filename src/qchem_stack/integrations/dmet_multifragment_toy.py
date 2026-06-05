@@ -1,7 +1,7 @@
 """
 Toy **multi-fragment** driver: each fragment receives the **same** global ``QubitHamiltonian``.
 
-This is **not** bath DMET. It exercises :class:`~qchem_stack.integrations.dmet_self_consistent.DMETSelfConsistencyLoop`
+This is **not** bath DMET. It exercises :class:`~qchem_stack.chem.embedding.dmet_self_consistent.DMETSelfConsistencyLoop`
 wiring with a trivial convergence criterion (one global VQE sweep per fragment per cycle).
 
 Enable only for small active spaces (explicit opt-in via ``EmbeddingSpec``).
