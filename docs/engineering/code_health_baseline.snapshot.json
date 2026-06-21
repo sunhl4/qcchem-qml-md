@@ -1,0 +1,110 @@
+{
+  "src_root": "src/qchem_stack",
+  "line_threshold": 400,
+  "python_file_count": 457,
+  "files_over_line_threshold": 0,
+  "files_over_500_lines": 0,
+  "large_files": [],
+  "dict_str_any_top": [
+    {
+      "count": 27,
+      "path": "src/qchem_stack/protocols/protocol_v2_document.py"
+    },
+    {
+      "count": 13,
+      "path": "src/qchem_stack/integrations/methods_resource_unified.py"
+    },
+    {
+      "count": 11,
+      "path": "src/qchem_stack/chem/embedding/dmet_self_consistent.py"
+    },
+    {
+      "count": 11,
+      "path": "src/qchem_stack/mitigation/qermit_runtime.py"
+    },
+    {
+      "count": 11,
+      "path": "src/qchem_stack/quantum/algorithms/base.py"
+    },
+    {
+      "count": 11,
+      "path": "src/qchem_stack/quantum/algorithms/uccsd_vqe.py"
+    },
+    {
+      "count": 10,
+      "path": "src/qchem_stack/backends/spec.py"
+    },
+    {
+      "count": 9,
+      "path": "src/qchem_stack/chem/pre_quantum_input.py"
+    },
+    {
+      "count": 9,
+      "path": "src/qchem_stack/orchestration/stage_execution.py"
+    },
+    {
+      "count": 9,
+      "path": "src/qchem_stack/protocols/workflow_preview.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/chem/bridges/driver_meta_schema.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/chem/embedding/oniom.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/chem/integration/meta_schema.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/integrations/resource_estimation_preview.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/jobs/nexus_analog.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/quantum/algorithms/uccsd_pauli_decomposition.py"
+    },
+    {
+      "count": 8,
+      "path": "src/qchem_stack/quantum/qse_transition.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/backends/pauli_measure_expand.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/chem/classical_benchmarks/stub_backend.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/config/migrations.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/integrations/l3_algorithm_benchmark.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/md_bridge/classical_h2_ff.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/orchestration/pipeline_sync_context.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/orchestration/run_context.py"
+    },
+    {
+      "count": 7,
+      "path": "src/qchem_stack/orchestration/stages.py"
+    }
+  ]
+}

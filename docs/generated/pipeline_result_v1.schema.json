@@ -1,0 +1,103 @@
+{
+  "$id": "https://github.com/sunhl4/qcchem-qml-md/schemas/pipeline_result_v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "algorithm": {
+      "type": "string"
+    },
+    "angles": {
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "energy_after_variational": {
+      "type": "number"
+    },
+    "energy_pauli_protocol": {
+      "type": "number"
+    },
+    "job": {
+      "additionalProperties": false,
+      "properties": {
+        "job_id": {
+          "type": "string"
+        },
+        "protocol_hash": {
+          "type": "string"
+        },
+        "store": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "job_id",
+        "protocol_hash",
+        "store"
+      ],
+      "type": "object"
+    },
+    "nfev": {
+      "type": "integer"
+    },
+    "pre_quantum_input": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "protocol_counts": {
+      "additionalProperties": true,
+      "type": "object"
+    },
+    "repro": {
+      "additionalProperties": true,
+      "properties": {
+        "parity_snapshot": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "pipeline_profile": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "run_context": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "run_summary": {
+          "$ref": "run_summary_v1.schema.json"
+        }
+      },
+      "type": "object"
+    },
+    "resource_summary": {
+      "additionalProperties": true,
+      "properties": {
+        "n_circuits": {
+          "type": "integer"
+        },
+        "n_qubits": {
+          "type": "integer"
+        },
+        "pauli_averaging_protocol_ran": {
+          "type": "boolean"
+        },
+        "sum_shots": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "scf_energy": {
+      "type": "number"
+    },
+    "schema": {
+      "const": "pipeline_result_v1"
+    }
+  },
+  "required": [
+    "repro"
+  ],
+  "title": "pipeline_result_v1",
+  "type": "object"
+}

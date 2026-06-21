@@ -27,12 +27,13 @@ export QCHEM_STACK_PYTHON=/path/to/python   # optional override
 |------|------|
 | **契约 / capability 导出** | 产品与 HTTP 控制台同源模块 **`qchem_stack.protocols.product_contract`**（ gap 列表、capability_map、parity export 的稳定键常量等）；workflow 预览 **`qchem_stack.integrations.workflow_preview`**。布局见 [Product contracts and workflow-preview](#product-contracts-and-workflow-preview-stable-imports)。矩阵与路线图仍按需维护（见 [public_parity_matrix.md §5](docs/public_parity_matrix.md)）。 |
 | **度量与台账** | 月度更新 [与Vendor platform… — 附录 B](docs/public_parity_matrix.md) §3；主表 yes/partial/n/a 可用 `python scripts/count_parity_matrix_main_tables.py` 对照手填。 |
-| **签字合并 gate** | 合并前：`ruff check` / `ruff format --check` / `pytest` / `check_parity_export_sample` / `check_comparative_execution_backlog`；或一键：**`./scripts/release_precheck.sh`**（PR 可用 **`--quick`** 跳过 Docusaurus build，见 [`scripts/README.md`](scripts/README.md)）；CI **`security-audit`** 对 `pip install -e ".[dev]"` 运行 `pip-audit`（传递依赖见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
+| **签字合并 gate** | 合并前：`ruff check` / `ruff format --check` / `pytest` / `check_parity_export_sample` / `check_comparative_execution_backlog`；或一键：**`QCHEM_STACK_PYTHON=python ./scripts/release_precheck.sh`**（PR 可用 **`--quick`** 跳过 Docusaurus / nbmake，见 [`scripts/README.md`](scripts/README.md)）；CI **`security-audit`** 对 `dev` 与 **`chem,api`** 安装面运行 `pip-audit`（见 [`pip-audit.toml`](pip-audit.toml) allowlist）；在 [附录 C](docs/public_parity_matrix.md) 末行可写明 **实名 + 日期**。 |
 
 ### 发版前
 
-1. `./scripts/release_precheck.sh`（pytest + coverage 阈值 + parity + OpenAPI snapshot + import/doc 链）
-2. Major releases: complete [`docs/engineering/v1_0_acceptance.md`](docs/engineering/v1_0_acceptance.md); integrators read [`migration_v0_8_to_v1_0.md`](docs/engineering/migration_v0_8_to_v1_0.md)
+1. `QCHEM_STACK_PYTHON=python ./scripts/release_precheck.sh`（pytest + coverage + pyright + pip-audit + contract-docs 同步）
+2. Minor releases (1.1.x): complete [`docs/engineering/v1_1_acceptance.md`](docs/engineering/v1_1_acceptance.md); integrators read [`docs/engineering/migration_v1_0_to_v1_1.md`](docs/engineering/migration_v1_0_to_v1_1.md)
+3. Patch releases on 1.0.x: [`docs/engineering/v1_0_acceptance.md`](docs/engineering/v1_0_acceptance.md) + [`docs/engineering/migration_v0_8_to_v1_0.md`](docs/engineering/migration_v0_8_to_v1_0.md)
 3. Optional full gate: `QCHEM_RELEASE_FULL=1 ./scripts/release_precheck.sh`（L3 benchmarks when PySCF installed）
 4. `python scripts/generate_configs_catalog.py` 并提交 `docs/generated/configs_catalog_snippet.md` 与 `docusaurus-site/docs/reference/configs-catalog-body.md`
 5. 大改动建议拆 PR：**docs** / **orchestration** / **tests** / **ci** 分开发，便于 review 与 bisect
@@ -73,7 +74,7 @@ QCHEM_RUN_L3=1 pytest -m l3 -q --tb=short
 python scripts/l3_algorithm_benchmark_report.py --output /tmp/l3_benchmark.json
 ```
 
-CI runs this in the **`test-nightly`** scheduled job (see `.github/workflows/ci.yml`).
+CI runs this in the **`test-nightly`** job (see `.github/workflows/nightly.yml`, invoked from `ci.yml` on schedule).
 
 ## Install profiles (pip extras)
 
@@ -98,16 +99,16 @@ From the repo root:
 Optional heavier chemistry smoke (multi-fragment DMET exact, etc.):
 
 ```bash
-./scripts/venv-run pytest -m slow tests/test_dmet_fragment_exact.py -q --tb=short
+./scripts/venv-run pytest -m slow tests/chem/test_dmet_fragment_exact.py -q --tb=short
 ```
 
 Targeted markers (see `pyproject.toml`): `-m l1_excited`, `-m l1_md_ml`, `-m l3`. CI **`lint`** job runs **`ruff check`** + **`ruff format --check`** before the **`test`** matrix installs the package.
 
-**Molecular Hamiltonian parity (PySCF ↔ OpenFermion, Tangelo recipe)**：`tests/test_integral_openfermion_tangelo_recipe.py` 校验 CAS 活性空间积分经 `transpose(0,2,3,1)` 与 `InteractionOperator` 半因子后，H₂(sto-3g) 的 **JW 固定粒子数扇区基态 = PySCF FCI**，并与手工 Tangelo 公式得到的 `QubitOperator` 稠密矩阵一致。若本机可 `import tangelo`（部分 Python 版本上 PyPI 包构建可能失败），同文件中的可选用例会与 `SecondQuantizedMolecule` 的 JW 哈密顿量做矩阵对比。
+**Molecular Hamiltonian parity (PySCF ↔ OpenFermion, Tangelo recipe)**：`tests/chem/test_integral_openfermion_tangelo_recipe.py` 校验 CAS 活性空间积分经 `transpose(0,2,3,1)` 与 `InteractionOperator` 半因子后，H₂(sto-3g) 的 **JW 固定粒子数扇区基态 = PySCF FCI**，并与手工 Tangelo 公式得到的 `QubitOperator` 稠密矩阵一致。若本机可 `import tangelo`（部分 Python 版本上 PyPI 包构建可能失败），同文件中的可选用例会与 `SecondQuantizedMolecule` 的 JW 哈密顿量做矩阵对比。
 
 ### CI markers (PR 必跑)
 
-主矩阵命令为 **`pytest tests -m "not slow and not perf"`**（见 `.github/workflows/ci.yml`）。其中已包含带 **`l1_excited`** 与 **`l1_md_ml`** marker 的用例，无需在 PR 上单独再跑一遍（除非本地调试：`pytest -m l1_excited` / `pytest -m l1_md_ml`）。激发态/VQD/QSE/SCEOM 回归以 `l1_excited` 为准；`md_bridge` 与 MD/ML 契约以 `l1_md_ml` 为准（长板字段与 `repro` 对齐清单见 [与Vendor platform能力差距与实施计划 — 附录 B §6](docs/public_parity_matrix.md#y1-residual-partial-sla-template) 表末行）。
+主矩阵命令为 **`pytest tests -m "not slow and not perf"`**（见 `.github/workflows/test.yml`）。Python **3.12** 另跑 **`pytest -m l1_md_ml -k "not jax"`**（`tests/md_bridge` + `tests/integrations`）。激发态/VQD/QSE/SCEOM 回归以 `l1_excited` 为准；完整 jax-md / qmlff 重路径仍在 **nightly** `test-md-bridge-l1`（`pytest -m l1_md_ml` 全量）。
 
 **Lint job** 另跑 `python scripts/check_comparative_execution_backlog.py`（与上文「签字合并 gate」一致）。
 
@@ -118,11 +119,11 @@ Targeted markers (see `pyproject.toml`): `-m l1_excited`, `-m l1_md_ml`, `-m l3`
 | **PR (required)** | Every push/PR | `pytest tests -m "not slow and not perf"` |
 | **PR extras (3.12)** | CI only | smoke scripts, `check_parity_export_sample.py`, API tests |
 | **Nightly** | schedule / `[nightly]` | `pytest -m "slow or perf"`; `QCHEM_RUN_L3=1 pytest -m l3` |
-| **Local optional** | Before release | `pytest -m psi4`, `pytest -m l1_md_ml`, `pytest -m uqc_mock`; DMET exact: `pytest -m slow tests/test_dmet_fragment_exact.py` |
+| **Local optional** | Before release | `pytest -m psi4`, `pytest -m l1_md_ml`, `pytest -m uqc_mock`; DMET exact: `pytest -m slow tests/chem/test_dmet_fragment_exact.py` |
 
 Markers: `slow`, `perf`, `l3`, `l1_excited`, `l1_md_ml`, `pyscf`, `psi4`, `uqc_mock` — see `pyproject.toml`.
 
-**Parity / `computables_rich`（可选 repro）**：`parity_integrations.include_computables_rich_in_repro: true` 时的 workflow-preview 对齐见 `tests/test_workflow_preview_repro_alignment.py`；FastAPI 侧 `POST /v1/meta/workflow-preview` 烟测见 `tests/test_api_runs.py`（需 `pip install -e ".[api]"`，CI 已装）。
+**Parity / `computables_rich`（可选 repro）**：`parity_integrations.include_computables_rich_in_repro: true` 时的 workflow-preview 对齐见 `tests/repro/test_workflow_preview_repro_alignment.py`；FastAPI 侧 `POST /v1/meta/workflow-preview` 烟测见 `tests/api/test_api_runs.py`（需 `pip install -e ".[api]"`，CI 已装）。
 
 ## Config module style (nested schema)
 
@@ -164,12 +165,12 @@ When you add or rename keys that appear in **`repro`**, **`repro.parity_snapshot
 1. **Orchestration** — set the value in [`src/qchem_stack/orchestration/repro_summary.py`](src/qchem_stack/orchestration/repro_summary.py) and/or [`repro_snapshot.py`](src/qchem_stack/orchestration/repro_snapshot.py) (or the stage that owns the key; see [`docs/engineering/pipeline_stage_ownership.md`](docs/engineering/pipeline_stage_ownership.md)).
 2. **Export stable keys** — if the field must appear in config-only parity export, add it to **`PARITY_EXPORT_V3_STABLE_KEYS`** in [`src/qchem_stack/protocols/product_contract.py`](src/qchem_stack/protocols/product_contract.py).
 3. **Export scripts** — extend [`scripts/export_parity_criteria_table.py`](scripts/export_parity_criteria_table.py) and ensure [`scripts/check_parity_export_sample.py`](scripts/check_parity_export_sample.py) still passes (auto-discovers `configs/*.yaml`).
-4. **Tests** — add or extend a focused test (pattern: [`tests/test_workflow_preview_repro_alignment.py`](tests/test_workflow_preview_repro_alignment.py)); for export-only keys, refresh [`tests/fixtures/parity_export_example_h2_config_only.json`](tests/fixtures/parity_export_example_h2_config_only.json) when intentional.
+4. **Tests** — add or extend a focused test (pattern: [`tests/repro/test_workflow_preview_repro_alignment.py`](tests/repro/test_workflow_preview_repro_alignment.py)); for export-only keys, refresh [`tests/fixtures/parity_export_example_h2_config_only.json`](tests/fixtures/parity_export_example_h2_config_only.json) when intentional.
 5. **Docs** — if user-visible, note the key in [`docs/ENGINEERING_ARCHITECTURE.md`](docs/ENGINEERING_ARCHITECTURE.md) or the relevant contract doc; run doc sync scripts if the key affects generated tables.
 
 ## Product contracts and workflow-preview (stable imports)
 
-- **Capability gaps / product surface literals** live in **`src/qchem_stack/protocols/product_contract.py`** (`product_gap_categories`, `PRODUCT_CAPABILITY_MAP`, `PARITY_EXPORT_V3_STABLE_KEYS`, mitigation / differentiation bundles, expectation-path helpers). HTTP **`GET /v1/meta/capability-surface`** MUST stay aligned via `tests/test_api_runs.py::test_capability_surface_matches_product_contract`.
+- **Capability gaps / product surface literals** live in **`src/qchem_stack/protocols/product_contract.py`** (`product_gap_categories`, `PRODUCT_CAPABILITY_MAP`, `PARITY_EXPORT_V3_STABLE_KEYS`, mitigation / differentiation bundles, expectation-path helpers). HTTP **`GET /v1/meta/capability-surface`** MUST stay aligned via `tests/api/test_api_runs.py::test_capability_surface_matches_product_contract`.
 - **Workflow preview payload** (`protocol_stages_preview_v1`, **`computable_graph_v2`**, `workflow_preview_payload`, slim summaries): **`src/qchem_stack/integrations/workflow_preview.py`** (HTTP `POST /v1/meta/workflow-preview`, pipeline repro sidecars when enabled).
 
 Spot-check:
@@ -196,8 +197,8 @@ After intentional contract changes to **`product_gap_categories()`**, **`PARITY_
 
 ### 算符池与 L3 基准（ADAPT / IQEB）
 
-- **新池 id 或 YAML 别名**：除 `quantum/operator_pool_registry.py`、`config.py` 中 `adapt_pool_id` / `iqeb_pool_id` Literal 外，按需更新 `tests/test_operator_pool_registry_export.py`、`docs/public_parity_matrix.md` 与 [算法面广度索引](docs/算法面广度_Vendor platform_Tangelo对照索引.md)。若增加**代表运行配置**，同步 `scripts/check_parity_export_sample.py`、`tests/test_export_parity_golden.py` 参数表，并评估是否加入 `integrations/l3_algorithm_benchmark.py` 的 `L3_PYTEST_YAMLS` / `DEFAULT_BENCHMARK_YAMLS`。HTTP **`GET /v1/meta/capability-surface`** 返回 **`schema: capability_surface_v2`**（参见 `src/qchem_stack/api/app.py`），与 **`tests/test_api_runs.py::test_capability_surface_matches_product_contract`** 同源对拍。
-- **可选重型门禁**：`QCHEM_RUN_L3=1 ./scripts/venv-run pytest -m l3`（`tests/test_l3_benchmark_smoke.py`）。
+- **新池 id 或 YAML 别名**：除 `quantum/operator_pool_registry.py`、`config.py` 中 `adapt_pool_id` / `iqeb_pool_id` Literal 外，按需更新 `tests/quantum/test_operator_pool_registry_export.py`、`docs/public_parity_matrix.md` 与 [算法面广度索引](docs/算法面广度_Vendor platform_Tangelo对照索引.md)。若增加**代表运行配置**，同步 `scripts/check_parity_export_sample.py`、`tests/repro/test_export_parity_golden.py` 参数表，并评估是否加入 `integrations/l3_algorithm_benchmark.py` 的 `L3_PYTEST_YAMLS` / `DEFAULT_BENCHMARK_YAMLS`。HTTP **`GET /v1/meta/capability-surface`** 返回 **`schema: capability_surface_v2`**（参见 `src/qchem_stack/api/app.py`），与 **`tests/api/test_api_runs.py::test_capability_surface_matches_product_contract`** 同源对拍。
+- **可选重型门禁**：`QCHEM_RUN_L3=1 ./scripts/venv-run pytest -m l3`（`tests/integrations/test_l3_benchmark_smoke.py`）。
 
 ## Dependabot（依赖与 Actions）
 
@@ -209,17 +210,17 @@ After intentional contract changes to **`product_gap_categories()`**, **`PARITY_
 
 | 区域 | 模块 / 文档 | 合并前自检 |
 |------|-------------|------------|
-| **配置门禁** | `config/_experiment_validation.py`，`validate_pre_quantum_contract` | `pytest tests/test_config_pre_quantum_combos.py tests/test_validate_pre_quantum_contract.py -q` |
-| **公开构建 API** | `chem/pre_quantum_build.build_pre_quantum_input`；勿再教用户直接用 `molecular_hamiltonian_from_classical_reference` | `pytest tests/test_build_pre_quantum_input_api.py -q` |
-| **装配（chem）** | `chem/pre_quantum_build.py`（`build_pre_quantum_input` / `build_pre_quantum_input_with_context`），分支见 `chem/pre_quantum_path.py` | `pytest tests/test_build_pre_quantum_input_api.py -q` |
-| **管线阶段（编排）** | `stage_execution.build_pre_quantum_stage`（precomputed / live 分叉与计时） | `pytest tests/test_orchestration_pipeline.py tests/test_pre_quantum_input_contract.py -q` |
-| **单次 run 缓存** | `chem/bridges/run_build_cache.py` → `out["pre_quantum_build_cache"]` | `pytest tests/test_run_build_cache.py -q` |
-| **分支解析** | `chem/pre_quantum_path.py`（与 `hamiltonian_semantics` / 校验共用） | `pytest tests/test_pre_quantum_path.py -q` |
-| **嵌入语义** | `chem/embedding/hamiltonian_semantics.py`；`parity_snapshot.pre_quantum_handoff_v1` | `pytest tests/test_embedding_hamiltonian_semantics.py -q` |
-| **活性空间 exporter** | `chem/integrals/*_active_space_exporter.py`，`canonical_integral_pack` | `pytest tests/test_canonical_integral_pack.py -q` |
+| **配置门禁** | `config/_experiment_validation.py`，`validate_pre_quantum_contract` | `pytest tests/config/test_config_pre_quantum_combos.py tests/chem/test_validate_pre_quantum_contract.py -q` |
+| **公开构建 API** | `chem/pre_quantum_build.build_pre_quantum_input`；勿再教用户直接用 `molecular_hamiltonian_from_classical_reference` | `pytest tests/chem/test_build_pre_quantum_input_api.py -q` |
+| **装配（chem）** | `chem/pre_quantum_build.py`（`build_pre_quantum_input` / `build_pre_quantum_input_with_context`），分支见 `chem/pre_quantum_path.py` | `pytest tests/chem/test_build_pre_quantum_input_api.py -q` |
+| **管线阶段（编排）** | `stage_execution.build_pre_quantum_stage`（precomputed / live 分叉与计时） | `pytest tests/orchestration/test_orchestration_pipeline.py tests/chem/test_pre_quantum_input_contract.py -q` |
+| **单次 run 缓存** | `chem/bridges/run_build_cache.py` → `out["pre_quantum_build_cache"]` | `pytest tests/chem/test_run_build_cache.py -q` |
+| **分支解析** | `chem/pre_quantum_path.py`（与 `hamiltonian_semantics` / 校验共用） | `pytest tests/chem/test_pre_quantum_path.py -q` |
+| **嵌入语义** | `chem/embedding/hamiltonian_semantics.py`；`parity_snapshot.pre_quantum_handoff_v1` | `pytest tests/chem/test_embedding_hamiltonian_semantics.py -q` |
+| **活性空间 exporter** | `chem/integrals/*_active_space_exporter.py`，`canonical_integral_pack` | `pytest tests/chem/test_canonical_integral_pack.py -q` |
 | **Psi4（可选）** | `chem/integrals/psi4_active_space.py`；CI job `test-psi4` | `pytest -m psi4 -q`（本机需 `pip install psi4`） |
 | **YAML 组合表** | `docs/pre_quantum_yaml_matrix.md` | 新增/禁止组合时更新矩阵 + 负例测试 |
-| **Parity 导出** | `pre_quantum_semantics_from_config` ∈ `PARITY_EXPORT_V3_STABLE_KEYS` | `pytest tests/test_export_pre_quantum_semantics.py`；`python scripts/check_parity_export_sample.py` |
+| **Parity 导出** | `pre_quantum_semantics_from_config` ∈ `PARITY_EXPORT_V3_STABLE_KEYS` | `pytest tests/repro/test_export_pre_quantum_semantics.py`；`python scripts/check_parity_export_sample.py` |
 
 推荐端到端样例：`configs/example_h2.yaml`（PySCF canonical）、`configs/example_h2_precomputed_bundle.yaml`（离线）、`configs/example_h2_psi4_rhf_sto3g.yaml`（Psi4）、`configs/example_h4_schmidt_multifragment.yaml`（Schmidt，`-m slow`）。
 

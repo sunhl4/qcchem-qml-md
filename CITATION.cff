@@ -1,0 +1,14 @@
+cff-version: 1.2.0
+title: qchem-stack
+message: "If you use qchem-stack in research, please cite it using the metadata below."
+version: 1.1.0
+license: Apache-2.0
+authors:
+  - given-names: Yaozheng
+repository-code: "https://github.com/sunhl4/qcchem-qml-md"
+url: "https://github.com/sunhl4/qcchem-qml-md"
+keywords:
+  - quantum-chemistry
+  - vqe
+  - workflow
+  - reproducibility

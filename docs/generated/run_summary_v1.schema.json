@@ -1,0 +1,60 @@
+{
+  "$id": "https://github.com/sunhl4/qcchem-qml-md/schemas/run_summary_v1.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "energy_pauli_protocol": {
+      "type": "number"
+    },
+    "error_message": {
+      "type": "string"
+    },
+    "error_type": {
+      "type": "string"
+    },
+    "pipeline_slowest_stage": {
+      "type": "string"
+    },
+    "pipeline_total_wall_ms": {
+      "type": "number"
+    },
+    "protocol_energy_stderr": {
+      "type": "number"
+    },
+    "protocol_expectation_source": {
+      "type": "string"
+    },
+    "protocol_n_measurement_circuits": {
+      "type": "integer"
+    },
+    "protocol_shots_per_circuit_effective": {
+      "type": "number"
+    },
+    "protocol_total_shots_budget": {
+      "type": "integer"
+    },
+    "protocol_zne_mode": {
+      "type": "string"
+    },
+    "quantum_algorithm": {
+      "type": "string"
+    },
+    "quantum_algorithm_yaml": {
+      "type": "string"
+    },
+    "scf_energy": {
+      "type": "number"
+    },
+    "stage_failed": {
+      "type": "string"
+    },
+    "stages_completed": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "title": "run_summary_v1",
+  "type": "object"
+}
