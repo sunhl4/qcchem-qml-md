@@ -49,8 +49,11 @@ def main() -> None:
         algorithm_benchmark_bundle_v1,
         merged_experiment_benchmark_v1,
     )
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
-    bundle = algorithm_benchmark_bundle_v1(repo_root=_ROOT, config_rels=rels)
+    bundle = algorithm_benchmark_bundle_v1(
+        repo_root=_ROOT, config_rels=rels, run_sync=run_pipeline_sync
+    )
     out_obj: dict = {
         "bundle_schema_version": "1",
         "algorithm_benchmark_bundle_v1": bundle,

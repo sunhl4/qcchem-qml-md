@@ -24,11 +24,17 @@ def test_l3_representative_algorithm_yamls_sync_pipeline() -> None:
             "Set QCHEM_RUN_L3=1 to run L3 numerical benchmarks (see docs/public_parity_matrix.md 附录 B §7)"
         )
     pytest.importorskip("pyscf")
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
+
     root = repo_root()
     for rel in L3_PYTEST_YAMLS:
         assert (root / rel).is_file(), f"missing L3 representative config: {rel}"
 
-    bundle = algorithm_benchmark_bundle_v1(repo_root=root, config_rels=list(L3_PYTEST_YAMLS))
+    bundle = algorithm_benchmark_bundle_v1(
+        repo_root=root,
+        config_rels=list(L3_PYTEST_YAMLS),
+        run_sync=run_pipeline_sync,
+    )
     assert bundle["schema"] == "algorithm_benchmark_bundle_v1"
     assert len(bundle["rows"]) == len(L3_PYTEST_YAMLS)
     for row in bundle["rows"]:

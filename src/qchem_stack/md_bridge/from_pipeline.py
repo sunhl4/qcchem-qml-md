@@ -2,237 +2,39 @@
 
 from __future__ import annotations
 
-import hashlib
-import json
-from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, cast
 
 import yaml
 
 from qchem_stack.contracts.schema_ids import QMEF_ML_ATTACHMENT_V1
-from qchem_stack.exceptions import PipelineError
+from qchem_stack.md_bridge.from_pipeline_extract import (
+    active_space_digest,
+    as_pyscf_rhf,
+    atomic_numbers_from_pyscf_mol,
+    config_sha_prefix,
+    energy_hartree_from_pipeline_out,
+    hf_nuclear_forces_neg_gradient_hartree_bohr,
+    normalize_coords,
+    primary_qmframe,
+    protocol_hash_prefix,
+    rhf_at_coordinates,
+)
+from qchem_stack.md_bridge.from_pipeline_types import (
+    PipelineOut,
+    QmefAttachmentContext,
+    QmefDatasetPayload,
+    QmefFrameMeta,
+    QmefFramePayload,
+    QmefMlAttachmentReproBlock,
+)
+from qchem_stack.md_bridge.pipeline_runner import PipelineRunner, resolve_pipeline_runner
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
-from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
 if TYPE_CHECKING:
     from pathlib import Path
 
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.drivers.pyscf_driver_types import PySCFRHFResult
     from qchem_stack.config import ExperimentConfig
-
-
-PipelineOut = PipelineResultV1 | dict[str, Any]
-
-
-class QmefFramePayload(TypedDict, total=False):
-    atomic_numbers: list[int]
-    positions_bohr: list[list[float]]
-    energy_hartree: float
-    forces_hartree_bohr: list[list[float]]
-    charge: int
-    multiplicity: int
-    box: list[float] | None
-    method_tag: str
-    active_space_hash: str
-    protocol_hash: str
-    repro_config_sha256_prefix: str
-    backend_noise_tag: str
-
-
-class QmefDatasetPayload(TypedDict):
-    frames: list[QmefFramePayload]
-    provenance_yaml: str
-
-
-class QmefFrameMeta(TypedDict):
-    index: int
-    coordinates_source: str
-    energy_theory: str
-    energy_reference_mode: str
-    forces_theory: str
-
-
-class QmefMlAttachmentReproBlock(TypedDict):
-    schema: str
-    epistemic_bound: str
-    frame_meta: list[QmefFrameMeta]
-    dataset: QmefDatasetPayload
-
-
-@dataclass(frozen=True)
-class QmefAttachmentContext:
-    """Typed ingress for QMEF attachment from a completed pipeline row."""
-
-    cfg: ExperimentConfig
-    out: PipelineOut
-    cfg_path: Path | None = None
-
-
-def _as_out_dict(out: PipelineOut) -> dict[str, Any]:
-    return cast("dict[str, Any]", out)
-
-
-def _is_periodic_rhf(rhf: PySCFRHFResult) -> bool:
-    dm = getattr(rhf, "driver_meta", None) or {}
-    if dm.get("pbc"):
-        return True
-    mol = rhf.mf.mol
-    return type(mol).__name__ == "Cell"
-
-
-def _atomic_numbers_from_pyscf_mol(rhf: PySCFRHFResult) -> list[int]:
-    mol = rhf.mf.mol
-    return [int(mol.atom_charge(i)) for i in range(mol.natm)]
-
-
-def _hf_nuclear_forces_neg_gradient_hartree_bohr(
-    rhf: PySCFRHFResult, method: str
-) -> list[list[float]] | None:
-    """
-    Classical nuclear forces :math:`-\\partial E/\\partial R` (Hartree/Bohr) when PySCF gradients succeed.
-
-    PySCF ``grad.*.kernel()`` returns :math:`\\partial E/\\partial R`; ML datasets conventionally store ``-grad``.
-    """
-    if _is_periodic_rhf(rhf):
-        return None
-    try:
-        import numpy as np
-        from pyscf import grad
-    except ImportError:
-        return None
-    mf = rhf.mf
-    try:
-        if method == "RHF":
-            g = grad.RHF(mf)
-        elif method == "ROHF":
-            g = grad.ROHF(mf)
-        elif method == "UHF":
-            g = grad.UHF(mf)
-        else:
-            return None
-        arr = -np.asarray(g.kernel(), dtype=float)
-        return cast("list[list[float]]", arr.tolist())
-    except (np.linalg.LinAlgError, ValueError, TypeError) as exc:
-        _log = __import__("logging").getLogger(__name__)
-        _log.warning("kernel matrix computation failed, returning None: %s", exc)
-        return None
-
-
-def _active_space_digest(cfg: ExperimentConfig) -> str:
-    blob = json.dumps(
-        cfg.active_space.model_dump(mode="json"), sort_keys=True, separators=(",", ":")
-    )
-    return hashlib.sha256(blob.encode("utf-8")).hexdigest()[:16]
-
-
-def _protocol_hash_prefix(out: PipelineOut) -> str:
-    repro = _as_out_dict(out).get("repro")
-    if not isinstance(repro, dict):
-        return ""
-    snap = repro.get("parity_snapshot")
-    if not isinstance(snap, dict):
-        return ""
-    sig = snap.get("compiler_bundle_signature")
-    return str(sig)[:48] if isinstance(sig, str) else ""
-
-
-def _config_sha_prefix(out: PipelineOut) -> str:
-    repro = _as_out_dict(out).get("repro")
-    if not isinstance(repro, dict):
-        return ""
-    return str(repro.get("config_sha256_prefix") or "")
-
-
-def _normalize_coords(coords: list[list[float]]) -> list[list[float]]:
-    return [[float(x), float(y), float(z)] for x, y, z in coords]
-
-
-def _energy_hartree_from_pipeline_out(cfg: ExperimentConfig, out: PipelineOut) -> float:
-    out_d = _as_out_dict(out)
-    ref = cfg.md_ml_export.energy_reference
-    if ref == "scf":
-        scf = out_d.get("scf_energy")
-        if scf is None:
-            raise PipelineError(
-                "md_ml_export.energy_reference='scf' requires scf_energy on pipeline output."
-            )
-        return float(scf)
-    if ref == "pauli_protocol":
-        if "energy_pauli_protocol" not in out_d:
-            raise PipelineError(
-                "md_ml_export.energy_reference='pauli_protocol' requires a completed Pauli stage "
-                "(missing energy_pauli_protocol on pipeline output)."
-            )
-        return float(out_d["energy_pauli_protocol"])
-    energy_var = out_d.get("energy_after_variational")
-    if energy_var is None:
-        raise PipelineError("md_ml_export requires energy_after_variational on pipeline output.")
-    return float(energy_var)
-
-
-def _rhf_at_coordinates(cfg: ExperimentConfig, coords: list[list[float]]) -> PySCFRHFResult:
-    """Fresh mean-field solve at ``coords`` (same stoichiometry / charge / mult / basis / solvent / PBC as ``cfg``)."""
-    from qchem_stack.chem.bridges.reference_factory import pyscf_rhf_result_from_config
-    from qchem_stack.config import MdMlExportSpec
-
-    child = cfg.model_copy(
-        deep=True,
-        update={
-            "molecule": cfg.molecule.model_copy(
-                update={"coordinates": _normalize_coords(coords), "coordinate_unit": "bohr"}
-            ),
-            "md_ml_export": MdMlExportSpec(),
-        },
-    )
-    return pyscf_rhf_result_from_config(child)
-
-
-def _as_pyscf_rhf(reference: ClassicalMeanFieldReference) -> PySCFRHFResult:
-    if reference.backend_tag() != "pyscf":
-        raise PipelineError(
-            "QMEF attachment currently requires a PySCF-backed classical reference "
-            f"(got backend={reference.backend_tag()!r})."
-        )
-    return reference.as_pyscf_rhf_result()
-
-
-def _qmframe_from_rhf(
-    cfg: ExperimentConfig,
-    out: PipelineOut,
-    rhf: PySCFRHFResult,
-    coords: list[list[float]],
-    *,
-    energy_hartree: float,
-    method_tag: str,
-) -> QMFrame:
-    zs = _atomic_numbers_from_pyscf_mol(rhf)
-    forces: list[list[float]] = []
-    if cfg.md_ml_export.include_hf_nuclear_gradient:
-        frc = _hf_nuclear_forces_neg_gradient_hartree_bohr(rhf, str(cfg.scf.method))
-        if frc is not None:
-            forces = frc
-    return QMFrame(
-        atomic_numbers=zs,
-        positions_bohr=_normalize_coords(coords),
-        energy_hartree=float(energy_hartree),
-        forces_hartree_bohr=forces,
-        charge=int(cfg.molecule.charge),
-        multiplicity=int(cfg.molecule.multiplicity),
-        box=None,
-        method_tag=method_tag,
-        active_space_hash=_active_space_digest(cfg),
-        protocol_hash=_protocol_hash_prefix(out),
-        repro_config_sha256_prefix=_config_sha_prefix(out),
-        backend_noise_tag=str(cfg.backend.provider),
-    )
-
-
-def _primary_qmframe(cfg: ExperimentConfig, out: PipelineOut, rhf: PySCFRHFResult) -> QMFrame:
-    energy = _energy_hartree_from_pipeline_out(cfg, out)
-    positions = _normalize_coords(cfg.molecule.coordinates_in_bohr().tolist())
-    tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.mapping.fermion_qubit}"
-    return _qmframe_from_rhf(cfg, out, rhf, positions, energy_hartree=energy, method_tag=tag)
 
 
 def _extra_frame_hf_scf(
@@ -242,9 +44,11 @@ def _extra_frame_hf_scf(
     *,
     index: int,
 ) -> QMFrame:
-    rhf = _rhf_at_coordinates(cfg, coords)
+    from qchem_stack.md_bridge.from_pipeline_extract import qmframe_from_rhf
+
+    rhf = rhf_at_coordinates(cfg, coords)
     tag = f"{cfg.scf.method}/HF-SCF-trajectory[{index}]"
-    return _qmframe_from_rhf(
+    return qmframe_from_rhf(
         cfg,
         out,
         rhf,
@@ -261,41 +65,42 @@ def _extra_frame_full_pipeline(
     *,
     index: int,
     cfg_path: Path | None,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> QMFrame:
     from qchem_stack.config import MdMlExportSpec
-    from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
     child = cfg.model_copy(
         deep=True,
         update={
             "molecule": cfg.molecule.model_copy(
-                update={"coordinates": _normalize_coords(coords), "coordinate_unit": "bohr"}
+                update={"coordinates": normalize_coords(coords), "coordinate_unit": "bohr"}
             ),
             "md_ml_export": MdMlExportSpec(),
         },
     )
-    out_c = run_pipeline_sync(child, cfg_path=cfg_path)
-    energy = _energy_hartree_from_pipeline_out(cfg, out_c)
-    rhf_g = _rhf_at_coordinates(cfg, coords)
+    runner = resolve_pipeline_runner(pipeline_runner)
+    out_c = runner(child, cfg_path=cfg_path)
+    energy = energy_hartree_from_pipeline_out(cfg, out_c)
+    rhf_g = rhf_at_coordinates(cfg, coords)
     forces: list[list[float]] = []
     if cfg.md_ml_export.include_hf_nuclear_gradient:
-        frc = _hf_nuclear_forces_neg_gradient_hartree_bohr(rhf_g, str(cfg.scf.method))
+        frc = hf_nuclear_forces_neg_gradient_hartree_bohr(rhf_g, str(cfg.scf.method))
         if frc is not None:
             forces = frc
-    zs = _atomic_numbers_from_pyscf_mol(rhf_g)
+    zs = atomic_numbers_from_pyscf_mol(rhf_g)
     tag = f"{cfg.scf.method}/{cfg.quantum.algorithm}/JW-{cfg.active_space.mapping.fermion_qubit}/trajectory-FP[{index}]"
     return QMFrame(
         atomic_numbers=zs,
-        positions_bohr=_normalize_coords(coords),
+        positions_bohr=normalize_coords(coords),
         energy_hartree=float(energy),
         forces_hartree_bohr=forces,
         charge=int(cfg.molecule.charge),
         multiplicity=int(cfg.molecule.multiplicity),
         box=None,
         method_tag=tag,
-        active_space_hash=_active_space_digest(cfg),
-        protocol_hash=_protocol_hash_prefix(primary_out),
-        repro_config_sha256_prefix=_config_sha_prefix(primary_out),
+        active_space_hash=active_space_digest(cfg),
+        protocol_hash=protocol_hash_prefix(primary_out),
+        repro_config_sha256_prefix=config_sha_prefix(primary_out),
         backend_noise_tag=str(cfg.backend.provider),
     )
 
@@ -306,14 +111,15 @@ def build_qmef_ml_attachment_repro_block(
     reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> QmefMlAttachmentReproBlock:
     """
     Canonical ``repro.qmef_ml_attachment_v1`` — one **primary** frame from the finished pipeline plus optional
     **extra** geometries (HF-SCF-only or full nested pipelines per ``md_ml_export.trajectory_theory_level``).
     """
     spec = cfg.md_ml_export
-    rhf = _as_pyscf_rhf(reference)
-    frames: list[QMFrame] = [_primary_qmframe(cfg, out, rhf)]
+    rhf = as_pyscf_rhf(reference)
+    frames: list[QMFrame] = [primary_qmframe(cfg, out, rhf)]
     frame_meta: list[QmefFrameMeta] = [
         {
             "index": 0,
@@ -327,10 +133,19 @@ def build_qmef_ml_attachment_repro_block(
     ]
 
     for i, raw_coords in enumerate(spec.trajectory.extra_coordinates_bohr):
-        coords = _normalize_coords(raw_coords)
+        coords = normalize_coords(raw_coords)
         idx = i + 1
         if spec.trajectory.theory_level == "full_pipeline":
-            frames.append(_extra_frame_full_pipeline(cfg, out, coords, index=i, cfg_path=cfg_path))
+            frames.append(
+                _extra_frame_full_pipeline(
+                    cfg,
+                    out,
+                    coords,
+                    index=i,
+                    cfg_path=cfg_path,
+                    pipeline_runner=pipeline_runner,
+                )
+            )
             fm_energy = "nested_full_pipeline"
         else:
             frames.append(_extra_frame_hf_scf(cfg, out, coords, index=i))
@@ -382,9 +197,17 @@ def build_qmef_ml_attachment_repro_block(
 def build_qmef_ml_attachment_from_context(
     ctx: QmefAttachmentContext,
     reference: ClassicalMeanFieldReference,
+    *,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> QmefMlAttachmentReproBlock:
     """Build QMEF attachment from a :class:`QmefAttachmentContext`."""
-    return build_qmef_ml_attachment_repro_block(ctx.cfg, ctx.out, reference, cfg_path=ctx.cfg_path)
+    return build_qmef_ml_attachment_repro_block(
+        ctx.cfg,
+        ctx.out,
+        reference,
+        cfg_path=ctx.cfg_path,
+        pipeline_runner=pipeline_runner,
+    )
 
 
 def build_qmef_dataset_single_frame_repro_block(
@@ -393,9 +216,16 @@ def build_qmef_dataset_single_frame_repro_block(
     reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> QmefMlAttachmentReproBlock:
     """Backward-compatible name — delegates to :func:`build_qmef_ml_attachment_repro_block`."""
-    return build_qmef_ml_attachment_repro_block(cfg, out, reference, cfg_path=cfg_path)
+    return build_qmef_ml_attachment_repro_block(
+        cfg,
+        out,
+        reference,
+        cfg_path=cfg_path,
+        pipeline_runner=pipeline_runner,
+    )
 
 
 __all__ = [

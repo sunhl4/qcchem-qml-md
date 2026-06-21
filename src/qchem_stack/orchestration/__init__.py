@@ -1,6 +1,7 @@
 """YAML-driven pipelines (solver bridge → pre-quantum → variational → Pauli protocol → jobs)."""
 
 from qchem_stack.exceptions import PipelineError
+from qchem_stack.md_bridge.pipeline_runner import register_pipeline_runner
 from qchem_stack.orchestration.pipeline import (
     collect_repro_metadata,
     run_pipeline_from_config,
@@ -13,6 +14,8 @@ from qchem_stack.orchestration.pipeline_result import (
 )
 from qchem_stack.orchestration.run_context import PipelineStageTimer, RunContext
 from qchem_stack.orchestration.workflow import WorkflowCoordinator
+
+register_pipeline_runner(run_pipeline_sync)
 
 __all__ = [
     "PipelineError",

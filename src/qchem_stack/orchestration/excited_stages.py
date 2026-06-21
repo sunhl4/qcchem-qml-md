@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -43,9 +43,9 @@ def run_excited_stages(
     *,
     qh: QubitHamiltonian,
     exe: HamiltonianExpectationExecutor,
-    angles: np.ndarray,
+    angles: np.ndarray | list[float],
     energy_pre: float,
-    out: dict[str, Any],
+    out: dict[str, object],
     profile: PipelineStageTimer,
     emit: Callable[[str], None],
     pre_quantum_input: PreQuantumInput | None = None,

@@ -25,6 +25,7 @@ from pathlib import Path
 from typing import TYPE_CHECKING, Any, Literal
 
 from qchem_stack.exceptions import PipelineError
+from qchem_stack.md_bridge.pipeline_runner import PipelineRunner, resolve_pipeline_runner
 from qchem_stack.md_bridge.schema import QMEFDataset, QMFrame
 
 if TYPE_CHECKING:
@@ -87,6 +88,7 @@ def label_base_geometry_only(
     energy_reference: EnergyReference = "variational",
     theory_level: TheoryLevel = "full_pipeline",
     include_hf_nuclear_gradient: bool = True,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> LabelingResult:
     """Run the pipeline on the YAML's base geometry only; return a 1-frame dataset."""
     return label_geometries_with_pipeline(
@@ -96,6 +98,7 @@ def label_base_geometry_only(
         theory_level=theory_level,
         include_hf_nuclear_gradient=include_hf_nuclear_gradient,
         failure_isolation=False,
+        pipeline_runner=pipeline_runner,
     )
 
 
@@ -107,6 +110,7 @@ def label_geometries_with_pipeline(
     theory_level: TheoryLevel = "hf_scf",
     include_hf_nuclear_gradient: bool = True,
     failure_isolation: bool = True,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> LabelingResult:
     """Label a base + extra-geometries batch using ``run_pipeline_sync``.
 
@@ -155,6 +159,7 @@ def label_geometries_with_pipeline(
             energy_reference=energy_reference,
             theory_level=theory_level,
             include_hf_nuclear_gradient=include_hf_nuclear_gradient,
+            pipeline_runner=pipeline_runner,
         )
     except Exception as exc:
         if not failure_isolation or not extras:
@@ -170,6 +175,7 @@ def label_geometries_with_pipeline(
         energy_reference=energy_reference,
         theory_level=theory_level,
         include_hf_nuclear_gradient=include_hf_nuclear_gradient,
+        pipeline_runner=pipeline_runner,
     )
 
     frames: list[QMFrame] = list(base_only.dataset.frames)
@@ -186,6 +192,7 @@ def label_geometries_with_pipeline(
                 energy_reference=energy_reference,
                 theory_level=theory_level,
                 include_hf_nuclear_gradient=include_hf_nuclear_gradient,
+                pipeline_runner=pipeline_runner,
             )
         except Exception as exc:  # noqa: BLE001 - we record the message verbatim
             logger.warning("per-geometry labeling failed for index %s: %s", i, exc)
@@ -272,11 +279,11 @@ def _run_with_extras(
     energy_reference: EnergyReference,
     theory_level: TheoryLevel,
     include_hf_nuclear_gradient: bool,
+    pipeline_runner: PipelineRunner | None = None,
 ) -> LabelingResult:
     """One shot at the pipeline. Caller wraps for failure isolation."""
     from qchem_stack.config import MdMlExportSpec
     from qchem_stack.config.md_ml_export import MdMlTrajectorySpec
-    from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
     cfg = base_cfg.model_copy(
         deep=True,
@@ -293,7 +300,8 @@ def _run_with_extras(
         },
     )
 
-    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
+    runner = resolve_pipeline_runner(pipeline_runner)
+    out = runner(cfg, cfg_path=cfg_path)
     if not isinstance(out, dict):
         raise PipelineError(f"run_pipeline_sync returned unexpected type {type(out).__name__}")
     repro = out.get("repro")

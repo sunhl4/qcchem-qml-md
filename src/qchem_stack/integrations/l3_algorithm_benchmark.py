@@ -16,7 +16,7 @@ baseline H2 VQE, default IQEB, and QPE dual-track for paper-style ``l3_algorithm
 from __future__ import annotations
 
 import time
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, Protocol
 
 from qchem_stack.config import load_experiment_config
 from qchem_stack.config.quantum_helpers import (
@@ -31,6 +31,18 @@ from qchem_stack.contracts.schema_ids import (
 
 if TYPE_CHECKING:
     from pathlib import Path
+
+    from qchem_stack.config import ExperimentConfig
+
+
+class PipelineSyncRunner(Protocol):
+    def __call__(
+        self,
+        cfg: ExperimentConfig,
+        *,
+        cfg_path: Path | None = ...,
+    ) -> dict[str, object]: ...
+
 
 DEFAULT_BENCHMARK_YAMLS: tuple[str, ...] = (
     "configs/example_h2.yaml",
@@ -66,21 +78,34 @@ L3_PYTEST_YAMLS: tuple[str, ...] = (
 )
 
 
-def algorithm_benchmark_bundle_v1(*, repo_root: Path, config_rels: list[str]) -> dict[str, Any]:
-    from qchem_stack.orchestration.pipeline import run_pipeline_sync
-
+def algorithm_benchmark_bundle_v1(
+    *,
+    repo_root: Path,
+    config_rels: list[str],
+    run_sync: PipelineSyncRunner | None = None,
+) -> dict[str, Any]:
     rows: list[dict[str, Any]] = []
     for rel in config_rels:
         p = repo_root / rel
         if not p.is_file():
             continue
+        if run_sync is None:
+            msg = (
+                "algorithm_benchmark_bundle_v1 requires run_sync= when config files exist; "
+                "inject run_pipeline_sync from scripts or tests."
+            )
+            raise TypeError(msg)
         t0 = time.perf_counter()
         cfg = load_experiment_config(p)
         exp_id = cfg.experiment_id
-        out = run_pipeline_sync(cfg, cfg_path=p)
+        out = run_sync(cfg, cfg_path=p)
         wall_ms = (time.perf_counter() - t0) * 1000.0
-        rs = out.get("repro", {}).get("run_summary") or {}
-        nfev_val = out.get("nfev")
+        out_row: dict[str, Any] = out if isinstance(out, dict) else dict(out)
+        rs = out_row.get("repro", {})
+        rs = rs if isinstance(rs, dict) else {}
+        run_summary = rs.get("run_summary") or {}
+        run_summary = run_summary if isinstance(run_summary, dict) else {}
+        nfev_val = out_row.get("nfev")
         nfev = int(nfev_val) if isinstance(nfev_val, int) else None
         row: dict[str, Any] = {
             "experiment_id": exp_id,
@@ -88,12 +113,12 @@ def algorithm_benchmark_bundle_v1(*, repo_root: Path, config_rels: list[str]) ->
             "quantum_algorithm_yaml": resolve_variational_algorithm(cfg),
             "adapt_pool_id_yaml": resolve_adapt_pool_id(cfg),
             "iqeb_pool_id_yaml": resolve_iqeb_pool_id(cfg),
-            "scf_energy_au": out.get("scf_energy"),
-            "energy_after_variational_au": out.get("energy_after_variational"),
+            "scf_energy_au": out_row.get("scf_energy"),
+            "energy_after_variational_au": out_row.get("energy_after_variational"),
             "nfev": nfev,
-            "adapt_total_gradient_evals": rs.get("adapt_total_gradient_evals"),
+            "adapt_total_gradient_evals": run_summary.get("adapt_total_gradient_evals"),
             "wall_time_ms": float(wall_ms),
-            "stages_completed_tail": list((rs.get("stages_completed") or [])[-5:]),
+            "stages_completed_tail": list((run_summary.get("stages_completed") or [])[-5:]),
         }
         rows.append(row)
     return {"schema": ALGORITHM_BENCHMARK_BUNDLE_V1, "rows": rows}
