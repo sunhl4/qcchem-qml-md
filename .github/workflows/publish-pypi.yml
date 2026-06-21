@@ -39,7 +39,8 @@ jobs:
         run: |
           python -m venv /tmp/qchem-wheel-smoke
           /tmp/qchem-wheel-smoke/bin/pip install -U pip
-          /tmp/qchem-wheel-smoke/bin/pip install dist/*.whl
+          WHEEL=$(ls dist/*.whl | head -1)
+          /tmp/qchem-wheel-smoke/bin/pip install "${WHEEL}[chem]"
           /tmp/qchem-wheel-smoke/bin/qchem-run --scenario minimal_vqe --json-summary
 
       - name: Publish to TestPyPI (dry-run / manual)
