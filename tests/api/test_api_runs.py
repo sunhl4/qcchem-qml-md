@@ -137,10 +137,7 @@ def test_v1_routes_expose_api_contract_version_1_0() -> None:
             {"json": {"experiment_yaml": _minimal_experiment_yaml()}},
         ),
     ):
-        if method == "GET":
-            r = client.get(url, **kwargs)
-        else:
-            r = client.post(url, **kwargs)
+        r = client.get(url, **kwargs) if method == "GET" else client.post(url, **kwargs)
         assert r.status_code == 200, (method, url, r.text)
         assert r.json().get("api_contract_version") == "1.0"
 

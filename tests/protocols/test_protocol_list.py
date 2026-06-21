@@ -7,6 +7,8 @@ from tests.helpers.paths import configs_path
 
 pytest.importorskip("pyscf")
 
+from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
+
 from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import load_experiment_config
@@ -15,7 +17,6 @@ from qchem_stack.protocols.computables.expectation import ExpectationValueComput
 from qchem_stack.protocols.computables.qse_matrices import QSEMatricesComputable
 from qchem_stack.protocols.protocol_list import ProtocolList
 from qchem_stack.quantum.algorithms.excited_basis import build_qse_basis_from_vqe_hea
-from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
 
 
 def test_protocol_list_runs_energy_and_qse() -> None:

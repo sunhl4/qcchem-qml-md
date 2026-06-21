@@ -31,7 +31,6 @@ if TYPE_CHECKING:
     from pathlib import Path
 
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
-    from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.chem.pre_quantum_input import PreQuantumInput
     from qchem_stack.config import ExperimentConfig
 

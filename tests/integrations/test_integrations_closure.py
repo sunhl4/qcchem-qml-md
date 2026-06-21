@@ -6,6 +6,7 @@ from dataclasses import replace
 
 from qchem_stack.backends.spec import CircuitIR
 from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
+from qchem_stack.chem.embedding.dmet_self_consistent import DMETBathState, DMETSelfConsistencyLoop
 from qchem_stack.chem.kernels.spin_ucc import (
     IdentityRegrouping,
     build_spin_uccsd_fermion_generators,
@@ -17,7 +18,6 @@ from qchem_stack.integrations import (
     qermit_capability_matrix,
     tensornet_closure_strategy,
 )
-from qchem_stack.chem.embedding.dmet_self_consistent import DMETBathState, DMETSelfConsistencyLoop
 from qchem_stack.integrations.tket_fullchain import (
     TketCompileMode,
     circuit_ir_to_tket_stats_or_none,
