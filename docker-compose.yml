@@ -4,6 +4,24 @@
 # Protocol blobs default to JSON v2 (QCHEM_PROTOCOL_BLOB_V2=1); set 0 only for legacy pickle write.
 
 services:
+  postgres:
+    image: postgres:15
+    container_name: qchem-postgres
+    environment:
+      POSTGRES_USER: qchem
+      POSTGRES_PASSWORD: qchem
+      POSTGRES_DB: qchem_jobs
+    ports:
+      - "5432:5432"
+    volumes:
+      - qchem_pg_data:/var/lib/postgresql/data
+      - ./scripts/init_postgres_jobs.sql:/docker-entrypoint-initdb.d/01_jobs.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U qchem -d qchem_jobs"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   qchem-worker:
     build:
       context: .
@@ -14,9 +32,13 @@ services:
       - ./data:/data
       - ./configs:/configs:ro
     environment:
-      - QCHEM_PROTOCOL_HMAC_KEY=${QCHEM_PROTOCOL_HMAC_KEY:-dev-hmac-key-change-in-production}
+      - QCHEM_PROTOCOL_HMAC_KEY=${QCHEM_PROTOCOL_HMAC_KEY:?Set QCHEM_PROTOCOL_HMAC_KEY before starting}
       - QCHEM_ALLOW_LEGACY_PICKLE=0
-    command: ["qchem-jobs-worker", "--db", "/data/jobs.sqlite", "--workers", "4"]
+      - QCHEM_JOB_DATABASE_URL=${QCHEM_JOB_DATABASE_URL:-postgresql://qchem:qchem@postgres:5432/qchem_jobs}
+    command: ["qchem-jobs-worker", "--db-url", "postgresql://qchem:qchem@postgres:5432/qchem_jobs", "--workers", "4"]
+    depends_on:
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     healthcheck:
       test: ["CMD", "python", "-c", "import qchem_stack; print('OK')"]
@@ -37,8 +59,10 @@ services:
       - ./data:/data
       - ./configs:/configs:ro
     environment:
-      - QCHEM_PROTOCOL_HMAC_KEY=${QCHEM_PROTOCOL_HMAC_KEY:-dev-hmac-key-change-in-production}
+      - QCHEM_PROTOCOL_HMAC_KEY=${QCHEM_PROTOCOL_HMAC_KEY:?Set QCHEM_PROTOCOL_HMAC_KEY before starting}
       - QCHEM_ALLOW_LEGACY_PICKLE=0
+      - QCHEM_STACK_API_KEY=${QCHEM_STACK_API_KEY:?Set QCHEM_STACK_API_KEY before starting}
+      - QCHEM_STACK_REQUIRE_API_KEY=${QCHEM_STACK_REQUIRE_API_KEY:-1}
       - QCHEM_API_HOST=0.0.0.0
       - QCHEM_API_PORT=8000
       - QCHEM_JOB_DB=/data/jobs.sqlite
@@ -54,10 +78,9 @@ services:
       retries: 3
       start_period: 15s
 
-volumes:
-  data:
-    driver: local
-
 networks:
   default:
     name: qchem-network
+
+volumes:
+  qchem_pg_data:

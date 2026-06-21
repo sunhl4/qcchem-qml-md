@@ -1,0 +1,4 @@
+include README_PYPI.md
+include README.md
+include LICENSE
+graft configs

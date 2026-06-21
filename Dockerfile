@@ -1,5 +1,7 @@
 # syntax=docker/dockerfile:1
 # qchem-stack images: build with --target slim (default) or --target full
+# Note: CI and release gates use Python 3.12; images currently track 3.11-slim for size.
+# Align to 3.12 when rebuilding base images for production (pyproject requires >=3.10).
 
 FROM python:3.11-slim AS builder-base
 
