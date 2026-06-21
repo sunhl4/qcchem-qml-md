@@ -2,6 +2,10 @@
 
 from __future__ import annotations
 
+from pathlib import Path
+
+from qchem_stack.config.config_paths import default_configs_dir
+
 SCENARIOS: dict[str, tuple[str, str, list[str]]] = {
     "minimal_vqe": (
         "Minimal VQE (Path A)",
@@ -48,20 +52,63 @@ SCENARIOS: dict[str, tuple[str, str, list[str]]] = {
         "MD / ML active learning",
         "QMEF dataset loops; optional QML-FF / UQC mock backends.",
         [
-            "example_h2_qmlff_md.yaml",
             "example_h2_uqc_mock_md_ml.yaml",
+            "example_h2_qmlff_md.yaml",
             "example_h4_classical_md_stub.yaml",
             "example_h2_md_ml_trajectory_full_pipeline.yaml",
         ],
     ),
 }
 
+__all__ = [
+    "SCENARIOS",
+    "list_scenarios_text",
+    "scenario_base_config_path",
+    "scenario_config_path",
+    "scenario_v3_path",
+]
+
+
+def _configs_root(configs_dir: Path | None) -> Path:
+    return configs_dir if configs_dir is not None else default_configs_dir()
+
+
+def scenario_v3_path(scenario_id: str, *, configs_dir: Path | None = None) -> Path:
+    """Path to thin scenario-first v3 stub YAML (``configs/scenarios/{id}.yaml``)."""
+    if scenario_id not in SCENARIOS:
+        known = ", ".join(sorted(SCENARIOS))
+        raise ValueError(f"unknown scenario {scenario_id!r}; choose from: {known}")
+    base = _configs_root(configs_dir)
+    return (base / "scenarios" / f"{scenario_id}.yaml").resolve()
+
+
+def scenario_base_config_path(scenario_id: str, *, configs_dir: Path | None = None) -> Path:
+    """Full v2 reference YAML for a scenario (legacy onboarding path)."""
+    if scenario_id not in SCENARIOS:
+        known = ", ".join(sorted(SCENARIOS))
+        raise ValueError(f"unknown scenario {scenario_id!r}; choose from: {known}")
+    rel = SCENARIOS[scenario_id][2][0]
+    base = _configs_root(configs_dir)
+    return (base / rel).resolve()
+
+
+def scenario_config_path(scenario_id: str, *, configs_dir: Path | None = None) -> Path:
+    """Resolve onboarding YAML: prefer ``configs/scenarios/{id}.yaml``, else full v2 reference."""
+    v3 = scenario_v3_path(scenario_id, configs_dir=configs_dir)
+    if v3.is_file():
+        return v3
+    return scenario_base_config_path(scenario_id, configs_dir=configs_dir)
+
 
 def list_scenarios_text(*, configs_prefix: str = "configs/") -> str:
     lines = ["Available config scenarios:", ""]
+    base = default_configs_dir()
     for sid, (title, desc, yaml_names) in SCENARIOS.items():
+        v3_rel = f"{configs_prefix}scenarios/{sid}.yaml"
+        v3_path = base / "scenarios" / f"{sid}.yaml"
+        primary = v3_rel if v3_path.is_file() else f"{configs_prefix}{yaml_names[0]}"
         lines.append(f"  {sid:16}  {title}")
         lines.append(f"                    {desc}")
-        lines.append(f"                    -> {configs_prefix}{yaml_names[0]}")
+        lines.append(f"                    -> {primary}")
         lines.append("")
     return "\n".join(lines)

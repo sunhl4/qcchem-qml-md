@@ -1,0 +1,47 @@
+schema_version: '2'
+experiment_id: h2_uniform_multifragment_toy_sto3g
+random_seed: 1
+molecule:
+  symbols:
+  - H
+  - H
+  coordinates:
+  - - 0.0
+    - 0.0
+    - 0.0
+  - - 0.0
+    - 0.0
+    - 1.4
+  coordinate_unit: bohr
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+scf:
+  driver: pyscf
+  method: RHF
+active_space:
+  strategy: cas
+  mapping:
+    fermion_qubit: jordan_wigner
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+backend:
+  provider: statevector
+quantum:
+  algorithm: vqe
+  pauli:
+    use_protocol: false
+  vqe:
+    depth: 1
+    maxiter: 30
+embedding:
+  mode: dmet
+  n_scf_cycles_embedding: 1
+  dmet:
+    fragment_labels:
+    - frag_a
+    - frag_b
+    hamiltonian_source: parity_stub
+    uniform_multifragment_toy: true
+    multifragment_one_shot_shared_hamiltonian: false

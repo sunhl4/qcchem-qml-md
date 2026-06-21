@@ -82,6 +82,39 @@ class JobStore(Protocol):
     def result(self, job_id: str) -> dict[str, Any]: ...
 
 
+class WorkerJobStore(JobStore, Protocol):
+    """Job ledger surface required by ``qchem-jobs-worker`` and retry dispatch."""
+
+    def claim_next_queued(self) -> str | None: ...
+
+    def mark_running(self, job_id: str) -> None: ...
+
+    def complete(self, job_id: str, result: dict[str, Any]) -> None: ...
+
+    def fail(self, job_id: str, message: str) -> None: ...
+
+    def mark_timed_out(self, job_id: str, timeout_seconds: int) -> None: ...
+
+    def append_timeline(self, job_id: str, kind: str, status: str) -> None: ...
+
+    def append_timeline_event(self, job_id: str, event: dict[str, Any]) -> None: ...
+
+    def get_job_public_summary(self, job_id: str) -> JobPublicSummary: ...
+
+    def get_job_row(self, job_id: str) -> dict[str, Any]: ...
+
+    def requeue_after_failure(
+        self,
+        job_id: str,
+        message: str,
+        *,
+        max_retries: int,
+        exponential_backoff: bool = False,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+    ) -> bool: ...
+
+
 def parse_meta_json(meta_raw: str | None) -> dict[str, Any] | None:
     if not meta_raw:
         return None

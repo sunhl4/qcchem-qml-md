@@ -4,6 +4,71 @@ All notable changes to this project are documented in this file.
 
 The format is based on **Keep a Changelog**, and this project adheres to **Semantic Versioning** intent for the Python package (`pyproject.toml`).
 
+## [Unreleased]
+
+## [1.1.0] - 2026-06-15
+
+### Added
+
+- Bundled configs: `config_paths.default_configs_dir()`; wheel installs YAMLs under `share/qchem-stack/configs`.
+- GitHub Pages docs deployment (`deploy-docs.yml`); `SECURITY.md`, `CITATION.cff`, `CODE_OF_CONDUCT.md`.
+- **Release hardening**: `scripts/check_doc_test_paths.py` (Tier-1 fail); expanded `release_precheck.sh` (pyright config slice, pip-audit, contract-docs sync); per-package coverage floors aligned to measured baseline (`jobs` 62%, `md_bridge` 69%).
+- **Types & export**: `protocols/parity_export_types.py`; Pyright `reportAny=error` on all core packages; `dict[str, Any]` density regression gate for `protocols/`.
+- **Jobs & observability**: Postgres protocol conformance CI; OTel docker-compose example (`examples/observability/docker-compose.otlp.yaml`); config validation `Suggestion:` hints for DMET/RHF.
+- **P0–P3 waves (carry-over)**: reusable CI workflows; `WorkerJobStore` / `PostgresJobStore`; config v3 scenario MVP; pipeline JSON schema snapshots; role-based onboarding; production deployment checklist.
+
+### Removed
+
+- `qchem_stack.integrations.compat.*` re-export shims — use `chem.embedding.dmet_self_consistent`, `integrations.schmidt_per_fragment_vqe`, `chem.kernels.spin_ucc`.
+
+### Changed
+
+- Legacy unsigned pickle protocol blobs **disabled by default** (`JobPayloadError`); migration via `scripts/migrate_job_protocol_blobs.py` with temporary `QCHEM_ALLOW_LEGACY_PICKLE=1`.
+- `release_precheck.sh` aligned with CI lint/contract-docs/security gates; default skips full-stack pyright (opt-in `QCHEM_PYRIGHT_FULL=1` for 1.2 debt); L3/nbmake use `--no-cov`; `run_all_smoke.py` skips jax tutorial without `[qmlff]`.
+- Per-package coverage floors for `integrations` (60%), `contracts` and `sdk` (75%).
+- Tests live under layer subdirectories only (`tests/<layer>/`); contributor docs remapped via `check_doc_test_paths.py --fix`.
+
+### Security
+
+- `security.yml` audits both `dev` and `chem,api` install surfaces with `pip-audit`.
+
+## [1.0.0] - 2026-06-05
+
+### Added
+
+- **P0–P3 engineering wave**: Python 3.10 `StrEnum` shim; `QCHEM_STACK_REQUIRE_API_KEY` fail-fast; `protocols.excited_resource_export` (removes protocols→orchestration import); ADAPT/IQEB/DMET L1 example YAMLs; `docs/engineering/test_ownership.md`; perf baseline seed; SDK doc sync in CI.
+- **Stable integrator facade** [`qchem_stack.sdk`](src/qchem_stack/sdk/__init__.py): pipeline, parity export, workflow preview, repro helpers.
+- Console scripts **`qchem-run`** and **`qchem-export-parity`**; wheel-safe **`export_parity_criteria_table`** in-package.
+- HTTP **`api_contract_version": "1.0"`** on all `/v1/*` routes; OpenAPI snapshot gate (`docs/generated/openapi_snapshot.json`).
+- Docs: [`docs/engineering/v1_0_acceptance.md`](docs/engineering/v1_0_acceptance.md), [`migration_v0_8_to_v1_0.md`](docs/engineering/migration_v0_8_to_v1_0.md).
+- CI: import-linter contracts (protocols/chem/quantum layer boundaries); `QCHEM_RELEASE_FULL=1` optional L3 in `release_precheck.sh`.
+- Jobs/md_bridge test expansion; coverage floors **jobs 75%**, **md_bridge 70%**.
+- Operator-pool L1 configs: `example_h2_adapt_bk_pool.yaml`, `example_h2_adapt_generalized_doubles_pool.yaml`, `example_h2_iqeb_bk_singles_pool.yaml`.
+- DMET L1 config: `example_h2_dimer_dmet_self_consistent.yaml`.
+
+### Changed
+
+- Tests reorganized from flat `tests/test_*.py` into layer subdirectories (`api/`, `chem/`, `quantum/`, `repro/`, …).
+- `pipeline_events` split into `pipeline_event_types.py`, `pipeline_event_bus.py`, and slim facade.
+- Coverage floors: `md_bridge` and `api` packages ≥70%; `release_precheck.sh` runs pytest with `--cov`.
+- PyPI classifier **Production/Stable**; package version **1.0.0**.
+- **`results/`** local-only (see `results/README.md`).
+- Per-package coverage floors and pyright tightening on **backends** / **jobs**.
+- Execution closeout docs under **`docs/execution/archive/2026Q2/`**.
+- `product_contract_gaps` rows include `evidence` YAML lists for operator pools and DMET.
+
+### Removed (breaking since v0.8 / v1.0)
+
+- **`qchem_stack.chem.embedding.schmidt_variational_sidecar`** — use **`integrations.schmidt_per_fragment_vqe`**.
+- **`molecular_hamiltonian_from_pyscf`** — use **`build_pre_quantum_input`** / YAML pipeline.
+- **`qchem_stack.chem.pre_quantum_build.hamiltonian`** alias — use **`build_pre_quantum_input(...).qubit_hamiltonian`**.
+- **`projection_hamiltonian.mulliken_mo_populations_on_atoms`** (PySCF-mf shim) — use **`chem.embedding.ao_fragment.mulliken_mo_populations_on_atoms`** with **`AOBasisView`**.
+- Root **`opus4.8-test.md`** agent session artifact (0.8 cycle).
+
+### Fixed
+
+- `release_precheck.sh` no longer assumes pre-existing `htmlcov/` for threshold checks.
+
 ## [0.6.0] - 2026-06-03
 
 ### Added
@@ -48,32 +113,6 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 - **`qchem_stack.sdk.export_parity_table`** and **`qchem-export-parity`** call the in-package exporter (no subprocess).
 - **`scripts/venv-run`** / CONTRIBUTING: prefer `.venv` bootstrap path.
 - Docs index: explicit Product / Reference / Non-runtime zones.
-
-## [1.0.0] - 2026-06-04
-
-### Added
-
-- **Stable integrator facade** [`qchem_stack.sdk`](src/qchem_stack/sdk/__init__.py): pipeline, parity export, workflow preview, repro helpers.
-- Console scripts **`qchem-run`** and **`qchem-export-parity`**; wheel-safe **`export_parity_criteria_table`** in-package.
-- HTTP **`api_contract_version": "1.0"`** on all `/v1/*` routes; OpenAPI snapshot gate (`docs/generated/openapi_snapshot.json`).
-- Docs: [`docs/engineering/v1_0_acceptance.md`](docs/engineering/v1_0_acceptance.md), [`migration_v0_8_to_v1_0.md`](docs/engineering/migration_v0_8_to_v1_0.md).
-- CI: import-linter contracts (protocols/chem/quantum layer boundaries); `QCHEM_RELEASE_FULL=1` optional L3 in `release_precheck.sh`.
-- Jobs/md_bridge test expansion; coverage floors **jobs 75%**, **md_bridge 70%**.
-
-### Changed
-
-- PyPI classifier **Production/Stable**; package version **1.0.0**.
-- **`results/`** local-only (see `results/README.md`).
-- Per-package coverage floors and pyright tightening on **backends** / **jobs**.
-- Execution closeout docs under **`docs/execution/archive/2026Q2/`**.
-
-### Removed (breaking since v0.8 / v1.0)
-
-- **`qchem_stack.chem.embedding.schmidt_variational_sidecar`** — use **`integrations.schmidt_per_fragment_vqe`**.
-- **`molecular_hamiltonian_from_pyscf`** — use **`build_pre_quantum_input`** / YAML pipeline.
-- **`qchem_stack.chem.pre_quantum_build.hamiltonian`** alias — use **`build_pre_quantum_input(...).qubit_hamiltonian`**.
-- **`projection_hamiltonian.mulliken_mo_populations_on_atoms`** (PySCF-mf shim) — use **`chem.embedding.ao_fragment.mulliken_mo_populations_on_atoms`** with **`AOBasisView`**.
-- Root **`opus4.8-test.md`** agent session artifact (0.8 cycle).
 
 ## [0.3.0] - 2026-05-28
 

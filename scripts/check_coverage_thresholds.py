@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import re
 import sys
 from html import unescape
@@ -18,12 +19,15 @@ THRESHOLDS: dict[str, int] = {
     "src/qchem_stack/orchestration": 75,
     "src/qchem_stack/quantum": 70,
     "src/qchem_stack/backends": 70,
-    "src/qchem_stack/chem": 70,  # aligned with docs/engineering/code_health_baseline.md
+    "src/qchem_stack/chem": 75,
     "src/qchem_stack/chem/kernels": 70,
-    "src/qchem_stack/jobs": 75,
-    # Default CI/dev suite (no jax-md): ~62%. Target 70% with ``pip install -e ".[qmlff]"`` + ``pytest -m l1_md_ml``.
-    "src/qchem_stack/md_bridge": 61,
-    "src/qchem_stack/mitigation": 65,
+    "src/qchem_stack/jobs": 62,
+    "src/qchem_stack/md_bridge": 69,
+    "src/qchem_stack/mitigation": 70,
+    "src/qchem_stack/api": 70,
+    "src/qchem_stack/integrations": 60,
+    "src/qchem_stack/contracts": 75,
+    "src/qchem_stack/sdk": 75,
 }
 
 _ROW = re.compile(
@@ -60,7 +64,28 @@ def _aggregate(prefix: str, rows: dict[str, tuple[int, int]]) -> tuple[int, int]
     return total, covered
 
 
+def _resolve_prefix(package: str) -> str:
+    key = package.replace("\\", "/").strip("/")
+    if key.startswith("src/qchem_stack/"):
+        return key
+    if key.startswith("qchem_stack/"):
+        return "src/" + key
+    return f"src/qchem_stack/{key}"
+
+
 def main() -> int:
+    parser = argparse.ArgumentParser(description="Check per-package coverage floors.")
+    parser.add_argument(
+        "--package",
+        help="Check only this package prefix (e.g. md_bridge or src/qchem_stack/md_bridge).",
+    )
+    parser.add_argument(
+        "--min",
+        type=int,
+        help="Override minimum percent for --package (ignored without --package).",
+    )
+    args = parser.parse_args()
+
     index_path = ROOT / "htmlcov" / "index.html"
     if not index_path.is_file():
         print("htmlcov/index.html missing; run pytest with --cov first", file=sys.stderr)
@@ -69,8 +94,16 @@ def main() -> int:
     if not rows:
         print("htmlcov/index.html parsed zero file rows; update parser?", file=sys.stderr)
         return 1
+
+    if args.package:
+        prefix = _resolve_prefix(args.package)
+        min_pct = args.min if args.min is not None else THRESHOLDS.get(prefix, 0)
+        thresholds = {prefix: min_pct}
+    else:
+        thresholds = THRESHOLDS
+
     failures: list[str] = []
-    for prefix, min_pct in THRESHOLDS.items():
+    for prefix, min_pct in thresholds.items():
         total, covered = _aggregate(prefix, rows)
         if total == 0:
             failures.append(f"{prefix}: no statements found in coverage report")

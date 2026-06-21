@@ -1,0 +1,3 @@
+schema_version: "3"
+scenario: mitigation_shots
+overrides: {}

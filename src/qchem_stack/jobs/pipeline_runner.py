@@ -9,13 +9,15 @@ from typing import TYPE_CHECKING, Any
 import yaml
 
 from qchem_stack.config import ExperimentConfig
+from qchem_stack.config.path_sandbox import ConfigBaseDirError, validate_config_base_dir
 from qchem_stack.contracts.schema_ids import FULL_PIPELINE_JOB_RESULT_V1
+from qchem_stack.exceptions import JobPayloadError
 from qchem_stack.jobs.kinds import JOB_KIND_FULL_PIPELINE
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from qchem_stack.orchestration.run_context import RunContext
 
 if TYPE_CHECKING:
-    from qchem_stack.jobs.store import SqliteJobStore
+    from qchem_stack.jobs.store_schema import WorkerJobStore
     from qchem_stack.orchestration.pipeline_result import PipelineResultV1
 
 _RESULT_KEYS = (
@@ -61,31 +63,32 @@ def pipeline_result_for_job_store(out: PipelineResultV1) -> dict[str, Any]:
     return slim
 
 
-def run_full_pipeline_job(store: SqliteJobStore, job_id: str) -> None:
+def run_full_pipeline_job(store: WorkerJobStore, job_id: str) -> None:
     row = store.get_job_row(job_id)
     kind = row.get("job_kind") or "pauli_protocol"
     if kind != JOB_KIND_FULL_PIPELINE:
-        raise ValueError(
+        raise JobPayloadError(
             f"job {job_id}: expected job_kind {JOB_KIND_FULL_PIPELINE!r}, got {kind!r}"
         )
     raw = row["payload"]
     if not isinstance(raw, bytes):
-        raise TypeError("payload must be bytes")
+        raise JobPayloadError("payload must be bytes")
     body = json.loads(raw.decode("utf-8"))
     cy = body.get("config_yaml")
     if not isinstance(cy, str) or not cy.strip():
-        raise ValueError("full_pipeline payload missing config_yaml")
+        raise JobPayloadError("full_pipeline payload missing config_yaml")
     data = yaml.safe_load(cy)
     if not isinstance(data, dict):
-        raise ValueError("config_yaml must parse to a mapping")
+        raise JobPayloadError("config_yaml must parse to a mapping")
     base_dir_raw = body.get("config_base_dir")
     base_dir: Path | None = None
     if base_dir_raw is not None:
         if not isinstance(base_dir_raw, str) or not base_dir_raw.strip():
-            raise ValueError("config_base_dir must be a non-empty string when provided")
-        base_dir = Path(base_dir_raw).expanduser().resolve()
-        if not base_dir.is_dir():
-            raise ValueError(f"config_base_dir is not a directory: {base_dir}")
+            raise JobPayloadError("config_base_dir must be a non-empty string when provided")
+        try:
+            base_dir = validate_config_base_dir(base_dir_raw)
+        except ConfigBaseDirError as exc:
+            raise JobPayloadError(str(exc)) from exc
     cfg = ExperimentConfig.from_yaml_dict(
         data,
         geometry_files_base_dir=base_dir,

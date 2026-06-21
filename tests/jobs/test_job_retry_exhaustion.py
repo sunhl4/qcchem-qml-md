@@ -5,8 +5,6 @@ from __future__ import annotations
 import tempfile
 from typing import TYPE_CHECKING
 
-import pytest
-
 from qchem_stack.jobs.store import JobStatus, SqliteJobStore, process_job_with_retry
 
 if TYPE_CHECKING:

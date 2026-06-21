@@ -90,8 +90,8 @@ class JobStoreLifecycleMixin:
         try:
             con.execute("BEGIN IMMEDIATE")
             row = con.execute(
-                "SELECT job_id FROM jobs WHERE status=? ORDER BY created ASC LIMIT 1",
-                (JobStatus.QUEUED.value,),
+                "SELECT job_id FROM jobs WHERE status=? AND updated <= ? ORDER BY created ASC LIMIT 1",
+                (JobStatus.QUEUED.value, now),
             ).fetchone()
             if row is None:
                 con.commit()
@@ -168,3 +168,48 @@ class JobStoreLifecycleMixin:
         if err:
             out["error"] = str(err)[:2000]
         return out
+
+    def requeue_after_failure(
+        self: JobStoreSqlProtocol,
+        job_id: str,
+        message: str,
+        *,
+        max_retries: int,
+        exponential_backoff: bool = False,
+        base_delay: float = 1.0,
+        max_delay: float = 60.0,
+    ) -> bool:
+        from .store_retry import exponential_backoff_delay
+
+        con, is_temp = self._get_connection()
+        scheduled = False
+        try:
+            row = con.execute("SELECT retry_count FROM jobs WHERE job_id=?", (job_id,)).fetchone()
+            r = int(row[0] if row and row[0] is not None else 0)
+            now = time.time()
+            if r < max_retries:
+                updated_at = (
+                    now + exponential_backoff_delay(r, base_delay, max_delay)
+                    if exponential_backoff
+                    else now
+                )
+                con.execute(
+                    """UPDATE jobs SET retry_count=retry_count+1, status=?, result=NULL,
+                       error_message=?, updated=? WHERE job_id=?""",
+                    (JobStatus.QUEUED.value, message[:8000], updated_at, job_id),
+                )
+                scheduled = True
+            else:
+                con.execute(
+                    "UPDATE jobs SET status=?, error_message=?, updated=? WHERE job_id=?",
+                    (JobStatus.FAILED.value, message[:8000], now, job_id),
+                )
+            con.commit()
+        finally:
+            if is_temp:
+                con.close()
+        if scheduled:
+            self.append_timeline(job_id, "retry_scheduled", JobStatus.QUEUED.value)
+        else:
+            self.append_timeline(job_id, "failed", JobStatus.FAILED.value)
+        return scheduled
