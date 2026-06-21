@@ -646,14 +646,14 @@ EXPERIMENT_CROSS_VALIDATORS = (
 | 2 | 扩展 `GeometryFileFormat` |
 | 3 | `_infer_geometry_format` 加分支 |
 | 4 | `merge_molecule_dict_from_geometry_file` 允许新 format |
-| 5 | `tests/test_geometry_files.py` |
+| 5 | `tests/chem/test_geometry_files.py` |
 
 ### 10.6 提 PR 前自查
 
 - [ ] 对照 [config_校验分层约定.md](config_校验分层约定.md)
 - [ ] 子块 `extra="forbid"`
 - [ ] 错误信息里用完整 nested 路径（如 `quantum.vqe.maxiter`）
-- [ ] 跑 `pytest tests/test_config_validation_helpers.py` 或 section 专项测试
+- [ ] 跑 `pytest tests/config/test_config_validation_helpers.py` 或 section 专项测试
 - [ ] 示例 YAML 能 `from_yaml_dict` 加载
 - [ ] 更新对应 `docs/说明_*.md`
 

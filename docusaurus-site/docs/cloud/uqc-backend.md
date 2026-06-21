@@ -50,5 +50,5 @@ backend:
 ## 测试
 
 ```bash
-pytest tests/test_uqc_backend_units.py tests/test_uqc_mock_md_ml_integration.py -q
+pytest tests/quantum/test_uqc_backend_units.py tests/quantum/test_uqc_mock_md_ml_integration.py -q
 ```

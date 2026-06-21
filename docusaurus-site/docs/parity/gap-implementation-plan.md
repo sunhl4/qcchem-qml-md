@@ -10,7 +10,7 @@ description: 摘自仓库 docs/public_parity_matrix.md 的公开差距摘要与�
 ## 维护约定
 
 - 新增或重命名 YAML 能力字段时，同步 `qchem_stack.protocols.product_contract` 中的 `PARITY_EXPORT_V3_STABLE_KEYS` 与 `scripts/check_parity_export_sample.py`。
-- HTTP **`GET /v1/meta/capability-surface`** 返回 `schema: capability_surface_v2`，与 `tests/test_api_runs.py::test_capability_surface_matches_product_contract` 同源对拍。
+- HTTP **`GET /v1/meta/capability-surface`** 返回 `schema: capability_surface_v2`，与 `tests/api/test_api_runs.py::test_capability_surface_matches_product_contract` 同源对拍。
 - **`GET /v1/meta/parity-gaps`** 返回 `capability_gap_export_v1`（仅 gaps 列表）。
 
 ## 差距类别（摘要）

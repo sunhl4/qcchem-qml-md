@@ -19,7 +19,7 @@ description: qchem_stack.protocols.product_contract 与 qchem_stack.integrations
 |------|-----------------|------|
 | Gap 行 + anchors | `product_gap_categories()`, `product_gap_anchor_index_v1()`, `validate_product_gap_categories()` | `GET /v1/meta/parity-gaps`、`GET /v1/meta/capability-surface` |
 | Capability 名称 → 模块 | `PRODUCT_CAPABILITY_MAP` / `product_capability_map_for_docs()` | `capability_surface_v2.capability_map` |
-| Export 常量 | `PARITY_EXPORT_V3_STABLE_KEYS` | `scripts/check_parity_export_sample.py`、`tests/test_export_parity_golden.py` |
+| Export 常量 | `PARITY_EXPORT_V3_STABLE_KEYS` | `scripts/check_parity_export_sample.py`、`tests/repro/test_export_parity_golden.py` |
 | 预览载荷 | `workflow_preview_payload`, `computable_graph_v2`, `protocol_stages_preview_v1`, `slim_product_summary_from_pipeline_result` | FastAPI **`POST /v1/meta/workflow-preview`**、`GET /v1/runs/{id}/summary` |
 
 ## 自检（本地）

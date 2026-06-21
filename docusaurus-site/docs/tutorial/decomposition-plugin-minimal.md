@@ -24,7 +24,7 @@ embedding:
 
 ## 验收
 
-- `pytest tests/test_decomposition_plugin_pipeline.py`（端到端 `run_pipeline_sync`）
+- `pytest tests/chem/test_decomposition_plugin_pipeline.py`（端到端 `run_pipeline_sync`）
 - `python scripts/export_parity_criteria_table.py configs/example_decomposition_plugin_toy.yaml`
 - 检查 `run_summary` 与导出结果中的分解插件字段
 

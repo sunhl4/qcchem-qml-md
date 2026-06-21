@@ -13,7 +13,7 @@ keywords:
 ## 发布前检查
 
 - Python：`pytest tests -m "not slow and not perf"`；`python scripts/check_parity_export_sample.py`
-- 生产 API：设置 `QCHEM_STACK_API_KEY`；验证 `tests/test_api_auth_middleware.py`
+- 生产 API：设置 `QCHEM_STACK_API_KEY`；验证 `tests/api/test_api_auth_middleware.py`
 - `npm install` 与 `npm run build` 均成功
 - 主页、导航、侧边栏、页脚链接全部可访问
 - 关键页面 `title/description` 已设置
