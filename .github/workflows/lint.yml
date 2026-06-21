@@ -1,0 +1,38 @@
+name: Lint
+
+on:
+  workflow_call:
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install Ruff
+        run: |
+          python -m pip install -U pip
+          pip install "ruff>=0.3"
+      - name: Ruff check (src + tests + scripts + examples)
+        run: ruff check src/qchem_stack tests scripts examples
+      - name: Ruff format (check only)
+        run: ruff format --check src/qchem_stack tests scripts examples
+      - name: Import layer boundaries
+        run: python scripts/check_import_layers.py
+      - name: Import linter contracts
+        run: |
+          pip install import-linter
+          lint-imports
+      - name: Comparative execution backlog validator
+        run: python scripts/check_comparative_execution_backlog.py
+      - name: Code health regression (large files)
+        run: python scripts/check_code_health_regression.py
+      - name: Test layout (no flat tests at tests/ root)
+        run: python scripts/check_test_layout.py
+      - name: Doc test path drift (Tier-1)
+        run: python scripts/check_doc_test_paths.py

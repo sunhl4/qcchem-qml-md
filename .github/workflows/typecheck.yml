@@ -1,0 +1,41 @@
+name: Typecheck
+
+on:
+  workflow_call:
+
+jobs:
+  typecheck-config:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install package + pyright
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]" pyright
+      - name: Pyright (config, exceptions, repro)
+        run: pyright src/qchem_stack/config src/qchem_stack/repro src/qchem_stack/exceptions.py
+      - name: Pyright (chem solvers)
+        run: pyright src/qchem_stack/chem/solvers
+
+  typecheck-stack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install package + pyright
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]" pyright
+      - name: Pyright (full src/qchem_stack)
+        run: pyright src/qchem_stack

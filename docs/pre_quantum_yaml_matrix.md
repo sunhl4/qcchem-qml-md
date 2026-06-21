@@ -1,6 +1,6 @@
 # Pre-quantum YAML 组合矩阵（验收表）
 
-维护者与 CI 用：描述 **进入量子阶段之前** 允许的 `ExperimentConfig` 组合。规则实现在 `qchem_stack.config._experiment_validation`；一次性调用全部门禁可用 `validate_pre_quantum_contract(cfg)`；负例见 `tests/test_config_pre_quantum_combos.py`。
+维护者与 CI 用：描述 **进入量子阶段之前** 允许的 `ExperimentConfig` 组合。规则实现在 `qchem_stack.config._experiment_validation`；一次性调用全部门禁可用 `validate_pre_quantum_contract(cfg)`；负例见 `tests/config/test_config_pre_quantum_combos.py`。
 
 ## 图例
 
@@ -54,9 +54,9 @@
 ## 基线命令（波次 0）
 
 ```bash
-./scripts/venv-run pytest tests/test_orchestration_pipeline.py tests/test_pre_quantum_input_contract.py tests/test_backend_capability_conformance.py -q
-./scripts/venv-run pytest tests/test_run_build_cache.py tests/test_validate_pre_quantum_contract.py tests/test_config_pre_quantum_combos.py -q
-./scripts/venv-run pytest -m psi4 tests/test_psi4_pre_quantum_pipeline.py tests/test_psi4_pyscf_h2_canonical_parity.py tests/test_psi4_pyscf_alignment.py -q  # optional
+./scripts/venv-run pytest tests/orchestration/test_orchestration_pipeline.py tests/chem/test_pre_quantum_input_contract.py tests/backends/test_backend_capability_conformance.py -q
+./scripts/venv-run pytest tests/chem/test_run_build_cache.py tests/chem/test_validate_pre_quantum_contract.py tests/config/test_config_pre_quantum_combos.py -q
+./scripts/venv-run pytest -m psi4 tests/chem/test_psi4_pre_quantum_pipeline.py tests/chem/test_psi4_pyscf_h2_canonical_parity.py tests/chem/test_psi4_pyscf_alignment.py -q  # optional
 cd docusaurus-site && npm run build
 ```
 

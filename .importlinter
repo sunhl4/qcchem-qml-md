@@ -25,9 +25,14 @@ source_modules =
     qchem_stack.protocols
 forbidden_modules =
     qchem_stack.orchestration
-ignore_imports =
-    qchem_stack.protocols.parity_criteria_export -> qchem_stack.orchestration.excited_stages
-    qchem_stack.protocols.parity_criteria_export -> qchem_stack.md_bridge
+
+[importlinter:contract:integrations-no-orchestration]
+name = integrations must not import orchestration at module level
+type = forbidden
+source_modules =
+    qchem_stack.integrations
+forbidden_modules =
+    qchem_stack.orchestration
 
 [importlinter:contract:chem-no-jobs]
 name = chem must not import jobs
@@ -44,3 +49,19 @@ source_modules =
     qchem_stack.quantum
 forbidden_modules =
     qchem_stack.jobs
+
+[importlinter:contract:orchestration-no-api]
+name = orchestration must not import api
+type = forbidden
+source_modules =
+    qchem_stack.orchestration
+forbidden_modules =
+    qchem_stack.api
+
+[importlinter:contract:md-bridge-no-orchestration]
+name = md_bridge must not import orchestration at module level
+type = forbidden
+source_modules =
+    qchem_stack.md_bridge
+forbidden_modules =
+    qchem_stack.orchestration

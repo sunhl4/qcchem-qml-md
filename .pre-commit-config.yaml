@@ -9,3 +9,27 @@ repos:
         files: ^(src/qchem_stack|tests|scripts|examples)/
       - id: ruff-format
         files: ^(src/qchem_stack|tests|scripts|examples)/
+
+  - repo: https://github.com/RobertCraigie/pyright-python
+    rev: v1.1.403
+    hooks:
+      - id: pyright
+        name: pyright (config layer)
+        files: ^src/qchem_stack/config/
+        args: ["--project", "pyproject.toml"]
+      - id: pyright
+        name: pyright (full stack)
+        files: ^src/qchem_stack/
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.4.1
+    hooks:
+      - id: codespell
+        args: ["--skip=*.json,*.sqlite,*.lock,htmlcov,.git,*.egg-info,build,dist"]
+        exclude: ^docs/技术文档
+
+  - repo: https://github.com/Yelp/detect-secrets
+    rev: v1.5.0
+    hooks:
+      - id: detect-secrets
+        args: ["--baseline", ".secrets.baseline"]

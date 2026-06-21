@@ -1,0 +1,58 @@
+name: Test
+
+on:
+  workflow_call:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.10", "3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev]"
+      - name: Strict repro JSON API
+        run: |
+          python -c "from qchem_stack.repro.export import repro_json_dumps; repro_json_dumps({'ok': True})"
+      - name: Pytest
+        run: pytest tests -q --tb=short -m "not slow and not perf" -n auto
+      - name: Backend statevector conformance (PR smoke)
+        if: matrix.python-version == '3.12'
+        run: pytest tests/backends/test_p4_backend_conformance.py -k statevector -q --tb=short
+      - name: Backend output contract (statevector + qiskit)
+        if: matrix.python-version == '3.12'
+        run: |
+          pip install -e ".[quantum]"
+          pytest tests/backends/test_backend_output_contract.py -q --tb=short
+      - name: Precomputed-only pipeline smoke (no PySCF)
+        if: matrix.python-version == '3.12'
+        run: python scripts/smoke_pipeline.py --precomputed-only
+      - name: MD/ML bridge smoke (l1_md_ml, PR)
+        if: matrix.python-version == '3.12'
+        run: pytest tests/md_bridge tests/integrations -q --tb=short -m l1_md_ml -k "not jax"
+      - name: Upload coverage report
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: htmlcov-py312
+          path: htmlcov/
+          if-no-files-found: warn
+      - name: Per-package coverage thresholds
+        if: matrix.python-version == '3.12'
+        run: python scripts/check_coverage_thresholds.py
+      - name: PR slow smoke (Python 3.12 only)
+        if: matrix.python-version == '3.12'
+        run: pytest tests/integrations/test_pr_slow_smoke.py tests/chem/test_embedding.py -m slow -q --tb=short
+      - name: Check examples importable (syntax and import validation)
+        run: python scripts/check_examples_importable.py

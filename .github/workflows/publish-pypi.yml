@@ -19,10 +19,10 @@ jobs:
     runs-on: ubuntu-latest
     environment: ${{ github.event_name == 'release' && 'pypi' || '' }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Python
-        uses: actions/setup-python@v5
+        uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -31,6 +31,16 @@ jobs:
 
       - name: Build sdist and wheel
         run: python -m build
+
+      - name: Validate distribution metadata
+        run: twine check dist/*
+
+      - name: Smoke install wheel
+        run: |
+          python -m venv /tmp/qchem-wheel-smoke
+          /tmp/qchem-wheel-smoke/bin/pip install -U pip
+          /tmp/qchem-wheel-smoke/bin/pip install dist/*.whl
+          /tmp/qchem-wheel-smoke/bin/qchem-run --scenario minimal_vqe --json-summary
 
       - name: Publish to TestPyPI (dry-run / manual)
         if: github.event_name == 'workflow_dispatch' && inputs.dry_run

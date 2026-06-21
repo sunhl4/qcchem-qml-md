@@ -1,0 +1,37 @@
+name: Bug report
+description: Report a reproducible issue in qchem-stack
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. Include version, install method, and minimal repro steps.
+  - type: input
+    id: version
+    attributes:
+      label: qchem-stack version
+      placeholder: "1.1.0"
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        pip install ...
+        qchem-run --scenario minimal_vqe
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+    validations:
+      required: true
