@@ -32,20 +32,22 @@ router = APIRouter(tags=["meta", "product"])
 def product_surface() -> dict[str, object]:
     from qchem_stack import __version__
 
-    return with_api_contract({
-        "schema": PRODUCT_SURFACE_V1,
-        "qchem_stack_version": __version__,
-        "capability_notes": [
-            "Five-stage protocol preview: POST /v1/meta/workflow-preview (YAML-only, no chemistry).",
-            "Computable DAG (semantic v2): POST /v1/meta/workflow-preview.",
-            "Capability one-shot: GET /v1/meta/capability-surface (product capability map + product gaps + operator_pool_registry_export_v1).",
-            "Job lifecycle: POST/GET /v1/runs (optional project_slug), GET /v1/runs/{id}/summary, repro GET /v1/runs/{id}/repro (DONE only); events use persisted timeline when available.",
-            "ML / MD bridge surface: GET /v1/meta/ml-md-bridge; validate QMEFDataset JSON: POST /v1/meta/qmef-validate; in-memory MLIP stub fit: POST /v1/meta/ml-md-trainer-stub-fit.",
-        ],
-        "gap_export": "/v1/meta/parity-gaps",
-        "capability_surface": "/v1/meta/capability-surface",
-        "ml_md_bridge": "/v1/meta/ml-md-bridge",
-    })
+    return with_api_contract(
+        {
+            "schema": PRODUCT_SURFACE_V1,
+            "qchem_stack_version": __version__,
+            "capability_notes": [
+                "Five-stage protocol preview: POST /v1/meta/workflow-preview (YAML-only, no chemistry).",
+                "Computable DAG (semantic v2): POST /v1/meta/workflow-preview.",
+                "Capability one-shot: GET /v1/meta/capability-surface (product capability map + product gaps + operator_pool_registry_export_v1).",
+                "Job lifecycle: POST/GET /v1/runs (optional project_slug), GET /v1/runs/{id}/summary, repro GET /v1/runs/{id}/repro (DONE only); events use persisted timeline when available.",
+                "ML / MD bridge surface: GET /v1/meta/ml-md-bridge; validate QMEFDataset JSON: POST /v1/meta/qmef-validate; in-memory MLIP stub fit: POST /v1/meta/ml-md-trainer-stub-fit.",
+            ],
+            "gap_export": "/v1/meta/parity-gaps",
+            "capability_surface": "/v1/meta/capability-surface",
+            "ml_md_bridge": "/v1/meta/ml-md-bridge",
+        }
+    )
 
 
 @router.get("/v1/meta/capability-surface")
@@ -72,21 +74,23 @@ def capability_surface(request: Request) -> dict[str, object]:
             status_code=500,
             detail={"message": "invalid product_gap_categories contract", "errors": errs},
         )
-    payload: dict[str, object] = with_api_contract({
-        "schema": CAPABILITY_SURFACE_V2,
-        "qchem_stack_version": __version__,
-        "capability_map": product_capability_map_for_docs(),
-        "gaps": product_gap_categories(),
-        "gap_anchor_index_v1": product_gap_anchor_index_v1(),
-        "mitigation_execution_model": mitigation_execution_model_public(),
-        "open_stack_differentiators": open_stack_differentiators_public(),
-        "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
-        "algorithm_registry_export_v1": algorithm_registry_export(),
-        "variational_registry_export_v1": variational_registry_export(),
-        "excited_registry_export_v1": excited_registry_export(),
-        "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
-        "ansatz_protocol_matrix_v1": ansatz_protocol_matrix_v1(),
-    })
+    payload: dict[str, object] = with_api_contract(
+        {
+            "schema": CAPABILITY_SURFACE_V2,
+            "qchem_stack_version": __version__,
+            "capability_map": product_capability_map_for_docs(),
+            "gaps": product_gap_categories(),
+            "gap_anchor_index_v1": product_gap_anchor_index_v1(),
+            "mitigation_execution_model": mitigation_execution_model_public(),
+            "open_stack_differentiators": open_stack_differentiators_public(),
+            "operator_pool_registry_export_v1": operator_pool_registry_export_v1(),
+            "algorithm_registry_export_v1": algorithm_registry_export(),
+            "variational_registry_export_v1": variational_registry_export(),
+            "excited_registry_export_v1": excited_registry_export(),
+            "uccsd_mapping_support_matrix_v1": uccsd_mapping_support_matrix_v1(),
+            "ansatz_protocol_matrix_v1": ansatz_protocol_matrix_v1(),
+        }
+    )
     body = api_json_dumps(payload, sort_keys=True)
     etag = hashlib.sha256(body.encode("utf-8")).hexdigest()[:32]
     if_none = request.headers.get("if-none-match", "").strip().strip('"')
@@ -114,12 +118,14 @@ def parity_gaps() -> dict[str, object]:
             status_code=500,
             detail={"message": "invalid product_gap_categories contract", "errors": errs},
         )
-    return with_api_contract({
-        "schema": CAPABILITY_GAP_EXPORT_V1,
-        "qchem_stack_version": __version__,
-        "gaps": product_gap_categories(),
-        "gap_anchor_index_v1": product_gap_anchor_index_v1(),
-    })
+    return with_api_contract(
+        {
+            "schema": CAPABILITY_GAP_EXPORT_V1,
+            "qchem_stack_version": __version__,
+            "gaps": product_gap_categories(),
+            "gap_anchor_index_v1": product_gap_anchor_index_v1(),
+        }
+    )
 
 
 @router.post("/v1/meta/workflow-preview", tags=["product"])
@@ -140,12 +146,14 @@ def computables_preview(
 ) -> dict[str, object]:
     cfg = experiment_config_from_request_yaml(body.experiment_yaml)
     refs = list_computables_for_config(cfg)
-    return with_api_contract({
-        "schema": COMPUTABLES_PREVIEW_V1,
-        "experiment_id": cfg.experiment_id,
-        "computables": [{"name": r.name, "kind": r.kind, "details": r.details} for r in refs],
-        "computable_abstract": computables_export_dict(cfg, protocol_counts=None),
-    })
+    return with_api_contract(
+        {
+            "schema": COMPUTABLES_PREVIEW_V1,
+            "experiment_id": cfg.experiment_id,
+            "computables": [{"name": r.name, "kind": r.kind, "details": r.details} for r in refs],
+            "computable_abstract": computables_export_dict(cfg, protocol_counts=None),
+        }
+    )
 
 
 @router.get("/v1/meta/queue-stats")
@@ -156,8 +164,10 @@ def queue_stats(
 ) -> dict[str, object]:
     db = validate_db_path(job_db_path) if job_db_path else default_job_db_path()
     store = sqlite_job_store(str(db))
-    return with_api_contract({
-        "schema": QUEUE_STATS_V1,
-        "job_db": str(store.path.resolve()),
-        "counts": store.count_by_status(),
-    })
+    return with_api_contract(
+        {
+            "schema": QUEUE_STATS_V1,
+            "job_db": str(store.path.resolve()),
+            "counts": store.count_by_status(),
+        }
+    )

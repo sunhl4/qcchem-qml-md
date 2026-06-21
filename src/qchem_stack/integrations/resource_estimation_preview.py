@@ -98,9 +98,7 @@ def build_resource_estimation_preview_v1(
         },
         "vqe_depth_yaml": int(qt.vqe.depth),
         "n_pauli_groups_upper_bound_proxy": (
-            max(1, int(qt.pauli.support_max_terms) // 8)
-            if qt.pauli.support_max_terms
-            else None
+            max(1, int(qt.pauli.support_max_terms) // 8) if qt.pauli.support_max_terms else None
         ),
         "pmsv_enabled_yaml": mit.pmsv.enabled,
         "run_sampled_pauli_protocol_yaml": qt.pauli.run_sampled,

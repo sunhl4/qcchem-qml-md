@@ -81,13 +81,15 @@ def list_runs(
         limit=limit,
         offset=offset,
     )
-    return with_api_contract({
-        "schema": JOB_LIST_V1,
-        "job_db": str(db.resolve()),
-        "limit": limit,
-        "offset": offset,
-        "jobs": jobs,
-    })
+    return with_api_contract(
+        {
+            "schema": JOB_LIST_V1,
+            "job_db": str(db.resolve()),
+            "limit": limit,
+            "offset": offset,
+            "jobs": jobs,
+        }
+    )
 
 
 @router.post("/v1/runs", response_model=None)
@@ -139,15 +141,17 @@ async def post_run(request: Request, body: Annotated[RunRequest, Body()]) -> dic
         meta_extra=meta_extra,
     )
     return JSONResponse(
-        with_api_contract({
-            "schema": RUN_ENQUEUE_RESPONSE_V1,
-            "job_id": handle.job_id,
-            "experiment_id": cfg.experiment_id,
-            "trace_id": rc.trace_id,
-            "client_request_id": rc.client_request_id,
-            "status": "QUEUED",
-            "job_db": str(db.resolve()),
-        }),
+        with_api_contract(
+            {
+                "schema": RUN_ENQUEUE_RESPONSE_V1,
+                "job_id": handle.job_id,
+                "experiment_id": cfg.experiment_id,
+                "trace_id": rc.trace_id,
+                "client_request_id": rc.client_request_id,
+                "status": "QUEUED",
+                "job_db": str(db.resolve()),
+            }
+        ),
         status_code=202,
         headers=headers,
     )
@@ -182,12 +186,14 @@ def get_run_events(
         raise HTTPException(status_code=404, detail=f"job not found: {e}") from e
     events_raw = tl.get("events") or []
     events: list[dict[str, object]] = [dict(e) for e in events_raw if isinstance(e, dict)]
-    return with_api_contract({
-        "schema": JOB_EVENTS_V1,
-        "job_id": job_id,
-        "note": str(tl.get("source", "")),
-        "events": events,
-    })
+    return with_api_contract(
+        {
+            "schema": JOB_EVENTS_V1,
+            "job_id": job_id,
+            "note": str(tl.get("source", "")),
+            "events": events,
+        }
+    )
 
 
 @router.get("/v1/runs/{job_id}/summary")
@@ -228,12 +234,14 @@ def get_run_repro(
     repro = row.get("repro")
     if not isinstance(repro, dict):
         raise HTTPException(status_code=404, detail="result has no repro block")
-    return with_api_contract({
-        "schema": RUN_REPRO_ONLY_V1,
-        "job_id": job_id,
-        "job_kind": row.get("job_kind"),
-        "repro": repro,
-    })
+    return with_api_contract(
+        {
+            "schema": RUN_REPRO_ONLY_V1,
+            "job_id": job_id,
+            "job_kind": row.get("job_kind"),
+            "repro": repro,
+        }
+    )
 
 
 @router.get("/v1/runs/{job_id}")

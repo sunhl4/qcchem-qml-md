@@ -207,7 +207,9 @@ def protocol_from_v2_document(
         pauli_support_max_terms=doc.get("pauli_support_max_terms"),
         classical_shadows_enabled=bool(doc.get("classical_shadows_enabled", False)),
         classical_shadows_budget_pairs=int(doc.get("classical_shadows_budget_pairs", 256)),
-        nexus_analog=_nexus_analog_from_dict(cast("dict[str, Any] | None", doc.get("nexus_analog"))),
+        nexus_analog=_nexus_analog_from_dict(
+            cast("dict[str, Any] | None", doc.get("nexus_analog"))
+        ),
     )
 
 
