@@ -175,7 +175,7 @@ jobs:
           python -m pip install -U pip
           pip install -e ".[dev,pytket,nexus,jobs-postgres,observability]" || pip install -e ".[dev]"
       - name: Pytket bridge smoke
-        run: pytest tests/test_pytket_bridge.py -q --tb=short
+        run: pytest tests/backends/test_pytket_bridge.py -q --tb=short
       - name: Nexus optional probe
         run: python -c "from qchem_stack.integrations.nexus_optional import nexus_installation_status; print(nexus_installation_status())"
       - name: Observability extra import probe

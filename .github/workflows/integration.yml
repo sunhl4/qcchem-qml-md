@@ -46,7 +46,7 @@ jobs:
       - name: Smoke projection L1 trace (PySCF)
         run: python scripts/smoke_pipeline.py --projection-trace
       - name: Pytket bridge (optional extra)
-        run: pytest tests/test_pytket_bridge.py -q --tb=short
+        run: pytest tests/backends/test_pytket_bridge.py -q --tb=short
       - name: Smoke Qiskit Pauli shots (optional extra)
         run: python scripts/smoke_pipeline.py --qiskit-shots
       - name: Smoke sampled Pauli protocol (PySCF)

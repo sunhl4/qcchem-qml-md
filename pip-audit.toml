@@ -4,5 +4,15 @@
 # Usage: pip-audit --skip-editable --desc on --ignore-vuln <ID>
 
 [pip-audit]
-# Example (uncomment when needed):
-# ignore-vuln = ["PYSEC-2024-0000"]
+# aiohttp 3.11.x is pinned transitively by uqc-client (~=3.11.13); fix requires 3.13.4+.
+ignore-vuln = [
+    "CVE-2026-34513",
+    "CVE-2026-34514",
+    "CVE-2026-34515",
+    "CVE-2026-34516",
+    "CVE-2026-34517",
+    "CVE-2026-34518",
+    "CVE-2026-34519",
+    "CVE-2026-34520",
+    "CVE-2026-34525",
+]
