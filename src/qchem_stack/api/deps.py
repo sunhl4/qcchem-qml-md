@@ -13,6 +13,7 @@ from fastapi import HTTPException
 from pydantic import ValidationError
 
 from qchem_stack.config import ExperimentConfig
+from qchem_stack.config.path_sandbox import ConfigBaseDirError, validate_config_base_dir
 from qchem_stack.jobs.store import SqliteJobStore
 
 MAX_EXPERIMENT_YAML_BYTES = 512 * 1024
@@ -82,7 +83,10 @@ def experiment_config_from_request_yaml(
         raise HTTPException(status_code=400, detail="experiment_yaml must parse to a mapping")
     base_dir = None
     if config_base_dir is not None and config_base_dir.strip():
-        base_dir = Path(config_base_dir).expanduser().resolve()
+        try:
+            base_dir = validate_config_base_dir(config_base_dir)
+        except ConfigBaseDirError as exc:
+            raise HTTPException(status_code=403, detail=str(exc)) from exc
     try:
         return ExperimentConfig.from_yaml_dict(raw, geometry_files_base_dir=base_dir)
     except ValidationError as exc:

@@ -16,8 +16,8 @@ from qchem_stack.quantum.algorithms.uccsd_circuit import (
     uccsd_prepare_statevector,
 )
 from qchem_stack.quantum.algorithms.uccsd_vqe import UCCSDVQE, UCCSDTrotterVQE
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 from tests.helpers.paths import configs_path
-from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
 
 
 def _h2_qh():

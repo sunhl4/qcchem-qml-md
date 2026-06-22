@@ -17,8 +17,8 @@ from qchem_stack.protocols.computables.qse_matrices import QSEMatricesComputable
 from qchem_stack.quantum.algorithms.excited import QSE
 from qchem_stack.quantum.algorithms.excited_basis import build_qse_basis_from_uccsd_reference
 from qchem_stack.quantum.variational_branch import build_uccsd_variational_model
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 from tests.helpers.paths import configs_path
-from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
 
 
 def test_qse_matrices_computable_qiskit_uccsd_path() -> None:

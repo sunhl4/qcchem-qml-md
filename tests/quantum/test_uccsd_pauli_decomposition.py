@@ -19,8 +19,8 @@ from qchem_stack.quantum.algorithms.uccsd_pauli_decomposition import (
     cluster_expm_via_pauli_product,
     decompose_antihermitian_to_pauli_terms,
 )
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 from tests.helpers.paths import configs_path
-from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
 
 
 def _qh_from_config(rel: str):

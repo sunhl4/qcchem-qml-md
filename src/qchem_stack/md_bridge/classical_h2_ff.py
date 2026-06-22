@@ -98,6 +98,14 @@ class ClassicalH2MorseModel:
         x = np.exp(-p.a_inv_ang * (r_ang - p.re_ang))
         return cast("np.ndarray", p.de_ev * (1.0 - x) ** 2 - p.de_ev + p.shift_ev)
 
+    @staticmethod
+    def _morse_dE_dr(r_ang: float, p: ClassicalH2MorseParams) -> float:
+        x = np.exp(-p.a_inv_ang * (r_ang - p.re_ang))
+        return float(p.de_ev * 2.0 * (1.0 - x) * p.a_inv_ang * x)
+
+    def _resolve_params(self, params: dict[str, Any] | None) -> ClassicalH2MorseParams:
+        return ClassicalH2MorseParams(**(params or self.get_parameters()))
+
     def compute_total_energy(
         self,
         positions: Any,
@@ -106,9 +114,14 @@ class ClassicalH2MorseModel:
         box: Any = None,
         neighbor_list: Any = None,
     ) -> Any:
-        import jax.numpy as jnp
+        p = self._resolve_params(params)
+        try:
+            import jax.numpy as jnp
+        except ImportError:
+            pos = np.asarray(positions, dtype=np.float64)
+            r = float(np.linalg.norm(pos[1] - pos[0]))
+            return np.float32(self._morse_energy_ev(np.array(r), p))
 
-        p = ClassicalH2MorseParams(**(params or self.get_parameters()))
         pos = jnp.asarray(positions, dtype=jnp.float32)
         r = jnp.linalg.norm(pos[1] - pos[0])
         de = jnp.asarray(p.de_ev, dtype=jnp.float32)
@@ -127,12 +140,24 @@ class ClassicalH2MorseModel:
         box: Any = None,
         neighbor_list: Any = None,
     ) -> Any:
-        import jax
-        import jax.numpy as jnp
+        p = self._resolve_params(params)
+        try:
+            import jax
+            import jax.numpy as jnp
+        except ImportError:
+            pos = np.asarray(positions, dtype=np.float64)
+            r_vec = pos[1] - pos[0]
+            r = float(np.linalg.norm(r_vec))
+            if r < 1e-12:
+                return np.zeros_like(pos, dtype=np.float32)
+            dE_dr = self._morse_dE_dr(r, p)
+            unit = r_vec / r
+            f1 = -dE_dr * unit
+            return np.stack([-f1, f1]).astype(np.float32)
 
         pos = jnp.asarray(positions, dtype=jnp.float32)
 
-        def _e(rpos):
+        def _e(rpos: Any) -> Any:
             return self.compute_total_energy(rpos, species, params, box, neighbor_list)
 
         return -jax.grad(_e)(pos)

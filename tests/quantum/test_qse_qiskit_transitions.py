@@ -12,8 +12,8 @@ from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input
 from qchem_stack.config import load_experiment_config
 from qchem_stack.quantum.algorithms.excited import QSE
 from qchem_stack.quantum.variational_branch import build_uccsd_variational_model
+from tests.fixtures.classical_reference import pyscf_rhf_from_config
 from tests.helpers.paths import configs_path
-from tests.test_gap_closure_and_ucc import pyscf_rhf_from_config
 
 
 def test_qse_uccsd_qiskit_transitions_smoke() -> None:
