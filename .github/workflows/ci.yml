@@ -177,7 +177,7 @@ jobs:
       - name: Pytket bridge smoke
         run: pytest tests/backends/test_pytket_bridge.py -q --tb=short
       - name: Nexus optional probe
-        run: python -c "from qchem_stack.integrations.nexus_optional import nexus_installation_status; print(nexus_installation_status())"
+        run: python -c "from qchem_stack.integrations.nexus_optional import probe_qnexus_installation; print(probe_qnexus_installation())"
       - name: Observability extra import probe
         run: python -c "from qchem_stack.orchestration import pipeline_otel_subscriber; print('otel_module_ok')"
 

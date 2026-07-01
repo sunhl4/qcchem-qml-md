@@ -40,3 +40,19 @@ def test_repro_unsupported_type() -> None:
 
     with pytest.raises(ReproExportError, match="unsupported"):
         repro_dict_for_strict_json({"x": Opaque()})
+
+
+def test_repro_path_and_list_cycle() -> None:
+    from pathlib import Path
+
+    out = repro_dict_for_strict_json({"p": Path("/tmp/x")})
+    assert out["p"] == "/tmp/x"
+    lst: list = [1]
+    lst.append(lst)
+    with pytest.raises(ReproExportError, match="cycle"):
+        repro_dict_for_strict_json({"items": lst})
+
+
+def test_repro_rejects_non_object_top_level() -> None:
+    with pytest.raises(ReproExportError, match="top-level repro must serialize"):
+        repro_dict_for_strict_json([])  # type: ignore[arg-type]

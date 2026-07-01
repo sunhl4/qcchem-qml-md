@@ -51,7 +51,7 @@ def product_surface() -> dict[str, object]:
 
 
 @router.get("/v1/meta/capability-surface")
-def capability_surface(request: Request) -> Response:
+def capability_surface(request: Request, response: Response) -> dict[str, object]:
     from qchem_stack import __version__
     from qchem_stack.protocols.product_contract import (
         ansatz_protocol_matrix_v1,
@@ -93,14 +93,12 @@ def capability_surface(request: Request) -> Response:
     )
     body = api_json_dumps(payload, sort_keys=True)
     etag = hashlib.sha256(body.encode("utf-8")).hexdigest()[:32]
+    response.headers["ETag"] = f'"{etag}"'
     if_none = request.headers.get("if-none-match", "").strip().strip('"')
     if if_none == etag:
-        return Response(status_code=304, headers={"ETag": f'"{etag}"'})
-    return Response(
-        content=body,
-        media_type="application/json",
-        headers={"ETag": f'"{etag}"'},
-    )
+        response.status_code = 304
+        return {}
+    return payload
 
 
 @router.get("/v1/meta/parity-gaps")

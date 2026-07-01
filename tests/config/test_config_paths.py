@@ -11,6 +11,11 @@ from qchem_stack.config.config_paths import (
     installed_share_configs_dir,
     repo_configs_dir,
 )
+from qchem_stack.config.path_sandbox import (
+    ConfigBaseDirError,
+    allowed_config_base_dirs,
+    validate_config_base_dir,
+)
 from qchem_stack.config.scenarios import scenario_config_path
 from tests.helpers.paths import repo_root
 
@@ -117,3 +122,29 @@ def test_default_configs_dir_returns_cwd_configs_path_when_unresolved(
     monkeypatch.setattr("qchem_stack.config.config_paths.repo_configs_dir", lambda: None)
     monkeypatch.setattr("qchem_stack.config.config_paths.installed_share_configs_dir", lambda: None)
     assert default_configs_dir() == (work / "configs").resolve()
+
+
+def test_allowed_config_base_dirs_includes_repo_configs() -> None:
+    bases = allowed_config_base_dirs()
+    repo = repo_configs_dir()
+    assert repo is not None
+    assert any(str(repo).startswith(str(base)) or str(base).startswith(str(repo)) for base in bases)
+
+
+def test_validate_config_base_dir_rejects_empty() -> None:
+    with pytest.raises(ConfigBaseDirError, match="non-empty"):
+        validate_config_base_dir("  ")
+
+
+def test_validate_config_base_dir_accepts_repo_configs() -> None:
+    repo = repo_configs_dir()
+    assert repo is not None
+    resolved = validate_config_base_dir(str(repo))
+    assert resolved == repo.resolve()
+
+
+def test_validate_config_base_dir_rejects_outside_allowlist(tmp_path: Path) -> None:
+    outside = tmp_path / "outside"
+    outside.mkdir()
+    with pytest.raises(ConfigBaseDirError, match="outside allowed"):
+        validate_config_base_dir(str(outside))

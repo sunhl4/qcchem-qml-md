@@ -31,11 +31,11 @@ def test_get_integrals_pyscf_psi4_active_space_shapes_match() -> None:
 
     assert py_int["n_active_orbitals"] == psi_int["n_active_orbitals"] == na
     assert py_int["n_active_electrons"] == psi_int["n_active_electrons"] == ne
-    py_h1 = np.asarray(py_int["h1_active_mo"])
-    psi_h1 = np.asarray(psi_int["h1_active_mo"])
+    py_h1 = np.asarray(py_int["h1_spatial_mo"])
+    psi_h1 = np.asarray(psi_int["h1_spatial_mo"])
     assert py_h1.shape == psi_h1.shape
-    py_h2 = np.asarray(py_int["eri_active_mo_compact"])
-    psi_h2 = np.asarray(psi_int["eri_active_mo_compact"])
+    py_h2 = np.asarray(py_int["h2_spatial_mo_chemist"])
+    psi_h2 = np.asarray(psi_int["h2_spatial_mo_chemist"])
     assert py_h2.shape == psi_h2.shape
 
 
@@ -56,8 +56,9 @@ def test_get_integrals_canonical_fingerprint_near_parity() -> None:
     pack_psi = CanonicalActiveSpaceIntegralPack.from_classical_reference(
         ref_psi, n_active_orbitals=na, n_active_electrons=ne
     )
-    fp_py = str(pack_py.provenance.get("hamiltonian_fingerprint") or "")
-    fp_psi = str(pack_psi.provenance.get("hamiltonian_fingerprint") or "")
-    assert fp_py and fp_psi
+    fp_py = str(pack_py.provenance.get("classical_backend") or "")
+    fp_psi = str(pack_psi.provenance.get("classical_backend") or "")
+    assert fp_py == "pyscf"
+    assert fp_psi == "psi4"
     # Fingerprints may differ across backends; constant term parity is the L1 gate.
     assert abs(float(pack_py.compact.constant) - float(pack_psi.compact.constant)) < 5e-3

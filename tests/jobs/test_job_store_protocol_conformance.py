@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import inspect
-import os
 import uuid
 
 import pytest
@@ -42,13 +41,8 @@ def sqlite_store(tmp_path) -> SqliteJobStore:
 
 
 @pytest.fixture
-def postgres_store():
-    url = os.environ.get("QCHEM_JOB_DATABASE_URL")
-    if not url:
-        pytest.skip("QCHEM_JOB_DATABASE_URL not set")
-    from qchem_stack.jobs.store_postgres import PostgresJobStore
-
-    return PostgresJobStore(url)
+def postgres_store(pg_store):
+    return pg_store
 
 
 def test_inmemory_enqueue_and_result(memory_store: InMemoryJobStore) -> None:

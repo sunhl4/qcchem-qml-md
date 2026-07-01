@@ -125,6 +125,7 @@ omit = [
     # TypedDict-only schema modules (no runtime logic; import smoke in tests/).
     "*/quantum/algorithms/excited_basis_types.py",
     "*/protocols/protocol_counts_schema.py",
+    "*/repro/schema.py",
 ]
 
 [tool.coverage.report]

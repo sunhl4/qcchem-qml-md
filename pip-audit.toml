@@ -4,8 +4,13 @@
 # Usage: pip-audit --skip-editable --desc on --ignore-vuln <ID>
 
 [pip-audit]
-# aiohttp 3.11.x is pinned transitively by uqc-client (~=3.11.13); fix requires 3.13.4+.
+# aiohttp 3.11.x is pinned transitively by uqc-client (~=3.11.13, i.e. <3.12);
+# it cannot be bumped to the fixed 3.13.4+/3.14.1 without an upstream
+# uqc-client release. Track upstream and drop these once uqc-client relaxes
+# its aiohttp pin.
 ignore-vuln = [
+    # aiohttp 3.11.18 advisories (all fixed in 3.12.14 - 3.14.1, unreachable
+    # under uqc-client's ~=3.11.13 pin).
     "CVE-2026-34513",
     "CVE-2026-34514",
     "CVE-2026-34515",
@@ -15,4 +20,22 @@ ignore-vuln = [
     "CVE-2026-34519",
     "CVE-2026-34520",
     "CVE-2026-34525",
+    "PYSEC-2026-237",   # TLS SNI bypass on connection reuse; fixed 3.14.1
+    "CVE-2025-53643",   # request smuggling (pure-python parser); fixed 3.12.14
+    "CVE-2025-69225",   # non-ASCII decimals in Range header; fixed 3.13.3
+    "CVE-2026-22815",   # uncapped memory via trailer handling; fixed 3.13.4
+    "CVE-2026-47265",   # cookies leaked across cross-origin redirect; fixed 3.14.0
+    "CVE-2026-54276",   # DigestAuth across cross-origin redirect; fixed 3.14.1
+    "CVE-2026-54280",   # payload resource leak on client disconnect; fixed 3.14.1
+    "CVE-2026-54274",   # incomplete websocket frame DoS; fixed 3.14.1
+    # python-socketio 5.12.1 is pinned transitively by uqc-client; CVE-2025-61765
+    # (pickle RCE) only affects multi-server deployments with a compromised Redis
+    # queue; CVE-2026-48804 (binary attachment DoS) requires unauthenticated WS.
+    # Single-server / API-only installs are not exposed. Drop once uqc-client bumps.
+    "CVE-2025-61765",
+    "CVE-2026-48804",
+    # requests 2.32.5 (transitive) — CVE-2026-25645 only impacts the
+    # extract_zipped_paths() utility; standard requests usage is unaffected.
+    # Fixed in 2.33.0; drop once a transitive bump is available.
+    "CVE-2026-25645",
 ]

@@ -17,11 +17,6 @@ pytestmark = pytest.mark.skipif(
 )
 
 
-@pytest.fixture
-def pg_store() -> PostgresJobStore:
-    return PostgresJobStore(os.environ["QCHEM_JOB_DATABASE_URL"])
-
-
 def test_postgres_enqueue_complete(pg_store: PostgresJobStore) -> None:
     pg_store.enqueue("pg-e2e-1", b"yaml-bytes")
     jid = pg_store.claim_next_queued()
