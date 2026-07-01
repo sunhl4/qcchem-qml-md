@@ -68,7 +68,7 @@ pyyaml==6.0.3
 qiskit==2.4.2
 qiskit-aer==0.17.2
 qiskit-qasm3-import==0.6.0
-requests==2.32.5
+requests==2.34.2
 rustworkx==0.18.0
 scipy==1.18.0
 simple-websocket==1.1.0
