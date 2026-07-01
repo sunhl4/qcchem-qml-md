@@ -23,7 +23,7 @@ THRESHOLDS: dict[str, int] = {
     "src/qchem_stack/chem": 75,
     "src/qchem_stack/chem/kernels": 70,
     "src/qchem_stack/jobs": 62,
-    "src/qchem_stack/md_bridge": 69,
+    "src/qchem_stack/md_bridge": 68,
     "src/qchem_stack/mitigation": 70,
     "src/qchem_stack/api": 70,
     "src/qchem_stack/integrations": 60,

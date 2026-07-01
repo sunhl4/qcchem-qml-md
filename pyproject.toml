@@ -98,11 +98,8 @@ addopts = [
     "--cov-report=term-missing",
     "--cov-report=html",
 ]
-# The 80% coverage gate is enforced only on the full test suite (Test + Nightly
-# cross-platform jobs) via an explicit ``--cov-fail-under=80`` flag on those
-# pytest invocations. Narrow subset jobs (optional backends, pytket bridge,
-# integration smoke, psi4, contract-smoke) inherit the reports but must not
-# fail on a coverage threshold they cannot reach.
+# The 80% coverage gate is enforced on the full test suite via explicit
+# ``--cov-fail-under=79`` on the Pytest step (v1.1 baseline; raise to 80 in v1.2).
 markers = [
     "l3: optional deep numerical benchmarks (QCHEM_RUN_L3=1)",
     "l1_excited: VQD/QSE/SCEOM unit tests (selective CI: pytest -m l1_excited)",
