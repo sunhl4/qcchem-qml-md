@@ -51,7 +51,7 @@ def product_surface() -> dict[str, object]:
 
 
 @router.get("/v1/meta/capability-surface")
-def capability_surface(request: Request) -> dict[str, object]:
+def capability_surface(request: Request) -> Response:
     from qchem_stack import __version__
     from qchem_stack.protocols.product_contract import (
         ansatz_protocol_matrix_v1,

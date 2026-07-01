@@ -63,7 +63,7 @@ def _deserialize_qubit_operator(doc: dict[str, Any]) -> QubitOperator:
         pauli_list = term.get("pauli") or []
         pauli = tuple((int(i), str(g)) for i, g in pauli_list)
         coeff = complex(float(term["coeff_real"]), float(term.get("coeff_imag", 0.0)))
-        op += QubitOperator(pauli, coeff)
+        op += QubitOperator(pauli, coeff)  # type: ignore[arg-type]
     return op
 
 
@@ -183,32 +183,37 @@ def protocol_from_v2_document(
     doc: ProtocolBlobDocumentV2 | dict[str, Any],
 ) -> PauliAveragingProtocol:
     """Reconstruct ``PauliAveragingProtocol`` from a v2 JSON document."""
-    if int(doc.get("protocol_blob_version", 0)) != PROTOCOL_BLOB_VERSION_V2:
+    # Treat the document as a plain dict for access: ``ProtocolBlobDocumentV2``
+    # is a ``total=False`` TypedDict, so keyed access trips pyright's
+    # "could not access item" check even though every key is populated by
+    # ``protocol_to_v2_document`` and validated at load time.
+    raw: dict[str, Any] = cast("dict[str, Any]", doc)
+    if int(raw.get("protocol_blob_version", 0)) != PROTOCOL_BLOB_VERSION_V2:
         raise ValueError(
             f"expected protocol_blob_version={PROTOCOL_BLOB_VERSION_V2}, "
-            f"got {doc.get('protocol_blob_version')!r}"
+            f"got {raw.get('protocol_blob_version')!r}"
         )
-    ham = _deserialize_qubit_operator(cast("dict[str, Any]", doc["hamiltonian"]))
-    angles = np.asarray(doc.get("angles") or [0.0], dtype=float)
+    ham = _deserialize_qubit_operator(cast("dict[str, Any]", raw["hamiltonian"]))
+    angles = np.asarray(raw.get("angles") or [0.0], dtype=float)
     return PauliAveragingProtocol(
         hamiltonian=ham,
-        n_qubits=int(doc["n_qubits"]),
-        backend=_backend_spec_from_dict(cast("dict[str, Any]", doc["backend_spec"])),
-        pass_bundle=_pass_bundle_from_dict(cast("dict[str, Any]", doc.get("pass_bundle") or {})),
-        pmsv=_pmsv_from_dict(cast("dict[str, Any] | None", doc.get("pmsv"))),
-        zne_scales=list(doc["zne_scales"]) if doc.get("zne_scales") is not None else None,
-        zne_mode=doc.get("zne_mode", "scalar_stub"),
-        hea_depth=int(doc.get("hea_depth", 1)),
+        n_qubits=int(raw["n_qubits"]),
+        backend=_backend_spec_from_dict(cast("dict[str, Any]", raw["backend_spec"])),
+        pass_bundle=_pass_bundle_from_dict(cast("dict[str, Any]", raw.get("pass_bundle") or {})),
+        pmsv=_pmsv_from_dict(cast("dict[str, Any] | None", raw.get("pmsv"))),
+        zne_scales=list(raw["zne_scales"]) if raw.get("zne_scales") is not None else None,
+        zne_mode=raw.get("zne_mode", "scalar_stub"),
+        hea_depth=int(raw.get("hea_depth", 1)),
         angles=angles,
-        measurement_grouping=doc.get("measurement_grouping", "tensor_product"),
-        run_sampled=bool(doc.get("run_sampled", False)),
-        run_qiskit_shots=bool(doc.get("run_qiskit_shots", False)),
-        record_histograms=bool(doc.get("record_histograms", False)),
-        pauli_support_max_terms=doc.get("pauli_support_max_terms"),
-        classical_shadows_enabled=bool(doc.get("classical_shadows_enabled", False)),
-        classical_shadows_budget_pairs=int(doc.get("classical_shadows_budget_pairs", 256)),
+        measurement_grouping=raw.get("measurement_grouping", "tensor_product"),
+        run_sampled=bool(raw.get("run_sampled", False)),
+        run_qiskit_shots=bool(raw.get("run_qiskit_shots", False)),
+        record_histograms=bool(raw.get("record_histograms", False)),
+        pauli_support_max_terms=raw.get("pauli_support_max_terms"),
+        classical_shadows_enabled=bool(raw.get("classical_shadows_enabled", False)),
+        classical_shadows_budget_pairs=int(raw.get("classical_shadows_budget_pairs", 256)),
         nexus_analog=_nexus_analog_from_dict(
-            cast("dict[str, Any] | None", doc.get("nexus_analog"))
+            cast("dict[str, Any] | None", raw.get("nexus_analog"))
         ),
     )
 

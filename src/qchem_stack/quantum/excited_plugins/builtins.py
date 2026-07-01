@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from typing import cast
+
 import numpy as np
 
 from qchem_stack.config.quantum_helpers import (
@@ -195,7 +197,7 @@ def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
         shots_per_matrix_element=int(sceom_kw["shots_per_matrix_element"]),
         self_consistent_rounds=int(sceom_kw["self_consistent_rounds"]),
         shots_backend=str(sceom_kw["shots_backend"]),
-        s_generators=gens,
+        s_generators=cast("list[object] | None", gens),
         prepare_state=prepare_state,
         hea_depth=resolve_vqe_depth(cfg),
     )

@@ -33,7 +33,7 @@ def jordan_wigner_interaction_operator_sparse(
         return cast("QubitOperator", jordan_wigner(iop))
 
     eps = float(atol)
-    n_qubits = count_qubits(iop)
+    n_qubits = int(count_qubits(iop) or 0)
     tb = np.asarray(iop.two_body_tensor)
     ob = np.asarray(iop.one_body_tensor)
 
@@ -42,16 +42,16 @@ def jordan_wigner_interaction_operator_sparse(
     for p in range(n_qubits):
         coefficient = complex(ob[p, p])
         if abs(coefficient) > eps:
-            qubit_operator += jordan_wigner_one_body(p, p, coefficient)
+            qubit_operator += jordan_wigner_one_body(p, p, coefficient)  # type: ignore[arg-type]
 
     for p, q in itertools.combinations(range(n_qubits), 2):
         coefficient = 0.5 * (ob[p, q] + ob[q, p].conjugate())
         if abs(coefficient) > eps:
-            qubit_operator += jordan_wigner_one_body(p, q, coefficient)
+            qubit_operator += jordan_wigner_one_body(p, q, coefficient)  # type: ignore[arg-type]
 
         coefficient = tb[p, q, p, q] - tb[p, q, q, p] - tb[q, p, p, q] + tb[q, p, q, p]
         if abs(coefficient) > eps:
-            qubit_operator += jordan_wigner_two_body(p, q, p, q, coefficient)
+            qubit_operator += jordan_wigner_two_body(p, q, p, q, coefficient)  # type: ignore[arg-type]
 
     for (p, q), (r, s) in itertools.combinations(itertools.combinations(range(n_qubits), 2), 2):
         coefficient = 0.5 * (

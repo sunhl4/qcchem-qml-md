@@ -136,7 +136,11 @@ exclude_lines = [
     "if TYPE_CHECKING:",
     "if __name__ == .__main__.:",
 ]
-fail_under = 80
+# No `fail_under` here: the 80% gate is enforced only via the explicit
+# `--cov-fail-under=80` CLI flag on the full test suite (see .github/workflows
+# /test.yml Pytest step). Narrow/targeted pytest invocations (PR smoke,
+# optional backends, pytket bridge, integration smoke) inherit --cov from
+# addopts but must NOT fail on a threshold they cannot reach.
 show_missing = true
 skip_covered = false
 

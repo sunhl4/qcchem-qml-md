@@ -91,7 +91,7 @@ def boson_to_qubit_mapping(bos_op: BosonOperator) -> QubitOperator:
     for term, coeff in bos_op.terms.items():
         if not term:
             continue
-        piece = QubitOperator((), complex(coeff))
+        piece = QubitOperator((), complex(coeff))  # type: ignore[arg-type]
         for mode, is_dagger in term:
             piece *= _boson_ladder(int(mode), dagger=bool(is_dagger))
         mapped += piece

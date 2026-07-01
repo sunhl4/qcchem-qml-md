@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import math
 from functools import lru_cache
+from typing import Any, cast
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -102,7 +103,7 @@ def _rotate_vacuum_majorana(
 
 def jkmn(fermion_operator: object, *, n_qubits: int) -> QubitOperator:
     """Map a fermionic operator to qubits with the JKMN encoding."""
-    majorana = get_majorana_operator(fermion_operator)
+    majorana = get_majorana_operator(cast("Any", fermion_operator))
     encoding = _expand_majorana_map(int(n_qubits))
     mapped = QubitOperator()
     atol = 1.0e-12

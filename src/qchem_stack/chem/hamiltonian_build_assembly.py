@@ -48,7 +48,7 @@ def assemble_qubit_hamiltonian(
 
     from qchem_stack.chem.hamiltonian_build import QubitHamiltonian
 
-    n_phys = int(count_qubits(qop))
+    n_phys = int(count_qubits(qop) or 0)
     fp, fp_trunc = hamiltonian_fingerprint_from_qubit_operator(qop)
     driver_meta, backend_tag = _classical_driver_meta_payload(rhf)
     source_tag, bridge_tag = _resolve_integral_metadata(
