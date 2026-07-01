@@ -36,4 +36,4 @@ description: Nexus、HQC、cuTensorNet L0 等刻意排除边界，避免范围�
 - 多经典后端插件（PySCF 默认、Psi4 可选、entry-point solver）
 - 本地可审计的作业状态机与 Methods 对齐字段
 
-相关入口：[产品定位](./positioning) · [教程索引](../tutorial/index) · 仓库 `docs/public_parity_matrix.md`
+相关入口：[产品定位](./positioning) · [教程索引](../tutorial/) · 仓库 `docs/public_parity_matrix.md`

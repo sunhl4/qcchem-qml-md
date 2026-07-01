@@ -5,7 +5,7 @@ description: QMEF 数据集、QML-FF 与 JAX-MD 在线学习桥接。
 
 # MD/ML 主动学习闭环
 
-**权威文档**：仓库 [`docs/qmlff_md_integration_说明.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/qmlff_md_integration_说明.md)。
+**权威文档**：仓库 [`docs/qmlff_md_integration_说明.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/qmlff_md_integration_说明.md)。
 
 ## 依赖
 
@@ -32,5 +32,5 @@ summary = run_md_validation_loop(
 
 ## 相关配置
 
-- [`configs/README.md`](https://github.com/yaozheng/qchem-stack/blob/main/configs/README.md) — MD/ML 与 UQC 示例索引
-- [`docs/说明_md_ml_export配置.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/说明_md_ml_export配置.md)
+- [`configs/README.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/configs/README.md) — MD/ML 与 UQC 示例索引
+- [`docs/说明_md_ml_export配置.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/说明_md_ml_export配置.md)

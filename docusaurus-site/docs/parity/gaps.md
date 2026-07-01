@@ -9,9 +9,9 @@ Machine-readable gaps are exported by **`GET /v1/meta/capability-surface`** (`ga
 
 ## Quick links
 
-- Full matrix: [public parity matrix](../../../docs/public_parity_matrix.md) (repo `docs/public_parity_matrix.md`)
+- Full matrix: [public parity matrix](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/public_parity_matrix.md) (repo `docs/public_parity_matrix.md`)
 - Implementation plan excerpt: [gap implementation plan](./gap-implementation-plan.md)
-- L1 playbook: [partial → L1](../../../docs/engineering/partial_to_l1_playbook.md)
+- L1 playbook: [partial → L1](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/engineering/partial_to_l1_playbook.md)
 
 ## HTTP
 

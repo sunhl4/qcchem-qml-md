@@ -15,7 +15,7 @@ description: configs/ 下 105 个 YAML 的分组索引（97 ExperimentConfig + 8
 
 ## 模板
 
-复制 [`configs/_template.yaml`](https://github.com/yaozheng/qchem-stack/blob/main/configs/_template.yaml) 并按注释修改字段。
+复制 [`configs/_template.yaml`](https://github.com/sunhl4/qcchem-qml-md/blob/main/configs/_template.yaml) 并按注释修改字段。
 
 ## 完整列表（自动生成）
 

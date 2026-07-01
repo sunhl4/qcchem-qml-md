@@ -10,7 +10,7 @@ keywords:
 
 # HTTP API、SQLite 作业队列与可观测性
 
-> **Authoritative repo contract**: [`docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md). English summary: [`docs/QUICKSTART_HTTP_API_en.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/QUICKSTART_HTTP_API_en.md).
+> **Authoritative repo contract**: [`docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md). English summary: [`docs/QUICKSTART_HTTP_API_en.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/QUICKSTART_HTTP_API_en.md).
 
 本文是 `qchem_stack.api` 与 `qchem_stack.jobs` 的工程契约摘要，用于服务化集成与运维对接。
 

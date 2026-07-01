@@ -5,7 +5,7 @@ description: Psi4 作为 ChemIntegralSolver 可选后端的配置与设计说明
 
 # Psi4 经典后端
 
-**设计文档**：仓库 [`docs/execution/psi4_get_integrals_design.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/execution/psi4_get_integrals_design.md)。
+**设计文档**：仓库 [`docs/execution/psi4_get_integrals_design.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/execution/psi4_get_integrals_design.md)。
 
 ## 示例 YAML
 
@@ -21,4 +21,4 @@ Psi4 测试在 GitHub Actions `test-psi4` job 中运行：`pytest -m psi4`。
 
 ## 与 PySCF 的关系
 
-PySCF 仍是 CI 数值主路径；Psi4 用于交叉验证与多后端 parity。见 [`docs/execution/psi4_pyscf_parity_matrix.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/execution/psi4_pyscf_parity_matrix.md)。
+PySCF 仍是 CI 数值主路径；Psi4 用于交叉验证与多后端 parity。见 [`docs/execution/psi4_pyscf_parity_matrix.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/execution/psi4_pyscf_parity_matrix.md)。

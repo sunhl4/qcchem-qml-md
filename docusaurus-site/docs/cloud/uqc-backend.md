@@ -5,7 +5,7 @@ description: UQC ion-trap 云模拟器与硬件 backend 集成摘要。
 
 # UQC 云平台后端
 
-**权威文档**（中文完整版）：仓库 [`docs/UQC云平台集成技术报告.md`](https://github.com/yaozheng/qchem-stack/blob/main/docs/UQC云平台集成技术报告.md)。
+**权威文档**（中文完整版）：仓库 [`docs/UQC云平台集成技术报告.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/UQC云平台集成技术报告.md)。
 
 ## 快速配置
 
