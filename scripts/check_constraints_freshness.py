@@ -23,6 +23,11 @@ import sys
 import tempfile
 from pathlib import Path
 
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from _constraints_normalize import normalize_constraints_text, pip_compile_base_cmd
+
 
 def _pip_compile_exe() -> str:
     """Prefer pip-compile beside the active interpreter (avoids stale conda on PATH)."""
@@ -43,24 +48,13 @@ def check_constraint_freshness(
         print(f"✗ {constraint_file} does not exist")
         return False
 
-    # Generate fresh constraints to a temporary file
     with tempfile.NamedTemporaryFile(mode="w", suffix=".txt", delete=False) as tmp:
         tmp_path = tmp.name
 
     try:
-        cmd = [
-            _pip_compile_exe(),
-            "--output-file",
-            tmp_path,
-            "--upgrade",  # Must mirror scripts/update_constraints.py
-            "--no-header",
-            "--no-annotate",
-            "--strip-extras",
-        ]
-
+        cmd = pip_compile_base_cmd(_pip_compile_exe(), tmp_path)
         for extra in extras:
             cmd.extend(["--extra", extra])
-
         cmd.append(str(pyproject_toml))
 
         result = subprocess.run(cmd, capture_output=True, text=True)
@@ -70,12 +64,8 @@ def check_constraint_freshness(
             print(f"  stderr: {result.stderr}")
             return False
 
-        # Compare generated constraints with existing file
-        with open(constraint_file) as f:
-            existing = f.read()
-
-        with open(tmp_path) as f:
-            generated = f.read()
+        existing = normalize_constraints_text(constraint_file.read_text(encoding="utf-8"))
+        generated = normalize_constraints_text(Path(tmp_path).read_text(encoding="utf-8"))
 
         if existing != generated:
             print(f"✗ {constraint_file} is outdated")
@@ -86,7 +76,6 @@ def check_constraint_freshness(
         return True
 
     finally:
-        # Clean up temporary file
         Path(tmp_path).unlink(missing_ok=True)
 
 
@@ -100,7 +89,6 @@ def main() -> int:
         print(f"ERROR: {pyproject_toml} not found")
         return 1
 
-    # Check if pip-compile is available
     try:
         subprocess.run([_pip_compile_exe(), "--version"], capture_output=True, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
@@ -112,34 +100,24 @@ def main() -> int:
 
     all_fresh = True
 
-    # Check dev.txt
-    if not check_constraint_freshness(
-        pyproject_toml,
-        constraints_dir / "dev.txt",
-        extras=["dev"],
-    ):
+    if not check_constraint_freshness(pyproject_toml, constraints_dir / "dev.txt", extras=["dev"]):
         all_fresh = False
 
-    # Check uqc.txt
-    if not check_constraint_freshness(
-        pyproject_toml,
-        constraints_dir / "uqc.txt",
-        extras=["uqc"],
-    ):
+    if not check_constraint_freshness(pyproject_toml, constraints_dir / "uqc.txt", extras=["uqc"]):
         all_fresh = False
 
     print()
     if all_fresh:
         print("✓ All constraint files are up to date")
         return 0
-    else:
-        print("✗ Some constraint files are outdated")
-        print()
-        print("To fix:")
-        print("  1. Run: python scripts/update_constraints.py")
-        print("  2. Review changes: git diff constraints/")
-        print("  3. Commit: git add constraints/ && git commit -m 'Update dependency constraints'")
-        return 1
+
+    print("✗ Some constraint files are outdated")
+    print()
+    print("To fix:")
+    print("  1. Run: python scripts/update_constraints.py")
+    print("  2. Review changes: git diff constraints/")
+    print("  3. Commit: git add constraints/ && git commit -m 'Update dependency constraints'")
+    return 1
 
 
 if __name__ == "__main__":

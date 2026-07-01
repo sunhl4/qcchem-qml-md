@@ -70,12 +70,7 @@ jobs:
       - name: Check dependency constraints freshness
         run: |
           pip install 'pip-tools==7.5.3'
-          python scripts/update_constraints.py
-          if ! git diff --exit-code constraints/; then
-            echo "::error::constraints/ differs from Linux pip-compile output (regenerate on ubuntu-latest)"
-            git diff constraints/
-            exit 1
-          fi
+          python scripts/check_constraints_freshness.py
 
   contract-smoke:
     needs: lint

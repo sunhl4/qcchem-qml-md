@@ -22,6 +22,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+from _constraints_normalize import normalize_constraints_text, pip_compile_base_cmd
+
 
 def _pip_compile_exe() -> str:
     for base in (Path(sys.executable).parent, Path(sys.executable).resolve().parent):
@@ -35,24 +40,11 @@ def run_pip_compile(input_file: str, output_file: str, extras: list[str]) -> Non
     """Run pip-compile to generate constraint file."""
     print(f"Generating {output_file}...")
 
-    # Build pip-compile command
-    cmd = [
-        _pip_compile_exe(),
-        "--output-file",
-        output_file,
-        "--upgrade",  # Resolve latest compatible pins (must match check_constraints_freshness)
-        "--no-header",  # Omit header comment
-        "--no-annotate",  # Omit annotations
-        "--strip-extras",  # Remove [extras] from output
-    ]
-
-    # Add extras
+    cmd = pip_compile_base_cmd(_pip_compile_exe(), output_file)
     for extra in extras:
         cmd.extend(["--extra", extra])
-
     cmd.append(input_file)
 
-    # Run pip-compile
     result = subprocess.run(cmd, capture_output=True, text=True)
 
     if result.returncode != 0:
@@ -61,6 +53,10 @@ def run_pip_compile(input_file: str, output_file: str, extras: list[str]) -> Non
         print(f"stderr: {result.stderr}")
         sys.exit(1)
 
+    Path(output_file).write_text(
+        normalize_constraints_text(Path(output_file).read_text(encoding="utf-8")),
+        encoding="utf-8",
+    )
     print(f"✓ Generated {output_file}")
 
 
@@ -69,7 +65,6 @@ def main() -> int:
     project_root = Path(__file__).parent.parent
     constraints_dir = project_root / "constraints"
 
-    # Ensure constraints directory exists
     constraints_dir.mkdir(exist_ok=True)
 
     pyproject_toml = project_root / "pyproject.toml"
@@ -77,30 +72,17 @@ def main() -> int:
         print(f"ERROR: {pyproject_toml} not found")
         return 1
 
-    # Check if pip-compile is available
     try:
         subprocess.run([_pip_compile_exe(), "--version"], capture_output=True, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("ERROR: pip-compile not found. Install it with: pip install pip-tools")
         return 1
 
-    # Generate constraint files
     print("Updating dependency constraints...")
     print()
 
-    # dev.txt: All dev dependencies
-    run_pip_compile(
-        str(pyproject_toml),
-        str(constraints_dir / "dev.txt"),
-        extras=["dev"],
-    )
-
-    # uqc.txt: UQC-specific dependencies
-    run_pip_compile(
-        str(pyproject_toml),
-        str(constraints_dir / "uqc.txt"),
-        extras=["uqc"],
-    )
+    run_pip_compile(str(pyproject_toml), str(constraints_dir / "dev.txt"), extras=["dev"])
+    run_pip_compile(str(pyproject_toml), str(constraints_dir / "uqc.txt"), extras=["uqc"])
 
     print()
     print("✓ All constraint files updated successfully")
