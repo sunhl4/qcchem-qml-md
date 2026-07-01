@@ -18,14 +18,25 @@ Requirements:
 
 from __future__ import annotations
 
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
 
-_SCRIPTS = Path(__file__).resolve().parent
-if str(_SCRIPTS) not in sys.path:
-    sys.path.insert(0, str(_SCRIPTS))
-from _constraints_normalize import normalize_constraints_text, pip_compile_base_cmd
+
+def _constraints_normalize():
+    path = Path(__file__).resolve().parent / "_constraints_normalize.py"
+    spec = importlib.util.spec_from_file_location("_constraints_normalize", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod
+
+
+_norm = _constraints_normalize()
+normalize_constraints_text = _norm.normalize_constraints_text
+pip_compile_base_cmd = _norm.pip_compile_base_cmd
 
 
 def _pip_compile_exe() -> str:
