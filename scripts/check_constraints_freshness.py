@@ -37,7 +37,7 @@ def _constraints_normalize():
 
 _norm = _constraints_normalize()
 normalize_constraints_text = _norm.normalize_constraints_text
-pip_compile_base_cmd = _norm.pip_compile_base_cmd
+pip_compile_check_cmd = _norm.pip_compile_check_cmd
 
 
 def _pip_compile_exe() -> str:
@@ -63,7 +63,7 @@ def check_constraint_freshness(
         tmp_path = tmp.name
 
     try:
-        cmd = pip_compile_base_cmd(_pip_compile_exe(), tmp_path)
+        cmd = pip_compile_check_cmd(_pip_compile_exe(), tmp_path, str(constraint_file))
         for extra in extras:
             cmd.extend(["--extra", extra])
         cmd.append(str(pyproject_toml))
@@ -81,6 +81,17 @@ def check_constraint_freshness(
         if existing != generated:
             print(f"✗ {constraint_file} is outdated")
             print("  Run: python scripts/update_constraints.py")
+            import difflib
+
+            diff = difflib.unified_diff(
+                existing.splitlines(),
+                generated.splitlines(),
+                fromfile=str(constraint_file),
+                tofile="pip-compile (fresh)",
+                lineterm="",
+            )
+            for line in list(diff)[:80]:
+                print(f"  {line}")
             return False
 
         print(f"✓ {constraint_file} is up to date")

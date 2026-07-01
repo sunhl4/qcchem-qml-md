@@ -36,7 +36,8 @@ def _constraints_normalize():
 
 _norm = _constraints_normalize()
 normalize_constraints_text = _norm.normalize_constraints_text
-pip_compile_base_cmd = _norm.pip_compile_base_cmd
+pip_compile_update_cmd = _norm.pip_compile_update_cmd
+pip_compile_check_cmd = _norm.pip_compile_check_cmd
 
 
 def _pip_compile_exe() -> str:
@@ -51,7 +52,7 @@ def run_pip_compile(input_file: str, output_file: str, extras: list[str]) -> Non
     """Run pip-compile to generate constraint file."""
     print(f"Generating {output_file}...")
 
-    cmd = pip_compile_base_cmd(_pip_compile_exe(), output_file)
+    cmd = pip_compile_update_cmd(_pip_compile_exe(), output_file)
     for extra in extras:
         cmd.extend(["--extra", extra])
     cmd.append(input_file)

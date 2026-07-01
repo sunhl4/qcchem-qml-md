@@ -68,6 +68,8 @@ jobs:
       - name: SDK doc sync
         run: python scripts/check_sdk_docs_sync.py
       - name: Check dependency constraints freshness
+        env:
+          PIP_INDEX_URL: https://pypi.org/simple
         run: |
           pip install 'pip-tools==7.5.3'
           python scripts/check_constraints_freshness.py

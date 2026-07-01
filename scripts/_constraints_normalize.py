@@ -24,13 +24,33 @@ def normalize_constraints_text(text: str) -> str:
     return "\n".join(lines) + "\n"
 
 
-def pip_compile_base_cmd(pip_compile_exe: str, output_file: str) -> list[str]:
-    """Shared pip-compile flags for update + freshness check."""
+def pip_compile_update_cmd(pip_compile_exe: str, output_file: str) -> list[str]:
+    """Full upgrade resolve when refreshing committed lockfiles."""
     return [
         pip_compile_exe,
         "--output-file",
         output_file,
         "--upgrade",
+        *_pip_compile_emit_flags(),
+    ]
+
+
+def pip_compile_check_cmd(
+    pip_compile_exe: str, output_file: str, constraint_file: str
+) -> list[str]:
+    """Re-resolve under existing pins (cross-platform stable vs --upgrade)."""
+    return [
+        pip_compile_exe,
+        "--output-file",
+        output_file,
+        "--constraint",
+        constraint_file,
+        *_pip_compile_emit_flags(),
+    ]
+
+
+def _pip_compile_emit_flags() -> list[str]:
+    return [
         "--no-header",
         "--no-annotate",
         "--strip-extras",
@@ -38,3 +58,8 @@ def pip_compile_base_cmd(pip_compile_exe: str, output_file: str) -> list[str]:
         "--no-emit-trusted-host",
         "--no-emit-options",
     ]
+
+
+# Back-compat alias for update_constraints.py
+def pip_compile_base_cmd(pip_compile_exe: str, output_file: str) -> list[str]:
+    return pip_compile_update_cmd(pip_compile_exe, output_file)
