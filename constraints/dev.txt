@@ -83,7 +83,7 @@ packaging==26.2
 pandas==2.3.3
 parso==0.8.7
 pexpect==4.9.0
-pillow==12.2.0
+pillow==12.3.0
 pip-tools==7.5.3
 platformdirs==4.10.0
 pluggy==1.6.0
@@ -117,7 +117,6 @@ pytket==2.18.0
 pytz==2026.2
 pyyaml==6.0.3
 pyzmq==27.1.0
-qchem-stack @ file:.
 qiskit==2.4.2
 qiskit-aer==0.17.2
 qiskit-qasm3-import==0.6.0

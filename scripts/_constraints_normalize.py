@@ -18,8 +18,7 @@ def normalize_constraints_text(text: str) -> str:
         if line in _MAC_ONLY_PACKAGES:
             continue
         if line.startswith("qchem-stack @"):
-            lines.append("qchem-stack @ file:.")
-            continue
+            continue  # omit editable self-pin; always installed from checkout in dev/CI
         lines.append(line)
     return "\n".join(lines) + "\n"
 
