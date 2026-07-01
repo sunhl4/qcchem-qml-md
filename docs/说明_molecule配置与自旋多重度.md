@@ -346,7 +346,7 @@ YAML molecule.ecp
 
 z-matrix 几何分支在 `MoleculeSpec.coordinates_in_bohr()` 里建临时 `gto.M` 时同样传入 `ecp=self.ecp`。
 
-单元测试确认透传：`tests/test_pyscf_solver_adapter.py::test_ecp_is_forwarded_to_pyscf_mol`。
+单元测试确认透传：`tests/chem/test_pyscf_solver_adapter.py::test_ecp_is_forwarded_to_pyscf_mol`。
 
 **Psi4 路径（`scf.driver: psi4`）**：当前 `ecp` 会写入 `MolecularSystem` 与 `driver_meta["ecp"]`，但 **Psi4 SCF 入口尚未把 ECP 写入 Psi4 计算选项**（仅记录配置）。重元素 + ECP 的端到端经典计算请优先使用 **`scf.driver: pyscf`**。
 
@@ -446,6 +446,6 @@ print(cfg.molecule.ecp)    # lanl2dz
 | 配置加载入口 | `src/qchem_stack/config/io.py` |
 | PySCF `spin` / `ecp` | `src/qchem_stack/chem/solvers/pyscf_solver.py`（`_make_mol`） |
 | Psi4（`ecp` 元数据） | `src/qchem_stack/chem/solvers/psi4_solver.py` |
-| ECP 透传测试 | `tests/test_pyscf_solver_adapter.py` |
+| ECP 透传测试 | `tests/chem/test_pyscf_solver_adapter.py` |
 | 几何文件示例 | `configs/example_h2_geometry_file_xyz.yaml`、`configs/structures_h2.xyz` |
 | ECP + LANL2DZ 样例 | `configs/example_mg_lanl2dz_ecp_rhf.yaml`、`example_hbr_zmatrix_lanl2dz_ecp_density_fit.yaml` |

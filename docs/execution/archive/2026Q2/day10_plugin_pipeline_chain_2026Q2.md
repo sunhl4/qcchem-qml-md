@@ -14,12 +14,12 @@
 - 更新 `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：[CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）：
   - 将上述三个字段加入 `RUN_SUMMARY_DOCUMENTED_KEYS`，保持键注册 CI 一致。
 
-- 更新 `tests/test_decomposition_plugin_pipeline.py`：
+- 更新 `tests/chem/test_decomposition_plugin_pipeline.py`：
   - 对两片段示例新增 `run_summary` 断言，验证最小执行链完整闭合。
 
 ## 验证
 
-- `.venv/bin/pytest tests/test_decomposition_plugin_pipeline.py tests/test_run_summary_key_registry.py -q`
+- `.venv/bin/pytest tests/chem/test_decomposition_plugin_pipeline.py tests/repro/test_repro_run_summary.py -q`
   - 结果：`7 passed`
 - `.venv/bin/python scripts/check_parity_export_sample.py`
   - 结果：通过

@@ -22,8 +22,8 @@ Use this index to tell **product paths** (stable imports, HTTP/meta surfaces, CI
 | `schmidt_per_fragment_vqe.py` | Post-variational Schmidt impurity VQE sidecar | `embedding_workflow_stage` |
 | `dmet_fragment_solvers.py` | DMET fragment VQE solver (uses `quantum.*`) | DMET demo / workflow stage |
 
-These modules are covered by contract tests (`tests/test_workflow_preview_contract.py`,
-`tests/test_methods_resource_unified_export.py`, etc.) and documented in
+These modules are covered by contract tests (`tests/protocols/test_workflow_preview_contract.py`,
+`tests/repro/test_methods_resource_unified_export.py`, etc.) and documented in
 [`CONTRIBUTING.md`](../../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports).
 
 ## Research / analog / toy paths

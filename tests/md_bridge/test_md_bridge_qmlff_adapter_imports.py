@@ -118,7 +118,7 @@ def test_example_h2_qmlff_md_yaml_loads() -> None:
         _bond_stretch_geometries,
     )
 
-    repo = Path(__file__).resolve().parent.parent
+    repo = Path(__file__).resolve().parents[2]
     cfg = MdValidationLoopConfig.from_yaml(repo / "configs/example_h2_qmlff_md.yaml")
     assert cfg.force_field_backend == "qmlff_preset"
     assert cfg.lr_scheduler == "constant"
@@ -147,7 +147,7 @@ def test_example_h2_qnn_native_yaml_loads() -> None:
 
     from qchem_stack.md_bridge import MdValidationLoopConfig
 
-    repo = Path(__file__).resolve().parent.parent
+    repo = Path(__file__).resolve().parents[2]
     cfg = MdValidationLoopConfig.from_yaml(repo / "configs/example_h2_qnn_native_md.yaml")
     assert cfg.force_field_backend == "qmlff_quantum"
     assert cfg.energy_normalization == "subtract_mean"
@@ -167,7 +167,7 @@ def test_phase_yaml_configs_load() -> None:
 
     from qchem_stack.md_bridge import MdValidationLoopConfig
 
-    repo = Path(__file__).resolve().parent.parent
+    repo = Path(__file__).resolve().parents[2]
     qmp = MdValidationLoopConfig.from_yaml(repo / "configs/example_h2_qmp_md.yaml")
     assert qmp.force_field_backend == "qmlff_qmp_h2"
     classical = MdValidationLoopConfig.from_yaml(repo / "configs/example_h2_classical_md.yaml")

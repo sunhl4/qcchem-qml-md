@@ -106,8 +106,8 @@ sequenceDiagram
 
 ## 7. 测试与回归
 
-- `tests/test_pytket_bridge.py`：有 pytket 时校验 HEA+CX；`ImportError` 路径用 monkeypatch 测 `pytket: None`。
-- `tests/test_job_flow.py`：`launch` 后 `protocol_hash` 长度 32，`retrieve` 后 `status == DONE`。
+- `tests/backends/test_pytket_bridge.py`：有 pytket 时校验 HEA+CX；`ImportError` 路径用 monkeypatch 测 `pytket: None`。
+- `tests/jobs/test_pipeline_job_store.py`：`launch` 后 `protocol_hash` 长度 32，`retrieve` 后 `status == DONE`。
 
 ---
 

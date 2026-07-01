@@ -314,7 +314,9 @@ def run_sceom_nested_commutator(
                 ref = delta / nrm
 
     if final_evals is None or final_m is None:
-        raise RuntimeError("SCEOM optimization failed: no valid M-matrix computed")
+        from qchem_stack.exceptions import QuantumAlgorithmError
+
+        raise QuantumAlgorithmError("SCEOM optimization failed: no valid M-matrix computed")
     evals = final_evals
     m_mat = final_m
     sceom_analysis = [

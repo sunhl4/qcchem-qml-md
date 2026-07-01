@@ -765,7 +765,7 @@ assert pre_q.qubit_hamiltonian.n_qubits > 0
 | 5 | `config/scf_specs.py` — 若需新 driver 子块字段 |
 | 6 | `config/_experiment_validation.py` — capability 门禁 |
 | 7 | `integration/presets.py` — 可选 preset 函数 |
-| 8 | `tests/test_backend_capability_conformance.py` + `run_integration_checklist(solver)` |
+| 8 | `tests/backends/test_backend_capability_conformance.py` + `run_integration_checklist(solver)` |
 | 9 | [说明_经典化学后端驱动_registry与能力位.md](说明_经典化学后端驱动_registry与能力位.md) |
 
 **Entrypoint 注册（推荐第三方）：**
@@ -789,7 +789,7 @@ my_backend = "my_pkg.chem_adapter:build_my_solver"
 | 5 | `pre_quantum_path.resolve_pre_quantum_path` — 判别逻辑 |
 | 6 | `config/_experiment_validation.py` — 组合规则 + capability |
 | 7 | `docs/pre_quantum_yaml_matrix.md` — 矩阵行 |
-| 8 | `tests/test_pre_quantum_input_contract.py` |
+| 8 | `tests/chem/test_pre_quantum_input_contract.py` |
 
 **Builder 契约：**
 
@@ -829,7 +829,7 @@ def branch_my_path(req: PreQuantumBuildRequest) -> tuple[PreQuantumInput, dict |
 - [ ] orchestration 无新增 `import pyscf` / `if scf.driver == "pyscf"` 选路
 - [ ] 新 `supports_*` 已写入 `SolverCapabilities` 并在 config 校验门控
 - [ ] 稳定 API 已加入子包 `__all__`；必要时加入 `chem/__init__.py` `_LAZY_ATTRS`
-- [ ] `tests/test_chem_public_surface.py` 或 area 契约测试
+- [ ] `tests/chem/test_chem_public_surface.py` 或 area 契约测试
 - [ ] `chem/README.md` Layout 表已更新（若新增 area）
 - [ ] [pre_quantum_yaml_matrix.md](pre_quantum_yaml_matrix.md) 已更新（若改分支）
 - [ ] 本文对应章节已同步

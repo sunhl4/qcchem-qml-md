@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import sqlite3
 from typing import TYPE_CHECKING, Any, cast
 
 from qchem_stack.backends.pauli_grouping import build_measurement_plan
@@ -11,7 +10,7 @@ from qchem_stack.jobs.nexus_analog import nexus_analog_billing_for_job_result
 from qchem_stack.protocols.secure_serialization import secure_loads_protocol
 
 if TYPE_CHECKING:
-    from qchem_stack.jobs.store import SqliteJobStore
+    from qchem_stack.jobs.store_schema import WorkerJobStore
     from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 
@@ -60,13 +59,12 @@ def dataframe_circuit_shot_rows(proto: PauliAveragingProtocol) -> list[dict[str,
     return rows
 
 
-def process_pauli_protocol_job(store: SqliteJobStore, job_id: str) -> None:
-    con = sqlite3.connect(store.path)
-    row = con.execute("SELECT payload FROM jobs WHERE job_id=?", (job_id,)).fetchone()
-    con.close()
-    if row is None:
+def process_pauli_protocol_job(store: WorkerJobStore, job_id: str) -> None:
+    row = store.get_job_row(job_id)
+    payload = row.get("payload")
+    if payload is None:
         raise KeyError(job_id)
-    proto: PauliAveragingProtocol = secure_loads_protocol(row[0])
+    proto: PauliAveragingProtocol = secure_loads_protocol(payload)
     proto.compile()
     proto.run()
     val = proto.evaluate()

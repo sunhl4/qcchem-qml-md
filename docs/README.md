@@ -15,7 +15,7 @@ This directory is the **engineering and contract** documentation for `qchem-stac
 | Audience | Start here |
 |----------|------------|
 | **L1 — Users** | [`docusaurus-site/`](../docusaurus-site/), [`README.md`](../README.md), [`configs/README.md`](../configs/README.md) |
-| **L2 — Integrators** | [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md), [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md), HTTP contract docs under `技术文档_HTTP_API*.md` |
+| **L2 — Integrators** | [`ONBOARDING_BY_ROLE.md`](ONBOARDING_BY_ROLE.md), [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md), [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md), HTTP contract docs under `技术文档_HTTP_API*.md` |
 | **L3 — Maintainers** | [`public_parity_matrix.md`](public_parity_matrix.md), active plans under [`execution/`](execution/) (archived closeouts: [`execution/archive/2026Q2/`](execution/archive/2026Q2/)) |
 
 Tier policy: [`engineering/doc_tier_policy.md`](engineering/doc_tier_policy.md).

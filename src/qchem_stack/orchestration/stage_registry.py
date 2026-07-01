@@ -31,11 +31,12 @@ StageName = Literal[
 
 @dataclass(frozen=True)
 class StageLifecycle:
-    """Start/complete events emitted around a pipeline stage."""
+    """Start/complete/failed events emitted around a pipeline stage."""
 
     name: StageName
-    started: PipelineEvents
-    completed: PipelineEvents
+    started: str
+    completed: str
+    failed: str
 
 
 @dataclass(frozen=True)
@@ -49,27 +50,41 @@ class StageSpec:
 
 
 PIPELINE_STAGE_LIFECYCLES: tuple[StageLifecycle, ...] = (
-    StageLifecycle("scf", PipelineEvents.SCF_STARTED, PipelineEvents.SCF_COMPLETED),
+    StageLifecycle(
+        "scf",
+        PipelineEvents.SCF_STARTED,
+        PipelineEvents.SCF_COMPLETED,
+        PipelineEvents.SCF_FAILED,
+    ),
     StageLifecycle(
         "pre_quantum",
         PipelineEvents.PRE_QUANTUM_STARTED,
         PipelineEvents.PRE_QUANTUM_COMPLETED,
+        PipelineEvents.PRE_QUANTUM_FAILED,
     ),
     StageLifecycle(
         "variational",
         PipelineEvents.VARIATIONAL_STARTED,
         PipelineEvents.VARIATIONAL_COMPLETED,
+        PipelineEvents.VARIATIONAL_FAILED,
     ),
     StageLifecycle(
         "embedding_workflow",
         PipelineEvents.EMBEDDING_WORKFLOW_STARTED,
         PipelineEvents.EMBEDDING_WORKFLOW_COMPLETED,
+        PipelineEvents.EMBEDDING_WORKFLOW_FAILED,
     ),
-    StageLifecycle("excited", PipelineEvents.EXCITED_STARTED, PipelineEvents.EXCITED_COMPLETED),
+    StageLifecycle(
+        "excited",
+        PipelineEvents.EXCITED_STARTED,
+        PipelineEvents.EXCITED_COMPLETED,
+        PipelineEvents.EXCITED_FAILED,
+    ),
     StageLifecycle(
         "protocol_finalize",
         PipelineEvents.PROTOCOL_FINALIZE_STARTED,
         PipelineEvents.PROTOCOL_FINALIZE_COMPLETED,
+        PipelineEvents.PROTOCOL_FINALIZE_FAILED,
     ),
 )
 
@@ -77,6 +92,7 @@ PIPELINE_WRAPPER_LIFECYCLE = StageLifecycle(
     "pipeline",
     PipelineEvents.PIPELINE_STARTED,
     PipelineEvents.PIPELINE_COMPLETED,
+    PipelineEvents.PIPELINE_FAILED,
 )
 
 PIPELINE_STAGE_SPECS: tuple[StageSpec, ...] = (

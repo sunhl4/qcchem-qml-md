@@ -6,7 +6,7 @@
 
 - **Jordan–Wigner**：`active_space.fermion_qubit_mapping: jordan_wigner`（默认）下，UCCSD 簇算符经 OpenFermion 流程映射为 **Pauli 字符串**，与 **同一映射下** 构建的 `QubitHamiltonian` 一致。
 - **稠密簇指数**（`UCCSDVQE`）或 **一阶 Trotter 层重复**（`UCCSDTrotterVQE` + `quantum.variational.uccsd_trotter_steps`），见 [`quantum/algorithms/uccsd_vqe.py`](../src/qchem_stack/quantum/algorithms/uccsd_vqe.py) 与示例 `configs/example_h2_uccsd*.yaml`。
-- **JW 电路路径**（`uccsd_circuit.py` + `uccsd_circuit_qiskit.py`）：AnsatzPrep / PauliAveraging 与 Qiskit 采样可导出 UCCSD prep CircuitIR；**Pauli 门分解**（`uccsd_pauli_decomposition.py`，默认 `quantum.uccsd.decomposition_mode: pauli`）替换稠密 `UNITARY` 占位，资源统计含 2Q/depth；parity 门禁见 `tests/test_uccsd_pauli_decomposition.py`、`tests/test_uccsd_circuit_parity.py`。示例：`configs/example_h2_uccsd_pauli_protocol.yaml`。
+- **JW 电路路径**（`uccsd_circuit.py` + `uccsd_circuit_qiskit.py`）：AnsatzPrep / PauliAveraging 与 Qiskit 采样可导出 UCCSD prep CircuitIR；**Pauli 门分解**（`uccsd_pauli_decomposition.py`，默认 `quantum.uccsd.decomposition_mode: pauli`）替换稠密 `UNITARY` 占位，资源统计含 2Q/depth；parity 门禁见 `tests/quantum/test_uccsd_pauli_decomposition.py`、`tests/quantum/test_uccsd_circuit_parity.py`。示例：`configs/example_h2_uccsd_pauli_protocol.yaml`。
 
 ## 刻意不宣称（`n/a`）
 

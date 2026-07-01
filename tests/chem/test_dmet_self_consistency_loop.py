@@ -34,3 +34,17 @@ def test_dmet_self_consistency_loop_converges_and_writes_parity_snapshot() -> No
     assert traced.get("converged") is True
     assert int(traced.get("cycles") or 0) >= 2
     assert isinstance(traced.get("history"), list)
+
+
+def test_h2_dimer_dmet_self_consistency_converges() -> None:
+    p = configs_path("example_h2_dimer_dmet_self_consistent.yaml")
+    if not p.is_file():
+        pytest.skip("example_h2_dimer_dmet_self_consistent.yaml missing")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    loop = out.get("dmet_self_consistency_loop")
+    assert isinstance(loop, dict)
+    assert loop.get("converged") is True
+    traced = out["repro"]["parity_snapshot"].get("dmet_self_consistency_loop")
+    assert isinstance(traced, dict)
+    assert traced.get("converged") is True

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from typing import cast
 
 import numpy as np
 
@@ -47,4 +48,4 @@ class OverlapSquaredComputable:
             est, se = _overlap_squared_swap_test(psi_ref, psi, int(self.shots), rng)
             meta["overlap_squared_shot_mean"] = float(est)
             meta["overlap_squared_shot_stderr"] = float(se)
-        return EvaluationResult(self.name, exact, meta)
+        return EvaluationResult(self.name, exact, cast("dict[str, object]", meta))

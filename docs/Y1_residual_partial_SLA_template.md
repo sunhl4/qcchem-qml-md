@@ -8,7 +8,7 @@
 |------------------|--------------|------------------------------|----------|--------|-------------------------|
 | `ucc_chem_ansatz` | 化学 UCC 池与闭源默认非逐条对齐 | partial + JW UCCSD/Trotter YAML | Y1-Q4 | 见 MAINTAINERS | |
 | `tensornet` | TN 化学尺度收缩 | **n/a**（开放栈 stub；不宣称 `vendor-cutensornet`） | Y2-Q2 | 见 MAINTAINERS | 见矩阵 §1 |
-| `drivers_cosmo_pbc` | 全 driver 表面 / 多 k / 溶剂边界 | partial_kmesh | Y1-Q4 | 见 MAINTAINERS | PySCF 版本；变更 `PYSCF_MIN_VERSION_RECOMMENDED` 时同步矩阵 §3；回归见 `tests/test_pyscf_driver_meta_contract.py`、`tests/test_tier2_optional_integrations_frontier.py`（PBC/ddCOSMO 相关断言） |
+| `drivers_cosmo_pbc` | 全 driver 表面 / 多 k / 溶剂边界 | partial_kmesh | Y1-Q4 | 见 MAINTAINERS | PySCF 版本；变更 `PYSCF_MIN_VERSION_RECOMMENDED` 时同步矩阵 §3；回归见 `tests/chem/test_pyscf_solver_adapter.py`、`tests/integrations/test_tier2_optional_integrations_frontier.py`（PBC/ddCOSMO 相关断言） |
 | `composable_computable` | 与闭源 Computable 融合顺序 | rich_optional（workflow-preview） | Y1-Q4 | 见 MAINTAINERS | |
 | `integrations_closure_layer` | 产品默认闭包 | reference_v1 | 长期 | 见 MAINTAINERS | 仅 L1 |
 | `dmet_scf_loop` | 化学意义上完整 DMET bath / 闭源 bath 拟合 | partial + 文档钩子 | Y2-Q1 | 见 MAINTAINERS | 用户钩子 + Schmidt 生产路径 |
@@ -23,7 +23,7 @@
 | **`compiler_pass_bundle`** | 默认 `CompilerSpec`+CircuitIR；**非**默认全链 TKET | partial + 矩阵 §4「默认 / 可选 pytket」叙事 | Y1-Q4 | 见 MAINTAINERS | 可选 `pytket`；`test_pytket_bridge.py` |
 | **`computables_rich` 入 repro** | `parity_integrations.include_computables_rich_in_repro` | partial；golden 可选 | Y2-Q1 | 见 MAINTAINERS | `test_workflow_preview_repro_alignment.py` |
 | **矩阵 §3 分解插件** | `embedding.mode: plugin` 玩具 demo 与教程互链 | partial + 文档索引 | Y1-Q4 | 见 MAINTAINERS | `example_decomposition_plugin_toy.yaml`；[case-study-h2-family](../docusaurus-site/docs/tutorial/case-study-h2-family.md) |
-| **`ninety_day_checklist`** | D1–D90 台账 vs Cursor 计划 | **模板已填满**；缓冲周见 [`P2_buffer_week_playbook.md`](P2_buffer_week_playbook.md) | Y2-Q1 | 见 MAINTAINERS | [`P2_ninety_day_execution_checklist.md`](P2_ninety_day_execution_checklist.md)；`tests/test_api_runs.py`、`scripts/check_parity_export_sample.py`（取代已移除的 parity matrix anchor 专属用例） |
+| **`ninety_day_checklist`** | D1–D90 台账 vs Cursor 计划 | **模板已填满**；缓冲周见 [`P2_buffer_week_playbook.md`](P2_buffer_week_playbook.md) | Y2-Q1 | 见 MAINTAINERS | [`P2_ninety_day_execution_checklist.md`](P2_ninety_day_execution_checklist.md)；`tests/api/test_api_runs.py`、`scripts/check_parity_export_sample.py`（取代已移除的 parity matrix anchor 专属用例） |
 
 **签off 规则**
 

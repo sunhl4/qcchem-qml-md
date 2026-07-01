@@ -26,7 +26,8 @@ Do not extend Tier 2 files for new features; add Tier 1 docs or CHANGELOG instea
 | Path | Role |
 |------|------|
 | `竞争定位*.md`, `工程记忆*.md` | Competitive positioning and narrative |
-| `qwen三模型评测*.md`, `组会汇报_*.md` | Research / presentation (non-runtime) |
+| [`research/presentations/`](../research/presentations/) | Internal presentation notes (formerly at `docs/组会汇报_*.md`) |
+| [`research/evaluations/`](../research/evaluations/) | LLM / research evaluations (formerly at `docs/qwen*.md`) |
 | [`internal/`](../internal/) | Maintainer audits and research notes |
 | [`research/README.md`](../research/README.md) | Index for Tier 3 docs |
 
@@ -34,7 +35,10 @@ These inform backlog and UX but are **not** runtime dependencies. Code must not 
 
 ## Drift checks (CI)
 
+- `scripts/check_doc_test_paths.py` — Tier-1 docs must not reference stale flat `tests/test_*.py` paths (`--fix` remaps to layer paths)
 - `scripts/check_doc_links.py` — Docusaurus `configs/*.yaml` references exist (docusaurus job)
 - `scripts/check_comparative_execution_backlog.py` — backlog YAML consistency (lint job)
 - `scripts/sync_pre_quantum_docs.py` — pre-quantum matrix sync
 - `scripts/generate_config_reference_snippets.py --check` — Pydantic field tables under `docs/generated/`
+
+Tier-1 also includes repository-root [`CONTRIBUTING.md`](../CONTRIBUTING.md).

@@ -1,16 +1,17 @@
 """Typed shapes for :func:`~qchem_stack.orchestration.pipeline.run_pipeline_sync` outputs.
 
-Runtime payloads remain ``dict[str, Any]`` for forward compatibility; these TypedDicts
+Runtime payloads remain ``dict[str, object]`` for forward compatibility; these TypedDicts
 document stable keys for integrators, HTTP adapters, and static analysis.
 """
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, TypedDict, cast
+from typing import TYPE_CHECKING, TypedDict, cast
 
 from typing_extensions import NotRequired
 
 from qchem_stack.contracts.schema_ids import PIPELINE_RESULT_V1
+from qchem_stack.exceptions import PipelineError
 
 if TYPE_CHECKING:
     from collections.abc import Mapping
@@ -133,10 +134,10 @@ def assert_pipeline_result_core_keys(payload: Mapping[str, object]) -> None:
     """Raise if any required pipeline result key is missing."""
     missing = sorted(k for k in PIPELINE_RESULT_CORE_KEYS if k not in payload)
     if missing:
-        raise KeyError("pipeline result payload missing core keys: " + ", ".join(missing))
+        raise PipelineError("pipeline result payload missing core keys: " + ", ".join(missing))
 
 
-def tag_pipeline_result(payload: PipelineResultV1 | dict[str, Any]) -> PipelineResultV1:
+def tag_pipeline_result(payload: PipelineResultV1 | dict[str, object]) -> PipelineResultV1:
     """Attach ``schema: pipeline_result_v1`` without mutating nested structures."""
     tagged = dict(payload)
     tagged.setdefault("schema", PIPELINE_RESULT_V1)

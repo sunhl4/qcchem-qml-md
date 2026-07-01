@@ -103,7 +103,7 @@ GeometryFileFormat = Literal["xyz"]
 (["H", "H"], [[0.0, 0.0, 0.0], [0.0, 0.0, 0.74]])
 ```
 
-**测试参考：** `tests/test_geometry_files.py::test_parse_xyz_h2`、`test_parse_xyz_extended_extra_columns`。
+**测试参考：** `tests/chem/test_geometry_files.py::test_parse_xyz_h2`、`test_parse_xyz_extended_extra_columns`。
 
 ---
 
@@ -266,19 +266,19 @@ preprocess_experiment_dict_geometry_files
 | 分子 schema | `src/qchem_stack/config/molecule.py` |
 | 示例 YAML | `configs/example_h2_geometry_file_xyz.yaml` |
 | 示例 xyz | `configs/structures_h2.xyz` |
-| 单元测试 | `tests/test_geometry_files.py` |
+| 单元测试 | `tests/chem/test_geometry_files.py` |
 
 **建议阅读顺序：**
 
 1. `configs/structures_h2.xyz` + `configs/example_h2_geometry_file_xyz.yaml`
 2. `geometry_files.py`（本文）
-3. `tests/test_geometry_files.py`（行为契约）
+3. `tests/chem/test_geometry_files.py`（行为契约）
 4. `molecule.py` 中 `coordinates_in_bohr()`
 
 **本地验证：**
 
 ```bash
-pytest tests/test_geometry_files.py -q
+pytest tests/chem/test_geometry_files.py -q
 ```
 
 ```python
@@ -310,7 +310,7 @@ print(cfg.molecule.coordinates_in_bohr())
 3. `_infer_geometry_format` 增加后缀映射；
 4. `load_cartesian_geometry_file` 增加分支；
 5. `merge_molecule_dict_from_geometry_file` 允许 `geometry_file_format` 新取值；
-6. 补充 `tests/test_geometry_files.py` 与本文档 §4。
+6. 补充 `tests/chem/test_geometry_files.py` 与本文档 §4。
 
 保持 **解析（纯函数）与读盘（`load_*`）分离**，与现有 XYZ 路径一致，便于测试。
 

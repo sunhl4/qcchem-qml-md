@@ -65,14 +65,6 @@ def _hmac_signature_valid(data: bytes) -> tuple[bool, bytes]:
     return hmac.compare_digest(signature, expected_signature), payload
 
 
-def _looks_like_pickle_payload(data: bytes) -> bool:
-    """Heuristic for legacy unsigned ``pickle.dumps`` blobs (pre-HMAC format)."""
-    if not data:
-        return False
-    first = data[0:1]
-    return first in {b"\x80", b"(", b"]", b"}", b"\x95", b"c"}
-
-
 def _finalize_loaded(obj: Any, expected_type: type | None) -> Any:
     if expected_type is not None and not isinstance(obj, expected_type):
         raise TypeError(
@@ -84,47 +76,25 @@ def _finalize_loaded(obj: Any, expected_type: type | None) -> Any:
 def secure_loads(data: bytes, expected_type: type | None = None) -> Any:
     """Deserialize object with HMAC signature verification.
 
-    Supports legacy unsigned ``pickle.dumps`` blobs written before HMAC signing
-    was introduced (e.g. existing SQLite job rows).
-
     Args:
-        data: Bytes containing HMAC signature followed by pickle data, or legacy pickle
+        data: Bytes containing HMAC signature followed by pickle data
         expected_type: Optional type to verify after deserialization
 
     Returns:
         Deserialized object
 
     Raises:
-        ValueError: If signature is invalid or data is too short / not pickle
+        ValueError: If signature is invalid or data is too short
         TypeError: If deserialized object doesn't match expected_type
     """
-    if len(data) >= 32:
-        valid, payload = _hmac_signature_valid(data)
-        if valid:
-            return _finalize_loaded(pickle.loads(payload), expected_type)
+    if len(data) < 32:
+        raise ValueError("Data too short to contain valid HMAC signature")
 
-    if _looks_like_pickle_payload(data):
-        # Security: reject legacy unsigned pickles by default
-        _allow_legacy = os.environ.get("QCHEM_ALLOW_LEGACY_PICKLE", "").lower()
-        if _allow_legacy not in {"1", "true", "yes"}:
-            raise ValueError(
-                "Loading legacy unsigned pickle payloads is disabled by default for security. "
-                "To enable for migration, set QCHEM_ALLOW_LEGACY_PICKLE=1 and re-save via "
-                "PauliAveragingProtocol.dumps() to upgrade to HMAC-signed format."
-            )
-        warnings.warn(
-            "Loading legacy unsigned protocol pickle blob; re-save via "
-            "PauliAveragingProtocol.dumps() to upgrade to HMAC-signed format.",
-            DeprecationWarning,
-            stacklevel=2,
-        )
-        _log.debug("secure_loads: legacy unsigned pickle (%d bytes)", len(data))
-        return _finalize_loaded(pickle.loads(data), expected_type)
-
-    if len(data) >= 32:
+    valid, payload = _hmac_signature_valid(data)
+    if not valid:
         raise ValueError("Invalid HMAC signature - data may have been tampered with")
 
-    raise ValueError("Data too short to contain valid HMAC signature or legacy pickle payload")
+    return _finalize_loaded(pickle.loads(payload), expected_type)
 
 
 def _protocol_blob_v2_enabled() -> bool:
@@ -147,8 +117,13 @@ def secure_dumps_protocol(proto: PauliAveragingProtocol) -> bytes:
     return secure_dumps(proto)
 
 
+def _legacy_pickle_allowed() -> bool:
+    return os.environ.get("QCHEM_ALLOW_LEGACY_PICKLE", "").lower() in {"1", "true", "yes", "on"}
+
+
 def secure_loads_protocol(data: bytes) -> PauliAveragingProtocol:
-    """Deserialize PauliAveragingProtocol (HMAC JSON v2 or signed/legacy pickle v1)."""
+    """Deserialize PauliAveragingProtocol (HMAC JSON v2 or signed pickle v1)."""
+    from qchem_stack.exceptions import JobPayloadError
     from qchem_stack.protocols.protocol import PauliAveragingProtocol
     from qchem_stack.protocols.protocol_v2_document import (
         is_protocol_v2_json_payload,
@@ -162,5 +137,23 @@ def secure_loads_protocol(data: bytes) -> PauliAveragingProtocol:
 
     if is_protocol_v2_json_payload(data):
         return protocol_v2_loads(data)
+
+    if data[:1] == b"\x80":
+        if not _legacy_pickle_allowed():
+            raise JobPayloadError(
+                "Legacy unsigned pickle protocol blobs are disabled by default. "
+                "Set QCHEM_ALLOW_LEGACY_PICKLE=1 only during one-time migration, "
+                "then re-save jobs as HMAC-signed JSON v2."
+            )
+        warnings.warn(
+            "Loading unsigned legacy pickle protocol blob; migrate with "
+            "scripts/migrate_job_protocol_blobs.py and unset QCHEM_ALLOW_LEGACY_PICKLE.",
+            DeprecationWarning,
+            stacklevel=2,
+        )
+        return cast(
+            "PauliAveragingProtocol",
+            _finalize_loaded(pickle.loads(data), PauliAveragingProtocol),
+        )
 
     return cast("PauliAveragingProtocol", secure_loads(data, expected_type=PauliAveragingProtocol))

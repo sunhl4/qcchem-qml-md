@@ -4,7 +4,7 @@
 
 ## 本日执行
 
-- `.venv/bin/pytest tests/test_export_parity_golden.py tests/test_methods_resource_unified_export.py -q`
+- `.venv/bin/pytest tests/repro/test_export_parity_golden.py tests/repro/test_methods_resource_unified_export.py -q`
   - 结果：`18 passed`
 - `.venv/bin/python scripts/check_parity_export_sample.py`
   - 结果：通过

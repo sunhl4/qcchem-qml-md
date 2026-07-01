@@ -48,7 +48,13 @@ def _load_fixture_extxyz(path: Path) -> QMEFDataset:
 
 
 def test_qmef_golden_extxyz_roundtrip(tmp_path: Path) -> None:
-    fixture = Path(__file__).resolve().parent / "fixtures" / "qmef" / "h2_equilibrium.extxyz"
+    fixture = (
+        Path(__file__).resolve().parents[2]
+        / "tests"
+        / "fixtures"
+        / "qmef"
+        / "h2_equilibrium.extxyz"
+    )
     dataset = _load_fixture_extxyz(fixture)
     out_path = tmp_path / "roundtrip.xyz"
     export_extended_xyz(dataset, out_path)

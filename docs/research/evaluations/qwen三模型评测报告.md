@@ -1,0 +1,141 @@
+# 千问三模型评测报告（量子算法工程师场景）
+
+---
+
+## 1. 评测概览
+
+
+| 维度         | 说明                                                             |
+| -------------- | ------------------------------------------------------------------ |
+| **评测对象** | `qwen-flash` / `qwen3-coder-next` / `qwen3.7-max`                |
+| **场景数**   | 3（日常解释 / 编程 / 架构设计）                               |
+| **总调用**   | 9 次（3×3 全矩阵）                                              |
+| **角色定位** | flash → 简单日常；coder-next → 编程 Agent；3.7-max → 复杂推理 |
+
+### 1.1 模型路由建议
+
+![模型路由建议](assets/qwen_benchmark/01_model_routing.png)
+
+</details>
+
+### 2  雷达图（相对表现）
+
+![三模型场景得分雷达图](assets/qwen_benchmark/02_score_radar.png)
+
+
+
+---
+
+## 3. 效率对比
+
+### 3.1 Token 消耗
+
+![Token 消耗对比](assets/qwen_benchmark/04_tokens.png)
+
+
+| 模型             |    S1 |    S2 |    S3 |       合计 | 相对 flash |
+| ------------------ | ------: | ------: | ------: | -----------: | :----------: |
+| qwen-flash       |   472 | 1,085 | 1,804 |  **3,361** |   1.0×   |
+| qwen3-coder-next |   445 | 1,139 | 2,305 |  **3,889** |   1.2×   |
+| qwen3.7-max      | 3,850 | 2,099 | 4,432 | **10,381** | **3.1×** |
+
+---
+
+## 4. 分场景详评
+
+### 4.1 S1 — Jordan-Wigner 映射解释
+
+**任务**：180–220 字，3 条 bullet，说明动机 / 结构变化 / 代价。
+
+
+| 模型       |  延迟 | tokens | 物理正确性 |            格式遵守            |
+| ------------ | ------: | -------: | :----------: | :------------------------------: |
+| flash      |  3.4s |    472 |     ✅     |          ⚠️ 超字数          |
+| coder-next |  2.1s |    445 |     ✅     |          ⚠️ 超字数          |
+| 3.7-max    | 31.8s |   3850 |     ✅     | ⚠️ 超字数 + 高 thinking 开销 |
+
+**结论**：三模型物理内容均正确（Pauli 字符串、Z 链非局域性、资源代价）。日常解释首选 **flash** 或 **coder-next**；不必为 S1 类任务调用 3.7-max。
+
+---
+
+### 4.2 S2 — `select_adapt_candidates` 编程
+
+**任务**：实现 ADAPT 算符贪心选择（梯度过滤 → 降序 → qubit 宽度约束）。
+
+
+| 模型       |  延迟 | tokens | 代码可运行 | 关键问题                               |
+| ------------ | ------: | -------: | :----------: | ---------------------------------------- |
+| flash      |  8.0s |  1,085 | ❌ FAILED | `filtered_sorted.index(name)` 逻辑错误 |
+| coder-next |  4.0s |  1,139 | ✅ PASSED | 实现清晰，union 计数正确               |
+| 3.7-max    | 14.9s |  2,099 | ✅ PASSED | 文档化最好，边界测试完备               |
+
+**flash 失败根因**：
+
+```python
+# flash 错误写法：filtered_sorted 仅为 name 列表，index 与 pool 索引混用
+qubits = [q for q in pool[filtered_sorted.index(name)][1]]
+```
+
+**推荐**：Cursor 日常编程默认 **qwen3-coder-next**；复杂算法模块可切换 **3.7-max**。
+
+---
+
+### 4.3 S3 — H4 激发态流水线架构 memo
+
+**任务**：4e/4o H4，shots ≤ 5×10⁵，输出 A–E 结构化 memo（拓扑 / 三档对比 / 决策树 / 不推荐组合 / 验证实验）。
+
+#### 推荐拓扑对比
+
+![H4 流水线拓扑对比](assets/qwen_benchmark/05_pipeline_topo.png)
+
+
+| 模型        |          shots 预算意识          |   架构质量   | 关键差异                             |
+| ------------- | :---------------------------------: | :------------: | -------------------------------------- |
+| flash       | ⚠️ 乐观（三模块叠加仍称 ≤5e5） |   结构完整   | 推荐 Adapt+VQD+QSE 全链路            |
+| coder-next  |    ⚠️ Adapt+VQD ≈4.8×10⁵    |  细节最丰富  | VQD 作主路径，QSE 仅对照             |
+| **3.7-max** |        ✅**明确否决 VQD**        | **约束最严** | **Adapt+QSE 主路径，~3×10⁵ shots** |
+| **GPT 5.5** | ✅**预算分层管理** | **约束严格 + 验证闭环** | **Adapt+QSE 主路径，增加 bootstrap / FCI / 对称性验证** |
+
+**GPT 5.5 完整原始输出（归档）**：[`artifacts/qwen_benchmark/gpt55_s3_architecture.md`](../artifacts/qwen_benchmark/gpt55_s3_architecture.md)（JSON：[`gpt55_s3_architecture.json`](../artifacts/qwen_benchmark/gpt55_s3_architecture.json)）
+
+#### S3 最终判定：qwen3.7-max vs GPT 5.5
+
+| 维度 | qwen3.7-max | GPT 5.5 | 胜者 |
+| --- | --- | --- | --- |
+| 主路径决断 | Adapt + QSE，~3×10⁵ shots | Adapt + QSE，~3×10⁵ shots | 平 |
+| shots 预算论证 | 明确否决 VQD；含负向压测（强行 Adapt+VQD 预期 >5×10⁵） | 三档分层（筛查 / 主路径 / 增强），预算合并管理 | **3.7-max** |
+| 架构风险识别 | QSE 矩阵病态、梯度 SNR、SCEOM 过度设计 | overlap 条件数、selected doubles 升级、噪声回退 | 平 |
+| 验证实验（E） | 5 条带阈值，偏算法诊断 | FCI 标尺 + bootstrap + 对称性 + 几何扫描 + shots 消融 | **GPT 5.5** |
+| memo 体裁 | 精炼，A–E 结构紧凑 | 完整，但更偏实验执行手册 | **3.7-max** |
+
+**结论：GPT 5.5 综合略优，但两者应合并使用，而非二选一。**
+
+- **架构决断与 shots 约束**：两者在最关键问题上完全一致，均正确给出 `Adapt + QSE` 主路径并在 ≤5×10⁵ 预算下否决 VQD。`3.7-max` 的 VQD 负向压测（V5）和 QSE 条件数阈值（κ(S) < 100）论证更硬，适合作为“为什么不用 VQD”的否决依据。
+- **实验可落地性**：GPT 5.5 在验证闭环上明显更强——FCI 对照、误差条、bootstrap、对称性守恒与 shots 分配消融，更接近算法工程师可直接执行的 checklist。
+- **采纳建议**：**主路径与预算红线以 3.7-max 为准**；**验证方案与 shots 分层以 GPT 5.5 补全**。合并后即为 S3 最优实验草案。
+
+---
+
+## 5. 决策矩阵
+
+
+| 你的需求                  | 首选模型         | 备选                         |
+| --------------------------- | ------------------ | ------------------------------ |
+| Cmd+K 改一行、写注释      | qwen-flash       | —                           |
+| Agent / Composer 写模块   | qwen3-coder-next | 3.7-max（难 bug）            |
+| 流水线架构、shot 预算论证 | qwen3.7-max      | coder-next（细节多但约束弱） |
+| 成本敏感、批量问答        | qwen-flash       | coder-next                   |
+
+
+
+## 附录 A — 模型参数量（公开信息）
+
+
+| 模型             | 参数量                   | 备注                    |
+| ------------------ | -------------------------- | ------------------------- |
+| qwen-flash       | 未公开                   | 商业 API，侧重速度/成本 |
+| qwen3-coder-next | 80B total / 3B activated |                      |
+| qwen3.7-max      | >1T total                | 激活参数量未公开   |
+
+
+

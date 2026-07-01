@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -16,29 +16,33 @@ from qchem_stack.contracts.schema_ids import (
 from qchem_stack.orchestration.repro_summary import classical_benchmark_summary
 
 if TYPE_CHECKING:
+    from collections.abc import Sequence
+
+    from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.chem.pre_quantum_input import PreQuantumInput
 
 
 def assemble_pipeline_result_dict(
     *,
-    repro: dict[str, Any],
-    rhf: Any,
+    repro: dict[str, object],
+    rhf: ClassicalMeanFieldReference,
     energy_pre: float,
-    angles: Any,
-    algo_meta: dict[str, Any],
-    algorithm_report: Any,
-    pre_q_input: Any,
-    classical_benchmarks: dict[str, Any] | None,
-    embedding_input_payload: Any,
-    energy_components: Any,
-    rdm_bundle_meta: dict[str, Any] | None,
-    rdm_correction_report: Any,
-    rdm_correction_readiness: Any,
+    angles: np.ndarray | Sequence[float],
+    algo_meta: dict[str, object],
+    algorithm_report: object,
+    pre_q_input: PreQuantumInput,
+    classical_benchmarks: dict[str, object] | None,
+    embedding_input_payload: object,
+    energy_components: object,
+    rdm_bundle_meta: dict[str, object] | None,
+    rdm_correction_report: object,
+    rdm_correction_readiness: object,
     qh: QubitHamiltonian,
     build_cache: RunBuildCache,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Assemble the post-variational result dict (pre embedding/excited/protocol stages)."""
-    out: dict[str, Any] = {
+    out: dict[str, object] = {
         "repro": repro,
         "scf_energy": float(rhf.e_tot),
         "energy_after_variational": float(energy_pre),
@@ -65,12 +69,18 @@ def assemble_pipeline_result_dict(
     return out
 
 
-def patch_repro_parity_snapshot(out: dict[str, Any]) -> None:
+def patch_repro_parity_snapshot(out: dict[str, object]) -> None:
     """Augment ``repro.parity_snapshot`` with build-cache and registry exports in place."""
-    repro_ps = out.get("repro", {}).get("parity_snapshot")
-    if not isinstance(repro_ps, dict):
+    repro_raw = out.get("repro")
+    if not isinstance(repro_raw, dict):
         return
-    repro_ps["pre_quantum_build_cache_v1"] = dict(out["pre_quantum_build_cache"])
+    repro_ps_raw = repro_raw.get("parity_snapshot")
+    if not isinstance(repro_ps_raw, dict):
+        return
+    repro_ps = repro_ps_raw
+    build_cache = out.get("pre_quantum_build_cache")
+    if isinstance(build_cache, dict):
+        repro_ps["pre_quantum_build_cache_v1"] = dict(build_cache)
     repro_ps["active_space_exporters_registry_v1"] = {
         "schema": ACTIVE_SPACE_EXPORTERS_REGISTRY_V1,
         "backend_tags": list(list_active_space_integral_exporters()),

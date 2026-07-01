@@ -82,7 +82,7 @@ pre_quantum_build / hamiltonian                     （OpenFermion 等；映射�
   - **Schmidt 杂质 ERI**：Psi4 用 `MintsHelper.ao_eri` + MO 变换；PySCF 用 `ao2mo.full`。
   - **Mulliken 投影**：Psi4 CASCI 块计算时临时改写 `wfn.Ca()`，结束后恢复，避免污染参考波函数。
   - **Psi4 1.10 API**：SCF 返回 `core.RHF`（非 `Wavefunction`）；`MintsHelper` 使用 `ao_overlap`/`ao_kinetic`/`ao_potential`；无 `energy('casci')` 时走 Mints CASCI 有效哈密顿量回退。
-  - **Parity CI**：`pytest -m psi4` 含 `tests/test_psi4_pyscf_h2_canonical_parity.py` 与 `tests/test_psi4_pyscf_alignment.py`（H₂ 软阈值）。
+  - **Parity CI**：`pytest -m psi4` 含 `tests/chem/test_psi4_pyscf_h2_canonical_parity.py` 与 `tests/chem/test_psi4_pyscf_alignment.py`（H₂ 软阈值）。
 
 ---
 

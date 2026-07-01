@@ -18,6 +18,8 @@ import logging
 import sys
 from pathlib import Path
 
+import qchem_stack.orchestration  # noqa: F401 — registers md_bridge pipeline runner
+
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 if str(_REPO_ROOT / "src") not in sys.path:
     sys.path.insert(0, str(_REPO_ROOT / "src"))

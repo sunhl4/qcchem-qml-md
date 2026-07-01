@@ -16,12 +16,12 @@
   - `configs/decomposition_plugin_two_fragment_integrals.json`
   - `configs/example_decomposition_plugin_two_fragment.yaml`
 - 测试增强：
-  - `tests/test_decomposition_plugin_pipeline.py` 新增两片段摘要断言。
-  - `tests/test_export_parity_golden.py` 与 `scripts/check_parity_export_sample.py` 纳入新配置。
+  - `tests/chem/test_decomposition_plugin_pipeline.py` 新增两片段摘要断言。
+  - `tests/repro/test_export_parity_golden.py` 与 `scripts/check_parity_export_sample.py` 纳入新配置。
 
 ## 验证
 
-- `.venv/bin/pytest tests/test_decomposition_plugin_pipeline.py tests/test_export_parity_golden.py tests/test_methods_resource_unified_export.py -q`
+- `.venv/bin/pytest tests/chem/test_decomposition_plugin_pipeline.py tests/repro/test_export_parity_golden.py tests/repro/test_methods_resource_unified_export.py -q`
   - 结果：`21 passed`
 - `.venv/bin/python scripts/check_parity_export_sample.py`
   - 结果：通过

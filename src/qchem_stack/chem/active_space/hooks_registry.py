@@ -35,7 +35,9 @@ def freeze_active_space_hooks() -> None:
 
 def _ensure_registry_mutable() -> None:
     if _REGISTRY_FROZEN:
-        raise RuntimeError(
+        from qchem_stack.exceptions import PreQuantumError
+
+        raise PreQuantumError(
             "Active-space hooks registry is frozen for this process. "
             "Register hooks before calling freeze_active_space_hooks()."
         )

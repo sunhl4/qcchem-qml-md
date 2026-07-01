@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.orchestration.excited_stages import (
     excited_methods_unified,
@@ -15,9 +15,9 @@ if TYPE_CHECKING:
 
 def resource_summary_excited_only(
     n_qubits: int, excited_rs: ExcitedResourceSummary
-) -> dict[str, Any]:
+) -> dict[str, object]:
     ub = excited_shots_upper_bound(excited_rs)
-    rs: dict[str, Any] = {
+    rs: dict[str, object] = {
         "n_circuits": 0,
         "sum_shots": 0,
         "max_depth": 0,

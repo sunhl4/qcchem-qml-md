@@ -10,10 +10,12 @@ from tests.helpers.paths import configs_path
 
 def test_export_parity_criteria_table_config_only_matches_cli() -> None:
     from qchem_stack.protocols.parity_criteria_export import export_parity_criteria_table
+    from qchem_stack.protocols.parity_export_types import assert_stable_keys_present
 
     cfg = configs_path("example_h2.yaml")
     table = export_parity_criteria_table(cfg)
     assert table.get("parity_export_schema_version") == "3"
+    assert_stable_keys_present(table)
     assert table.get("experiment_id")
     assert table.get("embedding", {}).get("mode") == "none"
     assert isinstance(table.get("capability_gap_categories"), list)

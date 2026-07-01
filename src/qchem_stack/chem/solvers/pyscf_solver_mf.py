@@ -121,7 +121,9 @@ def execute_periodic_mean_field(solver: PySCFIntegralSolver) -> MolecularMeanFie
             meta["solvent"] = "ddcosmo"
             meta["ddcosmo_epsilon"] = float(solver.chemistry_extended.solvent.epsilon)
         except Exception as exc:  # noqa: BLE001
-            raise RuntimeError("ddCOSMO on this periodic mean-field object failed.") from exc
+            from qchem_stack.exceptions import SolverError
+
+            raise SolverError("ddCOSMO on this periodic mean-field object failed.") from exc
     mf_p = as_pyscf_cas(mf)
     e_tot = float(mf_p.kernel())
     mo_ev = mf_p.mo_energy

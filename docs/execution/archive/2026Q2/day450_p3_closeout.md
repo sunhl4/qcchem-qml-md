@@ -9,7 +9,7 @@
 |------|--------|----------|
 | H-001 | done | `docusaurus-site/docs/tutorial/index.md`, `sidebars.ts` |
 | H-002 | done | `notebooks/*.ipynb` (4 walkthroughs) |
-| H-003 | done | `scripts/benchmark_dashboard/generate.py`, `tests/test_benchmark_dashboard_generate.py` |
+| H-003 | done | `scripts/benchmark_dashboard/generate.py`, `tests/integrations/test_benchmark_dashboard_generate.py` |
 | H-004 | done | `CONTRIBUTING.md` plugin checklist, `examples/solver_plugin_entrypoint_demo/README.md` |
 | H-005 | done | `docs/product/non_goals.md`, docusaurus mirror |
 

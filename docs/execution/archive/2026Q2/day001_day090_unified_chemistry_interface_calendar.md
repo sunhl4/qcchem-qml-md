@@ -43,7 +43,7 @@ PLAN_START_DATE: 2026-05-08
 
 **当日完成定义（DoD）**：
 
-- 扩展 `tests/test_solver_registry_contract.py`：门面 `classical_mean_field_via_solver_bridge` 走 registry
+- 扩展 `tests/chem/test_solver_registry_contract.py`：门面 `classical_mean_field_via_solver_bridge` 走 registry
 - 断言 `driver_meta` 含 canonical headers
 
 **日末检查**：`git diff` 可审；相关测试绿。

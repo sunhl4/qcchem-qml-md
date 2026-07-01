@@ -34,7 +34,9 @@ def get_active_space_integrals(
     if run_scf:
         mf.kernel()
     if not getattr(mf, "converged", False):
-        raise RuntimeError("SCF did not converge; cannot build active-space integrals.")
+        from qchem_stack.exceptions import SolverError
+
+        raise SolverError("SCF did not converge; cannot build active-space integrals.")
 
     driver_meta: dict[str, Any] = {}
     frozen = kwargs.get("frozen_orbitals")

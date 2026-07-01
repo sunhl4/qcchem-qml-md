@@ -84,15 +84,15 @@
 
 建议新增以下测试文件（命名可微调）：
 
-- `tests/test_pyscf_driver_meta_contract.py`
+- `tests/chem/test_pyscf_solver_adapter.py`
   - 覆盖分子 RHF 与 PBC RHF/KRHF 的 `driver_meta` 字段完整性；
   - 覆盖 `solvent_model=ddcosmo` 的字段与值。
 
-- `tests/test_active_space_strategy_unified.py`
+- `tests/chem/test_active_space_strategy_unified.py`
   - `manual` / `cas` 两策略均可跑通；
   - 非法配置报错语义（参数缺失、范围错误）。
 
-- `tests/test_pyscf_classical_benchmarks.py`
+- `tests/chem/test_pyscf_classical_benchmarks.py`
   - benchmark 返回结构稳定；
   - 可用/不可用方法的 `status` 语义稳定；
   - 在可运行环境下校验 `hf <= mp2/ccsd/casci` 的基本趋势（仅做宽松断言）。

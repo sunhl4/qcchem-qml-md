@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import TYPE_CHECKING, Any, Protocol
+from typing import TYPE_CHECKING, Protocol
 
 if TYPE_CHECKING:
     import numpy as np
@@ -18,14 +18,14 @@ class EvaluationContext:
     angles: np.ndarray
     ansatz_prep: AnsatzPrepSpec | None = None
     rng: np.random.Generator | None = None
-    extra: dict[str, Any] = field(default_factory=dict)
+    extra: dict[str, object] = field(default_factory=dict)
 
 
 @dataclass
 class EvaluationResult:
     name: str
-    value: float | complex | dict[str, Any]
-    meta: dict[str, Any] = field(default_factory=dict)
+    value: float | complex | dict[str, object]
+    meta: dict[str, object] = field(default_factory=dict)
 
 
 class ComputableRuntime(Protocol):

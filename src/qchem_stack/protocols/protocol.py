@@ -23,7 +23,8 @@ if TYPE_CHECKING:
     from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
     from qchem_stack.backends.pauli_grouping import PauliMeasurementPlan
     from qchem_stack.config import NexusAnalogSpec
-    from qchem_stack.jobs.store import JobHandle, SqliteJobStore
+    from qchem_stack.jobs.store import JobHandle
+    from qchem_stack.jobs.store_schema import WorkerJobStore
     from qchem_stack.mitigation.pmsv import PMSVConfig
     from qchem_stack.protocols.ansatz_prep import AnsatzPrepSpec
 
@@ -120,17 +121,17 @@ class PauliAveragingProtocol:
     def dataframe_circuit_shot_rows(self) -> list[dict[str, Any]]:
         return dataframe_circuit_shot_rows(self)
 
-    def launch(self, store: SqliteJobStore) -> JobHandle:
+    def launch(self, store: WorkerJobStore) -> JobHandle:
         blob = secure_dumps_protocol(self)
         jid = str(uuid.uuid4())
         ph = hashlib.sha256(blob).hexdigest()[:32]
         return store.enqueue(jid, blob, protocol_hash=ph)
 
     @staticmethod
-    def process_job(store: SqliteJobStore, job_id: str) -> None:
+    def process_job(store: WorkerJobStore, job_id: str) -> None:
         process_pauli_protocol_job(store, job_id)
 
-    def retrieve(self, store: SqliteJobStore, handle: JobHandle) -> dict[str, Any]:
+    def retrieve(self, store: WorkerJobStore, handle: JobHandle) -> dict[str, Any]:
         return store.result(handle.job_id)
 
     def dumps(self) -> bytes:

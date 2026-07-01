@@ -211,9 +211,8 @@ def run_sceom_excited(ctx: ExcitedRunContext) -> ExcitedStageOutcome:
     if prepare_state is not None:
         sceom_meta["variational_ansatz"] = "uccsd"
     comp_value = comp_out.value
-    excitation_energies = (
-        list(comp_value.get("excitation_energies") or []) if isinstance(comp_value, dict) else []
-    )
+    raw_energies = comp_value.get("excitation_energies") if isinstance(comp_value, dict) else None
+    excitation_energies = list(raw_energies) if isinstance(raw_energies, list) else []
     return ExcitedStageOutcome(
         bundle_key="sceom",
         bundle={

@@ -54,7 +54,7 @@
 
 > **小注**：严格说「完整 SHA-256」常指 **64 个 hex 字符**；这里用 **32 个字符前缀** 仍然是「基于 SHA-256 的指纹」，更短、好贴进表格；在科学工作流里很常见。若论文 Methods 要写精确，可写明「SHA-256 的十六进制前缀（前 32 字符）」。
 
-同一套规则下：**相同 Pauli 展开与系数 → 相同指纹**；**映射不同、电子数不同、系数不同**等 → 指纹应不同（本仓库有对应测试，例如 `tests/test_hamiltonian_fingerprint.py`）。
+同一套规则下：**相同 Pauli 展开与系数 → 相同指纹**；**映射不同、电子数不同、系数不同**等 → 指纹应不同（本仓库有对应测试，例如 `tests/chem/test_hamiltonian_fingerprint.py`）。
 
 ---
 
@@ -104,7 +104,7 @@
 ## 8. 延伸阅读（代码位置）
 
 - 指纹计算：`src/qchem_stack/chem/hamiltonian.py` → `hamiltonian_fingerprint_from_qubit_operator`  
-- 行为与稳定性测试：`tests/test_hamiltonian_fingerprint.py`  
+- 行为与稳定性测试：`tests/chem/test_hamiltonian_fingerprint.py`  
 - 协议侧哈希示例：`src/qchem_stack/protocols/protocol.py`（`protocol_hash` 相关逻辑）
 
 若你需要一段可直接放进论文 **Methods / Supplement** 的英文表述，可以基于上述「排序规则 + 系数格式 + UTF-8 + SHA-256 + 输出截断」四条逐字对齐代码再写一版（避免与实现不一致）。

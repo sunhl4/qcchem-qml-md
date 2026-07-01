@@ -5,7 +5,7 @@ from __future__ import annotations
 import json
 import logging
 from pathlib import Path
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.chem.embedding.dmet import DMETContext
 from qchem_stack.chem.embedding.dmet_self_consistent import (
@@ -33,8 +33,8 @@ _log = logging.getLogger(__name__)
 def run_dmet_fragment_solve_if_requested(
     cfg: ExperimentConfig,
     qh: QubitHamiltonian,
-    exe: Any,
-    out: dict[str, Any],
+    exe: object,
+    out: dict[str, object],
 ) -> None:
     """Optional impurity VQE on global active Hamiltonian (single-fragment DMET *shape* demo)."""
     from qchem_stack.config.embedding_enums import EmbeddingMode
@@ -103,11 +103,11 @@ class DmetStrategy:
         self,
         cfg: ExperimentConfig,
         *,
-        out: dict[str, Any],
+        out: dict[str, object],
         qh: QubitHamiltonian,
-        exe: Any,
-        embedding_input_payload: dict[str, Any] | None,
-        schmidt_ctx: dict[str, Any] | None,
+        exe: object,
+        embedding_input_payload: dict[str, object] | None,
+        schmidt_ctx: dict[str, object] | None,
         rhf: ClassicalMeanFieldReference,
         cfg_path: Path | None,
         profile: PipelineStageTimer,

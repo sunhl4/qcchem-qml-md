@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.contracts.schema_ids import EMBEDDING_WORKFLOW_V1
 
@@ -23,11 +23,11 @@ class PluginStrategy:
         self,
         cfg: ExperimentConfig,
         *,
-        out: dict[str, Any],
+        out: dict[str, object],
         qh: QubitHamiltonian,
-        exe: Any,
-        embedding_input_payload: dict[str, Any] | None,
-        schmidt_ctx: dict[str, Any] | None,
+        exe: object,
+        embedding_input_payload: dict[str, object] | None,
+        schmidt_ctx: dict[str, object] | None,
         rhf: ClassicalMeanFieldReference,
         cfg_path: Path | None,
         profile: PipelineStageTimer,
@@ -39,7 +39,8 @@ class PluginStrategy:
             return
 
         plugin = cfg.embedding.plugin
-        hm = out.get("hamiltonian_meta") or {}
+        raw_hm = out.get("hamiltonian_meta")
+        hm: dict[str, object] = raw_hm if isinstance(raw_hm, dict) else {}
         resolved_json = hm.get("decomposition_plugin_json")
         term_counts = hm.get("decomposition_fragment_pauli_term_counts")
         term_total = 0

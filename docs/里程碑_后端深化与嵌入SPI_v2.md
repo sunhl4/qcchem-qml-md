@@ -66,7 +66,7 @@ flowchart LR
 
 3. **M1-C（调用方迁移策略）**  
    - Driver、脚本、示范代码：**新代码只用 Tangelo 对齐名**；旧名通过薄包装保留。  
-   - 单元测试：**新增** `tests/test_chem_integral_solver_tangelo_aliases.py`（命名与调度覆盖）。  
+   - 单元测试：**新增** `tests/chem/test_chem_integral_solver_tangelo_aliases.py`（命名与调度覆盖）。  
 
 ### 2.3 验收标准（DoD）
 
@@ -78,7 +78,7 @@ flowchart LR
 
 - Source：`src/qchem_stack/chem/solvers/base.py`（Protocol）、`pyscf_solver.py` / `psi4_solver.py`。  
 - Call sites：`PySCFDriver`、`integrations/cross_solver_parity.py` 使用 **`compute_mean_field`**。  
-- Tests：`tests/test_chem_integral_solver_tangelo_aliases.py`；`test_pyscf_solver_adapter`、`test_psi4_solver_smoke` 增补。
+- Tests：`tests/chem/test_chem_integral_solver_tangelo_aliases.py`；`test_pyscf_solver_adapter`、`test_psi4_solver_smoke` 增补。
 
 ### 2.5 风险与缓解
 
@@ -125,7 +125,7 @@ scf:
    - `SolverCapabilities`：`psi4` 的 `supports_molecular_scf=True`（完成 M2-A 后）。  
 
 5. **M2-E：测试与 CI**  
-   - `tests/test_psi4_full_pipeline_optional.py`：`pytest.importorskip("psi4")`，小体系 H2/STO-3G。  
+   - `tests/chem/test_psi4_pre_quantum_pipeline.py`：`pytest.importorskip("psi4")`，小体系 H2/STO-3G。  
    - 主 CI：无 psi4 **skip**；Nightly/`optional` job：装机 psi4 跑全链路。  
 
 ### 3.3 验收标准（DoD）

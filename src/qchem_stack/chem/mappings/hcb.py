@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from functools import lru_cache
+
 import numpy as np
 from openfermion import BosonOperator
 from openfermion.ops import QubitOperator
@@ -117,6 +119,7 @@ def hcb_reference_statevector(*, n_spin_orbitals: int, n_electrons: int) -> np.n
     return psi
 
 
+@lru_cache(maxsize=128)
 def hcb_n_qubits(n_spin_orbitals: int) -> int:
     return int(np.ceil(int(n_spin_orbitals) / 2))
 

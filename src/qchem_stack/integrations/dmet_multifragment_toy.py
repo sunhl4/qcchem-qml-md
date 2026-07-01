@@ -65,7 +65,7 @@ def run_uniform_hamiltonian_multifragment_toy(
     def build_ham(_fid: str, _bath: DMETBathState) -> QubitHamiltonian:
         return qh
 
-    def update_bath(bath: DMETBathState, _frags) -> DMETBathState:
+    def update_bath(bath: DMETBathState, _frags: list[Any]) -> DMETBathState:
         k = int(bath.meta.get("toy_cycle", 0)) + 1
         return replace(bath, meta={**bath.meta, "toy_cycle": k})
 

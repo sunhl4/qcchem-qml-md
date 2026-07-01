@@ -5,8 +5,8 @@
 ## 本日实现
 
 - 文件：
-  - `tests/test_methods_resource_unified_export.py`
-  - `tests/test_export_parity_golden.py`
+  - `tests/repro/test_methods_resource_unified_export.py`
+  - `tests/repro/test_export_parity_golden.py`
   - `scripts/check_parity_export_sample.py`
 - 变更摘要：
   - （填写新增断言）

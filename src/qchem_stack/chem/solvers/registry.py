@@ -9,11 +9,12 @@ from __future__ import annotations
 import warnings
 from collections.abc import Callable, Mapping
 from dataclasses import dataclass, field
-from importlib.metadata import EntryPoint, entry_points
+from importlib.metadata import EntryPoint
 from threading import RLock
 from types import MappingProxyType
 from typing import Literal, cast
 
+from qchem_stack._entry_points import iter_entry_points
 from qchem_stack.chem.solvers.base import ChemIntegralSolver, SolverCapabilities
 from qchem_stack.config import ExperimentConfig
 
@@ -211,12 +212,7 @@ def _resolve_entry_point_factory(value: object, *, source: str) -> SolverFactory
 
 
 def _iter_solver_entry_points() -> list[EntryPoint]:
-    eps = entry_points()
-    if hasattr(eps, "select"):
-        selected = list(eps.select(group=_ENTRY_POINT_GROUP))
-    else:
-        selected = list(eps.get(_ENTRY_POINT_GROUP, []))  # type: ignore[attr-defined]
-    return sorted(selected, key=lambda ep: (ep.name.strip().lower(), ep.value))
+    return iter_entry_points(_ENTRY_POINT_GROUP)
 
 
 def _discover_external_solvers() -> None:

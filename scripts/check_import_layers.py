@@ -1,47 +1,28 @@
 #!/usr/bin/env python3
-"""AST check: chem and quantum must not import orchestration at module scope."""
+"""AST check: chem and quantum must not violate layer import boundaries."""
 
 from __future__ import annotations
 
-import ast
 import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "src" / "qchem_stack"
-
-FORBIDDEN_IMPORTS = {
-    "chem": {"orchestration"},
-    "quantum": {"orchestration", "pyscf"},
-}
 
 
-def _module_imports(path: Path) -> set[str]:
-    tree = ast.parse(path.read_text(encoding="utf-8"), filename=str(path))
-    found: set[str] = set()
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                found.add(alias.name.split(".")[0])
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            found.add(node.module.split(".")[0])
-    return found
+def _load_collect_layer_violations():
+    import importlib.util
+
+    path = ROOT / "tests" / "helpers" / "import_boundary_allowlists.py"
+    spec = importlib.util.spec_from_file_location("import_boundary_allowlists", path)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load {path}")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    return mod.collect_layer_violations
 
 
 def main() -> int:
-    violations: list[str] = []
-    for pkg, forbidden in FORBIDDEN_IMPORTS.items():
-        base = SRC / pkg
-        if not base.is_dir():
-            continue
-        for py in base.rglob("*.py"):
-            if py.name == "__init__.py" and py.parent == base:
-                continue
-            imports = _module_imports(py)
-            bad = imports & forbidden
-            if bad:
-                rel = py.relative_to(ROOT)
-                violations.append(f"{rel}: forbidden top-level imports {sorted(bad)}")
+    violations = _load_collect_layer_violations()(ROOT)
     if violations:
         print("Import layer violations:", file=sys.stderr)
         for v in violations:

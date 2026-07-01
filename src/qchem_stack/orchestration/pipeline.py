@@ -25,7 +25,7 @@ import asyncio
 import hashlib
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -37,6 +37,7 @@ from qchem_stack.config import (
     load_experiment_config,
 )
 from qchem_stack.config.quantum_helpers import pauli_protocol_enabled, resolve_vqe_depth
+from qchem_stack.exceptions import PipelineError
 from qchem_stack.jobs.store import SqliteJobStore
 from qchem_stack.orchestration.pipeline_assembly import (
     assemble_pipeline_result_dict,
@@ -76,7 +77,7 @@ def collect_repro_metadata(
     cfg: ExperimentConfig,
     cfg_path: Path | None = None,
     qh: QubitHamiltonian | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     return _collect_repro_metadata_impl(
         cfg,
         parity_snapshot_fn=repro_quantum_snapshot,
@@ -91,7 +92,7 @@ def run_pipeline_sync(
     cfg_path: Path | None = None,
     hamiltonian_out: list[QubitHamiltonian] | None = None,
     run_context: RunContext | None = None,
-    job_timeline_emit: Callable[[dict[str, Any]], None] | None = None,
+    job_timeline_emit: Callable[[dict[str, object]], None] | None = None,
 ) -> PipelineResultV1:
     """Run chemistry + VQE/ADAPT + optional excited stages + optional Pauli protocol in-process."""
     return _run_pipeline_sync(
@@ -123,7 +124,7 @@ def run_pipeline_from_config(
     qh = qh_lane[0]
     angles_raw = sync.get("angles")
     if angles_raw is None:
-        raise KeyError("pipeline sync missing angles before job enqueue")
+        raise PipelineError("pipeline sync missing angles before job enqueue")
     angles = np.asarray(angles_raw, dtype=float)
     bspec2 = backend_spec_from_config(cfg)
     exe2 = executor_from_spec(bspec2)
@@ -143,7 +144,7 @@ def run_pipeline_from_config(
     if not enqueue_only:
         PauliAveragingProtocol.process_job(store, handle.job_id)
         sync["job_result"] = store.result(handle.job_id)
-    attach_run_summary(cast("dict[str, Any]", sync), cfg)
+    attach_run_summary(cast("dict[str, object]", sync), cfg)
     return tag_pipeline_result(sync)
 
 
@@ -156,7 +157,7 @@ async def run_pipeline_async(
     executor: ThreadPoolExecutor | None = None,
 ) -> PipelineResultV1:
     """Async wrapper for :func:`run_pipeline_from_config`."""
-    loop = asyncio.get_event_loop()
+    loop = asyncio.get_running_loop()
     return await loop.run_in_executor(
         executor,
         lambda: run_pipeline_from_config(

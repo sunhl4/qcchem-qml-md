@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.config.quantum_helpers import (
     qpe_demo_track_requested,
@@ -28,14 +28,14 @@ if TYPE_CHECKING:
 
 
 def attach_nexus_mitigation_tn(
-    out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
+    out: dict[str, object], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Nexus / HQC analog, Qermit-style mitigation graph report, optional CuTensorNet stub."""
     if cfg.nexus_analog.enabled:
         rows = out.get("resource_rows")
         if rows is None:
             rows = out.get("pauli_measurement_ledger")
-        led = nexus_analog_ledger_from_rows(list(rows or []), cfg)
+        led = nexus_analog_ledger_from_rows(rows if isinstance(rows, list) else [], cfg)
         if led is not None:
             out["nexus_analog_ledger"] = led
     mgr = build_qermit_style_mitigation_report(cfg)
@@ -56,7 +56,7 @@ def attach_nexus_mitigation_tn(
 
 
 def attach_qpe_demo_track_if_requested(
-    out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
+    out: dict[str, object], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Optional dense QPE + Bayesian toy, same as ``scripts/run_qpe_track_demo.py``."""
     if not qpe_demo_track_requested(cfg):
@@ -67,13 +67,13 @@ def attach_qpe_demo_track_if_requested(
 
 
 def attach_vqs_track_if_requested(
-    out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
+    out: dict[str, object], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Optional VQS / McLachlan dynamics on variational parameters."""
     if not vqs_track_requested(cfg):
         return
     ang = out.get("angles")
-    if ang is None:
+    if not isinstance(ang, list):
         return
     from qchem_stack.quantum.algorithms.vqs_pipeline_track import vqs_track_payload
 
@@ -85,7 +85,7 @@ def attach_vqs_track_if_requested(
 
 
 def attach_qpe_three_algorithm_pack_if_requested(
-    out: dict[str, Any], cfg: ExperimentConfig, qh: QubitHamiltonian
+    out: dict[str, object], cfg: ExperimentConfig, qh: QubitHamiltonian
 ) -> None:
     """Dense QPE trio from :mod:`~qchem_stack.quantum.algorithms.qpe`."""
     if not qpe_three_pack_requested(cfg):
@@ -99,7 +99,7 @@ def attach_qpe_three_algorithm_pack_if_requested(
     qt = cfg.quantum
     t_ev = float(qt.demos.qpe.three_pack.time)
 
-    def _row(public: str, res: Any) -> dict[str, Any]:
+    def _row(public: str, res: object) -> dict[str, object]:
         meta = getattr(res, "meta", None)
         md = dict(meta) if isinstance(meta, dict) else {}
         return {
@@ -141,7 +141,7 @@ def attach_qpe_three_algorithm_pack_if_requested(
 
 
 def maybe_attach_md_ml_qmef_dataset(
-    out: dict[str, Any],
+    out: dict[str, object],
     cfg: ExperimentConfig,
     reference: ClassicalMeanFieldReference,
     *,
@@ -154,7 +154,12 @@ def maybe_attach_md_ml_qmef_dataset(
     if not isinstance(repro, dict):
         return
     from qchem_stack.md_bridge.from_pipeline import build_qmef_ml_attachment_repro_block
+    from qchem_stack.orchestration.pipeline import run_pipeline_sync
 
     repro["qmef_ml_attachment_v1"] = build_qmef_ml_attachment_repro_block(
-        cfg, out, reference, cfg_path=cfg_path
+        cfg,
+        out,
+        reference,
+        cfg_path=cfg_path,
+        pipeline_runner=run_pipeline_sync,
     )

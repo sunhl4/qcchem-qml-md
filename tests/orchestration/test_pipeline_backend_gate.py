@@ -88,9 +88,5 @@ def test_mockchem_canonical_pack_capability_missing() -> None:
     cfg = load_experiment_config(p)
     register_solver("mockchem", _MockChemSolver)
     cfg.scf.driver = "mockchem"
-    from qchem_stack.exceptions import ConfigurationError
-
-    with pytest.raises(
-        ConfigurationError, match="supports_restricted_active_space_qubit_hamiltonian"
-    ):
+    with pytest.raises(PipelineError, match="supports_restricted_active_space_qubit_hamiltonian"):
         run_pipeline_sync(cfg, cfg_path=p)

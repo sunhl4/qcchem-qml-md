@@ -325,8 +325,8 @@ python examples/qmlff_md_pipeline_demo.py \
 
 **测试**：
 
-- `tests/test_md_bridge_qmlff_adapter_imports.py` — 配置加载、export 面
-- `tests/test_md_bridge_classical_h2_ff.py` — Morse 拟合
+- `tests/md_bridge/test_md_bridge_qmlff_adapter_imports.py` — 配置加载、export 面
+- `tests/md_bridge/test_md_bridge_classical_h2_ff.py` — Morse 拟合
 
 ---
 
@@ -362,8 +362,8 @@ QML-FF 仓库内 [`scripts/train_qmp_h2.py`](../../QML-FF/scripts/train_qmp_h2.p
 | `configs/example_h2_angle_md.yaml` | 阶段 2：angle 编码 QNN |
 | `configs/example_h2_classical_md.yaml` | 阶段 3：经典 Morse AL |
 | `examples/qmlff_force_field_benchmark.py` | 阶段 3：多后端能量 MAE benchmark |
-| `tests/test_md_bridge_classical_h2_ff.py` | Morse 拟合单元测试 |
-| `tests/test_md_bridge_qmlff_adapter_imports.py` | 配置加载、export 面 |
+| `tests/md_bridge/test_md_bridge_classical_h2_ff.py` | Morse 拟合单元测试 |
+| `tests/md_bridge/test_md_bridge_qmlff_adapter_imports.py` | 配置加载、export 面 |
 
 ---
 

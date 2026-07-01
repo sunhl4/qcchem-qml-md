@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING, Any, cast
 
 import numpy as np  # noqa: TC002
 from openfermion.ops import QubitOperator  # noqa: TC002
@@ -63,7 +63,12 @@ def qse_h_s_via_computable(
     value = out.value
     if not isinstance(value, dict):
         raise TypeError("QSEMatricesComputable.evaluate must return a dict value payload.")
-    return value["H"], value["S"], list(records)
+    rec_list = records if isinstance(records, list) else []
+    return (
+        cast("np.ndarray", value["H"]),
+        cast("np.ndarray", value["S"]),
+        rec_list,
+    )
 
 
 def s_condition_number(s_mat: np.ndarray) -> float:

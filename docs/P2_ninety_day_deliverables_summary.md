@@ -17,7 +17,7 @@ python scripts/check_parity_export_sample.py
 - **W4**：`mitigation_pec_literature_stub_v1`（文献向 PEC 占位）+ `configs/example_h2_pec_literature_stub.yaml`。  
 - **W5/Tangelo**：[`P2_W5_algorithm_registry_alignment.md`](P2_W5_algorithm_registry_alignment.md) §4、[`examples/tangelo_facade_demo.py`](../examples/tangelo_facade_demo.py)。  
 - **W7**：[`examples/README.md`](../examples/README.md)、Docusaurus [`tutorial-index-three-paths.md`](../docusaurus-site/docs/tutorial/tutorial-index-three-paths.md)、分解教程页。  
-- **回归**：[`scripts/sample_pipeline_configs.py`](../scripts/sample_pipeline_configs.py)（抽样 10 YAML）、[`tests/test_computable_roundtrip_minimal.py`](../tests/test_computable_roundtrip_minimal.py)、HTTP workflow-preview 异常单测。
+- **回归**：[`scripts/sample_pipeline_configs.py`](../scripts/sample_pipeline_configs.py)（抽样 10 YAML）、[`tests/quantum/test_computable_roundtrip_minimal.py`](../tests/quantum/test_computable_roundtrip_minimal.py)、HTTP workflow-preview 异常单测。
 
 ## 下一阶段（M-P2-c/d）
 

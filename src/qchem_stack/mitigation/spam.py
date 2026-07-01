@@ -233,6 +233,7 @@ def correct_n_qubit_histogram(
         )
 
     if uses_tensor_product:
+        assert cal.per_qubit_matrices is not None
         # Build tensor-product matrix
         mat = np.asarray(cal.per_qubit_matrices[0], dtype=float)
         for q_mat in cal.per_qubit_matrices[1:]:

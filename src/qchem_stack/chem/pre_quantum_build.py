@@ -29,8 +29,10 @@ __all__ = [
 
 if TYPE_CHECKING:
     from pathlib import Path
+    from typing import Any
 
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
+    from qchem_stack.chem.bridges.run_build_cache import RunBuildCache
     from qchem_stack.chem.pre_quantum_input import PreQuantumInput
     from qchem_stack.config import ExperimentConfig
 
@@ -40,8 +42,8 @@ def build_pre_quantum_input_with_context(
     reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
-    cache=None,
-    profile=None,
+    cache: RunBuildCache | None = None,
+    profile: Any | None = None,
 ) -> tuple[PreQuantumInput, dict | None]:
     """Assemble :class:`PreQuantumInput` and optional Schmidt context for the sync pipeline."""
     _register_default_pre_quantum_branch_builders()
@@ -70,7 +72,7 @@ def build_pre_quantum_input(
     reference: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None = None,
-    cache=None,
+    cache: RunBuildCache | None = None,
 ) -> PreQuantumInput:
     """Public chem entry: build :class:`PreQuantumInput` (same branches as the sync pipeline)."""
     pre_q, _ctx = build_pre_quantum_input_with_context(

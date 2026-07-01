@@ -122,7 +122,9 @@ def execute_molecular_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFie
         chemistry_extended=solver.chemistry_extended,
     )
     if e_au is None or wfn is None:
-        raise RuntimeError(f"Psi4 SCF unavailable: {reason}")
+        from qchem_stack.exceptions import SolverError
+
+        raise SolverError(f"Psi4 SCF unavailable: {reason}")
     if mo_energies is None:
         mo_energies = np.asarray([float(e_au)], dtype=float)
     nmo = psi4_nmo(wfn)
@@ -170,7 +172,9 @@ def execute_periodic_mean_field(solver: Psi4IntegralSolver) -> MolecularMeanFiel
         cell_vectors_bohr=np.asarray(pbc, dtype=float),
     )
     if e_au is None or wfn is None:
-        raise RuntimeError(f"Psi4 periodic SCF unavailable: {reason}")
+        from qchem_stack.exceptions import SolverError
+
+        raise SolverError(f"Psi4 periodic SCF unavailable: {reason}")
     result = MolecularMeanFieldResult(
         mf=wfn,
         e_tot=float(e_au),

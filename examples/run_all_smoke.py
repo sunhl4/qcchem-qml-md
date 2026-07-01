@@ -3,9 +3,14 @@
 
 from __future__ import annotations
 
+import importlib.util
 import subprocess
 import sys
 from pathlib import Path
+
+
+def _optional_importable(module: str) -> bool:
+    return importlib.util.find_spec(module) is not None
 
 
 def main() -> int:
@@ -21,6 +26,11 @@ def main() -> int:
         root / "examples" / "tutorial_07_md_classical_h2_only.py",
     ]
     for s in scripts:
+        if s.name == "tutorial_07_md_classical_h2_only.py" and not _optional_importable("jax"):
+            print(
+                f"skip {s.name} (pip install qchem-stack[qmlff] for jax-md path)", file=sys.stderr
+            )
+            continue
         if s.name == "toy_dmrg_spin_chain.py":
             argv = [
                 sys.executable,

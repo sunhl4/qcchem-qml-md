@@ -9,4 +9,4 @@ Strict migrators reject unknown flat keys. See [`config_校验分层约定.md`](
 | `scf.precomputed_bundle_path` | `scf.precomputed.bundle_path` |
 | `attach_md_ml_to_repro` | `md_ml_export.attach_single_frame_to_repro` |
 
-Codemods: `scripts/codemod_*.py`. Tests: `tests/test_config_migration_strict.py`.
+Codemods: `scripts/codemod_*.py`. Tests: `tests/config/test_migrations.py`.

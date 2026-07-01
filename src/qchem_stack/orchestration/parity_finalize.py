@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.chem.embedding.dmet import DMETContext, VQEFragmentSolverStub
 from qchem_stack.chem.embedding.dmet_self_consistent import OneShotEmbeddingDriver
@@ -25,10 +25,11 @@ if TYPE_CHECKING:
     from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 
-def schmidt_per_fragment_vqe_parity_summary(spfv: dict[str, Any]) -> dict[str, Any]:
+def schmidt_per_fragment_vqe_parity_summary(spfv: dict[str, object]) -> dict[str, object]:
     """Compact JSON digest for repro parity snapshot."""
-    fr = spfv.get("fragments") or []
-    rows: list[dict[str, Any]] = []
+    fr_raw = spfv.get("fragments")
+    fr = fr_raw if isinstance(fr_raw, list) else []
+    rows: list[dict[str, object]] = []
     nfev_total = 0
     for r in fr:
         if not isinstance(r, dict):
@@ -53,7 +54,7 @@ def schmidt_per_fragment_vqe_parity_summary(spfv: dict[str, Any]) -> dict[str, A
 
 
 def finalize_open_stack_parity_snapshot(
-    out: dict[str, Any],
+    out: dict[str, object],
     cfg: ExperimentConfig,
     proto: PauliAveragingProtocol | None,
 ) -> None:

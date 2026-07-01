@@ -32,7 +32,7 @@ class PreQuantumBuildRequest:
 
 PreQuantumBranchBuilder = Callable[
     [PreQuantumBuildRequest],
-    tuple[PreQuantumInput, dict[str, Any] | None],
+    tuple[PreQuantumInput, dict[str, Any] | None],  # noqa: UP045
 ]
 
 _BUILDERS: dict[PreQuantumPath, PreQuantumBranchBuilder] = {}

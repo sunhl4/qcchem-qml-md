@@ -13,8 +13,8 @@ Use when upgrading a `partial` row in [`public_parity_matrix.md`](../public_pari
 ## CI commands
 
 ```bash
-pytest tests/test_api_runs.py::test_capability_surface_matches_product_contract -q
-pytest tests/test_partial_l1_evidence.py -q
+pytest tests/api/test_api_runs.py::test_capability_surface_matches_product_contract -q
+pytest tests/repro/test_partial_l1_evidence.py -q
 python scripts/check_parity_export_sample.py
 ```
 

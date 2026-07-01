@@ -49,8 +49,8 @@
 **最小闸门命令**：
 
 ```bash
-pytest tests/test_api_runs.py::test_capability_surface_matches_product_contract \
-       tests/test_api_runs.py::test_parity_gaps_meta -q --tb=short
+pytest tests/api/test_api_runs.py::test_capability_surface_matches_product_contract \
+       tests/api/test_api_runs.py::test_parity_gaps_meta -q --tb=short
 python scripts/check_comparative_execution_backlog.py
 python scripts/check_parity_export_sample.py
 ```
@@ -76,14 +76,14 @@ python scripts/check_parity_export_sample.py
 | P0-01 | 引入 `tests/conftest.py`：H2 YAML factory、PySCF skip guard、solver registry autouse cleanup | `tests/conftest.py`, `tests/helpers/` | 至少 3 个 orchestration 测试改用 factory，删除重复 inline YAML |
 | P0-02 | orchestration 重复测试 parametrize 化 | `tests/orchestration/test_orchestration_pipeline.py` | ADAPT/IQEB pool 类测试合并为 parametrize，行数降 ≥30% |
 | P0-03 | `run_all_smoke.py` 扩容 | `examples/run_all_smoke.py` | 覆盖 tangelo_facade、open_stack_quantum_problem、parity export smoke |
-| P0-04 | tensornet stub 最小测试 | `tests/test_tensornet_stub.py` | `tensornet_engine_resolved` 键有断言；parity matrix §1 行可引用 |
+| P0-04 | tensornet stub 最小测试 | `tests/quantum/test_tensornet_stub.py` | `tensornet_engine_resolved` 键有断言；parity matrix §1 行可引用 |
 
 ### P0-W2：Parity golden 与 gap 零漂移（Day188–194）
 
 | ID | 任务 | 触点 | 验收 |
 |----|------|------|------|
 | P0-05 | parity export 样本扩容 | `scripts/check_parity_export_sample.py`, `configs/` | 新增：DMET fragment exact、projection Mulliken、SA-VQE、mitigation ZNE fold |
-| P0-06 | workflow-preview ↔ run repro golden | `tests/test_workflow_preview_repro_alignment.py` | 至少 5 条 YAML：preview 与 DONE repro 的 computable_graph 键一致 |
+| P0-06 | workflow-preview ↔ run repro golden | `tests/repro/test_workflow_preview_repro_alignment.py` | 至少 5 条 YAML：preview 与 DONE repro 的 computable_graph 键一致 |
 | P0-07 | gap 台账与 HTTP 对拍 CI | `product_contract_gaps.py`, CI | `validate_product_gap_categories()` 在 CI 必跑；drift 即 fail |
 
 ### P0-W3：文档契约同步（Day195–210）
@@ -130,7 +130,7 @@ python scripts/check_parity_export_sample.py
 |----|------|------|------|
 | P1-09 | **SCBK** 哈密顿量路径（不要求 UCCSD Trotter） | `fermion_mapping_registry.py`, `hamiltonian.py` | `active_space.fermion_qubit_mapping: symmetry_conserving_bk` 可跑 VQE+HEA |
 | P1-10 | JKMN/HCB 从 `planned_not_wired` → 实现或永久 `n/a` | mapping status rows | capability-surface 与 parity 矩阵一致 |
-| P1-11 | 多映射 conformance 测试矩阵 | `tests/test_backend_capability_conformance.py` | 同一 H₂：JW/BK/SCBK 输出 schema 相同、能量合理 |
+| P1-11 | 多映射 conformance 测试矩阵 | `tests/backends/test_backend_capability_conformance.py` | 同一 H₂：JW/BK/SCBK 输出 schema 相同、能量合理 |
 
 ---
 
@@ -208,7 +208,7 @@ python scripts/check_parity_export_sample.py
 
 | ID | 任务 | 触点 | 验收 |
 |----|------|------|------|
-| P2-09 | 主动学习多轮集成测试 | `tests/test_md_bridge_multi_round.py` | ≥3 轮；mock qchem labeler |
+| P2-09 | 主动学习多轮集成测试 | `tests/md_bridge/test_md_bridge_multi_round.py` | ≥3 轮；mock qchem labeler |
 | P2-10 | QMEF 数据集 golden | `tests/fixtures/qmef/` | round-trip export/import |
 | P2-11 | H₂ 云仿真 AL **能量差** 目标 | `scripts/run_uqc_md_ml.py`, results | \|ΔE\| < 0.1 Ha（可调阈值）；写入 validation summary |
 | P2-12 | `ml/surrogate.py` 标注 deprecated 或接 md_bridge | `ml/` | README 指向 md_bridge；无误导性 toy 默认路径 |

@@ -16,7 +16,7 @@
 | Day92 | W1 字段草案 | `product_contract.py`、`export_parity_criteria_table.py` | 字段命名草案与映射表 | 命名与现有 schema 不冲突 |
 | Day93 | W1 contract 预接入 | `product_contract.py` | run/export 预注册字段草案 | key 注册完整 |
 | Day94 | W1 export 预接入 | `export_parity_criteria_table.py` | config-only / `--results` 对应镜像草案 | 字段可导出 |
-| Day95 | W1 test 预接入 | `tests/test_methods_resource_unified_export.py` | 新增断言草案 | 失败路径可定位 |
+| Day95 | W1 test 预接入 | `tests/repro/test_methods_resource_unified_export.py` | 新增断言草案 | 失败路径可定位 |
 | Day96 | W1 文档同步 | `docs/*`、`docusaurus-site/*` | 键名口径同步说明 | docs/docusaurus-site 同源 |
 | Day97 | Week1 小结 | Day91–96 记录 | 周总结页（可并入 day97） | 本周遗留滚动到 Day98 |
 | Day98 | W1 收口：代码 | contract/export/tests | 第一批可运行改动 | 子集 pytest 可跑 |

@@ -21,6 +21,16 @@ pip install -U "qchem-stack[chem]>=1.0.0,<2"
 
 v0.8.0 removals (unchanged): see [`api_stability_policy.md`](api_stability_policy.md) — `molecular_hamiltonian_from_classical_reference`, `apply_backend_profile()`, `integrations.dmet_self_consistent` shim.
 
+## Planned for 1.1.0
+
+See [`migration_v1_0_to_v1_1.md`](migration_v1_0_to_v1_1.md) for the full upgrade guide.
+
+| Removed | Use instead |
+|---------|-------------|
+| `qchem_stack.integrations.compat.*` | `chem.embedding.dmet_self_consistent`, `integrations.schmidt_per_fragment_vqe`, `chem.kernels.spin_ucc` |
+| `QCHEM_PROTOCOL_BLOB_V2=0` (pickle write path) | Default HMAC-signed JSON v2 (unset or `1`) |
+| `QCHEM_ALLOW_LEGACY_PICKLE=1` (production default) | Migrate blobs then unset; unsigned pickle load disabled by default |
+
 ## Stable integrator surface (1.0.0)
 
 Prefer **`qchem_stack.sdk`**:
@@ -57,5 +67,5 @@ Prefer **`qchem_stack.sdk`**:
 ```bash
 ./scripts/bootstrap_dev.sh
 ./scripts/release_precheck.sh
-pytest tests/test_deprecation_schedule.py tests/test_sdk_surface_snapshot.py -q
+pytest tests/repro/test_deprecation_schedule.py tests/repro/test_sdk_surface_snapshot.py -q
 ```

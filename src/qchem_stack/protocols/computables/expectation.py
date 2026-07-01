@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -45,8 +45,10 @@ class ExpectationValueComputable:
         )
         return EvaluationResult(self.name, val, {"path": "hea_executor"})
 
-    def evaluate_via_protocol_counts(self, protocol_counts: dict[str, Any]) -> EvaluationResult:
+    def evaluate_via_protocol_counts(self, protocol_counts: dict[str, object]) -> EvaluationResult:
         exp = protocol_counts.get("expectation")
         if exp is None:
             raise KeyError("protocol_counts missing expectation")
+        if not isinstance(exp, (int, float)):
+            raise TypeError(f"protocol_counts expectation must be numeric, got {type(exp)!r}")
         return EvaluationResult(self.name, float(exp), {"path": "pauli_protocol"})

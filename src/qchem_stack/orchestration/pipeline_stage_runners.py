@@ -75,11 +75,12 @@ def run_scf_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.rdm_bundle_meta = scf_stage.rdm_bundle_meta
     ctx.rdm_correction_report = scf_stage.rdm_correction_report
     ctx.rdm_correction_readiness = scf_stage.rdm_correction_readiness
-    ctx.stage_completion_data = {"scf_energy": float(ctx.rhf.e_tot)}
+    ctx.stage_completion_data = {"scf_energy": float(scf_stage.rhf.e_tot)}
 
 
 def run_pre_quantum_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.stage_completion_data = {}
+    assert ctx.rhf is not None
     pre_q_stage = build_pre_quantum_stage(
         ctx.cfg,
         ctx.rhf,
@@ -102,12 +103,13 @@ def run_pre_quantum_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.qh = pre_q_stage.qh
     if ctx.hamiltonian_out is not None:
         ctx.hamiltonian_out.clear()
-        ctx.hamiltonian_out.append(ctx.qh)
-    ctx.stage_completion_data = {"n_qubits": int(ctx.qh.n_qubits)}
+        ctx.hamiltonian_out.append(pre_q_stage.qh)
+    ctx.stage_completion_data = {"n_qubits": int(pre_q_stage.qh.n_qubits)}
 
 
 def bind_post_pre_quantum_ctx(ctx: PipelineSyncContext) -> None:
     """Collect repro metadata and backend handles after Hamiltonian is fixed."""
+    assert ctx.qh is not None
     ctx.repro = ctx.collect_repro_metadata_fn(ctx.cfg, ctx.cfg_path, ctx.qh)
     if ctx.run_context is not None:
         ctx.repro["run_context"] = ctx.run_context.to_repro_dict()
@@ -118,6 +120,10 @@ def bind_post_pre_quantum_ctx(ctx: PipelineSyncContext) -> None:
 
 def run_variational_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.stage_completion_data = {}
+    assert ctx.qh is not None
+    assert ctx.exe is not None
+    assert ctx.pre_q_input is not None
+    assert ctx.rhf is not None
     q = ctx.cfg.quantum
     vctx = VariationalRunContext(
         cfg=ctx.cfg,
@@ -164,6 +170,9 @@ def run_variational_stage_ctx(ctx: PipelineSyncContext) -> None:
 
 def run_embedding_workflow_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.stage_completion_data = {}
+    assert ctx.qh is not None
+    assert ctx.exe is not None
+    assert ctx.rhf is not None
     apply_embedding_workflow_stage(
         ctx.cfg,
         out=ctx.out,
@@ -180,6 +189,9 @@ def run_embedding_workflow_stage_ctx(ctx: PipelineSyncContext) -> None:
 
 def run_excited_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.stage_completion_data = {}
+    assert ctx.qh is not None
+    assert ctx.exe is not None
+    assert ctx.angles is not None
     ctx.excited_rs = run_excited_stages(
         ctx.cfg,
         qh=ctx.qh,
@@ -195,6 +207,12 @@ def run_excited_stage_ctx(ctx: PipelineSyncContext) -> None:
 
 def run_protocol_finalize_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.stage_completion_data = {}
+    assert ctx.qh is not None
+    assert ctx.angles is not None
+    assert ctx.bspec is not None
+    assert ctx.exe is not None
+    assert ctx.bundle is not None
+    assert ctx.rhf is not None
     ctx.result = tag_pipeline_result(
         run_protocol_and_finalize_stage(
             ctx.cfg,

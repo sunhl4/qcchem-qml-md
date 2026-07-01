@@ -24,6 +24,15 @@ import tempfile
 from pathlib import Path
 
 
+def _pip_compile_exe() -> str:
+    """Prefer pip-compile beside the active interpreter (avoids stale conda on PATH)."""
+    for base in (Path(sys.executable).parent, Path(sys.executable).resolve().parent):
+        candidate = base / "pip-compile"
+        if candidate.is_file():
+            return str(candidate)
+    return "pip-compile"
+
+
 def check_constraint_freshness(
     pyproject_toml: Path,
     constraint_file: Path,
@@ -40,7 +49,7 @@ def check_constraint_freshness(
 
     try:
         cmd = [
-            "pip-compile",
+            _pip_compile_exe(),
             "--output-file",
             tmp_path,
             "--no-header",
@@ -92,7 +101,7 @@ def main() -> int:
 
     # Check if pip-compile is available
     try:
-        subprocess.run(["pip-compile", "--version"], capture_output=True, check=True)
+        subprocess.run([_pip_compile_exe(), "--version"], capture_output=True, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("ERROR: pip-compile not found. Install it with: pip install pip-tools")
         return 1

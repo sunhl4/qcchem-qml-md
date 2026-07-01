@@ -29,7 +29,7 @@
 - `src/qchem_stack/config/geometry_files.py`
 - `configs/structures_h2.xyz`
 - `configs/example_h2_geometry_file_xyz.yaml`
-- `tests/test_geometry_files.py`
+- `tests/chem/test_geometry_files.py`
 
 ## C. 离线经典（预计算 bundle）验收
 
@@ -45,8 +45,8 @@
 - `src/qchem_stack/chem/precomputed_bundle.py`
 - `src/qchem_stack/chem/solvers/precomputed_solver.py`
 - `configs/precomputed_classical_reference_h2.json`
-- `tests/test_precomputed_bundle.py`
-- `tests/test_pipeline_precomputed_lane.py`
+- `tests/chem/test_precomputed_bundle.py`
+- `tests/orchestration/test_pipeline_precomputed_lane.py`
 
 ## D. 统一量子入口验收
 
@@ -67,7 +67,7 @@
 对应模块：
 
 - `src/qchem_stack/chem/solvers/registry.py`
-- `tests/test_solver_registry_contract.py`
+- `tests/chem/test_solver_registry_contract.py`
 
 ## F. 工具与文档验收
 
@@ -86,10 +86,10 @@
 
 ```bash
 python3 -m py_compile src/qchem_stack scripts tests
-pytest tests/test_config_molecule_inputs.py -q
-pytest tests/test_geometry_files.py -q
-pytest tests/test_precomputed_bundle.py tests/test_pipeline_precomputed_lane.py -q
-pytest tests/test_solver_registry_contract.py -q
+pytest tests/config/test_config_molecule_inputs.py -q
+pytest tests/chem/test_geometry_files.py -q
+pytest tests/chem/test_precomputed_bundle.py tests/orchestration/test_pipeline_precomputed_lane.py -q
+pytest tests/chem/test_solver_registry_contract.py -q
 ```
 
 > 注：若本机缺少 `pyscf` / `openfermion` / `pydantic`，请先安装依赖再执行完整验收。

@@ -69,13 +69,13 @@ pip install jax-md
 ### 4.1 仅测 UQC mock 后端注册
 
 ```bash
-pytest tests/test_uqc_mock_md_ml_integration.py::test_uqc_mock_backend_registered_and_mock_energy -q
+pytest tests/quantum/test_uqc_mock_md_ml_integration.py::test_uqc_mock_backend_registered_and_mock_energy -q
 ```
 
 ### 4.2 流水线 + QMEF 附件（需 PySCF）
 
 ```bash
-pytest tests/test_uqc_mock_md_ml_integration.py::test_pipeline_uqc_mock_attaches_qmef_for_md_ml -q
+pytest tests/quantum/test_uqc_mock_md_ml_integration.py::test_pipeline_uqc_mock_attaches_qmef_for_md_ml -q
 ```
 
 或：
@@ -94,7 +94,7 @@ print("VQE energy:", out["energy_after_variational"])
 ### 4.3 完整一轮主动学习（需 PySCF + QML-FF + jax-md）
 
 ```bash
-pytest tests/test_uqc_mock_md_ml_integration.py::test_md_validation_loop_one_round_uqc_mock_labeling -q
+pytest tests/quantum/test_uqc_mock_md_ml_integration.py::test_md_validation_loop_one_round_uqc_mock_labeling -q
 ```
 
 或命令行：
@@ -124,7 +124,7 @@ run_md_validation_loop(
 主 CI（`.github/workflows/ci.yml`）在 **L1 MD/ML** 阶段会执行：
 
 ```bash
-pytest tests/test_uqc_mock_md_ml_integration.py -m "not slow" -q --tb=short
+pytest tests/quantum/test_uqc_mock_md_ml_integration.py -m "not slow" -q --tb=short
 ```
 
 覆盖：UQC provider 注册 + mock 能量 + 流水线 QMEF 附件（需 PySCF，随 `[dev]` 安装）。

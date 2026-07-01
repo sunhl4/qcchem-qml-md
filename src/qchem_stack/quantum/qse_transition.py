@@ -48,7 +48,7 @@ def hamiltonian_transition_amplitude(
             acc += complex(c) * np.vdot(phi_left, phi_right)
         else:
             acc += complex(c) * transition_pauli_amplitude(phi_left, phi_right, term, n_qubits)
-    return acc
+    return complex(acc)
 
 
 def qse_h_s_matrices_exact(

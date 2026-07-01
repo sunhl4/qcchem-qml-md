@@ -47,8 +47,8 @@ UCCSD 变分 ansatz 目前仅允许 `jordan_wigner` 与 `bravyi_kitaev`（见 `_
 | 映射与路径选择 | `src/qchem_stack/chem/hamiltonian.py`（`_fermion_operator_to_qubits`、`_interaction_operator_to_qubits`、`_use_restricted_spatial_fermion_build`） |
 | JW 稀疏 atol | `src/qchem_stack/chem/jordan_wigner_sparse.py` |
 | 配置字段 | `src/qchem_stack/config/active_space.py` |
-| BK/SCBK spatial 与 InteractionOperator 数值一致（H₂） | `tests/test_spatial_fermion_jw_path.py`（参数化 BK、SCBK） |
-| 映射指纹 / 比特数 | `tests/test_fermion_qubit_mapping.py`、`tests/test_pyscf_h2_optional.py` |
+| BK/SCBK spatial 与 InteractionOperator 数值一致（H₂） | `tests/chem/test_spatial_fermion_jw_path.py`（参数化 BK、SCBK） |
+| 映射指纹 / 比特数 | `tests/chem/test_fermion_qubit_mapping.py`、`tests/chem/test_pyscf_h2_optional.py` |
 | 示例 yaml | `configs/example_h2_uccsd_bk.yaml`（BK） |
 
 ---
@@ -159,7 +159,7 @@ active_space:
 - **目标：** 在 BK 哈密顿量 Pauli 展开后（或映射过程中）丢弃 $|c| \le \tau$ 的项，控制项数与 VQE 成本。
 - **注意：** 不能复用 `jordan_wigner_coeff_atol` 字段名；建议新增如 `bravyi_kitaev_coeff_atol` 或通用的 `qubit_hamiltonian_coeff_atol`（需文档说明对各映射是否生效）。
 - **参考实现：** `src/qchem_stack/chem/jordan_wigner_sparse.py`。
-- **验收：** H₂ 能量随 $\tau$ 的偏差表；`meta` 记录 $\tau$ 与剩余项数；`tests/test_spatial_fermion_jw_path.py` 或新文件。
+- **验收：** H₂ 能量随 $\tau$ 的偏差表；`meta` 记录 $\tau$ 与剩余项数；`tests/chem/test_spatial_fermion_jw_path.py` 或新文件。
 
 ### P2 — SCBK 映射后系数截断
 

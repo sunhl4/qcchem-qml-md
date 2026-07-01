@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.exceptions import PipelineError
@@ -69,7 +69,7 @@ def refine_mean_field_for_active_space(
 
 def embedding_input_system_payload(
     cfg: ExperimentConfig, rhf: ClassicalMeanFieldReference
-) -> dict[str, Any] | None:
+) -> dict[str, object] | None:
     rep = cfg.embedding.embedding_input_representation
     if rep == "mo":
         return None

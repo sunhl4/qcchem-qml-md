@@ -31,3 +31,17 @@ def test_load_bundle_dict_invalid_schema_raises(tmp_path: Path) -> None:
     bad.write_text(json.dumps([]), encoding="utf-8")
     with pytest.raises(ValueError):
         load_bundle_dict(str(bad))
+
+
+def test_mock_external_solver_capabilities_registered() -> None:
+    register_mock_external_solver()
+    cfg = load_experiment_config(configs_path("example_h2_mock_external.yaml"))
+    solver = create_solver(cfg)
+    caps = solver.capabilities
+    assert caps.supports_rhf is True
+
+
+def test_projection_hamiltonian_module_importable() -> None:
+    from qchem_stack.chem.embedding import projection_hamiltonian
+
+    assert hasattr(projection_hamiltonian, "molecular_hamiltonian_fragment_mulliken_projection")

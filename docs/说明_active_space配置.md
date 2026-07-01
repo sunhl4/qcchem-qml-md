@@ -118,7 +118,7 @@ active_space:
 - `quantum.variational_ansatz=uccsd` 不允许 `symmetry_conserving_bravyi_kitaev`（`_experiment_validation.py`）。  
 - 部分嵌入/投影侧路径仍以 JW 为主（见 `hamiltonian.py` 注释）。
 
-实现入口：`_fermion_operator_to_qubits`、`_interaction_operator_to_qubits`、`_use_restricted_spatial_fermion_build`（`src/qchem_stack/chem/hamiltonian.py`）。parity 测试：`tests/test_spatial_fermion_jw_path.py`（含 BK/SCBK 与 InteractionOperator 路径数值一致）。
+实现入口：`_fermion_operator_to_qubits`、`_interaction_operator_to_qubits`、`_use_restricted_spatial_fermion_build`（`src/qchem_stack/chem/hamiltonian.py`）。parity 测试：`tests/chem/test_spatial_fermion_jw_path.py`（含 BK/SCBK 与 InteractionOperator 路径数值一致）。
 
 **BK/SCBK 勿用 JW 专用项、构建路径图解、后续性能优化待办：** [说明_BK与SCBK映射路径与性能优化备忘.md](说明_BK与SCBK映射路径与性能优化备忘.md)。
 

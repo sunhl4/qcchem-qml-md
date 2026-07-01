@@ -12,7 +12,7 @@
 
 | 项目 | 本栈做法 | 刻意不做 |
 |------|----------|----------|
-| 身份与配额 | 无；绑定 `127.0.0.1` + 文档要求边缘鉴权 | Nexus 项目 IAM、合同限额 |
+| 身份与配额 | 可选 `QCHEM_STACK_API_KEY`（`X-API-Key`）；生产可设 `QCHEM_STACK_REQUIRE_API_KEY=1` 强制 fail-fast；默认开发无认证 | Nexus 项目 IAM、合同限额 |
 | 作业存储 | 本地 SQLite，FIFO `QUEUED` | Redis/Celery/多云主从 |
 | 全量结果 | `full_pipeline` 入库为 **白名单** `full_pipeline_job_result_v1` | 无界 `pickle`/`QubitHamiltonian` 落库 |
 | 事件流 | 新作业 **`jobs.timeline_json`**：`submitted` / `running` / **`pipeline_stage`**（`stage` 与 `run_pipeline_sync` 一致）/ `completed` / `failed` / `retry_scheduled`；`GET …/events` 透传字段 | 与云侧完整审计等价 |
@@ -97,7 +97,7 @@ HTTP 异步入队常见键：
 |------|------|----------------------------|
 | GET | `/health` | 无 `schema`；体为 `{"status":"ok"}` |
 | GET | `/health/ready` | 无 `schema`；体为 `{"status":"ready","job_db_default":...}`；SQLite ping 失败 → **503** |
-| GET | `/v1/meta/capability-surface` | `capability_surface_v2`（`qchem_stack_version`、`capability_map`、`gaps`、`gap_anchor_index_v1`、`mitigation_execution_model`、`open_stack_differentiators`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`、`uccsd_mapping_support_matrix_v1`） |
+| GET | `/v1/meta/capability-surface` | `capability_surface_v2`（`qchem_stack_version`、`capability_map`、`gaps`（各行可含 `evidence?: string[]` 指向 `configs/` 示例 YAML）、`gap_anchor_index_v1`、`mitigation_execution_model`、`open_stack_differentiators`、`operator_pool_registry_export_v1`、`algorithm_registry_export_v1`、`variational_registry_export_v1`、`uccsd_mapping_support_matrix_v1`） |
 | GET | `/v1/meta/parity-gaps` | `capability_gap_export_v1`：`qchem_stack_version`、`gaps` |
 | GET | `/v1/meta/product-surface` | `product_surface_v1`（控制台用路由指针 + `emulation_notes`） |
 | POST | `/v1/meta/workflow-preview` | `workflow_preview_v1`（五阶段 + `computable_graph_v2` + 可选 YAML 边覆盖 + `computable_abstract`；可选 `computables_rich`） |
@@ -165,13 +165,26 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 - 环境变量 **`QCHEM_JOB_DB`**：默认队列 SQLite 路径兜底。
 
+### 7.1 认证与环境变量（`app.py` 真源）
+
+| 变量 | 值 | 行为 |
+|------|-----|------|
+| （默认） | `QCHEM_STACK_API_KEY` 未设 | 无 `AuthenticationMiddleware`；启动时 warning |
+| `QCHEM_STACK_API_KEY` | 非空 | 启用 `AuthenticationMiddleware`；客户端请求须带 `X-API-Key` 头 |
+| `QCHEM_STACK_REQUIRE_API_KEY` | `1` / `true` / `yes` 且 key 缺失 | 启动 **fail-fast** `ConfigurationError`（生产推荐） |
+| `QCHEM_STACK_DISABLE_RATE_LIMIT` | `1` | 关闭限流（测试 / CI 用，见 `tests/api/conftest.py`） |
+| `QCHEM_STACK_DB_DIR` | 目录路径 | SQLite `job_db_path` 解析允许根（见 `api/deps.validate_db_path`） |
+| `QCHEM_STACK_CONFIG_BASE_DIR` | 目录路径 | `POST /v1/runs` 的 `config_base_dir` 与几何文件解析允许根；默认含仓库 `configs/` |
+
+**开发**：本地可省略 API key。**生产**：同时设置 `QCHEM_STACK_REQUIRE_API_KEY=1` 与 `QCHEM_STACK_API_KEY=<secret>`，并配置 `QCHEM_STACK_DB_DIR` / `QCHEM_STACK_CONFIG_BASE_DIR`；在反向代理层限制 `127.0.0.1` 绑定以外的暴露面。
+
 ---
 
 ## 8. 维护清单（变更时同步）
 
 1. 增删 HTTP 路由或响应 `schema`：更新本文 **§5**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §9、[README.md](../../README.md) HTTP 段、[launch_retrieve_nexus_analog.md](launch_retrieve_nexus_analog.md) 表格（若行为类比变）。
 2. 增减 `meta` 键或 `full_pipeline_job_result_v1` 白名单：更新 **`pipeline_runner.py`**、[ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §10。
-3. 观测字段变更：更新 **§2**、`tests/test_observability_pipeline.py`（PySCF）、`tests/test_api_runs.py`（FastAPI）。
+3. 观测字段变更：更新 **§2**、`tests/repro/test_observability_pipeline.py`（PySCF）、`tests/api/test_api_runs.py`（FastAPI）。
 4. 机读差距分类：视需要更新 **`qchem_stack.protocols.product_contract`**（`product_gap_categories()` 等）与 [public_parity_matrix.md](public_parity_matrix.md)。
 
 ---
@@ -224,9 +237,9 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 
 ### 9.6 测试与 CI
 
-- FastAPI：`tests/test_api_runs.py`（`importorskip("fastapi")`）。
-- 存储：`tests/test_job_store_list.py`、`tests/test_store_experiment_meta.py`。
-- 全流程（PySCF）：`tests/test_pipeline_job_store.py`、`tests/test_observability_pipeline.py`。
+- FastAPI：`tests/api/test_api_runs.py`（`importorskip("fastapi")`）。
+- 存储：`tests/jobs/test_job_store_list.py`、`tests/jobs/test_job_store.py`。
+- 全流程（PySCF）：`tests/jobs/test_pipeline_job_store.py`、`tests/repro/test_observability_pipeline.py`。
 - CI：见 `.github/workflows/ci.yml`（`pip install -e ".[dev]"` 已含 `api` 依赖链）。
 
 ---

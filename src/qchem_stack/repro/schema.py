@@ -8,7 +8,9 @@ Pipeline sync output shapes: :mod:`qchem_stack.orchestration.pipeline_result`.
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, NotRequired, TypedDict
+from typing import TYPE_CHECKING, TypedDict
+
+from typing_extensions import NotRequired
 
 from qchem_stack.contracts.schema_ids import (
     PARITY_EXPORT_SCHEMA_VERSION_V3,

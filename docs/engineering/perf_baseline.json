@@ -1,4 +1,5 @@
 {
-  "perf_wall_seconds": 0.0,
-  "note": "Placeholder; nightly test-nightly job updates via scripts/check_perf_regression.py"
+  "perf_wall_seconds": 35.0,
+  "schema": "perf_baseline_v1",
+  "note": "Seeded from local pytest -m perf wall time (2026-06); nightly updates via check_perf_regression.py"
 }

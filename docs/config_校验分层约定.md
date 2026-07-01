@@ -216,7 +216,7 @@ flowchart TD
 1. 在 `{section}_specs.py`（或对应模型）增加字段与 `Field` 约束。
 2. 单字段规则 → `@field_validator`；子块内跨字段 → `_{section}_validation.py`。
 3. 若依赖 `molecule` / `scf.driver` / `SolverCapabilities` → `_experiment_validation.py`，**禁止**写死 `driver == "pyscf"`（AVAS 等 milestone 例外见 [说明_active_space配置.md](说明_active_space配置.md)）。
-4. 补测试：`tests/test_config_validation_helpers.py` 或 section 专项测试；packaged YAML 须能 `from_yaml_dict`。
+4. 补测试：`tests/config/test_config_validation_helpers.py` 或 section 专项测试；packaged YAML 须能 `from_yaml_dict`。
 6. 更新 `docs/说明_*.md` 字段表；错误信息前缀使用完整 nested 路径（如 `quantum.vqe.maxiter`）。
 
 ### 5.2 何时新建 `_{section}_validation.py`

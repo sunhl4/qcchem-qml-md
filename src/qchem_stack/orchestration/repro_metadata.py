@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import hashlib
 import sys
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.config import ExperimentConfig, dump_experiment_config
 
@@ -50,10 +50,10 @@ def classical_software_versions() -> dict[str, str]:
 def collect_repro_metadata_impl(
     cfg: ExperimentConfig,
     *,
-    parity_snapshot_fn: Callable[[ExperimentConfig, QubitHamiltonian | None], dict[str, Any]],
+    parity_snapshot_fn: Callable[[ExperimentConfig, QubitHamiltonian | None], dict[str, object]],
     cfg_path: Path | None = None,
     qh: QubitHamiltonian | None = None,
-) -> dict[str, Any]:
+) -> dict[str, object]:
     """Hashes and versions for job/publication reproducibility."""
     from qchem_stack.protocols.workflow_preview import (
         workflow_preview_payload,
@@ -65,7 +65,7 @@ def collect_repro_metadata_impl(
     raw_yaml = dump_experiment_config(cfg)
     h = hashlib.sha256(raw_yaml.encode("utf-8")).hexdigest()[:16]
     classical_versions = classical_software_versions()
-    repro: dict[str, Any] = {
+    repro: dict[str, object] = {
         "experiment_id": cfg.experiment_id,
         "random_seed": cfg.random_seed,
         "config_sha256_prefix": h,

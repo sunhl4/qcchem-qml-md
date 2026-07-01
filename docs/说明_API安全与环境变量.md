@@ -25,7 +25,7 @@
 
 - **未设置**：不挂载 `AuthenticationMiddleware`，本地开发可直接访问（日志会警告）。
 - **已设置（生产推荐）**：请求须带 `Authorization: Bearer <QCHEM_STACK_API_KEY>`；缺少头返回 **401**，错误 token 返回 **403**。
-- 回归：`tests/test_api_auth_middleware.py`（reload app 后验证 Bearer）。
+- 回归：`tests/api/test_api_auth_middleware.py`（reload app 后验证 Bearer）。
 - `/health` 与 `/health/ready` 始终匿名可访问（K8s probe）。
 
 ## 速率限制
@@ -37,7 +37,7 @@
 | `GET /v1/runs/{job_id}/*` | 120 / 分钟 |
 | `POST /v1/meta/*`、`POST /v1/ml-md/*` | 30 / 分钟 |
 
-超限返回 **429**。全量 pytest 默认通过 `tests/conftest.py` 设置 `QCHEM_STACK_DISABLE_RATE_LIMIT=1`；429 行为见 `tests/test_api_rate_limiting.py`。
+超限返回 **429**。全量 pytest 默认通过 `tests/conftest.py` 设置 `QCHEM_STACK_DISABLE_RATE_LIMIT=1`；429 行为见 `tests/api/test_api_rate_limiting.py`。
 
 ## CORS
 

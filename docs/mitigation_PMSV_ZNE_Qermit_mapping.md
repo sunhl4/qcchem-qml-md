@@ -34,6 +34,6 @@
 
 ### MitigationSpec YAML 键（机读审计）
 
-与 `qchem_stack.config.MitigationSpec` 嵌套块一一对应（YAML `mitigation.*`）：`execution_class`；`zne.enabled`、`zne.mode`、`zne.scales`；`pmsv.enabled`、`pmsv.stabilizers`、`pmsv.retention_rate`、`pmsv.report_extension`、`pmsv.extra`；`stubs.spam_calibration`、`stubs.pec_literature`、`stubs.classical_shadows`、`stubs.classical_shadows_budget_pairs`。加载时仍接受旧扁平键（`pmsv_enabled` 等）并由 migration 迁入子块。回归：`tests/test_mitigation_spec_doc_audit.py`。
+与 `qchem_stack.config.MitigationSpec` 嵌套块一一对应（YAML `mitigation.*`）：`execution_class`；`zne.enabled`、`zne.mode`、`zne.scales`；`pmsv.enabled`、`pmsv.stabilizers`、`pmsv.retention_rate`、`pmsv.report_extension`、`pmsv.extra`；`stubs.spam_calibration`、`stubs.pec_literature`、`stubs.classical_shadows`、`stubs.classical_shadows_budget_pairs`。加载时仍接受旧扁平键（`pmsv_enabled` 等）并由 migration 迁入子块。回归：`tests/mitigation/test_mitigation_output_schema.py`。
 
 **公开 errmit 手册钉扎（维护）**：本文档编写时对照 [Quantinuum errmit 手册](https://www.quantinuum.com/)，锚定日期见 [与Vendor platform能力差距与实施计划 — 附录 C](public_parity_matrix.md#appendix-c)「公开文档钉扎」。

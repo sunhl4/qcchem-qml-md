@@ -141,3 +141,27 @@ def test_backend_forbids_unknown_keys() -> None:
 
     with pytest.raises(ValidationError):
         BackendSpecConfig.model_validate({"provider": "statevector", "typo_field": True})
+
+
+def test_embedding_dmet_rhf_suggestion_in_error() -> None:
+    from qchem_stack.config._embedding_validation import (
+        EmbeddingValidationContext,
+        validate_embedding,
+    )
+    from qchem_stack.config.embedding_specs import EmbeddingDmet
+
+    spec = EmbeddingDmet.model_validate(
+        {
+            "mode": "dmet",
+            "dmet": {
+                "hamiltonian_source": "schmidt_atomic_production",
+                "schmidt": {
+                    "dmet_max_cycles": 2,
+                    "fragment_atom_indices": [0, 1],
+                },
+            },
+        }
+    )
+    ctx = EmbeddingValidationContext(n_atom=2, scf_method="UHF", scf_driver="pyscf")
+    with pytest.raises(ConfigurationError, match="Suggestion:.*embedding_dmet"):
+        validate_embedding(spec, ctx)

@@ -23,6 +23,11 @@ except ImportError:
     SLOWAPI_AVAILABLE = False
     _LimiterCls = None
 
+    def get_remote_address(request: Request) -> str:
+        client = request.client
+        return client.host if client is not None else "127.0.0.1"
+
+
 _F = TypeVar("_F", bound=Callable[..., Any])
 
 # Shared limiter singleton — routers import this for @limiter.limit decorators.

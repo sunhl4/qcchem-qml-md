@@ -31,3 +31,10 @@ def echo_runner_factory():
     """YAML ``quantum.algorithm_factory: ...echo_runner:echo_runner_factory``."""
 
     return run_echo_variational
+
+
+class EchoVariationalPlugin:
+    """Reference class-style plugin (zero-arg constructor + ``run_variational``)."""
+
+    def run_variational(self, ctx: VariationalRunContext) -> VariationalStageOutcome:
+        return run_echo_variational(ctx)

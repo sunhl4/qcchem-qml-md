@@ -35,61 +35,63 @@ def test_load_config_non_mapping_raises_configuration_error(tmp_path: Path) -> N
         load_experiment_config(p)
 
 
-def test_projection_mulliken_requires_non_empty_fragment_atoms() -> None:
+@pytest.mark.parametrize(
+    "embedding_config,expected_error_match",
+    [
+        (
+            {
+                "mode": "projection",
+                "projection": {
+                    "quantum_hamiltonian": "fragment_mulliken_mo",
+                    "fragment_atom_indices": [],
+                },
+            },
+            None,
+        ),
+        (
+            {
+                "mode": "none",
+                "projection": {
+                    "quantum_hamiltonian": "fragment_mulliken_mo",
+                    "fragment_atom_indices": [0],
+                },
+            },
+            None,
+        ),
+        (
+            {
+                "mode": "projection",
+                "projection": {
+                    "quantum_hamiltonian": "fragment_mulliken_mo",
+                    "fragment_atom_indices": [0, 2],
+                },
+            },
+            "out of range",
+        ),
+    ],
+    ids=[
+        "empty_fragment_atoms",
+        "projection_with_mode_none",
+        "fragment_atom_out_of_range",
+    ],
+)
+def test_projection_config_validation(
+    embedding_config: dict, expected_error_match: str | None
+) -> None:
     raw = {
         "schema_version": "2",
         "experiment_id": "e",
         "random_seed": 0,
         "molecule": _MOLECULE,
         "active_space": _CAS,
-        "embedding": {
-            "mode": "projection",
-            "projection": {
-                "quantum_hamiltonian": "fragment_mulliken_mo",
-                "fragment_atom_indices": [],
-            },
-        },
+        "embedding": embedding_config,
     }
-    with pytest.raises(ValidationError):
-        ExperimentConfig.from_yaml_dict(raw)
-
-
-def test_projection_mulliken_requires_projection_mode() -> None:
-    raw = {
-        "schema_version": "2",
-        "experiment_id": "e",
-        "random_seed": 0,
-        "molecule": _MOLECULE,
-        "active_space": _CAS,
-        "embedding": {
-            "mode": "none",
-            "projection": {
-                "quantum_hamiltonian": "fragment_mulliken_mo",
-                "fragment_atom_indices": [0],
-            },
-        },
-    }
-    with pytest.raises(ValidationError):
-        ExperimentConfig.from_yaml_dict(raw)
-
-
-def test_projection_fragment_atom_index_out_of_range() -> None:
-    raw = {
-        "schema_version": "2",
-        "experiment_id": "e",
-        "random_seed": 0,
-        "molecule": _MOLECULE,
-        "active_space": _CAS,
-        "embedding": {
-            "mode": "projection",
-            "projection": {
-                "quantum_hamiltonian": "fragment_mulliken_mo",
-                "fragment_atom_indices": [0, 2],
-            },
-        },
-    }
-    with pytest.raises(ValidationError, match="out of range"):
-        ExperimentConfig.from_yaml_dict(raw)
+    if expected_error_match:
+        with pytest.raises(ValidationError, match=expected_error_match):
+            ExperimentConfig.from_yaml_dict(raw)
+    else:
+        with pytest.raises(ValidationError):
+            ExperimentConfig.from_yaml_dict(raw)
 
 
 def test_projection_mulliken_valid_config_loads() -> None:

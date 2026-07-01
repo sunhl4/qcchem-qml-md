@@ -11,7 +11,7 @@ from pathlib import Path
 
 import pytest
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 
 
 @pytest.mark.no_pyscf
@@ -58,4 +58,19 @@ def test_qchem_run_list_scenarios() -> None:
     assert rc == 0
     text = buf.getvalue()
     assert "minimal_vqe" in text
-    assert "configs/example_h2.yaml" in text
+    assert "configs/scenarios/minimal_vqe.yaml" in text
+
+
+def test_qchem_run_scenario_resolves_config() -> None:
+    from qchem_stack.config.scenarios import scenario_config_path
+
+    path = scenario_config_path("minimal_vqe", configs_dir=ROOT / "configs")
+    assert path.name == "minimal_vqe.yaml"
+    assert path.is_file()
+
+
+def test_qchem_run_unknown_scenario() -> None:
+    from qchem_stack.cli import main_run
+
+    rc = main_run(["--scenario", "not_a_real_scenario"])
+    assert rc == 2

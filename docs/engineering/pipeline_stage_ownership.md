@@ -30,9 +30,14 @@ Assembly after variational: `orchestration/pipeline_assembly.py` (`assemble_pipe
 
 | Concern | Module |
 |---------|--------|
-| Stage lifecycle enum pairs | `orchestration/stage_registry.py` |
+| Stage lifecycle (`started` / `completed` / `failed`) | `orchestration/stage_registry.py` (`StageLifecycle`) |
 | `emit_stage_event` hooks | `orchestration/pipeline_event_hooks.py` |
+| Global bus + default log subscriber | `orchestration/pipeline_events.py` (`get_event_bus`) |
 | JSON log lines | `orchestration/run_context.py` |
+
+On stage failure, `pipeline_sync_runner._run_pipeline_stages` emits `stage.<name>.failed` and
+`pipeline.failed`, records `repro.run_summary.stage_failed` / `error_type` / `error_message`
+when `ctx.repro` exists, then raises `PipelineError`.
 
 ## Registry-driven execution
 

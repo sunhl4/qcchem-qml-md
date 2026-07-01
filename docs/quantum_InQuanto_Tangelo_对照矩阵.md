@@ -2,7 +2,7 @@
 
 **目的**：在 L1 语义下，将 `qchem_stack.quantum` 与 InQuanto（Computable × Protocol）、Tangelo（BuiltInAnsatz / 激发态算法）公开叙事对齐；**不**宣称 L0 数值或闭源 API 等价。
 
-**机读矩阵**：`qchem_stack.protocols.product_contract.ansatz_protocol_matrix_v1()`（CI：`tests/test_api_runs.py::test_capability_surface_matches_product_contract`）。
+**机读矩阵**：`qchem_stack.protocols.product_contract.ansatz_protocol_matrix_v1()`（CI：`tests/api/test_api_runs.py::test_capability_surface_matches_product_contract`）。
 
 ## Ansatz × Protocol 正交
 

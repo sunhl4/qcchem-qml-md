@@ -38,7 +38,9 @@ class SurrogateEnergyModel:
 
     def predict(self, X: np.ndarray) -> np.ndarray:
         if self.weights is None:
-            raise RuntimeError("call fit first")
+            from qchem_stack.exceptions import MDBridgeError
+
+            raise MDBridgeError("call fit first")
         x = np.c_[np.ones(len(X)), X]
         return cast("np.ndarray", x @ self.weights)
 

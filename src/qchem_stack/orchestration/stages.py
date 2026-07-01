@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     import logging
@@ -21,18 +21,18 @@ class ScfStageArtifacts:
     rhf: ClassicalMeanFieldReference
     precomputed_mode: bool
     solver_caps: SolverCapabilities
-    energy_components: dict[str, Any]
-    embedding_input_payload: dict[str, Any] | None
-    classical_benchmarks: dict[str, Any] | None
-    rdm_bundle_meta: dict[str, Any] | None
-    rdm_correction_report: dict[str, Any] | None
-    rdm_correction_readiness: dict[str, Any] | None
+    energy_components: dict[str, object]
+    embedding_input_payload: dict[str, object] | None
+    classical_benchmarks: dict[str, object] | None
+    rdm_bundle_meta: dict[str, object] | None
+    rdm_correction_report: dict[str, object] | None
+    rdm_correction_readiness: dict[str, object] | None
 
 
 @dataclass(slots=True)
 class PreQuantumStageArtifacts:
     pre_quantum_input: PreQuantumInput
-    schmidt_ctx: dict[str, Any] | None
+    schmidt_ctx: dict[str, object] | None
     qh: QubitHamiltonian
 
 

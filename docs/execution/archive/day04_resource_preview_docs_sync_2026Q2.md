@@ -16,7 +16,7 @@
 - 文档口径与代码一致：
   - 导出实现：`scripts/export_parity_criteria_table.py`
   - 生成函数：`src/qchem_stack/integrations/resource_estimation_preview.py`
-  - 测试：`tests/test_methods_resource_unified_export.py`
+  - 测试：`tests/repro/test_methods_resource_unified_export.py`
 
 ## 结论
 

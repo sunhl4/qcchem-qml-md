@@ -72,6 +72,13 @@ def algorithm_registry_export() -> dict[str, dict[str, Any]]:
     return out
 
 
+def uccsd_mapping_support_matrix_export() -> dict[str, Any]:
+    """Re-export for HTTP/meta surfaces (keeps ``api`` off ``quantum.algorithms``)."""
+    from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_mapping_support_matrix_v1
+
+    return uccsd_mapping_support_matrix_v1()
+
+
 def build_registered_algorithm(
     algorithm_id: str, hamiltonian: QubitHamiltonian, **kwargs: Any
 ) -> Any:

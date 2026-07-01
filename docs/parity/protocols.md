@@ -1,0 +1,13 @@
+# Protocols 与工作流
+
+
+| 公开能力 | 官方入口 | qchem_stack |
+|----------|----------|-------------|
+| 五阶段 instantiate→build→compile→run→evaluate | [Protocols overview](https://www.quantinuum.com/) | `partial`：五阶段有等价；可选 `run_sampled`（statevector MC）与 `run_qiskit_shots_pauli_protocol`（Qiskit `get_counts` / Aer/硬件，见 [技术文档_设备比特串与Qiskit采样路径.md](技术文档_设备比特串与Qiskit采样路径.md)）；五阶段上可挂 **`nexus_analog` 计价**与 **`zne_scales`**（若启用 ZNE）。异步侧 **非** Nexus 1:1，见 [launch/retrieve 对照](launch_retrieve_nexus_analog.md)（`JobHandle` 含 `protocol_hash`，本地 SQLite 队列 + worker；pickle 协议上带 `NexusAnalogSpec` 与同步计价一致） |
+| `dataframe_circuit_shot` 式资源表 | [Resource estimation](https://www.quantinuum.com/) | `yes`：`dataframe_circuit_shot_rows` + `spec.dataframe_circuit_shot`；导出侧可选 `resource_estimation_preview_v1`（`parity_integrations.resource_estimation_preview: true`）用于 Methods 轻量切片，**非**云计价、非闭源 L0 resource estimator。并可在同开关下导出 `algorithm_registry_alignment_v1` / `md_ml_repro_freeze_fields_v1` 作为 W5/W6 机读证据块（内含 **`operator_pool_registry_export_v1`**）。 |
+| 公开 `Computable` / Methods 摘要（文档向） | API 与导出脚本 | `partial`→**可检证 L1**：YAML 机读 `POST /v1/meta/computables-preview`、`POST /v1/meta/workflow-preview`（五阶段 + `computable_graph_v2` + 可选 `include_computables_rich` → **`computables_rich_v1`**）；跑完后 slim 面板 `GET /v1/runs/{id}/summary`，完整 `repro` 见 `GET /v1/runs/{id}/repro`（`DONE`）；gap `composable_computable` 状态 **`analog_v2_semantic_graph_rich_optional`** |
+| 作业提交 / 列表 / 轮询（产品网关） | Nexus / 云侧 UX 叙事 | `partial`：**本地 FastAPI 类比** `qchem_stack.api`：`POST/GET /v1/runs`、`GET /v1/meta/parity-gaps`、**`POST /v1/meta/computables-preview`**、**`GET /v1/meta/queue-stats`**；无厂商身份与配额，见 [ENGINEERING_ARCHITECTURE.md](ENGINEERING_ARCHITECTURE.md) §9、[launch/retrieve 对照](launch_retrieve_nexus_analog.md) |
+| `qnexus` / HQC 计价 | 同上 | `n/a` + **本地类比**：`jobs/cost` + `nexus_analog` 权重（`nexus_analog_ledger` / 作业 `nexus_analog_billing`）；**不**伪造 HQC 货币。可选 `nexus_cloud`（`http`/`mock` 侧车条，非厂商 SDK） |
+| Qermit `MitRes`/`MitEx` | [Noise mitigation](https://www.quantinuum.com/) | `partial`→**runtime L1**：`PMSV`/`ZNE`（Richardson 外推 + circuit fold）/`SPAM`（2-qubit 赋值矩阵校正）；**classical shadows** 主路径经 `classical_shadows_hamiltonian_expectation` 写入 `mitigation_dag_execution`（非仅 stub flag）；本地 async mitigation 队列见 `jobs/mitigation_queue.py`；**非** Qermit 商业 MitRes/MitEx |
+| `CuTensorNetProtocol` | [vendor-cutensornet API](https://www.quantinuum.com/) | `n/a`（诚实降级）：开放栈仅 `tensornet/cutensornet_protocol_stub` + 引擎探测键 **`tensornet_engine_resolved`** / **`tensornet_fallback_reason`**；**不**随仓库附带 `vendor-cutensornet` 级化学尺度收缩或厂商二进制；若业务需要 L3 收缩 demo，走可选环境里 cuQuantum/cuPy，而非宣称产品 parity |
+

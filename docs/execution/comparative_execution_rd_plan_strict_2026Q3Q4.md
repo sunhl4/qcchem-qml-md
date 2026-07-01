@@ -86,9 +86,9 @@
 建议最小闸门命令：
 
 ```bash
-pytest tests/test_api_runs.py::test_capability_surface_matches_product_contract \
-       tests/test_api_runs.py::test_parity_gaps_meta tests/test_api_runs.py \
-       tests/test_fermion_qubit_mapping.py tests/test_excited_qse_hs.py -q --tb=short
+pytest tests/api/test_api_runs.py::test_capability_surface_matches_product_contract \
+       tests/api/test_api_runs.py::test_parity_gaps_meta tests/api/test_api_runs.py \
+       tests/chem/test_fermion_qubit_mapping.py tests/quantum/test_excited_qse_hs.py -q --tb=short
 python scripts/check_comparative_execution_backlog.py
 ```
 

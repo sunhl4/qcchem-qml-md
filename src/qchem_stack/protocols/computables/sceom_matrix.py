@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -28,13 +28,13 @@ class SCEOMMatrixComputable:
     shots_per_matrix_element: int = 0
     self_consistent_rounds: int = 0
     shots_backend: str = "statevector"
-    s_generators: list[Any] | None = None
+    s_generators: list[object] | None = None
     prepare_state: Callable[[np.ndarray], np.ndarray] | None = None
     hea_depth: int = 1
 
     def evaluate(self, ctx: EvaluationContext) -> EvaluationResult:
         rng = ctx.rng or np.random.default_rng(0)
-        extra: dict[str, Any] = {}
+        extra: dict[str, object] = {}
         gens = self.s_generators if self.s_generators is not None else ctx.extra.get("s_generators")
         if gens is not None:
             extra["s_generators"] = gens
@@ -54,7 +54,8 @@ class SCEOMMatrixComputable:
             )
             variety = "uccsd"
         else:
-            depth = int(ctx.extra.get("hea_depth", self.hea_depth))
+            depth_raw = ctx.extra.get("hea_depth", self.hea_depth)
+            depth = int(depth_raw) if isinstance(depth_raw, int) else self.hea_depth
             res = run_sceom_nested_commutator_from_hea(
                 self.hamiltonian,
                 angles,

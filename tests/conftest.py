@@ -24,6 +24,9 @@ os.environ.setdefault("QCHEM_STACK_DISABLE_RATE_LIMIT", "1")
 # P0-2: Set HMAC key for all tests (required by secure_serialization.py)
 os.environ.setdefault("QCHEM_PROTOCOL_HMAC_KEY", "test-hmac-key-for-testing-only-32bytes")
 
+# Most API tests expect no bearer token unless explicitly testing auth middleware.
+os.environ.pop("QCHEM_STACK_API_KEY", None)
+
 if TYPE_CHECKING:
     from qchem_stack.config import ExperimentConfig
 
@@ -80,13 +83,3 @@ def h2_config() -> ExperimentConfig:
 def tmp_job_db(tmp_path: Path) -> Path:
     """Temporary SQLite database for job queue tests."""
     return tmp_path / "test_jobs.sqlite"
-
-
-@pytest.fixture
-def mock_executor():
-    """Mock HamiltonianExpectationExecutor for testing."""
-    from unittest.mock import MagicMock
-
-    executor = MagicMock()
-    executor.expectation_hea.return_value = -1.0
-    return executor

@@ -1,0 +1,19 @@
+# Algorithms
+
+
+| 公开类 | qchem_stack | 备注 |
+|--------|-------------|------|
+| `AlgorithmVQE` | `yes`：`quantum/algorithms/vqe.py`；**变分 ansatz 菜单**：`hea` / `uccsd` / **`uccgd`** / **`qcc`** / **`upccgsd`** / **`puccd`**（JW/BK 方阵编码，见 `quantum/variational_plugins/builtins.py`）；**UCCGD/UpCCGSD/pUCCD Pauli 协议**：`quantum.pauli.use_protocol: true` + `configs/example_h2_uccgd_pauli_protocol.yaml`；UCCSD JW + PauliAveraging（`configs/example_h2_uccsd_pauli_protocol.yaml`）；**`n/a`**：BK/SCBK UCCSD Trotter 电路 |
+| `AlgorithmAdaptVQE` / FermionicAdapt | `partial(interface-ready)`：`adapt.py` 已切到 **commutator gradient** + 可执行 pool registry（`fermionic_uccsd`/`toy_pair_xx`）；新增 `quantum.algorithm: tetris_adapt`（同轮多算符追加，实验态） |
+| `AlgorithmIQEB` | `partial(interface-ready)`：`IQEBVQE` 外层支持 `iqeb_n_grads` + `iqeb_energy_tolerance` + pool registry（默认 `iqeb_qubit_excitation`）；仍属开放栈等价实现而非闭源逐行同构 |
+| `AlgorithmVQD` | `partial`→**L1 闭合增强**：`excited_vqd.py` 多级 deflation；`optimizer_mode: collapsed\|three_computable`；`overlap_mode: deflation_circuit` 导出 CSWAP swap-test CircuitIR + `qiskit_export_v1`。变分流形：**HEA** 或 **UCCSD**。示例：`configs/example_h2_vqd_uccsd.yaml`、`configs/example_h2_vqd_uccsd_three_computable.yaml`、`configs/example_h2_vqd_deflation_circuit.yaml` |
+| `AlgorithmQSE` | `partial`→**L1 闭合增强**：`excited_qse.py` + `qse_transition.py`；UCCSD 路径 `pauli_transitions` / **`pauli_transitions_qiskit`**；`expansion_pool: fermionic_singles\|fermionic_singles_doubles`；内部矩阵经 **`QSEMatricesComputable`**。示例：`configs/example_h2_uccsd_qse_pauli_qiskit.yaml` |
+| `AlgorithmSCEOM` | `partial`→**L1 闭合增强**：默认 `generator_strategy: fermionic_singles_mapped`；`self_consistent_rounds`；M 元素 statevector / 可选 Qiskit；**HEA/UCCSD 均经 `SCEOMMatrixComputable`**；`sceom_analysis` 摘要 |
+| `Algorithm*QPE` | `partial(interface-ready)`：新增 `quantum/algorithms/qpe.py`（`AlgorithmDeterministicQPE` / `AlgorithmKitaevQPE` / `AlgorithmInfoTheoryQPE`）并接入 demo track；主配置树仍通过 `qpe_demo_track_after_variational` / `qpe_pipeline_integration` 出具报告；完工后 **`run_summary.qpe_open_stack_contract_v1`** 给出稳定实施路径别名（对齐 Methods / `methods_resource_unified_v1`） |
+| `AlgorithmVQS` / `AlgorithmMcLachlan*` | `partial(interface-ready)`：``quantum/algorithms/vqs.py`` + **主配置侧车** `quantum.vqs_track_after_variational` / `quantum.vqs_pipeline_integration` → 管线输出 `vqs_track`（`vqs_track_v1`）与 `run_summary.vqs_open_stack_contract_v1`；示例 `configs/example_h2_vqs_track.yaml`；动力学 RHS 仍为开放栈占位，**非** 产品级时间演化 parity |
+| `AlgorithmBayesianQPE` + Phayes | `partial`：`qpe_qec_demo/bayesian_stub.py`（`BayesianQPEStub`）；模块说明见 [`qpe_qec_demo/README.md`](../src/qchem_stack/qpe_qec_demo/README.md)；并入 `qpe_demo_track` / `run_summary.qpe_demo_track_ran`；同上 **`run_summary.qpe_open_stack_contract_v1`**；单测 `tests/quantum/test_l1_phase_c_iqeb_bayesian.py` |
+| YAML `quantum.algorithm_factory` / `variational_plugins` | `partial`：注册表 + YAML 导入路径派发；示例 `configs/example_h2_echo_variational_plugin.yaml`；parity 导出 **`variational_registry_export_v1`**（嵌于 `algorithm_registry_alignment_v1`，需 `parity_integrations.resource_estimation_preview: true`） |
+| `quantum.adapt_pool_id` / `quantum.iqeb_pool_id`（算符池） | `yes`：**可执行** `quantum/operator_pool_registry.py`（JW-mapped spin-UCCSD、BK、generalized doubles、**`iqeb_qubit_excitation`** 与 **`pool_id_aliases`**）；L1 pipeline smoke（`tests/quantum/test_adapt_l1_pipeline_smoke.py`）断言 `run_summary.adapt_pool_id_yaml`；示例 `configs/example_h2_adapt_bk_pool.yaml`、`example_h2_adapt_generalized_doubles_pool.yaml`、`example_h2_iqeb_bk_singles_pool.yaml` 等（见 `product_contract_gaps.evidence`）；**`GET /v1/meta/capability-surface`** 内嵌 **`operator_pool_registry_export_v1`**；相对 Tangelo / 厂商全套激发 taxonomy **仍为 partial** |
+
+**Registry 钉扎（P2-W5）**：YAML `quantum.algorithm`、`quantum.algorithm_factory`（可选插件）、算符池、`quantum.variational_ansatz`、fermion→qubit 映射的机读对照见 [附录 A §11](public_parity_matrix.md#p2-w5-algorithm-registry-alignment)与本节上表各行交叉维护；机读 gaps 增补 **`adapt_iqeb_operator_pool_surface`**。
+

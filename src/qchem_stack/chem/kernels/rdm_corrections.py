@@ -9,17 +9,16 @@ import numpy as np
 from qchem_stack.chem.bridges.mean_field_like import PySCFMeanFieldLike
 from qchem_stack.chem.bridges.pyscf_shadow_reference import build_pyscf_rhf_shadow
 from qchem_stack.chem.rdm_bundle import RDMBundle, SpinModelLit
-from qchem_stack.contracts.schema_ids import RDM_CORRECTION_REPORT_V1
+from qchem_stack.contracts.rdm_correction_types import (
+    RdmCorrectionReadinessV1,
+    RdmCorrectionReportV1,
+    rdm_correction_readiness_v1,
+    rdm_correction_report_v1,
+)
 
 if TYPE_CHECKING:
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.config import ExperimentConfig
-
-
-def _rdm_correction_report_v1(**fields: Any) -> dict[str, Any]:
-    out: dict[str, Any] = {"schema": RDM_CORRECTION_REPORT_V1}
-    out.update(fields)
-    return out
 
 
 def rdm_bundle_from_mean_field(reference: ClassicalMeanFieldReference) -> RDMBundle:
@@ -65,14 +64,14 @@ def run_nevpt2_casci_correction(
     n_active_electrons: int,
     *,
     cfg: ExperimentConfig,
-) -> dict[str, Any]:
+) -> RdmCorrectionReportV1:
     """NEVPT2 on CASCI reference; PySCF ``mrpt.NEVPT`` (native or shadow-imported MO)."""
     tag = rhf.backend_tag()
     if tag == "pyscf":
         return run_pyscf_nevpt2_casci_correction(rhf, n_active_orbitals, n_active_electrons)
     if tag == "psi4":
         return run_psi4_nevpt2_casci_correction(rhf, n_active_orbitals, n_active_electrons, cfg=cfg)
-    return _rdm_correction_report_v1(
+    return rdm_correction_report_v1(
         method="nevpt2_casci",
         status="failed",
         energy_correction_au=None,
@@ -89,7 +88,7 @@ def run_psi4_nevpt2_casci_correction(
     n_active_electrons: int,
     *,
     cfg: ExperimentConfig,
-) -> dict[str, Any]:
+) -> RdmCorrectionReportV1:
     """Strongly-contracted NEVPT2 via PySCF ``mrpt.NEVPT`` on MO imported from Psi4."""
     if rhf.backend_tag() != "psi4":
         return _nevpt2_failed_report(
@@ -105,7 +104,7 @@ def run_psi4_nevpt2_casci_correction(
             "pyscf_entrypoint": "mrpt.NEVPT(CASCI(...))",
             "implementation_id": "pyscf_mrpt_on_psi4_imported_mo_v1",
         }
-        return _rdm_correction_report_v1(
+        return rdm_correction_report_v1(
             method="psi4_nevpt2_casci",
             status="ok",
             energy_correction_au=e_nevpt,
@@ -130,7 +129,7 @@ def run_pyscf_nevpt2_casci_correction(
     rhf: ClassicalMeanFieldReference,
     n_active_orbitals: int,
     n_active_electrons: int,
-) -> dict[str, Any]:
+) -> RdmCorrectionReportV1:
     """
     Strongly-contracted NEVPT2 correlation energy from PySCF ``mrpt.NEVPT`` on a **CASCI** reference.
     """
@@ -151,7 +150,7 @@ def run_pyscf_nevpt2_casci_correction(
             "pyscf_entrypoint": "mrpt.NEVPT(CASCI(...))",
             "implementation_id": "pyscf_mrpt_on_native_mf_v1",
         }
-        return _rdm_correction_report_v1(
+        return rdm_correction_report_v1(
             method="pyscf_nevpt2_casci",
             status="ok",
             energy_correction_au=e_nevpt,
@@ -177,9 +176,9 @@ def _nevpt2_failed_report(
     method: str,
     backend_key: str,
     reason: str,
-) -> dict[str, Any]:
+) -> RdmCorrectionReportV1:
     block = {"status": "failed", "reason": reason}
-    out = _rdm_correction_report_v1(
+    out = rdm_correction_report_v1(
         method=method,
         status="failed",
         energy_correction_au=None,
@@ -195,11 +194,11 @@ def _nevpt2_failed_report(
 def run_rdm_correction(
     method: Literal["stub_nevpt2", "stub_ac0"],
     bundle: RDMBundle,
-) -> dict[str, Any]:
+) -> RdmCorrectionReportV1:
     """Open-stack placeholder for stub RDM correction workflows."""
     if method not in ("stub_nevpt2", "stub_ac0"):
         raise ValueError(f"Unsupported stub RDM correction method: {method!r}")
-    return _rdm_correction_report_v1(
+    return rdm_correction_report_v1(
         method=method,
         status="stub",
         energy_correction_au=0.0,
@@ -218,25 +217,24 @@ def run_rdm_correction(
 def build_rdm_correction_readiness(
     *,
     requested_method: str,
-    correction_report: dict[str, Any],
+    correction_report: RdmCorrectionReportV1,
     bundle_meta: dict[str, Any],
-) -> dict[str, Any]:
+) -> RdmCorrectionReadinessV1:
     """Parity-oriented readiness blob for RDM correction exports."""
     nevpt_status = _nevpt2_status_from_report(correction_report)
-    return {
-        "schema": "rdm_correction_readiness_v1",
-        "requested_method": requested_method,
-        "rdm1_source": bundle_meta.get("rdm_source") or bundle_meta.get("source"),
-        "rdm_basis": bundle_meta.get("rdm_basis"),
-        "spin_model": bundle_meta.get("spin_model"),
-        "reference_wavefunction": str(correction_report.get("reference_wavefunction") or "scf_rhf"),
-        "kernel_class": str(correction_report.get("kernel_class") or "unknown"),
-        "nevpt2_status": nevpt_status,
-        "nevpt2_pyscf_status": nevpt_status,
-    }
+    return rdm_correction_readiness_v1(
+        requested_method=requested_method,
+        rdm1_source=bundle_meta.get("rdm_source") or bundle_meta.get("source"),
+        rdm_basis=bundle_meta.get("rdm_basis"),
+        spin_model=bundle_meta.get("spin_model"),
+        reference_wavefunction=str(correction_report.get("reference_wavefunction") or "scf_rhf"),
+        kernel_class=str(correction_report.get("kernel_class") or "unknown"),
+        nevpt2_status=nevpt_status,
+        nevpt2_pyscf_status=nevpt_status,
+    )
 
 
-def _nevpt2_status_from_report(correction_report: dict[str, Any]) -> str:
+def _nevpt2_status_from_report(correction_report: RdmCorrectionReportV1) -> str:
     for key in ("nevpt2", "pyscf_nevpt2", "psi4_nevpt2"):
         block = correction_report.get(key)
         if isinstance(block, dict) and block.get("status") is not None:

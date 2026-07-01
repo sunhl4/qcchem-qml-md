@@ -8,7 +8,7 @@ pytest.importorskip("fastapi")
 
 from fastapi.testclient import TestClient
 
-from qchem_stack.api.app import app
+from qchem_stack.api.app import create_app
 
 _SAMPLE_QMEF = {
     "frames": [
@@ -25,7 +25,7 @@ _SAMPLE_QMEF = {
 
 
 def test_ml_md_bridge_surface_v1() -> None:
-    client = TestClient(app)
+    client = TestClient(create_app())
     r = client.get("/v1/meta/ml-md-bridge")
     assert r.status_code == 200
     d = r.json()
@@ -39,7 +39,7 @@ def test_ml_md_bridge_surface_v1() -> None:
 
 
 def test_qmef_validate_ok_and_invalid() -> None:
-    client = TestClient(app)
+    client = TestClient(create_app())
     ok = client.post("/v1/meta/qmef-validate", json={"qmef": _SAMPLE_QMEF})
     assert ok.status_code == 200
     body = ok.json()
@@ -55,7 +55,7 @@ def test_qmef_validate_ok_and_invalid() -> None:
 
 
 def test_trainer_stub_fit_via_http() -> None:
-    client = TestClient(app)
+    client = TestClient(create_app())
     r = client.post(
         "/v1/meta/ml-md-trainer-stub-fit",
         json={"qmef": _SAMPLE_QMEF, "hyperparams": {"lr": 1e-3}},
@@ -71,7 +71,7 @@ def test_trainer_stub_fit_via_http() -> None:
 
 
 def test_product_surface_lists_ml_md_bridge_route() -> None:
-    client = TestClient(app)
+    client = TestClient(create_app())
     pa = client.get("/v1/meta/product-surface").json()
     assert pa.get("ml_md_bridge") == "/v1/meta/ml-md-bridge"
     notes = "\n".join(str(x) for x in (pa.get("capability_notes") or []))

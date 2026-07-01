@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.config.embedding_enums import DmetHamiltonianSource, EmbeddingMode
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels
@@ -29,7 +29,7 @@ if TYPE_CHECKING:
 __all__ = ["attach_run_summary", "classical_benchmark_summary"]
 
 
-def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
+def attach_run_summary(out: dict[str, object], cfg: ExperimentConfig) -> None:
     """Merge machine-readable stage list and resource hints into ``out['repro']``."""
     repro = out.get("repro")
     if not isinstance(repro, dict):
@@ -61,7 +61,7 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         stages.append("sceom")
     if pauli_protocol_enabled(cfg) and "energy_pauli_protocol" in out:
         stages.append("pauli_averaging_protocol")
-    sm: dict[str, Any] = {
+    sm: dict[str, object] = {
         "stages_completed": stages,
         "quantum_algorithm": q.algorithm,
         "quantum_algorithm_yaml": q.algorithm,
@@ -240,8 +240,9 @@ def attach_run_summary(out: dict[str, Any], cfg: ExperimentConfig) -> None:
         if rr_ready.get("nevpt2_pyscf_status") is not None:
             sm["rdm_correction_readiness_nevpt2_pyscf_status"] = rr_ready["nevpt2_pyscf_status"]
     apply_quantum_and_demo_run_summary_fields(sm, out, cfg, repro)
-    if isinstance(out.get("nexus_analog_ledger"), dict):
-        sm["nexus_analog_hqc_units"] = out["nexus_analog_ledger"].get("hqc_units")
+    nexus_analog_ledger = out.get("nexus_analog_ledger")
+    if isinstance(nexus_analog_ledger, dict):
+        sm["nexus_analog_hqc_units"] = nexus_analog_ledger.get("hqc_units")
     if out.get("mitigation_graph_report"):
         sm["mitigation_graph_report_present"] = True
     if out.get("mitigation_dag_execution"):

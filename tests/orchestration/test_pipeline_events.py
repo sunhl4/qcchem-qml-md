@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+from unittest.mock import MagicMock
+
 import pytest
 
 from qchem_stack.orchestration.pipeline_events import (
@@ -87,3 +89,89 @@ def test_pipeline_event_requires_name() -> None:
 def test_emit_stage_event_constants_exist() -> None:
     assert PipelineEvents.SCF_STARTED == "stage.scf.started"
     assert PipelineEvents.PIPELINE_COMPLETED == "pipeline.completed"
+
+
+def test_otel_subscriber_noop_without_endpoint(monkeypatch: pytest.MonkeyPatch) -> None:
+    from qchem_stack.orchestration.pipeline_event_bus import EventBus
+    from qchem_stack.orchestration.pipeline_otel_subscriber import (
+        register_otel_subscriber_if_configured,
+    )
+
+    monkeypatch.delenv("OTEL_EXPORTER_OTLP_ENDPOINT", raising=False)
+    bus = EventBus()
+    register_otel_subscriber_if_configured(bus)
+    bus.emit(PipelineEvent(name="stage.scf.started", stage="scf"))
+
+
+def test_otel_subscriber_registers_handlers_with_mocked_sdk(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    import qchem_stack.orchestration.pipeline_otel_subscriber as mod
+    from qchem_stack.orchestration.pipeline_event_bus import EventBus
+
+    monkeypatch.setattr(mod, "_otel_registered", False)
+    monkeypatch.setenv("OTEL_EXPORTER_OTLP_ENDPOINT", "http://127.0.0.1:4318")
+    monkeypatch.setattr(mod, "_otel_available", lambda: True)
+
+    class _Span:
+        def set_attribute(self, _key: str, _val: str) -> None:
+            return None
+
+        def __enter__(self) -> _Span:
+            return self
+
+        def __exit__(self, *_args: object) -> None:
+            return None
+
+    class _Tracer:
+        def start_as_current_span(self, _name: str) -> _Span:
+            return _Span()
+
+    fake_trace = MagicMock()
+    fake_trace.get_tracer.return_value = _Tracer()
+
+    fake_otel = MagicMock()
+    fake_exporter = MagicMock()
+    fake_resource = MagicMock()
+    fake_resource.create.return_value = MagicMock()
+    fake_provider = MagicMock()
+    fake_provider_cls = MagicMock(return_value=fake_provider)
+    fake_processor = MagicMock()
+
+    monkeypatch.setitem(
+        __import__("sys").modules,
+        "opentelemetry",
+        fake_otel,
+    )
+    monkeypatch.setitem(__import__("sys").modules, "opentelemetry.trace", fake_trace)
+    monkeypatch.setitem(
+        __import__("sys").modules,
+        "opentelemetry.exporter.otlp.proto.http.trace_exporter",
+        MagicMock(OTLPSpanExporter=fake_exporter),
+    )
+    monkeypatch.setitem(
+        __import__("sys").modules,
+        "opentelemetry.sdk.resources",
+        MagicMock(Resource=fake_resource),
+    )
+    monkeypatch.setitem(
+        __import__("sys").modules,
+        "opentelemetry.sdk.trace",
+        MagicMock(TracerProvider=fake_provider_cls),
+    )
+    monkeypatch.setitem(
+        __import__("sys").modules,
+        "opentelemetry.sdk.trace.export",
+        MagicMock(BatchSpanProcessor=fake_processor),
+    )
+
+    subscribed: list[str] = []
+    bus = EventBus()
+
+    def _capture_subscribe(name: str, handler: object, **kwargs: object) -> None:
+        subscribed.append(name)
+
+    monkeypatch.setattr(bus, "subscribe", _capture_subscribe)
+    mod.register_otel_subscriber_if_configured(bus)
+    assert "stage.*" in subscribed
+    assert "pipeline.*" in subscribed

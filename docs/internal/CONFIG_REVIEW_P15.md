@@ -18,7 +18,7 @@ P15 completes the config review backlog: helper/validation module split, propert
 | `scf` | Flat driver controls on root | `pyscf` / `psi4` / `precomputed` sub-blocks + `scf_helpers.py` |
 | `embedding` backend caps | Fake `_Cfg` object for path resolve | Direct `embedding_helpers` + `PreQuantumPath` |
 | AVAS validation | Duplicated in backend-cap + dedicated validator | Single gate: `validate_avas_strategy_requires_labels_and_capability` |
-| Migration strictness | Partial (embedding, chemistry_extended, quantum) | All 8 section migrators + `tests/test_config_migration_strict.py` |
+| Migration strictness | Partial (embedding, chemistry_extended, quantum) | All 8 section migrators + `tests/config/test_migrations.py` |
 | Field descriptions | Class docstrings on `compiler`, `parity_integrations`, `nexus` | `Field(description=...)` on public knobs |
 | Style doc §3.2/3.3 | “待实现” | ✅ marked implemented in `docs/config_校验分层约定.md` |
 
@@ -52,7 +52,7 @@ P15 completes the config review backlog: helper/validation module split, propert
 - Helpers: `mitigation_helpers.py`, `chemistry_extended_helpers.py`, `md_ml_export_helpers.py`, `scf_helpers.py`
 - Validation: `_mitigation_validation.py` (extension point)
 - Codemods: `codemod_mitigation_paths.py`, `codemod_md_ml_paths.py`, `codemod_scf_paths.py`; updated `codemod_active_space_paths.py`, `codemod_chemistry_paths.py`
-- Tests: `tests/test_config_migration_strict.py`
+- Tests: `tests/config/test_migrations.py`
 - Docs: `docs/config_校验分层约定.md` §3.2/3.3/SCF row; `STYLE_OPTIMIZATION_ROADMAP.md` P15-config
 
 ## CI-equivalent results (2026-05-20)
@@ -61,7 +61,7 @@ P15 completes the config review backlog: helper/validation module split, propert
 |------|--------|
 | `pyright src/qchem_stack/config` | 0 errors |
 | `pytest tests/test_config_*.py tests/test_*embedding* tests/test_*active_space* tests/test_validate_pre_quantum*` | **165 passed**, 1 skipped |
-| `pytest tests/test_orchestration_pipeline.py tests/test_repro_*.py` | **56 passed** (incl. CASSCF audit + Schmidt smoke) |
+| `pytest tests/orchestration/test_orchestration_pipeline.py tests/test_repro_*.py` | **56 passed** (incl. CASSCF audit + Schmidt smoke) |
 | `ruff check src/qchem_stack/config tests scripts` | Pre-existing TC001/B017 in legacy files; config edits formatted |
 | `code_health_baseline.json` | Updated |
 

@@ -12,7 +12,7 @@ from fastapi.testclient import TestClient
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 
-from qchem_stack.api.app import app
+from qchem_stack.api.app import create_app
 from qchem_stack.api.middleware import create_limiter, limiter, rate_limit
 
 
@@ -23,6 +23,7 @@ def test_create_limiter_returns_limiter_instance() -> None:
 
 
 def test_app_has_limiter_when_slowapi_available() -> None:
+    app = create_app()
     assert hasattr(app.state, "limiter")
     assert app.state.limiter is not None
 

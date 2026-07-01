@@ -17,6 +17,15 @@ See also [说明_API安全与环境变量.md](../说明_API安全与环境变量
 HMAC provides **integrity** checking, not safe deserialization. Treat job SQLite files
 and the HMAC key as sensitive. Do not expose the worker API without authentication.
 
+## Production checklist (required)
+
+| Check | Production value |
+|-------|------------------|
+| `QCHEM_PROTOCOL_HMAC_KEY` | Strong random secret (32+ bytes); **required** for workers |
+| `QCHEM_ALLOW_LEGACY_PICKLE` | **Unset** or `0` (never `1` in production) |
+| `QCHEM_STACK_API_KEY` | Set when exposing `qchem-api` on a network |
+| `QCHEM_STACK_REQUIRE_API_KEY` | `1` when API is network-facing (fail-fast if key missing) |
+
 ## Migration procedure
 
 1. Set a strong random `QCHEM_PROTOCOL_HMAC_KEY` in the worker environment.

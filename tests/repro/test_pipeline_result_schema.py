@@ -3,6 +3,7 @@ from __future__ import annotations
 import pytest
 
 from qchem_stack.contracts.schema_ids import PIPELINE_RESULT_V1
+from qchem_stack.exceptions import PipelineError
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
 from qchem_stack.orchestration.pipeline_result import (
     PIPELINE_RESULT_CORE_KEYS,
@@ -19,7 +20,7 @@ def test_pipeline_result_core_keys_constant() -> None:
 
 
 def test_assert_pipeline_result_core_keys_raises() -> None:
-    with pytest.raises(KeyError, match="missing core keys"):
+    with pytest.raises(PipelineError, match="missing core keys"):
         assert_pipeline_result_core_keys({})
 
 

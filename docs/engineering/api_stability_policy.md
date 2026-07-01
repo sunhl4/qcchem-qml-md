@@ -23,7 +23,7 @@
 | `list_scenarios_text`, `SCENARIOS` | Scenario picker |
 | `repro_json_dumps`, `repro_dict_for_strict_json` | Strict repro JSON |
 
-Regression: `tests/test_sdk_surface_snapshot.py`.
+Regression: `tests/repro/test_sdk_surface_snapshot.py`.
 
 ## Stable HTTP API (since 1.0.0)
 
@@ -56,7 +56,7 @@ Migration: [`migration_v0_8_to_v1_0.md`](migration_v0_8_to_v1_0.md).
 
 ## Config contract
 
-`ExperimentConfig.schema_version` is independent of package semver. Breaking YAML changes require migration codemods and `tests/test_config_migration_strict.py`.
+`ExperimentConfig.schema_version` is independent of package semver. Breaking YAML changes require migration codemods and `tests/config/test_migrations.py`.
 
 ## Release checklist
 

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.config.quantum_helpers import (
     quantum_algorithm_report_run_summary_fields,
@@ -21,10 +21,10 @@ if TYPE_CHECKING:
 
 
 def apply_quantum_and_demo_run_summary_fields(
-    sm: dict[str, Any],
-    out: dict[str, Any],
+    sm: dict[str, object],
+    out: dict[str, object],
     cfg: ExperimentConfig,
-    repro: dict[str, Any],
+    repro: dict[str, object],
 ) -> None:
     q = cfg.quantum
     sm.update(quantum_algorithm_report_run_summary_fields(out))
@@ -57,7 +57,7 @@ def apply_quantum_and_demo_run_summary_fields(
         if isinstance(im, dict) and im.get("rounds") is not None:
             sm["iqeb_outer_rounds_recorded"] = int(im["rounds"])
         selected = out.get("iqeb_selected_pauli_strings")
-        if selected is not None:
+        if isinstance(selected, list):
             sm["iqeb_selected_pauli_count"] = len(selected)
             sm["iqeb_selected_pauli_strings_head"] = list(selected[:8])
         if "nfev" in out:
@@ -207,12 +207,13 @@ def apply_quantum_and_demo_run_summary_fields(
             sm["job_async_energy_stderr"] = jr["energy_stderr"]
         if jr.get("total_shots_budget") is not None:
             sm["job_async_total_shots_budget"] = jr["total_shots_budget"]
-    if isinstance(out.get("qpe_demo_track"), dict):
+    qpe_demo_track = out.get("qpe_demo_track")
+    if isinstance(qpe_demo_track, dict):
         demo_flags = quantum_demo_open_stack_yaml_flags(cfg)
         sm["qpe_demo_track_ran"] = True
         sm["qpe_open_stack_contract_v1"] = {
             "schema": QPE_OPEN_STACK_CONTRACT_V1,
-            "demo_track_payload_schema": out["qpe_demo_track"].get("schema"),
+            "demo_track_payload_schema": qpe_demo_track.get("schema"),
             "kitaev_dense_energy_fn": (
                 "qchem_stack.qpe_qec_demo.pipeline_track.kitaev_qpe_energy_estimate — dense phase readout shortcut"
             ),
@@ -228,24 +229,25 @@ def apply_quantum_and_demo_run_summary_fields(
             },
             "pipeline_attach": "_attach_qpe_demo_track_if_requested (orchestration/pipeline.py)",
         }
-    if isinstance(out.get("qpe_algorithm_three_pack"), dict):
-        qp3 = out["qpe_algorithm_three_pack"]
+    qp3 = out.get("qpe_algorithm_three_pack")
+    if isinstance(qp3, dict):
         sm["qpe_three_pack_ran"] = True
-        sm["qpe_three_pack_deterministic_energy_est"] = (
-            qp3.get("deterministic_qpe_report_v1") or {}
-        ).get("energy_estimate")
-        sm["qpe_three_pack_kitaev_energy_est"] = (qp3.get("kitaev_qpe_report_v1") or {}).get(
-            "energy_estimate"
-        )
-        sm["qpe_three_pack_info_theory_energy_est"] = (
-            qp3.get("info_theory_qpe_report_v1") or {}
-        ).get("energy_estimate")
-    if isinstance(out.get("vqs_track"), dict):
+        det = qp3.get("deterministic_qpe_report_v1")
+        if isinstance(det, dict):
+            sm["qpe_three_pack_deterministic_energy_est"] = det.get("energy_estimate")
+        kit = qp3.get("kitaev_qpe_report_v1")
+        if isinstance(kit, dict):
+            sm["qpe_three_pack_kitaev_energy_est"] = kit.get("energy_estimate")
+        inf = qp3.get("info_theory_qpe_report_v1")
+        if isinstance(inf, dict):
+            sm["qpe_three_pack_info_theory_energy_est"] = inf.get("energy_estimate")
+    vqs_track = out.get("vqs_track")
+    if isinstance(vqs_track, dict):
         demo_flags = quantum_demo_open_stack_yaml_flags(cfg)
         sm["vqs_track_ran"] = True
         sm["vqs_open_stack_contract_v1"] = {
             "schema": VQS_OPEN_STACK_CONTRACT_V1,
-            "track_payload_schema": out["vqs_track"].get("schema"),
+            "track_payload_schema": vqs_track.get("schema"),
             "implementations": {
                 "vqs": "qchem_stack.quantum.algorithms.vqs.AlgorithmVQS",
                 "mclachlan_real_time": "qchem_stack.quantum.algorithms.vqs.AlgorithmMcLachlanRealTime",

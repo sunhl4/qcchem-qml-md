@@ -14,12 +14,6 @@ def require_pyscf() -> tuple[Any, Any]:
 
 
 def pyscf_version_or_unknown() -> str:
-    try:
-        import pyscf
+    from qchem_stack.chem.solvers._common import package_version_or_unknown
 
-        v = getattr(pyscf, "__version__", "")
-        if isinstance(v, str) and v.strip():
-            return v.strip()
-    except Exception:  # pragma: no cover
-        pass
-    return "unknown"
+    return package_version_or_unknown("pyscf")

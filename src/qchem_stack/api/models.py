@@ -1,4 +1,8 @@
-"""HTTP request/response models for the qchem-stack API."""
+"""HTTP request/response models for the qchem-stack API.
+
+Async run summaries align with ``pipeline_result_v1`` (see
+``docs/generated/pipeline_result_v1.schema.json`` and ``run_summary_v1.schema.json``).
+"""
 
 from __future__ import annotations
 

@@ -112,7 +112,7 @@ quantum:
 
 ## 9. 测试与回归
 
-- `tests/test_qiskit_pauli_shots.py`：线序/比特反转、`energy_estimate_grouped_qiskit_shots` 与 Qiskit 精确期望在**大 shots** 下接近、以及 `PauliAveragingProtocol` 的 **run_qiskit_shots** 端到端。  
+- `tests/quantum/test_qiskit_pauli_shots.py`：线序/比特反转、`energy_estimate_grouped_qiskit_shots` 与 Qiskit 精确期望在**大 shots** 下接近、以及 `PauliAveragingProtocol` 的 **run_qiskit_shots** 端到端。  
 - 需安装 `qchem_stack[quantum]`（`qiskit` + `qiskit-aer`）。
 
 ## 10. 故障排查

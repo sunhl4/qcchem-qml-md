@@ -24,6 +24,8 @@ from pathlib import Path
 
 import numpy as np
 
+import qchem_stack.orchestration  # noqa: F401 — registers md_bridge pipeline runner
+
 _REPO_ROOT = Path(__file__).resolve().parent.parent
 _QMLFF_ROOT = _REPO_ROOT.parent / "QML-FF"
 if str(_REPO_ROOT / "src") not in sys.path:

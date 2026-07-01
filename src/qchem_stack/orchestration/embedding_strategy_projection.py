@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.config.embedding_enums import ProjectionQuantumHamiltonian
 from qchem_stack.contracts.schema_ids import PROJECTION_EMBEDDING_WORKFLOW_V1
@@ -24,11 +24,11 @@ class ProjectionStrategy:
         self,
         cfg: ExperimentConfig,
         *,
-        out: dict[str, Any],
+        out: dict[str, object],
         qh: QubitHamiltonian,
-        exe: Any,
-        embedding_input_payload: dict[str, Any] | None,
-        schmidt_ctx: dict[str, Any] | None,
+        exe: object,
+        embedding_input_payload: dict[str, object] | None,
+        schmidt_ctx: dict[str, object] | None,
         rhf: ClassicalMeanFieldReference,
         cfg_path: Path | None,
         profile: PipelineStageTimer,
@@ -50,8 +50,10 @@ class ProjectionStrategy:
             "parity_module": "qchem_stack.chem.embedding.projection",
             "stage_timing": "post_variational",
         }
-        hm = out.get("hamiltonian_meta") or {}
-        audit = hm.get("projection_mulliken_mo_audit_v1")
+        raw_hm = out.get("hamiltonian_meta")
+        hm: dict[str, object] = raw_hm if isinstance(raw_hm, dict) else {}
+        audit_raw = hm.get("projection_mulliken_mo_audit_v1")
+        audit = audit_raw if isinstance(audit_raw, dict) else {}
         if audit:
             wf["projection_selected_mo_indices"] = list(audit.get("selected_mo_indices") or [])
             wf["projection_mulliken_weights"] = list(audit.get("mulliken_weights") or [])

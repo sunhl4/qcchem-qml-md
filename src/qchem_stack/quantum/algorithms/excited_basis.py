@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import math
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -24,6 +24,16 @@ if TYPE_CHECKING:
     from collections.abc import Callable
 
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
+    from qchem_stack.quantum.algorithms.excited_basis_types import (
+        CircuitIrOperationV1,
+        TangeloDeflationAnalogyV1,
+        VqdCrossStackSemanticsBundleV1,
+        VqdDeflationSwapTestCircuitSketchV1,
+        VqdObjectiveChannelV1,
+        VqdOverlapChannelV1,
+        VqdThreeProtocolChannelsV1,
+        VqdWeightChannelV1,
+    )
 
 
 def _gram_schmidt(
@@ -132,13 +142,13 @@ def _vqd_three_protocol_channels(
     shots_weight: int,
     rng: np.random.Generator,
     pauli_grouping: str = "tensor_product",
-) -> dict[str, Any]:
+) -> VqdThreeProtocolChannelsV1:
     """Three-channel reporting model: Hamiltonian expectation, overlap(s), deflation weight (product)."""
     g_new = np.asarray(g_new, dtype=complex).ravel()
     g_new = g_new / (np.linalg.norm(g_new) + FLOAT_PRECISION_TINY)
     h_dense = qubit_operator_to_sparse(h_op, n_qubits)
     e_ex = float(np.real(np.vdot(g_new, h_dense @ g_new)))
-    obj: dict[str, Any] = {
+    obj: VqdObjectiveChannelV1 = {
         "energy_exact": e_ex,
         "shots_budget_objective": int(max(0, shots_objective)),
     }
@@ -150,7 +160,7 @@ def _vqd_three_protocol_channels(
         obj["energy_shot_mean"] = float(m)
         obj["energy_shot_stderr"] = float(se)
     overlap_ex = float(sum(abs(np.vdot(s, g_new)) ** 2 for s in prev_states))
-    ov: dict[str, Any] = {
+    ov: VqdOverlapChannelV1 = {
         "overlap_squared_sum_exact": overlap_ex,
         "shots_per_pair": int(max(0, shots_overlap)),
     }
@@ -164,7 +174,7 @@ def _vqd_three_protocol_channels(
         ov["overlap_squared_sum_shot_mean"] = float(est_sum)
         ov["overlap_squared_sum_shot_stderr"] = float(math.sqrt(se_sq))
     w_ex = penalty_weight * overlap_ex
-    wt: dict[str, Any] = {
+    wt: VqdWeightChannelV1 = {
         "penalty_weight": penalty_weight,
         "weight_exact": float(w_ex),
         "shots_budget_weight": int(max(0, shots_weight)),
@@ -174,6 +184,7 @@ def _vqd_three_protocol_channels(
         and shots_overlap > 0
         and prev_states
         and "overlap_squared_sum_shot_mean" in ov
+        and "overlap_squared_sum_shot_stderr" in ov
     ):
         wt["weight_shot_mean"] = float(penalty_weight * ov["overlap_squared_sum_shot_mean"])
         wt["weight_shot_stderr"] = float(penalty_weight * ov["overlap_squared_sum_shot_stderr"])
@@ -189,10 +200,10 @@ def _vqd_objective_computable(
     shots_objective: int,
     rng: np.random.Generator,
     pauli_grouping: str = "tensor_product",
-) -> dict[str, Any]:
+) -> VqdObjectiveChannelV1:
     """Objective channel (ExpectationValue analog) for VQD three-computable mode."""
     return cast(
-        "dict[str, Any]",
+        "VqdObjectiveChannelV1",
         _vqd_three_protocol_channels(
             prev_states,
             g_new,
@@ -216,10 +227,10 @@ def _vqd_overlap_computable(
     *,
     shots_overlap: int,
     rng: np.random.Generator,
-) -> dict[str, Any]:
+) -> VqdOverlapChannelV1:
     """Overlap channel (OverlapSquared analog) for VQD three-computable mode."""
     return cast(
-        "dict[str, Any]",
+        "VqdOverlapChannelV1",
         _vqd_three_protocol_channels(
             prev_states,
             g_new,
@@ -244,10 +255,10 @@ def _vqd_weight_computable(
     shots_overlap: int,
     shots_weight: int,
     rng: np.random.Generator,
-) -> dict[str, Any]:
+) -> VqdWeightChannelV1:
     """Weight channel for VQD three-computable mode."""
     return cast(
-        "dict[str, Any]",
+        "VqdWeightChannelV1",
         _vqd_three_protocol_channels(
             prev_states,
             g_new,
@@ -262,12 +273,14 @@ def _vqd_weight_computable(
     )
 
 
-def vqd_deflation_swap_test_circuit_sketch(*, n_system_qubits: int) -> dict[str, Any]:
+def vqd_deflation_swap_test_circuit_sketch(
+    *, n_system_qubits: int
+) -> VqdDeflationSwapTestCircuitSketchV1:
     """Open-stack swap-test CircuitIR for ``overlap_mode: deflation_circuit`` (reference |phi>, trial |psi>)."""
     n = int(n_system_qubits)
     anc = 2 * n
     n_total = 2 * n + 1
-    ops: list[dict[str, Any]] = [
+    ops: list[CircuitIrOperationV1] = [
         {"name": "H", "qubits": [anc], "params": {}},
     ]
     for k in range(n):
@@ -296,7 +309,7 @@ def vqd_cross_stack_semantics_meta(
     overlap_mode: str,
     optimizer_mode: str = "collapsed",
     n_system_qubits: int | None = None,
-) -> dict[str, Any]:
+) -> VqdCrossStackSemanticsBundleV1:
     """Cross-stack narrative hooks for VQD reporting (parity / Methods export)."""
     coeff = (
         float(penalty_weights_resolved[0]) if penalty_weights_resolved else float(penalty_weight)
@@ -307,7 +320,7 @@ def vqd_cross_stack_semantics_meta(
         overlap_repr = "deflation_circuit_recipe_with_circuit_ir_sketch"
     else:
         overlap_repr = "statevector_overlap_with_circuit_analogy_reporting"
-    deflation_block: dict[str, Any] = {
+    deflation_block: TangeloDeflationAnalogyV1 = {
         "schema": TANGELO_DEFLATION_ANALOGY_V1,
         "deflation_coeff_yaml": coeff,
         "penalty_schedule_resolved": list(penalty_weights_resolved),
@@ -319,7 +332,7 @@ def vqd_cross_stack_semantics_meta(
         ),
     }
     if overlap_mode == "deflation_circuit":
-        recipe: dict[str, Any] = {
+        recipe: dict[str, object] = {
             "schema": "vqd_deflation_circuit_recipe_v1",
             "note": (
                 "Deflation-circuit analogy with open-stack swap-test CircuitIR sketch; "

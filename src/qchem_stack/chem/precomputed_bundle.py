@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import re
+from collections.abc import Callable
 from pathlib import Path
 from typing import Any
 
@@ -40,18 +41,21 @@ def _expect_non_empty_list(value: Any, message: str) -> list[Any]:
     return value
 
 
-def _coerce_int(value: Any, message: str) -> int:
+def _coerce_numeric(
+    value: Any, message: str, converter: Callable[[Any], int | float]
+) -> int | float:
     try:
-        return int(value)
+        return converter(value)
     except Exception as exc:  # noqa: BLE001
         raise ValueError(message) from exc
+
+
+def _coerce_int(value: Any, message: str) -> int:
+    return int(_coerce_numeric(value, message, int))
 
 
 def _coerce_float(value: Any, message: str) -> float:
-    try:
-        return float(value)
-    except Exception as exc:  # noqa: BLE001
-        raise ValueError(message) from exc
+    return float(_coerce_numeric(value, message, float))
 
 
 def _coerce_positive_int(value: Any, *, field: str) -> int:

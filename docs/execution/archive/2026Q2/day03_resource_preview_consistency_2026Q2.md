@@ -4,7 +4,7 @@
 
 ## 本日实现
 
-- 测试增强：`tests/test_methods_resource_unified_export.py`
+- 测试增强：`tests/repro/test_methods_resource_unified_export.py`
   - 在 `test_methods_resource_unified_qpe_plus_tket_probe_schema` 中新增逐字段一致性断言：
     - `n_circuits`
     - `n_qubits`
@@ -17,7 +17,7 @@
 
 ## 验证
 
-- `.venv/bin/pytest tests/test_methods_resource_unified_export.py -q`
+- `.venv/bin/pytest tests/repro/test_methods_resource_unified_export.py -q`
 - 结果：通过（本地环境中按依赖可运行项执行）。
 
 ## 结论

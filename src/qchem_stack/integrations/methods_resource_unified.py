@@ -2,17 +2,38 @@
 
 from __future__ import annotations
 
-from typing import Any, TypedDict
+from typing import Any, TypedDict, cast
 
 from qchem_stack.contracts.schema_ids import METHODS_RESOURCE_UNIFIED_V1
 
 
 class MethodsResourceUnifiedV1(TypedDict, total=False):
     schema: str
+    classical_backend_id: str | None
+    classical_benchmark_backend_yaml: str | None
+    quantum_algorithm_yaml: str | None
+    quantum_algorithm_factory_yaml: str | None
     resource_summary: dict[str, int | float | bool | None]
-    qpe_demo_track_compact: dict[str, object]
-    tket_probe_schema: str | None
+    qpe_demo_track: dict[str, Any] | None
+    run_summary_qpe_demo_track_ran: bool | None
+    run_summary_qpe_three_pack_ran: bool | None
+    qpe_three_pack_deterministic_energy_est: float | None
+    qpe_three_pack_kitaev_energy_est: float | None
+    qpe_three_pack_info_theory_energy_est: float | None
+    qpe_open_stack_contract_v1: dict[str, Any] | None
+    run_summary_vqs_track_ran: bool | None
+    vqs_open_stack_contract_v1: dict[str, Any] | None
+    excited_protocol_contract_v1_present: bool
+    tket_first_compiled_circuit_probe_schema: str | None
     classical_benchmark_active: bool
+    classical_benchmark_summary_schema: str | None
+    classical_benchmark_recommended_baseline_policy: str | None
+    classical_benchmark_recommended_baseline_method: str | None
+    classical_benchmark_recommended_baseline_energy_au: float | None
+    classical_benchmark_best_method: str | None
+    classical_benchmark_best_energy_au: float | None
+    mitigation_zne_mode_yaml: str | None
+    mitigation_zne_scales_yaml: list[float] | None
 
 
 def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> MethodsResourceUnifiedV1:
@@ -126,32 +147,35 @@ def build_methods_resource_unified_v1(pipeline_row: dict[str, Any]) -> MethodsRe
         if k in rsum and rsum[k] is not None:
             proto_mirror[f"run_summary_{k}"] = rsum[k]
 
-    return {
-        "schema": METHODS_RESOURCE_UNIFIED_V1,
-        "classical_backend_id": rsum.get("classical_backend_id"),
-        "classical_benchmark_backend_yaml": rsum.get("classical_benchmark_backend_yaml"),
-        "quantum_algorithm_yaml": rsum.get("quantum_algorithm_yaml"),
-        "quantum_algorithm_factory_yaml": rsum.get("quantum_algorithm_factory_yaml"),
-        "resource_summary": rs_pick,
-        "qpe_demo_track": qpe_compact,
-        "run_summary_qpe_demo_track_ran": rsum.get("qpe_demo_track_ran"),
-        "run_summary_qpe_three_pack_ran": rsum.get("qpe_three_pack_ran"),
-        "qpe_three_pack_deterministic_energy_est": qpe_three_de,
-        "qpe_three_pack_kitaev_energy_est": qpe_three_ke,
-        "qpe_three_pack_info_theory_energy_est": qpe_three_ie,
-        "qpe_open_stack_contract_v1": qpe_contract_d,
-        "run_summary_vqs_track_ran": rsum.get("vqs_track_ran"),
-        "vqs_open_stack_contract_v1": vqs_contract_d,
-        "excited_protocol_contract_v1_present": excited_contract is not None,
-        "tket_first_compiled_circuit_probe_schema": tket_schema,
-        "classical_benchmark_active": classical_active,
-        "classical_benchmark_summary_schema": sum_schema,
-        "classical_benchmark_recommended_baseline_policy": rec_policy,
-        "classical_benchmark_recommended_baseline_method": rec_method,
-        "classical_benchmark_recommended_baseline_energy_au": rec_energy,
-        "classical_benchmark_best_method": best_m,
-        "classical_benchmark_best_energy_au": best_e,
-        "mitigation_zne_mode_yaml": rsum.get("mitigation_zne_mode_yaml"),
-        "mitigation_zne_scales_yaml": rsum.get("mitigation_zne_scales_yaml"),
-        **proto_mirror,
-    }
+    return cast(
+        "MethodsResourceUnifiedV1",
+        {
+            "schema": METHODS_RESOURCE_UNIFIED_V1,
+            "classical_backend_id": rsum.get("classical_backend_id"),
+            "classical_benchmark_backend_yaml": rsum.get("classical_benchmark_backend_yaml"),
+            "quantum_algorithm_yaml": rsum.get("quantum_algorithm_yaml"),
+            "quantum_algorithm_factory_yaml": rsum.get("quantum_algorithm_factory_yaml"),
+            "resource_summary": rs_pick,
+            "qpe_demo_track": qpe_compact,
+            "run_summary_qpe_demo_track_ran": rsum.get("qpe_demo_track_ran"),
+            "run_summary_qpe_three_pack_ran": rsum.get("qpe_three_pack_ran"),
+            "qpe_three_pack_deterministic_energy_est": qpe_three_de,
+            "qpe_three_pack_kitaev_energy_est": qpe_three_ke,
+            "qpe_three_pack_info_theory_energy_est": qpe_three_ie,
+            "qpe_open_stack_contract_v1": qpe_contract_d,
+            "run_summary_vqs_track_ran": rsum.get("vqs_track_ran"),
+            "vqs_open_stack_contract_v1": vqs_contract_d,
+            "excited_protocol_contract_v1_present": excited_contract is not None,
+            "tket_first_compiled_circuit_probe_schema": tket_schema,
+            "classical_benchmark_active": classical_active,
+            "classical_benchmark_summary_schema": sum_schema,
+            "classical_benchmark_recommended_baseline_policy": rec_policy,
+            "classical_benchmark_recommended_baseline_method": rec_method,
+            "classical_benchmark_recommended_baseline_energy_au": rec_energy,
+            "classical_benchmark_best_method": best_m,
+            "classical_benchmark_best_energy_au": best_e,
+            "mitigation_zne_mode_yaml": rsum.get("mitigation_zne_mode_yaml"),
+            "mitigation_zne_scales_yaml": rsum.get("mitigation_zne_scales_yaml"),
+            **proto_mirror,
+        },
+    )

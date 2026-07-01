@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+from functools import lru_cache
 from typing import TYPE_CHECKING
 
 from qchem_stack.chem.integrals.psi4_active_space_exporter import Psi4ActiveSpaceIntegralExporter
@@ -21,6 +22,7 @@ _EXPORTERS: dict[str, ActiveSpaceIntegralExporter] = {
 _REGISTRY_FROZEN = False
 
 
+@lru_cache(maxsize=256)
 def _normalized_backend_tag(backend_tag: str) -> str:
     return str(backend_tag).strip().lower()
 

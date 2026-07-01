@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, Protocol, runtime_checkable
+from typing import TYPE_CHECKING, Protocol, runtime_checkable
 
 if TYPE_CHECKING:
     from collections.abc import Callable
@@ -22,11 +22,11 @@ class EmbeddingStrategy(Protocol):
         self,
         cfg: ExperimentConfig,
         *,
-        out: dict[str, Any],
+        out: dict[str, object],
         qh: QubitHamiltonian,
-        exe: Any,
-        embedding_input_payload: dict[str, Any] | None,
-        schmidt_ctx: dict[str, Any] | None,
+        exe: object,
+        embedding_input_payload: dict[str, object] | None,
+        schmidt_ctx: dict[str, object] | None,
         rhf: ClassicalMeanFieldReference,
         cfg_path: Path | None,
         profile: PipelineStageTimer,

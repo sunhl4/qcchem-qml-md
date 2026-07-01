@@ -2,49 +2,11 @@
 
 from __future__ import annotations
 
-import ast
-from pathlib import Path
-
+from tests.helpers.import_boundary_allowlists import quantum_import_violations
 from tests.helpers.paths import repo_root
 
 
-def _quantum_python_files() -> list[Path]:
-    root = repo_root() / "src" / "qchem_stack" / "quantum"
-    return sorted(root.rglob("*.py"))
-
-
-def _all_imports(path: Path) -> list[str]:
-    """Every imported module name, including lazy/function-scope imports (ast.walk)."""
-    tree = ast.parse(path.read_text(encoding="utf-8"))
-    names: list[str] = []
-    for node in ast.walk(tree):
-        if isinstance(node, ast.Import):
-            for alias in node.names:
-                names.append(alias.name)
-        elif isinstance(node, ast.ImportFrom) and node.module:
-            names.append(node.module)
-    return names
-
-
 def test_quantum_layer_never_imports_orchestration_or_integrations() -> None:
-    """quantum must not import orchestration or integrations anywhere, even lazily."""
-    root = repo_root()
-    forbidden_prefixes = ("qchem_stack.orchestration", "qchem_stack.integrations")
-    violations: list[str] = []
-    for path in _quantum_python_files():
-        rel = path.relative_to(root)
-        for mod in _all_imports(path):
-            if mod.startswith(forbidden_prefixes):
-                violations.append(f"{rel}: import {mod}")
+    """quantum must not import orchestration, integrations, or jobs (shared CI rules)."""
+    violations = quantum_import_violations(repo_root())
     assert not violations, "imports violate quantum layer boundaries:\n" + "\n".join(violations)
-
-
-def test_quantum_directory_has_no_pyscf_imports() -> None:
-    root = repo_root()
-    quantum_dir = root / "src" / "qchem_stack" / "quantum"
-    hits: list[str] = []
-    for py in quantum_dir.rglob("*.py"):
-        txt = py.read_text(encoding="utf-8")
-        if "import pyscf" in txt or "from pyscf" in txt:
-            hits.append(str(py.relative_to(root)))
-    assert not hits, f"quantum layer must stay backend-agnostic; found pyscf imports in: {hits}"

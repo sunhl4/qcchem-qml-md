@@ -16,7 +16,7 @@ Follow-up to [CONFIG_REVIEW_P15.md](CONFIG_REVIEW_P15.md).
 ## Verification
 
 ```bash
-./scripts/venv-run pytest tests/test_config_*.py tests/test_config_migration_strict.py -q
+./scripts/venv-run pytest tests/test_config_*.py tests/config/test_migrations.py -q
 ./scripts/venv-run pyright src/qchem_stack/config
 ```
 

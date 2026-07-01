@@ -36,9 +36,9 @@ def build_ao_embedding_payload(
 
 def build_lowdin_embedding_payload(
     *,
-    overlap,
-    hcore,
-    rdm1_ao,
+    overlap: Any,
+    hcore: Any,
+    rdm1_ao: Any,
     energy_nuc: float,
     driver_meta: Mapping[str, Any],
     epistemic_bound: str,

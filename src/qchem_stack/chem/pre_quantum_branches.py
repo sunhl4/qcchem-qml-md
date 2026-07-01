@@ -18,6 +18,8 @@ from qchem_stack.chem.solvers.registry import create_solver
 from qchem_stack.exceptions import PipelineError
 
 if TYPE_CHECKING:
+    from pathlib import Path
+
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.bridges.run_build_cache import RunBuildCache
     from qchem_stack.chem.pre_quantum_builder_registry import PreQuantumBuildRequest
@@ -52,7 +54,7 @@ def build_pre_quantum_from_embedding_plugin(
     cfg: ExperimentConfig,
     reference: ClassicalMeanFieldReference,
     *,
-    cfg_path,
+    cfg_path: Path | None,
 ) -> tuple[PreQuantumInput, None]:
     from qchem_stack.chem.embedding.decomposition_plugin import (
         qubit_hamiltonian_from_decomposition_plugin,

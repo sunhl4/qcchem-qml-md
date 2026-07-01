@@ -23,7 +23,7 @@
 - [x] `run_summary` 镜像  
   - `embedding_input_representation_yaml`；
   - `embedding_input_system_schema`。
-- [x] 新增测试：`tests/test_pyscf_driver_phase_b_interfaces.py`、`tests/test_phase_bc_pipeline_wiring.py`（lowdin 路径）。
+- [x] 新增测试：`tests/chem/test_pyscf_solver_adapter.py`、`tests/orchestration/test_phase_bc_pipeline_wiring.py`（lowdin 路径）。
 
 ---
 
@@ -42,7 +42,7 @@
 - [x] parity/export 接入  
   - `export_parity_criteria_table.py` 增加 config 与 run mirror 字段；
   - `RUN_SUMMARY_DOCUMENTED_KEYS` 已同步扩展。
-- [x] 新增测试：`tests/test_phase_bc_pipeline_wiring.py`（rdm stub + Phase 3 NEVPT 路径）。
+- [x] 新增测试：`tests/orchestration/test_phase_bc_pipeline_wiring.py`（rdm stub + Phase 3 NEVPT 路径）。
 
 ---
 
@@ -104,9 +104,9 @@
 2. 文档与示例统一使用 backend-agnostic 入口，不再将 compat-only 路径作为可用指南。
 3. 新增功能 PR 不得引入新的 `scf.driver` 品牌判断分支（除 adapter 边界）。
 4. 回归矩阵持续通过：
-   - `tests/test_backend_capability_conformance.py`
-   - `tests/test_pipeline_backend_gate.py`
-   - `tests/test_canonical_integral_pack.py`
+   - `tests/backends/test_backend_capability_conformance.py`
+   - `tests/orchestration/test_pipeline_backend_gate.py`
+   - `tests/chem/test_canonical_integral_pack.py`
 
 ---
 

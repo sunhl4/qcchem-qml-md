@@ -21,14 +21,14 @@
   - 新增 `algorithm_registry_alignment_v1` 与 `md_ml_repro_freeze_fields_v1`（W5/W6 证据块）。
   - `--results` 路径镜像新增 plugin 与 ZNE 相关 `run_summary` 键。
 - 测试增强：
-  - `tests/test_decomposition_plugin_pipeline.py`
-  - `tests/test_export_parity_golden.py`
-  - `tests/test_methods_resource_unified_export.py`
+  - `tests/chem/test_decomposition_plugin_pipeline.py`
+  - `tests/repro/test_export_parity_golden.py`
+  - `tests/repro/test_methods_resource_unified_export.py`
 
 ## 验证（计划）
 
-- `pytest tests/test_decomposition_plugin_pipeline.py -q`
-- `pytest tests/test_export_parity_golden.py tests/test_methods_resource_unified_export.py -q`
+- `pytest tests/chem/test_decomposition_plugin_pipeline.py -q`
+- `pytest tests/repro/test_export_parity_golden.py tests/repro/test_methods_resource_unified_export.py -q`
 - `python scripts/check_parity_export_sample.py`
 
 ## 结论

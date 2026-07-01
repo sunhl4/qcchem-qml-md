@@ -28,7 +28,9 @@ def validate_algorithm_registered_or_factory(spec: QuantumSpec) -> None:
         with contextlib.suppress(ImportError):
             import qchem_stack.quantum  # noqa: F401
     if _algorithm_validator is None:
-        raise RuntimeError(
+        from qchem_stack.exceptions import ConfigurationError
+
+        raise ConfigurationError(
             "quantum algorithm validator not injected. "
             "Import qchem_stack.quantum before constructing QuantumSpec, "
             "or call set_algorithm_validator() manually."
@@ -96,7 +98,9 @@ def validate_operator_pool_ids(spec: QuantumSpec) -> None:
         with contextlib.suppress(ImportError):
             import qchem_stack.quantum  # noqa: F401
     if _operator_pool_validator is None:
-        raise RuntimeError(
+        from qchem_stack.exceptions import ConfigurationError
+
+        raise ConfigurationError(
             "operator pool validator not injected. "
             "Import qchem_stack.quantum before constructing QuantumSpec, "
             "or call set_operator_pool_validator() manually."

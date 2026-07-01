@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from enum import StrEnum
+from qchem_stack.config._str_enum import StrEnum
 
 
 class EmbeddingMode(StrEnum):

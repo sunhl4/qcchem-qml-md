@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 import numpy as np
 
@@ -26,6 +26,7 @@ if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.chem.pre_quantum_input import PreQuantumInput
     from qchem_stack.chem.solvers.base import SolverCapabilities
+    from qchem_stack.contracts.rdm_correction_types import RdmCorrectionReportV1
     from qchem_stack.orchestration.run_context import PipelineStageTimer
 
 
@@ -46,7 +47,7 @@ class ScfStageContext:
         [ExperimentConfig, ClassicalMeanFieldReference], ExperimentConfig
     ]
     embedding_input_payload_fn: Callable[
-        [ExperimentConfig, ClassicalMeanFieldReference], dict[str, Any] | None
+        [ExperimentConfig, ClassicalMeanFieldReference], dict[str, object] | None
     ]
 
 
@@ -58,7 +59,7 @@ class PreQuantumStageContext:
     ]
     hamiltonian_with_context_fn: Callable[
         [ExperimentConfig, ClassicalMeanFieldReference, Path | None],
-        tuple[PreQuantumInput, dict[str, Any] | None],
+        tuple[PreQuantumInput, dict[str, object] | None],
     ]
 
 
@@ -97,10 +98,10 @@ def run_scf_stage(
     energy_components = enrich_energy_components_oniom_if_configured(
         cfg, coords_bohr, energy_components
     )
-    classical_benchmarks: dict[str, Any] | None = None
-    rdm_bundle_meta: dict[str, Any] | None = None
-    rdm_correction_report: dict[str, Any] | None = None
-    rdm_correction_readiness: dict[str, Any] | None = None
+    classical_benchmarks: dict[str, object] | None = None
+    rdm_bundle_meta: dict[str, object] | None = None
+    rdm_correction_report: dict[str, object] | None = None
+    rdm_correction_readiness: dict[str, object] | None = None
     embedding_input_payload = context.embedding_input_payload_fn(cfg, rhf)
     if precomputed_mode and cfg.chemistry_extended.benchmarks.enabled:
         raise PipelineError(
@@ -145,7 +146,7 @@ def run_scf_stage(
         rdm_bundle_meta = dict(rdmb.metadata)
         rdm_m = cfg.chemistry_extended.post_hf.rdm_correction_method
         if rdm_m in ("stub_nevpt2", "stub_ac0"):
-            rdm_correction_report = cast("dict[str, Any]", run_rdm_correction(rdm_m, rdmb))
+            rdm_correction_report = cast("dict[str, object]", run_rdm_correction(rdm_m, rdmb))
         elif rdm_m in ("pyscf_nevpt2_casci", "psi4_nevpt2_casci"):
             if not solver_caps.supports_rdm_nevpt2_casci:
                 raise PipelineError(
@@ -154,7 +155,7 @@ def run_scf_stage(
                 )
             n_active_orbitals, n_active_electrons = _require_cas_active_counts(cfg)
             rdm_correction_report = cast(
-                "dict[str, Any]",
+                "dict[str, object]",
                 run_nevpt2_casci(
                     cfg,
                     rhf,
@@ -168,12 +169,12 @@ def run_scf_stage(
 
             merge_rdm_correction_bindings_into_reference(rhf.driver_meta, rdm_correction_report)
         else:
-            raise ValueError(f"Unsupported rdm_correction_method: {rdm_m!r}")
+            raise PipelineError(f"Unsupported rdm_correction_method: {rdm_m!r}")
         rdm_correction_readiness = cast(
-            "dict[str, Any]",
+            "dict[str, object]",
             build_rdm_correction_readiness(
                 requested_method=rdm_m,
-                correction_report=rdm_correction_report,
+                correction_report=cast("RdmCorrectionReportV1", rdm_correction_report),
                 bundle_meta=rdm_bundle_meta or {},
             ),
         )

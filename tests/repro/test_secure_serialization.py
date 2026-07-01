@@ -43,7 +43,9 @@ def test_legacy_unsigned_pickle_still_loads() -> None:
     legacy = pickle.dumps(proto)
 
     # Without env var, should be rejected
-    with pytest.raises(ValueError, match="disabled by default"):
+    from qchem_stack.exceptions import JobPayloadError
+
+    with pytest.raises(JobPayloadError, match="disabled by default"):
         secure_loads_protocol(legacy)
 
     # With env var set, should load with deprecation warning

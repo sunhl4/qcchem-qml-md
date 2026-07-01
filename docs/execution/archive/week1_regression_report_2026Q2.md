@@ -10,9 +10,9 @@
 
 1. `.venv/bin/python scripts/check_parity_export_sample.py`
    - 结果：通过（22 配置样例）
-2. `.venv/bin/pytest tests/test_methods_resource_unified_export.py tests/test_export_parity_golden.py -q`
+2. `.venv/bin/pytest tests/repro/test_methods_resource_unified_export.py tests/repro/test_export_parity_golden.py -q`
    - 结果：`18 passed`
-3. `.venv/bin/pytest tests/test_decomposition_plugin_pipeline.py tests/test_methods_resource_unified_export.py -q`
+3. `.venv/bin/pytest tests/chem/test_decomposition_plugin_pipeline.py tests/repro/test_methods_resource_unified_export.py -q`
    - 结果：`5 passed`
 
 ## 文档同步

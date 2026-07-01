@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, cast
 
 from qchem_stack.backends.spec import CircuitIR
 from qchem_stack.quantum.algorithms.excited_basis import vqd_deflation_swap_test_circuit_sketch
@@ -12,7 +12,7 @@ def deflation_swap_test_circuit_ir(*, n_system_qubits: int) -> CircuitIR:
     sketch = vqd_deflation_swap_test_circuit_sketch(n_system_qubits=int(n_system_qubits))
     return CircuitIR(
         n_qubits=int(sketch["n_qubits"]),
-        operations=list(sketch["operations"]),
+        operations=cast("list[dict[str, Any]]", list(sketch["operations"])),
         boxes=list(sketch.get("boxes") or []),
     )
 

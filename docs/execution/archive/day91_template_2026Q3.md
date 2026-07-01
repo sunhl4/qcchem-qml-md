@@ -7,7 +7,7 @@
 - 文件：
   - `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：`product_gap_categories()`、export 稳定键等；详见 [CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）
   - `scripts/export_parity_criteria_table.py`
-  - `tests/test_methods_resource_unified_export.py`
+  - `tests/repro/test_methods_resource_unified_export.py`
 - 变更摘要：
   - （填写新增/调整键名）
   - （填写是否涉及 run_summary/parity_snapshot/export）

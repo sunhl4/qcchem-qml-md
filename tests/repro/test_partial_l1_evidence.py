@@ -20,9 +20,53 @@ def test_product_gap_categories_have_anchors() -> None:
         assert row.get("status")
 
 
+def test_product_gap_evidence_paths_exist_on_disk() -> None:
+    from pathlib import Path
+
+    from qchem_stack.protocols.product_contract import validate_product_gap_categories
+
+    assert not validate_product_gap_categories()
+    repo_root = Path(__file__).resolve().parents[2]
+    for row in product_gap_categories():
+        for path in row.get("evidence") or []:
+            assert (repo_root / path).is_file(), f"missing evidence: {path}"
+
+
 def test_dmet_self_consistency_l1_yaml_exists() -> None:
     p = configs_path("example_h4_dmet_self_consistent.yaml")
     assert p.is_file()
+    assert configs_path("example_h2_dimer_dmet_self_consistent.yaml").is_file()
+    assert configs_path("example_h2_uniform_multifragment_toy.yaml").is_file()
+
+
+def test_adapt_iqeb_operator_pool_l1_yamls_exist() -> None:
+    for name in (
+        "example_h2_adapt_staggered_pool.yaml",
+        "example_h2_adapt_bk_pool.yaml",
+        "example_h2_adapt_generalized_doubles_pool.yaml",
+        "example_h2_iqeb_bk_singles_pool.yaml",
+    ):
+        assert configs_path(name).is_file()
+
+
+def test_operator_pool_ids_resolve_for_l1_yamls() -> None:
+    from qchem_stack.config import load_experiment_config
+    from qchem_stack.quantum.operator_pool_registry import is_registered_operator_pool_id
+
+    cases = (
+        ("example_h2_adapt_bk_pool.yaml", "fermionic_uccsd_bravyi_kitaev"),
+        ("example_h2_adapt_generalized_doubles_pool.yaml", "fermionic_generalized_doubles"),
+        ("example_h2_iqeb_bk_singles_pool.yaml", "fermionic_uccsd_singles_bravyi_kitaev"),
+    )
+    for cfg_name, pool_id in cases:
+        cfg = load_experiment_config(configs_path(cfg_name))
+        resolved = (
+            cfg.quantum.adapt.pool_id
+            if cfg.quantum.algorithm == "adapt"
+            else cfg.quantum.iqeb.pool_id
+        )
+        assert resolved == pool_id
+        assert is_registered_operator_pool_id(str(resolved))
 
 
 def test_workflow_preview_repro_alignment_module_importable() -> None:

@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 from qchem_stack.config import ExperimentConfig, compiler_bundle_signature_from_config
 from qchem_stack.config.active_space_helpers import (
@@ -30,7 +30,7 @@ if TYPE_CHECKING:
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
 
 
-def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig) -> None:
+def append_open_stack_parity_fields(snap: dict[str, object], cfg: ExperimentConfig) -> None:
     """Designed open-stack parity block (public-contract L1)."""
     pis = cfg.parity_integrations
     snap["parity_integrations"] = pis.model_dump(mode="json")
@@ -100,7 +100,7 @@ def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig)
         cfg.embedding, EmbeddingProjection
     ):
         proj = cfg.embedding.projection
-        trace: dict[str, Any] = {
+        trace: dict[str, object] = {
             "schema": PROJECTION_EMBEDDING_OPEN_TRACE_V1,
             "low_level": proj.low_level,
             "high_level": proj.high_level,
@@ -142,9 +142,9 @@ def append_open_stack_parity_fields(snap: dict[str, Any], cfg: ExperimentConfig)
         snap["open_gap_closure_reference"] = build_open_gap_closure_reference(cfg)
 
 
-def repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -> dict[str, Any]:
+def repro_quantum_snapshot(cfg: ExperimentConfig, qh: QubitHamiltonian | None) -> dict[str, object]:
     """Falsifiability/parity fields aligned with Methods tables."""
-    snap: dict[str, Any] = {
+    snap: dict[str, object] = {
         **quantum_repro_core_fields(cfg),
         **quantum_repro_sidecar_fields(cfg),
         **mitigation_repro_core_fields(cfg),

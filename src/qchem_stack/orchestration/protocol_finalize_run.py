@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any
+from typing import TYPE_CHECKING
 
 import numpy as np
 
@@ -33,21 +33,24 @@ if TYPE_CHECKING:
     from collections.abc import Callable
     from pathlib import Path
 
+    from qchem_stack.backends.executor_base import HamiltonianExpectationExecutor
+    from qchem_stack.backends.spec import BackendSpec, CompilerPassBundle
     from qchem_stack.chem.bridges.mean_field_reference import ClassicalMeanFieldReference
     from qchem_stack.chem.hamiltonian import QubitHamiltonian
     from qchem_stack.config import ExperimentConfig
     from qchem_stack.orchestration.excited_stages_types import ExcitedResourceSummary
     from qchem_stack.orchestration.run_context import PipelineStageTimer
+    from qchem_stack.protocols.protocol import PauliAveragingProtocol
 
 
 def _attach_common_sidecars(
-    out: dict[str, Any],
+    out: dict[str, object],
     cfg: ExperimentConfig,
     qh: QubitHamiltonian,
     rhf: ClassicalMeanFieldReference,
     *,
     cfg_path: Path | None,
-    proto: Any | None,
+    proto: PauliAveragingProtocol | None,
 ) -> None:
     attach_nexus_mitigation_tn(out, cfg, qh)
     attach_qpe_demo_track_if_requested(out, cfg, qh)
@@ -60,18 +63,18 @@ def _attach_common_sidecars(
 def run_protocol_and_finalize_stage(
     cfg: ExperimentConfig,
     *,
-    out: dict[str, Any],
+    out: dict[str, object],
     qh: QubitHamiltonian,
-    angles: Any,
+    angles: np.ndarray | list[float],
     excited_rs: ExcitedResourceSummary | None,
-    bspec: Any,
-    exe: Any,
-    bundle: Any,
+    bspec: BackendSpec,
+    exe: HamiltonianExpectationExecutor,
+    bundle: CompilerPassBundle,
     rhf: ClassicalMeanFieldReference,
     cfg_path: Path | None,
     profile: PipelineStageTimer,
     emit: Callable[[str], None],
-) -> dict[str, Any]:
+) -> dict[str, object]:
     profile.mark("pre_pauli_protocol")
     emit("pre_pauli_protocol")
     if not pauli_protocol_enabled(cfg):
@@ -93,7 +96,9 @@ def run_protocol_and_finalize_stage(
         emit("pauli_protocol_skipped")
         profile.mark("finalize_repro")
         emit("finalize_repro")
-        out["repro"]["pipeline_profile"] = profile.to_profile_dict()
+        repro = out.get("repro")
+        if isinstance(repro, dict):
+            repro["pipeline_profile"] = profile.to_profile_dict()
         attach_run_summary_impl(out, cfg)
         return out
 
@@ -141,6 +146,8 @@ def run_protocol_and_finalize_stage(
     emit("pauli_protocol_done")
     profile.mark("finalize_repro")
     emit("finalize_repro")
-    out["repro"]["pipeline_profile"] = profile.to_profile_dict()
+    repro = out.get("repro")
+    if isinstance(repro, dict):
+        repro["pipeline_profile"] = profile.to_profile_dict()
     attach_run_summary_impl(out, cfg)
     return out

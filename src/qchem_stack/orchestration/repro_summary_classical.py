@@ -1,21 +1,20 @@
 from __future__ import annotations
 
-from typing import Any
-
 from qchem_stack.contracts.schema_ids import CLASSICAL_BENCHMARK_SUMMARY_V1
 
 
-def classical_benchmark_summary(cb: dict[str, Any]) -> dict[str, Any]:
+def classical_benchmark_summary(cb: dict[str, object]) -> dict[str, object]:
     """Compact Methods-friendly digest for ``classical_benchmarks``."""
-    rows: dict[str, dict[str, Any]] = {}
+    rows: dict[str, dict[str, object]] = {}
     for method_key in ("hf", "mp2", "ccsd", "casci"):
         v = cb.get(method_key)
         if isinstance(v, dict):
             rows[method_key] = v
     ok_vals: dict[str, float] = {}
     for k, row in rows.items():
-        if row.get("status") == "ok" and row.get("value") is not None:
-            ok_vals[k] = float(row["value"])
+        value = row.get("value")
+        if row.get("status") == "ok" and isinstance(value, int | float):
+            ok_vals[k] = float(value)
     hf = ok_vals.get("hf")
     best_method: str | None = None
     best_energy: float | None = None

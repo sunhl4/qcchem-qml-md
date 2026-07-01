@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from collections.abc import Callable
 from dataclasses import dataclass, field
+from functools import lru_cache
 from typing import Any, Final
 
 from openfermion import bravyi_kitaev, jordan_wigner
@@ -21,6 +22,15 @@ from qchem_stack.contracts.schema_ids import OPERATOR_POOL_REGISTRY_EXPORT_V1
 OperatorPoolFactory = Callable[[QubitHamiltonian], list[QubitOperator]]
 
 
+def _hamiltonian_cache_key(hamiltonian: QubitHamiltonian) -> tuple[int, int | None, int | None]:
+    """Extract hashable cache key from QubitHamiltonian."""
+    n_qubits = int(hamiltonian.n_qubits)
+    fs = hamiltonian.fermion_space
+    if fs is None:
+        return (n_qubits, None, None)
+    return (n_qubits, int(fs.n_spin_orbitals), int(fs.n_electrons))
+
+
 @dataclass(frozen=True)
 class OperatorPoolRegistryEntry:
     summary: str
@@ -28,122 +38,164 @@ class OperatorPoolRegistryEntry:
     capabilities: dict[str, bool] = field(default_factory=dict)
 
 
-def _toy_pair_xx_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    n = int(hamiltonian.n_qubits)
+@lru_cache(maxsize=256)
+def _toy_pair_xx_pool_cached(n_qubits: int) -> list[QubitOperator]:
     out: list[QubitOperator] = []
-    for i in range(n):
-        for j in range(i + 1, n):
+    for i in range(n_qubits):
+        for j in range(i + 1, n_qubits):
             out.append(QubitOperator(((i, "X"), (j, "X")), 1.0))
     return out
 
 
-def _fermionic_uccsd_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_uccsd_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+def _toy_pair_xx_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    return _toy_pair_xx_pool_cached(int(hamiltonian.n_qubits))
+
+
+@lru_cache(maxsize=256)
+def _fermionic_uccsd_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_uccsd_fermion_generators(n_spin_orbitals, n_electrons)
     out: list[QubitOperator] = []
     for op in ferm_ops:
         qop = jordan_wigner(op)
         if not isinstance(qop, QubitOperator):
             continue
         out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
+
+
+def _fermionic_uccsd_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_uccsd_pool_cached(*key)
+
+
+@lru_cache(maxsize=256)
+def _fermionic_uccsd_doubles_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(n_spin_orbitals, n_electrons)
+    out: list[QubitOperator] = []
+    for op in ferm_ops:
+        qop = jordan_wigner(op)
+        if not isinstance(qop, QubitOperator):
+            continue
+        out.append(qop)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
 
 
 def _fermionic_uccsd_doubles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(
-        int(fs.n_spin_orbitals), int(fs.n_electrons)
-    )
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_uccsd_doubles_pool_cached(*key)
+
+
+@lru_cache(maxsize=256)
+def _fermionic_uccsd_singles_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_ucc_singles_only_fermion_generators(n_spin_orbitals, n_electrons)
     out: list[QubitOperator] = []
     for op in ferm_ops:
         qop = jordan_wigner(op)
         if not isinstance(qop, QubitOperator):
             continue
         out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
 
 
 def _fermionic_uccsd_singles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_singles_only_fermion_generators(
-        int(fs.n_spin_orbitals), int(fs.n_electrons)
-    )
-    out: list[QubitOperator] = []
-    for op in ferm_ops:
-        qop = jordan_wigner(op)
-        if not isinstance(qop, QubitOperator):
-            continue
-        out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_uccsd_singles_pool_cached(*key)
 
 
-def _iqeb_qubit_excitation_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    n = int(hamiltonian.n_qubits)
+@lru_cache(maxsize=256)
+def _iqeb_qubit_excitation_pool_cached(n_qubits: int) -> list[QubitOperator]:
     out: list[QubitOperator] = []
-    for i in range(n):
-        for j in range(i + 1, n):
+    for i in range(n_qubits):
+        for j in range(i + 1, n_qubits):
             # Anti-hermitian one-body qubit excitation analog.
             out.append(
                 0.5j * QubitOperator(((i, "X"), (j, "Y")), 1.0)
                 - 0.5j * QubitOperator(((i, "Y"), (j, "X")), 1.0)
             )
-    return out or _toy_pair_xx_pool(hamiltonian)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
 
 
-def _fermionic_uccsd_bravyi_kitaev_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_uccsd_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+def _iqeb_qubit_excitation_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    return _iqeb_qubit_excitation_pool_cached(int(hamiltonian.n_qubits))
+
+
+@lru_cache(maxsize=256)
+def _fermionic_uccsd_bravyi_kitaev_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_uccsd_fermion_generators(n_spin_orbitals, n_electrons)
     out: list[QubitOperator] = []
     for fer in ferm_ops:
         qop = bravyi_kitaev(fer)
         if not isinstance(qop, QubitOperator):
             continue
         out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
+
+
+def _fermionic_uccsd_bravyi_kitaev_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_uccsd_bravyi_kitaev_pool_cached(*key)
+
+
+@lru_cache(maxsize=256)
+def _fermionic_uccsd_singles_bravyi_kitaev_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_ucc_singles_only_fermion_generators(n_spin_orbitals, n_electrons)
+    out: list[QubitOperator] = []
+    for fer in ferm_ops:
+        qop = bravyi_kitaev(fer)
+        if not isinstance(qop, QubitOperator):
+            continue
+        out.append(qop)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
 
 
 def _fermionic_uccsd_singles_bravyi_kitaev_pool(
     hamiltonian: QubitHamiltonian,
 ) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_singles_only_fermion_generators(
-        int(fs.n_spin_orbitals), int(fs.n_electrons)
-    )
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_uccsd_singles_bravyi_kitaev_pool_cached(*key)
+
+
+@lru_cache(maxsize=256)
+def _fermionic_uccsd_doubles_bravyi_kitaev_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(n_spin_orbitals, n_electrons)
     out: list[QubitOperator] = []
     for fer in ferm_ops:
         qop = bravyi_kitaev(fer)
         if not isinstance(qop, QubitOperator):
             continue
         out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
 
 
 def _fermionic_uccsd_doubles_bravyi_kitaev_pool(
     hamiltonian: QubitHamiltonian,
 ) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_ucc_doubles_only_fermion_generators(
-        int(fs.n_spin_orbitals), int(fs.n_electrons)
-    )
-    out: list[QubitOperator] = []
-    for fer in ferm_ops:
-        qop = bravyi_kitaev(fer)
-        if not isinstance(qop, QubitOperator):
-            continue
-        out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_uccsd_doubles_bravyi_kitaev_pool_cached(*key)
 
 
 def _combined_bk_single_double_slices(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
@@ -166,18 +218,25 @@ def _fermionic_singles_doubles_staggered_pool(hamiltonian: QubitHamiltonian) -> 
     return out or _toy_pair_xx_pool(hamiltonian)
 
 
-def _fermionic_generalized_doubles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
-    fs = hamiltonian.fermion_space
-    if fs is None:
-        return _toy_pair_xx_pool(hamiltonian)
-    ferm_ops = build_spin_uccgd_fermion_generators(int(fs.n_spin_orbitals), int(fs.n_electrons))
+@lru_cache(maxsize=256)
+def _fermionic_generalized_doubles_pool_cached(
+    n_qubits: int, n_spin_orbitals: int | None, n_electrons: int | None
+) -> list[QubitOperator]:
+    if n_spin_orbitals is None or n_electrons is None:
+        return _toy_pair_xx_pool_cached(n_qubits)
+    ferm_ops = build_spin_uccgd_fermion_generators(n_spin_orbitals, n_electrons)
     out: list[QubitOperator] = []
     for op in ferm_ops:
         qop = jordan_wigner(op)
         if not isinstance(qop, QubitOperator):
             continue
         out.append(qop)
-    return out or _toy_pair_xx_pool(hamiltonian)
+    return out or _toy_pair_xx_pool_cached(n_qubits)
+
+
+def _fermionic_generalized_doubles_pool(hamiltonian: QubitHamiltonian) -> list[QubitOperator]:
+    key = _hamiltonian_cache_key(hamiltonian)
+    return _fermionic_generalized_doubles_pool_cached(*key)
 
 
 OPERATOR_POOL_ID_ALIASES: Final[dict[str, str]] = {

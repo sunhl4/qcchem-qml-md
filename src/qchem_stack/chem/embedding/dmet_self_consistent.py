@@ -104,7 +104,7 @@ class DMETSelfConsistencyLoop:
         *,
         initial_bath: DMETBathState,
         build_fragment_hamiltonian: Callable[[str, DMETBathState], Any],
-        update_bath_sequential: Callable[[DMETBathState, object], DMETBathState],
+        update_bath_sequential: Callable[[DMETBathState, DMETFragmentResult], DMETBathState],
         is_converged: Callable[[DMETBathState, DMETBathState, int], bool],
     ) -> dict[str, Any]:
         bath = initial_bath
@@ -123,7 +123,8 @@ class DMETSelfConsistencyLoop:
                         "energy": frag_row.energy if frag_row else None,
                     }
                 )
-                bath = update_bath_sequential(bath, frag_row)
+                if frag_row is not None:
+                    bath = update_bath_sequential(bath, frag_row)
             prev = bath
             history.append({"cycle": k, "per_fragment": per_fragment})
             cycles = k + 1

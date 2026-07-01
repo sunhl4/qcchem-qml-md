@@ -431,7 +431,7 @@ except UQCAuthenticationError:
 
 | 测试项 | 位置 | CI |
 |--------|------|-----|
-| UQC mock 注册 + mock 能量 | `tests/test_uqc_mock_md_ml_integration.py` | 是（`uqc_mock and not slow`） |
+| UQC mock 注册 + mock 能量 | `tests/quantum/test_uqc_mock_md_ml_integration.py` | 是（`uqc_mock and not slow`） |
 | 流水线 + QMEF 附件 | 同上 `test_pipeline_uqc_mock_attaches_qmef_for_md_ml` | 是 |
 | 一轮主动学习环 | 同上 `test_md_validation_loop_one_round_uqc_mock_labeling`（`@pytest.mark.slow`） | 否（需本机 QML-FF） |
 

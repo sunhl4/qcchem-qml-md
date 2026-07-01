@@ -74,7 +74,7 @@ L5  Legacy        drivers/           PySCFDriver (deprecated)
 
 1. 在实现模块定义函数/类型，写入该模块 `__all__`。
 2. 若属于顶层推荐入口，加入 `chem/__init__.py` 的 `__all__` 与 `_LAZY_ATTRS`（或 eager import 若轻量且无环）。
-3. 在 `tests/test_chem_public_surface.py` 或 area 契约测试中覆盖 import。
+3. 在 `tests/chem/test_chem_public_surface.py` 或 area 契约测试中覆盖 import。
 4. 更新 `chem/README.md` Layout 表（一行即可）。
 
 `ChemIntegralSolver` / `SolverCapabilities`  intentionally 不在顶层 `chem.__all__`；从 `qchem_stack.chem.solvers` 导入（见 `chem/README.md`）。

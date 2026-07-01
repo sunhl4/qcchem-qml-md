@@ -70,4 +70,4 @@ jobs:
           python -m pip install -U pip
           pip install -e ".[dev]"
       - name: Pytest (cross-platform smoke)
-        run: pytest tests -q --tb=short -m "not slow and not perf"
+        run: pytest tests -q --tb=short -m "not slow and not perf" --cov-fail-under=80

@@ -32,7 +32,7 @@ L5  Kernels        statevector.py        HEA statevector、dense Pauli 期望
 
 ### 1.1 硬规则
 
-1. **`quantum/` 禁止** module-scope `import qchem_stack.orchestration` 或 `import pyscf`（CI：`tests/test_quantum_layer_import_boundaries.py`）。
+1. **`quantum/` 禁止** module-scope `import qchem_stack.orchestration` 或 `import pyscf`（CI：`tests/quantum/test_quantum_layer_import_boundaries.py`）。
 2. **算法不解析 YAML** — 只接收 `ExperimentConfig` 已通过 context 传入的字段，或显式 typed 参数；重复访问走 `config.quantum_helpers`。
 3. **Fermionic UCC generator** 来自 `chem.kernels.spin_ucc`（非 `integrations.ucc_reference` 新代码路径）。
 4. **公开 API** 从子模块显式 import（见 README 推荐路径）；`quantum/__init__.py` 保持空 `__all__` 以避免 chem↔config↔quantum 循环。
@@ -76,7 +76,7 @@ L5  Kernels        statevector.py        HEA statevector、dense Pauli 期望
 新增稳定 API 的步骤：
 
 1. 在实现模块定义函数/类型，写入该模块 `__all__`。
-2. 在 `tests/test_quantum_public_surface.py` 覆盖 import。
+2. 在 `tests/quantum/test_quantum_public_surface.py` 覆盖 import。
 3. 更新 `quantum/README.md` Layout 表（一行即可）。
 4. **不** 未经 cycle 测试向 `quantum/__init__.py` 加 lazy export。
 

@@ -21,13 +21,13 @@
 ### Tangelo 对齐 — 广度钉扎（Day 31–60）
 
 - **Registry / 命名锚**：`quantum/ansatz_registry.py`（含 ADAPT 教程命名别名注释）；`chem/fermion_mapping_registry.py`（JKMN 等映射的白名单诚实边界）。
-- **Mitigation**：`mitigation.classical_shadows_stub_enabled` — DAG 节点置于 SPAM 之后、PMSV 之前；迹一致性见 `tests/test_mitigation_dag_trace_homology.py`。
+- **Mitigation**：`mitigation.classical_shadows_stub_enabled` — DAG 节点置于 SPAM 之后、PMSV 之前；迹一致性见 `tests/mitigation/test_zne_fold.py`。
 - **AVAS / CASSCF 诚实边界**：`active_space.strategy=avas_stub`（CAS 尺寸语义，**无**阈值投影）与 **`strategy=avas`**（PySCF **`mcscf.avas`**，`configs/example_h2_avas.yaml`）；**`casscf_orbital_optimization_for_integrals`** 与 audit 共用单次 CASSCF。**`chem.active_space.mean_field_meta`** / hooks → `hamiltonian_meta.pyscf_driver`；stub 示例仍见 `configs/example_h2_avas_stub.yaml`。
 
 ### 产品收口（Day 61–90）
 
 - **三条用户路径**：见仓库根 [`examples/README.md`](../../examples/README.md)（教程脚本 / YAML 管线 / `md_bridge`）。
-- **QMEF trainer smoke**：`tests/test_qmef_trainer_smoke.py`（`StubTorchMLIPTrainer`）。
+- **QMEF trainer smoke**：`tests/integrations/test_qmef_trainer_smoke.py`（`StubTorchMLIPTrainer`）。
 - **契约稳定**：上述闸门 + `docs/public_parity_matrix.md` 矩阵行更新（mitigation、经典化学 embedding）。
 
 ## _residual / 下一季度指针

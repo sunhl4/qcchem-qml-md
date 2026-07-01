@@ -14,7 +14,7 @@
 - 同步更新：
   - `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：[CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）
   - `scripts/export_parity_criteria_table.py`
-  - `tests/test_methods_resource_unified_export.py`
+  - `tests/repro/test_methods_resource_unified_export.py`
 - 交付：新增字段的 config-only 与 `--results` 双路径测试。
 
 ### Week 3–4：P2-W3 + W4（经典边界 + 缓解进阶）
@@ -29,7 +29,7 @@
 ### Week 5–6：P2-W7 与发布前收口
 
 - 扩充 docusaurus-site 与 examples 的索引闭环（新用户三路径）。
-- **算法 L3 可选门禁**：设置 `QCHEM_RUN_L3=1` 时跑 `pytest -m l3`（**7** 条代表配置：基线 **`example_h2.yaml`**（VQE）+ ADAPT singles/doubles、**ADAPT `uccsd_jw` 别名**、IQEB fermionic doubles、**IQEB `qubit_excitation` 别名**、excited-smoke），见 [`tests/test_l3_benchmark_smoke.py`](../tests/test_l3_benchmark_smoke.py)；汇总 JSON 可跑 `python scripts/l3_algorithm_benchmark_report.py`（可选 `--merged`）。
+- **算法 L3 可选门禁**：设置 `QCHEM_RUN_L3=1` 时跑 `pytest -m l3`（**7** 条代表配置：基线 **`example_h2.yaml`**（VQE）+ ADAPT singles/doubles、**ADAPT `uccsd_jw` 别名**、IQEB fermionic doubles、**IQEB `qubit_excitation` 别名**、excited-smoke），见 [`tests/integrations/test_l3_benchmark_smoke.py`](../tests/integrations/test_l3_benchmark_smoke.py)；汇总 JSON 可跑 `python scripts/l3_algorithm_benchmark_report.py`（可选 `--merged`）。
 - 做一轮总闸：
   - `pytest`
   - `python scripts/check_parity_export_sample.py`

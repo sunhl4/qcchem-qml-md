@@ -14,6 +14,7 @@ from qchem_stack.chem.solvers import ChemIntegralSolver, create_solver
 from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
 from qchem_stack.chem.solvers.pyscf_solver import PySCFIntegralSolver
 from qchem_stack.config import load_experiment_config
+from qchem_stack.exceptions import SolverError
 
 _EXAMPLE_H2 = configs_path("example_h2.yaml")
 
@@ -123,7 +124,7 @@ active_space:
     try:
         out = s.compute_mean_field(periodic=False)
         assert out.driver_meta.get("driver_family") == "psi4"
-    except RuntimeError as exc:
+    except (RuntimeError, SolverError) as exc:
         assert "Psi4 SCF unavailable" in str(exc)
     with pytest.raises(ValueError, match="cell_vectors_bohr"):
         s.compute_mean_field(periodic=True)

@@ -22,7 +22,7 @@ def test_sdk_list_scenarios_includes_minimal_vqe() -> None:
 
     text = list_scenarios_text()
     assert "minimal_vqe" in text
-    assert "example_h2.yaml" in text
+    assert "configs/scenarios/minimal_vqe.yaml" in text
 
 
 def test_sdk_workflow_preview_payload() -> None:

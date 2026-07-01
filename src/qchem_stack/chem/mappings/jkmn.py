@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import math
+from functools import lru_cache
 
 import numpy as np
 from openfermion.ops import QubitOperator
@@ -11,6 +12,7 @@ from openfermion.transforms.opconversions.conversions import get_majorana_operat
 _PAULI_BY_DIGIT = ("X", "Y", "Z")
 
 
+@lru_cache(maxsize=64)
 def _tree_height(n_qubits: int) -> int:
     return int(math.log(2 * n_qubits + 1, 3))
 
@@ -22,6 +24,7 @@ def _node_index(path: str, depth: int) -> int:
     return index
 
 
+@lru_cache(maxsize=64)
 def _leaf_pauli_strings(height: int) -> list[list[tuple[int, str]]]:
     strings: list[list[tuple[int, str]]] = []
     for value in range(3**height):
@@ -40,6 +43,7 @@ def _leaf_pauli_strings(height: int) -> list[list[tuple[int, str]]]:
     return strings
 
 
+@lru_cache(maxsize=64)
 def _expand_majorana_map(n_qubits: int) -> dict[int, QubitOperator]:
     height = _tree_height(n_qubits)
     leaves = _leaf_pauli_strings(height)

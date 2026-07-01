@@ -159,7 +159,8 @@ def _validate_dmet_context(spec: EmbeddingDmet, ctx: EmbeddingValidationContext)
     if str(ctx.scf_method).strip().upper() != "RHF":
         raise ConfigurationError(
             "embedding.dmet.hamiltonian_source='schmidt_atomic_production' requires "
-            "scf.method='RHF' (closed-shell single density matrix)."
+            "scf.method='RHF' (closed-shell single density matrix). "
+            "Suggestion: use scf.method='RHF' or try onboarding scenario `embedding_dmet`."
         )
     cycles = int(spec.dmet.schmidt.dmet_max_cycles)
     if cycles < 1:

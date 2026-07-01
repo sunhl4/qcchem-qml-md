@@ -3,10 +3,11 @@ from __future__ import annotations
 import warnings
 from collections.abc import Callable
 from dataclasses import dataclass
-from importlib.metadata import EntryPoint, entry_points
+from importlib.metadata import EntryPoint
 from threading import RLock
 from typing import cast
 
+from qchem_stack._entry_points import iter_entry_points
 from qchem_stack.backends.executor_base import (
     HamiltonianExpectationExecutor,
     StatevectorHeaExecutor,
@@ -140,9 +141,9 @@ def _uqc_factory(spec: BackendSpec) -> HamiltonianExpectationExecutor:
             "provider='uqc' requires qchem-stack-uqc. "
             "Install: pip install -e packages/qchem-stack-uqc"
         ) from e
-    from qchem_stack.backends.uqc_executor import UQCCloudHeaExecutor
+    from qchem_stack.backends import uqc_executor
 
-    return UQCCloudHeaExecutor(spec)
+    return uqc_executor.UQCCloudHeaExecutor(spec)  # pyright: ignore[reportAttributeAccessIssue]
 
 
 def _resolve_entry_point_factory(value: object, *, source: str) -> BackendFactory:
@@ -157,12 +158,7 @@ def _resolve_entry_point_factory(value: object, *, source: str) -> BackendFactor
 
 
 def _iter_backend_entry_points() -> list[EntryPoint]:
-    eps = entry_points()
-    if hasattr(eps, "select"):
-        selected = list(eps.select(group=_ENTRY_POINT_GROUP))
-    else:
-        selected = list(eps.get(_ENTRY_POINT_GROUP, []))  # type: ignore[attr-defined]
-    return sorted(selected, key=lambda ep: (ep.name.strip().lower(), ep.value))
+    return iter_entry_points(_ENTRY_POINT_GROUP)
 
 
 def _register_builtin_backends() -> None:

@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import TYPE_CHECKING, Any, cast
+from typing import TYPE_CHECKING, cast
 
 from qchem_stack.config.embedding_enums import EmbeddingMode
 from qchem_stack.orchestration.embedding_strategies import (
@@ -37,11 +37,11 @@ _STRATEGIES: dict[EmbeddingMode, EmbeddingStrategy] = cast(
 def apply_embedding_workflow_stage(
     cfg: ExperimentConfig,
     *,
-    out: dict[str, Any],
+    out: dict[str, object],
     qh: QubitHamiltonian,
-    exe: Any,
-    embedding_input_payload: dict[str, Any] | None,
-    schmidt_ctx: dict[str, Any] | None,
+    exe: object,
+    embedding_input_payload: dict[str, object] | None,
+    schmidt_ctx: dict[str, object] | None,
     rhf: ClassicalMeanFieldReference,
     cfg_path: Path | None,
     profile: PipelineStageTimer,

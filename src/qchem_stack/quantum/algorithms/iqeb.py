@@ -98,7 +98,11 @@ class IQEBVQE(AlgorithmBase):
             prev_energy = float(last.energy)
 
         if last is None:
-            raise RuntimeError("IQEB optimization failed: no successful VQE rounds completed")
+            from qchem_stack.exceptions import QuantumAlgorithmError
+
+            raise QuantumAlgorithmError(
+                "IQEB optimization failed: no successful VQE rounds completed"
+            )
 
         out = IQEBResult(
             energy=last.energy,

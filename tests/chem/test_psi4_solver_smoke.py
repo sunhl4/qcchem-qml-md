@@ -10,6 +10,7 @@ from qchem_stack.chem.integration.presets import capabilities_psi4_production
 from qchem_stack.chem.solvers import create_solver
 from qchem_stack.chem.solvers.psi4_solver import Psi4IntegralSolver
 from qchem_stack.config import ExperimentConfig, load_experiment_config
+from qchem_stack.exceptions import SolverError
 from qchem_stack.orchestration.scf_stage import run_scf_reference
 
 
@@ -58,7 +59,7 @@ def test_psi4_create_solver_runtime_behavior(psi4_hf_config: ExperimentConfig) -
         out = s.compute_mean_field(periodic=False)
         assert out.e_tot == pytest.approx(float(out.e_tot))
         assert out.driver_meta.get("driver_family") == "psi4"
-    except RuntimeError as exc:
+    except (RuntimeError, SolverError) as exc:
         assert "Psi4 SCF unavailable" in str(exc)
     with pytest.raises(ValueError, match="cell_vectors_bohr"):
         s.run_periodic_mean_field()
@@ -72,5 +73,5 @@ def test_run_scf_no_longer_hard_gates_driver(psi4_hf_config: ExperimentConfig) -
     try:
         out = run_scf_reference(psi4_hf_config)
         assert out.backend_tag() == "psi4"
-    except RuntimeError as exc:
+    except (RuntimeError, SolverError) as exc:
         assert "Psi4 SCF unavailable" in str(exc)

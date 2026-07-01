@@ -15,7 +15,7 @@ pytest.importorskip("fastapi")
 from fastapi import HTTPException
 from fastapi.testclient import TestClient
 
-from qchem_stack.api.app import app
+from qchem_stack.api.app import create_app
 from qchem_stack.api.deps import MAX_EXPERIMENT_YAML_BYTES, experiment_config_from_request_yaml
 
 
@@ -23,7 +23,7 @@ class TestHealthEndpoints:
     """D57: `/health` and `/health/ready` match HTTP API contract doc shapes."""
 
     def test_health_and_ready_json_contract(self) -> None:
-        client = TestClient(app)
+        client = TestClient(create_app())
         h = client.get("/health")
         assert h.status_code == 200
         assert h.json() == {"status": "ok"}
@@ -39,7 +39,7 @@ class TestCORSMiddleware:
     """CORS middleware configuration tests."""
 
     def test_cors_preflight_allows_origin(self) -> None:
-        client = TestClient(app)
+        client = TestClient(create_app())
         r = client.options(
             "/health",
             headers={

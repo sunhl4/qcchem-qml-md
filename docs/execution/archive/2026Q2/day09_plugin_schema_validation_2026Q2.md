@@ -15,14 +15,14 @@
     - 对 **全部 fragments** 执行上述校验（不只主片段）
     - 强制 `primary_fragment_id` 必须命中 fragments map
 
-- `tests/test_decomposition_plugin_pipeline.py`
+- `tests/chem/test_decomposition_plugin_pipeline.py`
   - 新增失败路径回归：
     - `primary_fragment_id` 缺失于 fragments map
     - 次片段 Pauli 标签长度与 `n_qubits` 不匹配
 
 ## 验证
 
-- `.venv/bin/pytest tests/test_decomposition_plugin_pipeline.py -q`
+- `.venv/bin/pytest tests/chem/test_decomposition_plugin_pipeline.py -q`
   - 结果：`4 passed`
 - `.venv/bin/python scripts/check_parity_export_sample.py`
   - 结果：通过

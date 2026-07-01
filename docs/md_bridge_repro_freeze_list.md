@@ -47,4 +47,4 @@
 ## 4. 回归
 
 - `pytest -m l1_md_ml`（见 [CONTRIBUTING.md](../CONTRIBUTING.md)）。  
-- 代表测：`tests/test_md_bridge.py`、`tests/test_md_ml_qmef_repro_attachment.py`。
+- 代表测：`tests/md_bridge/test_md_bridge.py`、`tests/integrations/test_md_ml_qmef_repro_attachment.py`。

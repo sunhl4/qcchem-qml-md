@@ -55,4 +55,4 @@ PySCF 是当前**实现最完整**的适配器，不是架构上的唯一真源�
 - `src/qchem_stack/chem/solvers/registry.py` — 注册表
 - `src/qchem_stack/chem/solvers/base.py` — `ChemIntegralSolver`、`SolverCapabilities`
 - `src/qchem_stack/chem/bridges/facade.py` — `classical_mean_field_via_solver_bridge`
-- `tests/test_solver_registry_contract.py` — 契约测试
+- `tests/chem/test_solver_registry_contract.py` — 契约测试

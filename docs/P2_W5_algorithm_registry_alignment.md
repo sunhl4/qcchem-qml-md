@@ -41,7 +41,7 @@
 | `bravyi_kitaev` | 全栈 Hamiltonian 构建 |
 | `symmetry_conserving_bravyi_kitaev` | OpenFermion SCBK |
 
-源码：`src/qchem_stack/chem/fermion_mapping_registry.py`；conformance：`tests/test_backend_capability_conformance.py`、`tests/test_fermion_qubit_mapping.py`。
+源码：`src/qchem_stack/chem/fermion_mapping_registry.py`；conformance：`tests/backends/test_backend_capability_conformance.py`、`tests/chem/test_fermion_qubit_mapping.py`。
 
 ---
 

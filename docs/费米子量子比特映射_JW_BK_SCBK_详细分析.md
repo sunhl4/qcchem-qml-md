@@ -94,7 +94,7 @@ SCBK 在**理想对称性 + 全栈一致**时往往更省，但不构成「永�
 | YAML 键 | `active_space.fermion_qubit_mapping`（如 `jordan_wigner` / `bravyi_kitaev` / `symmetry_conserving_bravyi_kitaev`） |
 | 实跑导出脚本 | `docs/assets/export_mapping_comparison_data.py` |
 | 作图 | `docs/assets/generate_all_figures.py` → `fig_mapping_comparison()` |
-| 映射相关单测（接线） | `tests/test_fermion_qubit_mapping.py`、端到端覆盖面见 `tests/test_orchestration_pipeline.py`、`tests/test_backend_capability_conformance.py` |
+| 映射相关单测（接线） | `tests/chem/test_fermion_qubit_mapping.py`、端到端覆盖面见 `tests/orchestration/test_orchestration_pipeline.py`、`tests/backends/test_backend_capability_conformance.py` |
 
 ---
 

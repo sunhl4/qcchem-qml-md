@@ -23,13 +23,21 @@ import sys
 from pathlib import Path
 
 
+def _pip_compile_exe() -> str:
+    for base in (Path(sys.executable).parent, Path(sys.executable).resolve().parent):
+        candidate = base / "pip-compile"
+        if candidate.is_file():
+            return str(candidate)
+    return "pip-compile"
+
+
 def run_pip_compile(input_file: str, output_file: str, extras: list[str]) -> None:
     """Run pip-compile to generate constraint file."""
     print(f"Generating {output_file}...")
 
     # Build pip-compile command
     cmd = [
-        "pip-compile",
+        _pip_compile_exe(),
         "--output-file",
         output_file,
         "--no-header",  # Omit header comment
@@ -70,7 +78,7 @@ def main() -> int:
 
     # Check if pip-compile is available
     try:
-        subprocess.run(["pip-compile", "--version"], capture_output=True, check=True)
+        subprocess.run([_pip_compile_exe(), "--version"], capture_output=True, check=True)
     except (subprocess.CalledProcessError, FileNotFoundError):
         print("ERROR: pip-compile not found. Install it with: pip install pip-tools")
         return 1

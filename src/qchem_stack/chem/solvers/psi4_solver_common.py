@@ -4,12 +4,6 @@ from __future__ import annotations
 
 
 def psi4_version_or_unknown() -> str:
-    try:
-        import psi4
+    from qchem_stack.chem.solvers._common import package_version_or_unknown
 
-        v = getattr(psi4, "__version__", "")
-        if isinstance(v, str) and v.strip():
-            return v.strip()
-    except Exception:  # pragma: no cover
-        pass
-    return "unknown"
+    return package_version_or_unknown("psi4")

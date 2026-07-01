@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 from qchem_stack.contracts.schema_ids import PRODUCT_GAP_ANCHOR_INDEX_V1
+
+_REPO_ROOT = Path(__file__).resolve().parents[3]
 
 PRODUCT_CAPABILITY_MAP: dict[str, str] = {
     "ProtocolLifecycle": "qchem_stack.protocols.protocol.PauliAveragingProtocol + ProtocolPhase",
@@ -85,6 +88,12 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
             "generalized doubles, and IQEB qubit-excitation aliases; not vendor full taxonomy."
         ),
         "status": "available",
+        "evidence": [
+            "configs/example_h2_adapt_staggered_pool.yaml",
+            "configs/example_h2_adapt_bk_pool.yaml",
+            "configs/example_h2_adapt_generalized_doubles_pool.yaml",
+            "configs/example_h2_iqeb_bk_singles_pool.yaml",
+        ],
     },
     {
         "id": "dmet_self_consistency_depth",
@@ -94,6 +103,12 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
             "ONIOM/QM-MM production demos; full cuTensorNet-scale DMET remains out of scope."
         ),
         "status": "available",
+        "evidence": [
+            "configs/example_h4_dmet_self_consistent.yaml",
+            "configs/example_h2_dimer_dmet_self_consistent.yaml",
+            "configs/example_h4_dmet_fragment_exact_small.yaml",
+            "configs/example_h2_uniform_multifragment_toy.yaml",
+        ],
     },
     {
         "id": "tensor_network_engine",
@@ -190,6 +205,18 @@ def validate_product_gap_categories() -> list[str]:
             errors.append(f"row[{idx}] missing non-empty release_anchor")
         else:
             anchors.append(anchor)
+        evidence = row.get("evidence")
+        if evidence is not None:
+            if not isinstance(evidence, list):
+                errors.append(f"row[{idx}] evidence must be a list when present")
+            else:
+                rid_label = rid if isinstance(rid, str) and rid else f"row[{idx}]"
+                for path in evidence:
+                    if not isinstance(path, str) or not path:
+                        errors.append(f"{rid_label}: evidence entries must be non-empty strings")
+                        continue
+                    if not (_REPO_ROOT / path).is_file():
+                        errors.append(f"{rid_label}: missing evidence file {path}")
     if len(ids) != len(set(ids)):
         errors.append("duplicated gap id detected")
     if len(anchors) != len(set(anchors)):

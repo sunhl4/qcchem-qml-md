@@ -46,7 +46,18 @@ def _hea_circuit_braket(n_qubits: int, depth: int, angles: np.ndarray) -> Any:
 
 def _pauli_expectation_braket(circuit: Any, hamiltonian: QubitOperator, n_qubits: int) -> float:
     """Compute ``<H>`` via Braket ``LocalSimulator`` statevector + manual Pauli expectation."""
+    import contextlib
+
     from braket.devices import LocalSimulator
+
+    # Newer amazon-braket-sdk refuses ``run(circuit, shots=0)`` unless the circuit
+    # declares an explicit result type. Attach a state-vector result type so the
+    # simulator returns the wavefunction we consume below. Older SDKs already
+    # inject a result type, so the call is a no-op there.
+    with contextlib.suppress(
+        Exception
+    ):  # pragma: no cover - older SDKs already inject a result type
+        circuit.state_vector()
 
     sim = LocalSimulator()
     task = sim.run(circuit, shots=0)

@@ -6,7 +6,7 @@
 
 - 文件：
   - `src/qchem_stack/protocols/product_contract.py`（**`qchem_stack.protocols.product_contract`**：差距分类与 export 稳定键；详见 [CONTRIBUTING](../../CONTRIBUTING.md#product-contracts-and-workflow-preview-stable-imports)）
-  - `tests/test_run_summary_key_registry.py`
+  - `tests/repro/test_repro_run_summary.py`
 - 变更摘要：
   - （填写新增键）
   - （填写 registry 对齐情况）
@@ -14,7 +14,7 @@
 ## 验证
 
 - 命令：
-  - `pytest tests/test_run_summary_key_registry.py -q`
+  - `pytest tests/repro/test_repro_run_summary.py -q`
 - 结果：
   - （填写）
 

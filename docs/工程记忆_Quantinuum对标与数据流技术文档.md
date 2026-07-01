@@ -204,7 +204,7 @@ flowchart TB
 | `sceom_shot_noise_model`         | SCEOM meta：`none` / `symmetric_gaussian_on_real_M` 等（`quantum/algorithms/sceom.py`）                                                              |
 | `sceom_shots_per_matrix_element` | YAML 预算_echo                                                                                                                                       |
 
-**回归**：`tests/test_orchestration_pipeline.py`（`test_run_pipeline_sync_h2_vqd_yaml_shots`、`test_run_pipeline_sync_h2_qse_sceom_yaml`、`test_run_pipeline_sync_h2_qse_pauli_transitions_run_summary`）。**Export**：`--results` 合并时若 `repro.run_summary` 已含上列键，脚本另输出 `vqd_three_protocol_present_from_run_summary`、`qse_shot_mode_from_run_summary`、`sceom_shot_noise_model_from_run_summary`。
+**回归**：`tests/orchestration/test_orchestration_pipeline.py`（`test_run_pipeline_sync_h2_vqd_yaml_shots`、`test_run_pipeline_sync_h2_qse_sceom_yaml`、`test_run_pipeline_sync_h2_qse_pauli_transitions_run_summary`）。**Export**：`--results` 合并时若 `repro.run_summary` 已含上列键，脚本另输出 `vqd_three_protocol_present_from_run_summary`、`qse_shot_mode_from_run_summary`、`sceom_shot_noise_model_from_run_summary`。
 
 **与 `PauliAveragingProtocol` 的咬合方向（推荐实现顺序）**：
 
@@ -384,7 +384,7 @@ flowchart TB
 
 - 能力变化时同步：**`qchem_stack.protocols.product_contract`**（gap 导出）、[public_parity_matrix.md](public_parity_matrix.md)。
 - 新增 `parity_snapshot` 顶层键时：更新本节 §13.2、[技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md)（若 DMET 相关）。
-- 变更 **HTTP 路由** / **作业表 `meta`** / **`run_context` 头** / **`pipeline_profile`** 时：同步 [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md) **§9**，并跑 `tests/test_api_runs.py`、`tests/test_job_store_list.py` 等。
+- 变更 **HTTP 路由** / **作业表 `meta`** / **`run_context` 头** / **`pipeline_profile`** 时：同步 [技术文档_HTTP_API与SQLite作业队列及可观测性契约.md](技术文档_HTTP_API与SQLite作业队列及可观测性契约.md) **§9**，并跑 `tests/api/test_api_runs.py`、`tests/jobs/test_job_store_list.py` 等。
 
 ---
 
@@ -472,7 +472,7 @@ flowchart TB
 - 能力差距与边界：[public_parity_matrix.md](public_parity_matrix.md)、本文 **§0**
 - 机读 driver 表面：`qchem_stack.integrations.open_driver_surface.open_driver_coverage_matrix`
 - 经典化学主实现：`qchem_stack.chem.drivers.pyscf_driver`、`qchem_stack.chem.embedding.*`
-- **P1 capability / embedding gates（pytest）**：`tests/test_backend_capability_conformance.py`（后端能力矩阵等）；端到端编排与映射见 `tests/test_orchestration_pipeline.py`、`tests/test_fermion_qubit_mapping.py`；TKET/pytket 可选链见 `tests/test_pytket_bridge.py`、`tests/test_methods_resource_unified_export.py`。
+- **P1 capability / embedding gates（pytest）**：`tests/backends/test_backend_capability_conformance.py`（后端能力矩阵等）；端到端编排与映射见 `tests/orchestration/test_orchestration_pipeline.py`、`tests/chem/test_fermion_qubit_mapping.py`；TKET/pytket 可选链见 `tests/backends/test_pytket_bridge.py`、`tests/repro/test_methods_resource_unified_export.py`。
 - 教程与 parity 叙事：`docusaurus-site/docs/`（用户站）、`docs/public_parity_matrix.md`（机读 gaps 以 `product_contract` 为准）
 
 ---
@@ -503,7 +503,7 @@ flowchart TB
 | ------------------------ | -------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
 | 镜像`status` vs 正文   | 本文 §2–§4、`open_driver_coverage_matrix`           | 改版镜像 YAML 时对照[与Vendor platform — 附录 D](public_parity_matrix.md) **附录 A**     |
 | AVAS / CASSCF 产品深度 | `integrations/open_driver_surface.py` 行 `not_claimed` | 矩阵 §3 与 gap`drivers_cosmo_pbc` 不升级为 `yes` 除非实现                                 |
-| UCCSD 变分 × 映射     | `quantum/algorithms/uccsd_vqe.py`（JW-only）           | 与`ucc_chem_ansatz` 机读条一致；BK/SCBK UCCSD 电路边界见 `tests/test_uccsd_mapping_support_matrix.py` |
+| UCCSD 变分 × 映射     | `quantum/algorithms/uccsd_vqe.py`（JW-only）           | 与`ucc_chem_ansatz` 机读条一致；BK/SCBK UCCSD 电路边界见 `tests/quantum/test_uccsd_mapping_support_matrix.py` |
 
 ### 1.4 复现程度等级定义
 
@@ -686,6 +686,6 @@ Vendor platform 文档中的 **scf.driver** 字面量请以 `pyscf_driver` 支�
 ### 4. 回归
 
 - `pytest -m l1_md_ml`（见 [CONTRIBUTING.md](../CONTRIBUTING.md)）。
-- 代表测：`tests/test_md_bridge.py`。
+- 代表测：`tests/md_bridge/test_md_bridge.py`。
 
 *文档版本：与仓库源码同步维护；重大行为变更时请更新 §1（缓解行）、§4、§7、**§11**、**§13** 及 [技术文档_CircuitIR与TKET桥接及作业契约.md](技术文档_CircuitIR与TKET桥接及作业契约.md)；**§9** 仅保留归档指针。必要时 bump 配置 `schema_version`（若引入破坏性 YAML 字段）。*

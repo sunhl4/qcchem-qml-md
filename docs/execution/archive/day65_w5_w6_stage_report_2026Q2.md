@@ -18,7 +18,7 @@
 
 ## 验证
 
-- `tests/test_methods_resource_unified_export.py::test_registry_and_mdml_blocks_in_config_only_export` 覆盖新增块。
+- `tests/repro/test_methods_resource_unified_export.py::test_registry_and_mdml_blocks_in_config_only_export` 覆盖新增块。
 
 ## 结论
 

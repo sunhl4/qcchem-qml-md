@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import logging
 import os
-from typing import Any
 
 from qchem_stack.orchestration.pipeline_events import (
     emit_pipeline_event,
@@ -22,7 +21,7 @@ def emit_stage_event(
     *,
     stage: str | None = None,
     trace_id: str | None = None,
-    data: dict[str, Any] | None = None,
+    data: dict[str, object] | None = None,
 ) -> None:
     """Emit a pipeline event; optional DEBUG log when ``QCHEM_PIPELINE_DEBUG_EVENTS=1``."""
     emit_pipeline_event(

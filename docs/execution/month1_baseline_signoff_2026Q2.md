@@ -7,7 +7,7 @@
 - `resource_estimation_preview_v1` 已具备 config-only 与 pipeline 两模式：
   - 实现：`src/qchem_stack/integrations/resource_estimation_preview.py`
   - 导出：`scripts/export_parity_criteria_table.py`
-  - 测试：`tests/test_methods_resource_unified_export.py`
+  - 测试：`tests/repro/test_methods_resource_unified_export.py`
 - parity 抽样已覆盖 22 份配置（含 H2O/N2 CAS 样例）：
   - `scripts/check_parity_export_sample.py`
 
@@ -16,7 +16,7 @@
 - plugin 最小可跑链路已形成并可回归：
   - 配置：`configs/example_decomposition_plugin_toy.yaml`
   - 执行：`embedding.mode=plugin`
-  - 测试：`tests/test_decomposition_plugin_pipeline.py`
+  - 测试：`tests/chem/test_decomposition_plugin_pipeline.py`
 - 新增可检证元数据（本轮）：
   - `embedding_workflow.decomposition_plugin_json_resolved_path`
   - `embedding_workflow.integral_source`
@@ -30,7 +30,7 @@
 ## 回归记录（本轮）
 
 - `pytest`：
-  - `.venv/bin/pytest tests/test_decomposition_plugin_pipeline.py tests/test_methods_resource_unified_export.py -q`
+  - `.venv/bin/pytest tests/chem/test_decomposition_plugin_pipeline.py tests/repro/test_methods_resource_unified_export.py -q`
   - 结果：`5 passed`
 - parity 导出抽样：
   - `.venv/bin/python scripts/check_parity_export_sample.py`
