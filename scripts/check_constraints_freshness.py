@@ -52,6 +52,7 @@ def check_constraint_freshness(
             _pip_compile_exe(),
             "--output-file",
             tmp_path,
+            "--upgrade",  # Must mirror scripts/update_constraints.py
             "--no-header",
             "--no-annotate",
             "--strip-extras",

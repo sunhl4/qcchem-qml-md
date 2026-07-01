@@ -40,6 +40,7 @@ def run_pip_compile(input_file: str, output_file: str, extras: list[str]) -> Non
         _pip_compile_exe(),
         "--output-file",
         output_file,
+        "--upgrade",  # Resolve latest compatible pins (must match check_constraints_freshness)
         "--no-header",  # Omit header comment
         "--no-annotate",  # Omit annotations
         "--strip-extras",  # Remove [extras] from output

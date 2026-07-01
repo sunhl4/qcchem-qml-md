@@ -28,6 +28,19 @@ ignore-vuln = [
     "CVE-2026-54276",   # DigestAuth across cross-origin redirect; fixed 3.14.1
     "CVE-2026-54280",   # payload resource leak on client disconnect; fixed 3.14.1
     "CVE-2026-54274",   # incomplete websocket frame DoS; fixed 3.14.1
+    "CVE-2025-69223",   # zip bomb DoS; fixed 3.13.3
+    "CVE-2025-69224",   # request smuggling (non-ASCII); fixed 3.13.3
+    "CVE-2025-69228",   # Request.post() memory exhaustion; fixed 3.13.3
+    "CVE-2025-69229",   # chunked read CPU DoS; fixed 3.13.3
+    "CVE-2025-69230",   # invalid cookie logging storm; fixed 3.13.3
+    "CVE-2025-69226",   # static path info leak; fixed 3.13.3
+    "CVE-2025-69227",   # Request.post() infinite loop (-O); fixed 3.13.3
+    "CVE-2026-34993",   # CookieJar.load() RCE; fixed 3.14.0
+    "CVE-2026-54273",   # pipelined request memory DoS; fixed 3.14.1
+    "CVE-2026-54279",   # host-only cookie restore bug; fixed 3.14.1
+    "CVE-2026-54277",   # max_line_size bypass (C parser); fixed 3.14.1
+    "CVE-2026-50269",   # multipart header injection; fixed 3.14.0
+    "CVE-2026-54278",   # compressed body zip bomb; fixed 3.14.1
     # python-socketio 5.12.1 is pinned transitively by uqc-client; CVE-2025-61765
     # (pickle RCE) only affects multi-server deployments with a compromised Redis
     # queue; CVE-2026-48804 (binary attachment DoS) requires unauthenticated WS.
