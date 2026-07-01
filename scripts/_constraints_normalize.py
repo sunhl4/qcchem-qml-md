@@ -5,11 +5,6 @@ from __future__ import annotations
 # ipython pulls appnope on macOS only; omit from shared Linux/macOS lockfiles.
 _MAC_ONLY_PACKAGES = frozenset({"appnope==0.1.4"})
 
-_QCHEM_STACK_LINE = re.compile(
-    r"^qchem-stack @ file:///.*$",
-    re.MULTILINE,
-)
-
 
 def normalize_constraints_text(text: str) -> str:
     """Strip local pip config noise and platform-specific pins."""
