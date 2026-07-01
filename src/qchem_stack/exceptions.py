@@ -38,3 +38,27 @@ class PreQuantumError(QChemStackError):
 
 class PreQuantumCapabilityError(PreQuantumError):
     """Selected backend or registered adapters cannot satisfy a required pre-quantum capability."""
+
+
+class JobPayloadError(QChemStackError):
+    """SQLite full-pipeline job payload is missing or malformed."""
+
+
+class QuantumAlgorithmError(QChemStackError):
+    """Quantum algorithm execution failure (VQE non-convergence, VQD deflation, zero-norm)."""
+
+
+class SolverError(QChemStackError):
+    """Classical chemistry solver adapter failure (SCF non-convergence, integral extraction)."""
+
+
+class BackendError(QChemStackError):
+    """Backend executor failure (provider error, transpilation, shot simulation)."""
+
+
+class MitigationError(QChemStackError):
+    """Error mitigation failure (ZNE extrapolation, PMSV filtering, SPAM correction)."""
+
+
+class MDBridgeError(QChemStackError):
+    """MD/ML bridge failure (training export, active learning, force field builder)."""
