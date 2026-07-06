@@ -1,0 +1,62 @@
+{
+  "schema_version": "1",
+  "id": "550e8400-e29b-41d4-a716-446655440000",
+  "timestamp": "2026-07-02T12:00:00Z",
+  "path_type": "hybrid",
+  "problem": {
+    "domain": "many_body",
+    "description": "1D TFIM ground-state property at h/J=0.5",
+    "parameters": {
+      "model": "transverse_field_ising",
+      "n_sites": 12,
+      "J": 1.0,
+      "h": 0.5
+    }
+  },
+  "quantum_execution": {
+    "backend": "ibm_kyoto",
+    "device_calibration_id": "cal-20260702-001",
+    "circuit": {
+      "ansatz": "hardware_efficient",
+      "depth": 8,
+      "n_qubits": 12,
+      "params": [0.12, -0.34, 0.56],
+      "ir_hash": "sha256:abc123..."
+    },
+    "measurement": {
+      "protocol": "shadow",
+      "n_shots": 4096,
+      "observables": ["ZZ", "XX"],
+      "expectation_values": {
+        "ZZ": -0.82,
+        "energy": -1.137
+      },
+      "raw_outcomes": ["010011001011", "110100110101"],
+      "shadow_vectors": [[0.1, -0.2, 0.05], [0.08, -0.19, 0.04]]
+    }
+  },
+  "labels": {
+    "energy_hartree": -1.137,
+    "custom": {
+      "phase": "ordered"
+    }
+  },
+  "classical_reference": {
+    "method": "exact_diagonalization",
+    "value": -1.138,
+    "uncertainty": 0.001
+  },
+  "mitigation": {
+    "applied": ["readout", "ml_surrogate"],
+    "surrogate_model_id": "surrogate-v1-ibm-kyoto"
+  },
+  "repro": {
+    "software_versions": {
+      "qiskit": "1.4.0",
+      "python": "3.11.8"
+    },
+    "random_seed": 42,
+    "hash": "repro:7f3a9c2e",
+    "source_run_id": "run-20260702-001"
+  }
+}

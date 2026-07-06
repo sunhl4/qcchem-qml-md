@@ -1,0 +1,28 @@
+# HPC / 超算专用 conda 环境（在登录节点创建，计算节点复用同一 prefix）
+#
+# 用法（SSH 到 login01 后，见 docs/HPC登录与环境配置教程_幺正量子集群.md）:
+#   bash scripts/hpc/setup_qchem_stack_env.sh
+#
+# 说明：PySCF/Qiskit 走 conda-forge；JAX/QML-FF/PennyLane 由 setup 脚本用 pip 钉版本（避免 conda/pip 混装 jaxlib 冲突）。
+
+name: qchem-stack
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - pip
+  - setuptools>=68
+  - wheel
+  - numpy>=1.24
+  - scipy>=1.11
+  - pandas>=2.0
+  - pydantic>=2.5
+  - pyyaml>=6.0
+  - opt_einsum>=3.3
+  - openfermion>=1.5
+  - pyscf>=2.4
+  - qiskit>=2.0,<3
+  - qiskit-aer>=0.13
+  - ase>=3.22
+  - h5py>=3.8
+  - scikit-learn>=1.3

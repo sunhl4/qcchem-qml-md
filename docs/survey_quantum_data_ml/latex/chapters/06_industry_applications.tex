@@ -1,0 +1,35 @@
+\section{跨领域应用成熟度}
+\label{sec:applications}
+
+\begin{table}[htbp]
+  \centering
+  \caption{领域成熟度（TRL 与主导路径）}
+  \small
+  \begin{tabular}{@{}llcl@{}}
+    \toprule
+    领域 & TRL & 路径 & 12--24 月 outlook \\
+    \midrule
+    量子多体/相分类 & 4--5 & 2 & shadow foundation 扩大 \\
+    QEM/处理器代理 & 4--5 & 1 & 云 QPU 标配 ML mitigation \\
+    量子化学/材料 & 3--4 & 1 & SQD + MLFF 并行 \\
+    HEP 异常检测 & 3--4 & 2 & 需更多纠缠资源 \\
+    金融优化 & 3 & 1 & 10--20 资产 hybrid pilot \\
+    药物发现 & 2--3 & 1+混合 & 低数据 QSVM/VQR PoC \\
+    通用 CV & 2 & 混合 & utility-scale 实验增多 \\
+    时序预测 & 2 & 1 & benchmark 偏负面 \\
+    网络安全 & 2--3 & 混合 & 少样本 QAE 有初步证据 \\
+    量子传感 & 3--4 & 2 & digital twin + NN readout \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{里程碑实验}
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Nat.\ Commun.\ 2024}：IBM 127-qubit 实验数据 + 经典 ML，44-qubit 回归~\cite{Cho2024ExpMLQuantumData}
+  \item \textbf{Nat.\ Biotech.\ 2024}：量子增强生成 KRAS 抑制剂，实验验证 hit~\cite{KRASQuantumDrug2024}
+  \item \textbf{Communications Physics 2024}：LHC 量子核异常检测，真机超越经典（足够资源时）~\cite{LHCQuantumAnomaly2024}
+  \item \textbf{Nat.\ Commun.\ 2026}：42-qubit predictive surrogates~\cite{PredictiveSurrogates2026}
+\end{itemize}
+
+各领域一页速查见 \texttt{docs/survey\_quantum\_data\_ml/cheatsheets/}。

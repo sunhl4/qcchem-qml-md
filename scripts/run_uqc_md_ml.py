@@ -88,6 +88,7 @@ def main() -> int:
         write_resolved_experiment_yaml,
     )
 
+    import qchem_stack.orchestration  # noqa: F401 — registers default pipeline runner for MD/ML loop
     from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
 
     cfg, prof, _ = load_experiment_with_backend_profile(args.experiment, profile_id)

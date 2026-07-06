@@ -8,124 +8,80 @@ from __future__ import annotations
 
 import pytest
 
-from qchem_stack.backends.spec import BackendSpec
-from qchem_stack.config import ExperimentConfig
-from qchem_stack.config.active_space import ActiveSpaceSpec
-from qchem_stack.config.molecule import MoleculeSpec
-from qchem_stack.config.quantum import QuantumSpec
-from qchem_stack.config.scf import SCFSpec
+from qchem_stack.config import load_experiment_config
 from qchem_stack.orchestration.pipeline import run_pipeline_sync
+from tests.helpers.h2_yaml import write_experiment_yaml
 
 pyscf = pytest.importorskip("pyscf")
 
 
+def _lih_vqe_dict(*, experiment_id: str, maxiter: int, depth: int) -> dict:
+    return {
+        "schema_version": "2",
+        "experiment_id": experiment_id,
+        "molecule": {
+            "symbols": ["Li", "H"],
+            "coordinates": [[0.0, 0.0, 0.0], [0.0, 0.0, 1.595]],
+            "coordinate_unit": "angstrom",
+            "charge": 0,
+            "multiplicity": 1,
+            "basis": "sto-3g",
+        },
+        "active_space": {
+            "strategy": "cas",
+            "cas": {"n_orbitals": 2, "n_electrons": 2},
+        },
+        "scf": {"driver": "pyscf", "method": "RHF"},
+        "embedding": {"mode": "none"},
+        "backend": {"provider": "statevector", "shots_per_circuit": 512},
+        "quantum": {
+            "algorithm": "vqe",
+            "vqe": {"depth": depth, "maxiter": maxiter},
+            "pauli": {"use_protocol": False},
+        },
+    }
+
+
 @pytest.mark.slow
 @pytest.mark.pyscf
-def test_lih_sto3g_vqe_smoke() -> None:
+def test_lih_sto3g_vqe_smoke(tmp_path) -> None:
     """Smoke test for LiH VQE with minimal basis set."""
-    # Create LiH configuration programmatically
-    cfg = ExperimentConfig(
-        schema_version="2",
-        experiment_id="lih_sto3g_vqe_smoke",
-        molecule=MoleculeSpec(
-            symbols=["Li", "H"],
-            coordinates=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.595]],  # Li-H bond length in Angstrom
-            basis="sto-3g",
-            charge=0,
-            spin=0,
-        ),
-        scf=SCFSpec(
-            driver="pyscf",
-            method="rhf",
-        ),
-        active_space=ActiveSpaceSpec(
-            n_electrons=2,
-            n_orbitals=2,
-            freeze_core=True,
-        ),
-        backend=BackendSpec(
-            name="statevector",
-            provider="qiskit",
-        ),
-        quantum=QuantumSpec(
-            algorithm="vqe",
-            ansatz="uccsd",
-            optimizer="cobyla",
-            max_iterations=100,
+    cfg_path = write_experiment_yaml(
+        tmp_path / "lih_sto3g_vqe_smoke.yaml",
+        _lih_vqe_dict(
+            experiment_id="lih_sto3g_vqe_smoke",
+            maxiter=100,
+            depth=2,
         ),
     )
+    cfg = load_experiment_config(cfg_path)
+    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
 
-    out = run_pipeline_sync(cfg)
-
-    # Validate pipeline completed successfully
-    assert "schema" in out
     assert out["schema"] == "pipeline_result_v1"
-
-    # Check that we have a variational energy
-    assert "energy_after_variational" in out
     e_var = out["energy_after_variational"]
-    assert e_var is not None
-    assert e_var < 0.0  # Should be negative (bound state)
-
-    # Validate that SCF converged
-    assert "scf_energy" in out
+    assert e_var is not None and e_var < 0.0
     e_scf = out["scf_energy"]
-    assert e_scf is not None
-    assert e_scf < 0.0
-
-    # VQE energy should be lower than or close to SCF energy
-    # (within 0.1 Ha tolerance for this smoke test)
+    assert e_scf is not None and e_scf < 0.0
     assert e_var <= e_scf + 0.1
-
-    # Check reproducibility snapshot
-    assert "repro" in out
-    repro = out["repro"]
-    assert "parity_snapshot" in repro
+    assert "parity_snapshot" in out["repro"]
 
 
 @pytest.mark.slow
 @pytest.mark.pyscf
-def test_lih_active_space_2e_2o() -> None:
+def test_lih_active_space_2e_2o(tmp_path) -> None:
     """Test LiH with 2-electron, 2-orbital active space."""
-    cfg = ExperimentConfig(
-        schema_version="2",
-        experiment_id="lih_cas_2e_2o",
-        molecule=MoleculeSpec(
-            symbols=["Li", "H"],
-            coordinates=[[0.0, 0.0, 0.0], [0.0, 0.0, 1.595]],
-            basis="sto-3g",
-            charge=0,
-            spin=0,
-        ),
-        scf=SCFSpec(
-            driver="pyscf",
-            method="rhf",
-        ),
-        active_space=ActiveSpaceSpec(
-            n_electrons=2,
-            n_orbitals=2,
-            freeze_core=True,
-        ),
-        backend=BackendSpec(
-            name="statevector",
-            provider="qiskit",
-        ),
-        quantum=QuantumSpec(
-            algorithm="vqe",
-            ansatz="hea",
+    cfg_path = write_experiment_yaml(
+        tmp_path / "lih_cas_2e_2o.yaml",
+        _lih_vqe_dict(
+            experiment_id="lih_cas_2e_2o",
+            maxiter=50,
             depth=2,
-            optimizer="cobyla",
-            max_iterations=50,
         ),
     )
+    cfg = load_experiment_config(cfg_path)
+    out = run_pipeline_sync(cfg, cfg_path=cfg_path)
 
-    out = run_pipeline_sync(cfg)
-
-    # Validate basic structure
     assert out["schema"] == "pipeline_result_v1"
     assert "energy_after_variational" in out
-
-    # Check that we have the expected number of qubits for 2e/2o
-    # With Jordan-Wigner: 2 orbitals = 4 qubits
-    n_qubits = out.get("n_qubits", 0)
+    n_qubits = out["pre_quantum_input"]["n_qubits"]
     assert n_qubits == 4, f"Expected 4 qubits for 2e/2o, got {n_qubits}"

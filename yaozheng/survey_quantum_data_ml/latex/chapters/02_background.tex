@@ -1,0 +1,38 @@
+\section{背景与问题定义}
+\label{sec:background}
+
+\subsection{两条数据路径}
+
+\begin{description}[leftmargin=3cm,style=nextline]
+  \item[\pathone{}] 量子输出与经典可对照的物理量或优化目标（能量、力、可观测量期望、组合优化目标值等）。经典 ML 执行监督学习：$(\text{问题描述}, \text{电路/上下文}) \rightarrow \text{标签}$。
+  \item[\pathtwo{}] 问题映射到量子电路后，通过测量/采样得到的原生数据（bitstring、Pauli/Clifford 测量记录、shadow 向量、overlap 等），不要求与经典输出逐点对应。经典 ML 执行表征学习、预训练、few-shot 或自监督下游任务。
+\end{description}
+
+\subsection{概念边界}
+
+\begin{table}[htbp]
+  \centering
+  \caption{与相邻概念的关系}
+  \begin{tabular}{@{}llp{7cm}@{}}
+    \toprule
+    概念 & 本报告范围 & 说明 \\
+    \midrule
+    经典数据 + 量子 feature map & 部分 & 输入为经典；量子仅作编码 \\
+    AI for Quantum & 相关 & ML 消费校准/日志数据 \\
+    纯量子 ML 端到端 & 相关 & 本报告聚焦经典 ML 消费量子数据 \\
+    Quantum-inspired 经典算法 & 不重点 & 无真实量子数据 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{决策流程（摘要）}
+
+\begin{enumerate}[leftmargin=*]
+  \item 经典世界是否有明确定义且可独立验证的标签？$\rightarrow$ 是则 \pathone{}，否则 \pathtwo{}。
+  \item 量子标签/测量成本是否显著高于经典 inference？$\rightarrow$ 是则需 Surrogate / Foundation / Active Learning。
+  \item 问题是否具有量子结构（纠缠、相、非局域关联）？$\rightarrow$ 决定 \pathtwo{} 是否值得投入。
+  \item 系统规模 $>20$ qubit 且用 global fidelity kernel？$\rightarrow$ 高风险，改 local/projected kernel 或 shadow~\cite{ExponentialConcentrationQK2024,MitigateConcentrationCovariant2025}。
+  \item 是否存在 sim$\rightarrow$hardware 漂移？$\rightarrow$ 需 UDA 或 robust shallow shadows~\cite{UDAImperfectQuantumData2026,RobustShallowShadows2025}。
+\end{enumerate}
+
+详细决策矩阵见附录速查表及 \texttt{cheatsheets/} 目录。

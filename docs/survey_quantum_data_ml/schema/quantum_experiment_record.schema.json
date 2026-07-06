@@ -1,0 +1,262 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://qchem-stack.local/schemas/quantum_experiment_record.schema.json",
+  "title": "QuantumExperimentRecord",
+  "description": "Standard record for quantum experiment data consumed by classical ML (paths 1/2/hybrid). Schema version 1.",
+  "type": "object",
+  "required": ["schema_version", "id", "timestamp", "path_type", "problem", "quantum_execution", "repro"],
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "const": "1",
+      "description": "Schema generation; bump on breaking changes."
+    },
+    "id": {
+      "type": "string",
+      "format": "uuid",
+      "description": "Unique record identifier."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "ISO 8601 UTC timestamp of record creation or experiment completion."
+    },
+    "path_type": {
+      "type": "string",
+      "enum": ["labeled", "native", "hybrid"],
+      "description": "Path 1 (labeled), Path 2 (native measurement), or hybrid pipeline."
+    },
+    "problem": { "$ref": "#/$defs/ProblemSpec" },
+    "quantum_execution": { "$ref": "#/$defs/QuantumExecution" },
+    "labels": { "$ref": "#/$defs/Labels" },
+    "classical_reference": { "$ref": "#/$defs/ClassicalReference" },
+    "mitigation": { "$ref": "#/$defs/Mitigation" },
+    "repro": { "$ref": "#/$defs/Repro" }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": { "path_type": { "const": "labeled" } },
+        "required": ["path_type"]
+      },
+      "then": {
+        "required": ["labels"],
+        "properties": {
+          "labels": {
+            "anyOf": [
+              { "required": ["energy_hartree"] },
+              { "required": ["class_label"] },
+              { "required": ["custom"] }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "if": {
+        "properties": { "path_type": { "const": "native" } },
+        "required": ["path_type"]
+      },
+      "then": {
+        "properties": {
+          "quantum_execution": {
+            "properties": {
+              "measurement": {
+                "anyOf": [
+                  { "required": ["raw_outcomes"] },
+                  { "required": ["shadow_vectors"] }
+                ]
+              }
+            }
+          }
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "ProblemDomain": {
+      "type": "string",
+      "enum": [
+        "many_body",
+        "chemistry",
+        "finance",
+        "hep",
+        "sensing",
+        "cv",
+        "security",
+        "materials",
+        "other"
+      ]
+    },
+    "ProblemSpec": {
+      "type": "object",
+      "required": ["domain"],
+      "additionalProperties": false,
+      "properties": {
+        "domain": { "$ref": "#/$defs/ProblemDomain" },
+        "description": { "type": "string", "maxLength": 4096 },
+        "parameters": {
+          "type": "object",
+          "description": "Free-form problem parameters (Hamiltonian couplings, geometry, constraints).",
+          "additionalProperties": true
+        }
+      }
+    },
+    "CircuitSpec": {
+      "type": "object",
+      "required": ["n_qubits"],
+      "additionalProperties": false,
+      "properties": {
+        "ansatz": { "type": "string" },
+        "depth": { "type": "integer", "minimum": 0 },
+        "n_qubits": { "type": "integer", "minimum": 1 },
+        "params": {
+          "type": "array",
+          "items": { "type": "number" }
+        },
+        "ir_hash": {
+          "type": "string",
+          "description": "Optional hash of circuit IR / OpenQASM / pytket serialization."
+        }
+      }
+    },
+    "MeasurementProtocol": {
+      "type": "string",
+      "enum": [
+        "computational",
+        "random_pauli",
+        "clifford",
+        "shadow",
+        "adaptive",
+        "continuous",
+        "other"
+      ]
+    },
+    "MeasurementSpec": {
+      "type": "object",
+      "required": ["protocol", "n_shots"],
+      "additionalProperties": false,
+      "properties": {
+        "protocol": { "$ref": "#/$defs/MeasurementProtocol" },
+        "n_shots": { "type": "integer", "minimum": 1 },
+        "observables": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Pauli strings or observable names (Path 1)."
+        },
+        "expectation_values": {
+          "type": "object",
+          "additionalProperties": { "type": "number" },
+          "description": "Precomputed expectations keyed by observable label."
+        },
+        "raw_outcomes": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^[01]+$"
+          },
+          "description": "Computational-basis bitstrings (Path 2)."
+        },
+        "shadow_vectors": {
+          "type": "array",
+          "items": { "type": "array", "items": { "type": "number" } },
+          "description": "Classical shadow feature vectors."
+        }
+      }
+    },
+    "QuantumExecution": {
+      "type": "object",
+      "required": ["backend", "circuit", "measurement"],
+      "additionalProperties": false,
+      "properties": {
+        "backend": {
+          "type": "string",
+          "description": "Device id or simulator name, e.g. ibm_kyoto, quantinuum_h2, aer_simulator."
+        },
+        "device_calibration_id": { "type": "string" },
+        "circuit": { "$ref": "#/$defs/CircuitSpec" },
+        "measurement": { "$ref": "#/$defs/MeasurementSpec" }
+      }
+    },
+    "Labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "energy_hartree": { "type": "number" },
+        "forces_hartree_bohr": {
+          "type": "array",
+          "items": {
+            "type": "array",
+            "items": { "type": "number" },
+            "minItems": 3,
+            "maxItems": 3
+          }
+        },
+        "class_label": {
+          "oneOf": [
+            { "type": "string" },
+            { "type": "integer" }
+          ]
+        },
+        "regression_target": { "type": "number" },
+        "custom": {
+          "type": "object",
+          "additionalProperties": true
+        }
+      }
+    },
+    "ClassicalReference": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "e.g. DFT, CCSD, exact, classical_solver, pyscf_mf"
+        },
+        "value": {},
+        "uncertainty": { "type": "number", "minimum": 0 }
+      }
+    },
+    "MitigationSpec": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "applied": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "enum": [
+              "zne",
+              "readout",
+              "cdr",
+              "pec",
+              "virtual_distillation",
+              "ml_surrogate",
+              "other"
+            ]
+          }
+        },
+        "surrogate_model_id": { "type": "string" },
+        "notes": { "type": "string" }
+      }
+    },
+    "Repro": {
+      "type": "object",
+      "required": ["hash"],
+      "additionalProperties": false,
+      "properties": {
+        "software_versions": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "random_seed": { "type": "integer" },
+        "hash": {
+          "type": "string",
+          "description": "Content hash or pipeline repro fingerprint."
+        },
+        "source_run_id": { "type": "string" }
+      }
+    }
+  }
+}

@@ -4,7 +4,9 @@ These documents inform product narrative and backlog but are **not runtime depen
 
 | Document | Purpose |
 |----------|---------|
-| [量子计算化学软件平台-行业与竞品调研报告.md](量子计算化学软件平台-行业与竞品调研报告.md) | Industry survey + architecture framework (v2.0, 20k+ 汉字, code+docs) |
+| [HPC登录与环境配置教程_幺正量子集群.md](../HPC登录与环境配置教程_幺正量子集群.md) | 幺正 HPC SSH/代理/conda/UQC/力场在线学习 smoke |
+| [量子计算化学软件平台-行业与竞品调研报告.md](量子计算化学软件平台-行业与竞品调研报告.md) | Industry survey + architecture framework (v2.0, code+docs) |
+| [量子计算化学软件平台-经典计算化学集成交付说明.md](量子计算化学软件平台-经典计算化学集成交付说明.md) | Phase 2 classical chemistry integration spec (code + examples, code+docs) |
 | [竞争定位与路线图_对标Quantinuum产品与技术路线.md](../竞争定位与路线图_对标Quantinuum产品与技术路线.md) | Competitive positioning |
 | [工程记忆_Quantinuum对标与数据流技术文档.md](../工程记忆_Quantinuum对标与数据流技术文档.md) | Engineering memory / data-flow |
 | [public_parity_matrix.md](../public_parity_matrix.md) | Capability parity matrix (also engineering contract) |

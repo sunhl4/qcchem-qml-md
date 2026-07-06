@@ -1,0 +1,43 @@
+\section{混合范式与 Benchmark}
+\label{sec:hybrid-benchmark}
+
+\subsection{混合训练三阶段}
+
+\begin{enumerate}[leftmargin=*]
+  \item \textbf{阶段 A}（\pathtwo{}）：随机测量 / shadow 自监督预训练（GPT、contrastive、autoencoder）
+  \item \textbf{阶段 B}（\pathone{}）：稀疏 labeled oracle 微调
+  \item \textbf{阶段 C}（部署）：纯经典 inference 或 surrogate
+\end{enumerate}
+
+代表：ShadowGPT~\cite{ShadowGPT2024}、Transformer NQS + Rydberg 实验预训练~\cite{TransformerNQSPretrain2025}、Predictive Surrogates~\cite{PredictiveSurrogates2026}。
+
+\subsection{Benchmark 共识}
+
+\begin{table}[htbp]
+  \centering
+  \caption{关键 benchmark 结论}
+  \small
+  \begin{tabular}{@{}llp{6.5cm}@{}}
+    \toprule
+    文献 & 规模 & 结论 \\
+    \midrule
+    Bowles 2024 & 160 数据集 & 经典整体优于量子；去纠缠常不降性能 \\
+    Schnabel 2025 & 20,000+ 模型 & QKM 高度依赖超参；无 universal winner \\
+    Fellner 2026 & 27 时序任务 & VQA 常不如简单经典模型 \\
+    QSVM 2026 & 970 实验 & 严格 nested CV 下量子核不 consistently 更优 \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{项目验收检查清单}
+
+任何 ``quantum data $\rightarrow$ ML'' 项目应报告：
+\begin{enumerate}[leftmargin=*]
+  \item 经典强基线（同参数量或同训练预算）
+  \item Nested CV 或独立 test set
+  \item 总 quantum shot budget 与 wall-clock 成本
+  \item sim vs hardware 分离结果
+  \item 噪声 ablation
+  \item measurement protocol + raw outcomes 存档
+  \item 负结果 / 无 advantage 情形
+\end{enumerate}

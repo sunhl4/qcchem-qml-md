@@ -1,0 +1,48 @@
+# HPC / CI smoke：UQC mock + 1 轮主动学习（无云 token，分钟级）
+# 实验 YAML: configs/example_h2_uqc_mock_md_ml.yaml
+#
+#   python scripts/run_uqc_md_ml.py \
+#     --backend-profile uqc_mock \
+#     --experiment configs/example_h2_uqc_mock_md_ml.yaml \
+#     --loop configs/example_h2_uqc_mock_qmlff_loop_smoke.yaml \
+#     --output results/hpc_smoke_uqc_mock
+
+max_rounds: 1
+energy_tolerance_hartree: 1.0
+n_candidate_frames: 1
+add_top_k_per_round: 1
+label_energy_reference: variational
+validation_energy_reference: variational
+validation_theory_level: full_pipeline
+label_screening_theory_level: full_pipeline
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+validation_skip_initial_md_frame: false
+
+n_seed_geometries: 2
+seed_mode: bond_stretch
+seed_bond_min_bohr: 1.2
+seed_bond_max_bohr: 1.6
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_species_list: [H]
+
+n_epochs_per_round: 1
+batch_size: 1
+learning_rate: 1.0e-3
+force_weight: 10.0
+energy_normalization: none
+warm_start: true
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 4
+md_dt_fs: 0.25
+md_temperature_K: 100.0
+md_save_stride: 2
+md_seed: 0
+
+write_per_round_extxyz: true
+seed: 0

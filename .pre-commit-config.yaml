@@ -25,7 +25,11 @@ repos:
     rev: v2.4.1
     hooks:
       - id: codespell
-        args: ["--skip=*.json,*.sqlite,*.lock,htmlcov,.git,*.egg-info,build,dist"]
+        args:
+          [
+            "--skip=*.json,*.sqlite,*.lock,htmlcov,.git,*.egg-info,build,dist",
+            "--ignore-words=codespell-ignore.txt",
+          ]
         exclude: ^docs/技术文档
 
   - repo: https://github.com/Yelp/detect-secrets

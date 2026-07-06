@@ -1,0 +1,27 @@
+\section{\pathtwo{}：原生量子测量数据}
+\label{sec:path2}
+
+\subsection{核心技术：Classical Shadows}
+
+Classical shadow tomography 将 $n$-qubit 态 $\rho$ 用多项式次随机 Pauli 测量压缩为经典表示~\cite{Jerbi2024ShadowsQML}。近一年 ML 集成进展：
+
+\begin{itemize}[leftmargin=*]
+  \item \textbf{Foundation 预训练}：ShadowGPT~\cite{ShadowGPT2024}、LLM4QPE~\cite{LLM4QPE2024}、FNQS~\cite{FNQS2025}
+  \item \textbf{真机验证}：Cho \& Kim（127 qubit，44 qubit ML）~\cite{Cho2024ExpMLQuantumData}；robust shallow shadows~\cite{RobustShallowShadows2025}
+  \item \textbf{可扩展 kernel}：GLQK 利用关联长度，平移对称下常数样本复杂度~\cite{GLQK2025}
+  \item \textbf{半监督/域适应}：SSL4Q~\cite{SSL4Q2024}；UDA on imperfect data~\cite{UDAImperfectQuantumData2026}
+  \item \textbf{无监督相变}：PCA + shadows~\cite{UnsupPCAShadows2025}；KMeans + shadows~\cite{OrderedPhasesShadows2025}
+\end{itemize}
+
+\subsection{Quantum Reservoir Computing}
+
+量子 reservoir 固定动力学，仅训练经典 readout~\cite{FeedbackQRC2024,MinimalisticQRC2025}。适合时序与原生测量轨迹，是 NISQ 下最可扩展的 \pathtwo{} 范式之一。
+
+\subsection{理论边界}
+
+\begin{itemize}[leftmargin=*]
+  \item Global fidelity kernel 在大 qubit 下指数集中~\cite{ExponentialConcentrationQK2024}
+  \item 纠缠导致可证学习优势（IonQ 实验）~\cite{EntanglementAdvantage2025}
+  \item 光子平台样本复杂度降 11.8 数量级（特定协议）~\cite{PreskillPhotonicLearning2025}
+  \item 单 shot QML 与可训练性一般不可兼得~\cite{SingleShotQMLLimits2025}
+\end{itemize}

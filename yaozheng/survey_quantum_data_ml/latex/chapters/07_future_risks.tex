@@ -1,0 +1,36 @@
+\section{未来方向与风险}
+\label{sec:future-risks}
+
+\subsection{3--5 年研究方向}
+
+\begin{enumerate}[leftmargin=*]
+  \item Cross-domain Quantum Foundation Model（统一 shadow 预训练，跨设备微调）
+  \item Quantum Data Advantage 物理判据（何时 \pathtwo{} 必不可少）
+  \item Cost-aware AutoML（accuracy vs shots vs qubit-hours 联合优化）
+  \item Federated Quantum Data（多实验室 shadow 联合训练）~\cite{QFLSurvey2025}
+  \item Real-time ML-QEM loop（校准漂移 $\rightarrow$ surrogate 在线更新）
+  \item Standard benchmark suite（类 MLPerf 的 Quantum-Data-ML benchmark）
+\end{enumerate}
+
+\subsection{风险矩阵}
+
+\begin{table}[htbp]
+  \centering
+  \small
+  \begin{tabular}{@{}llp{5.5cm}@{}}
+    \toprule
+    风险 & 影响 & 缓解 \\
+    \midrule
+    指数集中（QKM） & 大 qubit kernel 失效 & local/projected kernel, shadow \\
+    sim$\rightarrow$hw 漂移 & 预训练失效 & UDA, robust shadows \\
+    测量成本 & 路径 2 数据贵 & RL shot allocation, surrogate \\
+    标签噪声 & 路径 1 学偏 & 收敛判据 + 不确定性加权 \\
+    过度营销 & 决策误导 & 强制 benchmark 协议 \\
+    数据 silo & 无法 foundation 化 & 统一 schema（见~\ref{sec:appendix-schema}） \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\subsection{不建议过度投入的方向}
+
+小数据集通用 QNN 替代经典 NN；无 shot budget 的 advantage 宣传；50+ qubit global fidelity kernel 无 mitigation；无 measurement protocol 存档的实验。

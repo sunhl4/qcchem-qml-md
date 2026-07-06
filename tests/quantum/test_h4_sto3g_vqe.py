@@ -34,16 +34,16 @@ def test_h4_linear_chain_vqe_pipeline() -> None:
     assert e_var is not None
     assert e_var < 0.0  # Should be negative (bound state)
 
-    # Validate active space configuration
-    assert out.get("n_qubits", 0) >= 4  # H4 should have at least 4 qubits
+    # Validate active space configuration (n_qubits lives under pre_quantum_input)
+    assert out["pre_quantum_input"]["n_qubits"] >= 4
 
     # Check reproducibility snapshot
     assert "repro" in out
     repro = out["repro"]
     assert "parity_snapshot" in repro
 
-    # Validate that the Hamiltonian was built correctly
-    assert "hamiltonian_terms_count" in repro.get("parity_snapshot", {})
+    # Hamiltonian handoff fingerprint (stable parity field)
+    assert out["pre_quantum_input"]["hamiltonian_fingerprint"]
 
 
 @pytest.mark.slow

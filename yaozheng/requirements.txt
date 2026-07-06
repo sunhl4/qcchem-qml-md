@@ -1,0 +1,7 @@
+# Standalone Python deps for quantum-data ML survey pack (no qchem_stack).
+pydantic>=2.0,<3
+pandas>=2.0
+pyarrow>=14
+
+# Optional: run schema/store tests
+pytest>=7.0

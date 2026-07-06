@@ -1,0 +1,31 @@
+{
+  "schema_version": "1",
+  "id": "660e8400-e29b-41d4-a716-446655440001",
+  "timestamp": "2026-07-02T14:00:00Z",
+  "path_type": "native",
+  "problem": {
+    "domain": "many_body",
+    "description": "Shadow dataset for phase classification without per-sample energy labels",
+    "parameters": {
+      "model": "cluster_ising",
+      "n_sites": 8
+    }
+  },
+  "quantum_execution": {
+    "backend": "aer_simulator",
+    "circuit": {
+      "ansatz": "state_preparation",
+      "n_qubits": 8,
+      "depth": 4
+    },
+    "measurement": {
+      "protocol": "shadow",
+      "n_shots": 2048,
+      "shadow_vectors": [[0.02, -0.11, 0.07, 0.03], [0.01, -0.09, 0.08, 0.02]]
+    }
+  },
+  "repro": {
+    "hash": "repro:native-shadow-001",
+    "random_seed": 123
+  }
+}
