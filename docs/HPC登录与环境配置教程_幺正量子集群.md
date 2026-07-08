@@ -128,6 +128,7 @@ source ~/env.sh
 # source ~/miniforge3/etc/profile.d/conda.sh
 # conda activate ~/envs/qchem-stack
 # export JAX_PLATFORMS=cpu
+# export QMLFF_QUANTUM_DEVICE=default.qubit
 # cd ~/projects/qchem_qml_md
 ```
 
@@ -182,8 +183,14 @@ mkdir -p ~/logs logs
 PROFILE=uqc_mock sbatch scripts/hpc/smoke_uqc_md_ml.sbatch
 PROFILE=uqc_cloud sbatch scripts/hpc/smoke_uqc_md_ml.sbatch
 
+# H4 线性链 CAS(4,4) — 比 H2 更大（8 qubit）
+PROFILE=uqc_mock LOOP=configs/example_h4_uqc_mock_qmlff_loop_hpc.yaml sbatch scripts/hpc/run_h4_uqc_md_ml.sbatch
+PROFILE=uqc_mock LOOP=configs/example_h4_uqc_mock_qmlff_loop_5rounds.yaml sbatch scripts/hpc/run_h4_uqc_md_ml.sbatch
+PROFILE=uqc_cloud LOOP=configs/example_h4_uqc_cloud_sim_qmlff_loop_5rounds.yaml sbatch scripts/hpc/run_h4_uqc_md_ml.sbatch
+
 squeue -u $USER
 tail -f logs/uqc_mdml_smoke_<jobid>.out
+tail -f logs/h4_uqc_mdml_<jobid>.out
 ```
 
 ---
@@ -261,6 +268,7 @@ SERVER_HOST=192.168.110.148
 SERVER_PORT=8003
 UQC_API_TOKEN=<门户用户中心，约 30 分钟有效>
 JAX_PLATFORMS=cpu
+QMLFF_QUANTUM_DEVICE=default.qubit
 ```
 
 ---
@@ -271,6 +279,8 @@ JAX_PLATFORMS=cpu
 |------|---------|-----------|---------|-------|
 | mock | `uqc_mock` | `configs/example_h2_uqc_mock_md_ml.yaml` | `configs/example_h2_uqc_mock_qmlff_loop_smoke.yaml` | 否 |
 | 云 | `uqc_cloud` | `configs/example_h2_uqc_cloud_sim_md_ml.yaml` | `configs/example_h2_uqc_cloud_sim_qmlff_loop_smoke.yaml` | 是 |
+| H4 mock | `uqc_mock` | `configs/example_h4_uqc_mock_md_ml.yaml` | `configs/example_h4_uqc_mock_qmlff_loop_hpc.yaml` | 否 |
+| H4 云 5 轮 | `uqc_cloud` | `configs/example_h4_uqc_cloud_sim_md_ml.yaml` | `configs/example_h4_uqc_cloud_sim_qmlff_loop_5rounds.yaml` | 是 |
 
 ---
 
@@ -306,7 +316,8 @@ JAX_PLATFORMS=cpu
 |------|------|
 | [`environment-hpc.yml`](../environment-hpc.yml) | conda 基础依赖 |
 | [`scripts/hpc/setup_qchem_stack_env.sh`](../scripts/hpc/setup_qchem_stack_env.sh) | 一键安装 |
-| [`scripts/hpc/smoke_uqc_md_ml.sbatch`](../scripts/hpc/smoke_uqc_md_ml.sbatch) | Slurm smoke |
+| [`scripts/hpc/smoke_uqc_md_ml.sbatch`](../scripts/hpc/smoke_uqc_md_ml.sbatch) | Slurm H2 smoke |
+| [`scripts/hpc/run_h4_uqc_md_ml.sbatch`](../scripts/hpc/run_h4_uqc_md_ml.sbatch) | Slurm H4 mock/云 在线学习 |
 
 ---
 

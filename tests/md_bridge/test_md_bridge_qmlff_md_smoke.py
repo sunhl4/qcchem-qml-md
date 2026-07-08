@@ -49,6 +49,19 @@ def test_build_qmlff_model_handle_initialises_params():
     assert idx.tolist() == [0, 0]
 
 
+def test_build_qmlff_from_preset_resolves_auto_device():
+    """Presets use device_name=auto; builder must resolve before qml.device()."""
+    import pennylane as qml
+
+    from qchem_stack.md_bridge import build_qmlff_model_from_preset
+
+    with pytest.raises(Exception, match="auto"):
+        qml.device("auto", wires=2)
+
+    handle = build_qmlff_model_from_preset(["H"], preset="atomic_amplitude")
+    assert handle.model.dev.name != "auto"
+
+
 def test_predict_energy_forces_hartree_units_roundtrip(small_qmef_dataset):
     from qchem_stack.md_bridge import (
         build_qmlff_model_from_preset,

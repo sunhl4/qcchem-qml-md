@@ -95,6 +95,7 @@ SERVER_HOST=192.168.110.148
 SERVER_PORT=8003
 UQC_API_TOKEN=
 JAX_PLATFORMS=cpu
+QMLFF_QUANTUM_DEVICE=default.qubit
 EOF
   chmod 600 "$envfile"
   log "wrote $envfile"
@@ -107,6 +108,7 @@ write_env_sh() {
 source $CONDA_PREFIX/etc/profile.d/conda.sh
 conda activate $ENV_PATH
 export JAX_PLATFORMS=cpu
+export QMLFF_QUANTUM_DEVICE=default.qubit
 cd $QCHEM_REPO
 EOF
   chmod 644 "$envsh"
@@ -129,6 +131,7 @@ print('OK jax', m.version('jax'), 'pennylane', m.version('pennylane'))
 run_mock_smoke() {
   cd "$QCHEM_REPO"
   export JAX_PLATFORMS=cpu
+  export QMLFF_QUANTUM_DEVICE="${QMLFF_QUANTUM_DEVICE:-default.qubit}"
   python scripts/run_uqc_md_ml.py \
     --backend-profile uqc_mock \
     --experiment configs/example_h2_uqc_mock_md_ml.yaml \

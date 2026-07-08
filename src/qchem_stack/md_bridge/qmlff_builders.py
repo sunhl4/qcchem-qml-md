@@ -240,6 +240,15 @@ def build_qmlff_model_from_preset(
         raise ValueError("species_list must be non-empty (e.g. ['H'] for hydrogen)")
 
     builder = ModelBuilder.from_preset(preset, species_list=species_list, **builder_overrides)
+    # Presets default device_name="auto"; resolve before qml.device() (HPC CPU has no "auto" plugin).
+    try:
+        from qmlff.utils.runtime_devices import resolve_quantum_device
+
+        device_name = str(getattr(builder.config, "device_name", "auto")).strip()
+        if device_name.lower() == "auto":
+            builder.config.device_name = resolve_quantum_device("auto")
+    except ImportError:
+        pass
     model = builder.build()
 
     if hasattr(model, "descriptor") and hasattr(model, "n_qubits"):

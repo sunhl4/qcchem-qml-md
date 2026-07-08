@@ -29,6 +29,7 @@ source "$CONDA_ROOT/etc/profile.d/conda.sh"
 conda activate "$ENV_PATH"
 cd "$REPO"
 export JAX_PLATFORMS="${JAX_PLATFORMS:-cpu}"
+export QMLFF_QUANTUM_DEVICE="${QMLFF_QUANTUM_DEVICE:-default.qubit}"
 export QCHEM_STACK_PYTHON="$(which python)"
 
 # 注册 pipeline runner + UQC backend
