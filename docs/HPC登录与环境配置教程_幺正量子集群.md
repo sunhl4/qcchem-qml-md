@@ -188,6 +188,10 @@ PROFILE=uqc_mock LOOP=configs/example_h4_uqc_mock_qmlff_loop_hpc.yaml sbatch scr
 PROFILE=uqc_mock LOOP=configs/example_h4_uqc_mock_qmlff_loop_5rounds.yaml sbatch scripts/hpc/run_h4_uqc_md_ml.sbatch
 PROFILE=uqc_cloud LOOP=configs/example_h4_uqc_cloud_sim_qmlff_loop_5rounds.yaml sbatch scripts/hpc/run_h4_uqc_md_ml.sbatch
 
+PROFILE=uqc_mock LOOP=configs/example_h2o_uqc_mock_qmlff_loop_hpc.yaml sbatch scripts/hpc/run_h2o_uqc_md_ml.sbatch
+PROFILE=uqc_mock LOOP=configs/example_h2o_uqc_mock_qmlff_loop_5rounds.yaml sbatch scripts/hpc/run_h2o_uqc_md_ml.sbatch
+PROFILE=uqc_cloud LOOP=configs/example_h2o_uqc_cloud_sim_qmlff_loop_5rounds.yaml sbatch scripts/hpc/run_h2o_uqc_md_ml.sbatch
+
 squeue -u $USER
 tail -f logs/uqc_mdml_smoke_<jobid>.out
 tail -f logs/h4_uqc_mdml_<jobid>.out
@@ -281,6 +285,8 @@ QMLFF_QUANTUM_DEVICE=default.qubit
 | 云 | `uqc_cloud` | `configs/example_h2_uqc_cloud_sim_md_ml.yaml` | `configs/example_h2_uqc_cloud_sim_qmlff_loop_smoke.yaml` | 是 |
 | H4 mock | `uqc_mock` | `configs/example_h4_uqc_mock_md_ml.yaml` | `configs/example_h4_uqc_mock_qmlff_loop_hpc.yaml` | 否 |
 | H4 云 5 轮 | `uqc_cloud` | `configs/example_h4_uqc_cloud_sim_md_ml.yaml` | `configs/example_h4_uqc_cloud_sim_qmlff_loop_5rounds.yaml` | 是 |
+| H2O mock | `uqc_mock` | `configs/example_h2o_uqc_mock_md_ml.yaml` | `configs/example_h2o_uqc_mock_qmlff_loop_hpc.yaml` | 否 |
+| H2O 云 5 轮 | `uqc_cloud` | `configs/example_h2o_uqc_cloud_sim_md_ml.yaml` | `configs/example_h2o_uqc_cloud_sim_qmlff_loop_5rounds.yaml` | 是 |
 
 ---
 
@@ -318,6 +324,7 @@ QMLFF_QUANTUM_DEVICE=default.qubit
 | [`scripts/hpc/setup_qchem_stack_env.sh`](../scripts/hpc/setup_qchem_stack_env.sh) | 一键安装 |
 | [`scripts/hpc/smoke_uqc_md_ml.sbatch`](../scripts/hpc/smoke_uqc_md_ml.sbatch) | Slurm H2 smoke |
 | [`scripts/hpc/run_h4_uqc_md_ml.sbatch`](../scripts/hpc/run_h4_uqc_md_ml.sbatch) | Slurm H4 mock/云 在线学习 |
+| [`scripts/hpc/run_h2o_uqc_md_ml.sbatch`](../scripts/hpc/run_h2o_uqc_md_ml.sbatch) | Slurm H2O mock/云 在线学习 |
 
 ---
 

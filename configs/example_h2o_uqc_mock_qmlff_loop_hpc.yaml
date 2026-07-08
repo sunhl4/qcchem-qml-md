@@ -1,0 +1,44 @@
+# H2O UQC mock 力场在线学习（HPC：2 轮，jitter 种子）
+# 实验: configs/example_h2o_uqc_mock_md_ml.yaml
+
+max_rounds: 2
+energy_tolerance_hartree: 1.0
+n_candidate_frames: 2
+add_top_k_per_round: 1
+label_energy_reference: variational
+validation_energy_reference: variational
+validation_theory_level: full_pipeline
+label_screening_theory_level: full_pipeline
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+validation_skip_initial_md_frame: false
+
+n_seed_geometries: 3
+seed_mode: jitter
+seed_jitter_bohr: 0.05
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_species_list: [O, H]
+qmlff_builder_overrides:
+  n_qubits: 8
+  n_layers: 3
+
+n_epochs_per_round: 2
+batch_size: 1
+learning_rate: 1.0e-3
+force_weight: 10.0
+energy_normalization: none
+warm_start: true
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 6
+md_dt_fs: 0.25
+md_temperature_K: 100.0
+md_save_stride: 2
+md_seed: 0
+
+write_per_round_extxyz: true
+seed: 0
