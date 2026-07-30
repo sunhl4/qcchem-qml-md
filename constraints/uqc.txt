@@ -59,7 +59,7 @@ pyparsing==3.3.2
 python-dateutil==2.9.0.post0
 python-dotenv==1.2.2
 python-engineio==4.13.3
-python-socketio==5.12.1
+python-socketio==5.16.3
 pytz==2026.2
 pyyaml==6.0.3
 qiskit==2.5.0
