@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
-"""Run pip-audit with ignore list from pip-audit.toml."""
+"""Run pip-audit; optionally apply ignore list from pip-audit.toml.
+
+Usage:
+  python scripts/run_pip_audit.py              # with pip-audit.toml allowlist
+  python scripts/run_pip_audit.py --no-allowlist
+"""
 
 from __future__ import annotations
 
@@ -22,9 +27,15 @@ def _ignore_vuln_ids() -> list[str]:
 
 
 def main(argv: list[str] | None = None) -> int:
-    cmd = ["pip-audit", "--skip-editable", "--desc", "on", *(argv or sys.argv[1:])]
-    for vuln_id in _ignore_vuln_ids():
-        cmd.extend(["--ignore-vuln", vuln_id])
+    args = list(argv if argv is not None else sys.argv[1:])
+    use_allowlist = True
+    if "--no-allowlist" in args:
+        use_allowlist = False
+        args = [a for a in args if a != "--no-allowlist"]
+    cmd = ["pip-audit", "--skip-editable", "--desc", "on", *args]
+    if use_allowlist:
+        for vuln_id in _ignore_vuln_ids():
+            cmd.extend(["--ignore-vuln", vuln_id])
     return subprocess.call(cmd)
 
 

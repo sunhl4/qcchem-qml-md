@@ -20,6 +20,24 @@ def test_product_gap_categories_have_anchors() -> None:
         assert row.get("status")
 
 
+def test_product_capability_sla_v1_normalizes_statuses() -> None:
+    from qchem_stack.contracts.schema_ids import PRODUCT_CAPABILITY_SLA_V1
+    from qchem_stack.protocols.product_contract import product_capability_sla_v1
+
+    allowed = {"available", "partial", "stub_only", "n/a", "local_runtime_only"}
+    payload = product_capability_sla_v1()
+    assert payload["schema"] == PRODUCT_CAPABILITY_SLA_V1
+    gaps = product_gap_categories()
+    assert set(payload["by_id"]) == {row["id"] for row in gaps}
+    assert len(payload["rows"]) == len(gaps)
+    for row in payload["rows"]:
+        assert row["sla"] in allowed
+    assert payload["by_id"]["mitigation_batch_scheduler"] == "partial"
+    assert payload["by_id"]["tensor_network_engine"] == "stub_only"
+    assert payload["by_id"]["managed_cloud_runtime"] == "local_runtime_only"
+    assert payload["by_id"]["uccsd_scbk_trotter_circuit"] == "n/a"
+
+
 def test_product_gap_evidence_paths_exist_on_disk() -> None:
     from pathlib import Path
 

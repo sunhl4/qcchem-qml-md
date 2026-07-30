@@ -24,11 +24,20 @@ def main() -> int:
         root / "examples" / "example_open_stack_quantum_problem.py",
         root / "examples" / "toy_dmrg_spin_chain.py",
         root / "examples" / "tutorial_07_md_classical_h2_only.py",
+        root / "examples" / "tutorial_gqe_h2_smoke.py",
     ]
     for s in scripts:
         if s.name == "tutorial_07_md_classical_h2_only.py" and not _optional_importable("jax"):
             print(
                 f"skip {s.name} (pip install qchem-stack[qmlff] for jax-md path)", file=sys.stderr
+            )
+            continue
+        if s.name == "tutorial_gqe_h2_smoke.py" and (
+            not _optional_importable("jax") or not _optional_importable("optax")
+        ):
+            print(
+                f"skip {s.name} (pip install qchem-stack[gqe] for jax/optax)",
+                file=sys.stderr,
             )
             continue
         if s.name == "toy_dmrg_spin_chain.py":

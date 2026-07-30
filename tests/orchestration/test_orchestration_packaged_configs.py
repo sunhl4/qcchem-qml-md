@@ -275,6 +275,24 @@ def test_run_pipeline_sync_packaged_h2_iqeb_yaml() -> None:
     assert snap["iqeb_max_rounds"] == 2
 
 
+def test_run_pipeline_sync_packaged_h2_iqcc_yaml() -> None:
+    p = configs_path("example_h2_iqcc.yaml")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["algorithm"] == "iqcc"
+    assert isinstance(out.get("iqcc_meta"), dict)
+    assert isinstance(out.get("iqcc_selected_generators"), list)
+    rsum = out["repro"]["run_summary"]
+    assert rsum["quantum_algorithm"] == "iqcc"
+    assert rsum.get("iqcc_implementation_path") == "qchem_stack.quantum.algorithms.iqcc.IQCCVQE"
+    assert rsum.get("iqcc_max_steps_yaml") == 3
+    assert rsum.get("iqcc_top_k_yaml") == 2
+    snap = out["repro"]["parity_snapshot"]
+    assert snap["quantum_algorithm"] == "iqcc"
+    assert snap["iqcc_max_steps"] == 3
+    assert snap["iqcc_enable_pt"] is False
+
+
 def test_run_pipeline_sync_packaged_projection_trace_yaml() -> None:
     p = configs_path("example_h2_projection_trace.yaml")
     cfg = load_experiment_config(p)

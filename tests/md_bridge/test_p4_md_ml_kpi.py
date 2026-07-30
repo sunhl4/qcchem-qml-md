@@ -98,11 +98,11 @@ def test_md_validation_five_rounds_meets_accuracy_threshold(tmp_path: Path) -> N
             side_effect=_mock_traj,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.predict_energy_forces_hartree",
             side_effect=_mock_predict,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.qmlff_handle_to_qmef_frame",
             side_effect=lambda handle, **kw: {
                 "energy_hartree": -1.12,
                 "positions_bohr": kw.get("positions_bohr"),
@@ -158,11 +158,11 @@ def test_md_validation_runs_five_rounds_when_below_loop_tolerance(tmp_path: Path
             side_effect=_mock_traj,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.predict_energy_forces_hartree",
             side_effect=_mock_predict,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.qmlff_handle_to_qmef_frame",
             side_effect=lambda handle, **kw: {
                 "energy_hartree": -1.12,
                 "positions_bohr": kw.get("positions_bohr"),
@@ -242,11 +242,11 @@ def test_h4_md_validation_meets_kpi_with_mock_labeler(tmp_path: Path) -> None:
             side_effect=_mock_traj,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.predict_energy_forces_hartree",
             side_effect=_mock_predict,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.qmlff_handle_to_qmef_frame",
             side_effect=lambda handle, **kw: {
                 "energy_hartree": -1.12,
                 "positions_bohr": kw.get("positions_bohr"),

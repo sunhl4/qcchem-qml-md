@@ -1,54 +1,50 @@
 import type {ReactNode} from 'react';
 import clsx from 'clsx';
 import Heading from '@theme/Heading';
+import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
-type FeatureItem = {
+type LayerItem = {
   title: string;
-  Svg: React.ComponentType<React.ComponentProps<'svg'>>;
   description: ReactNode;
+  to: string;
 };
 
-const FeatureList: FeatureItem[] = [
+const layers: LayerItem[] = [
   {
-    title: 'P1 化学问题定义',
-    Svg: require('@site/static/img/undraw_docusaurus_mountain.svg').default,
-    description: (
-      <>
-        先把分子、基组、活性空间和嵌入参数定义清楚，减少后续调试中的语义歧义。
-      </>
-    ),
+    title: '模块手册',
+    description: <>按源码包：理论、调用、参数与可运行示例。</>,
+    to: '/modules/',
   },
   {
-    title: 'P2 程序构建与协议',
-    Svg: require('@site/static/img/undraw_docusaurus_tree.svg').default,
-    description: (
-      <>
-        把算法、协议和编排拆开，形成可演进、可验证、可追溯的执行计划。
-      </>
-    ),
+    title: '选型指南',
+    description: <>P1–P4：何时用什么映射、算法、后端与契约。</>,
+    to: '/guide/',
   },
   {
-    title: 'P3/P4 执行与作业',
-    Svg: require('@site/static/img/undraw_docusaurus_react.svg').default,
+    title: '教程与示例',
+    description: <>可运行步骤与 YAML 索引（验证命令 / 期望输出）。</>,
+    to: '/tutorial/',
+  },
+  {
+    title: '参考与 FAQ',
     description: (
       <>
-        从后端执行到作业状态机，再到 repro 导出，把实验升级为可维护的工程流程。
+        <Link to="/reference/api-surface">API 面</Link>、HTTP、配置字段、
+        <Link to="/faq/">FAQ</Link>。
       </>
     ),
+    to: '/reference/python-sdk',
   },
 ];
 
-function Feature({title, Svg, description}: FeatureItem) {
+function Layer({title, description, to}: LayerItem) {
   return (
-    <div className={clsx('col col--4', styles.featureCol)}>
-      <div className={styles.featureIconWrap}>
-        <Svg className={styles.featureSvg} role="img" />
-      </div>
-      <div className={styles.featureBody}>
+    <div className={clsx('col col--3', styles.featureCol)}>
+      <Link className={styles.featureBody} to={to}>
         <Heading as="h3">{title}</Heading>
         <p>{description}</p>
-      </div>
+      </Link>
     </div>
   );
 }
@@ -58,12 +54,14 @@ export default function HomepageFeatures(): ReactNode {
     <section className={styles.features}>
       <div className="container">
         <div className={styles.featuresHeader}>
-          <Heading as="h2">从能跑到能维护</Heading>
-          <p>围绕 P1-P4 构建产品手册，让新用户和维护者都能快速找到下一步动作。</p>
+          <Heading as="h2">文档分层</Heading>
+          <p>
+            模块讲「怎么用包」；选型讲「选什么」；教程讲「跟着做」；参考讲「字段与契约」。
+          </p>
         </div>
         <div className="row">
-          {FeatureList.map((props, idx) => (
-            <Feature key={idx} {...props} />
+          {layers.map((props) => (
+            <Layer key={props.title} {...props} />
           ))}
         </div>
       </div>

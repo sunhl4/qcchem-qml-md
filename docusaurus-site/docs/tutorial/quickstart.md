@@ -84,6 +84,18 @@ uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
 | 启动 API | `uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000` |
 | 本地烟测 | `python scripts/smoke_pipeline.py` |
 
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py
+```
+
+## 期望输出
+
+- 进程退出码 `0`
+- 结果含 `pre_quantum_input.hamiltonian_fingerprint`
+- `qchem-run --scenario minimal_vqe` 可替代烟测
+
 ## 6. 常见问题
 
 - **安装后找不到命令**：确认当前 shell 在正确 Python 虚拟环境中。

@@ -7,6 +7,7 @@ from typing import TYPE_CHECKING
 from qchem_stack.config.embedding_enums import DmetHamiltonianSource, EmbeddingMode
 from qchem_stack.config.embedding_helpers import nonempty_fragment_labels
 from qchem_stack.config.embedding_specs import EmbeddingDmet, EmbeddingPlugin
+from qchem_stack.config.gqe_helpers import gqe_enabled, gqe_repro_fields
 from qchem_stack.config.quantum_helpers import (
     classify_pauli_expectation_path_for_config,
     excited_qse_after_variational,
@@ -61,6 +62,8 @@ def attach_run_summary(out: dict[str, object], cfg: ExperimentConfig) -> None:
         stages.append("sceom")
     if pauli_protocol_enabled(cfg) and "energy_pauli_protocol" in out:
         stages.append("pauli_averaging_protocol")
+    if gqe_enabled(cfg) and isinstance(out.get("gqe_report"), dict):
+        stages.append("gqe")
     sm: dict[str, object] = {
         "stages_completed": stages,
         "quantum_algorithm": q.algorithm,
@@ -301,4 +304,17 @@ def attach_run_summary(out: dict[str, object], cfg: ExperimentConfig) -> None:
     ew = out.get("embedding_workflow")
     if isinstance(ew, dict):
         repro["embedding_workflow"] = ew
+    sm.update(gqe_repro_fields(cfg))
+    gqe_rep = out.get("gqe_report")
+    if isinstance(gqe_rep, dict):
+        if gqe_rep.get("best_energy") is not None:
+            sm["gqe_best_energy"] = float(gqe_rep["best_energy"])
+        if gqe_rep.get("n_energy_evals") is not None:
+            sm["gqe_n_energy_evals"] = int(gqe_rep["n_energy_evals"])
+        if gqe_rep.get("gqe_mode") is not None:
+            sm["gqe_mode"] = str(gqe_rep["gqe_mode"])
+        if gqe_rep.get("train_mode") is not None:
+            sm["gqe_train_mode"] = str(gqe_rep["train_mode"])
+        if gqe_rep.get("paper") is not None:
+            sm["gqe_paper"] = str(gqe_rep["paper"])
     repro["run_summary"] = sm

@@ -13,6 +13,16 @@ from qchem_stack.config.quantum_helpers import (
     resolve_adapt_grad_tol,
     resolve_adapt_max_iter,
     resolve_adapt_pool_id,
+    resolve_iqcc_coeff_atol,
+    resolve_iqcc_denom_cutoff,
+    resolve_iqcc_enable_pt,
+    resolve_iqcc_energy_tolerance,
+    resolve_iqcc_max_steps,
+    resolve_iqcc_max_terms,
+    resolve_iqcc_max_weight,
+    resolve_iqcc_pool_id,
+    resolve_iqcc_pool_mode,
+    resolve_iqcc_top_k,
     resolve_iqeb_energy_tolerance,
     resolve_iqeb_max_rounds,
     resolve_iqeb_n_grads,
@@ -29,7 +39,7 @@ from qchem_stack.config.quantum_helpers import (
     resolve_vsqs_trotter_order,
 )
 from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
-from qchem_stack.quantum.algorithms.iqcc import IQCCVQE
+from qchem_stack.quantum.algorithms.iqcc import IQCCVQE, iqcc_algorithm_report_v1
 from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
 from qchem_stack.quantum.algorithms.puccd_vqe import PUCCDVQE, puccd_algorithm_report_v1
 from qchem_stack.quantum.algorithms.qcc_vqe import QCCVQE, qcc_algorithm_report_v1
@@ -103,18 +113,8 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
         return _vqe_outcome(result, report_fn(result))
 
     if ansatz == "iqcc":
-        ir = IQCCVQE(qh, executor=exe).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
-        return _vqe_outcome(
-            ir,
-            {
-                "schema": "algorithm_iqcc_report_v1",
-                "algorithm": "vqe",
-                "variational_ansatz": "iqcc",
-                "final_value": float(ir.energy),
-                "nfev": int(ir.nfev),
-                "meta": dict(ir.meta),
-            },
-        )
+        # Legacy UX: ansatz:iqcc under algorithm:vqe still runs iterative iQCC.
+        return run_iqcc(ctx)
     if ansatz == "qite":
         qr = QITEVQE(qh, executor=exe).run(seed=ctx.seed)
         return VariationalStageOutcome(
@@ -212,6 +212,47 @@ def run_iqeb(ctx: VariationalRunContext) -> VariationalStageOutcome:
     )
 
 
+def run_iqcc(ctx: VariationalRunContext) -> VariationalStageOutcome:
+    """Iterative QCC / optional EN2 (iQCC+PT) outer-loop runner."""
+    cfg = ctx.cfg
+    qh = ctx.resolved_hamiltonian()
+    pool_mode = resolve_iqcc_pool_mode(cfg)
+    if pool_mode not in ("genin_dis", "iqeb_qubit_excitation"):
+        pool_mode = "genin_dis"
+    algo = IQCCVQE(
+        qh,
+        max_steps=resolve_iqcc_max_steps(cfg),
+        top_k=resolve_iqcc_top_k(cfg),
+        coeff_atol=resolve_iqcc_coeff_atol(cfg),
+        max_terms=resolve_iqcc_max_terms(cfg),
+        enable_pt=resolve_iqcc_enable_pt(cfg),
+        denom_cutoff=resolve_iqcc_denom_cutoff(cfg),
+        pool_mode=pool_mode,  # type: ignore[arg-type]
+        pool_id=resolve_iqcc_pool_id(cfg),
+        max_weight=resolve_iqcc_max_weight(cfg),
+        energy_tolerance=resolve_iqcc_energy_tolerance(cfg),
+        maxiter_inner=resolve_vqe_maxiter(cfg),
+        executor=ctx.executor,
+    )
+    ir = algo.run(seed=ctx.seed)
+    flat_amps: list[float] = []
+    for row in ir.amplitudes_history:
+        flat_amps.extend(float(x) for x in row)
+    return VariationalStageOutcome(
+        energy=float(ir.energy),
+        angles=np.asarray(flat_amps, dtype=float),
+        algo_meta={
+            "algorithm": "iqcc_pt" if resolve_iqcc_enable_pt(cfg) else "iqcc",
+            "iqcc_meta": ir.meta,
+            "iqcc_selected_generators": ir.selected_generators,
+            "energy_variational": ir.energy_variational,
+            "energy_pt": ir.energy_pt,
+            "nfev": ir.nfev,
+        },
+        algorithm_report=iqcc_algorithm_report_v1(ir),
+    )
+
+
 def _qpe_stage_outcome(
     ctx: VariationalRunContext,
     *,
@@ -293,6 +334,7 @@ BUILTIN_RUNNERS: dict[str, object] = {
     "adapt": run_adapt_family,
     "tetris_adapt": run_adapt_family,
     "iqeb": run_iqeb,
+    "iqcc": run_iqcc,
     "sa_vqe": run_sa_vqe_branch,
     "qpe_kitaev": run_qpe_kitaev,
     "qpe_deterministic": run_qpe_deterministic,

@@ -54,3 +54,14 @@ python scripts/smoke_pipeline.py --config configs/example_h2_psi4_rhf_sto3g.yaml
 
 - [ZNE 与 Qiskit 复现路径](./zne-qiskit-repro)
 - [P3 执行与分析](../guide/execution-and-analysis)
+
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py --config configs/example_h2.yaml
+```
+
+## 期望输出
+
+- 退出码 `0`
+- 更换 `backend.provider` 后仍能完成管线

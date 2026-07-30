@@ -20,6 +20,7 @@
 | `vqe` | VQE 超参 | `depth`, `maxiter`, `optimizer_method` |
 | `adapt` | ADAPT | `max_iter`, `pool_id` |
 | `iqeb` | IQEB | `pool_id`, `n_grads`, `max_rounds` |
+| `iqcc` | iQCC / iQCC+PT | `max_steps`, `top_k`, `enable_pt`, `pool_mode`, `coeff_atol`, `denom_cutoff` |
 | `pauli` | Pauli 协议 | `use_protocol`, `grouping`, `run_sampled` |
 | `excited.*` | 激发态（VQD/QSE/SCEOM） | `after_variational`, 各方法参数 |
 | `demos.*` | QPE/VQS 演示 sidecar | |

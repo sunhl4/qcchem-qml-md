@@ -62,6 +62,26 @@ class MdValidationLoopConfig:
         seed_jitter_bohr: σ of the Gaussian jitter (Bohr) when ``seed_mode=jitter``.
         seed_bond_min_bohr / seed_bond_max_bohr: bond-length scan range (Bohr)
             when ``seed_mode=bond_stretch``.
+        round_bonds_per_round: if >0, each AL round also labels and merges this
+            many **new** H–H bond lengths (staggered schedule complementary to
+            the seed scan). Use this when MD alone does not cover the PES.
+        stop_on_md_converged: when ``False``, keep running all ``max_rounds``
+            even if MD candidates already meet ``energy_tolerance_hartree``
+            (needed when the goal is a full bond-schedule online-learning pass).
+        pretrain_epochs: if >0, after the quantum bond-scan seed set is built,
+            train the force field on that dataset **alone** (no MD / no AL)
+            before entering online-learning rounds. This is the non-zero-shot
+            path: scan → pretrain → online learning.
+        dissociation_bond_bohr: chemistry threshold for logging / coverage
+            (bound vs dissociating). Does not by itself reject frames.
+        max_train_bond_bohr: reject MD merge candidates with longer bonds.
+            Default ``None`` → ``0.95 * cutoff`` (Å→Bohr). Beyond the FF
+            cutoff, pair interactions are not evaluated — such frames must
+            not enter training.
+        tolerance_stage1_hartree / tolerance_stage1_until_round: looser early
+            |ΔE| target (P1 staged convergence).
+        tolerance_stage2_hartree / tolerance_stage2_until_round: mid-stage
+            target before the final ``energy_tolerance_hartree``.
         md_init_frame: ``base`` starts MD from the equilibrium/base geometry;
             ``last`` uses the most recently merged training frame.
         n_epochs_per_round / batch_size / learning_rate / force_weight:
@@ -109,6 +129,17 @@ class MdValidationLoopConfig:
     seed_bond_min_bohr: float = 0.8
     seed_bond_max_bohr: float = 2.2
 
+    # Per-round bond-length injection (complementary to seed scan)
+    round_bonds_per_round: int = 0
+    stop_on_md_converged: bool = True
+
+    # Phase B: train on seed dataset before online learning (not zero-shot)
+    pretrain_epochs: int = 0
+
+    # Dissociation / cutoff policy (H2 and other diatomics)
+    dissociation_bond_bohr: float = 3.0
+    max_train_bond_bohr: float | None = None
+
     # QML-FF training
     n_epochs_per_round: int = 3
     batch_size: int = 1
@@ -138,6 +169,10 @@ class MdValidationLoopConfig:
     # Active learning
     n_candidate_frames: int = 4
     energy_tolerance_hartree: float = 5.0e-4  # ≈ 13.6 meV
+    tolerance_stage1_hartree: float | None = None
+    tolerance_stage1_until_round: int = 0
+    tolerance_stage2_hartree: float | None = None
+    tolerance_stage2_until_round: int = 0
     add_top_k_per_round: int = 2
     label_energy_reference: EnergyReference = "variational"
     validation_energy_reference: EnergyReference | None = None
@@ -152,6 +187,23 @@ class MdValidationLoopConfig:
     # IO
     write_per_round_extxyz: bool = True
     seed: int = 0
+
+    def resolve_round_tolerance(self, round_i: int) -> float:
+        """Staged |ΔE| target: stage1 → stage2 → final ``energy_tolerance_hartree``."""
+        r = int(round_i)
+        if (
+            self.tolerance_stage1_hartree is not None
+            and int(self.tolerance_stage1_until_round) > 0
+            and r <= int(self.tolerance_stage1_until_round)
+        ):
+            return float(self.tolerance_stage1_hartree)
+        if (
+            self.tolerance_stage2_hartree is not None
+            and int(self.tolerance_stage2_until_round) > 0
+            and r <= int(self.tolerance_stage2_until_round)
+        ):
+            return float(self.tolerance_stage2_hartree)
+        return float(self.energy_tolerance_hartree)
 
     @classmethod
     def from_yaml(cls, path: str | Path) -> MdValidationLoopConfig:

@@ -1,0 +1,93 @@
+# H₂ P0–P2 改进训练：解离前后覆盖 + 截断策略 + 分阶段容差
+#
+# P0
+#   - energy_normalization: subtract_mean
+#   - MD 并入训练集时拒绝 R > max_train_bond（默认 ≈0.95×FF cutoff）
+# P1
+#   - 密扫描 ≥24 点，覆盖 bound + dissociating（至 cutoff 内）
+#   - pretrain_epochs: 250
+#   - 分阶段容差 0.05 → 0.01 → 5e-4
+# P2
+#   - 40 轮 × 40 epoch；模型 n_qubits=8 / n_layers=3
+#
+# 解离与相互作用：
+#   - dissociation_bond_bohr=3.0：化学解离标记（bound vs dissociating）
+#   - cutoff_ang=6.0：qmlff 邻居截断（Å）。R > cutoff 时力场不再计算该对相互作用，
+#     此类 MD 飞散帧禁止入库；cutoff 内的解离后构型保留以学习渐近区。
+#
+#   python scripts/run_uqc_md_ml.py \
+#     --backend-profile statevector \
+#     --experiment configs/example_h2.yaml \
+#     --loop configs/example_h2_qmlff_bondscan_ol_p0p2.yaml \
+#     --output results/h2_bondscan_ol_p0p2
+#
+# HPC：LOOP=configs/example_h2_qmlff_bondscan_ol_p0p2.yaml MAX_ROUNDS=40 \
+#      sbatch --cpus-per-task=30 --mem=120G --time=2-00:00:00 \
+#      scripts/hpc/h2_bondscan_online_learning.sbatch
+
+max_rounds: 40
+energy_tolerance_hartree: 5.0e-4
+tolerance_stage1_hartree: 0.05
+tolerance_stage1_until_round: 15
+tolerance_stage2_hartree: 0.01
+tolerance_stage2_until_round: 30
+
+n_candidate_frames: 3
+add_top_k_per_round: 1
+label_energy_reference: variational
+validation_energy_reference: variational
+validation_theory_level: full_pipeline
+label_screening_theory_level: full_pipeline
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+validation_skip_initial_md_frame: false
+
+# ---- Phase A：稠密键长扫描（解离前 + 解离后至截断内）----
+n_seed_geometries: 28
+seed_mode: bond_stretch
+seed_bond_min_bohr: 0.70
+seed_bond_max_bohr: 5.50
+
+# 化学解离标记 / 训练最大键长 / FF 截断
+dissociation_bond_bohr: 3.0
+max_train_bond_bohr: null          # → 0.95 × cutoff
+cutoff_ang: 6.0                    # qmlff 默认；超过则不计算对相互作用
+
+# ---- Phase B：预训练 ----
+pretrain_epochs: 250
+
+# ---- Phase C：在线学习 ----
+round_bonds_per_round: 1
+stop_on_md_converged: false
+n_epochs_per_round: 40
+warm_start: true
+warm_start_params_only: true
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_builder_overrides:
+  n_qubits: 8
+  n_layers: 3
+qmlff_species_list: [H]
+
+batch_size: 1
+learning_rate: 1.0e-3
+lr_scheduler: constant
+force_weight: 10.0
+energy_normalization: subtract_mean
+grad_clip: 1.0
+
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 60
+md_dt_fs: 0.25
+md_temperature_K: 100.0
+md_save_stride: 10
+md_seed: 0
+md_gamma_ps_inv: 0.1
+md_tau_fs: 100.0
+max_neighbors: 16
+
+write_per_round_extxyz: true
+seed: 0

@@ -65,3 +65,19 @@ source_modules =
     qchem_stack.md_bridge
 forbidden_modules =
     qchem_stack.orchestration
+
+# Layered architecture (higher layers may import lower layers; not vice versa).
+# Order is HIGHER -> LOWER. Modules on the same line separated by `:` are peers
+# (may import each other). The middle packages form a strongly-connected
+# mutual-dependency cluster (e.g. protocols<->backends, jobs<->orchestration,
+# chem->repro->protocols, config<->chem/backends), so they are declared as ONE
+# peer layer; a finer linear split is infeasible without refactoring the
+# import cycles. This contract still enforces the meaningful outer boundaries:
+# api/sdk are not imported by the middle; contracts/exceptions stay leaf.
+[importlinter:contract:layered-architecture]
+name = Layered architecture (api/sdk > middle cluster > contracts/exceptions)
+type = layers
+layers =
+    qchem_stack.api : qchem_stack.sdk
+    qchem_stack.repro : qchem_stack.protocols : qchem_stack.jobs : qchem_stack.orchestration : qchem_stack.integrations : qchem_stack.md_bridge : qchem_stack.qpe_qec_demo : qchem_stack.tensornet : qchem_stack.chem : qchem_stack.quantum : qchem_stack.backends : qchem_stack.mitigation : qchem_stack.config
+    qchem_stack.contracts : qchem_stack.exceptions

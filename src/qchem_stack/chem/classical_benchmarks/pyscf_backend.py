@@ -47,8 +47,12 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
 
         emp2 = float(mp.UMP2(mf).kernel()[0]) if method == "UHF" else float(mp.MP2(mf).kernel()[0])
         out["mp2"] = _ok(emp2)
-    except Exception as e:  # noqa: BLE001
+    except ImportError as e:
+        out["mp2"] = _na(f"pyscf.mp unavailable: {e}")
+    except (MemoryError, RuntimeError, ValueError, ArithmeticError) as e:
         out["mp2"] = _failed(str(e))
+    except Exception as e:  # noqa: BLE001 - keep pipeline resilient to unexpected backend errors
+        out["mp2"] = _failed(f"unexpected: {e}")
 
     try:
         from pyscf import cc
@@ -56,8 +60,12 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
         mycc = cc.UCCSD(mf) if method == "UHF" else cc.CCSD(mf)
         ecc, *_ = mycc.kernel()
         out["ccsd"] = _ok(float(mf.e_tot) + float(ecc))
-    except Exception as e:  # noqa: BLE001
+    except ImportError as e:
+        out["ccsd"] = _na(f"pyscf.cc unavailable: {e}")
+    except (MemoryError, RuntimeError, ValueError, ArithmeticError) as e:
         out["ccsd"] = _failed(str(e))
+    except Exception as e:  # noqa: BLE001 - keep pipeline resilient to unexpected backend errors
+        out["ccsd"] = _failed(f"unexpected: {e}")
 
     na_o = ctx.n_active_orbitals
     na_e = ctx.n_active_electrons
@@ -74,7 +82,11 @@ def run_classical_post_hf_pyscf(ctx: ClassicalBenchmarkContext) -> dict[str, Any
             mc = as_pyscf_cas(mcscf.CASCI(as_pyscf_mf(mf), int(na_o), int(na_e)))
             ecas, *_ = mc.kernel()
             out["casci"] = _ok(float(ecas))
-        except Exception as e:  # noqa: BLE001
+        except ImportError as e:
+            out["casci"] = _na(f"pyscf.mcscf unavailable: {e}")
+        except (MemoryError, RuntimeError, ValueError, ArithmeticError) as e:
             out["casci"] = _failed(str(e))
+        except Exception as e:  # noqa: BLE001 - keep pipeline resilient to unexpected backend errors
+            out["casci"] = _failed(f"unexpected: {e}")
 
     return out

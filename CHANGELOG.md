@@ -6,6 +6,26 @@ The format is based on **Keep a Changelog**, and this project adheres to **Seman
 
 ## [Unreleased]
 
+### Added
+
+- **iQCC / iQCC+PT** as first-class `quantum.algorithm: iqcc`: DIS ranking, Hamiltonian dressing (`iqcc_dressing`), optional EN2; `QuantumIqccSpec` / `quantum.iqcc.*`; report `algorithm_iqcc_report_v1`; configs `example_h2_iqcc.yaml` / `example_h2_iqcc_pt.yaml`; deep-read docs.
+
+### Changed
+
+- Per-package coverage floor for `repro` raised to **50%** (next milestone **70%**); expanded strict JSON export / schema guard tests.
+- Install extras: `all` / `dev` no longer pull `uqc` by default; use `all-cloud` / `dev-uqc`. Capability SLA page + stub-config warnings; docs SoT (GQE guide→module), tutorial matrix, generated SDK API MDX.
+
+### Known Issues
+
+Residual items from the 2026-05-27 structured audit (`docs/AUDIT_REPORT_2026Q2.md`) not yet closed (tracked as P3 cleanup; none are blocking):
+
+- **CI matrix** still targets Python 3.10–3.12 only; Python 3.13 is not exercised (`requires-python = ">=3.10"` would allow it).
+- **Config style drift**: experiment YAMLs still mix "full-dump" (~240 lines, all defaults) and "minimal" (~50 lines) styles; a canonical minimal-template + migration of full-dump configs is pending.
+- **Example coverage gaps**: no end-to-end Python walkthroughs yet for Schmidt DMET, projection embedding, Psi4 backend, HTTP API client usage, AVAS active-space, or IQEB (configs exist for several; tutorials do not).
+- **`tests/data/`** directory now exists with `.gitkeep` (fixes the previously dangling `test_data_dir` fixture); shared binary fixtures can be added there as needed.
+- **Pyright `reportExplicitAny` is a no-op**: the per-package `reportExplicitAny = "error"` settings in `[tool.pyright.executionEnvironments]` are BasedPyright extensions and are silently ignored by the standard Pyright this project uses (`pyright>=1.1`, CI `typecheck.yml`, pre-commit `pyright-python` v1.1.403). The *active* strictness in each env is `reportMissingParameterType = "error"` (standard-pyright-recognized). `reportExplicitAny` is retained for parity and would activate only if the project switches to basedpyright (a follow-up; would surface explicit-`Any` annotations to fix).
+- **`docs/execution/` archive**: redundant top-level sprint-report duplicates with no inbound references (e.g. `week_unified_chem_w0[345]`, `w12`) were removed — identical copies are retained under `docs/execution/archive/`. The remaining top-level duplicates (`day91_next_phase_plan_2026Q3`, `day91_day120_daily_breakdown_2026Q3`, `day120_gate_checklist_2026Q3`, `month1_baseline_signoff_2026Q2`, `week1_regression_report_2026Q2`) are still referenced by active docs and by archive copies that point back at top-level paths; retiring them needs a dedicated doc-reorg PR to rewrite the cross-reference cascade (out of scope here).
+
 ## [1.1.0] - 2026-06-15
 
 ### Added

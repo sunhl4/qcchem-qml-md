@@ -63,6 +63,35 @@ def apply_quantum_and_demo_run_summary_fields(
         if "nfev" in out:
             sm["iqeb_final_inner_vqe_nfev"] = out["nfev"]
         sm["iqeb_implementation_path"] = "qchem_stack.quantum.algorithms.iqeb.IQEBVQE"
+    elif q.algorithm == "iqcc":
+        sm["iqcc_max_steps_yaml"] = variational_yaml["iqcc_max_steps_yaml"]
+        sm["iqcc_top_k_yaml"] = variational_yaml["iqcc_top_k_yaml"]
+        sm["iqcc_enable_pt_yaml"] = variational_yaml["iqcc_enable_pt_yaml"]
+        sm["iqcc_pool_mode_yaml"] = variational_yaml["iqcc_pool_mode_yaml"]
+        im = out.get("iqcc_meta")
+        if isinstance(im, dict):
+            steps = im.get("iqcc_steps")
+            if isinstance(steps, list):
+                sm["iqcc_outer_steps_recorded"] = len(steps)
+            if im.get("n_terms_final") is not None:
+                sm["iqcc_n_terms_final"] = int(im["n_terms_final"])
+            if im.get("enable_pt") is not None:
+                sm["iqcc_enable_pt_used"] = bool(im["enable_pt"])
+            if im.get("nfev") is not None and "nfev" not in out:
+                sm["iqcc_nfev"] = int(im["nfev"])
+        selected = out.get("iqcc_selected_generators")
+        if isinstance(selected, list):
+            sm["iqcc_selected_generator_count"] = len(selected)
+            sm["iqcc_selected_generators_head"] = list(selected[:8])
+        if "nfev" in out:
+            sm["iqcc_nfev"] = out["nfev"]
+        ar = out.get("algorithm_report")
+        if isinstance(ar, dict):
+            if ar.get("energy_variational") is not None:
+                sm["iqcc_energy_variational"] = float(ar["energy_variational"])
+            if ar.get("energy_pt") is not None:
+                sm["iqcc_energy_pt"] = float(ar["energy_pt"])
+        sm["iqcc_implementation_path"] = "qchem_stack.quantum.algorithms.iqcc.IQCCVQE"
     rs = out.get("resource_summary")
     if isinstance(rs, dict):
         if "sum_shots_total_with_excited_upper_bound" in rs:

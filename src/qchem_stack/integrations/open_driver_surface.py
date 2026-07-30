@@ -15,7 +15,7 @@ def open_driver_coverage_matrix() -> dict[str, Any]:
     """Machine-readable coverage for parity matrices / gap dashboards."""
     return {
         "schema": OPEN_DRIVER_SURFACE_V1,
-        "stack": "qchem_stack.chem.drivers.pyscf_driver",
+        "stack": "qchem_stack.chem.solvers.pyscf_solver",
         "rows": [
             {
                 "parity_matrix_row_label": "gas-phase RHF/UHF/ROHF",

@@ -26,11 +26,25 @@ keywords:
 - 不等价于商业云平台 IAM、OAuth、配额与计费体系
 - 强调可复现与可审计，而非闭源产品功能复刻
 
-## 鉴权与网络建议
+## 鉴权、CORS 与限流（生产）
 
-- 默认仅建议绑定 `127.0.0.1`
-- 对外暴露前请放在反向代理后并补鉴权
-- 不要直接裸露到公网
+| 环境变量 | 作用 |
+|----------|------|
+| `QCHEM_STACK_API_KEY` | 请求需带匹配 API Key（见中间件） |
+| `QCHEM_STACK_REQUIRE_API_KEY` | 设为真时：**启动时**若缺 `QCHEM_STACK_API_KEY` 则失败 |
+| `QCHEM_STACK_CORS_ORIGINS` | 允许的 CORS 来源列表（逗号分隔）；**不要**与 credentials 一起用 `*` |
+| `QCHEM_STACK_CORS_CREDENTIALS` | 是否允许 credentials（显式 origins） |
+
+限流：`slowapi` 装饰器挂在 runs / meta / ml_md 路由（见 `api/middleware.py` 中 `RUNS_*_LIMIT`、`META_POST_LIMIT` 等）。超限返回 429。
+
+```bash
+export QCHEM_STACK_REQUIRE_API_KEY=1
+export QCHEM_STACK_API_KEY='replace-me'  # pragma: allowlist secret
+export QCHEM_STACK_CORS_ORIGINS='https://docs.example.com'
+uvicorn qchem_stack.api.app:app --host 127.0.0.1 --port 8000
+```
+
+默认仅建议绑定 `127.0.0.1`；对外请放在反向代理后。未设 API Key 时进程会打 warning（开发便利，非生产默认）。
 
 ## 可观测字段
 

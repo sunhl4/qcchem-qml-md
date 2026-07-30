@@ -14,4 +14,8 @@ def test_sample_configs_include_vqd_uccsd_and_are_unique() -> None:
     assert "configs/example_h2_vqd_uccsd.yaml" in sample_configs
     assert len(sample_configs) == len(set(sample_configs))
     assert len(sample_configs) >= 96
-    assert len(md_loop_configs) == 11
+    # MD-loop configs are auto-discovered from configs/*.yaml (see
+    # scripts/check_parity_export_sample.py), so assert a floor + uniqueness
+    # rather than an exact count that drifts when configs are added.
+    assert len(md_loop_configs) >= 11
+    assert len(md_loop_configs) == len(set(md_loop_configs))

@@ -1,47 +1,76 @@
 ---
-title: 快速开始
-description: qchem-stack 文档站与工程仓库的统一入口，先理解你该从哪条路径开始。
+title: 开始使用
+description: 安装 qchem-stack，并在数分钟内跑通第一条量子化学管线。
 keywords:
   - qchem-stack
-  - docusaurus
-  - 快速开始
-  - 文档站
+  - install
+  - quickstart
 ---
 
-# 快速开始
+# 开始使用
 
-这个站点是 `qchem_qml_md` 的主文档入口，目标不是展示“概念海报”，而是帮助你快速完成三件事：
+**qchem-stack** 用 YAML 编排量子化学工作流：化学定义 → 程序构建 → 后端执行 → 可复现导出。
 
-- 跑通一条最小量子化学管线
-- 找到你要改的配置、脚本和接口
-- 在团队场景下稳定运行并可复现
+English notes: [Getting started](/getting-started-en)。
 
-## 你现在该点哪里
+---
 
-| 你的目标 | 建议入口 |
-|---|---|
-| 先跑通结果 | [15 分钟上手](./tutorial/quickstart) 或 [三条路径索引](./tutorial/tutorial-index-three-paths) |
-| 先理解配置怎么组织 | [工作流与 YAML 概览](./tutorial/workflow) |
-| 我是维护者，要看全局结构 | [指南总览（P1-P4）](./guide/) |
-| 我要接 HTTP / 队列 | [命令行与脚本](./reference/cli-and-scripts) + [HTTP API](./reference/http-api-sqlite-jobs) |
-| 我要做规划与验收 | [产品路线图](./product/roadmap) + [工程架构](./concept/engineering-architecture) |
+## 安装
 
-## 站点结构（维护视角）
+```bash
+pip install "qchem-stack[chem,quantum]"
+```
 
-- `docs/product`：产品能力、边界和路线
-- `docs/guide`：P1-P4 主线（化学 -> 程序 -> 执行 -> 作业）
-- `docs/tutorial`：可运行教程，强调“做什么 + 怎么验证”
-- `docs/reference`：CLI、HTTP、CircuitIR、DMET 等契约页
-- `docs/cloud`：本地/私有部署的云化治理实践
-- `docs/product` / `docs/concept`：产品路线、架构边界和验收口径
+| Extra | 用途 |
+|-------|------|
+| *(core)* | 预计算管线与严格 repro |
+| `chem` | PySCF |
+| `quantum` | Qiskit / Aer |
+| `api` | FastAPI 作业服务 |
+| `gqe` | GPT-QE（JAX） |
+| `uqc` | UQC 云客户端（实验面） |
+| `dev` | 测试与 lint（默认不含 uqc） |
 
-## 维护原则（建议）
+完整档位见 [安装档位](/reference/install-profiles)。无 PySCF 时可跑预计算烟测：
 
-- 教程必须“可运行 + 可验证”，不要只写概念描述
-- 参考页保持契约稳定，优先补字段和状态机，而不是口号
-- 规划页保持诚实口径：能力范围、边界与证据可追溯
-- 首页与导航的链接只指向可维护、长期稳定的入口页
+```bash
+python3 scripts/smoke_pipeline.py --precomputed-only
+```
 
-## 外部参考（按需）
+### 从源码开发
 
-- [项目仓库 README](https://github.com/sunhl4/qcchem-qml-md)
+```bash
+git clone https://github.com/sunhl4/qcchem-qml-md.git
+cd qcchem-qml-md
+./scripts/bootstrap_dev.sh
+```
+
+---
+
+## 第一条命令
+
+```bash
+qchem-run --scenario minimal_vqe
+```
+
+或在 Python 中：
+
+```python
+from qchem_stack.sdk import run_pipeline_from_config, repro_json_dumps
+
+out = run_pipeline_from_config("configs/example_h2.yaml")
+print(repro_json_dumps(out["repro"]))
+```
+
+---
+
+## 下一步
+
+| 目标 | 入口 |
+|------|------|
+| 端到端走通 | [15 分钟上手](/tutorial/quickstart) |
+| 现成 YAML | [示例](/examples/) · [配置目录](/reference/configs-catalog) |
+| 选型决策 | [手册](/guide/) |
+| 包级深读 | [模块手册](/modules/) |
+| API | [Python SDK](/reference/python-sdk) · [配置字段](/reference/config-fields/) |
+| 排错 | [FAQ](/faq/) |

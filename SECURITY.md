@@ -23,3 +23,12 @@ When exposing the HTTP API or job worker beyond localhost, see [`docs/engineerin
 - Set `QCHEM_STACK_REQUIRE_API_KEY=1` and a strong `QCHEM_STACK_API_KEY`
 - Set `QCHEM_PROTOCOL_HMAC_KEY` (never use dev defaults)
 - Keep `QCHEM_ALLOW_LEGACY_PICKLE=0` in production after blob migration
+- Set `QCHEM_QUANTUM_STRICT=1` to reject custom `quantum.algorithm_factory` import paths so only built-in registered algorithm ids are accepted (prevents arbitrary `module:callable` imports from YAML in production). Operator-pool ids are already validated in all modes.
+
+## UQC (experimental) and pip-audit allowlist
+
+The **`uqc`** extra (and **`all-cloud`** / **`dev-uqc`**) pulls the experimental UQC cloud client and its transitive pins (notably `aiohttp` / `python-socketio`). Those pins currently require CVE ignore entries in [`pip-audit.toml`](pip-audit.toml).
+
+- Core CI **`security-audit`** installs `.[dev]` **without** UQC and runs `pip-audit` **without** the allowlist.
+- Optional **`security-audit-uqc`** installs `.[dev-uqc]` and applies `pip-audit.toml` ignores only on that job.
+- Do **not** add direct-dependency CVEs to the allowlist; drop UQC-related ignores once upstream relaxes pins.

@@ -1,12 +1,14 @@
 import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
+import remarkMath from 'remark-math';
+import rehypeKatex from 'rehype-katex';
 
 // This runs in Node.js - Don't use client-side code here (browser APIs, JSX...)
 
 const config: Config = {
-  title: 'qchem-stack Docs',
-  tagline: 'Open quantum chemistry workflows with reproducible engineering outputs',
+  title: '量子计算化学',
+  tagline: '面向科学计算：YAML 管线、多后端执行与可复现导出',
   favicon: 'img/favicon.svg',
 
   // Future flags, see https://docusaurus.io/docs/api/docusaurus-config#future
@@ -28,10 +30,12 @@ const config: Config = {
   projectName: 'qcchem-qml-md',
 
   onBrokenLinks: 'throw',
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: 'throw',
+    },
+  },
 
-  // Even if you don't use internationalization, you can use this field to set
-  // useful metadata like html lang. For example, if your site is Chinese, you
-  // may want to replace "en" with "zh-Hans".
   i18n: {
     defaultLocale: 'zh-Hans',
     locales: ['zh-Hans'],
@@ -46,8 +50,10 @@ const config: Config = {
           routeBasePath: '/',
           editUrl:
             'https://github.com/sunhl4/qcchem-qml-md/tree/main/docusaurus-site/',
+          remarkPlugins: [remarkMath],
+          rehypePlugins: [rehypeKatex],
         },
-        blog: false,
+        blog: false, // residual blog/ directory removed; do not re-enable without content
         theme: {
           customCss: './src/css/custom.css',
         },
@@ -55,30 +61,66 @@ const config: Config = {
     ],
   ],
 
+  themes: [
+    [
+      require.resolve('@easyops-cn/docusaurus-search-local'),
+      {
+        hashed: true,
+        language: ['en', 'zh'],
+        indexDocs: true,
+        docsRouteBasePath: '/',
+        highlightSearchTermsOnTargetPage: true,
+        explicitSearchResultPath: true,
+        searchBarShortcutHint: true,
+      },
+    ],
+  ],
+
   themeConfig: {
     image: 'img/social-card-qchem.svg',
     colorMode: {
+      defaultMode: 'light',
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'qchem-stack',
+      title: '量子计算化学',
       logo: {
-        alt: 'qchem-stack Logo',
+        alt: '量子计算化学',
         src: 'img/logo-qchem.svg',
       },
       items: [
-        {to: '/getting-started', label: '快速开始', position: 'left'},
-        {to: '/product/features', label: '产品能力', position: 'left'},
-        {to: '/guide/', label: '指南', position: 'left'},
-        {to: '/tutorial/quickstart', label: '教程', position: 'left'},
-        {to: '/reference/cli-and-scripts', label: '参考', position: 'left'},
-        {to: '/product/roadmap', label: '路线图', position: 'left'},
-        {to: '/changelog/', label: '更新日志', position: 'left'},
+        {to: '/getting-started', label: '开始', position: 'left'},
+        {to: '/guide/', label: '选型', position: 'left'},
+        {to: '/modules/', label: '模块', position: 'left'},
+        {to: '/tutorial/', label: '教程', position: 'left'},
+        {to: '/examples/', label: '示例', position: 'left'},
         {
-          type: 'docSidebar',
-          sidebarId: 'mainSidebar',
+          type: 'dropdown',
+          label: '参考',
           position: 'left',
-          label: '文档目录',
+          items: [
+            {to: '/reference/python-sdk', label: 'Python SDK'},
+            {to: '/reference/api-generated', label: 'API 参考'},
+            {to: '/reference/http-api-sqlite-jobs', label: 'HTTP API'},
+            {to: '/reference/config-fields/', label: '配置字段'},
+            {to: '/faq/', label: 'FAQ'},
+            {to: '/reference/configs-catalog', label: '配置目录'},
+          ],
+        },
+        {
+          type: 'search',
+          position: 'right',
+        },
+        {
+          to: '/tutorial/quickstart',
+          label: '开始上手',
+          position: 'right',
+          className: 'navbar-cta',
+        },
+        {
+          href: 'https://pypi.org/project/qchem-stack/',
+          label: 'PyPI',
+          position: 'right',
         },
         {
           href: 'https://github.com/sunhl4/qcchem-qml-md',
@@ -91,43 +133,39 @@ const config: Config = {
       style: 'dark',
       links: [
         {
+          title: '产品',
+          items: [
+            {label: '开始使用', to: '/getting-started'},
+            {label: '15 分钟上手', to: '/tutorial/quickstart'},
+            {label: '能力 SLA', to: '/product/capability-sla'},
+            {label: 'FAQ', to: '/faq/'},
+          ],
+        },
+        {
           title: '文档',
           items: [
-            {
-              label: '快速开始',
-              to: '/getting-started',
-            },
-            {label: '产品能力', to: '/product/features'},
-            {label: '指南总览', to: '/guide/'},
-            {label: '教程', to: '/tutorial/quickstart'},
-            {label: '更新日志', to: '/changelog/'},
+            {label: '选型手册', to: '/guide/'},
+            {label: '模块手册', to: '/modules/'},
+            {label: 'Python SDK', to: '/reference/python-sdk'},
+            {label: '配置字段', to: '/reference/config-fields/'},
           ],
         },
         {
-          title: '产品与架构',
+          title: '项目',
           items: [
             {
-              label: '四柱指南',
-              to: '/guide/',
-            },
-            {
-              label: '云端与作业',
-              to: '/cloud/overview',
-            },
-            {label: '产品路线图', to: '/product/roadmap'},
-          ],
-        },
-        {
-          title: '外部链接',
-          items: [
-            {
-              label: '项目 GitHub',
+              label: 'GitHub',
               href: 'https://github.com/sunhl4/qcchem-qml-md',
             },
+            {
+              label: 'PyPI',
+              href: 'https://pypi.org/project/qchem-stack/',
+            },
+            {label: 'Changelog', to: '/changelog/'},
           ],
         },
       ],
-      copyright: `Copyright © ${new Date().getFullYear()} qchem-stack. Built with Docusaurus.`,
+      copyright: `© ${new Date().getFullYear()} qchem-stack · Apache-2.0`,
     },
     prism: {
       theme: prismThemes.github,

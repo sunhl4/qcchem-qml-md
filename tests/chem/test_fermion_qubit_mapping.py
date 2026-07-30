@@ -82,6 +82,7 @@ def test_algorithm_registry_sorted_ids() -> None:
 
     assert list_registered_algorithm_ids() == (
         "adapt",
+        "iqcc",
         "iqeb",
         "qpe_deterministic",
         "qpe_info_theory",

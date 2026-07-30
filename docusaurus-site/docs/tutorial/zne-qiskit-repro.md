@@ -39,3 +39,14 @@ python scripts/smoke_pipeline.py --config configs/example_h2_zne_circuit_fold.ya
 
 - [切换 Backend 并对比结果](./switch-backend-compare)
 - [P3 执行与分析](../guide/execution-and-analysis)
+
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py --config configs/example_h2_zne_circuit_fold.yaml
+```
+
+## 期望输出
+
+- 退出码 `0`
+- `repro` / run_summary 含 mitigation 相关键

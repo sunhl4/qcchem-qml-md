@@ -214,6 +214,11 @@ def _merge_pipeline_results(
     isp = data.get("iqeb_selected_pauli_strings")
     if isinstance(isp, list):
         out["iqeb_selected_pauli_strings_from_run"] = isp
+    if isinstance(data.get("iqcc_meta"), dict):
+        out["iqcc_meta_from_run"] = data["iqcc_meta"]
+    isg = data.get("iqcc_selected_generators")
+    if isinstance(isg, list):
+        out["iqcc_selected_generators_from_run"] = isg
     qdt = data.get("qpe_demo_track")
     if isinstance(qdt, dict):
         out["qpe_demo_track_from_run"] = {

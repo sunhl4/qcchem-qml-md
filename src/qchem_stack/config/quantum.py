@@ -24,6 +24,7 @@ from .quantum_specs import (
     QuantumDemosSpec,
     QuantumExcitedSpec,
     QuantumGraphSpec,
+    QuantumIqccSpec,
     QuantumIqebSpec,
     QuantumPauliSpec,
     QuantumTensornetSpec,
@@ -49,6 +50,7 @@ class QuantumSpec(ForbidExtraBase):
     vqe: QuantumVqeSpec = Field(default_factory=QuantumVqeSpec)
     adapt: QuantumAdaptSpec = Field(default_factory=QuantumAdaptSpec)
     iqeb: QuantumIqebSpec = Field(default_factory=QuantumIqebSpec)
+    iqcc: QuantumIqccSpec = Field(default_factory=QuantumIqccSpec)
     pauli: QuantumPauliSpec = Field(default_factory=QuantumPauliSpec)
     excited: QuantumExcitedSpec = Field(default_factory=QuantumExcitedSpec)
     demos: QuantumDemosSpec = Field(default_factory=QuantumDemosSpec)

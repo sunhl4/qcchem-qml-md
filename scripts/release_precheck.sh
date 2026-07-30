@@ -38,11 +38,17 @@ if [[ -x "$ROOT/.venv/bin/python" ]] && [[ -z "${QCHEM_STACK_PYTHON:-}" ]]; then
 fi
 
 PKG_VER="$("$PY" -c "import qchem_stack; print(qchem_stack.__version__)" 2>/dev/null || echo "?")"
-echo "== interpreter: $PY (qchem_stack $PKG_VER) =="
-if [[ "$PKG_VER" != "1.1.0" ]]; then
-  echo "error: release_precheck requires qchem_stack 1.1.0 editable install (got $PKG_VER)" >&2
+PYPROJECT_VER="$("$PY" -c "
+import tomllib
+from pathlib import Path
+data = tomllib.loads(Path('pyproject.toml').read_text(encoding='utf-8'))
+print(data['project']['version'])
+")"
+echo "== interpreter: $PY (qchem_stack $PKG_VER; pyproject $PYPROJECT_VER) =="
+if [[ "$PKG_VER" != "$PYPROJECT_VER" ]]; then
+  echo "error: installed qchem_stack.__version__ ($PKG_VER) must match pyproject.toml version ($PYPROJECT_VER)" >&2
   echo "hint: export QCHEM_STACK_PYTHON=$ROOT/.venv/bin/python" >&2
-  echo "hint: pip install -e \".[dev,chem,api]\" with that interpreter" >&2
+  echo "hint: pip install -e \".[dev,chem]\" with that interpreter" >&2
   exit 1
 fi
 
@@ -108,6 +114,13 @@ echo "== doc links =="
 echo "== configs catalog snippet =="
 "$PY" scripts/generate_configs_catalog.py
 "$PY" scripts/generate_configs_catalog.py --check
+
+echo "== examples gallery sync =="
+"$PY" scripts/generate_examples_gallery.py
+"$PY" scripts/generate_examples_gallery.py --check
+
+echo "== tutorial verify blocks =="
+"$PY" scripts/check_tutorial_verify_blocks.py
 
 echo "== coverage thresholds (requires prior pytest --cov) =="
 "$PY" scripts/check_coverage_thresholds.py || {

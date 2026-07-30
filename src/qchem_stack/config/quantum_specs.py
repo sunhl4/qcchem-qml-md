@@ -28,7 +28,8 @@ class QuantumVariationalSpec(ForbidExtraBase):
     ] = Field(
         default="hea",
         description=(
-            "Variational ansatz: HEA, cluster ansätze, qcc, iqcc/qite research plugins, or VSQS schedule."
+            "Variational ansatz: HEA, cluster ansätze (uccsd/qcc/…), legacy iqcc alias "
+            "(prefer algorithm:iqcc), qite research plugin, or VSQS schedule."
         ),
     )
     uccsd_trotter_steps: int | None = Field(
@@ -94,6 +95,39 @@ class QuantumIqebSpec(ForbidExtraBase):
         default=1.0e-8, gt=0.0, description="IQEB energy convergence tol."
     )
     max_rounds: int = Field(default=2, ge=1, le=64, description="Outer IQEB round cap.")
+
+
+class QuantumIqccSpec(ForbidExtraBase):
+    """Iterative QCC (iQCC) / optional EN2 (iQCC+PT) knobs."""
+
+    max_steps: int = Field(default=4, ge=1, le=128, description="Outer dressing iteration cap.")
+    top_k: int = Field(default=2, ge=1, le=64, description="Top-|g| entanglers per step.")
+    coeff_atol: float = Field(
+        default=1.0e-8, gt=0.0, description="Drop dressed Pauli terms below this |coeff|."
+    )
+    max_terms: int | None = Field(
+        default=None, ge=1, description="Optional hard cap on dressed Hamiltonian terms."
+    )
+    enable_pt: bool = Field(
+        default=False, description="Add EN2 correction over unused DIS (iQCC+PT)."
+    )
+    denom_cutoff: float = Field(
+        default=1.0e-6, gt=0.0, description="Skip EN2 terms with |D_k| below this cutoff."
+    )
+    pool_mode: Literal["genin_dis", "iqeb_qubit_excitation"] = Field(
+        default="genin_dis",
+        description="Candidate generators: Genin-style DIS or IQEB qubit-excitation pool.",
+    )
+    pool_id: OperatorPoolId = Field(
+        default=OperatorPoolId.IQEB_QUBIT_EXCITATION,
+        description="Operator pool id when pool_mode=iqeb_qubit_excitation.",
+    )
+    max_weight: int = Field(
+        default=4, ge=2, le=8, description="Max Pauli weight for Genin-style generators."
+    )
+    energy_tolerance: float = Field(
+        default=1.0e-8, gt=0.0, description="Stop when |E_n - E_{n-1}| falls below this."
+    )
 
 
 class QuantumPauliSpec(ForbidExtraBase):

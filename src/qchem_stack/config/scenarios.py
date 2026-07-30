@@ -60,8 +60,21 @@ SCENARIOS: dict[str, tuple[str, str, list[str]]] = {
     ),
 }
 
+# Declared pip extras typically needed beyond core install (advisory for CLI).
+SCENARIO_REQUIRES_EXTRAS: dict[str, tuple[str, ...]] = {
+    "minimal_vqe": ("chem",),
+    "uccsd_pauli": ("chem", "quantum"),
+    "adapt_iqeb": ("chem", "quantum"),
+    "excited_states": ("chem", "quantum"),
+    "embedding_dmet": ("chem",),
+    "mitigation_shots": ("chem", "quantum"),
+    "qpe_ft": ("chem", "quantum"),
+    "md_ml": ("chem", "uqc"),
+}
+
 __all__ = [
     "SCENARIOS",
+    "SCENARIO_REQUIRES_EXTRAS",
     "list_scenarios_text",
     "scenario_base_config_path",
     "scenario_config_path",
@@ -107,8 +120,10 @@ def list_scenarios_text(*, configs_prefix: str = "configs/") -> str:
         v3_rel = f"{configs_prefix}scenarios/{sid}.yaml"
         v3_path = base / "scenarios" / f"{sid}.yaml"
         primary = v3_rel if v3_path.is_file() else f"{configs_prefix}{yaml_names[0]}"
+        extras = SCENARIO_REQUIRES_EXTRAS.get(sid, ())
+        extras_note = f"requires_extras=[{', '.join(extras)}]" if extras else "requires_extras=[]"
         lines.append(f"  {sid:16}  {title}")
         lines.append(f"                    {desc}")
-        lines.append(f"                    -> {primary}")
+        lines.append(f"                    -> {primary}  ({extras_note})")
         lines.append("")
     return "\n".join(lines)

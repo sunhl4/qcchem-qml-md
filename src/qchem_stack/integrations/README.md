@@ -15,6 +15,7 @@ Use this index to tell **product paths** (stable imports, HTTP/meta surfaces, CI
 | `workflow_preview_graph.py` | Graph builder helpers for preview | Used by `workflow_preview` |
 | `methods_resource_unified.py` | Methods-style resource export bundle | Pipeline / export scripts |
 | `resource_estimation_preview.py` | Shot/circuit preview without chemistry | Meta APIs, export scripts |
+| `gqe/` | Nakaji GPT-QE (Plan B): JAX generative model + stack energy oracle | `run_gqe_from_config`; YAML `gqe:`; optional `.[gqe]` |
 | `cross_solver_parity.py` | HF energy cross-check reports | Tests, parity scripts |
 | `open_driver_surface.py` | Registered classical driver catalog | Capability / parity exports |
 | `rdm_corrections.py` | RDM correction orchestration glue (re-exports chem L3 kernels) | SCF stage when YAML enables |

@@ -33,6 +33,8 @@ _RESULT_KEYS = (
     "adapt_pool",
     "iqeb_meta",
     "iqeb_selected_pauli_strings",
+    "iqcc_meta",
+    "iqcc_selected_generators",
     "resource_summary",
     "protocol_counts",
     "vqe_meta",

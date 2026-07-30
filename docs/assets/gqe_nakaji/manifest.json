@@ -1,0 +1,16 @@
+{
+  "figures": [
+    "gqe_repro_overview.png",
+    "h2_pes_fig4_style.png",
+    "h2_error_vs_fci.png",
+    "h2_chem_acc_rate.png",
+    "h2_r20_retry_comparison.png",
+    "h2_trial_spread.png",
+    "lih_pes_pilot.png",
+    "lih_error_vs_fci.png",
+    "lih_correlation_captured.png"
+  ],
+  "h2_summary": "/home/sunhl/projects/qchem_qml_md/results/hpc_gqe_h2_scan_summary.json",
+  "lih_summary": "/home/sunhl/projects/qchem_qml_md/results/hpc_gqe_lih_pilot_summary.json",
+  "doc_assets_dir": "/home/sunhl/projects/qchem_qml_md/docs/assets/gqe_nakaji"
+}

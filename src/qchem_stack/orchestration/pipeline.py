@@ -1,16 +1,21 @@
-"""In-process pipeline: SCF → pre-quantum → variational → excited → protocol finalize.
+"""In-process pipeline: SCF → pre-quantum → variational → embedding → excited → protocol finalize.
 
 Orchestration wires chem, quantum, and backends; it must not be imported from those layers.
 
-Stage map (``run_pipeline_sync``)
-------------------------------------
+Stage map (``run_pipeline_sync``; see ``stage_registry.PIPELINE_STAGE_SPECS``)
+---------------------------------------------------------------------------
 1. **scf** — ``run_scf_stage``
-2. **pre_quantum** — ``build_pre_quantum_stage``
-3. **repro** — ``collect_repro_metadata`` after Hamiltonian is fixed
-4. **variational** — ``run_variational_stage``
-5. **embedding_workflow** — ``apply_embedding_workflow_stage``
-6. **excited** — ``run_excited_stages``
-7. **protocol_finalize** — ``run_protocol_and_finalize_stage``
+2. **pre_quantum** — ``build_pre_quantum_stage`` (post_run hook ``bind_post_pre_quantum_ctx``
+   collects **repro** metadata once the Hamiltonian is fixed; ``repro`` is therefore *not* a
+   standalone stage, despite some older docs listing it as one)
+3. **variational** — ``run_variational_stage``
+4. **embedding_workflow** — ``apply_embedding_workflow_stage``
+5. **excited** — ``run_excited_stages``
+6. **protocol_finalize** — ``run_protocol_and_finalize_stage``
+
+Note on ordering: ``embedding_workflow`` runs **after** ``variational`` by design — it applies
+a post-variational embedding correction / parity snapshot on top of the converged variational
+result rather than before it. Do not reorder without updating the parity contracts.
 
 Lifecycle names and events: ``stage_registry.PIPELINE_STAGE_LIFECYCLES``.
 Implementation body: ``pipeline_sync_runner.run_pipeline_sync``.

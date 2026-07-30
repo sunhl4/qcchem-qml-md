@@ -89,6 +89,18 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "materialization_result_schema": "algorithm_report_v1",
         "capabilities": {"supports_operator_pool": True, "supports_outer_rounds": True},
     },
+    "iqcc": {
+        "summary": "Iterative QCC with Hamiltonian dressing; optional EN2 (iQCC+PT).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_iqcc",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.iqcc.IQCCVQE",
+        "materialization_result_schema": "algorithm_iqcc_report_v1",
+        "capabilities": {
+            "supports_hamiltonian_dressing": True,
+            "supports_outer_rounds": True,
+            "supports_en2_pt": True,
+            "open_stack_implementation": True,
+        },
+    },
     "sa_vqe": {
         "summary": "Minimal state-averaged VQE with overlap penalty (SA-VQE).",
         "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sa_vqe_branch",
@@ -129,6 +141,7 @@ _MODEL_FACTORY_MAP: Final[dict[str, tuple[str, str, dict[str, Any]]]] = {
         {"tetris_style": True},
     ),
     "iqeb": ("qchem_stack.quantum.algorithms.iqeb", "IQEBVQE", {}),
+    "iqcc": ("qchem_stack.quantum.algorithms.iqcc", "IQCCVQE", {}),
     "sa_vqe": ("qchem_stack.quantum.algorithms.sa_vqe", "SAVQE", {}),
     "qpe_kitaev": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmKitaevQPE", {}),
     "qpe_deterministic": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmDeterministicQPE", {}),

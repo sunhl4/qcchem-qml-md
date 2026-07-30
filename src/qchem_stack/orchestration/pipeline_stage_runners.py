@@ -7,6 +7,7 @@ import logging
 from qchem_stack.backends.factory import executor_from_spec
 from qchem_stack.chem.pre_quantum_build import build_pre_quantum_input_with_context
 from qchem_stack.config import backend_spec_from_config, compiler_pass_bundle_from_config
+from qchem_stack.config.gqe_helpers import gqe_enabled, gqe_repro_fields, gqe_skip_variational
 from qchem_stack.config.quantum_helpers import resolve_variational_algorithm
 from qchem_stack.orchestration.embedding_workflow_stage import apply_embedding_workflow_stage
 from qchem_stack.orchestration.excited_stages import run_excited_stages
@@ -118,6 +119,38 @@ def bind_post_pre_quantum_ctx(ctx: PipelineSyncContext) -> None:
     ctx.bundle = compiler_pass_bundle_from_config(ctx.cfg)
 
 
+def _maybe_run_gqe_stage(ctx: PipelineSyncContext) -> None:
+    """Optional GPT-QE sidecar after Hamiltonian/VQE path (``gqe.enabled``)."""
+    if not gqe_enabled(ctx.cfg):
+        return
+    assert ctx.out is not None
+    from qchem_stack.integrations.gqe.api import run_gqe_from_config
+
+    report = run_gqe_from_config(ctx.cfg, cfg_path=ctx.cfg_path)
+    ctx.out["gqe_report"] = report
+    if isinstance(ctx.repro, dict):
+        rs = ctx.repro.setdefault("run_summary", {})
+        if isinstance(rs, dict):
+            rs.update(gqe_repro_fields(ctx.cfg))
+            if report.get("best_energy") is not None:
+                rs["gqe_best_energy"] = float(report["best_energy"])
+            if report.get("n_energy_evals") is not None:
+                rs["gqe_n_energy_evals"] = int(report["n_energy_evals"])
+            if report.get("gqe_mode") is not None:
+                rs["gqe_mode"] = str(report["gqe_mode"])
+            if report.get("paper") is not None:
+                rs["gqe_paper"] = str(report["paper"])
+            stages = rs.get("stages_completed")
+            if isinstance(stages, list) and "gqe" not in stages:
+                stages.append("gqe")
+    _pipeline_log.info(
+        "pipeline gqe_done experiment_id=%s best_energy=%s n_evals=%s",
+        ctx.cfg.experiment_id,
+        report.get("best_energy"),
+        report.get("n_energy_evals"),
+    )
+
+
 def run_variational_stage_ctx(ctx: PipelineSyncContext) -> None:
     ctx.stage_completion_data = {}
     assert ctx.qh is not None
@@ -125,32 +158,51 @@ def run_variational_stage_ctx(ctx: PipelineSyncContext) -> None:
     assert ctx.pre_q_input is not None
     assert ctx.rhf is not None
     q = ctx.cfg.quantum
-    vctx = VariationalRunContext(
-        cfg=ctx.cfg,
-        hamiltonian=ctx.qh,
-        executor=ctx.exe,
-        seed=ctx.cfg.random_seed,
-        pre_quantum_input=ctx.pre_q_input,
-    )
-    stage = run_variational_stage(vctx)
-    algo_meta = stage.algo_meta_must_include_algorithm(resolve_variational_algorithm(ctx.cfg))
-    ctx.angles = stage.angles
-    ctx.energy_pre = float(stage.energy)
-    ctx.profile.mark("variational_done")
-    _stage_emit(ctx, "variational_done")
-    _pipeline_log.info(
-        "pipeline variational_done experiment_id=%s algorithm=%s E_var_au=%.10f",
-        ctx.cfg.experiment_id,
-        q.algorithm,
-        float(ctx.energy_pre),
-    )
+
+    if gqe_skip_variational(ctx.cfg):
+        import numpy as np
+
+        ctx.angles = np.asarray([], dtype=float)
+        ctx.energy_pre = float(ctx.rhf.e_tot)
+        algo_meta = {
+            "algorithm": "gqe_skip_variational",
+            "quantum_algorithm_yaml": q.algorithm,
+            "gqe_skip_variational": True,
+        }
+        algorithm_report = None
+        _pipeline_log.info(
+            "pipeline variational_skipped_for_gqe experiment_id=%s",
+            ctx.cfg.experiment_id,
+        )
+    else:
+        vctx = VariationalRunContext(
+            cfg=ctx.cfg,
+            hamiltonian=ctx.qh,
+            executor=ctx.exe,
+            seed=ctx.cfg.random_seed,
+            pre_quantum_input=ctx.pre_q_input,
+        )
+        stage = run_variational_stage(vctx)
+        algo_meta = stage.algo_meta_must_include_algorithm(resolve_variational_algorithm(ctx.cfg))
+        ctx.angles = stage.angles
+        ctx.energy_pre = float(stage.energy)
+        algorithm_report = stage.algorithm_report
+        ctx.profile.mark("variational_done")
+        _stage_emit(ctx, "variational_done")
+        _pipeline_log.info(
+            "pipeline variational_done experiment_id=%s algorithm=%s E_var_au=%.10f",
+            ctx.cfg.experiment_id,
+            q.algorithm,
+            float(ctx.energy_pre),
+        )
+
     ctx.out = assemble_pipeline_result_dict(
         repro=ctx.repro,
         rhf=ctx.rhf,
         energy_pre=ctx.energy_pre,
         angles=ctx.angles,
         algo_meta=algo_meta,
-        algorithm_report=stage.algorithm_report,
+        algorithm_report=algorithm_report,
         pre_q_input=ctx.pre_q_input,
         classical_benchmarks=ctx.classical_benchmarks,
         embedding_input_payload=ctx.embedding_input_payload,
@@ -162,9 +214,11 @@ def run_variational_stage_ctx(ctx: PipelineSyncContext) -> None:
         build_cache=ctx.build_cache,
     )
     patch_repro_parity_snapshot(ctx.out)
+    _maybe_run_gqe_stage(ctx)
     ctx.stage_completion_data = {
         "energy_au": float(ctx.energy_pre),
         "algorithm": str(q.algorithm),
+        "gqe_enabled": gqe_enabled(ctx.cfg),
     }
 
 

@@ -1,0 +1,5 @@
+# Test data directory.
+#
+# Referenced by the `test_data_dir` session fixture in tests/conftest.py.
+# Drop shared binary/JSON test fixtures here; keep this .gitkeep so the
+# directory exists even when empty.

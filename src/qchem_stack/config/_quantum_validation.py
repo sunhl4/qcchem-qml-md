@@ -108,6 +108,7 @@ def validate_operator_pool_ids(spec: QuantumSpec) -> None:
     for field_path, pool_id in (
         ("quantum.adapt.pool_id", spec.adapt.pool_id),
         ("quantum.iqeb.pool_id", spec.iqeb.pool_id),
+        ("quantum.iqcc.pool_id", spec.iqcc.pool_id),
     ):
         pid = str(pool_id)
         if not _operator_pool_validator(pid):

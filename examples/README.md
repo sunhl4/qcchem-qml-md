@@ -2,6 +2,12 @@
 
 与 [CONTRIBUTING.md](../CONTRIBUTING.md) 中的 CI、`scripts/check_parity_export_sample.py` 及 **Docusaurus**（`docusaurus-site/`）教程并列使用。
 
+站点示例馆正文由本文件同步生成：
+
+```bash
+python scripts/generate_examples_gallery.py
+```
+
 These paths are reproducible **open-stack** entry points (YAML → pipeline → export → pytest). They do not claim line-level parity with closed-source tutorials.
 
 ## 新用户三条路径 / Three onboarding paths
@@ -54,7 +60,7 @@ CI 中 parity export 抽样见 `scripts/check_parity_export_sample.py`。
 ## MD / QMEF bridge（Path C）
 
 - Schema 与 stub：`qchem_stack.md_bridge`（`QMEFDataset`、`QMFrame`、`StubTorchMLIPTrainer`）
-- 测试：`tests/test_md_bridge.py`、`tests/test_qmef_trainer_smoke.py`（marker `l1_md_ml`）
+- 测试：`tests/md_bridge/test_md_bridge.py`、`tests/integrations/test_qmef_trainer_smoke.py`（marker `l1_md_ml`）
 
 ## PySCF → OpenFermion 量子问题示例
 

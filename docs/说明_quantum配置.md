@@ -6,7 +6,7 @@ YAML 路径与 Python 属性一致，例如 `cfg.quantum.vqe.maxiter`、`cfg.qua
 
 | 字段 | 说明 |
 |------|------|
-| `algorithm` | 变分算法 id：`vqe`、`adapt`、`iqeb`、`tetris_adapt` 等 |
+| `algorithm` | 变分算法 id：`vqe`、`adapt`、`iqeb`、`iqcc`、`tetris_adapt` 等 |
 | `algorithm_factory` | 可选插件导入路径 `module:callable`；默认仅允许 `qchem_stack.*` 模块 |
 
 ## 子块索引
@@ -14,9 +14,10 @@ YAML 路径与 Python 属性一致，例如 `cfg.quantum.vqe.maxiter`、`cfg.qua
 | 子块 | 何时需要 | 关键字段 |
 |------|----------|----------|
 | `variational` | 所有变分阶段 | `ansatz`（`hea`/`uccsd`）、`uccsd_trotter_steps` |
-| `vqe` | `algorithm=vqe` | `depth`、`maxiter`、`optimizer_method`、`initial_parameters_strategy` |
+| `vqe` | `algorithm=vqe`（亦为 iQCC 内层振幅优化 `maxiter`） | `depth`、`maxiter`、`optimizer_method`、`initial_parameters_strategy` |
 | `adapt` | `algorithm=adapt` | `max_iter`、`pool_id` |
 | `iqeb` | `algorithm=iqeb` | `max_rounds`、`pool_id`、`n_grads`、`energy_tolerance` |
+| `iqcc` | `algorithm=iqcc` | `max_steps`、`top_k`、`enable_pt`、`pool_mode`、`coeff_atol` |
 | `uccsd` | UCCSD Pauli 分解 | `decomposition_mode`（`pauli`/`unitary`） |
 | `pauli` | Pauli 测量协议 | `use_protocol`、`run_sampled`、`run_qiskit_shots`、`grouping` |
 | `excited.vqd` | VQD 激发态 | `after_variational`、`n_states`、`optimizer_mode`、`shots_*` |
@@ -84,6 +85,27 @@ Packaged YAML：`configs/example_h2_excited_smoke.yaml`、`configs/example_h2_vq
 - `quantum.adapt.pool_id` / `quantum.iqeb.pool_id` 见 [`public_parity_matrix.md`](public_parity_matrix.md) 与算符池 registry。
 - 示例：`configs/example_h2_adapt_singles_pool.yaml`、`configs/example_h2_iqeb.yaml`。
 
+## iQCC / iQCC+PT（迭代量子比特耦合簇）
+
+```yaml
+quantum:
+  algorithm: iqcc
+  iqcc:
+    max_steps: 3
+    top_k: 2
+    enable_pt: false          # true → EN2（iQCC+PT）
+    pool_mode: genin_dis      # 或 iqeb_qubit_excitation
+    coeff_atol: 1.0e-8
+    denom_cutoff: 1.0e-6
+  vqe:
+    maxiter: 80               # 每步振幅优化迭代上限
+```
+
+- 实现：`qchem_stack.quantum.algorithms.iqcc.IQCCVQE`；穿衣内核 `iqcc_dressing`。
+- 示例：`configs/example_h2_iqcc.yaml`、`configs/example_h2_iqcc_pt.yaml`。
+- 手册：[docusaurus `modules/quantum/algorithms/iqcc`](../docusaurus-site/docs/modules/quantum/algorithms/iqcc.md)。
+- 遗留 UX：`algorithm: vqe` + `variational.ansatz: iqcc` 仍转入同一 `run_iqcc`。
+
 ## Pauli shot 模式（互斥）
 
 | YAML 标志 | 语义 |
@@ -103,6 +125,15 @@ quantum:
 ```
 
 路径须在 allowlist 内；见 [`quantum_模块风格约定.md`](quantum_模块风格约定.md)。
+
+## GPT-QE（GQE）— 非 `quantum.algorithm`
+
+Nakaji GPT-QE 使用 **顶层** `gqe:` 块（`config.gqe.GqeSpec`），稳定入口为
+`qchem_stack.integrations.gqe.run_gqe_from_config`。可选依赖：`pip install 'qchem-stack[gqe]'`。
+
+- **不要** 用 `quantum.algorithm: vqe` + HEA 冒充已接入 GQE。
+- `gqe.enabled: true` 时 orchestration 可在变分阶段后写入 `gqe_report`；`skip_variational: true` 可跳过 VQE。
+- 文档：`docusaurus-site/docs/guide/gqe-generative-eigensolver.md`、`tutorial/gqe-nakaji-h2.md`。
 
 ## 旧扁平键
 

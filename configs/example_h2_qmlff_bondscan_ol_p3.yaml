@@ -1,0 +1,104 @@
+# H₂ P3：参考经典 ML 力场（NEP/MACE/NequIP）修正解离区学习失败
+#
+# 根因（job 8978 分析）：
+#   种子扫描只到 5.5 Bohr，但 cutoff=11.3 Bohr → 5.5–11.3 盲区
+#   → 模型外推差 → 力场在盲区把 MD 推过解离点 → 原子飞过 cutoff → 力=0 → 永久飞散
+#   → 飞散帧 |ΔE|≈0.3 Ha 主导 overall，但被禁止入库 → 死循环
+#
+# P3 修正（经典 ML 力场核心原则）：
+#   1. 训练集覆盖 MD 会遇到的全部构型空间（NEP/MACE 原则）
+#      - 种子扫描 [0.5, 10.5] Bohr，覆盖压缩→解离→cutoff 内渐近区
+#      - 消除 5.5–11.3 盲区和 <0.7 压缩区盲区
+#   2. MD 稳定化：更小步长 + 更低温度，减少飞散概率
+#   3. 15h 预算：预训练 150 ep + 12 轮 × 30 ep
+#
+# 对比 P0–P2：
+#   种子: [0.7, 5.5] 28点 → [0.5, 10.5] 40点
+#   预训练: 250 ep → 150 ep（帧更多，单轮 epoch 减少）
+#   在线学习: 40 轮 × 40 ep → 12 轮 × 30 ep
+#   MD: dt=0.25 fs / 60 步 / 100K → dt=0.15 fs / 40 步 / 50K
+#
+#   python scripts/run_uqc_md_ml.py \
+#     --backend-profile statevector \
+#     --experiment configs/example_h2.yaml \
+#     --loop configs/example_h2_qmlff_bondscan_ol_p3.yaml \
+#     --output results/h2_bondscan_ol_p3
+#
+# HPC：LOOP=configs/example_h2_qmlff_bondscan_ol_p3.yaml MAX_ROUNDS=12 \
+#      sbatch --cpus-per-task=30 --mem=120G --time=15:00:00 \
+#      scripts/hpc/h2_bondscan_online_learning.sbatch
+
+max_rounds: 12
+energy_tolerance_hartree: 5.0e-4
+tolerance_stage1_hartree: 0.05
+tolerance_stage1_until_round: 6
+tolerance_stage2_hartree: 0.01
+tolerance_stage2_until_round: 12
+
+n_candidate_frames: 3
+add_top_k_per_round: 1
+label_energy_reference: variational
+validation_energy_reference: variational
+validation_theory_level: full_pipeline
+label_screening_theory_level: full_pipeline
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+validation_skip_initial_md_frame: false
+
+# ---- Phase A：稠密键长扫描，覆盖压缩→平衡→解离→cutoff 内渐近区 ----
+# 经典 ML 力场原则：训练集必须覆盖 MD 会遇到的全构型空间
+# max_train_bond = 0.95 × cutoff = 0.95 × 11.34 = 10.77 Bohr
+# seed_bond_max_bohr=10.50 < 10.77，不会被 clamp
+n_seed_geometries: 40
+seed_mode: bond_stretch
+seed_bond_min_bohr: 0.50
+seed_bond_max_bohr: 10.50
+
+# 化学解离标记 / 训练最大键长 / FF 截断
+dissociation_bond_bohr: 3.0
+max_train_bond_bohr: null          # → 0.95 × cutoff = 10.77 Bohr
+cutoff_ang: 6.0                    # qmlff 邻居截断（Å）
+
+# ---- Phase B：预训练 ----
+# 帧数 40（vs P0-P2 的 29），epoch 降到 150（vs 250）补偿时间
+pretrain_epochs: 150
+
+# ---- Phase C：在线学习 ----
+round_bonds_per_round: 1
+stop_on_md_converged: false
+n_epochs_per_round: 30
+warm_start: true
+warm_start_params_only: true
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_builder_overrides:
+  n_qubits: 8
+  n_layers: 3
+qmlff_species_list: [H]
+
+batch_size: 1
+learning_rate: 1.0e-3
+lr_scheduler: constant
+force_weight: 10.0
+energy_normalization: subtract_mean
+grad_clip: 1.0
+
+# MD 稳定化：更小步长 + 更低温度 + 更短轨迹
+# H₂ 结合能 ~0.14 Ha = 44000 K，50 K 远低于解离阈值
+# dt=0.15 fs（vs 0.25）减少积分误差
+# n_steps=40（vs 60）减少飞散窗口
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 40
+md_dt_fs: 0.15
+md_temperature_K: 50.0
+md_save_stride: 10
+md_seed: 0
+md_gamma_ps_inv: 0.1
+md_tau_fs: 100.0
+max_neighbors: 16
+
+write_per_round_extxyz: true
+seed: 0

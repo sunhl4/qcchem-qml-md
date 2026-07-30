@@ -137,8 +137,19 @@ quantum:
   adapt:
     max_iter: 4
     pool_id: fermionic_uccsd
-  algorithm: vqe
+  algorithm: iqcc
   algorithm_factory: null
+  iqcc:
+    max_steps: 3
+    top_k: 2
+    coeff_atol: 1.0e-8
+    max_terms: null
+    enable_pt: false
+    denom_cutoff: 1.0e-6
+    pool_mode: genin_dis
+    pool_id: iqeb_qubit_excitation
+    max_weight: 4
+    energy_tolerance: 1.0e-8
   demos:
     qpe:
       demo_track_n_bits: 4
@@ -205,12 +216,12 @@ quantum:
     contraction_engine: stub
     expectation_stub: false
   variational:
-    ansatz: iqcc
+    ansatz: hea
     uccsd_trotter_steps: null
   vqe:
     depth: 1
     initial_parameters_strategy: random_uniform
-    maxiter: 400
+    maxiter: 80
     optimizer_method: COBYLA
 random_seed: 42
 scf:

@@ -1,6 +1,10 @@
 # pip-audit allowlist for transitive advisories we cannot fix immediately.
 # Direct dependency CVEs must be resolved or upgraded — do not add direct deps here.
 #
+# Scope: used only by the optional UQC security job (`security-audit-uqc`) and
+# local `python scripts/run_pip_audit.py` (default). Core `security-audit` runs
+# with `--no-allowlist` on `.[dev]` without uqc.
+#
 # Usage: pip-audit --skip-editable --desc on --ignore-vuln <ID>
 
 [pip-audit]

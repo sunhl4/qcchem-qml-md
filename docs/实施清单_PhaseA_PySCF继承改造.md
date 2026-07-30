@@ -147,7 +147,7 @@
 
 ## 9. 执行核对（当前仓库）
 
-- [x] A1：`run_classical_benchmarks` 已落地，支持 `hf/mp2/ccsd/casci` 与 `status/value/reason`。  
+- [x] A1：`run_classical_post_hf_benchmarks` 已落地（清单原建议名 `run_classical_benchmarks`，实现时更名为 post-HF 语义），支持 `hf/mp2/ccsd/casci` 与 `status/value/reason`。  
 - [x] A2：`driver_meta` 最小字段集已落地（含 `driver_meta_schema_version=1`）。  
 - [x] A3：`active_space.strategy=cas|manual` + `ncas/nelecas` + `frozen_orbitals` 已落地并保持旧字段兼容。  
 - [x] 新增测试文件：`test_pyscf_driver_meta_contract.py`、`test_active_space_strategy_unified.py`、`test_pyscf_classical_benchmarks.py`。  

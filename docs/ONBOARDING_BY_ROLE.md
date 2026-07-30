@@ -43,7 +43,7 @@ Single entry for contributors and integrators. Pair with [QUICKSTART_CONTRIBUTOR
 
 **Local smoke (no PySCF):** `./scripts/venv-run python scripts/smoke_pipeline.py --precomputed-only`
 
-**MD bridge install:** `pip install -e ".[chem,md-classical]"` for classical H₂ FF + QMEF; `pip install -e ".[chem,qmlff]"` when using sibling QML-FF + JAX-MD.
+**MD bridge install:** `pip install -e ".[chem]"` for classical H₂ FF + QMEF (md-classical profile, not a pip extra); `pip install -e ".[chem,qmlff]"` when using sibling QML-FF + JAX-MD.
 
 ## Historical / backlog docs
 

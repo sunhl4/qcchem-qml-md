@@ -44,11 +44,15 @@ flowchart TB
 
 ## CI 检查
 
+权威（含 **lazy import** 扫描）：
+
 ```bash
 python scripts/check_import_layers.py
 ```
 
-Lint job 在 Ruff 之后运行此脚本。
+补充（模块级 forbidden，不含 lazy）：仓库根 `.importlinter`（import-linter）。两套规则并存时以 `check_import_layers.py` 为发布签字依据；allowlist 条目应附 issue / 过期注释，勿无限膨胀。
+
+Lint job 在 Ruff 之后运行 `check_import_layers.py`。
 
 ## 测试路径 helper
 

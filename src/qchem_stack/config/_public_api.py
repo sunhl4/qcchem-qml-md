@@ -27,6 +27,7 @@ from .chemistry_extended import ChemistryExtendedSpec
 from .compiler import CompilerSpec
 from .embedding import EmbeddingSpec
 from .experiment import ExperimentConfig
+from .gqe import GqeSpec
 from .io import dump_experiment_config, load_experiment_config
 from .md_ml_export import MdMlExportSpec
 from .mitigation import MitigationSpec
@@ -44,6 +45,7 @@ __all__ = [
     "CompilerSpec",
     "EmbeddingSpec",
     "ExperimentConfig",
+    "GqeSpec",
     "MdMlExportSpec",
     "MitigationSpec",
     "MoleculeSpec",

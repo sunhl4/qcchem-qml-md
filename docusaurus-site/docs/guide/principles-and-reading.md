@@ -5,6 +5,10 @@ description: 不是操作教程，而是面向深入理解的阅读路线图。
 
 # 原理与阅读建议
 
+:::tip 模块手册
+按任务深读 → [reading-paths](/modules/reading-paths) · 选型地图 → [overview](./overview) · [模块总览](/modules/)
+:::
+
 本页面向已经跑通示例的读者，帮助你按主题深入理解系统设计与实现边界。
 
 ## 经典-量子接口与化学嵌入

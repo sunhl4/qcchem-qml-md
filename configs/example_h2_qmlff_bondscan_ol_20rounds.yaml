@@ -1,0 +1,73 @@
+# H₂：量子键长扫描建集 → 预训练力场 → 在线学习（非零样本）
+#
+# 三阶段（不是 0-shot / 0 样本在线学习）：
+#   A) 量子计算化学（VQE full_pipeline）扫描不同 H–H 键长，标注能量/力 → 初始训练集
+#   B) 仅在该训练集上预训练力场（pretrain_epochs，无 MD）
+#   C) 再进入在线学习：每轮 MD 校验 + 追加与种子不同的键长 + 继续训练
+#
+# 配对实验：configs/example_h2.yaml
+#
+#   python scripts/run_uqc_md_ml.py \
+#     --backend-profile statevector \
+#     --experiment configs/example_h2.yaml \
+#     --loop configs/example_h2_qmlff_bondscan_ol_20rounds.yaml \
+#     --output results/h2_bondscan_pretrain_ol_20
+#
+# HPC：scripts/hpc/h2_bondscan_online_learning.sbatch（默认 30 核 / 120G）
+
+max_rounds: 20
+energy_tolerance_hartree: 5.0e-4
+n_candidate_frames: 2
+add_top_k_per_round: 1
+label_energy_reference: variational
+validation_energy_reference: variational
+validation_theory_level: full_pipeline
+label_screening_theory_level: full_pipeline
+label_top_theory_level: full_pipeline
+include_hf_nuclear_gradient: true
+dedupe_decimals: 4
+validation_skip_initial_md_frame: false
+
+# ---- Phase A：量子化学键长扫描 → 有标签训练集（必须 >0）----
+n_seed_geometries: 16
+seed_mode: bond_stretch
+seed_bond_min_bohr: 0.8
+seed_bond_max_bohr: 2.4
+
+# ---- Phase B：先在扫描集上把力场训好（无 MD）----
+pretrain_epochs: 120
+
+# ---- Phase C：在线学习（warm-start 自 Phase B）----
+round_bonds_per_round: 1
+stop_on_md_converged: false
+n_epochs_per_round: 30
+warm_start: true
+warm_start_params_only: true
+
+force_field_backend: qmlff_preset
+qmlff_preset: atomic_amplitude
+qmlff_builder_overrides:
+  n_qubits: 6
+  n_layers: 2
+qmlff_species_list: [H]
+
+batch_size: 1
+learning_rate: 1.0e-3
+lr_scheduler: constant
+force_weight: 10.0
+energy_normalization: none
+
+# 短 MD：校验用；键长覆盖主要靠 Phase A/C 的显式扫描
+md_ensemble: nvt_langevin
+md_init_frame: base
+md_n_steps: 40
+md_dt_fs: 0.25
+md_temperature_K: 100.0
+md_save_stride: 10
+md_seed: 0
+md_gamma_ps_inv: 0.1
+md_tau_fs: 100.0
+max_neighbors: 16
+
+write_per_round_extxyz: true
+seed: 0

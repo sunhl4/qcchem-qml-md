@@ -12,6 +12,7 @@ __all__ = [
     "VQE",
     "FermionicAdaptVQE",
     "IQEBVQE",
+    "IQCCVQE",
     "VQD",
     "QSE",
     "AlgorithmDeterministicQPE",
@@ -31,6 +32,7 @@ _LAZY_EXPORTS: dict[str, tuple[str, str]] = {
     "VQE": ("qchem_stack.quantum.algorithms.vqe", "VQE"),
     "FermionicAdaptVQE": ("qchem_stack.quantum.algorithms.adapt", "FermionicAdaptVQE"),
     "IQEBVQE": ("qchem_stack.quantum.algorithms.iqeb", "IQEBVQE"),
+    "IQCCVQE": ("qchem_stack.quantum.algorithms.iqcc", "IQCCVQE"),
     "VQD": ("qchem_stack.quantum.algorithms.excited", "VQD"),
     "QSE": ("qchem_stack.quantum.algorithms.excited", "QSE"),
     "AlgorithmDeterministicQPE": (

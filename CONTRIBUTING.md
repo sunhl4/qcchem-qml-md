@@ -12,7 +12,11 @@
 ./scripts/bootstrap_dev.sh
 export QCHEM_STACK_PYTHON="$(pwd)/.venv/bin/python"
 ./scripts/venv-run pytest tests -q --tb=short -m "not slow and not perf"
+# PR merge gate (skip docusaurus):
+./scripts/release_precheck.sh --quick
 ```
+
+Note: `.[dev]` no longer pulls `uqc` by default. For UQC experimental: `pip install -e ".[dev-uqc]"`.
 
 [`scripts/venv-run`](scripts/venv-run) runs commands with **`QCHEM_STACK_PYTHON`** when set, otherwise **`.venv/bin/python`** if present, else `python3` on `PATH`:
 

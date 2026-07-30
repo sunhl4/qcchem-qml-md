@@ -55,6 +55,92 @@ class QSE:
     def run(self) -> QSEResult:
         return self.run_dense_reference()
 
+    def _solve_qse_with_mode(
+        self,
+        basis: list[np.ndarray],
+        *,
+        mode: str,
+        basis_reference: str | None = None,
+        shots_per_matrix_element: int = 4096,
+        shots_per_ij_term: int = 512,
+        rng: np.random.Generator | None = None,
+        extra_meta: dict[str, Any] | None = None,
+    ) -> QSEResult:
+        """Solve ``H c = E S c`` on ``basis`` with one of the shared solve backends.
+
+        ``mode`` is ``"dense"`` / ``"shot_noise"`` / ``"pauli_transitions"`` /
+        ``"pauli_transitions_qiskit"``. Unifies the per-mode meta-dict construction
+        shared by the public ``run_from_*`` wrappers, so the solve variants are
+        parametrised by ``mode`` instead of duplicated.
+        """
+        op = self.hamiltonian.operator
+        n = self.hamiltonian.n_qubits
+        ref = "arXiv:1603.05681"
+        k = len(basis)
+        gen = rng if rng is not None else np.random.default_rng(0)
+        meta: dict[str, Any]
+        if mode == "dense":
+            exc, h_sub, s_sub = excitation_energies_dense(op, n, basis)
+            meta = {
+                "reference": ref,
+                "K": k,
+                "H_sub_shape": list(h_sub.shape),
+                "S_condition_number": s_condition_number(s_sub),
+            }
+        elif mode == "shot_noise":
+            exc, s_sub = excitation_energies_shot_noise(
+                op, n, basis, shots_per_matrix_element=shots_per_matrix_element, rng=gen
+            )
+            meta = {
+                "reference": ref,
+                "K": k,
+                "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
+                "legacy_fast_path": True,
+                "shots_per_matrix_element": shots_per_matrix_element,
+                "S_condition_number": s_condition_number(s_sub),
+            }
+        elif mode == "pauli_transitions":
+            exc, s_mat, schedule_meta = excitation_energies_pauli_transitions(
+                op,
+                n,
+                basis,
+                shots_per_ij_term=shots_per_ij_term,
+                shot_mode="pauli_transitions",
+                rng=gen,
+            )
+            meta = {
+                "reference": ref,
+                "K": k,
+                "computable_runtime": "QSEMatricesComputable",
+                "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
+                "shots_per_ij_term": shots_per_ij_term,
+                "S_condition_number": s_condition_number(s_mat),
+                "qse_pauli_transition_schedule": schedule_meta,
+            }
+        elif mode == "pauli_transitions_qiskit":
+            exc, _, schedule_meta = excitation_energies_pauli_transitions(
+                op,
+                n,
+                basis,
+                shots_per_ij_term=shots_per_ij_term,
+                shot_mode="pauli_transitions_qiskit",
+            )
+            meta = {
+                "reference": ref,
+                "K": k,
+                "computable_runtime": "QSEMatricesComputable",
+                "shot_noise_model": "qiskit_histogram_per_ij_term",
+                "shots_per_ij_term": shots_per_ij_term,
+                "qse_pauli_transition_schedule": schedule_meta,
+            }
+        else:
+            raise ValueError(f"Unknown QSE solve mode: {mode!r}")
+        if basis_reference is not None:
+            meta["basis_reference"] = basis_reference
+        if extra_meta:
+            meta.update(extra_meta)
+        return QSEResult(excitation_energies=exc, meta=meta)
+
     def run_from_vqe_hea_basis(
         self,
         angles: np.ndarray,
@@ -67,20 +153,14 @@ class QSE:
         basis = build_basis_from_strategy(
             self._VQE_HEA, angles, self.hamiltonian, max_basis=kb, depth=depth
         )
-        exc, h_sub, s_sub = excitation_energies_dense(
-            self.hamiltonian.operator, self.hamiltonian.n_qubits, basis
-        )
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "K": len(basis),
+        return self._solve_qse_with_mode(
+            basis,
+            mode="dense",
+            extra_meta={
                 "K_raw": int(self.hamiltonian.n_qubits + 1),
                 "linear_dependencies_removed": int(
                     max(0, self.hamiltonian.n_qubits + 1 - len(basis))
                 ),
-                "H_sub_shape": list(h_sub.shape),
-                "S_condition_number": s_condition_number(s_sub),
             },
         )
 
@@ -99,23 +179,11 @@ class QSE:
         basis = build_basis_from_strategy(
             self._VQE_HEA, angles, self.hamiltonian, max_basis=kb, depth=depth
         )
-        exc, s_sub = excitation_energies_shot_noise(
-            self.hamiltonian.operator,
-            self.hamiltonian.n_qubits,
+        return self._solve_qse_with_mode(
             basis,
+            mode="shot_noise",
             shots_per_matrix_element=shots_per_matrix_element,
             rng=rng,
-        )
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "K": len(basis),
-                "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
-                "legacy_fast_path": True,
-                "shots_per_matrix_element": shots_per_matrix_element,
-                "S_condition_number": s_condition_number(s_sub),
-            },
         )
 
     def run_from_vqe_hea_basis_pauli_transitions(
@@ -133,25 +201,11 @@ class QSE:
         basis = build_basis_from_strategy(
             self._VQE_HEA, angles, self.hamiltonian, max_basis=kb, depth=depth
         )
-        exc, s_mat, schedule_meta = excitation_energies_pauli_transitions(
-            self.hamiltonian.operator,
-            self.hamiltonian.n_qubits,
+        return self._solve_qse_with_mode(
             basis,
+            mode="pauli_transitions",
             shots_per_ij_term=shots_per_ij_term,
-            shot_mode="pauli_transitions",
             rng=rng,
-        )
-        return QSEResult(
-            excitation_energies=exc,
-            meta={
-                "reference": "arXiv:1603.05681",
-                "K": len(basis),
-                "computable_runtime": "QSEMatricesComputable",
-                "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
-                "shots_per_ij_term": shots_per_ij_term,
-                "S_condition_number": s_condition_number(s_mat),
-                "qse_pauli_transition_schedule": schedule_meta,
-            },
         )
 
     def _run_uccsd_variant(
@@ -186,18 +240,8 @@ class QSE:
         """Build orthonormal micro-basis from UCCSD reference + mapped fermionic singles."""
 
         def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
-            exc, h_sub, s_sub = excitation_energies_dense(
-                self.hamiltonian.operator, self.hamiltonian.n_qubits, basis
-            )
-            return QSEResult(
-                excitation_energies=exc,
-                meta={
-                    "reference": "arXiv:1603.05681",
-                    "basis_reference": "uccsd_fermionic_singles",
-                    "K": len(basis),
-                    "H_sub_shape": list(h_sub.shape),
-                    "S_condition_number": s_condition_number(s_sub),
-                },
+            return self._solve_qse_with_mode(
+                basis, mode="dense", basis_reference="uccsd_fermionic_singles"
             )
 
         return self._run_uccsd_variant(
@@ -222,24 +266,12 @@ class QSE:
         rng = np.random.default_rng(seed)
 
         def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
-            exc, s_sub = excitation_energies_shot_noise(
-                self.hamiltonian.operator,
-                self.hamiltonian.n_qubits,
+            return self._solve_qse_with_mode(
                 basis,
+                mode="shot_noise",
+                basis_reference="uccsd_fermionic_singles",
                 shots_per_matrix_element=shots_per_matrix_element,
                 rng=rng,
-            )
-            return QSEResult(
-                excitation_energies=exc,
-                meta={
-                    "reference": "arXiv:1603.05681",
-                    "basis_reference": "uccsd_fermionic_singles",
-                    "K": len(basis),
-                    "shot_noise_model": "symmetric_gaussian_on_real_H_matrix",
-                    "legacy_fast_path": True,
-                    "shots_per_matrix_element": shots_per_matrix_element,
-                    "S_condition_number": s_condition_number(s_sub),
-                },
             )
 
         return self._run_uccsd_variant(
@@ -264,26 +296,12 @@ class QSE:
         rng = np.random.default_rng(seed)
 
         def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
-            exc, s_mat, schedule_meta = excitation_energies_pauli_transitions(
-                self.hamiltonian.operator,
-                self.hamiltonian.n_qubits,
+            return self._solve_qse_with_mode(
                 basis,
+                mode="pauli_transitions",
+                basis_reference=f"uccsd_{expansion_pool}",
                 shots_per_ij_term=shots_per_ij_term,
-                shot_mode="pauli_transitions",
                 rng=rng,
-            )
-            return QSEResult(
-                excitation_energies=exc,
-                meta={
-                    "reference": "arXiv:1603.05681",
-                    "basis_reference": f"uccsd_{expansion_pool}",
-                    "K": len(basis),
-                    "computable_runtime": "QSEMatricesComputable",
-                    "shot_noise_model": "grouped_statevector_shot_simulation_per_ij_term",
-                    "shots_per_ij_term": shots_per_ij_term,
-                    "S_condition_number": s_condition_number(s_mat),
-                    "qse_pauli_transition_schedule": schedule_meta,
-                },
             )
 
         return self._run_uccsd_variant(
@@ -304,24 +322,11 @@ class QSE:
         expansion_pool: str = "fermionic_singles",
     ) -> QSEResult:
         def _solve(*, basis: list[np.ndarray], expansion_pool: str, **_kw: Any) -> QSEResult:
-            exc, _, schedule_meta = excitation_energies_pauli_transitions(
-                self.hamiltonian.operator,
-                self.hamiltonian.n_qubits,
+            return self._solve_qse_with_mode(
                 basis,
+                mode="pauli_transitions_qiskit",
+                basis_reference=f"uccsd_{expansion_pool}",
                 shots_per_ij_term=shots_per_ij_term,
-                shot_mode="pauli_transitions_qiskit",
-            )
-            return QSEResult(
-                excitation_energies=exc,
-                meta={
-                    "reference": "arXiv:1603.05681",
-                    "basis_reference": f"uccsd_{expansion_pool}",
-                    "K": len(basis),
-                    "computable_runtime": "QSEMatricesComputable",
-                    "shot_noise_model": "qiskit_histogram_per_ij_term",
-                    "shots_per_ij_term": shots_per_ij_term,
-                    "qse_pauli_transition_schedule": schedule_meta,
-                },
             )
 
         return self._run_uccsd_variant(

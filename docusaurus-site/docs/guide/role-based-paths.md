@@ -5,6 +5,10 @@ description: 按研究者、平台工程师、维护者三类角色给出推荐�
 
 # 按角色导航
 
+:::tip 模块手册
+任务向顺序 → [reading-paths](/modules/reading-paths) · 新用户三条路径 → [onboarding-three-paths](./onboarding-three-paths) · [模块总览](/modules/)
+:::
+
 如果你不确定先读哪一页，按你的角色从下面入口开始。
 
 ## 量子化学研究者

@@ -57,6 +57,15 @@ from .geometry_files import (
     parse_xyz,
     preprocess_experiment_dict_geometry_files,
 )
+from .gqe import GqeSpec
+from .gqe_helpers import (
+    gqe_enabled,
+    gqe_repro_fields,
+    gqe_resolved_seed,
+    gqe_skip_variational,
+    gqe_spec,
+    gqe_train_overrides,
+)
 from .io import (
     backend_spec_from_config,
     compiler_bundle_signature_from_config,
@@ -96,6 +105,7 @@ __all__ = [
     "OperatorPoolId",
     "EmbeddingSpec",
     "ExperimentConfig",
+    "GqeSpec",
     "MdMlExportSpec",
     "MitigationSpec",
     "MoleculeSpec",
@@ -118,6 +128,12 @@ __all__ = [
     "preprocess_experiment_dict_geometry_files",
     "avas_ao_labels",
     "extra_coordinates_bohr",
+    "gqe_enabled",
+    "gqe_repro_fields",
+    "gqe_resolved_seed",
+    "gqe_skip_variational",
+    "gqe_spec",
+    "gqe_train_overrides",
     "mitigation_repro_core_fields",
     "pbc_cell_vectors_bohr",
     "pmsv_enabled",

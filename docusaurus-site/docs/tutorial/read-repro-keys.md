@@ -49,3 +49,14 @@ print(repro.get("run_summary", {}).keys())
 
 - [切换 Backend 并对比结果](./switch-backend-compare)
 - [HTTP API 与作业队列](../reference/http-api-sqlite-jobs)
+
+## 验证命令
+
+```bash
+python scripts/check_parity_export_sample.py
+```
+
+## 期望输出
+
+- 退出码 `0`
+- 导出 JSON 含 `resource_estimation_preview_v1` 等契约键

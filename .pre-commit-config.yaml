@@ -27,7 +27,7 @@ repos:
       - id: codespell
         args:
           [
-            "--skip=*.json,*.sqlite,*.lock,htmlcov,.git,*.egg-info,build,dist",
+            "--skip=*.json,*.sqlite,*.lock,htmlcov,.git,*.egg-info,build,dist,docs/gqe_nakaji_repro_report.md",
             "--ignore-words=codespell-ignore.txt",
           ]
         exclude: ^docs/技术文档
@@ -37,3 +37,17 @@ repos:
     hooks:
       - id: detect-secrets
         args: ["--baseline", ".secrets.baseline"]
+
+  # Import-layer contracts (same `lint-imports` as the CI lint.yml job).
+  # Local hook only (CI runs ``lint-imports`` directly in lint.yml). Uses the
+  # repo's `.venv` interpreter explicitly so it works from a plain shell without
+  # activating the venv (pre-commit's isolated `language: python` env cannot
+  # import the in-repo `qchem_stack` package).
+  - repo: local
+    hooks:
+      - id: lint-imports
+        name: lint-imports (import-linter contracts)
+        entry: .venv/bin/lint-imports
+        language: system
+        files: \.importlinter$
+        pass_filenames: false

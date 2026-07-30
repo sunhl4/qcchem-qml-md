@@ -1,4 +1,8 @@
-"""qchem-stack: quantum chemistry orchestration with protocols, ML, and MD bridge."""
+"""qchem-stack: quantum chemistry orchestration with protocols, ML, and MD bridge.
+
+ML / active-learning lives in :mod:`qchem_stack.md_bridge.active_learning`
+(the standalone ``qchem_stack.ml`` package was removed in v0.6.0).
+"""
 
 from __future__ import annotations
 

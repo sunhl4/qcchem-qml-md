@@ -5,6 +5,14 @@ description: UQC ion-trap 云模拟器与硬件 backend 集成摘要。
 
 # UQC 云平台后端
 
+:::warning 建议模式
+本文描述推荐运维模式；当前开源实现以本地 FastAPI + SQLite worker 为主，租户配额/商业 IAM 未内置强制执行。
+:::
+
+:::note 已实现部分
+开源栈已实现：`backend.provider: uqc`（`mock` / 云模拟）、相关 YAML 示例、executor / transpiler / Pauli 测量路径。商业控制台、租户 IAM 与配额强制不在本仓库内置范围。
+:::
+
 **权威文档**（中文完整版）：仓库 [`docs/UQC云平台集成技术报告.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/UQC云平台集成技术报告.md)。
 
 ## 快速配置

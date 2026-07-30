@@ -34,3 +34,14 @@ summary = run_md_validation_loop(
 
 - [`configs/README.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/configs/README.md) — MD/ML 与 UQC 示例索引
 - [`docs/说明_md_ml_export配置.md`](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/说明_md_ml_export配置.md)
+
+## 验证命令
+
+```bash
+python -m pytest tests/md_bridge/test_p4_md_ml_kpi.py -q --no-cov -m l1_md_ml
+```
+
+## 期望输出
+
+- 测试通过（需 `jax_md`）
+- 或对照 `configs/example_h2_*_md.yaml` 跑 loop

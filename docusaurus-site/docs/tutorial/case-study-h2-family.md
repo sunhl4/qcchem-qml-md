@@ -49,3 +49,14 @@
 
 - [切换 Backend 并对比结果](./switch-backend-compare)
 - [repro 关键字段速览](./read-repro-keys)
+
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py
+```
+
+## 期望输出
+
+- 退出码 `0`
+- H₂ 家族配置可按案例表逐项替换运行

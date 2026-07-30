@@ -38,3 +38,14 @@
 - 算法与协议字段： [P2](../guide/program-construction)
 - 执行与后端字段： [P3](../guide/execution-and-analysis)
 - 作业与可复现字段： [P4](../guide/jobs-and-reproducibility)
+
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py --config configs/example_h2.yaml
+```
+
+## 期望输出
+
+- 退出码 `0`
+- YAML 块 `molecule` / `quantum` / `backend` 可被加载

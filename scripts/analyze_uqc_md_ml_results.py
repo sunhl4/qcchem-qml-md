@@ -64,7 +64,7 @@ def plot_results(results_dir: Path, out_dir: Path | None = None) -> list[Path]:
     ax2.set_ylabel("Energy gap (Hartree)")
     lines1, lab1 = ax1.get_legend_handles_labels()
     lines2, lab2 = ax2.get_legend_handles_labels()
-    ax1.legend(lines1 + lines2, lab1 + lab2, loc="upper right")
+    ax1.legend(lines1 + lines2, lab1 + lab2, loc="center")
     ax1.set_title("UQC cloud online learning: dataset & QML vs qchem gap")
     fig.tight_layout()
     p1 = out_dir / "rounds_dataset_and_delta_e.png"

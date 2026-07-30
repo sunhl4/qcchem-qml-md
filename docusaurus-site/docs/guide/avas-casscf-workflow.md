@@ -5,6 +5,10 @@ description: 一键 AVAS+CASSCF 实验 YAML 与 parity 导出路径（P4-B10/B11
 
 # AVAS → CASSCF → integrals 工作流
 
+:::tip 模块手册
+[AVAS / CASSCF](/modules/chem/avas-casscf) · [chem 总览](/modules/chem/) · [P1 化学](./chemistry-and-embedding)
+:::
+
 本页面向**用户**（非内部 `说明_*.md`），说明如何用仓库里的 AVAS+CASSCF 模板跑通 active-space 积分，并导出 Methods 机读字段。
 
 ## 快速开始

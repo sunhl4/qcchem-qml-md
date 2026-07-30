@@ -6,6 +6,8 @@ Open orchestration for quantum-chemistry workloads: **chemistry → pre-quantum 
 
 **Package:** PyPI [`qchem-stack`](https://pypi.org/project/qchem-stack/) · import `qchem_stack` · repo [`qcchem-qml-md`](https://github.com/sunhl4/qcchem-qml-md)
 
+> **Capability SLA:** normalized product availability labels live in [capability SLA](docusaurus-site/docs/product/capability-sla.md) (`product_capability_sla_v1`).
+
 **Maintainers:** [CONTRIBUTING.md](CONTRIBUTING.md) · [ENGINEERING_ARCHITECTURE.md](docs/ENGINEERING_ARCHITECTURE.md) · [Onboarding by role](docs/ONBOARDING_BY_ROLE.md) · [English onboarding](docs/ONBOARDING_BY_ROLE_en.md) · [English architecture summary](docs/ENGINEERING_ARCHITECTURE_en.md)
 
 ## Get started
@@ -36,9 +38,9 @@ docker compose up -d   # optional API + worker on :8000
 | Variational / excited | `quantum/` | VQE, ADAPT, IQEB, VQD, QSE, SCEOM — see `configs/` |
 | Protocols + backends | `protocols/`, `backends/` | Pauli averaging, `BackendSpec` (statevector / qiskit / ionstack) |
 | Jobs + repro | `jobs/`, `repro/` | SQLite worker, strict JSON export |
-| MD / ML bridge | `md_bridge/` | `pip install -e ".[chem,md-classical]"` or `[qmlff]` for JAX-MD |
+| MD / ML bridge | `md_bridge/` | `pip install -e ".[chem]"` (md-classical profile) or `[qmlff]` for JAX-MD |
 
-Full capability narrative: [Docusaurus product/features](docusaurus-site/docs/product/features.md).
+Full capability narrative: [Docusaurus product/features](docusaurus-site/docs/product/features.md) · [Capability SLA](docusaurus-site/docs/product/capability-sla.md).
 
 <details>
 <summary><strong>Programmatic API, HTTP, Docker, simulators</strong></summary>

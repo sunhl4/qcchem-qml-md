@@ -1,15 +1,29 @@
 #!/usr/bin/env bash
-# Create .venv and install qchem-stack with dev extras (CI-parity local setup).
+# Bootstrap a local editable install for contributors.
+# Usage: ./scripts/bootstrap_dev.sh
 set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$ROOT"
+
 PY="${QCHEM_STACK_PYTHON:-python3}"
-if ! command -v "$PY" >/dev/null 2>&1; then
-  echo "error: Python not found: $PY" >&2
-  echo "hint: export QCHEM_STACK_PYTHON=/path/to/python3.10+" >&2
-  exit 1
+if [[ ! -d .venv ]]; then
+  echo "== create .venv =="
+  "$PY" -m venv .venv
 fi
-"$PY" -m venv .venv
-.venv/bin/pip install -U pip
-.venv/bin/pip install -e ".[dev]"
-echo "Done. Run: ./scripts/venv-run pytest tests -q --tb=short"
+# shellcheck disable=SC1091
+source .venv/bin/activate
+python -m pip install -U pip
+echo "== pip install -e '.[dev]' (no uqc by default; use .[dev-uqc] for cloud) =="
+pip install -e ".[dev]"
+
+cat <<'EOF'
+
+Next steps:
+  ./scripts/release_precheck.sh --quick
+  qchem-run --list-scenarios
+  cd docusaurus-site && npm ci && npm start   # docs at /qcchem-qml-md/
+
+Optional:
+  pip install -e ".[dev-uqc]"     # UQC experimental
+  pip install -e ".[gqe]"         # GPT-QE / JAX
+EOF

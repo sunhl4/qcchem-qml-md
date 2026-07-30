@@ -57,3 +57,14 @@ embedding:
 
 - [案例：H2 家族链式改配](./case-study-h2-family)
 - [P1 化学与嵌入](../guide/chemistry-and-embedding)
+
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py --projection-trace
+```
+
+## 期望输出
+
+- 退出码 `0`
+- projection 路径产出完整 pre-quantum / embedding 字段

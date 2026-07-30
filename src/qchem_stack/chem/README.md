@@ -26,7 +26,7 @@ Classical chemistry → pre-quantum interchange (`ExperimentConfig` → `PreQuan
 | Integration | `integration/` | `meta_schema` (kernel bindings), capability presets, checklist |
 | Kernels (L3) | `kernels/` | Shared algorithm dispatch (NEVPT2, AVAS delegate) |
 | Classical benchmarks | `classical_benchmarks/` | HF/MP2/CCSD/CASCI dispatch |
-| Legacy driver | `drivers/pyscf_driver.py` | **Deprecated** — `drivers/` exports `PySCFRHFResult` (eager) and lazy `PySCFDriver` |
+| Legacy driver types | `drivers/pyscf_driver_types.py` | **Deprecated** — `drivers/` exports only `PySCFRHFResult` (the eager RHF result type); `PySCFDriver` was removed in v0.6.0 → use `chem.solvers` |
 
 `ChemIntegralSolver` and `SolverCapabilities` are imported from `qchem_stack.chem.solvers` (not top-level `chem.__all__`) to avoid eagerly loading the full solver stack during test collection.
 
@@ -59,7 +59,7 @@ Full rules: [chem_模块风格约定.md](../../../docs/chem_模块风格约定.m
 - **Downstream consumes** `ClassicalMeanFieldReference` / `CanonicalActiveSpaceIntegralPack`, not raw MF objects.
 - **Backend-specific hooks** live under `active_space/` and `integrals/`; register via hook/exporter registries.
 - **New public names** belong in submodule `__all__` first, then re-export from `qchem_stack.chem` when stable.
-- **`PySCFDriver`** remains for migration windows only; AO views import from `systems/`, not `drivers/`.
+- **`PySCFRHFResult`** (legacy RHF result type) remains in `drivers/` for migration; `PySCFDriver` was removed in v0.6.0 — use `create_solver` + `ChemIntegralSolver`. AO views import from `systems/`, not `drivers/`.
 
 ## Public import surface
 

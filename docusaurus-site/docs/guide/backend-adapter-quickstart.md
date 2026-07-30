@@ -5,6 +5,10 @@ description: 模板、运行时注册、pip entry points、registry 排障与冲
 
 # 后端适配快速接入
 
+:::tip 模块手册
+[chem · solvers](/modules/chem/solvers) · [backends](/modules/backends) · [Psi4](./psi4-backend) · [P1 化学](./chemistry-and-embedding)
+:::
+
 本文即 Docusaurus 站内 **后端适配快速接入** 母稿；本地浏览：`cd docusaurus-site && npm start`。插件安装与发布另见仓库 [solver 插件安装与发布指南](https://github.com/sunhl4/qcchem-qml-md/blob/main/docs/solver_entrypoint_plugin_%E5%AE%89%E8%A3%85%E4%B8%8E%E5%8F%91%E5%B8%83%E6%8C%87%E5%8D%97.md)。
 
 ## 可选：脚手架

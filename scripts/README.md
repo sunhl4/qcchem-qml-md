@@ -12,6 +12,7 @@ Install dev deps first: `pip install -e ".[dev]"`. Optional extras: `[chem]`, `[
 | `check_parity_export_sample.py` | Config-only parity export on all experiment YAMLs | `python scripts/check_parity_export_sample.py` |
 | `check_coverage_thresholds.py` | Per-package coverage floors (needs `htmlcov/` from pytest) | `pytest tests -q --cov=src/qchem_stack && python scripts/check_coverage_thresholds.py` |
 | `check_doc_links.py` | Validate Docusaurus / docs links | `python scripts/check_doc_links.py` |
+| `check_tutorial_verify_blocks.py` | Tutorials must have 验证命令 + 期望输出 | `python scripts/check_tutorial_verify_blocks.py` |
 | `check_examples_importable.py` | Syntax/import check for `examples/` | `python scripts/check_examples_importable.py` |
 | `check_comparative_execution_backlog.py` | Comparative execution backlog validator | `python scripts/check_comparative_execution_backlog.py` |
 | `check_constraints_freshness.py` | pip-tools constraints drift | `pip install pip-tools && python scripts/check_constraints_freshness.py` |
@@ -36,6 +37,7 @@ Install dev deps first: `pip install -e ".[dev]"`. Optional extras: `[chem]`, `[
 | `sync_pre_quantum_docs.py` | Sync pre-quantum YAML matrix docs | `python scripts/sync_pre_quantum_docs.py` |
 | `generate_config_reference_snippets.py` | Regenerate `docs/generated/` snippets | `python scripts/generate_config_reference_snippets.py` |
 | `generate_configs_catalog.py` | Regenerate configs catalog snippet | `python scripts/generate_configs_catalog.py` |
+| `generate_examples_gallery.py` | Sync `examples/README.md` → Docusaurus 示例馆 | `python scripts/generate_examples_gallery.py` |
 | `execution_doc_index.py` | Index execution docs | `python scripts/execution_doc_index.py` |
 
 ## Parity and export

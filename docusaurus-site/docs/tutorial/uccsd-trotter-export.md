@@ -47,3 +47,14 @@ python scripts/export_parity_criteria_table.py configs/example_h2_uccsd_trotter.
 
 - [repro 关键字段速览](./read-repro-keys)
 - [产品路线图](../product/roadmap)
+
+## 验证命令
+
+```bash
+python scripts/smoke_pipeline.py --config configs/example_h2_uccsd_trotter.yaml
+```
+
+## 期望输出
+
+- 退出码 `0`
+- 结果可导出 parity / circuit 相关字段

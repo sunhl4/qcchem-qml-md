@@ -24,3 +24,14 @@ Inspect `repro.run_summary` for `classical_active_space_caveat_v1` and driver me
 ## Boundary
 
 See [non-goals](/product/non-goals) — we do **not** claim closed-source default parity for full AVAS/CASSCF orchestration.
+
+## 验证命令
+
+```bash
+qchem-run configs/example_h2_casscf_audit.yaml
+```
+
+## 期望输出
+
+- 退出码 `0`
+- 审计相关 meta / repro 字段可检查

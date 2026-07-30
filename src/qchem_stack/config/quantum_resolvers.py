@@ -81,6 +81,46 @@ def resolve_iqeb_energy_tolerance(cfg: ExperimentConfig) -> float:
     return float(cfg.quantum.iqeb.energy_tolerance)
 
 
+def resolve_iqcc_max_steps(cfg: ExperimentConfig) -> int:
+    return int(cfg.quantum.iqcc.max_steps)
+
+
+def resolve_iqcc_top_k(cfg: ExperimentConfig) -> int:
+    return int(cfg.quantum.iqcc.top_k)
+
+
+def resolve_iqcc_coeff_atol(cfg: ExperimentConfig) -> float:
+    return float(cfg.quantum.iqcc.coeff_atol)
+
+
+def resolve_iqcc_max_terms(cfg: ExperimentConfig) -> int | None:
+    return cfg.quantum.iqcc.max_terms
+
+
+def resolve_iqcc_enable_pt(cfg: ExperimentConfig) -> bool:
+    return bool(cfg.quantum.iqcc.enable_pt)
+
+
+def resolve_iqcc_denom_cutoff(cfg: ExperimentConfig) -> float:
+    return float(cfg.quantum.iqcc.denom_cutoff)
+
+
+def resolve_iqcc_pool_mode(cfg: ExperimentConfig) -> str:
+    return str(cfg.quantum.iqcc.pool_mode)
+
+
+def resolve_iqcc_pool_id(cfg: ExperimentConfig) -> str:
+    return str(cfg.quantum.iqcc.pool_id)
+
+
+def resolve_iqcc_max_weight(cfg: ExperimentConfig) -> int:
+    return int(cfg.quantum.iqcc.max_weight)
+
+
+def resolve_iqcc_energy_tolerance(cfg: ExperimentConfig) -> float:
+    return float(cfg.quantum.iqcc.energy_tolerance)
+
+
 def resolve_quantum_algorithm_factory(cfg: ExperimentConfig) -> str | None:
     return cfg.quantum.algorithm_factory
 
@@ -110,13 +150,17 @@ def quantum_workflow_preview_qpe_fields(cfg: ExperimentConfig) -> dict[str, obje
 
 
 def quantum_variational_run_summary_yaml_fields(cfg: ExperimentConfig) -> dict[str, object]:
-    """ADAPT / IQEB YAML keys copied into ``run_summary`` when bundles are present."""
+    """ADAPT / IQEB / iQCC YAML keys copied into ``run_summary`` when bundles are present."""
     return {
         "adapt_pool_id_yaml": resolve_adapt_pool_id(cfg),
         "adapt_max_iter_yaml": resolve_adapt_max_iter(cfg),
         "adapt_grad_tol_yaml": resolve_adapt_grad_tol(cfg),
         "iqeb_pool_id_yaml": resolve_iqeb_pool_id(cfg),
         "iqeb_max_rounds_yaml": resolve_iqeb_max_rounds(cfg),
+        "iqcc_max_steps_yaml": resolve_iqcc_max_steps(cfg),
+        "iqcc_top_k_yaml": resolve_iqcc_top_k(cfg),
+        "iqcc_enable_pt_yaml": resolve_iqcc_enable_pt(cfg),
+        "iqcc_pool_mode_yaml": resolve_iqcc_pool_mode(cfg),
     }
 
 
@@ -196,6 +240,10 @@ def quantum_repro_core_fields(cfg: ExperimentConfig) -> dict[str, object]:
         "vqe_maxiter": q.vqe.maxiter,
         "adapt_max_iter": q.adapt.max_iter,
         "iqeb_max_rounds": q.iqeb.max_rounds,
+        "iqcc_max_steps": q.iqcc.max_steps,
+        "iqcc_top_k": q.iqcc.top_k,
+        "iqcc_enable_pt": q.iqcc.enable_pt,
+        "iqcc_pool_mode": q.iqcc.pool_mode,
         "variational_ansatz": q.variational.ansatz,
         "run_sampled_pauli_protocol": q.pauli.run_sampled,
         "run_qiskit_shots_pauli_protocol": q.pauli.run_qiskit_shots,

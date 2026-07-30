@@ -14,13 +14,31 @@ jobs:
           python-version: "3.12"
           cache: pip
           cache-dependency-path: pyproject.toml
-      - name: Install dev extras + pip-audit
+      - name: Install core dev extras + pip-audit (no uqc)
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]" pip-audit
-      - name: pip-audit (dev install surface)
-        run: python scripts/run_pip_audit.py
-      - name: pip-audit (chem,api install surface)
+      - name: pip-audit (dev install surface, no CVE allowlist)
+        run: python scripts/run_pip_audit.py --no-allowlist
+      - name: pip-audit (chem,api install surface, no CVE allowlist)
         run: |
           pip install -e ".[chem,api]"
-          python scripts/run_pip_audit.py
+          python scripts/run_pip_audit.py --no-allowlist
+
+  security-audit-uqc:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - uses: actions/checkout@v5
+      - name: Set up Python
+        uses: actions/setup-python@v6
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: pyproject.toml
+      - name: Install dev-uqc extras + pip-audit
+        run: |
+          python -m pip install -U pip
+          pip install -e ".[dev-uqc]" pip-audit
+      - name: pip-audit (uqc install surface, pip-audit.toml allowlist)
+        run: python scripts/run_pip_audit.py

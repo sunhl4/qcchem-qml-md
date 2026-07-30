@@ -28,11 +28,16 @@ def _build_markdown() -> list[str]:
     profiles = (
         sorted((CONFIGS / "profiles").glob("*.yaml")) if (CONFIGS / "profiles").is_dir() else []
     )
+    scenarios = (
+        sorted((CONFIGS / "scenarios").glob("*.yaml")) if (CONFIGS / "scenarios").is_dir() else []
+    )
 
     body_lines = [
         f"**Total:** {len(yaml_files)} top-level YAML "
         f"({len(exp)} ExperimentConfig + {len(md)} MdValidationLoopConfig). "
-        f"Profiles: {len(profiles)} under `configs/profiles/`.",
+        f"Profiles: {len(profiles)} under `configs/profiles/`. "
+        f"Scenarios: {len(scenarios)} under `configs/scenarios/` "
+        f"(used by `qchem-run --list-scenarios`).",
         "",
         "## ExperimentConfig files",
         "",
@@ -42,6 +47,14 @@ def _build_markdown() -> list[str]:
     body_lines.extend(["", "## MdValidationLoopConfig files", ""])
     for p in md:
         body_lines.append(f"- `{p.name}`")
+    if profiles:
+        body_lines.extend(["", "## Profiles (`configs/profiles/`)", ""])
+        for p in profiles:
+            body_lines.append(f"- `profiles/{p.name}`")
+    if scenarios:
+        body_lines.extend(["", "## Scenarios (`configs/scenarios/`)", ""])
+        for p in scenarios:
+            body_lines.append(f"- `scenarios/{p.name}`")
     return body_lines
 
 

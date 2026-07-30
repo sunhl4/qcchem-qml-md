@@ -22,6 +22,8 @@ Pipeline stage ownership (which module writes `out` / `repro` keys): [`engineeri
 
 **Pre-quantum topology (pinned):** YAML validators and `resolve_pre_quantum_path` select the branch; **`chem.pre_quantum_build`** assembles `PreQuantumInput` (canonical pack, Schmidt, projection, plugin); **`chem.bridges.run_build_cache`** memoizes packs per run; **`orchestration.stage_execution.build_pre_quantum_stage`** only wires SCF output, precomputed ingress, profiling, and stage artifacts. Quantum stages consume `PreQuantumInput` only.
 
+**Stage ordering (pinned):** `run_pipeline_sync` runs six registry stages — `scf` → `pre_quantum` → `variational` → `embedding_workflow` → `excited` → `protocol_finalize`. `repro` metadata is collected via a `post_run` hook of `pre_quantum` (once the Hamiltonian is fixed), **not** as a standalone stage. `embedding_workflow` runs **after** `variational` by design: it applies a post-variational embedding correction / parity snapshot on top of the converged variational result. Do not reorder without updating parity contracts.
+
 Config schema, nested YAML layout, and code/architecture style for maintainers: [`config_校验分层约定.md`](config_校验分层约定.md) (**authoritative**; `embedding` + `quantum` are nested v2 reference sections). Dual-ingress offline bundle contract: [`技术文档_双线路经典输入与统一PreQuantumInput契约.md`](技术文档_双线路经典输入与统一PreQuantumInput契约.md).
 
 ## 1.1 Architecture invariant (pinned)

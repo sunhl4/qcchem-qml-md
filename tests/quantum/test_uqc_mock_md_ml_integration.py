@@ -62,6 +62,11 @@ def test_md_validation_loop_one_round_uqc_mock_labeling(_require_pyscf) -> None:
     pytest.importorskip("qmlff")
     pytest.importorskip("jax_md")
 
+    # The default pipeline runner is registered as an import side effect of
+    # ``qchem_stack.orchestration`` (see orchestration/__init__.py). This test
+    # lives under tests/quantum/ (no md_bridge conftest autouse fixture), so
+    # import it explicitly to avoid depending on test-collection order.
+    import qchem_stack.orchestration.pipeline  # noqa: F401
     from qchem_stack.md_bridge import MdValidationLoopConfig, run_md_validation_loop
 
     loop_cfg = MdValidationLoopConfig.from_yaml(LOOP_YAML)

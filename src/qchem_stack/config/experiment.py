@@ -31,6 +31,7 @@ from .chemistry_extended import ChemistryExtendedSpec
 from .compiler import CompilerSpec
 from .embedding_specs import EmbeddingNone
 from .geometry_files import preprocess_experiment_dict_geometry_files
+from .gqe import GqeSpec
 from .md_ml_export import MdMlExportSpec
 from .mitigation import MitigationSpec
 from .nexus import NexusAnalogSpec, NexusCloudSpec
@@ -87,6 +88,10 @@ class ExperimentConfig(CoreExperimentConfig):
     nexus_cloud: NexusCloudSpec = Field(default_factory=NexusCloudSpec)
     parity_integrations: ParityIntegrationsSpec = Field(default_factory=ParityIntegrationsSpec)
     md_ml_export: MdMlExportSpec = Field(default_factory=MdMlExportSpec)
+    gqe: GqeSpec = Field(
+        default_factory=GqeSpec,
+        description="Optional GPT-QE (integrations.gqe) sidecar; not quantum.algorithm.",
+    )
     extra: dict[str, Any] = Field(default_factory=dict)
 
     @field_validator("schema_version")

@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from collections.abc import Mapping, Sequence
 from typing import TYPE_CHECKING, Any
 
@@ -32,6 +33,7 @@ if TYPE_CHECKING:
 
 _CLUSTER_SQUARE_FERMION_QUBIT_MAPPINGS = frozenset({"jordan_wigner", "bravyi_kitaev", "jkmn"})
 _CLUSTER_ANSATZ_IDS = frozenset({"uccsd", "uccgd", "qcc", "upccgsd", "puccd"})
+_LOG = logging.getLogger("qchem_stack.config")
 
 
 def _raise_missing_backend_capability(
@@ -303,12 +305,27 @@ def validate_uccsd_variational_constraints(spec: ExperimentConfig) -> None:
         )
 
 
+def warn_stub_config_features(spec: ExperimentConfig) -> None:
+    """Emit ``logging.warning`` for clearly stub-oriented YAML toggles (non-fatal)."""
+    if bool(spec.quantum.tensornet.expectation_stub):
+        _LOG.warning(
+            "quantum.tensornet.expectation_stub=true: CuTensorNet expectation path is a "
+            "stub (SLA stub_only); disable for production-like runs."
+        )
+    if bool(spec.mitigation.stubs.classical_shadows):
+        _LOG.warning(
+            "mitigation.stubs.classical_shadows=true: classical-shadows node is stub-labeled "
+            "(research / non-SLA path); see product capability SLA docs."
+        )
+
+
 EXPERIMENT_CROSS_VALIDATORS = (
     validate_scf_driver_registered,
     validate_embedding_contract,
     validate_md_ml_extra_coordinates_shape,
     validate_md_ml_pauli_energy_requires_pauli_protocol,
     validate_uccsd_variational_constraints,
+    warn_stub_config_features,
     validate_precomputed_driver_excludes_live_hooks,
     validate_pbc_excludes_casscf_hooks,
     validate_avas_strategy_at_config_load,
@@ -352,4 +369,5 @@ __all__ = [
     "preprocess_top_level_yaml_dict",
     "validate_experiment_for_run",
     "validate_pre_quantum_contract",
+    "warn_stub_config_features",
 ]

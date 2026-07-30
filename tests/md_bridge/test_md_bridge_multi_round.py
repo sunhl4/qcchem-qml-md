@@ -112,11 +112,11 @@ def test_md_validation_loop_three_rounds_mock_labeler(tmp_path: Path) -> None:
             side_effect=_mock_jaxmd_trajectory,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.predict_energy_forces_hartree",
             side_effect=_mock_predict_energy,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.qmlff_handle_to_qmef_frame",
             side_effect=_mock_qmef_frame,
         ),
         patch(
@@ -175,11 +175,11 @@ def test_md_validation_loop_five_rounds_mock_labeler(tmp_path: Path) -> None:
             side_effect=_mock_jaxmd_trajectory,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.predict_energy_forces_hartree",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.predict_energy_forces_hartree",
             side_effect=_mock_predict_energy,
         ),
         patch(
-            "qchem_stack.md_bridge.md_loop_rounds.qmlff_handle_to_qmef_frame",
+            "qchem_stack.md_bridge.md_loop_frame_scoring.qmlff_handle_to_qmef_frame",
             side_effect=_mock_qmef_frame,
         ),
         patch(

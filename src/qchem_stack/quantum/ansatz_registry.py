@@ -136,10 +136,18 @@ ANSATZ_REGISTRY: Final[dict[str, AnsatzRegistryEntry]] = {
         capabilities={"jordan_wigner_only": True, "doubles_only": True},
     ),
     "iqcc": AnsatzRegistryEntry(
-        summary="Imaginary-time QCC research plugin with qubit-excitation pool.",
+        summary=(
+            "Legacy UX alias for iterative QCC; prefer ``quantum.algorithm: iqcc`` "
+            "+ ``quantum.iqcc.*`` (same ``IQCCVQE`` runner)."
+        ),
         implementation="qchem_stack.quantum.algorithms.iqcc.IQCCVQE",
         factory=_iqcc_factory,
-        capabilities={"research_plugin": True},
+        capabilities={
+            "legacy_ansatz_alias": True,
+            "supports_hamiltonian_dressing": True,
+            "supports_en2_pt": True,
+            "open_stack_implementation": True,
+        },
     ),
     "qite": AnsatzRegistryEntry(
         summary="Quantum imaginary-time evolution research plugin (fixed pool).",

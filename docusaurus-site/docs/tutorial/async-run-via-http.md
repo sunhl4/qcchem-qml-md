@@ -72,3 +72,15 @@ curl -sS "http://127.0.0.1:8000/v1/runs/$RUN_ID/repro"
 - [repro 关键字段速览](./read-repro-keys)
 - [命令行与脚本](../reference/cli-and-scripts)
 - [HTTP API 与作业队列](../reference/http-api-sqlite-jobs)
+
+## 验证命令
+
+```bash
+curl -sS "http://127.0.0.1:8000/v1/meta/product-surface" | head -c 200
+```
+
+## 期望输出
+
+- API 返回 JSON（需先 `uvicorn qchem_stack.api.app:app`）
+- 异步 run 终态为 `DONE` / `FAILED`
+- `/repro` 含 `run_summary`

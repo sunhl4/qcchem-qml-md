@@ -88,10 +88,20 @@ def test_cluster_pauli_protocol_yaml(config_rel: str, ansatz_kind: str) -> None:
     assert prep.get("ansatz_kind") == ansatz_kind
 
 
+def test_iqcc_algorithm_yaml() -> None:
+    p = configs_path("example_h2_iqcc.yaml")
+    cfg = load_experiment_config(p)
+    out = run_pipeline_sync(cfg, cfg_path=p)
+    assert out["algorithm"] == "iqcc"
+    assert isinstance(out.get("iqcc_meta"), dict)
+    ar = out.get("algorithm_report") or {}
+    assert ar.get("schema") == "algorithm_iqcc_report_v1"
+    assert math.isfinite(float(out["energy_after_variational"]))
+
+
 @pytest.mark.parametrize(
     "config_rel,algorithm",
     [
-        ("example_h2_iqcc.yaml", "iqcc"),
         ("example_h2_qite.yaml", "qite"),
     ],
 )

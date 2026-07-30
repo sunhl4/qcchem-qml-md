@@ -56,6 +56,16 @@ jobs:
           python scripts/generate_configs_catalog.py
           git diff --exit-code docs/generated/configs_catalog_snippet.md
           git diff --exit-code docusaurus-site/docs/reference/configs-catalog-body.md
+      - name: Tutorial↔config matrix sync
+        run: |
+          python scripts/generate_tutorial_config_matrix.py
+          git diff --exit-code docusaurus-site/docs/reference/tutorial-config-matrix.md
+      - name: Capability SLA docs sync
+        run: |
+          python scripts/generate_capability_sla_md.py
+          git diff --exit-code docusaurus-site/docs/product/capability-sla-body.md
+      - name: Guide↔module SoT (GQE)
+        run: python scripts/check_guide_module_sot.py
       - name: Parity gap snippet sync
         run: |
           python scripts/generate_parity_gap_snippet.py
@@ -67,6 +77,10 @@ jobs:
           python -c "from qchem_stack.protocols.product_contract import validate_product_gap_categories; errs=validate_product_gap_categories(); assert not errs, errs"
       - name: SDK doc sync
         run: python scripts/check_sdk_docs_sync.py
+      - name: SDK API MDX sync
+        run: |
+          python scripts/generate_sdk_api_mdx.py
+          git diff --exit-code docusaurus-site/docs/reference/api-generated.md
       - name: Check dependency constraints freshness
         env:
           PIP_INDEX_URL: https://pypi.org/simple
@@ -175,7 +189,7 @@ jobs:
       - name: Install optional extras (install profile matrix subset)
         run: |
           python -m pip install -U pip
-          pip install -e ".[dev,pytket,nexus,jobs-postgres,observability]" || pip install -e ".[dev]"
+          pip install -e ".[dev,pytket,nexus,jobs-postgres,observability]"
       - name: Pytket bridge smoke
         run: pytest tests/backends/test_pytket_bridge.py -q --tb=short
       - name: Nexus optional probe
@@ -187,6 +201,7 @@ jobs:
     needs: lint
     runs-on: ubuntu-latest
     if: github.event_name == 'schedule'
+    continue-on-error: true
     steps:
       - uses: actions/checkout@v5
       - uses: actions/setup-python@v6
@@ -198,13 +213,17 @@ jobs:
         run: |
           python -m pip install -U pip
           pip install -e ".[dev]"
-          pip install cirq amazon-braket-sdk 2>/dev/null || true
+          pip install cirq amazon-braket-sdk
       - name: Cirq and Braket backend conformance
         run: pytest tests/backends/test_p4_backend_conformance.py -k "cirq or braket" -q --tb=short
 
   test-psi4:
     needs: lint
     runs-on: ubuntu-latest
+    if: >
+      github.event_name == 'schedule' ||
+      github.event_name == 'workflow_dispatch' ||
+      contains(github.event.pull_request.labels.*.name, 'psi4')
     steps:
       - uses: actions/checkout@v5
       - name: Set up Python
@@ -262,6 +281,12 @@ jobs:
           python-version: "3.12"
       - name: Check Docusaurus config links
         run: python scripts/check_doc_links.py
+      - name: Check algorithm deep-read coverage vs registries
+        run: python scripts/check_algorithm_deep_read_coverage.py
+      - name: Check tutorial verify blocks
+        run: python scripts/check_tutorial_verify_blocks.py
+      - name: Guide↔module SoT (GQE)
+        run: python scripts/check_guide_module_sot.py
       - name: Install site deps
         working-directory: docusaurus-site
         run: npm ci

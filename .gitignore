@@ -62,6 +62,14 @@ psi.*.clean
 deck_build.*
 package-lock.json
 
+# Root-level transient artifacts (agent session dumps / archives — keep out of repo)
+/qwen*.test.md
+/yaozheng/
+/yaozheng.tar.gz
+/*-test.md
+/*_test.md
+/*.tar.gz
+
 # Agent / session logs (transient)
 tasks_*.csv
 .ferrmion.log
@@ -73,3 +81,6 @@ tasks_*.csv
 examples/artifacts/**
 !examples/artifacts/.gitkeep
 !examples/artifacts/README.md
+
+# Cursor recovery / agent transcripts (local only)
+/.cursor_recover/
