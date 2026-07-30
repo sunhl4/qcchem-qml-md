@@ -74,7 +74,7 @@ ptyprocess==0.7.0
 pubchempy==1.0.5
 pure-eval==0.2.3
 pydantic==2.13.4
-pydantic-core==2.46.4
+pydantic-core==2.47.0
 pygments==2.20.0
 pyparsing==3.3.2
 pyproject-hooks==1.2.0
