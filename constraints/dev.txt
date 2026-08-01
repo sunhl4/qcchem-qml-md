@@ -65,7 +65,7 @@ parso==0.8.7
 pexpect==4.9.0
 pillow==12.3.0
 pip-tools==7.5.3
-platformdirs==4.10.0
+platformdirs==4.11.0
 pluggy==1.6.0
 pre-commit==4.6.0
 prompt-toolkit==3.0.52
