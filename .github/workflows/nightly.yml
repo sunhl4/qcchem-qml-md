@@ -7,8 +7,8 @@ jobs:
   test-nightly:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-python@v6
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
         with:
           python-version: "3.12"
           cache: pip
@@ -25,7 +25,7 @@ jobs:
         run: python scripts/check_perf_regression.py --report /tmp/perf-regression-report.json
       - name: Upload perf regression report
         if: always()
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: perf-regression-report
           path: /tmp/perf-regression-report.json
@@ -44,7 +44,7 @@ jobs:
             --git-sha "${{ github.sha }}" \
             --output /tmp/benchmark_dashboard_nightly.html
       - name: Upload L3 benchmark bundle
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: l3-benchmark-bundle-nightly
           path: /tmp/l3_benchmark.json
@@ -58,9 +58,9 @@ jobs:
         os: [macos-latest, windows-latest]
         python-version: ["3.12"]
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v7
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v7
         with:
           python-version: ${{ matrix.python-version }}
           cache: pip
