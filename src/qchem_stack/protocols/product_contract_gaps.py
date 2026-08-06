@@ -5,27 +5,15 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 
-from qchem_stack.contracts.schema_ids import (
-    PRODUCT_CAPABILITY_SLA_V1,
-    PRODUCT_GAP_ANCHOR_INDEX_V1,
-)
-
-# Normalized SLA labels for docs / release surfaces.
-_SLA_STATUS_NORMALIZE: dict[str, str] = {
-    "available": "available",
-    "partial": "partial",
-    "partial_runtime": "partial",
-    "stub_only": "stub_only",
-    "n/a": "n/a",
-    "local_runtime_only": "local_runtime_only",
-    "reference": "partial",
-}
+from qchem_stack.contracts.schema_ids import PRODUCT_GAP_ANCHOR_INDEX_V1
 
 _REPO_ROOT = Path(__file__).resolve().parents[3]
 
 PRODUCT_CAPABILITY_MAP: dict[str, str] = {
     "ProtocolLifecycle": "qchem_stack.protocols.protocol.PauliAveragingProtocol + ProtocolPhase",
     "VQE": "qchem_stack.quantum.algorithms.vqe.VQE",
+    "GQE": "qchem_stack.quantum.algorithms.gqe.GQE",
+    "SQD_dense_prototype": "qchem_stack.quantum.algorithms.sqd.SQD (≤12 qubits; statevector only)",
     "AdaptVQE": "qchem_stack.quantum.algorithms.adapt.FermionicAdaptVQE",
     "IQEB": "qchem_stack.quantum.algorithms.iqeb.IQEBVQE",
     "ExcitedStateVQDQSE": "qchem_stack.quantum.algorithms.excited",
@@ -89,8 +77,8 @@ PRODUCT_GAP_CATEGORIES_V1: list[dict[str, Any]] = [
         "id": "chemically_aware_ansatz_pack",
         "release_anchor": "product_capability_matrix.md#ansatz-and-operator-pools",
         "open_stack_surface": (
-            "HEA, UCCSD, UCCGD, QCC, UpCCGSD, pUCCD, VSQS; iterative iQCC/iQCC+PT "
-            "(open-stack) and QITE research plugin; JW/BK/SCBK/JKMN/HCB mapping paths."
+            "HEA, UCCSD, UCCGD, QCC, UpCCGSD, pUCCD, VSQS, iQCC/QITE research plugins; "
+            "JW/BK/SCBK/JKMN/HCB (hard-core boson) mapping paths."
         ),
         "status": "available",
     },
@@ -171,41 +159,6 @@ def product_capability_map_for_docs() -> dict[str, str]:
 def product_gap_categories() -> list[dict[str, Any]]:
     """Product-facing capability gaps for release surfaces."""
     return [dict(row) for row in PRODUCT_GAP_CATEGORIES_V1]
-
-
-def normalize_capability_sla_status(status: str) -> str:
-    """Map a gap ``status`` string to an SLA label.
-
-    Allowed labels: ``available``, ``partial``, ``stub_only``, ``n/a``,
-    ``local_runtime_only``. Unknown statuses become ``n/a``.
-    """
-    key = str(status).strip().lower()
-    return _SLA_STATUS_NORMALIZE.get(key, "n/a")
-
-
-def product_capability_sla_v1() -> dict[str, Any]:
-    """Map each :data:`PRODUCT_GAP_CATEGORIES_V1` row to a normalized SLA label."""
-    rows: list[dict[str, Any]] = []
-    by_id: dict[str, str] = {}
-    for gap in PRODUCT_GAP_CATEGORIES_V1:
-        rid = str(gap["id"])
-        raw_status = str(gap.get("status", "n/a"))
-        sla = normalize_capability_sla_status(raw_status)
-        by_id[rid] = sla
-        rows.append(
-            {
-                "id": rid,
-                "release_anchor": gap.get("release_anchor"),
-                "status": raw_status,
-                "sla": sla,
-                "open_stack_surface": gap.get("open_stack_surface"),
-            }
-        )
-    return {
-        "schema": PRODUCT_CAPABILITY_SLA_V1,
-        "by_id": by_id,
-        "rows": rows,
-    }
 
 
 def _gap_id_and_anchor_pairs(gaps: list[dict[str, Any]]) -> list[tuple[str, str]]:

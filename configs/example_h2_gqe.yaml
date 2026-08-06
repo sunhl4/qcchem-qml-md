@@ -1,0 +1,34 @@
+schema_version: "2"
+experiment_id: example_h2_gqe
+molecule:
+  symbols: [H, H]
+  coordinates: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.74]]
+  coordinate_unit: angstrom
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+active_space:
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+scf:
+  driver: pyscf
+  method: RHF
+embedding:
+  mode: none
+backend:
+  provider: statevector
+  shots_per_circuit: 512
+quantum:
+  # GQE is a peer algorithm to VQE (classical generative policy + energy oracle).
+  algorithm: gqe
+  gqe:
+    n_gates: 8
+    max_iters: 20
+    batch_size: 8
+    loss: grpo
+    pool_mode: hamiltonian_pauli
+    embed_dim: 16
+  pauli:
+    use_protocol: false

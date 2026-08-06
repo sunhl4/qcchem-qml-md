@@ -55,10 +55,27 @@ def hea_state(
     n_qubits: int,
     depth: int,
     entangler: str = "linear_cnot",
+    *,
+    initial_state: np.ndarray | None = None,
 ) -> np.ndarray:
-    """Hardware-efficient ansatz: layers of Ry/Rx + CNOT chain."""
-    state = np.zeros(2**n_qubits, dtype=complex)
-    state[0] = 1.0
+    """Hardware-efficient ansatz: layers of Ry/Rx + CNOT chain.
+
+    When ``initial_state`` is provided it must be length ``2**n_qubits`` and is
+    used as the reference (e.g. Hartree–Fock) before HEA unitaries are applied.
+    """
+    if initial_state is None:
+        state = np.zeros(2**n_qubits, dtype=complex)
+        state[0] = 1.0
+    else:
+        state = np.asarray(initial_state, dtype=complex).ravel().copy()
+        if state.size != 2**n_qubits:
+            raise ValueError(
+                f"initial_state length {state.size} != 2**n_qubits ({2**n_qubits})"
+            )
+        nrm0 = float(np.linalg.norm(state))
+        if nrm0 < STATE_NORMALIZATION_FLOOR:
+            raise ValueError("initial_state has near-zero norm")
+        state = state / nrm0
     n_params = 2 * n_qubits * depth
     if angles.size != n_params:
         raise ValueError(f"expected {n_params} angles, got {angles.size}")

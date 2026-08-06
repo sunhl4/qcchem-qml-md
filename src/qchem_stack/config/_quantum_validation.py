@@ -108,7 +108,6 @@ def validate_operator_pool_ids(spec: QuantumSpec) -> None:
     for field_path, pool_id in (
         ("quantum.adapt.pool_id", spec.adapt.pool_id),
         ("quantum.iqeb.pool_id", spec.iqeb.pool_id),
-        ("quantum.iqcc.pool_id", spec.iqcc.pool_id),
     ):
         pid = str(pool_id)
         if not _operator_pool_validator(pid):
@@ -116,3 +115,23 @@ def validate_operator_pool_ids(spec: QuantumSpec) -> None:
                 f"Unknown {field_path}={pid!r}. "
                 "Use a registered operator pool id (see operator_pool_registry)."
             )
+
+
+def validate_sqd_customer_allowlist(spec: QuantumSpec) -> None:
+    """Require opt-in for experimental SQD-family algorithm ids."""
+    from qchem_stack.quantum.algorithms.sqd.types import (
+        CUSTOMER_SQD_ALGORITHM_IDS,
+        EXPERIMENTAL_SQD_ALGORITHM_IDS,
+    )
+
+    algo = str(spec.algorithm)
+    if algo not in EXPERIMENTAL_SQD_ALGORITHM_IDS:
+        return
+    if bool(spec.sqd.allow_experimental):
+        return
+    customer = ", ".join(sorted(CUSTOMER_SQD_ALGORITHM_IDS))
+    raise ValueError(
+        f"quantum.algorithm={algo!r} is an experimental SQD-family prototype. "
+        "Set quantum.sqd.allow_experimental: true to opt in, or use a "
+        f"customer-supported id: {customer}."
+    )

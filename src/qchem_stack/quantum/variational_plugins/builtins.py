@@ -13,20 +13,12 @@ from qchem_stack.config.quantum_helpers import (
     resolve_adapt_grad_tol,
     resolve_adapt_max_iter,
     resolve_adapt_pool_id,
-    resolve_iqcc_coeff_atol,
-    resolve_iqcc_denom_cutoff,
-    resolve_iqcc_enable_pt,
-    resolve_iqcc_energy_tolerance,
-    resolve_iqcc_max_steps,
-    resolve_iqcc_max_terms,
-    resolve_iqcc_max_weight,
-    resolve_iqcc_pool_id,
-    resolve_iqcc_pool_mode,
-    resolve_iqcc_top_k,
+    resolve_gqe_config_dict,
     resolve_iqeb_energy_tolerance,
     resolve_iqeb_max_rounds,
     resolve_iqeb_n_grads,
     resolve_iqeb_pool_id,
+    resolve_sqd_config_dict,
     resolve_uccsd_trotter_steps,
     resolve_variational_algorithm,
     resolve_variational_ansatz,
@@ -39,7 +31,7 @@ from qchem_stack.config.quantum_helpers import (
     resolve_vsqs_trotter_order,
 )
 from qchem_stack.quantum.algorithms.adapt import FermionicAdaptVQE
-from qchem_stack.quantum.algorithms.iqcc import IQCCVQE, iqcc_algorithm_report_v1
+from qchem_stack.quantum.algorithms.iqcc import IQCCVQE
 from qchem_stack.quantum.algorithms.iqeb import IQEBVQE
 from qchem_stack.quantum.algorithms.puccd_vqe import PUCCDVQE, puccd_algorithm_report_v1
 from qchem_stack.quantum.algorithms.qcc_vqe import QCCVQE, qcc_algorithm_report_v1
@@ -53,6 +45,16 @@ from qchem_stack.quantum.algorithms.sa_vqe import SAVQE
 from qchem_stack.quantum.algorithms.uccgd_vqe import UCCGDVQE, uccgd_algorithm_report_v1
 from qchem_stack.quantum.algorithms.uccsd_vqe import uccsd_algorithm_report_v1
 from qchem_stack.quantum.algorithms.upccgsd_vqe import UpCCGSDVQE, upccgsd_algorithm_report_v1
+from qchem_stack.quantum.algorithms.gqe import (
+    VARIANT_TO_CLASS as GQE_VARIANT_TO_CLASS,
+    GQEConfig,
+    gqe_algorithm_report_v1,
+)
+from qchem_stack.quantum.algorithms.sqd import (
+    VARIANT_TO_CLASS as SQD_VARIANT_TO_CLASS,
+    SqdConfig,
+    sqd_algorithm_report_v1,
+)
 from qchem_stack.quantum.algorithms.vqe import VQE
 from qchem_stack.quantum.algorithms.vsqs_vqe import VSQSVQE, vsqs_algorithm_report_v1
 from qchem_stack.quantum.variational_branch import run_uccsd_vqe_from_config
@@ -113,8 +115,18 @@ def run_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
         return _vqe_outcome(result, report_fn(result))
 
     if ansatz == "iqcc":
-        # Legacy UX: ansatz:iqcc under algorithm:vqe still runs iterative iQCC.
-        return run_iqcc(ctx)
+        ir = IQCCVQE(qh, executor=exe).run(maxiter=resolve_vqe_maxiter(cfg), seed=ctx.seed)
+        return _vqe_outcome(
+            ir,
+            {
+                "schema": "algorithm_iqcc_report_v1",
+                "algorithm": "vqe",
+                "variational_ansatz": "iqcc",
+                "final_value": float(ir.energy),
+                "nfev": int(ir.nfev),
+                "meta": dict(ir.meta),
+            },
+        )
     if ansatz == "qite":
         qr = QITEVQE(qh, executor=exe).run(seed=ctx.seed)
         return VariationalStageOutcome(
@@ -212,47 +224,6 @@ def run_iqeb(ctx: VariationalRunContext) -> VariationalStageOutcome:
     )
 
 
-def run_iqcc(ctx: VariationalRunContext) -> VariationalStageOutcome:
-    """Iterative QCC / optional EN2 (iQCC+PT) outer-loop runner."""
-    cfg = ctx.cfg
-    qh = ctx.resolved_hamiltonian()
-    pool_mode = resolve_iqcc_pool_mode(cfg)
-    if pool_mode not in ("genin_dis", "iqeb_qubit_excitation"):
-        pool_mode = "genin_dis"
-    algo = IQCCVQE(
-        qh,
-        max_steps=resolve_iqcc_max_steps(cfg),
-        top_k=resolve_iqcc_top_k(cfg),
-        coeff_atol=resolve_iqcc_coeff_atol(cfg),
-        max_terms=resolve_iqcc_max_terms(cfg),
-        enable_pt=resolve_iqcc_enable_pt(cfg),
-        denom_cutoff=resolve_iqcc_denom_cutoff(cfg),
-        pool_mode=pool_mode,  # type: ignore[arg-type]
-        pool_id=resolve_iqcc_pool_id(cfg),
-        max_weight=resolve_iqcc_max_weight(cfg),
-        energy_tolerance=resolve_iqcc_energy_tolerance(cfg),
-        maxiter_inner=resolve_vqe_maxiter(cfg),
-        executor=ctx.executor,
-    )
-    ir = algo.run(seed=ctx.seed)
-    flat_amps: list[float] = []
-    for row in ir.amplitudes_history:
-        flat_amps.extend(float(x) for x in row)
-    return VariationalStageOutcome(
-        energy=float(ir.energy),
-        angles=np.asarray(flat_amps, dtype=float),
-        algo_meta={
-            "algorithm": "iqcc_pt" if resolve_iqcc_enable_pt(cfg) else "iqcc",
-            "iqcc_meta": ir.meta,
-            "iqcc_selected_generators": ir.selected_generators,
-            "energy_variational": ir.energy_variational,
-            "energy_pt": ir.energy_pt,
-            "nfev": ir.nfev,
-        },
-        algorithm_report=iqcc_algorithm_report_v1(ir),
-    )
-
-
 def _qpe_stage_outcome(
     ctx: VariationalRunContext,
     *,
@@ -329,14 +300,95 @@ def run_sa_vqe_branch(ctx: VariationalRunContext) -> VariationalStageOutcome:
     )
 
 
+def run_gqe_family(ctx: VariationalRunContext) -> VariationalStageOutcome:
+    """Run GQE / A1–A8 variants registered as peer algorithms to VQE."""
+    algo = resolve_variational_algorithm(ctx.cfg)
+    cls = GQE_VARIANT_TO_CLASS.get(algo)
+    if cls is None:
+        raise ValueError(f"Unsupported GQE algorithm id: {algo!r}")
+    gqe_kw = resolve_gqe_config_dict(ctx.cfg)
+    config = GQEConfig(variant=cls._variant, seed=int(ctx.seed), **gqe_kw)  # type: ignore[arg-type]
+    model = cls(ctx.resolved_hamiltonian(), config=config)
+    result = model.build().run(seed=ctx.seed)
+    return VariationalStageOutcome(
+        energy=float(result.energy),
+        angles=np.asarray(result.angles, dtype=float),
+        algo_meta={
+            "algorithm": algo,
+            "nfev": result.nfev,
+            "gqe_meta": dict(result.meta),
+            "best_sequence": list(result.best_sequence),
+        },
+        algorithm_report=gqe_algorithm_report_v1(result, algorithm=algo),
+    )
+
+
+def run_sqd_family(ctx: VariationalRunContext) -> VariationalStageOutcome:
+    """Run sample-based SQD / QSCI family peers (dense statevector prototypes)."""
+    from qchem_stack.exceptions import PipelineError
+
+    algo = resolve_variational_algorithm(ctx.cfg)
+    cls = SQD_VARIANT_TO_CLASS.get(algo)
+    if cls is None:
+        raise ValueError(f"Unsupported SQD algorithm id: {algo!r}")
+    provider = str(ctx.cfg.backend.provider)
+    if provider != "statevector":
+        raise PipelineError(
+            "SQD-family algorithms currently run as dense statevector prototypes and do "
+            f"not use backend.provider={provider!r}. Set backend.provider: statevector "
+            "(or use VQE / another hardware-capable algorithm). "
+            "Reported execution_mode=dense_statevector; backend_executor_used=false."
+        )
+    sqd_kw = resolve_sqd_config_dict(ctx.cfg)
+    config = SqdConfig(seed=int(ctx.seed), **sqd_kw)  # type: ignore[arg-type]
+    model = cls(ctx.resolved_hamiltonian(), config=config, executor=ctx.executor)
+    result = model.build().run(seed=ctx.seed)
+    report = sqd_algorithm_report_v1(result, algorithm=algo)
+    return VariationalStageOutcome(
+        energy=float(result.energy),
+        angles=np.asarray(result.angles, dtype=float),
+        algo_meta={
+            "algorithm": algo,
+            "nfev": result.nfev,
+            "n_shots_total": report.get("n_shots_total"),
+            "sqd_meta": dict(result.meta),
+            "selected_bitstrings": list(result.selected_bitstrings),
+            "execution_mode": report.get("execution_mode"),
+            "backend_executor_used": report.get("backend_executor_used"),
+            "dense_prototype": report.get("dense_prototype"),
+            "fallback_hf": report.get("fallback_hf"),
+        },
+        algorithm_report=report,
+    )
+
+
 BUILTIN_RUNNERS: dict[str, object] = {
     "vqe": run_vqe_branch,
     "adapt": run_adapt_family,
     "tetris_adapt": run_adapt_family,
     "iqeb": run_iqeb,
-    "iqcc": run_iqcc,
     "sa_vqe": run_sa_vqe_branch,
     "qpe_kitaev": run_qpe_kitaev,
     "qpe_deterministic": run_qpe_deterministic,
     "qpe_info_theory": run_qpe_info_theory,
+    "gqe": run_gqe_family,
+    "conditional_gqe": run_gqe_family,
+    "pdpo_gqe": run_gqe_family,
+    "smiles_gqe": run_gqe_family,
+    "gqe_qsci": run_gqe_family,
+    "auger_gqe": run_gqe_family,
+    "gqkae": run_gqe_family,
+    "spin_gqe": run_gqe_family,
+    "adapt_gqe": run_gqe_family,
+    "cbs": run_sqd_family,
+    "qsci": run_sqd_family,
+    "sqd": run_sqd_family,
+    "qse_qsci_lite": run_sqd_family,
+    "adapt_qsci": run_sqd_family,
+    "skqd": run_sqd_family,
+    "sqdrift": run_sqd_family,
+    "hi_vqe_lite": run_sqd_family,
+    "ewf_trim_sqd_lite": run_sqd_family,
+    "qbe_sqd_lite": run_sqd_family,
+    "sqd_afqmc_lite": run_sqd_family,
 }

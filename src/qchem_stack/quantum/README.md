@@ -10,7 +10,7 @@ Quantum algorithms: variational ground state, excited-state sidecars, demo track
 
 | Area | Modules | Notes |
 |------|---------|-------|
-| Algorithms | `algorithms/` | `VQE`, `FermionicAdaptVQE`, `IQEBVQE`, `IQCCVQE`, `VQD`, `QSE`, QPE/VQS demos; UCCSD mapping in `uccsd_mapping.py`, CircuitIR in `uccsd_circuit.py` / `qcc_circuit.py`; iQCC dressing in `iqcc_dressing.py` |
+| Algorithms | `algorithms/` | `VQE`, `GQE`, SQD/QSCI sampling family (`sqd/`), `FermionicAdaptVQE`, `IQEBVQE`, `VQD`, `QSE`, QPE/VQS demos; UCCSD mapping in `uccsd_mapping.py`, CircuitIR in `uccsd_circuit.py` |
 | Variational plugins | `variational_plugins/` | `run_variational_stage`, `register_variational_plugin` |
 | Excited plugins | `excited_plugins/` | VQD / QSE / SCEOM sidecar dispatch |
 | Branch factory | `variational_branch.py` | Shared UCCSD vs HEA wiring |

@@ -4,14 +4,6 @@ Import from :mod:`qchem_stack.contracts` (or this module) instead of scattering
 literal ``"*_v1"`` strings. Repro TypedDict guards live in :mod:`qchem_stack.repro.schema`.
 """
 
-from qchem_stack.contracts.schema_ids_experimental import (
-    BAYESIAN_QPE_STUB_MAP_V1,
-    CUTENSORTNET_PROTOCOL_STUB_V1,
-    L3_ENERGY_BOOTSTRAP_STUB_V1,
-    MITIGATION_PEC_LITERATURE_STUB_V1,
-    ML_MD_TRAINER_STUB_FIT_V1,
-)
-
 # Chemistry / pre-quantum handoff
 PRE_QUANTUM_INPUT_SCHEMA_V1 = "pre_quantum_input_v1"
 CLASSICAL_REFERENCE_BUNDLE_V1 = "classical_reference_bundle_v1"
@@ -60,6 +52,8 @@ SCHMIDT_PER_FRAGMENT_VQE_V1 = "schmidt_per_fragment_vqe_v1"
 SCHMIDT_PER_FRAGMENT_VQE_PARITY_SUMMARY_V1 = "schmidt_per_fragment_vqe_parity_summary_v1"
 TKET_STATS_SKIPPED_V1 = "tket_stats_skipped_v1"
 ZNE_QISKIT_UNIFICATION_V1 = "zne_qiskit_unification_v1"
+MITIGATION_PEC_LITERATURE_STUB_V1 = "mitigation_pec_literature_stub_v1"
+CUTENSORTNET_PROTOCOL_STUB_V1 = "cutensornet_protocol_stub_v1"
 CLASSICAL_BENCHMARK_SUMMARY_V1 = "classical_benchmark_summary_v1"
 QPE_OPEN_STACK_CONTRACT_V1 = "qpe_open_stack_contract_v1"
 VQS_OPEN_STACK_CONTRACT_V1 = "vqs_open_stack_contract_v1"
@@ -94,15 +88,12 @@ TKET_STATS_ATTEMPT_V1 = "tket_stats_attempt_v1"
 TKET_PEEPHOLE_OPTIMIZE_V1 = "tket_peephole_optimize_v1"
 QNEXUS_PROBE_V1 = "qnexus_probe_v1"
 NEXUS_PUBLIC_WORKFLOW_BLUEPRINT_V1 = "nexus_public_workflow_blueprint_v1"
-GQE_PROBE_V1 = "gqe_probe_v1"
-GQE_ORACLE_RECORD_V1 = "gqe_oracle_record_v1"
-GQE_TRAIN_REPORT_V1 = "gqe_train_report_v1"
-GQE_BLUEPRINT_V1 = "gqe_blueprint_v1"
 
 # Parity export (stable top-level keys documented in repro.schema)
 PARITY_EXPORT_SCHEMA_VERSION_V3 = 3
 
 # L3 / MD bridge / mapping registry
+L3_ENERGY_BOOTSTRAP_STUB_V1 = "l3_energy_bootstrap_stub_v1"
 ML_MD_BRIDGE_SURFACE_V1 = "ml_md_bridge_surface_v1"
 QMEF_ML_ATTACHMENT_V1 = "qmef_ml_attachment_v1"
 PUBLIC_MAPPING_ALIAS_SURFACE_V1 = "public_mapping_alias_surface_v1"
@@ -135,6 +126,7 @@ FULL_PIPELINE_JOB_RESULT_V1 = "full_pipeline_job_result_v1"
 
 # MD bridge (P12)
 QMEF_VALIDATE_V1 = "qmef_validate_v1"
+ML_MD_TRAINER_STUB_FIT_V1 = "ml_md_trainer_stub_fit_v1"
 
 # Quantum algorithms / QPE demo (P12)
 TANGELO_DEFLATION_ANALOGY_V1 = "tangelo_deflation_analogy_v1"
@@ -144,17 +136,18 @@ OPERATOR_POOL_REGISTRY_EXPORT_V1 = "operator_pool_registry_export_v1"
 VQS_TRACK_V1 = "vqs_track_v1"
 VQS_INTEGRATION_CONTRACT_V1 = "vqs_integration_contract_v1"
 ALGORITHM_VQE_REPORT_V1 = "algorithm_vqe_report_v1"
+ALGORITHM_GQE_REPORT_V1 = "algorithm_gqe_report_v1"
+ALGORITHM_SQD_REPORT_V1 = "algorithm_sqd_report_v1"
 ALGORITHM_UCCSD_REPORT_V1 = "algorithm_uccsd_report_v1"
-ALGORITHM_IQCC_REPORT_V1 = "algorithm_iqcc_report_v1"
 PHASE_ESTIMATION_CONTRACT_V1 = "phase_estimation_contract_v1"
 QPE_QEC_DEMO_TRACK_V1 = "qpe_qec_demo_track_v1"
+BAYESIAN_QPE_STUB_MAP_V1 = "bayesian_qpe_stub_map_v1"
 
 # Protocols / mitigation (P12)
 PROTOCOL_EXPECTATION_SEMANTICS_V1 = "protocol_expectation_semantics_v1"
 MITIGATION_EXECUTION_MODEL_V1 = "mitigation_execution_model_v1"
 OPEN_STACK_DIFFERENTIATORS_V1 = "open_stack_differentiators_v1"
 PRODUCT_GAP_ANCHOR_INDEX_V1 = "product_gap_anchor_index_v1"
-PRODUCT_CAPABILITY_SLA_V1 = "product_capability_sla_v1"
 QERMIT_RUNTIME_V1 = "qermit_runtime_v1"
 MAPPING_STATUS_ROWS_V1 = "mapping_status_rows_v1"
 
@@ -197,11 +190,7 @@ __all__ = [
     "SCHMIDT_PER_FRAGMENT_VQE_PARITY_SUMMARY_V1",
     "TKET_STATS_SKIPPED_V1",
     "ZNE_QISKIT_UNIFICATION_V1",
-    "MITIGATION_PEC_LITERATURE_STUB_V1",
     "CUTENSORTNET_PROTOCOL_STUB_V1",
-    "L3_ENERGY_BOOTSTRAP_STUB_V1",
-    "ML_MD_TRAINER_STUB_FIT_V1",
-    "BAYESIAN_QPE_STUB_MAP_V1",
     "CLASSICAL_BENCHMARK_SUMMARY_V1",
     "QPE_OPEN_STACK_CONTRACT_V1",
     "VQS_OPEN_STACK_CONTRACT_V1",
@@ -232,11 +221,8 @@ __all__ = [
     "TKET_PEEPHOLE_OPTIMIZE_V1",
     "QNEXUS_PROBE_V1",
     "NEXUS_PUBLIC_WORKFLOW_BLUEPRINT_V1",
-    "GQE_PROBE_V1",
-    "GQE_ORACLE_RECORD_V1",
-    "GQE_TRAIN_REPORT_V1",
-    "GQE_BLUEPRINT_V1",
     "PARITY_EXPORT_SCHEMA_VERSION_V3",
+    "L3_ENERGY_BOOTSTRAP_STUB_V1",
     "ML_MD_BRIDGE_SURFACE_V1",
     "QMEF_ML_ATTACHMENT_V1",
     "TANGELO_PUBLIC_MAPPING_ALIAS_SURFACE_V1",
@@ -260,6 +246,7 @@ __all__ = [
     "NEXUS_ANALOG_V1",
     "FULL_PIPELINE_JOB_RESULT_V1",
     "QMEF_VALIDATE_V1",
+    "ML_MD_TRAINER_STUB_FIT_V1",
     "TANGELO_DEFLATION_ANALOGY_V1",
     "VQD_CROSS_STACK_SEMANTICS_V1",
     "UCCSD_MAPPING_SUPPORT_MATRIX_V1",
@@ -267,15 +254,16 @@ __all__ = [
     "VQS_TRACK_V1",
     "VQS_INTEGRATION_CONTRACT_V1",
     "ALGORITHM_VQE_REPORT_V1",
+    "ALGORITHM_GQE_REPORT_V1",
+    "ALGORITHM_SQD_REPORT_V1",
     "ALGORITHM_UCCSD_REPORT_V1",
-    "ALGORITHM_IQCC_REPORT_V1",
     "PHASE_ESTIMATION_CONTRACT_V1",
     "QPE_QEC_DEMO_TRACK_V1",
+    "BAYESIAN_QPE_STUB_MAP_V1",
     "PROTOCOL_EXPECTATION_SEMANTICS_V1",
     "MITIGATION_EXECUTION_MODEL_V1",
     "OPEN_STACK_DIFFERENTIATORS_V1",
     "PRODUCT_GAP_ANCHOR_INDEX_V1",
-    "PRODUCT_CAPABILITY_SLA_V1",
     "QERMIT_RUNTIME_V1",
     "MAPPING_STATUS_ROWS_V1",
 ]

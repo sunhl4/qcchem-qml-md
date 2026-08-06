@@ -53,6 +53,52 @@ def resolve_vqe_initial_parameters_strategy(cfg: ExperimentConfig) -> str:
     return str(cfg.quantum.vqe.initial_parameters_strategy)
 
 
+def resolve_gqe_config_dict(cfg: ExperimentConfig) -> dict[str, object]:
+    g = cfg.quantum.gqe
+    return {
+        "n_gates": int(g.n_gates),
+        "max_iters": int(g.max_iters),
+        "batch_size": int(g.batch_size),
+        "buffer_size": int(g.buffer_size),
+        "learning_rate": float(g.learning_rate),
+        "beta": float(g.beta),
+        "beta_min": float(g.beta_min),
+        "beta_max": float(g.beta_max),
+        "loss": str(g.loss),
+        "grpo_clip": float(g.grpo_clip),
+        "pdpo_alpha": float(g.pdpo_alpha),
+        "dpo_beta": float(g.dpo_beta),
+        "pool_mode": str(g.pool_mode),
+        "embed_dim": int(g.embed_dim),
+        "qcc_budget": None if g.qcc_budget is None else float(g.qcc_budget),
+        "qsci_subspace_size": int(g.qsci_subspace_size),
+        "condition_dim": int(g.condition_dim),
+        "energy_offset": float(g.energy_offset),
+        "backbone": str(g.backbone),
+    }
+
+
+def resolve_sqd_config_dict(cfg: ExperimentConfig) -> dict[str, object]:
+    s = cfg.quantum.sqd
+    return {
+        "n_shots": int(s.n_shots),
+        "subspace_size": int(s.subspace_size),
+        "max_iters": int(s.max_iters),
+        "hea_depth": int(s.hea_depth),
+        "n_electrons": None if s.n_electrons is None else int(s.n_electrons),
+        "krylov_dim": int(s.krylov_dim),
+        "krylov_dt": float(s.krylov_dt),
+        "qdrift_steps": int(s.qdrift_steps),
+        "qdrift_replicas": int(s.qdrift_replicas),
+        "recovery_iters": int(s.recovery_iters),
+        "n_fragments": int(s.n_fragments),
+        "afqmc_walkers": int(s.afqmc_walkers),
+        "afqmc_steps": int(s.afqmc_steps),
+        "energy_tol": float(s.energy_tol),
+        "carryover": int(s.carryover),
+    }
+
+
 def resolve_adapt_max_iter(cfg: ExperimentConfig) -> int:
     return int(cfg.quantum.adapt.max_iter)
 
@@ -79,46 +125,6 @@ def resolve_iqeb_n_grads(cfg: ExperimentConfig) -> int:
 
 def resolve_iqeb_energy_tolerance(cfg: ExperimentConfig) -> float:
     return float(cfg.quantum.iqeb.energy_tolerance)
-
-
-def resolve_iqcc_max_steps(cfg: ExperimentConfig) -> int:
-    return int(cfg.quantum.iqcc.max_steps)
-
-
-def resolve_iqcc_top_k(cfg: ExperimentConfig) -> int:
-    return int(cfg.quantum.iqcc.top_k)
-
-
-def resolve_iqcc_coeff_atol(cfg: ExperimentConfig) -> float:
-    return float(cfg.quantum.iqcc.coeff_atol)
-
-
-def resolve_iqcc_max_terms(cfg: ExperimentConfig) -> int | None:
-    return cfg.quantum.iqcc.max_terms
-
-
-def resolve_iqcc_enable_pt(cfg: ExperimentConfig) -> bool:
-    return bool(cfg.quantum.iqcc.enable_pt)
-
-
-def resolve_iqcc_denom_cutoff(cfg: ExperimentConfig) -> float:
-    return float(cfg.quantum.iqcc.denom_cutoff)
-
-
-def resolve_iqcc_pool_mode(cfg: ExperimentConfig) -> str:
-    return str(cfg.quantum.iqcc.pool_mode)
-
-
-def resolve_iqcc_pool_id(cfg: ExperimentConfig) -> str:
-    return str(cfg.quantum.iqcc.pool_id)
-
-
-def resolve_iqcc_max_weight(cfg: ExperimentConfig) -> int:
-    return int(cfg.quantum.iqcc.max_weight)
-
-
-def resolve_iqcc_energy_tolerance(cfg: ExperimentConfig) -> float:
-    return float(cfg.quantum.iqcc.energy_tolerance)
 
 
 def resolve_quantum_algorithm_factory(cfg: ExperimentConfig) -> str | None:
@@ -150,17 +156,13 @@ def quantum_workflow_preview_qpe_fields(cfg: ExperimentConfig) -> dict[str, obje
 
 
 def quantum_variational_run_summary_yaml_fields(cfg: ExperimentConfig) -> dict[str, object]:
-    """ADAPT / IQEB / iQCC YAML keys copied into ``run_summary`` when bundles are present."""
+    """ADAPT / IQEB YAML keys copied into ``run_summary`` when bundles are present."""
     return {
         "adapt_pool_id_yaml": resolve_adapt_pool_id(cfg),
         "adapt_max_iter_yaml": resolve_adapt_max_iter(cfg),
         "adapt_grad_tol_yaml": resolve_adapt_grad_tol(cfg),
         "iqeb_pool_id_yaml": resolve_iqeb_pool_id(cfg),
         "iqeb_max_rounds_yaml": resolve_iqeb_max_rounds(cfg),
-        "iqcc_max_steps_yaml": resolve_iqcc_max_steps(cfg),
-        "iqcc_top_k_yaml": resolve_iqcc_top_k(cfg),
-        "iqcc_enable_pt_yaml": resolve_iqcc_enable_pt(cfg),
-        "iqcc_pool_mode_yaml": resolve_iqcc_pool_mode(cfg),
     }
 
 
@@ -182,6 +184,21 @@ def quantum_algorithm_report_run_summary_fields(out: dict[str, object]) -> dict[
     final_value = ar.get("final_value")
     if isinstance(final_value, (int, float)):
         fields["algorithm_report_final_value_au"] = float(final_value)
+    # SQD-family epistemic mirrors (ignored when absent on other algorithms).
+    for key, out_key in (
+        ("dense_prototype", "algorithm_report_dense_prototype"),
+        ("execution_mode", "algorithm_report_execution_mode"),
+        ("backend_executor_used", "algorithm_report_backend_executor_used"),
+        ("literature_parity", "algorithm_report_literature_parity"),
+        ("customer_tier", "algorithm_report_customer_tier"),
+        ("fallback_hf", "algorithm_report_fallback_hf"),
+        ("n_shots_total", "algorithm_report_n_shots_total"),
+        ("max_qubits_supported", "algorithm_report_max_qubits_supported"),
+    ):
+        if key in ar:
+            fields[out_key] = ar[key]
+    if "postselect_kept_fraction" in ar and ar["postselect_kept_fraction"] is not None:
+        fields["algorithm_report_postselect_kept_fraction"] = ar["postselect_kept_fraction"]
     return fields
 
 
@@ -240,10 +257,6 @@ def quantum_repro_core_fields(cfg: ExperimentConfig) -> dict[str, object]:
         "vqe_maxiter": q.vqe.maxiter,
         "adapt_max_iter": q.adapt.max_iter,
         "iqeb_max_rounds": q.iqeb.max_rounds,
-        "iqcc_max_steps": q.iqcc.max_steps,
-        "iqcc_top_k": q.iqcc.top_k,
-        "iqcc_enable_pt": q.iqcc.enable_pt,
-        "iqcc_pool_mode": q.iqcc.pool_mode,
         "variational_ansatz": q.variational.ansatz,
         "run_sampled_pauli_protocol": q.pauli.run_sampled,
         "run_qiskit_shots_pauli_protocol": q.pauli.run_qiskit_shots,
@@ -253,6 +266,22 @@ def quantum_repro_core_fields(cfg: ExperimentConfig) -> dict[str, object]:
         "vqd_after_variational": q.excited.vqd.after_variational,
         "qse_after_variational": q.excited.qse.after_variational,
         "sceom_after_variational": q.excited.sceom.after_variational,
+        "sqd_n_shots": int(q.sqd.n_shots),
+        "sqd_subspace_size": int(q.sqd.subspace_size),
+        "sqd_max_iters": int(q.sqd.max_iters),
+        "sqd_hea_depth": int(q.sqd.hea_depth),
+        "sqd_n_electrons": q.sqd.n_electrons,
+        "sqd_krylov_dim": int(q.sqd.krylov_dim),
+        "sqd_krylov_dt": float(q.sqd.krylov_dt),
+        "sqd_qdrift_steps": int(q.sqd.qdrift_steps),
+        "sqd_qdrift_replicas": int(q.sqd.qdrift_replicas),
+        "sqd_recovery_iters": int(q.sqd.recovery_iters),
+        "sqd_n_fragments": int(q.sqd.n_fragments),
+        "sqd_afqmc_walkers": int(q.sqd.afqmc_walkers),
+        "sqd_afqmc_steps": int(q.sqd.afqmc_steps),
+        "sqd_carryover": int(q.sqd.carryover),
+        "sqd_energy_tol": float(q.sqd.energy_tol),
+        "sqd_allow_experimental": bool(q.sqd.allow_experimental),
     }
     if q.algorithm_factory:
         out["quantum_algorithm_factory"] = q.algorithm_factory

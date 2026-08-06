@@ -1,0 +1,38 @@
+schema_version: "2"
+experiment_id: example_h2_sqd
+molecule:
+  symbols: [H, H]
+  coordinates: [[0.0, 0.0, 0.0], [0.0, 0.0, 0.74]]
+  coordinate_unit: angstrom
+  charge: 0
+  multiplicity: 1
+  basis: sto-3g
+active_space:
+  strategy: cas
+  cas:
+    n_orbitals: 2
+    n_electrons: 2
+scf:
+  driver: pyscf
+  method: RHF
+embedding:
+  mode: none
+backend:
+  # SQD family is dense-statevector only (hard requirement).
+  provider: statevector
+  shots_per_circuit: 512
+quantum:
+  # Customer-supported: cbs | qsci | sqd | skqd | sqdrift
+  # Experimental (require sqd.allow_experimental: true):
+  #   adapt_qsci | qse_qsci_lite | hi_vqe_lite | ewf_trim_sqd_lite | qbe_sqd_lite | sqd_afqmc_lite
+  algorithm: sqd
+  sqd:
+    n_shots: 256
+    subspace_size: 8
+    max_iters: 3
+    hea_depth: 1
+    recovery_iters: 2
+    # n_electrons: 2   # optional override; else fermion_space / CAS electrons
+    allow_experimental: false
+  pauli:
+    use_protocol: false

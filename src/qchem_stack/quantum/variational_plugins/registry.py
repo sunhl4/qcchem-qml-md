@@ -89,18 +89,6 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "materialization_result_schema": "algorithm_report_v1",
         "capabilities": {"supports_operator_pool": True, "supports_outer_rounds": True},
     },
-    "iqcc": {
-        "summary": "Iterative QCC with Hamiltonian dressing; optional EN2 (iQCC+PT).",
-        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_iqcc",
-        "materialization_implementation": "qchem_stack.quantum.algorithms.iqcc.IQCCVQE",
-        "materialization_result_schema": "algorithm_iqcc_report_v1",
-        "capabilities": {
-            "supports_hamiltonian_dressing": True,
-            "supports_outer_rounds": True,
-            "supports_en2_pt": True,
-            "open_stack_implementation": True,
-        },
-    },
     "sa_vqe": {
         "summary": "Minimal state-averaged VQE with overlap penalty (SA-VQE).",
         "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sa_vqe_branch",
@@ -129,6 +117,214 @@ _BUILTIN_METADATA: Final[dict[str, dict[str, Any]]] = {
         "materialization_result_schema": "algorithm_info_theory_qpe_report_v1",
         "capabilities": {"supports_phase_estimation": True},
     },
+    "gqe": {
+        "summary": "Generative Quantum Eigensolver / GPT-QE (Nakaji): classical policy + energy oracle.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.GQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_operator_pool": True},
+    },
+    "conditional_gqe": {
+        "summary": "A1 Conditional-GQE with problem-conditioned generation + DPO.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.ConditionalGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_condition_input": True},
+    },
+    "pdpo_gqe": {
+        "summary": "A2 Persistent-DPO GQE with optional QCC cutting-cost budget mask.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.PersistentDPOGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_qcc_budget": True},
+    },
+    "smiles_gqe": {
+        "summary": "A3 SMILES-inspired operator-text GQE for mol-to-mol transfer.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.SmilesTransferGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_smiles_vocab": True},
+    },
+    "gqe_qsci": {
+        "summary": "A4 GQE with QSCI subspace-energy reward.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.QSCIGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_qsci_reward": True},
+    },
+    "auger_gqe": {
+        "summary": "A5 Auger / spectral GQE workflow with excited-weight oracle.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.AugerGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_spectral_oracle": True},
+    },
+    "gqkae": {
+        "summary": "A6 GQKAE: Kolmogorov–Arnold backbone + QSCI reward.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.GQKAE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_kan_backbone": True},
+    },
+    "spin_gqe": {
+        "summary": "A7 SpinGQE: spin Pauli pool + prefix WMSE loss.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.SpinGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_spin_hamiltonian": True},
+    },
+    "adapt_gqe": {
+        "summary": "A8 ADAPT-GQE: ADAPT teacher warm-start + GRPO fine-tune.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_gqe_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.gqe.AdaptGQE",
+        "materialization_result_schema": "algorithm_gqe_report_v1",
+        "capabilities": {"supports_generative_policy": True, "supports_adapt_distillation": True},
+    },
+    "cbs": {
+        "summary": (
+            "Dense truncated computational-basis energy (CBS-inspired; not Kohda shot CBS)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.CBS",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "customer",
+            "supports_basis_sampling": True,
+            "dense_truncated_support": True,
+        },
+    },
+    "qsci": {
+        "summary": "Quantum-Selected CI: sample configs then classical subspace diagonalization.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.QSCI",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "customer",
+            "supports_basis_sampling": True,
+            "supports_subspace_diag": True,
+        },
+    },
+    "sqd": {
+        "summary": (
+            "Sample-based Quantum Diagonalization with S-CORE-lite recovery "
+            "(dense prototype; not full IBM/qiskit-addon-sqd)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.SQD",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "customer",
+            "supports_basis_sampling": True,
+            "supports_subspace_diag": True,
+            "supports_score_lite_recovery": True,
+        },
+    },
+    "qse_qsci_lite": {
+        "summary": (
+            "QSCI subspace spectrum / gaps lite (not full QSE transition-operator workflow)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.QSEQSCI",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "experimental",
+            "supports_basis_sampling": True,
+            "supports_subspace_spectrum": True,
+        },
+    },
+    "adapt_qsci": {
+        "summary": "ADAPT-QSCI: grow sampling state via pool rotations on classical CI.",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.AdaptQSCI",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "experimental",
+            "supports_basis_sampling": True,
+            "supports_operator_pool": True,
+        },
+    },
+    "skqd": {
+        "summary": "Sample-based Krylov Quantum Diagonalization (dense exact Krylov powers).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.SKQD",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "customer",
+            "supports_basis_sampling": True,
+            "supports_krylov": True,
+        },
+    },
+    "sqdrift": {
+        "summary": "SqDRIFT: SKQD-style sampling with qDRIFT randomized evolution (dense lite).",
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.SqDRIFT",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "customer",
+            "supports_basis_sampling": True,
+            "supports_qdrift": True,
+        },
+    },
+    "hi_vqe_lite": {
+        "summary": (
+            "HI-VQE-lite: dual subspace + Ne-preserving singles; heuristic angle refresh "
+            "(not full Qunova/IBM handover)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.HIVQE",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "experimental",
+            "supports_basis_sampling": True,
+            "supports_dual_subspace": True,
+            "handover_full": False,
+        },
+    },
+    "ewf_trim_sqd_lite": {
+        "summary": (
+            "EWF-TrimSQD-lite: fragment-local Ne-preserving expansion then global diag "
+            "(no MP2 bath / η-trim)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.EWFTrimSQD",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "experimental",
+            "supports_basis_sampling": True,
+            "supports_fragment_local_expansion": True,
+            "embedding_full": False,
+        },
+    },
+    "qbe_sqd_lite": {
+        "summary": (
+            "QBE-SQD-lite: overlapping fragments + occupancy matching "
+            "(no Schmidt bath / BE potential)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.QBESQD",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "experimental",
+            "supports_basis_sampling": True,
+            "supports_occupancy_match_fragments": True,
+            "bootstrap_embedding_full": False,
+        },
+    },
+    "sqd_afqmc_lite": {
+        "summary": (
+            "SQD + ph-AFQMC-lite: subspace walker local energies "
+            "(not production phaseless AFQMC)."
+        ),
+        "implementation": "qchem_stack.quantum.variational_plugins.builtins.run_sqd_family",
+        "materialization_implementation": "qchem_stack.quantum.algorithms.sqd.SQDAFQMC",
+        "materialization_result_schema": "algorithm_sqd_report_v1",
+        "capabilities": {
+            "customer_tier": "experimental",
+            "supports_basis_sampling": True,
+            "supports_afqmc_lite": True,
+            "phaseless_afqmc_full": False,
+        },
+    },
 }
 
 
@@ -141,11 +337,30 @@ _MODEL_FACTORY_MAP: Final[dict[str, tuple[str, str, dict[str, Any]]]] = {
         {"tetris_style": True},
     ),
     "iqeb": ("qchem_stack.quantum.algorithms.iqeb", "IQEBVQE", {}),
-    "iqcc": ("qchem_stack.quantum.algorithms.iqcc", "IQCCVQE", {}),
     "sa_vqe": ("qchem_stack.quantum.algorithms.sa_vqe", "SAVQE", {}),
     "qpe_kitaev": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmKitaevQPE", {}),
     "qpe_deterministic": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmDeterministicQPE", {}),
     "qpe_info_theory": ("qchem_stack.quantum.algorithms.qpe", "AlgorithmInfoTheoryQPE", {}),
+    "gqe": ("qchem_stack.quantum.algorithms.gqe", "GQE", {}),
+    "conditional_gqe": ("qchem_stack.quantum.algorithms.gqe", "ConditionalGQE", {}),
+    "pdpo_gqe": ("qchem_stack.quantum.algorithms.gqe", "PersistentDPOGQE", {}),
+    "smiles_gqe": ("qchem_stack.quantum.algorithms.gqe", "SmilesTransferGQE", {}),
+    "gqe_qsci": ("qchem_stack.quantum.algorithms.gqe", "QSCIGQE", {}),
+    "auger_gqe": ("qchem_stack.quantum.algorithms.gqe", "AugerGQE", {}),
+    "gqkae": ("qchem_stack.quantum.algorithms.gqe", "GQKAE", {}),
+    "spin_gqe": ("qchem_stack.quantum.algorithms.gqe", "SpinGQE", {}),
+    "adapt_gqe": ("qchem_stack.quantum.algorithms.gqe", "AdaptGQE", {}),
+    "cbs": ("qchem_stack.quantum.algorithms.sqd", "CBS", {}),
+    "qsci": ("qchem_stack.quantum.algorithms.sqd", "QSCI", {}),
+    "sqd": ("qchem_stack.quantum.algorithms.sqd", "SQD", {}),
+    "qse_qsci_lite": ("qchem_stack.quantum.algorithms.sqd", "QSEQSCI", {}),
+    "adapt_qsci": ("qchem_stack.quantum.algorithms.sqd", "AdaptQSCI", {}),
+    "skqd": ("qchem_stack.quantum.algorithms.sqd", "SKQD", {}),
+    "sqdrift": ("qchem_stack.quantum.algorithms.sqd", "SqDRIFT", {}),
+    "hi_vqe_lite": ("qchem_stack.quantum.algorithms.sqd", "HIVQE", {}),
+    "ewf_trim_sqd_lite": ("qchem_stack.quantum.algorithms.sqd", "EWFTrimSQD", {}),
+    "qbe_sqd_lite": ("qchem_stack.quantum.algorithms.sqd", "QBESQD", {}),
+    "sqd_afqmc_lite": ("qchem_stack.quantum.algorithms.sqd", "SQDAFQMC", {}),
 }
 
 

@@ -12,6 +12,7 @@ from ._quantum_validation import (
     validate_algorithm_registered_or_factory,
     validate_operator_pool_ids,
     validate_pauli_shot_mode_mutually_exclusive,
+    validate_sqd_customer_allowlist,
     validate_uccsd_trotter_steps,
     validate_vqd_max_overlap_warn_nonneg,
     validate_vqd_penalty_weights_len,
@@ -23,10 +24,11 @@ from .quantum_specs import (
     QuantumAdaptSpec,
     QuantumDemosSpec,
     QuantumExcitedSpec,
+    QuantumGqeSpec,
     QuantumGraphSpec,
-    QuantumIqccSpec,
     QuantumIqebSpec,
     QuantumPauliSpec,
+    QuantumSqdSpec,
     QuantumTensornetSpec,
     QuantumUccsdSpec,
     QuantumVariationalSpec,
@@ -48,9 +50,10 @@ class QuantumSpec(ForbidExtraBase):
     variational: QuantumVariationalSpec = Field(default_factory=QuantumVariationalSpec)
     uccsd: QuantumUccsdSpec = Field(default_factory=QuantumUccsdSpec)
     vqe: QuantumVqeSpec = Field(default_factory=QuantumVqeSpec)
+    gqe: QuantumGqeSpec = Field(default_factory=QuantumGqeSpec)
+    sqd: QuantumSqdSpec = Field(default_factory=QuantumSqdSpec)
     adapt: QuantumAdaptSpec = Field(default_factory=QuantumAdaptSpec)
     iqeb: QuantumIqebSpec = Field(default_factory=QuantumIqebSpec)
-    iqcc: QuantumIqccSpec = Field(default_factory=QuantumIqccSpec)
     pauli: QuantumPauliSpec = Field(default_factory=QuantumPauliSpec)
     excited: QuantumExcitedSpec = Field(default_factory=QuantumExcitedSpec)
     demos: QuantumDemosSpec = Field(default_factory=QuantumDemosSpec)
@@ -90,6 +93,11 @@ class QuantumSpec(ForbidExtraBase):
     @model_validator(mode="after")
     def _operator_pool_ids_registered(self) -> QuantumSpec:
         validate_operator_pool_ids(self)
+        return self
+
+    @model_validator(mode="after")
+    def _sqd_customer_allowlist(self) -> QuantumSpec:
+        validate_sqd_customer_allowlist(self)
         return self
 
     @field_validator("excited", mode="before")

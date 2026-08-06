@@ -50,7 +50,7 @@ L5  Kernels        statevector.py        HEA statevector、dense Pauli 期望
 
 激发态资源估算 canonical 路径：`orchestration/excited_stages_resource.py` → pipeline `out["excited_resource_summary"]`；**不在** `ExcitedStageOutcome` 重复 resource 字段。
 
-变分 `algorithm_report`：HEA VQE / ADAPT / IQEB 经 `AlgorithmBase.generate_report()`；UCCSD 经 `uccsd_algorithm_report_v1`；iQCC 经 `iqcc_algorithm_report_v1`；pipeline 写入 `out["algorithm_report"]`，`repro.run_summary` 镜像 `algorithm_report_*` 摘要键。
+变分 `algorithm_report`：HEA VQE / ADAPT / IQEB 经 `AlgorithmBase.generate_report()`；UCCSD 经 `uccsd_algorithm_report_v1`；pipeline 写入 `out["algorithm_report"]`，`repro.run_summary` 镜像 `algorithm_report_*` 摘要键。
 | `variational_branch.py` | UCCSD / HEA 分支共享 factory | `build_uccsd_variational_model`, `run_uccsd_vqe_from_config` |
 | `algorithm_registry.py` | 物化/导出（sync 自 variational） | `build_registered_algorithm` |
 | `ansatz_registry.py` | UX/文档 ansatz 命名 | `ansatz_registry_export` |
@@ -65,7 +65,7 @@ L5  Kernels        statevector.py        HEA statevector、dense Pauli 期望
 | `variational_plugins.registry` | `quantum.algorithm` | 管线执行 runner |
 | `algorithm_registry` | 同上（导出） | Methods / 物化 legacy 对象 |
 | `ansatz_registry` | `quantum.variational.ansatz` | 文档与 workflow UX |
-| `operator_pool_registry` | `quantum.adapt.pool_id`, `quantum.iqeb.pool_id`, `quantum.iqcc.pool_id` | ADAPT/IQEB/iQCC 算符池 |
+| `operator_pool_registry` | `quantum.adapt.pool_id`, `quantum.iqeb.pool_id` | ADAPT/IQEB 算符池 |
 
 ---
 
@@ -142,7 +142,7 @@ Deprecation 发 `DeprecationWarning`；保留 re-export 至少一个迁移窗口
 | 算法 | 实现特点 | 局限 |
 |------|----------|------|
 | **ADAPT / IQEB** | dense statevector（`qubit_operator_to_sparse` + `expm` / HEA state） | 内存随 qubit 数指数增长；见 `algorithms/adapt.py` pool mat 预计算 |
-| **iQCC / iQCC+PT** | Pauli DIS + 相似变换穿衣 + 可选 EN2（`iqcc.py` / `iqcc_dressing.py`） | 开放实现，非闭源 OTI 比特级一致；项数随穿衣增长，依赖截断 |
+| **SQD / QSCI 采样族** | dense CB 采样 + 经典子空间对角化（`algorithms/sqd/`）；**强制** `backend.provider=statevector`；**硬上限** `n_qubits≤12` | 客户 id：`cbs`/`qsci`/`sqd`/`skqd`/`sqdrift`。实验 id（`allow_experimental: true`）：`adapt_qsci` 与 `*_lite`。非硬件采样；`backend_executor_used=false` 写入 report/run_summary。非 qiskit-addon-sqd / 生产 AFQMC |
 | **QSE / SCEOM** | HEA Pauli-X bump 或 UCCSD fermionic-singles 基；`exact` / `gaussian_h` / `pauli_transitions` / **`pauli_transitions_qiskit`** | `pauli_transitions` 经 **`QSEMatricesComputable`** + grouped statevector shot sim；Qiskit 过渡路径见 `backends/qiskit_qse_transition.py`；`gaussian_h` 标 `legacy_fast_path` |
 | **VQD** | 支持 UCCSD `prepare_state`；`optimizer_mode: three_computable` 分通道优化 | COBYLA 内层优化；大体系需资源估算 |
 | **Computable 运行时** | InQuanto Computable × Protocol | `protocols/computables/`（Expectation / QSE / SCEOM / Overlap）+ `ProtocolList.run_all`；classical shadows stub 接线 `ExpectationValueComputable`（`mitigation/qermit_runtime.py`） |

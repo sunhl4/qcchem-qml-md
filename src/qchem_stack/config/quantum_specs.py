@@ -28,8 +28,7 @@ class QuantumVariationalSpec(ForbidExtraBase):
     ] = Field(
         default="hea",
         description=(
-            "Variational ansatz: HEA, cluster ansätze (uccsd/qcc/…), legacy iqcc alias "
-            "(prefer algorithm:iqcc), qite research plugin, or VSQS schedule."
+            "Variational ansatz: HEA, cluster ansätze, qcc, iqcc/qite research plugins, or VSQS schedule."
         ),
     )
     uccsd_trotter_steps: int | None = Field(
@@ -72,6 +71,91 @@ class QuantumVqeSpec(ForbidExtraBase):
     )
 
 
+class QuantumGqeSpec(ForbidExtraBase):
+    """Generative Quantum Eigensolver knobs (peer algorithm family to VQE)."""
+
+    n_gates: int = Field(default=8, ge=1, le=128, description="Generated circuit token length.")
+    max_iters: int = Field(default=25, ge=1, description="GQE outer training iterations.")
+    batch_size: int = Field(default=8, ge=1, le=256, description="Sequences sampled per iteration.")
+    buffer_size: int = Field(default=64, ge=1, description="Replay buffer capacity.")
+    learning_rate: float = Field(default=5.0e-3, gt=0.0, description="Adam step size for policy.")
+    beta: float = Field(default=5.0, gt=0.0, description="Initial inverse temperature.")
+    beta_min: float = Field(default=0.5, gt=0.0, description="β schedule floor.")
+    beta_max: float = Field(default=20.0, gt=0.0, description="β schedule ceiling.")
+    loss: Literal["lm", "grpo", "dpo", "pdpo", "wmse"] = Field(
+        default="grpo",
+        description="Policy loss: Logit Matching / GRPO / DPO / Persistent-DPO / WMSE.",
+    )
+    grpo_clip: float = Field(default=0.2, gt=0.0, le=1.0, description="GRPO ratio clip ε.")
+    pdpo_alpha: float = Field(default=0.1, ge=0.0, le=1.0, description="Persistent-DPO α.")
+    dpo_beta: float = Field(default=0.1, gt=0.0, description="DPO / P-DPO temperature.")
+    pool_mode: Literal["hamiltonian_pauli", "uccsd", "spin_heisenberg", "simple"] = Field(
+        default="hamiltonian_pauli",
+        description="Operator-pool construction mode.",
+    )
+    embed_dim: int = Field(default=16, ge=2, le=256, description="Policy embedding dimension.")
+    qcc_budget: float | None = Field(
+        default=None,
+        description="Optional circuit-cutting cost budget (A2); None disables masking.",
+    )
+    qsci_subspace_size: int = Field(
+        default=8, ge=1, le=256, description="QSCI determinant subspace size (A4/A6)."
+    )
+    condition_dim: int = Field(
+        default=0, ge=0, le=256, description="Conditional-GQE condition vector size (A1)."
+    )
+    energy_offset: float = Field(
+        default=0.0, description="Logit-matching energy offset (Nakaji N₂ stability)."
+    )
+    backbone: Literal["linear", "kan"] = Field(
+        default="linear",
+        description="Classical generative backbone (KAN used by GQKAE).",
+    )
+
+
+class QuantumSqdSpec(ForbidExtraBase):
+    """Sample-based quantum chemistry knobs (SQD / QSCI family; peer to VQE).
+
+    Dense statevector prototypes only (≤12 qubits). Customer ids: ``cbs`` /
+    ``qsci`` / ``sqd`` / ``skqd`` / ``sqdrift``. Experimental lite ids require
+    ``allow_experimental: true``.
+    """
+
+    n_shots: int = Field(default=512, ge=1, description="Computational-basis shots per sample round.")
+    subspace_size: int = Field(default=16, ge=1, le=4096, description="Selected CI determinant count.")
+    max_iters: int = Field(default=5, ge=1, description="Outer iterative SQD / HI-VQE / ADAPT rounds.")
+    hea_depth: int = Field(default=1, ge=1, le=16, description="HEA depth for sampling preparation.")
+    n_electrons: int | None = Field(
+        default=None,
+        description="Particle-number sector; None uses Hamiltonian fermion_space when present.",
+    )
+    krylov_dim: int = Field(default=4, ge=1, le=64, description="SKQD Krylov basis size.")
+    krylov_dt: float = Field(default=0.3, gt=0.0, description="SKQD time step for Krylov powers.")
+    qdrift_steps: int = Field(default=8, ge=1, description="SqDRIFT qDRIFT steps per replica.")
+    qdrift_replicas: int = Field(default=4, ge=1, description="SqDRIFT independent channel replicas.")
+    recovery_iters: int = Field(default=3, ge=0, description="S-CORE-lite occupancy recovery passes.")
+    n_fragments: int = Field(default=2, ge=1, le=32, description="EWF / QBE fragment count (lite).")
+    afqmc_walkers: int = Field(
+        default=32,
+        ge=1,
+        description="Walker count for sqd_afqmc_lite subspace refinement (not ph-AFQMC).",
+    )
+    afqmc_steps: int = Field(
+        default=20,
+        ge=1,
+        description="Iteration count for sqd_afqmc_lite subspace refinement (not ph-AFQMC).",
+    )
+    energy_tol: float = Field(default=1.0e-5, gt=0.0, description="Iterative energy convergence tol.")
+    carryover: int = Field(default=4, ge=0, description="Configs carried across SQD iterations.")
+    allow_experimental: bool = Field(
+        default=False,
+        description=(
+            "Opt in to experimental SQD ids (adapt_qsci, *_lite embedding/AFQMC/QSE demos). "
+            "Customer-supported ids do not require this flag."
+        ),
+    )
+
+
 class QuantumAdaptSpec(ForbidExtraBase):
     max_iter: int = Field(default=5, ge=1, description="ADAPT outer iteration cap.")
     pool_id: OperatorPoolId = Field(
@@ -95,39 +179,6 @@ class QuantumIqebSpec(ForbidExtraBase):
         default=1.0e-8, gt=0.0, description="IQEB energy convergence tol."
     )
     max_rounds: int = Field(default=2, ge=1, le=64, description="Outer IQEB round cap.")
-
-
-class QuantumIqccSpec(ForbidExtraBase):
-    """Iterative QCC (iQCC) / optional EN2 (iQCC+PT) knobs."""
-
-    max_steps: int = Field(default=4, ge=1, le=128, description="Outer dressing iteration cap.")
-    top_k: int = Field(default=2, ge=1, le=64, description="Top-|g| entanglers per step.")
-    coeff_atol: float = Field(
-        default=1.0e-8, gt=0.0, description="Drop dressed Pauli terms below this |coeff|."
-    )
-    max_terms: int | None = Field(
-        default=None, ge=1, description="Optional hard cap on dressed Hamiltonian terms."
-    )
-    enable_pt: bool = Field(
-        default=False, description="Add EN2 correction over unused DIS (iQCC+PT)."
-    )
-    denom_cutoff: float = Field(
-        default=1.0e-6, gt=0.0, description="Skip EN2 terms with |D_k| below this cutoff."
-    )
-    pool_mode: Literal["genin_dis", "iqeb_qubit_excitation"] = Field(
-        default="genin_dis",
-        description="Candidate generators: Genin-style DIS or IQEB qubit-excitation pool.",
-    )
-    pool_id: OperatorPoolId = Field(
-        default=OperatorPoolId.IQEB_QUBIT_EXCITATION,
-        description="Operator pool id when pool_mode=iqeb_qubit_excitation.",
-    )
-    max_weight: int = Field(
-        default=4, ge=2, le=8, description="Max Pauli weight for Genin-style generators."
-    )
-    energy_tolerance: float = Field(
-        default=1.0e-8, gt=0.0, description="Stop when |E_n - E_{n-1}| falls below this."
-    )
 
 
 class QuantumPauliSpec(ForbidExtraBase):
