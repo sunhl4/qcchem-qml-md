@@ -147,4 +147,4 @@ embedding:
 - [pre_quantum_yaml_matrix.md](pre_quantum_yaml_matrix.md) — 允许的组合矩阵
 - [public_parity_matrix.md](public_parity_matrix.md) §3 — DMET / projection 能力行
 - [技术文档_DMET与parity_snapshot开放契约.md](技术文档_DMET与parity_snapshot开放契约.md) — DMET workflow 与 repro 键
-- [学习路线图_框架理论到源码阅读顺序.md](学习路线图_框架理论到源码阅读顺序.md) §③ — pre-quantum 分支选路
+- [QUICKSTART_CONTRIBUTORS.md](QUICKSTART_CONTRIBUTORS.md) — pre-quantum 分支选路入门

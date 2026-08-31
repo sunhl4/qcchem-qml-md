@@ -63,11 +63,10 @@ print(out["pre_quantum_input"]["hamiltonian_fingerprint"])
 </details>
 
 <details>
-<summary><strong>Deep reading (optional)</strong> — competitive positioning, long-form contracts</summary>
-
-Historical research docs (not runtime dependencies): [docs/research/README.md](docs/research/README.md).
+<summary><strong>Deep reading (optional)</strong> — long-form contracts & delivery handbooks</summary>
 
 - [Parity matrix](docs/public_parity_matrix.md) · [HTTP contract](docs/技术文档_HTTP_API与SQLite作业队列及可观测性契约.md) · [CircuitIR / TKET](docs/技术文档_CircuitIR与TKET桥接及作业契约.md)
+- Delivery handbooks: [docs/research/README.md](docs/research/README.md)
 
 </details>
 

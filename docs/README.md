@@ -2,13 +2,14 @@
 
 This directory is the **engineering and contract** documentation for `qchem-stack`. User-facing tutorials and onboarding live in [`docusaurus-site/`](../docusaurus-site/) (build with `cd docusaurus-site && npm install && npm start`).
 
-> **Documentation zones (read the right tier)**
+> **Documentation zones**
 >
-> | Zone | Start here | Not runtime API |
-> |------|------------|-----------------|
-> | **Product (3 must-read)** | [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md) · [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md) · [`public_parity_matrix.md`](public_parity_matrix.md) | — |
-> | **Reference (on demand)** | [`reference/config_field_index.md`](reference/config_field_index.md) · config `说明_*.md` | — |
-> | **Non-runtime** | [`research/README.md`](research/README.md) · [`execution/archive/`](execution/archive/) · [`internal/`](internal/) | Competitive research, day calendars, audits |
+> | Zone | Start here |
+> |------|------------|
+> | **Product (3 must-read)** | [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md) · [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md) · [`public_parity_matrix.md`](public_parity_matrix.md) |
+> | **Reference (on demand)** | [`reference/config_field_index.md`](reference/config_field_index.md) · config `说明_*.md` · `技术文档_*.md` |
+> | **Web manuals** | [`docusaurus-site/docs/`](../docusaurus-site/) |
+> | **Delivery handbooks** | [`research/README.md`](research/README.md) |
 
 ## Reader paths
 
@@ -16,7 +17,7 @@ This directory is the **engineering and contract** documentation for `qchem-stac
 |----------|------------|
 | **L1 — Users** | [`docusaurus-site/`](../docusaurus-site/), [`README.md`](../README.md), [`configs/README.md`](../configs/README.md) |
 | **L2 — Integrators** | [`ONBOARDING_BY_ROLE.md`](ONBOARDING_BY_ROLE.md), [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md), [`ENGINEERING_ARCHITECTURE.md`](ENGINEERING_ARCHITECTURE.md), HTTP contract docs under `技术文档_HTTP_API*.md` |
-| **L3 — Maintainers** | [`public_parity_matrix.md`](public_parity_matrix.md), active plans under [`execution/`](execution/) (archived closeouts: [`execution/archive/2026Q2/`](execution/archive/2026Q2/)) |
+| **L3 — Maintainers** | [`public_parity_matrix.md`](public_parity_matrix.md), [`engineering/`](engineering/), [`execution/`](execution/) |
 
 Tier policy: [`engineering/doc_tier_policy.md`](engineering/doc_tier_policy.md).
 
@@ -69,21 +70,12 @@ When changing parity export keys or pre-quantum allowed combos, update the repo 
 - [`QUICKSTART_CONTRIBUTORS.md`](QUICKSTART_CONTRIBUTORS.md)
 - [`QUICKSTART_HTTP_API_en.md`](QUICKSTART_HTTP_API_en.md)
 - [`说明_config入门_通俗导读.md`](说明_config入门_通俗导读.md)
-- [`学习路线图_框架理论到源码阅读顺序.md`](学习路线图_框架理论到源码阅读顺序.md)
 
-### Research / 对标 (historical — not runtime dependencies)
+### Delivery handbooks
 
 - Index: [`research/README.md`](research/README.md)
-- [`竞争定位与路线图_对标Quantinuum产品与技术路线.md`](竞争定位与路线图_对标Quantinuum产品与技术路线.md)
-- [`工程记忆_Quantinuum对标与数据流技术文档.md`](工程记忆_Quantinuum对标与数据流技术文档.md)
-- [`public_parity_matrix.md`](public_parity_matrix.md) (also used as engineering contract)
-- [`quantum_InQuanto_Tangelo_对照矩阵.md`](quantum_InQuanto_Tangelo_对照矩阵.md)
 
-### Execution archive
+### Execution engineering
 
-- Active plans: [`execution/comparative_execution_rd_plan_strict_2026Q3Q4.md`](execution/comparative_execution_rd_plan_strict_2026Q3Q4.md), [`execution/comparative_execution_backlog.yaml`](execution/comparative_execution_backlog.yaml)
-- Day-by-day evidence logs: [`execution/archive/`](execution/archive/) **and** duplicate working copies at [`execution/*.md`](execution/) (same content; archive is canonical for long-term storage)
-
-### Internal (maintainer notes)
-
-- [`internal/`](internal/) — config reviews, style roadmap, import layers, audit reports
+- Backlog: [`execution/comparative_execution_backlog.yaml`](execution/comparative_execution_backlog.yaml)
+- Design / checklist notes under [`execution/`](execution/)

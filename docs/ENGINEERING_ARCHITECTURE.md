@@ -1,6 +1,6 @@
 # qchem-stack — software engineering architecture
 
-This document anchors **qchem‑stack internals**: layering, HTTP contracts where they touch shipped code, and strict `repro` export posture. Competitive literature and backlog narratives live separately under **`docs/`** (optional reading). Related Chinese taxonomy: [竞争定位与路线图_对标Quantinuum产品与技术路线.md](竞争定位与路线图_对标Quantinuum产品与技术路线.md)、[工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md)、[public_parity_matrix.md](public_parity_matrix.md); see also **§14** in [工程记忆_Quantinuum对标与数据流技术文档.md](工程记忆_Quantinuum对标与数据流技术文档.md) ([Quantinuum public howto](https://www.quantinuum.com/)).
+This document anchors **qchem‑stack internals**: layering, HTTP contracts where they touch shipped code, and strict `repro` export posture. Capability gaps and implementation ledger: [public_parity_matrix.md](public_parity_matrix.md). User-facing web manuals: [`docusaurus-site/docs/`](../docusaurus-site/docs/).
 
 ## 1. Layer model
 
@@ -38,7 +38,7 @@ The project is pinned to this invariant:
 - **Dual classical ingress is supported**: live solver execution and offline precomputed bundles must converge to the same `PreQuantumInput` handoff before quantum stages.
 - **Pre-quantum handoff metadata is provenance-driven**: `PreQuantumInput.as_summary_dict()` exposes stable top-level fields (`source`, `backend_tag`, `integral_source`, `fermion_to_qubit_map`, `hamiltonian_fingerprint`) while preserving full `hamiltonian_meta` for debug. `integral_source` / `integral_openfermion_bridge` must come from explicit inputs or `CanonicalActiveSpaceIntegralPack.provenance` before falling back to backend labels.
 
-**Production milestone (pinned):** end-to-end **numerical** classical chemistry in CI and representative YAMLs targets **`scf.driver=pyscf`** until another backend implements `compute_mean_field` and (when building restricted active-space qubit Hamiltonians) satisfies `SolverCapabilities.supports_restricted_active_space_qubit_hamiltonian` plus interchange tests for `CanonicalActiveSpaceIntegralPack.from_classical_reference`. Additional codes register via `qchem_stack.chem.solvers.registry`. Product narrative and extension checklist (Chinese): [竞争定位与路线图 — §5.1](竞争定位与路线图_对标Quantinuum产品与技术路线.md).
+**Production milestone (pinned):** end-to-end **numerical** classical chemistry in CI and representative YAMLs targets **`scf.driver=pyscf`** until another backend implements `compute_mean_field` and (when building restricted active-space qubit Hamiltonians) satisfies `SolverCapabilities.supports_restricted_active_space_qubit_hamiltonian` plus interchange tests for `CanonicalActiveSpaceIntegralPack.from_classical_reference`. Additional codes register via `qchem_stack.chem.solvers.registry`. Extension checklist: [public_parity_matrix.md](public_parity_matrix.md).
 
 ## 1.2 PySCF boundary refactor (maintainer note)
 

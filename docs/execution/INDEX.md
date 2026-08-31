@@ -2,11 +2,7 @@
 
 <!-- generated: scripts/execution_doc_index.py -->
 
-Canonical backlog: `comparative_execution_backlog.yaml`. Historical copies under `archive/` are read-only.
-
-**Day templates** (planning stubs) live under [`archive/templates/`](archive/templates/) — not active execution evidence.
-
-**Active closeout / plans:** `day90_final_closeout_2026Q2.md`, `day91_next_phase_plan_2026Q3.md`, `comparative_execution_rd_plan_strict_2026Q3Q4.md`.
+Canonical backlog: `comparative_execution_backlog.yaml`.
 
 | Phase | Title | Status |
 |-------|-------|--------|

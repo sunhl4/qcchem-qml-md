@@ -2,7 +2,7 @@
 
 **New contributors:** start with the English quick start — [`docs/QUICKSTART_CONTRIBUTORS.md`](docs/QUICKSTART_CONTRIBUTORS.md) (YAML → pipeline → `repro` keys).
 
-**对标与工程母稿（三份 + 契约矩阵）**：[竞争定位](docs/竞争定位与路线图_对标Quantinuum产品与技术路线.md) · [工程记忆](docs/工程记忆_Quantinuum对标与数据流技术文档.md) · [差距与实施计划](docs/public_parity_matrix.md)（含 **附录 A–F**：P2 / Y1 / L1 / B→J / P1 审计 / 不排期项）· [parity 矩阵](docs/public_parity_matrix.md)。**详细技术契约**：`docs/技术文档_*.md`、`mitigation_PMSV_ZNE_Qermit_mapping.md`、`launch_retrieve_nexus_analog.md`。
+**工程契约母稿**：[差距与实施计划 / parity 矩阵](docs/public_parity_matrix.md)（含 **附录 A–F**）· [工程架构](docs/ENGINEERING_ARCHITECTURE.md)。**详细技术契约**：`docs/技术文档_*.md`、`mitigation_PMSV_ZNE_Qermit_mapping.md`、`launch_retrieve_nexus_analog.md`。Web 手册：[`docusaurus-site/docs/`](docusaurus-site/docs/)。
 
 ## Local Python environment (default)
 
@@ -135,12 +135,12 @@ All new or refactored YAML fields in `src/qchem_stack/config/` must follow [`doc
 
 ## Code style optimization (P0–P4)
 
-Milestone tracker: [`docs/internal/STYLE_OPTIMIZATION_ROADMAP.md`](docs/internal/STYLE_OPTIMIZATION_ROADMAP.md). Before large refactors, capture baseline:
+Before large refactors, capture baseline:
 
 ```bash
 ./scripts/venv-run python scripts/code_health_baseline.py
-# optional JSON artifact:
-./scripts/venv-run python scripts/code_health_baseline.py --write docs/internal/code_health_baseline.json
+# optional JSON artifact (CI snapshot lives under docs/engineering/):
+./scripts/venv-run python scripts/code_health_baseline.py --write docs/engineering/code_health_baseline.snapshot.json
 ```
 
 Style PRs should attach baseline diff (files >400 lines, `dict[str, Any]` hotspots). Optional local checks after P3/P4 land:

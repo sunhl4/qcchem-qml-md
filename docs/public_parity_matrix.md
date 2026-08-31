@@ -89,7 +89,7 @@
 ## 5. PandM 文献对照
 
 本仓库 **单仓克隆** 常不含 `PandM/` 长篇文献树；若你持有完整 monorepo，可在 **`PandM/materials/learning/quantum-chem/literature/`** 下检索「Quantinuum 竞品研究」「复现线」「数据流与判据」「激发态剖析」等文件名。  
-**竞争定位与路线图**母稿：[`竞争定位与路线图_对标Quantinuum产品与技术路线.md`](竞争定位与路线图_对标Quantinuum产品与技术路线.md)。用户可读摘要：[docusaurus-site/docs/product/positioning.md](../docusaurus-site/docs/product/positioning.md)（站点路由 `/product/positioning`）。
+用户可读产品定位摘要：[docusaurus-site/docs/product/positioning.md](../docusaurus-site/docs/product/positioning.md)（站点路由 `/product/positioning`）。
 
 ## 6. 1.0 L1 sign-off (maintainer ledger)
 
